@@ -7,7 +7,6 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\CrossModuleMatchingService;
-use Nexus\Services\MatchingService;
 
 /**
  * MatchingApiController - Cross-module matching API
@@ -35,6 +34,8 @@ class MatchingApiController extends BaseApiController
         $options = [
             'limit' => min(100, max(1, (int)($_GET['limit'] ?? 20))),
             'min_score' => max(0, min(100, (int)($_GET['min_score'] ?? 30))),
+            'debug' => ($_GET['debug'] ?? '') === 'true'
+                       && in_array($this->getAuthenticatedUserRole() ?? '', ['admin', 'tenant_admin', 'super_admin', 'god']),
         ];
 
         if (!empty($_GET['modules'])) {

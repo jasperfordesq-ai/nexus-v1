@@ -37,6 +37,7 @@ class CrossModuleMatchingService
         $limit = min($options['limit'] ?? 20, 100);
         $minScore = $options['min_score'] ?? 30;
         $modules = $options['modules'] ?? ['listings', 'jobs', 'volunteering', 'groups'];
+        $debugMode = !empty($options['debug']);
 
         $allMatches = [];
 
@@ -48,7 +49,7 @@ class CrossModuleMatchingService
 
         // Match across each enabled module
         if (in_array('listings', $modules)) {
-            $listingMatches = self::matchListings($userId, $userProfile, $tenantId, $limit);
+            $listingMatches = self::matchListings($userId, $userProfile, $tenantId, $limit, $debugMode);
             $allMatches = array_merge($allMatches, $listingMatches);
         }
 
@@ -125,7 +126,7 @@ class CrossModuleMatchingService
     /**
      * Match against listings (skills offered vs needed)
      */
-    private static function matchListings(int $userId, array $profile, int $tenantId, int $limit): array
+    private static function matchListings(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false): array
     {
         $matches = [];
         $userSkills = $profile['skills_array'];
@@ -154,7 +155,6 @@ class CrossModuleMatchingService
 
             $listings = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            $debugMode = ($_GET['debug'] ?? null) === 'true';
             foreach ($listings as $listing) {
                 $score = self::calculateListingScore($profile, $listing);
                 if ($score > 0) {
@@ -207,12 +207,14 @@ class CrossModuleMatchingService
         try {
             $limitInt = (int)$limit;
             $stmt = Database::query(
-                "SELECT j.id, j.title, j.description, j.location, j.latitude, j.longitude,
+                "SELECT j.id, j.title, j.description, j.location,
+                        COALESCE(j.latitude, NULL) AS latitude,
+                        COALESCE(j.longitude, NULL) AS longitude,
                         j.skills_required, j.organization_id, o.name as org_name
                  FROM job_vacancies j
                  LEFT JOIN organizations o ON j.organization_id = o.id
-                 WHERE j.tenant_id = ? AND j.status = 'active'
-                   AND (j.closing_date IS NULL OR j.closing_date >= CURDATE())
+                 WHERE j.tenant_id = ? AND j.status = 'open'
+                   AND (j.deadline IS NULL OR j.deadline >= CURDATE())
                  ORDER BY j.created_at DESC
                  LIMIT {$limitInt}",
                 [$tenantId]
@@ -298,14 +300,16 @@ class CrossModuleMatchingService
         try {
             $limitInt = (int)$limit;
             $stmt = Database::query(
-                "SELECT v.id, v.title, v.description, v.location, v.latitude, v.longitude,
+                "SELECT v.id, v.title, v.description, v.location,
+                        COALESCE(v.latitude, NULL) AS latitude,
+                        COALESCE(v.longitude, NULL) AS longitude,
                         v.skills_needed, v.start_date, v.end_date,
                         o.name as org_name
-                 FROM volunteer_opportunities v
-                 LEFT JOIN organizations o ON v.organization_id = o.id
-                 WHERE v.tenant_id = ? AND v.status = 'active'
+                 FROM vol_opportunities v
+                 LEFT JOIN vol_organizations o ON v.organization_id = o.id
+                 WHERE v.tenant_id = ? AND v.status = 'open' AND v.is_active = 1
                    AND (v.end_date IS NULL OR v.end_date >= CURDATE())
-                 ORDER BY v.created_at DESC
+                 ORDER BY v.start_date ASC
                  LIMIT {$limitInt}",
                 [$tenantId]
             );
