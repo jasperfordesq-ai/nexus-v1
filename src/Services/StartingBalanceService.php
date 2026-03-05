@@ -30,7 +30,8 @@ class StartingBalanceService
     public static function getStartingBalance(): float
     {
         try {
-            $value = TenantSettingsService::get('wallet.starting_balance');
+            $tenantId = TenantContext::getId();
+            $value = TenantSettingsService::get($tenantId, 'wallet.starting_balance');
             return max(0, (float) ($value ?? 0));
         } catch (\Exception $e) {
             return 0;
@@ -41,12 +42,11 @@ class StartingBalanceService
      * Set the starting balance for the current tenant (admin only)
      *
      * @param float $amount Starting balance amount
-     * @return bool Success
      */
-    public static function setStartingBalance(float $amount): bool
+    public static function setStartingBalance(float $amount): void
     {
         $amount = max(0, $amount);
-        return TenantSettingsService::set('wallet.starting_balance', (string) $amount);
+        TenantSettingsService::set(TenantContext::getId(), 'wallet.starting_balance', (string) $amount, 'float');
     }
 
     /**

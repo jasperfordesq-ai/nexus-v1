@@ -1483,15 +1483,21 @@ class CronController
      */
     private function geocodeBatchInternal(): void
     {
-        try {
-            $userResults = GeocodingService::batchGeocodeUsers(50);
-            echo "   Users: {$userResults['processed']} processed, {$userResults['success']} success.\n";
+        $this->forEachTenant(function ($tenantId, $slug) {
+            try {
+                $userResults = GeocodingService::batchGeocodeUsers(50);
+                if ($userResults['processed'] > 0) {
+                    echo "   [{$slug}] Users: {$userResults['processed']} processed, {$userResults['success']} success.\n";
+                }
 
-            $listingResults = GeocodingService::batchGeocodeListings(50);
-            echo "   Listings: {$listingResults['processed']} processed, {$listingResults['success']} success.\n";
-        } catch (\Throwable $e) {
-            echo "   Error: " . $e->getMessage() . "\n";
-        }
+                $listingResults = GeocodingService::batchGeocodeListings(50);
+                if ($listingResults['processed'] > 0) {
+                    echo "   [{$slug}] Listings: {$listingResults['processed']} processed, {$listingResults['success']} success.\n";
+                }
+            } catch (\Throwable $e) {
+                echo "   [{$slug}] Geocoding error: " . $e->getMessage() . "\n";
+            }
+        });
     }
 
     /**

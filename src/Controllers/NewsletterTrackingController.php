@@ -158,10 +158,9 @@ class NewsletterTrackingController
 
         $host = strtolower($parsedUrl['host']);
 
-        // Allow internal domains
+        // Allow internal domains + dynamic tenant custom domains
         $internalDomains = [
             'project-nexus.ie',
-            'hour-timebank.ie',
             'staging.timebank.local',
             'localhost',
         ];
@@ -170,6 +169,11 @@ class NewsletterTrackingController
             if ($host === $domain || str_ends_with($host, '.' . $domain)) {
                 return true;
             }
+        }
+
+        // Check tenant custom domains dynamically
+        if (\Nexus\Helpers\UrlHelper::isAllowedHost($host)) {
+            return true;
         }
 
         // Block javascript: and data: URLs

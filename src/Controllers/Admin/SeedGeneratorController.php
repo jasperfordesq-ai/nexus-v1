@@ -21,7 +21,7 @@ class SeedGeneratorController
         // Security: Admin only
         $this->requireAdmin();
 
-        $this->tenantId = $_SESSION['tenant_id'] ?? 1;
+        $this->tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
         $this->userId = $_SESSION['user_id'] ?? null;
 
         // SECURITY: Get admin credentials from environment or generate secure defaults

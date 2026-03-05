@@ -2940,7 +2940,7 @@ class EnterpriseController
 
     private function getTenantId(): int
     {
-        return (int) ($_SESSION['tenant_id'] ?? 1);
+        return (int) ($_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId());
     }
 
     private function formatFileSize(int $bytes): string

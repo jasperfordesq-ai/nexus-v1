@@ -498,9 +498,10 @@ class WalletFeaturesApiController extends BaseApiController
         }
 
         $amount = max(0, (float) $data['amount']);
-        $success = StartingBalanceService::setStartingBalance($amount);
 
-        if (!$success) {
+        try {
+            StartingBalanceService::setStartingBalance($amount);
+        } catch (\Exception $e) {
             $this->error('Failed to update starting balance', 500);
             return;
         }

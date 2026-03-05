@@ -43,7 +43,7 @@ class NexusScoreController
         }
 
         $userId = $_SESSION['user_id'];
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
+        $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
 
         // Get score (from cache or calculate fresh) - REAL-TIME DATA FOR YOUR ACCOUNT
         $scoreData = $this->cacheService->getScore($userId, $tenantId);
@@ -82,7 +82,7 @@ class NexusScoreController
      */
     public function publicProfile($profileUserId)
     {
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
+        $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
 
         // Calculate score (limited data for public view)
         $scoreData = $this->scoreService->calculateNexusScore($profileUserId, $tenantId);
@@ -107,7 +107,7 @@ class NexusScoreController
      */
     public function leaderboard()
     {
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
+        $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
         $timeframe = $_GET['timeframe'] ?? 'all-time';
         $category = $_GET['category'] ?? 'overall';
 
@@ -140,7 +140,7 @@ class NexusScoreController
         }
 
         $userId = $_SESSION['user_id'];
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
+        $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
 
         // Get date range from query params
         $startDate = $_GET['start'] ?? date('Y-m-d', strtotime('-30 days'));
@@ -179,7 +179,7 @@ class NexusScoreController
             exit;
         }
 
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
+        $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
 
         // Get aggregated analytics
         $analyticsData = $this->getAnalyticsData($tenantId);
@@ -212,7 +212,7 @@ class NexusScoreController
         }
 
         $userId = $_GET['user_id'] ?? $_SESSION['user_id'];
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
+        $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
 
         // Only allow users to view their own score or admins to view any
         if ($userId != $_SESSION['user_id'] && !($_SESSION['is_admin'] ?? false)) {
@@ -238,7 +238,7 @@ class NexusScoreController
             exit;
         }
 
-        $tenantId = $_SESSION['tenant_id'] ?? 1;
+        $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
 
         // This would ideally be a background job
         // For now, just acknowledge the request

@@ -16,7 +16,7 @@ class SeedGeneratorVerificationController
     {
         // Security: Admin only
         $this->requireAdmin();
-        $this->tenantId = $_SESSION['tenant_id'] ?? 1;
+        $this->tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
     }
 
     private function requireAdmin()

@@ -51,7 +51,7 @@ abstract class BaseEnterpriseController
 
     protected function getTenantId(): int
     {
-        return (int) ($_SESSION['tenant_id'] ?? 1);
+        return (int) ($_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId());
     }
 
     protected function wantsJson(): bool

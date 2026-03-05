@@ -680,7 +680,7 @@ class AdminConfigApiController extends BaseApiController
             Database::query("
                 CREATE TABLE IF NOT EXISTS `tenant_settings` (
                     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                    `tenant_id` INT UNSIGNED NOT NULL DEFAULT 1,
+                    `tenant_id` INT UNSIGNED NOT NULL,
                     `setting_key` VARCHAR(255) NOT NULL,
                     `setting_value` TEXT NULL,
                     `setting_type` ENUM('string','boolean','integer','float','json','array') DEFAULT 'string',

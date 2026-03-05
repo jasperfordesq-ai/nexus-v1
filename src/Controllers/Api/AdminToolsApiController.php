@@ -115,7 +115,7 @@ class AdminToolsApiController extends BaseApiController
             Database::query("
                 CREATE TABLE IF NOT EXISTS `seo_redirects` (
                     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                    `tenant_id` INT UNSIGNED NOT NULL DEFAULT 1,
+                    `tenant_id` INT UNSIGNED NOT NULL,
                     `from_url` VARCHAR(500) NOT NULL,
                     `to_url` VARCHAR(500) NOT NULL,
                     `status_code` SMALLINT NOT NULL DEFAULT 301,
