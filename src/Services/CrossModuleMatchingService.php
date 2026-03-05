@@ -109,10 +109,20 @@ class CrossModuleMatchingService
                 return null;
             }
 
-            // Parse skills into array
+            // Parse skills into array (legacy text column — used as fallback)
             $profile['skills_array'] = !empty($profile['skills'])
                 ? array_map('trim', array_map('strtolower', explode(',', $profile['skills'])))
                 : [];
+
+            // Load proficiency-weighted skills from user_skills table
+            // Falls back to unweighted skills_array if user_skills is empty
+            $weighted = SkillTaxonomyService::getProficiencyWeightedSkills($userId, $tenantId);
+            if (!empty($weighted)) {
+                $profile['skills_array']    = array_keys($weighted);
+                $profile['skills_weighted'] = $weighted;
+            } else {
+                $profile['skills_weighted'] = array_fill_keys($profile['skills_array'], 1.0);
+            }
 
             // Parse interests into array
             $profile['interests_array'] = !empty($profile['interests'])
@@ -543,11 +553,20 @@ class CrossModuleMatchingService
      */
     private static function calculateListingScore(array $profile, array $listing): int
     {
-        $userSkills = $profile['skills_array'];
+        $userSkills      = $profile['skills_array'];
+        $skillsWeighted  = $profile['skills_weighted'] ?? array_fill_keys($userSkills, 1.0);
         $listingKeywords = self::extractKeywords(($listing['title'] ?? '') . ' ' . ($listing['description'] ?? ''));
 
-        // Skill/keyword overlap (60% weight)
-        $skillScore = self::calculateKeywordOverlapScore($userSkills, $listingKeywords);
+        // Skill/keyword overlap (60% weight) — boosted by proficiency
+        $baseSkillScore = self::calculateKeywordOverlapScore($userSkills, $listingKeywords);
+        // Apply average proficiency weight of matching skills as a multiplier (capped at 1.5×)
+        $matchingSkills = array_intersect($userSkills, $listingKeywords);
+        $proficiencyMultiplier = 1.0;
+        if (!empty($matchingSkills)) {
+            $totalWeight = array_sum(array_intersect_key($skillsWeighted, array_flip($matchingSkills)));
+            $proficiencyMultiplier = min(1.5, $totalWeight / count($matchingSkills));
+        }
+        $skillScore = min(100, (int)round($baseSkillScore * $proficiencyMultiplier));
 
         // Proximity (30% weight)
         $proximityScore = 0;
