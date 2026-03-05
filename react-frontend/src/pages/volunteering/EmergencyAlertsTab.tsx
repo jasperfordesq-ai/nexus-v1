@@ -66,13 +66,13 @@ export function EmergencyAlertsTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: { alerts: EmergencyAlert[] } }>(
+      const response = await api.get<{ alerts?: EmergencyAlert[] }>(
         '/v2/volunteering/emergency-alerts'
       );
 
       if (response.success && response.data) {
-        const data = response.data as { alerts?: EmergencyAlert[] };
-        setAlerts(data.alerts ?? []);
+        const payload = response.data as { alerts?: EmergencyAlert[] } | EmergencyAlert[];
+        setAlerts(Array.isArray(payload) ? payload : (payload.alerts ?? []));
       } else {
         setError('Failed to load alerts');
       }

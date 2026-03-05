@@ -30,6 +30,10 @@ class AdminVolunteeringApiController extends BaseApiController
         'vol_emergency_alerts',
     ];
 
+    private const ALLOWED_COLUMNS = [
+        'vol_opportunities' => ['created_by', 'user_id', 'is_active', 'status', 'title', 'created_at', 'tenant_id'],
+    ];
+
     private function tableExists(string $table): bool
     {
         if (!in_array($table, self::ALLOWED_TABLES, true)) {
@@ -41,6 +45,42 @@ class AdminVolunteeringApiController extends BaseApiController
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    private function columnExists(string $table, string $column): bool
+    {
+        if (!isset(self::ALLOWED_COLUMNS[$table]) || !in_array($column, self::ALLOWED_COLUMNS[$table], true)) {
+            return false;
+        }
+
+        try {
+            $result = Database::query(
+                "SELECT COUNT(*) as cnt
+                 FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+                [$table, $column]
+            )->fetch();
+
+            return ((int)($result['cnt'] ?? 0)) > 0;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Resolve the author column used by vol_opportunities across schema variants.
+     */
+    private function getOpportunityAuthorColumn(): ?string
+    {
+        if ($this->columnExists('vol_opportunities', 'created_by')) {
+            return 'created_by';
+        }
+
+        if ($this->columnExists('vol_opportunities', 'user_id')) {
+            return 'user_id';
+        }
+
+        return null;
     }
 
     public function index(): void
@@ -71,7 +111,7 @@ class AdminVolunteeringApiController extends BaseApiController
         try {
             $stmt = Database::query(
                 "SELECT COUNT(*) as total,
-                        SUM(CASE WHEN status='open' AND is_active=1 THEN 1 ELSE 0 END) as active_count
+                        SUM(CASE WHEN status IN ('open', 'active') AND is_active=1 THEN 1 ELSE 0 END) as active_count
                  FROM vol_opportunities WHERE tenant_id = ?",
                 [$tenantId]
             );
@@ -88,8 +128,7 @@ class AdminVolunteeringApiController extends BaseApiController
                     "SELECT COUNT(*) as total,
                             SUM(CASE WHEN va.status='pending' THEN 1 ELSE 0 END) as pending
                      FROM vol_applications va
-                     INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
-                     WHERE vo.tenant_id = ?",
+                     WHERE va.tenant_id = ?",
                     [$tenantId]
                 );
                 $row = $stmt->fetch();
@@ -105,8 +144,7 @@ class AdminVolunteeringApiController extends BaseApiController
                 $stmt = Database::query(
                     "SELECT COALESCE(SUM(vl.hours), 0) as total_hours, COUNT(DISTINCT vl.user_id) as volunteers
                      FROM vol_logs vl
-                     INNER JOIN vol_opportunities vo ON vl.opportunity_id = vo.id
-                     WHERE vo.tenant_id = ?",
+                     WHERE vl.tenant_id = ?",
                     [$tenantId]
                 );
                 $row = $stmt->fetch();
@@ -118,15 +156,41 @@ class AdminVolunteeringApiController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
-                "SELECT vo.*, u.first_name, u.last_name
-                 FROM vol_opportunities vo
-                 LEFT JOIN users u ON vo.user_id = u.id
-                 WHERE vo.tenant_id = ?
-                 ORDER BY vo.created_at DESC LIMIT 10",
-                [$tenantId]
-            );
-            $data['recent_opportunities'] = $stmt->fetchAll() ?: [];
+            $authorColumn = $this->getOpportunityAuthorColumn();
+            if ($authorColumn !== null) {
+                $stmt = Database::query(
+                    "SELECT vo.id, vo.title, vo.status, vo.is_active, vo.created_at,
+                            CASE
+                                WHEN vo.is_active = 1 AND (vo.status = 'open' OR vo.status = 'active') THEN 'active'
+                                ELSE vo.status
+                            END as ui_status,
+                            u.first_name, u.last_name
+                     FROM vol_opportunities vo
+                     LEFT JOIN users u ON vo.{$authorColumn} = u.id
+                     WHERE vo.tenant_id = ?
+                     ORDER BY vo.created_at DESC LIMIT 10",
+                    [$tenantId]
+                );
+            } else {
+                $stmt = Database::query(
+                    "SELECT vo.id, vo.title, vo.status, vo.is_active, vo.created_at,
+                            CASE
+                                WHEN vo.is_active = 1 AND (vo.status = 'open' OR vo.status = 'active') THEN 'active'
+                                ELSE vo.status
+                            END as ui_status,
+                            NULL as first_name, NULL as last_name
+                     FROM vol_opportunities vo
+                     WHERE vo.tenant_id = ?
+                     ORDER BY vo.created_at DESC LIMIT 10",
+                    [$tenantId]
+                );
+            }
+            $rows = $stmt->fetchAll() ?: [];
+            $data['recent_opportunities'] = array_map(static function (array $row): array {
+                $row['status'] = $row['ui_status'] ?? $row['status'];
+                unset($row['ui_status']);
+                return $row;
+            }, $rows);
         } catch (\Exception $e) {
             error_log('[AdminVolunteering] Failed to fetch recent opportunities: ' . $e->getMessage());
         }
@@ -247,7 +311,34 @@ class AdminVolunteeringApiController extends BaseApiController
         }
         $tenantId = TenantContext::getId();
 
-        // Try org_wallets or organizations table for volunteer orgs
+        if ($this->tableExists('vol_organizations')) {
+            try {
+                $stmt = Database::query(
+                    "SELECT vo.id,
+                            vo.id as org_id,
+                            vo.name as org_name,
+                            vo.status,
+                            vo.created_at,
+                            COALESCE((SELECT COUNT(*) FROM org_members om WHERE om.tenant_id = vo.tenant_id AND om.organization_id = vo.id AND om.status = 'active'), 0) as member_count,
+                            COALESCE((SELECT COUNT(*) FROM vol_opportunities opp WHERE opp.tenant_id = vo.tenant_id AND opp.organization_id = vo.id AND opp.is_active = 1), 0) as opportunity_count,
+                            COALESCE((SELECT SUM(vl.hours) FROM vol_logs vl WHERE vl.tenant_id = vo.tenant_id AND vl.organization_id = vo.id AND vl.status = 'approved'), 0) as total_hours,
+                            0 as balance,
+                            0 as total_in,
+                            0 as total_out
+                     FROM vol_organizations vo
+                     WHERE vo.tenant_id = ?
+                     ORDER BY vo.name ASC
+                     LIMIT 100",
+                    [$tenantId]
+                );
+                $this->respondWithData($stmt->fetchAll() ?: []);
+                return;
+            } catch (\Throwable $e) {
+                error_log('[AdminVolunteering] Failed to fetch volunteering organizations: ' . $e->getMessage());
+            }
+        }
+
+        // Fallback to legacy org_wallets data where volunteering org tables are unavailable.
         try {
             $stmt = Database::query(
                 "SELECT ow.*, o.name as org_name

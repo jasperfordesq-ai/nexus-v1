@@ -127,11 +127,12 @@ export function CredentialVerificationTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: Credential[] }>('/v2/volunteering/credentials');
+      const response = await api.get<{ credentials?: Credential[] }>('/v2/volunteering/credentials');
 
       if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : [];
-        setCredentials(items as Credential[]);
+        const payload = response.data as { credentials?: Credential[] } | Credential[];
+        const items = Array.isArray(payload) ? payload : (payload.credentials ?? []);
+        setCredentials(items);
       } else {
         setError(t('credentials.load_failed', 'Failed to load credentials.'));
       }
@@ -176,10 +177,10 @@ export function CredentialVerificationTab() {
       setUploadError(null);
 
       const formData = new FormData();
-      formData.append('type', uploadForm.type);
-      formData.append('document', selectedFile);
+      formData.append('credential_type', uploadForm.type);
+      formData.append('file', selectedFile);
       if (uploadForm.expiry_date) {
-        formData.append('expiry_date', uploadForm.expiry_date);
+        formData.append('expires_at', uploadForm.expiry_date);
       }
 
       const response = await api.upload('/v2/volunteering/credentials', formData);

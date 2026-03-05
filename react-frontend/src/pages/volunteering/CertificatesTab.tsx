@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 interface Certificate {
@@ -65,13 +65,13 @@ export function CertificatesTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: { certificates: Certificate[] } }>(
+      const response = await api.get<{ certificates?: Certificate[] }>(
         '/v2/volunteering/certificates'
       );
 
       if (response.success && response.data) {
-        const data = response.data as { certificates?: Certificate[] };
-        setCertificates(data.certificates ?? []);
+        const payload = response.data as { certificates?: Certificate[] } | Certificate[];
+        setCertificates(Array.isArray(payload) ? payload : (payload.certificates ?? []));
       } else {
         setError('Failed to load certificates');
       }
@@ -108,8 +108,7 @@ export function CertificatesTab() {
   };
 
   const handleDownload = (code: string) => {
-    const apiBase = import.meta.env.VITE_API_URL || '';
-    window.open(`${apiBase}/v2/volunteering/certificates/${code}/html`, '_blank');
+    window.open(`${API_BASE}/v2/volunteering/certificates/${code}/html`, '_blank');
   };
 
   const containerVariants = {

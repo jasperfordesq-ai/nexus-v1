@@ -102,7 +102,7 @@ export function VolunteeringOverview() {
                     <p className="font-medium">{opp.title}</p>
                     <p className="text-xs text-default-400">by {opp.first_name} {opp.last_name}</p>
                   </div>
-                  <Chip size="sm" variant="flat" color={opp.status === 'active' ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
+                  <Chip size="sm" variant="flat" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
                 </div>
               ))}
             </div>

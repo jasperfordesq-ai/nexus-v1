@@ -37,6 +37,11 @@ class VolunteerService
     private static array $errors = [];
 
     /**
+     * Cached decline status value for vol_logs (declined vs rejected schema variants)
+     */
+    private static ?string $declineStatusValue = null;
+
+    /**
      * Get validation errors
      */
     public static function getErrors(): array
@@ -988,8 +993,8 @@ class VolunteerService
         $db = Database::getConnection();
 
         try {
-            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = NULL WHERE opportunity_id = ? AND user_id = ? AND shift_id = ?");
-            $stmt->execute([$shift['opportunity_id'], $userId, $shiftId]);
+            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = NULL WHERE opportunity_id = ? AND user_id = ? AND shift_id = ? AND tenant_id = ?");
+            $stmt->execute([$shift['opportunity_id'], $userId, $shiftId, TenantContext::getId()]);
 
             if ($stmt->rowCount() === 0) {
                 self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not signed up for this shift'];
@@ -1199,7 +1204,7 @@ class VolunteerService
             return false;
         }
 
-        $status = $action === 'approve' ? 'approved' : 'declined';
+        $status = $action === 'approve' ? 'approved' : self::getDeclineStatusValue();
 
         try {
             VolLog::updateStatus($logId, $status);
@@ -1289,10 +1294,50 @@ class VolunteerService
         return [
             'total_verified' => $totalVerified,
             'total_pending' => (float)($byStatus['pending'] ?? 0),
-            'total_declined' => (float)($byStatus['declined'] ?? 0),
+            'total_declined' => (float)(($byStatus['declined'] ?? 0) + ($byStatus['rejected'] ?? 0)),
             'by_organization' => $byOrg,
             'by_month' => $byMonth,
         ];
+    }
+
+    /**
+     * Resolve the "declined" state value for vol_logs across schema variants.
+     * Some environments use ENUM(...,'declined'), others use ENUM(...,'rejected').
+     */
+    private static function getDeclineStatusValue(): string
+    {
+        if (self::$declineStatusValue !== null) {
+            return self::$declineStatusValue;
+        }
+
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("
+                SELECT COLUMN_TYPE
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'vol_logs'
+                  AND COLUMN_NAME = 'status'
+                LIMIT 1
+            ");
+            $stmt->execute();
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $columnType = strtolower((string)($row['COLUMN_TYPE'] ?? ''));
+
+            if (strpos($columnType, "'declined'") !== false) {
+                self::$declineStatusValue = 'declined';
+            } elseif (strpos($columnType, "'rejected'") !== false) {
+                self::$declineStatusValue = 'rejected';
+            }
+        } catch (\Throwable $e) {
+            // Fallback below
+        }
+
+        if (self::$declineStatusValue === null) {
+            self::$declineStatusValue = 'declined';
+        }
+
+        return self::$declineStatusValue;
     }
 
     // ========================================

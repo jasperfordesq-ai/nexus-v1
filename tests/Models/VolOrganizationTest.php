@@ -226,7 +226,7 @@ class VolOrganizationTest extends DatabaseTestCase
         $this->assertEquals('approved', $org['status']);
     }
 
-    public function testUpdateStatusToRejected(): void
+    public function testUpdateStatusToDeclined(): void
     {
         $id = VolOrganization::create(
             self::$testTenantId,
@@ -236,10 +236,10 @@ class VolOrganizationTest extends DatabaseTestCase
             'reject@volorg.com'
         );
 
-        VolOrganization::updateStatus($id, 'rejected');
+        VolOrganization::updateStatus($id, 'declined');
 
         $org = VolOrganization::find($id);
-        $this->assertEquals('rejected', $org['status']);
+        $this->assertEquals('declined', $org['status']);
     }
 
     // ==========================================

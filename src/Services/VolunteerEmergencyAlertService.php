@@ -167,18 +167,37 @@ class VolunteerEmergencyAlertService
         }
 
         try {
-            // Update recipient response
-            $stmt = $db->prepare("UPDATE vol_emergency_alert_recipients SET response = ?, responded_at = NOW() WHERE id = ? AND tenant_id = ?");
+            $db->beginTransaction();
+
+            // Update recipient response and scope via parent alert tenant (works with/without recipient tenant_id column)
+            $stmt = $db->prepare("
+                UPDATE vol_emergency_alert_recipients r
+                JOIN vol_emergency_alerts a ON r.alert_id = a.id
+                SET r.response = ?, r.responded_at = NOW()
+                WHERE r.id = ? AND a.tenant_id = ?
+            ");
             $stmt->execute([$response, $recipient['id'], $tenantId]);
 
             if ($response === 'accepted') {
+                // Sign up the volunteer first; only mark alert as filled if signup succeeds.
+                $signupResult = VolunteerService::signUpForShift((int)$alert['shift_id'], $userId);
+                if (!$signupResult) {
+                    $db->rollBack();
+                    self::$errors = VolunteerService::getErrors();
+                    if (empty(self::$errors)) {
+                        self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Unable to accept alert at this time'];
+                    }
+                    return false;
+                }
+
                 // Mark alert as filled
                 $stmt = $db->prepare("UPDATE vol_emergency_alerts SET status = 'filled', filled_at = NOW() WHERE id = ? AND tenant_id = ?");
                 $stmt->execute([$alertId, $tenantId]);
+            }
 
-                // Sign up the volunteer for the shift
-                $signupResult = VolunteerService::signUpForShift((int)$alert['shift_id'], $userId);
+            $db->commit();
 
+            if ($response === 'accepted') {
                 // Notify the coordinator
                 try {
                     $user = \Nexus\Models\User::findById($userId);
@@ -200,6 +219,9 @@ class VolunteerEmergencyAlertService
 
             return true;
         } catch (\Exception $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
             error_log("VolunteerEmergencyAlertService::respond error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process response'];
             return false;
@@ -360,16 +382,16 @@ class VolunteerEmergencyAlertService
         $stmt = $db->prepare("
             SELECT DISTINCT u.id as user_id, u.email, u.name, u.skills
             FROM users u
-            JOIN vol_applications va ON va.user_id = u.id AND va.status = 'approved'
-            JOIN vol_opportunities opp ON va.opportunity_id = opp.id
-            JOIN vol_shifts s ON s.opportunity_id = opp.id AND s.id = ?
+            JOIN vol_applications va ON va.user_id = u.id AND va.status = 'approved' AND va.tenant_id = ?
+            JOIN vol_opportunities opp ON va.opportunity_id = opp.id AND opp.tenant_id = ?
+            JOIN vol_shifts s ON s.opportunity_id = opp.id AND s.id = ? AND s.tenant_id = ?
             WHERE u.tenant_id = ?
             AND u.id NOT IN (
-                SELECT user_id FROM vol_applications WHERE shift_id = ? AND status = 'approved'
+                SELECT user_id FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?
             )
             LIMIT 50
         ");
-        $stmt->execute([$shiftId, $tenantId, $shiftId]);
+        $stmt->execute([$tenantId, $tenantId, $shiftId, $tenantId, $tenantId, $shiftId, $tenantId]);
         $candidates = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // If we have required skills, filter candidates
@@ -460,13 +482,13 @@ class VolunteerEmergencyAlertService
         $stmt = $db->prepare("
             SELECT DISTINCT u.id as user_id
             FROM users u
-            JOIN vol_applications va ON va.user_id = u.id AND va.status = 'approved'
+            JOIN vol_applications va ON va.user_id = u.id AND va.status = 'approved' AND va.tenant_id = ?
             WHERE u.tenant_id = ?
             AND u.id NOT IN (SELECT user_id FROM vol_emergency_alert_recipients WHERE alert_id = ?)
-            AND u.id NOT IN (SELECT user_id FROM vol_applications WHERE shift_id = ? AND status = 'approved')
+            AND u.id NOT IN (SELECT user_id FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?)
             LIMIT 25
         ");
-        $stmt->execute([$tenantId, $alertId, $shiftId]);
+        $stmt->execute([$tenantId, $tenantId, $alertId, $shiftId, $tenantId]);
         $extraVolunteers = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($extraVolunteers as $v) {

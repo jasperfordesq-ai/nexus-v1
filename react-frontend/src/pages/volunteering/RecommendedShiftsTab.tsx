@@ -62,13 +62,13 @@ export function RecommendedShiftsTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: { shifts: RecommendedShift[] } }>(
+      const response = await api.get<{ shifts?: RecommendedShift[] }>(
         '/v2/volunteering/recommended-shifts?limit=10'
       );
 
       if (response.success && response.data) {
-        const data = response.data as { shifts?: RecommendedShift[] };
-        setShifts(data.shifts ?? []);
+        const payload = response.data as { shifts?: RecommendedShift[] } | RecommendedShift[];
+        setShifts(Array.isArray(payload) ? payload : (payload.shifts ?? []));
       } else {
         setError('Failed to load recommendations');
       }
