@@ -18,8 +18,23 @@ class AdminVolunteeringApiController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    private const ALLOWED_TABLES = [
+        'vol_opportunities',
+        'vol_applications',
+        'vol_shifts',
+        'vol_shift_signups',
+        'vol_organizations',
+        'vol_logs',
+        'vol_shift_checkins',
+        'vol_mood_checkins',
+        'vol_emergency_alerts',
+    ];
+
     private function tableExists(string $table): bool
     {
+        if (!in_array($table, self::ALLOWED_TABLES, true)) {
+            return false;
+        }
         try {
             Database::query("SELECT 1 FROM `{$table}` LIMIT 1");
             return true;
@@ -63,7 +78,9 @@ class AdminVolunteeringApiController extends BaseApiController
             $row = $stmt->fetch();
             $data['stats']['total_opportunities'] = (int) ($row['total'] ?? 0);
             $data['stats']['active_opportunities'] = (int) ($row['active_count'] ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            error_log('[AdminVolunteering] Failed to fetch opportunity stats: ' . $e->getMessage());
+        }
 
         if ($this->tableExists('vol_applications')) {
             try {
@@ -78,7 +95,9 @@ class AdminVolunteeringApiController extends BaseApiController
                 $row = $stmt->fetch();
                 $data['stats']['total_applications'] = (int) ($row['total'] ?? 0);
                 $data['stats']['pending_applications'] = (int) ($row['pending'] ?? 0);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                error_log('[AdminVolunteering] Failed to fetch application stats: ' . $e->getMessage());
+            }
         }
 
         if ($this->tableExists('vol_logs')) {
@@ -93,7 +112,9 @@ class AdminVolunteeringApiController extends BaseApiController
                 $row = $stmt->fetch();
                 $data['stats']['total_hours_logged'] = round((float) ($row['total_hours'] ?? 0), 1);
                 $data['stats']['active_volunteers'] = (int) ($row['volunteers'] ?? 0);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                error_log('[AdminVolunteering] Failed to fetch hours/volunteer stats: ' . $e->getMessage());
+            }
         }
 
         try {
@@ -106,7 +127,9 @@ class AdminVolunteeringApiController extends BaseApiController
                 [$tenantId]
             );
             $data['recent_opportunities'] = $stmt->fetchAll() ?: [];
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            error_log('[AdminVolunteering] Failed to fetch recent opportunities: ' . $e->getMessage());
+        }
 
         $this->respondWithData($data);
     }

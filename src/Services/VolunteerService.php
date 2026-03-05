@@ -119,7 +119,8 @@ class VolunteerService
 
         // Remote filter
         if (!empty($filters['is_remote'])) {
-            $sql .= " AND opp.location LIKE '%Remote%'";
+            $sql .= " AND opp.location LIKE ?";
+            $params[] = '%Remote%';
         }
 
         // Cursor pagination

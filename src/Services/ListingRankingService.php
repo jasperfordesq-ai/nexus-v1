@@ -547,7 +547,7 @@ class ListingRankingService
                   / ($priorStrength + $n);
 
         // Map to [engagement_minimum, 2.0] range
-        return max($config['engagement_minimum'], 1.0 + $bayesian);
+        return min(2.0, max($config['engagement_minimum'], 1.0 + $bayesian));
     }
 
     /**
@@ -606,6 +606,13 @@ class ListingRankingService
 
     /**
      * Calculate reciprocity score
+     *
+     * Detects one-directional and mutual exchange potential between the viewer
+     * and the listing owner:
+     *
+     * - Mutual match (A needs what B offers AND B needs what A offers): highest boost
+     * - One-directional match (only one side is complementary): medium boost
+     * - No match: base score (1.0)
      */
     private static function calculateReciprocityScore(array $listing, array $viewerListings): float
     {
@@ -615,25 +622,66 @@ class ListingRankingService
             return 1.0;
         }
 
-        $listingType = $listing['type'] ?? '';
+        $listingType     = $listing['type'] ?? '';
         $listingCategory = $listing['category_id'] ?? null;
-        $listingOwnerId = $listing['user_id'] ?? null;
+        $listingOwnerId  = $listing['user_id'] ?? null;
 
-        // Check if viewer has complementary listings
+        // Detect whether the viewer's listings are complementary to this listing
+        // (one-directional: viewer can fulfil what this listing needs, or vice versa)
+        $offerMatchesNeed = false;
         foreach ($viewerListings as $viewerListing) {
-            // If listing is a request and viewer has an offer in same category
+            // Listing is a request — viewer has an offer in same category
             if ($listingType === 'request' &&
                 $viewerListing['type'] === 'offer' &&
                 $viewerListing['category_id'] == $listingCategory) {
-                return $config['reciprocity_match_boost'];
+                $offerMatchesNeed = true;
+                break;
             }
 
-            // If listing is an offer and viewer has a request in same category
+            // Listing is an offer — viewer has a request in same category
             if ($listingType === 'offer' &&
                 $viewerListing['type'] === 'request' &&
                 $viewerListing['category_id'] == $listingCategory) {
-                return $config['reciprocity_match_boost'];
+                $offerMatchesNeed = true;
+                break;
             }
+        }
+
+        // Detect whether the listing owner also has a complementary need/offer
+        // matching the viewer's listings (reverse direction — mutual exchange check)
+        $needMatchesOffer = false;
+        if ($offerMatchesNeed && $listingOwnerId) {
+            $ownerListings = self::getUserListings($listingOwnerId);
+            foreach ($viewerListings as $viewerListing) {
+                $viewerType     = $viewerListing['type'] ?? '';
+                $viewerCategory = $viewerListing['category_id'] ?? null;
+
+                foreach ($ownerListings as $ownerListing) {
+                    // Viewer has an offer — does owner have a request in that category?
+                    if ($viewerType === 'offer' &&
+                        $ownerListing['type'] === 'request' &&
+                        $ownerListing['category_id'] == $viewerCategory) {
+                        $needMatchesOffer = true;
+                        break 2;
+                    }
+
+                    // Viewer has a request — does owner have an offer in that category?
+                    if ($viewerType === 'request' &&
+                        $ownerListing['type'] === 'offer' &&
+                        $ownerListing['category_id'] == $viewerCategory) {
+                        $needMatchesOffer = true;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        if ($offerMatchesNeed && $needMatchesOffer) {
+            // Mutual exchange — both parties can fulfil each other's needs
+            return $config['reciprocity_mutual_boost'];
+        } elseif ($offerMatchesNeed) {
+            // One-directional match
+            return $config['reciprocity_match_boost'];
         }
 
         return 1.0;

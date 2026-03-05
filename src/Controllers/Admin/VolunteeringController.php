@@ -58,7 +58,7 @@ class VolunteeringController
     {
         $this->requireAdmin();
         Csrf::verifyOrDie();
-        $id = $_POST['org_id'];
+        $id = (int) ($_POST['org_id'] ?? 0);
 
         // Update to 'approved'
         \Nexus\Models\VolOrganization::updateStatus($id, 'approved');
@@ -86,7 +86,7 @@ class VolunteeringController
     {
         $this->requireAdmin();
         Csrf::verifyOrDie();
-        $id = $_POST['org_id'];
+        $id = (int) ($_POST['org_id'] ?? 0);
 
         // Update to 'declined'
         \Nexus\Models\VolOrganization::updateStatus($id, 'declined');
@@ -123,7 +123,7 @@ class VolunteeringController
     {
         $this->requireAdmin();
         Csrf::verifyOrDie();
-        $id = $_POST['org_id'];
+        $id = (int) ($_POST['org_id'] ?? 0);
 
         // Find and Verify Tenant Ownership
         $org = \Nexus\Models\VolOrganization::find($id);
@@ -134,8 +134,8 @@ class VolunteeringController
 
         // Delete (We assume cascade or soft delete, but for now strict delete)
         $db = Database::getInstance();
-        $stmt = $db->prepare("DELETE FROM vol_organizations WHERE id = ?");
-        $stmt->execute([$id]);
+        $stmt = $db->prepare("DELETE FROM vol_organizations WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$id, TenantContext::getId()]);
 
         // Also could delete associated opportunities, but DB FK cascade should handle or allow orphan logic for now.
 

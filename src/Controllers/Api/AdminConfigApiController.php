@@ -10,6 +10,7 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Services\RedisCache;
+use Nexus\Services\TenantFeatureConfig;
 use Nexus\Services\FeedRankingService;
 use Nexus\Services\ListingRankingService;
 use Nexus\Services\MemberRankingService;
@@ -34,43 +35,11 @@ class AdminConfigApiController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /**
-     * All known features with defaults
-     */
-    private const FEATURE_DEFAULTS = [
-        'events' => true,
-        'groups' => true,
-        'gamification' => false,
-        'goals' => false,
-        'blog' => true,
-        'resources' => false,
-        'volunteering' => false,
-        'exchange_workflow' => false,
-        'organisations' => false,
-        'federation' => false,
-        'connections' => true,
-        'reviews' => true,
-        'polls' => false,
-        'job_vacancies' => false,
-        'ideation_challenges' => false,
-        'direct_messaging' => true,
-        'group_exchanges' => false,
-        'ai_chat' => false,
-    ];
+    /** @see TenantFeatureConfig::FEATURE_DEFAULTS — single source of truth */
+    private const FEATURE_DEFAULTS = TenantFeatureConfig::FEATURE_DEFAULTS;
 
-    /**
-     * All known modules with defaults
-     */
-    private const MODULE_DEFAULTS = [
-        'listings' => true,
-        'wallet' => true,
-        'messages' => true,
-        'dashboard' => true,
-        'feed' => true,
-        'notifications' => true,
-        'profile' => true,
-        'settings' => true,
-    ];
+    /** @see TenantFeatureConfig::MODULE_DEFAULTS — single source of truth */
+    private const MODULE_DEFAULTS = TenantFeatureConfig::MODULE_DEFAULTS;
 
     /**
      * GET /api/v2/admin/config

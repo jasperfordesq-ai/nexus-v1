@@ -395,6 +395,24 @@ class UserService
             GeocodingService::updateUserCoordinates($userId, $updateData['location']);
         }
 
+        // Refresh semantic embedding when searchable content changes
+        if (array_intersect(array_keys($updateData), ['bio', 'skills', 'first_name', 'last_name', 'location'])) {
+            try {
+                if (class_exists('\Nexus\Services\EmbeddingService')) {
+                    $tenantId = TenantContext::getId();
+                    $userRow = Database::query(
+                        "SELECT id, bio, skills, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+                        [$userId, $tenantId]
+                    )->fetch(\PDO::FETCH_ASSOC);
+                    if ($userRow) {
+                        \Nexus\Services\EmbeddingService::generateForUser($userRow);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Non-critical
+            }
+        }
+
         return true;
     }
 

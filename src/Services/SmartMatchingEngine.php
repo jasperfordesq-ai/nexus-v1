@@ -855,8 +855,21 @@ class SmartMatchingEngine
         ];
 
         // Extract words
+        // Primary extraction: words of 3+ chars
         preg_match_all('/\b[a-z]{3,}\b/', $text, $matches);
         $words = $matches[0] ?? [];
+
+        // Preserve important 2-char domain terms that the regex above drops
+        static $twoCharDomainTerms = [
+            'ai', 'ml', 'ux', 'ui', 'go', 'vr', 'ar', 'it', 'hr', 'pr',
+            'qa', 'db', 'uk', 'eu', 'us', 'r',
+        ];
+        preg_match_all('/\b[a-z]{1,2}\b/', $text, $shortMatches);
+        foreach ($shortMatches[0] ?? [] as $short) {
+            if (in_array($short, $twoCharDomainTerms, true)) {
+                $words[] = $short;
+            }
+        }
 
         // Remove stop words
         $keywords = array_diff($words, $stopWords);
