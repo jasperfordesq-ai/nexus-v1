@@ -20,7 +20,7 @@ class AttributeController
         // 1. Check Login
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // 2. Check Role (Admin OR Super Admin OR Tenant Admin)
@@ -32,7 +32,7 @@ class AttributeController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -77,7 +77,7 @@ class AttributeController
     {
         $this->requireAdmin();
         $attribute = Attribute::find($id);
-        if (!$attribute) { http_response_code(404); echo 'Attribute not found'; exit; }
+        if (!$attribute) { http_response_code(404); echo 'Attribute not found'; if (!defined('TESTING')) { exit; } }
 
         $categories = Category::getByType('listing');
 

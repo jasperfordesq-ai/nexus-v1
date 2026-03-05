@@ -20,7 +20,7 @@ class Error404Controller
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -31,7 +31,7 @@ class Error404Controller
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>You do not have permission to access this area.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 

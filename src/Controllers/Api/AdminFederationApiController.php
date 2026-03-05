@@ -593,7 +593,7 @@ class AdminFederationApiController extends BaseApiController
             }
 
             fclose($output);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
 
         } catch (\Exception $e) {
             error_log("Federation export error ({$type}): " . $e->getMessage());

@@ -39,7 +39,7 @@ class NexusScoreController
         // Verify authentication
         if (!isset($_SESSION['user_id'])) {
             header('Location: /login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -136,7 +136,7 @@ class NexusScoreController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: /login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -176,7 +176,7 @@ class NexusScoreController
         if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
             http_response_code(403);
             echo 'Forbidden';
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();
@@ -208,7 +208,7 @@ class NexusScoreController
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             echo json_encode(['error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_GET['user_id'] ?? $_SESSION['user_id'];
@@ -218,7 +218,7 @@ class NexusScoreController
         if ($userId != $_SESSION['user_id'] && !($_SESSION['is_admin'] ?? false)) {
             http_response_code(403);
             echo json_encode(['error' => 'Forbidden']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $scoreData = $this->scoreService->calculateNexusScore($userId, $tenantId);
@@ -235,7 +235,7 @@ class NexusScoreController
         if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
             http_response_code(403);
             echo json_encode(['error' => 'Forbidden']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = $_SESSION['tenant_id'] ?? \Nexus\Core\TenantContext::getId();

@@ -32,7 +32,7 @@ class CronJobController
 
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -43,7 +43,7 @@ class CronJobController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             http_response_code(403);
             echo 'Access Denied: Administrator privileges required.';
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -920,7 +920,7 @@ class CronJobController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -945,7 +945,7 @@ class CronJobController
         if (!$job) {
             $_SESSION['flash_error'] = 'Unknown cron job: ' . htmlspecialchars($jobId);
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Check if job is enabled
@@ -953,7 +953,7 @@ class CronJobController
         if (isset($jobSettings[$jobId]) && !$jobSettings[$jobId]['is_enabled']) {
             $_SESSION['flash_error'] = "Cannot run disabled job: {$job['name']}. Enable it first.";
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $startTime = microtime(true);
@@ -1152,7 +1152,7 @@ class CronJobController
         ];
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs?ran=' . $jobId);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -1296,7 +1296,7 @@ class CronJobController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs/settings');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -1337,7 +1337,7 @@ class CronJobController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/cron-jobs/logs');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -1352,6 +1352,6 @@ class CronJobController
             'stats' => $this->getJobStats(),
             'timestamp' => date('Y-m-d H:i:s'),
         ]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

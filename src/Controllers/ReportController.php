@@ -17,7 +17,7 @@ class ReportController
         \Nexus\Core\Csrf::verifyOrDie();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -35,7 +35,7 @@ class ReportController
             if (!empty($_POST['ajax'])) {
                 header('Content-Type: application/json');
                 echo json_encode(['status' => 'success']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Redirect back with flash message (using query param for MVP)
@@ -43,14 +43,14 @@ class ReportController
             // Append &reported=1
             $sep = (strpos($referer, '?') !== false) ? '&' : '?';
             header("Location: " . $referer . $sep . "msg=reported");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!empty($_POST['ajax'])) {
             header('Content-Type: application/json');
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Invalid report details']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/?error=invalid_report');

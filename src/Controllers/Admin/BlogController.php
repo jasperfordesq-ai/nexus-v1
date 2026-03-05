@@ -17,7 +17,7 @@ class BlogController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -28,7 +28,7 @@ class BlogController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "Access Denied";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -76,7 +76,7 @@ class BlogController
         $this->checkAdmin();
         // Redirect to builder (unified interface)
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/news/builder/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function update()
@@ -117,7 +117,7 @@ class BlogController
 
         if (!$post) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/news');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Load SEO for builder
@@ -141,7 +141,7 @@ class BlogController
         $id = $_POST['id'] ?? null;
         if (!$id) {
             echo json_encode(['success' => false, 'error' => 'No ID']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -149,7 +149,7 @@ class BlogController
 
         if (!$post) {
             echo json_encode(['success' => false, 'error' => 'Post not found']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $data = [
@@ -203,6 +203,6 @@ class BlogController
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

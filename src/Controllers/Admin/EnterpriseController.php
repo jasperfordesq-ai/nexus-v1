@@ -45,7 +45,7 @@ class EnterpriseController
 
         if (!$isAdmin && !$isSuperAdmin) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -151,7 +151,7 @@ class EnterpriseController
         if (!$request) {
             $_SESSION['flash_error'] = 'Request not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/requests');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Force modern layout
@@ -443,7 +443,7 @@ class EnterpriseController
         if (!$breach) {
             $_SESSION['flash_error'] = 'Breach not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/breaches');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Force modern layout
@@ -1194,7 +1194,7 @@ class EnterpriseController
         if (empty($consentType)) {
             $_SESSION['flash_error'] = 'Please select a consent type to backfill.';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -1236,7 +1236,7 @@ class EnterpriseController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -1253,7 +1253,7 @@ class EnterpriseController
         if (!$consentType) {
             $_SESSION['flash_error'] = 'Consent type not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get user consents for this type

@@ -149,13 +149,17 @@ class MetricsServiceTest extends TestCase
         $ref = new \ReflectionMethod(MetricsService::class, 'increment');
         $params = $ref->getParameters();
 
-        $this->assertCount(3, $params);
+        // increment(string $metric, int|array $value = 1, array $tags = [], float $sampleRate = 1.0)
+        // $value accepts array for convenience: increment($metric, $tags) is equivalent to increment($metric, 1, $tags)
+        $this->assertCount(4, $params);
         $this->assertEquals('metric', $params[0]->getName());
-        $this->assertEquals('tags', $params[1]->getName());
-        $this->assertEquals('value', $params[2]->getName());
+        $this->assertEquals('value', $params[1]->getName());
+        $this->assertEquals('tags', $params[2]->getName());
+        $this->assertEquals('sampleRate', $params[3]->getName());
 
-        $this->assertEquals([], $params[1]->getDefaultValue());
-        $this->assertEquals(1, $params[2]->getDefaultValue());
+        $this->assertEquals(1, $params[1]->getDefaultValue());
+        $this->assertEquals([], $params[2]->getDefaultValue());
+        $this->assertEquals(1.0, $params[3]->getDefaultValue());
     }
 
     public function testDecrementMethodSignature(): void
@@ -163,8 +167,14 @@ class MetricsServiceTest extends TestCase
         $ref = new \ReflectionMethod(MetricsService::class, 'decrement');
         $params = $ref->getParameters();
 
+        // decrement(string $metric, int|array $value = 1, array $tags = [])
         $this->assertCount(3, $params);
-        $this->assertEquals(1, $params[2]->getDefaultValue());
+        $this->assertEquals('metric', $params[0]->getName());
+        $this->assertEquals('value', $params[1]->getName());
+        $this->assertEquals('tags', $params[2]->getName());
+
+        $this->assertEquals(1, $params[1]->getDefaultValue());
+        $this->assertEquals([], $params[2]->getDefaultValue());
     }
 
     public function testIncrementDoesNotThrowWhenDisabled(): void

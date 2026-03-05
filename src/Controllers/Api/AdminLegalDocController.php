@@ -221,7 +221,7 @@ class AdminLegalDocController extends BaseApiController
             }
 
             fclose($output);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] exportAcceptances error: " . $e->getMessage());
             $this->jsonResponse(['success' => false, 'error' => 'Failed to export acceptances'], 500);

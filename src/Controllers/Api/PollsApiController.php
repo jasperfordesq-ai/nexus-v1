@@ -452,7 +452,7 @@ class PollsApiController extends BaseApiController
         header('Content-Disposition: attachment; filename="poll-' . $id . '-export.csv"');
         header('Content-Length: ' . strlen($csv));
         echo $csv;
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     // ============================================

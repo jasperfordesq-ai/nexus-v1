@@ -216,7 +216,7 @@ class AiChatController extends BaseAiController
                 echo "data: " . json_encode(['error' => 'AI provider is not configured. Please configure API keys in Admin > AI Settings.']) . "\n\n";
                 ob_flush();
                 flush();
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             AiMessage::createUserMessage($conversationId, $message);
@@ -262,7 +262,7 @@ class AiChatController extends BaseAiController
             flush();
         }
 
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**

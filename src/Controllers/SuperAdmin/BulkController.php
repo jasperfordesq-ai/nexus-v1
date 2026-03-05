@@ -294,6 +294,6 @@ class BulkController
     {
         $_SESSION['flash_error'] = $error;
         header('Location: ' . $url);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

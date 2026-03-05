@@ -400,7 +400,7 @@ class UserController
         }
 
         header('Location: /super-admin/users/' . $userId);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -441,7 +441,7 @@ class UserController
         }
 
         header('Location: /super-admin/users/' . $userId);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -475,7 +475,7 @@ class UserController
         $_SESSION['flash_success'] = 'Global super admin privileges granted - user can now access ALL tenants';
 
         header('Location: /super-admin/users/' . $userId);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -512,7 +512,7 @@ class UserController
         $_SESSION['flash_success'] = 'Global super admin privileges revoked';
 
         header('Location: /super-admin/users/' . $userId);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -610,6 +610,6 @@ class UserController
     {
         $_SESSION['flash_error'] = $error;
         header('Location: ' . $url);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

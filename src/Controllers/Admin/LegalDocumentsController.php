@@ -33,10 +33,10 @@ class LegalDocumentsController
                 header('Content-Type: application/json');
                 http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -49,11 +49,11 @@ class LegalDocumentsController
                 header('Content-Type: application/json');
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'Access denied']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('HTTP/1.0 403 Forbidden');
             echo "Access Denied";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -134,7 +134,7 @@ class LegalDocumentsController
             $_SESSION['form_errors'] = $errors;
             $_SESSION['form_data'] = $data;
             header('Location: /admin-legacy/legal-documents/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -143,11 +143,11 @@ class LegalDocumentsController
             $_SESSION['flash_success'] = 'Legal document created successfully. Now create the first version.';
             // nosemgrep: tainted-sql-string — $documentId is a database-generated integer ID from LegalDocumentService::createDocument()
             header("Location: /admin-legacy/legal-documents/{$documentId}/versions/create");
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to create document: ' . $e->getMessage();
             header('Location: /admin-legacy/legal-documents/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -198,11 +198,11 @@ class LegalDocumentsController
 
             $_SESSION['flash_success'] = 'Document settings updated successfully.';
             header("Location: /admin-legacy/legal-documents/{$id}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to update document: ' . $e->getMessage();
             header("Location: /admin-legacy/legal-documents/{$id}/edit");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -266,7 +266,7 @@ class LegalDocumentsController
             $_SESSION['form_errors'] = $errors;
             $_SESSION['form_data'] = $data;
             header("Location: /admin-legacy/legal-documents/{$documentId}/versions/create");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -281,11 +281,11 @@ class LegalDocumentsController
             }
 
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to create version: ' . $e->getMessage();
             header("Location: /admin-legacy/legal-documents/{$documentId}/versions/create");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -306,7 +306,7 @@ class LegalDocumentsController
         if (!$version['is_draft']) {
             $_SESSION['flash_error'] = 'Published versions cannot be edited. Create a new version instead.';
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $this->render('admin/legal-documents/versions/edit', [
@@ -333,7 +333,7 @@ class LegalDocumentsController
         if (!$version['is_draft']) {
             $_SESSION['flash_error'] = 'Published versions cannot be edited.';
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $data = [
@@ -349,11 +349,11 @@ class LegalDocumentsController
 
             $_SESSION['flash_success'] = 'Version updated successfully.';
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to update version: ' . $e->getMessage();
             header("Location: /admin-legacy/legal-documents/{$documentId}/versions/{$versionId}/edit");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -400,11 +400,11 @@ class LegalDocumentsController
 
             $_SESSION['flash_success'] = 'Version ' . $version['version_number'] . ' is now the current version.';
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to publish version: ' . $e->getMessage();
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -425,7 +425,7 @@ class LegalDocumentsController
         if (!$version['is_draft']) {
             $_SESSION['flash_error'] = 'Published versions cannot be deleted.';
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -433,11 +433,11 @@ class LegalDocumentsController
 
             $_SESSION['flash_success'] = 'Draft version deleted.';
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to delete version: ' . $e->getMessage();
             header("Location: /admin-legacy/legal-documents/{$documentId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -460,7 +460,7 @@ class LegalDocumentsController
         if ($version['is_draft']) {
             $_SESSION['flash_error'] = 'Cannot notify users about draft versions.';
             header("Location: " . TenantContext::getBasePath() . "/admin-legacy/legal-documents/{$documentId}/versions/{$versionId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -473,11 +473,11 @@ class LegalDocumentsController
             }
 
             header("Location: " . TenantContext::getBasePath() . "/admin-legacy/legal-documents/{$documentId}/versions/{$versionId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to send notifications: ' . $e->getMessage();
             header("Location: " . TenantContext::getBasePath() . "/admin-legacy/legal-documents/{$documentId}/versions/{$versionId}");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -605,7 +605,7 @@ class LegalDocumentsController
         }
 
         fclose($output);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

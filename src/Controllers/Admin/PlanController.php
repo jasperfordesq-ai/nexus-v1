@@ -26,10 +26,10 @@ class PlanController
                 header('Content-Type: application/json');
                 http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Only super admins can manage plans
@@ -40,11 +40,11 @@ class PlanController
                 header('Content-Type: application/json');
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'Super admin access required']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('HTTP/1.0 403 Forbidden');
             echo "Access Denied - Super Admin Only";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -73,7 +73,7 @@ class PlanController
             if (!Csrf::verify()) {
                 $_SESSION['error'] = 'Invalid CSRF token';
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $db = Database::getConnection();
@@ -85,7 +85,7 @@ class PlanController
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $_SESSION['error'] = 'Invalid features JSON';
                     header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans/create');
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
             }
 
@@ -117,7 +117,7 @@ class PlanController
 
             $_SESSION['success'] = 'Plan created successfully';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Show create form
@@ -139,14 +139,14 @@ class PlanController
         if (!$plan) {
             $_SESSION['error'] = 'Plan not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Csrf::verify()) {
                 $_SESSION['error'] = 'Invalid CSRF token';
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $db = Database::getConnection();
@@ -158,7 +158,7 @@ class PlanController
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $_SESSION['error'] = 'Invalid features JSON';
                     header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans/edit/' . $id);
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
             }
 
@@ -192,7 +192,7 @@ class PlanController
 
             $_SESSION['success'] = 'Plan updated successfully';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/plans');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Show edit form
@@ -212,12 +212,12 @@ class PlanController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify()) {
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Check if any tenants are assigned to this plan
@@ -231,7 +231,7 @@ class PlanController
                 'success' => false,
                 'error' => 'Cannot delete plan - it has active tenant assignments'
             ]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $stmt = $db->prepare("DELETE FROM pay_plans WHERE id = ?");
@@ -290,12 +290,12 @@ class PlanController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify()) {
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = (int)$_POST['tenant_id'];

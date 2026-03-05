@@ -88,7 +88,9 @@ abstract class BaseApiController
 
         http_response_code($status);
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        exit;
+        if (!defined('TESTING')) {
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        }
     }
 
     /**
@@ -270,7 +272,7 @@ abstract class BaseApiController
         $this->setApiVersionHeaders();
         $this->setRateLimitHeaders();
         http_response_code(204);
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**

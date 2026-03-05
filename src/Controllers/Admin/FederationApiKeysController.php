@@ -98,7 +98,7 @@ class FederationApiKeysController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/api-keys/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $name = trim($_POST['name'] ?? '');
@@ -112,7 +112,7 @@ class FederationApiKeysController
         if (empty($name)) {
             $_SESSION['flash_error'] = 'API key name is required.';
             header('Location: /admin-legacy/federation/api-keys/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Generate secure API key
@@ -178,7 +178,7 @@ class FederationApiKeysController
         session_write_close();
 
         header('Location: /admin-legacy/federation/api-keys');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -203,7 +203,7 @@ class FederationApiKeysController
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get usage stats
@@ -249,7 +249,7 @@ class FederationApiKeysController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -263,7 +263,7 @@ class FederationApiKeysController
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $stmt = $db->prepare("UPDATE federation_api_keys SET status = 'suspended' WHERE id = ?");
@@ -279,7 +279,7 @@ class FederationApiKeysController
 
         $_SESSION['flash_success'] = 'API key suspended.';
         header('Location: /admin-legacy/federation/api-keys');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -294,7 +294,7 @@ class FederationApiKeysController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -307,7 +307,7 @@ class FederationApiKeysController
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $stmt = $db->prepare("UPDATE federation_api_keys SET status = 'active' WHERE id = ?");
@@ -323,7 +323,7 @@ class FederationApiKeysController
 
         $_SESSION['flash_success'] = 'API key reactivated.';
         header('Location: /admin-legacy/federation/api-keys');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -338,7 +338,7 @@ class FederationApiKeysController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -351,7 +351,7 @@ class FederationApiKeysController
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Mark as revoked (keeps audit trail)
@@ -368,7 +368,7 @@ class FederationApiKeysController
 
         $_SESSION['flash_success'] = 'API key permanently revoked.';
         header('Location: /admin-legacy/federation/api-keys');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -388,7 +388,7 @@ class FederationApiKeysController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -401,7 +401,7 @@ class FederationApiKeysController
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
             header('Location: /admin-legacy/federation/api-keys');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Generate new key
@@ -431,6 +431,6 @@ class FederationApiKeysController
         session_write_close();
 
         header('Location: /admin-legacy/federation/api-keys');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

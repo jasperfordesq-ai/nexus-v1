@@ -381,7 +381,7 @@ class FederationExportController
         // Cleanup
         array_map('unlink', glob($tempDir . '/*'));
         rmdir($tempDir);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -528,7 +528,7 @@ class FederationExportController
         }
 
         fclose($output);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

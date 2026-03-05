@@ -25,10 +25,10 @@ class MenuController
                 header('Content-Type: application/json');
                 http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -41,11 +41,11 @@ class MenuController
                 header('Content-Type: application/json');
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'Access denied']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('HTTP/1.0 403 Forbidden');
             echo "Access Denied";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -125,7 +125,7 @@ class MenuController
     </div>
 </body>
 </html>';
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -142,7 +142,7 @@ class MenuController
         if (!$menu) {
             header('HTTP/1.0 404 Not Found');
             echo "Menu not found";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get available pages for linking
@@ -179,14 +179,14 @@ class MenuController
         if (!$validation['allowed']) {
             $_SESSION['error'] = $validation['reason'];
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/menus');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Csrf::verify()) {
                 $_SESSION['error'] = 'Invalid CSRF token';
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/menus');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $slug = self::generateSlug($_POST['name'] ?? 'menu');
@@ -206,7 +206,7 @@ class MenuController
 
             $_SESSION['success'] = 'Menu created successfully';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/menus/builder/' . $menuId);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Show create form
@@ -230,13 +230,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate menu settings
@@ -246,7 +246,7 @@ class MenuController
             http_response_code(400);
             // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $data = [
@@ -282,13 +282,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $success = Menu::toggleActive($id, $tenantId);
@@ -314,13 +314,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $success = Menu::delete($id, $tenantId);
@@ -346,13 +346,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate input data
@@ -362,7 +362,7 @@ class MenuController
             http_response_code(400);
             // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $menuId = (int)$_POST['menu_id'];
@@ -372,7 +372,7 @@ class MenuController
         if (!$menu) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Menu not found']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Check item limits
@@ -385,7 +385,7 @@ class MenuController
                 'success' => false,
                 'error' => "Maximum menu items ({$planLimits['max_menu_items']}) reached for your plan"
             ]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $data = [
@@ -445,13 +445,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate input data
@@ -461,7 +461,7 @@ class MenuController
             http_response_code(400);
             // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
             echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $data = [
@@ -501,13 +501,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $success = MenuItem::delete($id);
@@ -532,13 +532,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $items = json_decode($_POST['items'] ?? '[]', true);
@@ -546,7 +546,7 @@ class MenuController
         if (!is_array($items)) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid items data']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $success = MenuItem::updateSortOrder($items);
@@ -763,13 +763,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -803,13 +803,13 @@ class MenuController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $action = $_POST['action'] ?? '';
@@ -818,13 +818,13 @@ class MenuController
         if (!in_array($action, ['activate', 'deactivate', 'delete'])) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Invalid action']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!is_array($menuIds) || empty($menuIds)) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'No menus selected']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $affected = 0;

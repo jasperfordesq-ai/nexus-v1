@@ -21,14 +21,14 @@ class VolunteeringController
         if (session_status() === PHP_SESSION_NONE) session_start();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
         $role = $_SESSION['user_role'] ?? '';
         $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_admin']);
         if (!$isAdmin) {
             header('HTTP/1.1 403 Forbidden');
             echo 'Access Denied: Admin privileges required';
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -129,7 +129,7 @@ class VolunteeringController
         $org = \Nexus\Models\VolOrganization::find($id);
         // Security: Use strict comparison to prevent type juggling attacks
         if (!$org || (int)$org['tenant_id'] !== (int)TenantContext::getId()) {
-            http_response_code(403); echo 'Access denied'; exit;
+            http_response_code(403); echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         // Delete (We assume cascade or soft delete, but for now strict delete)

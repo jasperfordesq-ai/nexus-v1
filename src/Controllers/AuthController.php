@@ -71,7 +71,7 @@ class AuthController
                     header('Content-Type: application/json');
                     http_response_code(429);
                     echo json_encode(['error' => $message, 'retry_after' => $emailLimit['retry_after']]);
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
                 $tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
                 View::render('auth/login', [
@@ -90,7 +90,7 @@ class AuthController
                 header('Content-Type: application/json');
                 http_response_code(429);
                 echo json_encode(['error' => $message, 'retry_after' => $ipLimit['retry_after']]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             $tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
             View::render('auth/login', [
@@ -107,7 +107,7 @@ class AuthController
                 if ($isJson) {
                     header('Content-Type: application/json');
                     echo json_encode(['error' => 'Account pending approval']);
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
                 echo "Your account is pending approval. Please contact the administrator.";
                 return;
@@ -146,11 +146,11 @@ class AuthController
                             'redirect' => '/auth/2fa',
                             'code' => 'AUTH_2FA_REQUIRED',
                         ]);
-                        exit;
+                        if (!defined('TESTING')) { exit; }
                     }
 
                     header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa');
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
                 // Trusted device — skip 2FA, continue with normal login
             } elseif ($isAdminUser) {
@@ -166,11 +166,11 @@ class AuthController
                         'code' => 'AUTH_2FA_SETUP_REQUIRED',
                         'message' => 'Two-factor authentication setup is required for admin accounts.',
                     ]);
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
 
                 header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/auth/2fa/setup');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             // Regular users without 2FA: skip — 2FA is optional for members
 
@@ -219,7 +219,7 @@ class AuthController
                     'name' => $user['first_name'] . ' ' . $user['last_name'],
                     'role' => $user['role'] ?? 'member'
                 ]]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // CROSS-TENANT REDIRECT LOGIC
@@ -231,13 +231,13 @@ class AuthController
                 $targetTenant = \Nexus\Models\Tenant::find($user['tenant_id']);
                 if ($targetTenant) {
                     header('Location: /' . $targetTenant['slug'] . '/home');
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
             }
 
             // Standard Redirect - Direct to modern home feed instead of dashboard
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/home');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Security: Record failed login attempt
@@ -250,7 +250,7 @@ class AuthController
             header('Content-Type: application/json');
             http_response_code(401);
             echo json_encode(['error' => 'Invalid credentials']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Show login again with error
@@ -293,7 +293,7 @@ class AuthController
                         Password Security Error:<br>$errorString<br>
                         <a href='javascript:history.back()'>Go Back</a>
                       </div>";
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // GDPR Validation
@@ -470,7 +470,7 @@ class AuthController
                 // --------------------------
 
                 echo "Registration successful! Your account is pending admin approval. <a href='" . \Nexus\Core\TenantContext::getBasePath() . "/login'>Login here</a> once approved.";
-                exit;
+                if (!defined('TESTING')) { exit; }
             } catch (\PDOException $e) {
                 echo "Error: Email might be taken.";
             }
@@ -541,7 +541,7 @@ class AuthController
         session_regenerate_id(true);
 
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -656,7 +656,7 @@ class AuthController
 
         // Redirect to target user's home
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/home');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -667,7 +667,7 @@ class AuthController
         // Security: Verify we're actually impersonating
         if (empty($_SESSION['impersonating_as_admin_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/home');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Store impersonated user info for logging
@@ -713,7 +713,7 @@ class AuthController
 
         // Redirect back to admin users page
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/users');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -773,13 +773,13 @@ class AuthController
         if ($ipLimit['limited']) {
             // Still show generic message to prevent enumeration
             echo $genericMessage;
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate email format first
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             echo $genericMessage;
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // SECURITY: Rate limit by email to prevent abuse of specific accounts
@@ -787,7 +787,7 @@ class AuthController
             $emailLimit = \Nexus\Core\RateLimiter::check($email, 'email');
             if ($emailLimit['limited']) {
                 echo $genericMessage;
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             // Record the attempt (not a login, but rate limits apply)
             \Nexus\Core\RateLimiter::recordAttempt($email, 'email', false);
@@ -844,7 +844,7 @@ class AuthController
 
         // Security: Always show the same response regardless of whether user exists
         echo $genericMessage;
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function showReset()

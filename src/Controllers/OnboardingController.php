@@ -17,7 +17,7 @@ class OnboardingController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -103,6 +103,6 @@ class OnboardingController
 
         // Redirect to Dashboard
         header('Location: ' . TenantContext::getBasePath() . '/dashboard?msg=welcome_aboard');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

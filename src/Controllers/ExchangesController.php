@@ -34,7 +34,7 @@ class ExchangesController
         if (!BrokerControlConfigService::isExchangeWorkflowEnabled()) {
             $basePath = TenantContext::getBasePath();
             header('Location: ' . $basePath . '/listings');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -47,7 +47,7 @@ class ExchangesController
             $basePath = TenantContext::getBasePath();
             $returnUrl = urlencode($_SERVER['REQUEST_URI'] ?? '/exchanges');
             header('Location: ' . $basePath . '/login?return=' . $returnUrl);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
         return (int) $_SESSION['user_id'];
     }
@@ -146,7 +146,7 @@ class ExchangesController
             header('HTTP/1.1 403 Forbidden');
             $basePath = TenantContext::getBasePath();
             header('Location: ' . $basePath . '/exchanges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $history = ExchangeWorkflowService::getExchangeHistory($id);
@@ -177,7 +177,7 @@ class ExchangesController
             header('HTTP/1.1 404 Not Found');
             $basePath = TenantContext::getBasePath();
             header('Location: ' . $basePath . '/listings');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Can't request exchange on own listing
@@ -185,7 +185,7 @@ class ExchangesController
             $basePath = TenantContext::getBasePath();
             $_SESSION['flash_error'] = 'You cannot request an exchange on your own listing.';
             header('Location: ' . $basePath . '/listings/' . $listingId);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $pageTitle = 'Request Exchange';
@@ -212,7 +212,7 @@ class ExchangesController
         if ($listingId <= 0) {
             $_SESSION['flash_error'] = 'Invalid listing.';
             header('Location: ' . TenantContext::getBasePath() . '/exchanges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate hours
@@ -232,7 +232,7 @@ class ExchangesController
             $_SESSION['flash_error'] = 'Failed to create exchange request.';
             header('Location: ' . $basePath . '/listings/' . $listingId);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -255,7 +255,7 @@ class ExchangesController
         }
 
         header('Location: ' . $basePath . '/exchanges/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -279,7 +279,7 @@ class ExchangesController
             $_SESSION['flash_error'] = 'Failed to decline exchange request.';
             header('Location: ' . $basePath . '/exchanges/' . $id);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -302,7 +302,7 @@ class ExchangesController
         }
 
         header('Location: ' . $basePath . '/exchanges/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -328,7 +328,7 @@ class ExchangesController
         }
 
         header('Location: ' . $basePath . '/exchanges/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -352,7 +352,7 @@ class ExchangesController
             $_SESSION['flash_error'] = 'Failed to cancel exchange.';
             header('Location: ' . $basePath . '/exchanges/' . $id);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

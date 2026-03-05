@@ -911,7 +911,7 @@ class FederationApiController extends BaseApiController
             http_response_code(400);
             header('Content-Type: application/json');
             echo json_encode($result);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
         http_response_code(200);
@@ -919,7 +919,7 @@ class FederationApiController extends BaseApiController
         header('Cache-Control: no-store');
         header('Pragma: no-cache');
         echo json_encode($result);
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**

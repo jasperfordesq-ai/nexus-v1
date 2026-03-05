@@ -16,6 +16,8 @@ use Nexus\Services\XPShopService;
 use Nexus\Services\GamificationService;
 use Nexus\Services\LeaderboardSeasonService;
 use Nexus\Services\LeaderboardService;
+use Nexus\Services\NexusScoreCacheService;
+use Nexus\Services\NexusScoreService;
 use Nexus\Models\UserBadge;
 
 /**
@@ -721,6 +723,81 @@ class GamificationV2ApiController extends BaseApiController
      *
      * Response: 200 OK with reward data
      */
+    /**
+     * GET /api/v2/gamification/nexus-score
+     * Returns the current user's full NexusScore breakdown (own score only).
+     */
+    public function nexusScore(): void
+    {
+        $userId   = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        $this->rateLimit('nexus_score', 30, 60);
+
+        try {
+            $db           = Database::getInstance();
+            $cacheService = new NexusScoreCacheService($db);
+            $scoreData    = $cacheService->getScore($userId, $tenantId);
+
+            // Tier may be returned as an array (name/color/icon) — normalise to flat fields
+            $tier = $scoreData['tier'];
+            if (is_array($tier)) {
+                $tierName  = $tier['name']  ?? 'Novice';
+                $tierIcon  = $tier['icon']  ?? '';
+                $tierColor = $tier['color'] ?? '';
+            } else {
+                $tierName  = (string) $tier;
+                $tierIcon  = '';
+                $tierColor = '';
+            }
+
+            $breakdown = $scoreData['breakdown'] ?? [];
+            $formatted = [];
+            $categoryMeta = [
+                'engagement' => ['label' => 'Community Engagement', 'max' => 250],
+                'quality'    => ['label' => 'Contribution Quality',  'max' => 200],
+                'volunteer'  => ['label' => 'Volunteer Hours',        'max' => 200],
+                'activity'   => ['label' => 'Platform Activity',      'max' => 150],
+                'badges'     => ['label' => 'Badges & Achievements',  'max' => 100],
+                'impact'     => ['label' => 'Social Impact',          'max' => 100],
+            ];
+            foreach ($categoryMeta as $key => $meta) {
+                $cat = $breakdown[$key] ?? [];
+                $formatted[] = [
+                    'key'        => $key,
+                    'label'      => $meta['label'],
+                    'score'      => (int) ($cat['score'] ?? 0),
+                    'max'        => $meta['max'],
+                    'percentage' => $meta['max'] > 0
+                        ? round((($cat['score'] ?? 0) / $meta['max']) * 100, 1)
+                        : 0,
+                    'details'    => $cat['details'] ?? [],
+                ];
+            }
+
+            $this->respondWithData([
+                'total_score' => (int) ($scoreData['total_score'] ?? 0),
+                'max_score'   => 1000,
+                'percentage'  => (float) ($scoreData['percentage'] ?? 0),
+                'percentile'  => (float) ($scoreData['percentile'] ?? 0),
+                'tier'        => [
+                    'name'  => $tierName,
+                    'icon'  => $tierIcon,
+                    'color' => $tierColor,
+                ],
+                'breakdown'   => $formatted,
+                'insights'    => $scoreData['insights'] ?? [],
+            ]);
+        } catch (\Throwable $e) {
+            $this->respondWithError(
+                ApiErrorCodes::SERVER_INTERNAL_ERROR,
+                'Failed to load NexusScore',
+                null,
+                500
+            );
+        }
+    }
+
     public function claimChallenge(int $id): void
     {
         $userId = $this->getUserId();

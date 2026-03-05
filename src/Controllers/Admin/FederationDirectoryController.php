@@ -34,7 +34,7 @@ class FederationDirectoryController
 
         if (!isset($_SESSION['user_id']) || (!$isAdmin && !$isSuper && !$isAdminSession)) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -96,7 +96,7 @@ class FederationDirectoryController
 
         if ($timebankId === $tenantId) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/directory/profile');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get timebank profile

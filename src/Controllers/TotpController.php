@@ -34,7 +34,7 @@ class TotpController
     public function showVerify(): void
     {
         header('Location: ' . TenantContext::getBasePath() . '/login');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -47,13 +47,13 @@ class TotpController
 
         if (empty($_SESSION['pending_2fa_user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (($_SESSION['pending_2fa_expires'] ?? 0) < time()) {
             unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
             header('Location: ' . TenantContext::getBasePath() . '/login?error=2fa_timeout');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = (int)$_SESSION['pending_2fa_user_id'];
@@ -62,7 +62,7 @@ class TotpController
 
         if (empty($code)) {
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa?error=code_required');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Try verification
@@ -75,7 +75,7 @@ class TotpController
         if (!$result['success']) {
             $error = urlencode($result['error'] ?? 'Invalid code');
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa?error=' . $error);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // 2FA successful - complete login
@@ -95,7 +95,7 @@ class TotpController
         $redirect = $_SESSION['login_redirect'] ?? TenantContext::getBasePath() . '/dashboard';
         unset($_SESSION['login_redirect']);
         header('Location: ' . $redirect);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -106,7 +106,7 @@ class TotpController
     {
         // Legacy view removed — redirect to login
         header('Location: ' . TenantContext::getBasePath() . '/login');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -121,14 +121,14 @@ class TotpController
 
         if (!$userId) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $code = trim($_POST['code'] ?? '');
 
         if (empty($code)) {
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa/setup?error=code_required');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $result = TotpService::completeSetup($userId, $code);
@@ -136,7 +136,7 @@ class TotpController
         if (!$result['success']) {
             $error = urlencode($result['error'] ?? 'Verification failed');
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa/setup?error=' . $error);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Store backup codes in session for display
@@ -157,7 +157,7 @@ class TotpController
 
         // Redirect to backup codes page
         header('Location: ' . TenantContext::getBasePath() . '/auth/2fa/backup-codes');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -173,7 +173,7 @@ class TotpController
         } else {
             header('Location: ' . $basePath . '/settings');
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -186,7 +186,7 @@ class TotpController
 
         if (empty($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Require password confirmation
@@ -196,14 +196,14 @@ class TotpController
         if (!$user || !password_verify($password, $user['password_hash'])) {
             $_SESSION['flash_error'] = 'Invalid password.';
             header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $backupCodes = TotpService::generateBackupCodes($_SESSION['user_id']);
         $_SESSION['totp_backup_codes'] = $backupCodes;
 
         header('Location: ' . TenantContext::getBasePath() . '/auth/2fa/backup-codes');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -219,7 +219,7 @@ class TotpController
         } else {
             header('Location: ' . $basePath . '/settings');
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -232,7 +232,7 @@ class TotpController
         // 2FA is mandatory - disabling is not allowed
         $_SESSION['flash_error'] = 'Two-factor authentication is mandatory and cannot be disabled.';
         header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -245,7 +245,7 @@ class TotpController
 
         if (empty($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $deviceId = (int)($_POST['device_id'] ?? 0);
@@ -260,7 +260,7 @@ class TotpController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -273,7 +273,7 @@ class TotpController
 
         if (empty($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $count = TotpService::revokeAllDevices($_SESSION['user_id'], 'user_action');
@@ -285,7 +285,7 @@ class TotpController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -297,7 +297,7 @@ class TotpController
 
         if (!$user) {
             header('Location: ' . TenantContext::getBasePath() . '/login?error=user_not_found');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Clear pending 2FA session

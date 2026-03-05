@@ -97,7 +97,7 @@ class GdprRequestController extends BaseEnterpriseController
         if (!$request) {
             $_SESSION['flash_error'] = 'Request not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/requests');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         View::render('admin/enterprise/gdpr/request-view', [

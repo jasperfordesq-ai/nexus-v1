@@ -51,10 +51,10 @@ class MessageController
             if ($isApi) {
                 http_response_code(401);
                 echo json_encode(['error' => 'Unauthorized']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -67,7 +67,7 @@ class MessageController
             if ($isApi) {
                 header('Content-Type: application/json');
                 echo json_encode(['data' => $threads]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             require $this->getViewPath('index');
@@ -83,13 +83,13 @@ class MessageController
 
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
             if ($otherUserId == $_SESSION['user_id']) {
                 header('Location: ' . TenantContext::getBasePath() . '/messages');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $userId = $_SESSION['user_id'];
@@ -115,7 +115,7 @@ class MessageController
                 } else {
                     require $baseDir . 'modern/messages/messages_thread_partial.php';
                 }
-                exit; // Stop further rendering
+                if (!defined('TESTING')) { exit; } // Stop further rendering
             }
 
             // Check if this conversation is being monitored by broker
@@ -137,7 +137,7 @@ class MessageController
             if (!empty($_GET['ajax'])) {
                 http_response_code(500);
                 echo "Error loading chat: " . $e->getMessage();
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             die("Error loading thread: " . $e->getMessage());
         }
@@ -148,7 +148,7 @@ class MessageController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // If "to" parameter exists, redirect to that conversation
@@ -171,18 +171,18 @@ class MessageController
                 if ($otherTenantId && $otherTenantId != TenantContext::getId()) {
                     // Redirect to federated messages with tenant parameter
                     header('Location: ' . TenantContext::getBasePath() . '/federation/messages/' . $otherUserId . '?tenant=' . $otherTenantId);
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
             }
 
             // Same tenant - use regular messages
             header('Location: ' . TenantContext::getBasePath() . '/messages/' . $otherUserId);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Default to inbox if no target
         header('Location: ' . TenantContext::getBasePath() . '/messages');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // New Message / User Search (Mobile)
@@ -190,7 +190,7 @@ class MessageController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -199,7 +199,7 @@ class MessageController
         // 2026-01-17: Removed abandoned mobile app redirect
         // All devices now use the responsive messages page with modal
         header('Location: ' . TenantContext::getBasePath() . '/messages');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // Send Message
@@ -208,7 +208,7 @@ class MessageController
         \Nexus\Core\Csrf::verifyOrDie();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -219,7 +219,7 @@ class MessageController
 
             if (!$receiverId || empty($body)) {
                 header('Location: ' . UrlHelper::safeReferer(TenantContext::getBasePath() . '/messages'));
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $tenant = TenantContext::get();
@@ -279,7 +279,7 @@ class MessageController
 
             // Redirect back to thread
             header('Location: ' . TenantContext::getBasePath() . '/messages/' . $receiverId);
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             die("Error sending message: " . $e->getMessage());
         }
@@ -303,10 +303,10 @@ class MessageController
                 http_response_code(401);
                 header('Content-Type: application/json');
                 echo json_encode(['error' => 'Unauthorized']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -319,17 +319,17 @@ class MessageController
             if ($isAjax) {
                 header('Content-Type: application/json');
                 echo json_encode(['success' => true, 'deleted' => $deleted]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             header('Location: ' . TenantContext::getBasePath() . '/messages');
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             if ($isAjax) {
                 http_response_code(500);
                 header('Content-Type: application/json');
                 echo json_encode(['error' => $e->getMessage()]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             die("Error deleting conversation: " . $e->getMessage());
         }
@@ -346,7 +346,7 @@ class MessageController
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // CSRF verification
@@ -355,7 +355,7 @@ class MessageController
         if (!\Nexus\Core\Csrf::verify($token)) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get input
@@ -369,7 +369,7 @@ class MessageController
         if (!$messageId) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Message ID required']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -381,15 +381,15 @@ class MessageController
             if ($result === false) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'Message not found or access denied']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             echo json_encode(['success' => true, 'deleted' => $result['deleted']]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -404,7 +404,7 @@ class MessageController
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // CSRF verification
@@ -413,7 +413,7 @@ class MessageController
         if (!\Nexus\Core\Csrf::verify($token)) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get input
@@ -427,7 +427,7 @@ class MessageController
         if (!$otherUserId) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Other user ID required']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -437,11 +437,11 @@ class MessageController
             $deleted = Message::deleteConversation($tenantId, $userId, $otherUserId);
 
             echo json_encode(['success' => true, 'deleted' => $deleted]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -456,7 +456,7 @@ class MessageController
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // CSRF verification
@@ -465,7 +465,7 @@ class MessageController
         if (!\Nexus\Core\Csrf::verify($token)) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get input
@@ -481,13 +481,13 @@ class MessageController
         if (!$messageId) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Message ID required']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!$emoji) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Emoji required']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate emoji (basic check - allow common emojis)
@@ -495,7 +495,7 @@ class MessageController
         if (!in_array($emoji, $allowedEmojis)) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Invalid emoji']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -505,11 +505,11 @@ class MessageController
             $result = Message::toggleReaction($tenantId, $messageId, $userId, $emoji);
 
             echo json_encode($result);
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -524,20 +524,20 @@ class MessageController
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $idsParam = $_GET['ids'] ?? '';
         if (empty($idsParam)) {
             echo json_encode(['success' => true, 'reactions' => []]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Parse and validate IDs
         $ids = array_filter(array_map('intval', explode(',', $idsParam)));
         if (empty($ids)) {
             echo json_encode(['success' => true, 'reactions' => []]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Limit to 100 messages at a time
@@ -547,11 +547,11 @@ class MessageController
             $reactions = Message::getReactionsBatch($ids);
 
             echo json_encode(['success' => true, 'reactions' => $reactions]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 }

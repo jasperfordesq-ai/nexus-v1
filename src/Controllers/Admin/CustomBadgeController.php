@@ -20,7 +20,7 @@ class CustomBadgeController
     {
         if (!$this->isAdmin()) {
             header('Location: ' . TenantContext::getBasePath() . '/');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -52,7 +52,7 @@ class CustomBadgeController
     {
         if (!$this->isAdmin()) {
             header('Location: ' . TenantContext::getBasePath() . '/');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         View::render('admin/gamification/custom-badge-form', [
@@ -88,7 +88,7 @@ class CustomBadgeController
         if (empty($name)) {
             $_SESSION['flash_error'] = 'Badge name is required';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         Database::query(
@@ -99,7 +99,7 @@ class CustomBadgeController
 
         $_SESSION['flash_success'] = 'Custom badge created successfully!';
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -109,7 +109,7 @@ class CustomBadgeController
     {
         if (!$this->isAdmin()) {
             header('Location: ' . TenantContext::getBasePath() . '/');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -121,7 +121,7 @@ class CustomBadgeController
 
         if (!$badge) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         View::render('admin/gamification/custom-badge-form', [
@@ -158,7 +158,7 @@ class CustomBadgeController
         if (empty($name) || !$id) {
             $_SESSION['flash_error'] = 'Invalid badge data';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         Database::query(
@@ -169,7 +169,7 @@ class CustomBadgeController
 
         $_SESSION['flash_success'] = 'Custom badge updated successfully!';
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -192,7 +192,7 @@ class CustomBadgeController
         if (!$id) {
             $_SESSION['flash_error'] = 'Invalid badge ID';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Remove from users first
@@ -209,7 +209,7 @@ class CustomBadgeController
 
         $_SESSION['flash_success'] = 'Custom badge deleted successfully!';
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -233,7 +233,7 @@ class CustomBadgeController
         if (!$badgeId || empty($userIds)) {
             $_SESSION['flash_error'] = 'Please select a badge and at least one user';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get badge details
@@ -245,7 +245,7 @@ class CustomBadgeController
         if (!$badge) {
             $_SESSION['flash_error'] = 'Badge not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $awarded = 0;
@@ -289,7 +289,7 @@ class CustomBadgeController
 
         $_SESSION['flash_success'] = "Badge awarded to {$awarded} user(s)!";
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -312,7 +312,7 @@ class CustomBadgeController
         if (!$badgeId || !$userId) {
             $_SESSION['flash_error'] = 'Invalid parameters';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -323,7 +323,7 @@ class CustomBadgeController
 
         $_SESSION['flash_success'] = 'Badge revoked successfully!';
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/custom-badges');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

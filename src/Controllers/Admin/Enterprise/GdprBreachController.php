@@ -91,7 +91,7 @@ class GdprBreachController extends BaseEnterpriseController
         if (!$breach) {
             $_SESSION['flash_error'] = 'Breach not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/breaches');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         View::render('admin/enterprise/gdpr/breach-view', [

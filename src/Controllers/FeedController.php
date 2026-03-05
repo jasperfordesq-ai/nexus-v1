@@ -70,7 +70,7 @@ class FeedController
         \Nexus\Core\Csrf::verifyOrDie();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $content = trim($_POST['content'] ?? '');

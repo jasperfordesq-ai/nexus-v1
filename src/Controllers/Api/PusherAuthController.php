@@ -82,7 +82,7 @@ class PusherAuthController extends BaseApiController
             // Return raw JSON from Pusher
             header('Content-Type: application/json');
             echo $auth;
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         } catch (\Throwable $e) {
             error_log('[PusherAuth] authPrivate error: ' . $e->getMessage());
             $this->jsonResponse(['error' => 'Auth error: ' . $e->getMessage()], 500);
@@ -107,7 +107,7 @@ class PusherAuthController extends BaseApiController
             // Return raw JSON from Pusher
             header('Content-Type: application/json');
             echo $auth;
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         } catch (\Throwable $e) {
             error_log('[PusherAuth] authPresence error: ' . $e->getMessage());
             $this->jsonResponse(['error' => 'Auth error: ' . $e->getMessage()], 500);
@@ -130,7 +130,7 @@ class PusherAuthController extends BaseApiController
             // Return raw JSON from Pusher
             header('Content-Type: application/json');
             echo $auth;
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         } catch (\Throwable $e) {
             error_log('[PusherAuth] authFederation error: ' . $e->getMessage());
             $this->jsonResponse(['error' => 'Auth error: ' . $e->getMessage()], 500);

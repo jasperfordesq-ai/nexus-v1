@@ -36,7 +36,7 @@ class BrokerControlsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -47,7 +47,7 @@ class BrokerControlsController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -192,7 +192,7 @@ class BrokerControlsController
             }
 
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/configuration');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // GET - show form
@@ -308,7 +308,7 @@ class BrokerControlsController
             if (!$exchange) {
                 $_SESSION['flash_error'] = 'Exchange not found.';
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Get exchange history
@@ -323,7 +323,7 @@ class BrokerControlsController
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Error loading exchange: ' . $e->getMessage();
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         View::render('admin/broker-controls/exchanges/show', [
@@ -372,7 +372,7 @@ class BrokerControlsController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -389,7 +389,7 @@ class BrokerControlsController
         if (empty($reason)) {
             $_SESSION['flash_error'] = 'Please provide a reason for rejection.';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges/' . $id);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (class_exists('\\Nexus\\Services\\ExchangeWorkflowService')) {
@@ -418,7 +418,7 @@ class BrokerControlsController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/exchanges');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // =========================================================================
@@ -556,7 +556,7 @@ class BrokerControlsController
             }
 
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // GET - show form
@@ -573,7 +573,7 @@ class BrokerControlsController
             if (!$listing) {
                 $_SESSION['flash_error'] = 'Listing not found.';
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $existingTag = Database::query(
@@ -583,7 +583,7 @@ class BrokerControlsController
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Error loading listing: ' . $e->getMessage();
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         View::render('admin/broker-controls/risk-tags/form', [
@@ -615,7 +615,7 @@ class BrokerControlsController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/risk-tags');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // =========================================================================
@@ -688,7 +688,7 @@ class BrokerControlsController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/messages');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -719,7 +719,7 @@ class BrokerControlsController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/messages');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // =========================================================================
@@ -841,7 +841,7 @@ class BrokerControlsController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/broker-controls/monitoring');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // =========================================================================

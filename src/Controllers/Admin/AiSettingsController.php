@@ -32,7 +32,7 @@ class AiSettingsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -43,7 +43,7 @@ class AiSettingsController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -189,7 +189,7 @@ class AiSettingsController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/ai-settings');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -239,7 +239,7 @@ class AiSettingsController
                     'success' => false,
                     'message' => "Provider '$providerId' is not configured. Please add the API key and save settings first."
                 ]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Provider is configured - proceed with test
@@ -262,7 +262,7 @@ class AiSettingsController
             ]);
         }
 
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -279,6 +279,6 @@ class AiSettingsController
 
         $_SESSION['flash_success'] = 'AI settings initialized with defaults.';
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/ai-settings');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

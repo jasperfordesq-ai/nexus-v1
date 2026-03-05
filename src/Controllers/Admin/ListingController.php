@@ -20,7 +20,7 @@ class ListingController
         $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_admin']);
         if (!$isAdmin) {
             header('Location: /login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -194,14 +194,14 @@ class ListingController
         // 4. Redirect back
         $redirect = UrlHelper::safeReferer('/admin-legacy/listings?status=deleted');
         header("Location: $redirect");
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function edit($id)
     {
         $this->requireAdmin();
         header("Location: /listings/edit/$id");
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -222,6 +222,6 @@ class ListingController
         // Redirect back to pending review
         $redirect = UrlHelper::safeReferer('/admin-legacy/listings?status=pending');
         header("Location: $redirect");
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

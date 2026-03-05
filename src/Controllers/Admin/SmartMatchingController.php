@@ -31,7 +31,7 @@ class SmartMatchingController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -42,7 +42,7 @@ class SmartMatchingController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -157,7 +157,7 @@ class SmartMatchingController
 
             $_SESSION['flash_success'] = 'Smart Matching configuration saved successfully!';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching/configuration');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // GET - show form
@@ -191,7 +191,7 @@ class SmartMatchingController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -215,7 +215,7 @@ class SmartMatchingController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -242,7 +242,7 @@ class SmartMatchingController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/smart-matching');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -259,6 +259,6 @@ class SmartMatchingController
             'stats' => SmartMatchingAnalyticsService::getOverallStats(),
             'geocoding' => GeocodingService::getStats(),
         ]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }
