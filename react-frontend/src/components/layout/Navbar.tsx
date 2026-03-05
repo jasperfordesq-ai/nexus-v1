@@ -313,6 +313,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
     { label: t('nav.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' as const },
+    { label: t('nav.nexus_score', 'NexusScore'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' as const },
     { label: t('nav.matches', 'Matches'), href: tenantPath('/matches'), icon: Handshake },
     { label: t('nav.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
     { label: t('nav.skills', 'Skills'), href: tenantPath('/skills'), icon: GraduationCap },

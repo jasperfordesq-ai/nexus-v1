@@ -120,6 +120,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.matches', 'Matches'), href: '/matches', icon: Handshake },
     { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
+    { label: t('nav.nexus_score', 'NexusScore'), href: '/nexus-score', icon: BarChart3, feature: 'gamification' as const },
     { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
     { label: t('nav.skills', 'Skills'), href: '/skills', icon: GraduationCap },
     { label: t('nav.activity', 'My Activity'), href: '/activity', icon: Activity },

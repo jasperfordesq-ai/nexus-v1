@@ -510,14 +510,26 @@ export function ProfilePage() {
                   </span>
                 )}
                 {profile.nexus_score && (
-                  <span
-                    className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold"
-                    aria-label={`NexusScore: ${profile.nexus_score.total_score} (${profile.nexus_score.tier})`}
-                  >
-                    <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
-                    {profile.nexus_score.total_score}
-                    <span className="text-[10px] opacity-70 capitalize">{profile.nexus_score.tier}</span>
-                  </span>
+                  isOwnProfile ? (
+                    <Link
+                      to={tenantPath('/nexus-score')}
+                      className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold hover:bg-indigo-500/25 transition-colors"
+                      aria-label={`NexusScore: ${profile.nexus_score.total_score} (${profile.nexus_score.tier}) — view breakdown`}
+                    >
+                      <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
+                      {profile.nexus_score.total_score}
+                      <span className="text-[10px] opacity-70 capitalize">{profile.nexus_score.tier}</span>
+                    </Link>
+                  ) : (
+                    <span
+                      className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-semibold"
+                      aria-label={`NexusScore: ${profile.nexus_score.total_score} (${profile.nexus_score.tier})`}
+                    >
+                      <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
+                      {profile.nexus_score.total_score}
+                      <span className="text-[10px] opacity-70 capitalize">{profile.nexus_score.tier}</span>
+                    </span>
+                  )
                 )}
               </div>
 
