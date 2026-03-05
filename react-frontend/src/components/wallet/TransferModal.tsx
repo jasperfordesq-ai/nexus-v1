@@ -250,12 +250,12 @@ export function TransferModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-0 flex items-center justify-center z-[9999] p-4"
+            className="fixed inset-0 flex items-center justify-center z-[9999] p-4 overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-labelledby="transfer-modal-title"
           >
-            <div className="bg-theme-card backdrop-blur-xl border border-theme-default rounded-2xl w-full max-w-sm sm:max-w-md shadow-2xl">
+            <div className="bg-theme-card backdrop-blur-xl border border-theme-default rounded-2xl w-full max-w-sm sm:max-w-md shadow-2xl my-auto max-h-[90vh] overflow-y-auto">
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-theme-default">
                 <h2
