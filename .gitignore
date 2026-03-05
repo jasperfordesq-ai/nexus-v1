@@ -50,13 +50,6 @@ CLAUDE.md
 !/scripts/backup-production-db.sh
 !/scripts/check-migration-drift.sh
 !/scripts/check-migration-ci.sh
-/migrations/*
-!/migrations/2026_03_06_add_last_login_at.sql
-!/migrations/2026_03_06_create_match_history.sql
-!/migrations/2026_03_06_create_user_category_affinity.sql
-!/migrations/2026_03_06_create_user_distance_preference.sql
-!/migrations/2026_03_06_add_category_hierarchy.sql
-!/migrations/2026_03_06_add_users_availability_interests.sql
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────
 compose.prod.yml
