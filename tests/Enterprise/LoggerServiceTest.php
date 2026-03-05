@@ -96,8 +96,11 @@ class LoggerServiceTest extends TestCase
         $this->logger->info('Info message');
         $this->logger->debug('Debug message');
 
-        $logFile = $this->testLogPath . '/test-' . date('Y-m-d') . '.log';
-        $content = file_get_contents($logFile);
+        $channelFile = $this->testLogPath . '/test-' . date('Y-m-d') . '.log';
+        $errorFile = $this->testLogPath . '/error-' . date('Y-m-d') . '.log';
+        $channelContent = file_exists($channelFile) ? file_get_contents($channelFile) : '';
+        $errorContent = file_exists($errorFile) ? file_get_contents($errorFile) : '';
+        $content = $errorContent . $channelContent;
 
         $this->assertStringContainsString('EMERGENCY', $content);
         $this->assertStringContainsString('ALERT', $content);

@@ -270,31 +270,131 @@ class ConfigService
     }
 
     /**
-     * Get any configuration value by path
+     * Get a configuration value.
+     *
+     * When Vault is active: treats $path as a Vault secret path and $key as a field within it.
+     * When Vault is not active: treats $path as an environment variable name and $key as the default value.
      */
-    public function get(string $path, string $key = null, $default = null)
+    public function get(string $path, $key = null, $default = null)
     {
-        // Check local cache
-        $cacheKey = "config:{$path}";
-        if (!isset($this->localCache[$cacheKey])) {
-            if ($this->isUsingVault()) {
+        // When Vault is active, use path/key lookup
+        if ($this->isUsingVault()) {
+            $cacheKey = "vault:{$path}";
+            if (!isset($this->localCache[$cacheKey])) {
                 try {
                     $this->localCache[$cacheKey] = $this->vault->getSecret($path);
                 } catch (\Exception $e) {
                     $this->localCache[$cacheKey] = [];
                 }
-            } else {
-                $this->localCache[$cacheKey] = [];
+            }
+
+            $data = $this->localCache[$cacheKey];
+
+            if ($key === null) {
+                return $data ?: $default;
+            }
+
+            return $data[$key] ?? $default;
+        }
+
+        // Without Vault: treat $path as env var key, $key as default value
+        $cacheKey = "env:{$path}";
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
+        }
+
+        $envValue = getenv($path);
+        if ($envValue !== false && $envValue !== '') {
+            $this->localCache[$cacheKey] = $envValue;
+            return $envValue;
+        }
+
+        // $key serves as the default when not using Vault
+        $fallback = $key ?? $default;
+        return $fallback;
+    }
+
+    /**
+     * Get a required configuration value (throws if missing)
+     */
+    public function getRequired(string $key): string
+    {
+        $value = $this->get($key);
+        if ($value === null || $value === '' || (is_array($value) && empty($value))) {
+            throw new \RuntimeException("Required configuration key not found: {$key}");
+        }
+        return $value;
+    }
+
+    /**
+     * Get environment name
+     */
+    public function getEnvironment(): string
+    {
+        return getenv('APP_ENV') ?: 'production';
+    }
+
+    /**
+     * Get an integer configuration value
+     */
+    public function getInt(string $key, int $default = 0): int
+    {
+        $value = $this->get($key);
+        return $value !== null ? (int) $value : $default;
+    }
+
+    /**
+     * Get a boolean configuration value
+     */
+    public function getBool(string $key, bool $default = false): bool
+    {
+        $value = $this->get($key);
+        if ($value === null) {
+            return $default;
+        }
+        return in_array(strtolower((string) $value), ['true', '1', 'yes', 'on'], true);
+    }
+
+    /**
+     * Get a comma-separated configuration value as array
+     */
+    public function getArray(string $key, array $default = []): array
+    {
+        $value = $this->get($key);
+        if ($value === null || $value === '') {
+            return $default;
+        }
+        return array_map('trim', explode(',', (string) $value));
+    }
+
+    /**
+     * Get multiple configuration values at once
+     */
+    public function getAll(array $keys): array
+    {
+        $result = [];
+        foreach ($keys as $key) {
+            $result[$key] = $this->get($key);
+        }
+        return $result;
+    }
+
+    /**
+     * Validate that required configuration keys are present and non-empty
+     */
+    public function validate(array $requiredKeys): array
+    {
+        $missing = [];
+        foreach ($requiredKeys as $key) {
+            $value = getenv($key);
+            if ($value === false || $value === '') {
+                $missing[] = $key;
             }
         }
-
-        $data = $this->localCache[$cacheKey];
-
-        if ($key === null) {
-            return $data ?: $default;
-        }
-
-        return $data[$key] ?? $default;
+        return [
+            'valid' => empty($missing),
+            'missing' => $missing,
+        ];
     }
 
     /**

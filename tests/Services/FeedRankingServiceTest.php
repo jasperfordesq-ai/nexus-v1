@@ -50,10 +50,14 @@ class FeedRankingServiceTest extends TestCase
 
     public function testGeoDecayConstants(): void
     {
-        $this->assertEquals(10, FeedRankingService::GEO_FULL_SCORE_RADIUS);
-        $this->assertEquals(0.10, FeedRankingService::GEO_DECAY_PER_INTERVAL);
-        $this->assertEquals(10, FeedRankingService::GEO_DECAY_INTERVAL);
-        $this->assertEquals(0.1, FeedRankingService::GEO_MINIMUM_SCORE);
+        // Graduated global decay: <50km full score, 100km intervals, 15% floor
+        $this->assertEquals(50, FeedRankingService::GEO_FULL_SCORE_RADIUS);
+        $this->assertEquals(0.03, FeedRankingService::GEO_DECAY_PER_INTERVAL);
+        $this->assertEquals(100, FeedRankingService::GEO_DECAY_INTERVAL);
+        $this->assertEquals(0.15, FeedRankingService::GEO_MINIMUM_SCORE);
+        // Sanity: decay rate must be positive and less than 1
+        $this->assertGreaterThan(0, FeedRankingService::GEO_DECAY_PER_INTERVAL);
+        $this->assertLessThan(1, FeedRankingService::GEO_DECAY_PER_INTERVAL);
     }
 
     public function testFreshnessConstants(): void

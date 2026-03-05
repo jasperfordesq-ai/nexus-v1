@@ -70,13 +70,12 @@ class ConfigServiceTest extends TestCase
     public function testIsDebug(): void
     {
         putenv('APP_DEBUG=true');
+        $this->configService->clearCache();
         $this->assertTrue($this->configService->isDebug());
 
         putenv('APP_DEBUG=false');
-        // Need to clear cache or create new instance
-        $newConfigService = new ConfigService();
-        $this->setPrivateProperty($newConfigService, 'cache', []);
-        $this->assertFalse($newConfigService->isDebug());
+        $this->configService->clearCache();
+        $this->assertFalse($this->configService->isDebug());
     }
 
     /**
@@ -85,10 +84,9 @@ class ConfigServiceTest extends TestCase
     public function testIsProduction(): void
     {
         putenv('APP_ENV=production');
+        $this->configService->clearCache();
 
-        $configService = new ConfigService();
-
-        $this->assertTrue($configService->isProduction());
+        $this->assertTrue($this->configService->isProduction());
     }
 
     /**
