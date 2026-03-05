@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 import { execSync } from 'child_process'
 
@@ -16,7 +17,37 @@ const commitHash = process.env.BUILD_COMMIT || (() => {
 })()
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      // Don't inject SW registration into index.html automatically —
+      // we handle it in main.tsx so it only fires in production builds
+      injectRegister: null,
+      manifest: false, // We use our own public/manifest.json
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Don't cache API calls — always network first
+        runtimeCaching: [
+          {
+            urlPattern: /^https?.*\/api\//,
+            handler: 'NetworkOnly',
+          },
+          {
+            urlPattern: /^https?.*\/locales\//,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'nexus-locales',
+              expiration: { maxEntries: 50, maxAgeSeconds: 86400 },
+            },
+          },
+        ],
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/],
+      },
+    }),
+  ],
   define: {
     __BUILD_COMMIT__: JSON.stringify(commitHash),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),

@@ -40,7 +40,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 // ─────────────────────────────────────────────────────────────────────────────
 
 type LeaderboardPeriod = 'all' | 'season' | 'month' | 'week';
-type LeaderboardType = 'xp' | 'volunteer_hours' | 'credits_earned';
+type LeaderboardType = 'xp' | 'volunteer_hours' | 'credits_earned' | 'nexus_score';
 
 interface LeaderboardEntry {
   position: number;
@@ -371,6 +371,13 @@ export function LeaderboardPage() {
             <span className="text-xs text-theme-subtle ml-1">cr</span>
           </>
         );
+      case 'nexus_score':
+        return (
+          <>
+            <span className="font-bold text-indigo-400">{value.toLocaleString()}</span>
+            <span className="text-xs text-theme-subtle ml-1">/1000</span>
+          </>
+        );
       case 'xp':
       default:
         return (
@@ -386,12 +393,14 @@ export function LeaderboardPage() {
     xp: t('leaderboard.type.xp'),
     volunteer_hours: t('leaderboard.type.volunteer_hours'),
     credits_earned: t('leaderboard.type.credits_earned'),
+    nexus_score: t('leaderboard.type.nexus_score', 'NexusScore'),
   };
 
   const typeIcons: Record<LeaderboardType, React.ReactNode> = {
     xp: <Zap className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
     volunteer_hours: <Clock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
     credits_earned: <Coins className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
+    nexus_score: <Trophy className="w-4 h-4 text-indigo-400" aria-hidden="true" />,
   };
 
   const containerVariants = {
@@ -440,6 +449,7 @@ export function LeaderboardPage() {
             <SelectItem key="xp">{t('leaderboard.type.xp')}</SelectItem>
             <SelectItem key="volunteer_hours">{t('leaderboard.type.volunteer_hours')}</SelectItem>
             <SelectItem key="credits_earned">{t('leaderboard.type.credits_earned')}</SelectItem>
+            <SelectItem key="nexus_score">{t('leaderboard.type.nexus_score', 'NexusScore')}</SelectItem>
           </Select>
 
           {/* Period Selector */}
