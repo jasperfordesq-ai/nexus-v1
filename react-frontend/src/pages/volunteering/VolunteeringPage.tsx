@@ -342,7 +342,7 @@ function OpportunitiesTab() {
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
       if (searchQuery.trim()) params.set('search', searchQuery.trim());
 
-      const response = await api.get<{ data: Opportunity[]; meta: { cursor: string | null; has_more: boolean } }>(
+      const response = await api.get<Opportunity[]>(
         `/v2/volunteering/opportunities?${params}`
       );
 
@@ -681,7 +681,7 @@ function ApplicationsTab() {
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
       if (statusFilter) params.set('status', statusFilter);
 
-      const response = await api.get<{ data: Application[]; meta: { cursor: string | null; has_more: boolean } }>(
+      const response = await api.get<Application[]>(
         `/v2/volunteering/applications?${params}`
       );
 
@@ -913,7 +913,7 @@ function HoursTab() {
 
       const [summaryRes, orgsRes] = await Promise.all([
         api.get<HoursSummary>('/v2/volunteering/hours/summary'),
-        api.get<{ data: Organization[] }>('/v2/volunteering/organisations?per_page=50'),
+        api.get<Organization[]>('/v2/volunteering/organisations?per_page=50'),
       ]);
 
       if (summaryRes.success && summaryRes.data) {

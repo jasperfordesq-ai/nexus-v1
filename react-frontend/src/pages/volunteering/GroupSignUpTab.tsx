@@ -94,7 +94,7 @@ export function GroupSignUpTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: GroupReservation[] }>(
+      const response = await api.get<GroupReservation[]>(
         '/v2/volunteering/group-reservations'
       );
 

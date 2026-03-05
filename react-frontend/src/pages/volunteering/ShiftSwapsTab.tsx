@@ -83,7 +83,7 @@ export function ShiftSwapsTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: ShiftSwap[] }>(
+      const response = await api.get<{ swaps?: ShiftSwap[] }>(
         '/v2/volunteering/swaps'
       );
 
