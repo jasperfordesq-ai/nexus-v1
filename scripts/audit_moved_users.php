@@ -86,7 +86,7 @@ function err(string $msg): void     { echo colorize("  [ERROR] ", 'red') . $msg 
 $dbHost = getenv('DB_HOST') ?: 'db';
 $dbName = getenv('DB_NAME') ?: 'nexus';
 $dbUser = getenv('DB_USER') ?: 'nexus';
-$dbPass = getenv('DB_PASS') ?: 'REDACTED_DB_PASS';
+$dbPass = getenv('DB_PASS') ?: 'nexus_secret';
 
 try {
     $pdo = new PDO(
