@@ -73,6 +73,7 @@ test-results/
 
 # ─── Old/Quarantined Directories ─────────────────────────────────────────────
 react-frontend__quarantine_*/
+_deprecated/
 --version/
 
 # ─── Old Git Hooks (replaced by .husky) ──────────────────────────────────────
