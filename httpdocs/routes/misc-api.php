@@ -1146,5 +1146,6 @@ $router->add('GET', '/api/v2/admin/search/zero-results', 'Nexus\Controllers\Api\
 // ============================================
 // API V2 - CROSS-MODULE MATCHING (New endpoints)
 // ============================================
-$router->add('GET', '/api/v2/matches/all', 'Nexus\Controllers\Api\MatchingApiController@allMatches');
+$router->add('GET',  '/api/v2/matches/all',           'Nexus\Controllers\Api\MatchingApiController@allMatches');
+$router->add('POST', '/api/v2/matches/{id}/dismiss', 'Nexus\Controllers\Api\MatchingApiController@dismiss');
 
