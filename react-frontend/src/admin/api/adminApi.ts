@@ -857,11 +857,57 @@ export const adminNewsletters = {
 
   delete: (id: number) => api.delete(`/v2/admin/newsletters/${id}`),
 
-  getSubscribers: () => api.get('/v2/admin/newsletters/subscribers'),
+  getSubscribers: (params?: { page?: number; per_page?: number; status?: string; search?: string }) =>
+    api.get(`/v2/admin/newsletters/subscribers${params ? buildQuery(params) : ''}`),
+
+  addSubscriber: (data: { email: string; first_name?: string; last_name?: string }) =>
+    api.post('/v2/admin/newsletters/subscribers', data),
+
+  removeSubscriber: (id: number) =>
+    api.delete(`/v2/admin/newsletters/subscribers/${id}`),
+
+  importSubscribers: (rows: Array<{ email: string; first_name?: string; last_name?: string }>) =>
+    api.post('/v2/admin/newsletters/subscribers/import', { rows }),
+
+  exportSubscribers: () =>
+    api.get('/v2/admin/newsletters/subscribers/export'),
+
+  syncMembers: () =>
+    api.post('/v2/admin/newsletters/subscribers/sync', {}),
 
   getSegments: () => api.get('/v2/admin/newsletters/segments'),
 
+  getSegment: (id: number) => api.get(`/v2/admin/newsletters/segments/${id}`),
+
+  createSegment: (data: Record<string, unknown>) =>
+    api.post('/v2/admin/newsletters/segments', data),
+
+  updateSegment: (id: number, data: Record<string, unknown>) =>
+    api.put(`/v2/admin/newsletters/segments/${id}`, data),
+
+  deleteSegment: (id: number) => api.delete(`/v2/admin/newsletters/segments/${id}`),
+
+  previewSegment: (rules: Record<string, unknown>) =>
+    api.post('/v2/admin/newsletters/segments/preview', rules),
+
+  getSegmentSuggestions: () => api.get('/v2/admin/newsletters/segments/suggestions'),
+
   getTemplates: () => api.get('/v2/admin/newsletters/templates'),
+
+  getTemplate: (id: number) => api.get(`/v2/admin/newsletters/templates/${id}`),
+
+  createTemplate: (data: Record<string, unknown>) =>
+    api.post('/v2/admin/newsletters/templates', data),
+
+  updateTemplate: (id: number, data: Record<string, unknown>) =>
+    api.put(`/v2/admin/newsletters/templates/${id}`, data),
+
+  deleteTemplate: (id: number) => api.delete(`/v2/admin/newsletters/templates/${id}`),
+
+  duplicateTemplate: (id: number) =>
+    api.post(`/v2/admin/newsletters/templates/${id}/duplicate`, {}),
+
+  previewTemplate: (id: number) => api.get(`/v2/admin/newsletters/templates/${id}/preview`),
 
   getAnalytics: () => api.get('/v2/admin/newsletters/analytics'),
 
@@ -890,6 +936,12 @@ export const adminNewsletters = {
 
   // Diagnostics
   getDiagnostics: () => api.get('/v2/admin/newsletters/diagnostics'),
+
+  // Per-campaign stats
+  getStats: (id: number) => api.get(`/v2/admin/newsletters/${id}/stats`),
+
+  selectAbWinner: (id: number, winner: 'a' | 'b') =>
+    api.post(`/v2/admin/newsletters/${id}/ab-winner`, { winner }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

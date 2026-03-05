@@ -94,11 +94,14 @@ const NewsletterList = lazy(() => import('./modules/newsletters/NewsletterList')
 const NewsletterForm = lazy(() => import('./modules/newsletters/NewsletterForm'));
 const Subscribers = lazy(() => import('./modules/newsletters/Subscribers'));
 const Segments = lazy(() => import('./modules/newsletters/Segments'));
+const SegmentForm = lazy(() => import('./modules/newsletters/SegmentForm'));
 const Templates = lazy(() => import('./modules/newsletters/Templates'));
+const TemplateForm = lazy(() => import('./modules/newsletters/TemplateForm'));
 const NewsletterAnalytics = lazy(() => import('./modules/newsletters/NewsletterAnalytics'));
 const NewsletterBounces = lazy(() => import('./modules/newsletters/NewsletterBounces'));
 const NewsletterSendTimeOptimizer = lazy(() => import('./modules/newsletters/NewsletterSendTimeOptimizer'));
 const NewsletterDiagnostics = lazy(() => import('./modules/newsletters/NewsletterDiagnostics'));
+const NewsletterStats = lazy(() => import('./modules/newsletters/NewsletterStats'));
 
 // Volunteering module
 const VolunteeringOverview = lazy(() => import('./modules/volunteering/VolunteeringOverview'));
@@ -294,12 +297,17 @@ export function AdminRoutes() {
       <Route path="newsletters/create" element={<Lazy><NewsletterForm /></Lazy>} />
       <Route path="newsletters/edit/:id" element={<Lazy><NewsletterForm /></Lazy>} />
       <Route path="newsletters/subscribers" element={<Lazy><Subscribers /></Lazy>} />
+      <Route path="newsletters/segments/create" element={<Lazy><SegmentForm /></Lazy>} />
+      <Route path="newsletters/segments/edit/:id" element={<Lazy><SegmentForm /></Lazy>} />
       <Route path="newsletters/segments" element={<Lazy><Segments /></Lazy>} />
+      <Route path="newsletters/templates/create" element={<Lazy><TemplateForm /></Lazy>} />
+      <Route path="newsletters/templates/edit/:id" element={<Lazy><TemplateForm /></Lazy>} />
       <Route path="newsletters/templates" element={<Lazy><Templates /></Lazy>} />
       <Route path="newsletters/analytics" element={<Lazy><NewsletterAnalytics /></Lazy>} />
       <Route path="newsletters/bounces" element={<Lazy><NewsletterBounces /></Lazy>} />
       <Route path="newsletters/send-time-optimizer" element={<Lazy><NewsletterSendTimeOptimizer /></Lazy>} />
       <Route path="newsletters/diagnostics" element={<Lazy><NewsletterDiagnostics /></Lazy>} />
+      <Route path="newsletters/:id/stats" element={<Lazy><NewsletterStats /></Lazy>} />
 
       {/* ─── ADVANCED ─── */}
       <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />
