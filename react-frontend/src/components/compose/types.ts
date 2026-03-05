@@ -10,7 +10,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { TenantFeatures, TenantModules } from '@/types';
 
-export type ComposeTab = 'poll' | 'listing' | 'event' | 'goal';
+export type ComposeTab = 'post' | 'poll' | 'listing' | 'event' | 'goal';
 
 export type ComposeGate =
   | { type: 'feature'; key: keyof TenantFeatures }
