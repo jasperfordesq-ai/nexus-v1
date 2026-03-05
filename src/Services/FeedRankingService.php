@@ -89,7 +89,7 @@ class FeedRankingService
     /**
      * Get configuration from tenant settings, with fallback to constants
      */
-    private static function getConfig(): array
+    public static function getConfig(): array
     {
         if (self::$config !== null) {
             return self::$config;
