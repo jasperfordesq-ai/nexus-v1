@@ -14,9 +14,7 @@ $hSubtitle = 'Create, manage, and send beautiful email campaigns to your communi
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'Newsletter Admin';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 ?>
 
 <div class="newsletter-admin-wrapper">
@@ -298,7 +296,5 @@ else {
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

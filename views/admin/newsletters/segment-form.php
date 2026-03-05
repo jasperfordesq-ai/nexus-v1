@@ -22,9 +22,7 @@ $hSubtitle = 'Define rules to target specific groups of members';
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'Segments';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 ?>
 
 <div class="newsletter-admin-wrapper">
@@ -898,7 +896,5 @@ function escapeHtml(text) {
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

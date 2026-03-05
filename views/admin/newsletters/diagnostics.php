@@ -13,9 +13,7 @@ $hSubtitle = 'Check and repair newsletter database issues';
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'System Tools';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 
 $d = $diagnostics ?? [];
 $issues = $d['issues'] ?? [];
@@ -335,7 +333,5 @@ $stats = $d['newsletter_stats'] ?? [];
 </div>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

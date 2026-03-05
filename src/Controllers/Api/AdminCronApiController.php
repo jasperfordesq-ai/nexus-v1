@@ -32,6 +32,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function getLogs()
     {
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $params = $_GET;
 
@@ -104,6 +105,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function getLogDetail($logId)
     {
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         $stmt = Database::query(
@@ -131,6 +133,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function clearLogs()
     {
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $beforeDate = $_GET['before'] ?? null;
 
@@ -162,6 +165,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function getJobSettings($jobId)
     {
+        $this->requireAdmin();
         $stmt = Database::query(
             "SELECT * FROM cron_job_settings WHERE job_id = ?",
             [$jobId]
@@ -191,6 +195,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function updateJobSettings($jobId)
     {
+        $this->requireAdmin();
         $data = $this->getAllInput();
 
         // Check if settings exist
@@ -265,6 +270,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function getGlobalSettings()
     {
+        $this->requireAdmin();
         $stmt = Database::query("SELECT setting_key, setting_value FROM cron_settings");
         $rows = $stmt->fetchAll();
 
@@ -289,6 +295,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function updateGlobalSettings()
     {
+        $this->requireAdmin();
         $data = $this->getAllInput();
 
         $allowedKeys = ['default_notify_email', 'log_retention_days', 'max_concurrent_jobs'];
@@ -320,6 +327,7 @@ class AdminCronApiController extends BaseApiController
      */
     public function getHealthMetrics()
     {
+        $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
         // Jobs failed in last 24h (status = 'error' in DB)
