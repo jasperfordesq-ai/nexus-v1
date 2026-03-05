@@ -494,6 +494,7 @@ class UserController
 
         $tenantId = TenantContext::getId();
         $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        // nosemgrep: php.lang.security.injection.tainted-sql-string.tainted-sql-string -- $placeholders from array_fill of '?' only
         $validUsers = \Nexus\Core\Database::query(
             "SELECT id FROM users WHERE id IN ($placeholders) AND tenant_id = ?",
             array_merge($userIds, [$tenantId])

@@ -95,6 +95,7 @@ $router->add('GET', '/api/v2/users', function () {
     }
 
     // Get total count for meta
+    // nosemgrep: php.lang.security.injection.tainted-sql-string.tainted-sql-string -- $whereClause built from parameterized conditions only
     $countSql = "SELECT COUNT(*) as total FROM users u WHERE $whereClause";
     $totalCount = \Nexus\Core\Database::query($countSql, $params)->fetch()['total'] ?? 0;
 
@@ -137,6 +138,7 @@ $router->add('GET', '/api/v2/users', function () {
     }
 
     // Strip fields used only for ranking, plus private fields — not part of the public API contract
+    // nosemgrep: php.lang.security.injection.echoed-request.echoed-request -- output is json_encode with Content-Type: application/json
     $users = array_map(static function (array $u): array {
         unset(
             $u['_community_rank'], $u['_score_breakdown'],
