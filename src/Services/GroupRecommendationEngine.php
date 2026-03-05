@@ -45,8 +45,14 @@ class GroupRecommendationEngine
         // Get user's current group memberships
         $userGroups = self::getUserGroups($userId);
 
-        // If user has no groups, fall back to popularity-based recommendations
+        // Cold-start: user has no groups yet
         if (empty($userGroups)) {
+            // Try seeding from groups joined by the user's connections
+            $connectionGroups = self::getConnectionGroups($userId, $tenantId);
+            if (!empty($connectionGroups)) {
+                return $connectionGroups;
+            }
+            // Final fallback: popularity-based
             return self::getPopularGroups($tenantId, $limit, $options);
         }
 
@@ -518,6 +524,58 @@ class GroupRecommendationEngine
     /**
      * Get popular groups (fallback for new users)
      */
+    /**
+     * Cold-start: get groups joined by the user's connections, ranked by how many
+     * connections have joined. Excludes groups the user already belongs to.
+     */
+    private static function getConnectionGroups(int $userId, int $tenantId, int $limit = 10): array
+    {
+        try {
+            $rows = Database::query(
+                "SELECT g.*, gt.name as type_name,
+                        COUNT(DISTINCT gm.user_id) as connection_count,
+                        COUNT(DISTINCT gm2.id) as member_count
+                 FROM connections c
+                 JOIN group_members gm ON gm.user_id = CASE
+                     WHEN c.requester_id = ? THEN c.addressee_id
+                     ELSE c.requester_id
+                 END
+                 JOIN `groups` g ON g.id = gm.group_id
+                 LEFT JOIN group_types gt ON g.type_id = gt.id
+                 LEFT JOIN group_members gm2 ON gm2.group_id = g.id AND gm2.status = 'active'
+                 WHERE (c.requester_id = ? OR c.addressee_id = ?)
+                   AND c.status = 'accepted'
+                   AND c.tenant_id = ?
+                   AND g.tenant_id = ?
+                   AND g.status = 'active'
+                   AND (g.visibility IS NULL OR g.visibility = 'public')
+                   AND gm.status = 'active'
+                   AND g.id NOT IN (
+                       SELECT group_id FROM group_members
+                       WHERE user_id = ? AND tenant_id = ?
+                   )
+                 GROUP BY g.id
+                 ORDER BY connection_count DESC, member_count DESC
+                 LIMIT ?",
+                [$userId, $userId, $userId, $tenantId, $tenantId, $userId, $tenantId, $limit]
+            )->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($rows as &$row) {
+                $count = (int)($row['connection_count'] ?? 1);
+                $row['recommendation_score']  = min(1.0, 0.5 + $count * 0.1);
+                $row['recommendation_reason'] = $count === 1
+                    ? 'A connection of yours is in this group'
+                    : "{$count} of your connections are in this group";
+            }
+            unset($row);
+
+            return $rows;
+        } catch (\Throwable $e) {
+            error_log('GroupRecommendationEngine::getConnectionGroups error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     private static function getPopularGroups($tenantId, $limit, $options)
     {
         $sql = "
