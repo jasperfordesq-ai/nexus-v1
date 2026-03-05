@@ -44,7 +44,9 @@ use Nexus\Core\TenantContext;
  *    - Do they offer what viewer needs?
  *    - Do they need what viewer offers?
  *
- * Final Score = Activity × Contribution × Reputation × Connectivity × Proximity × Complementary
+ * Final Score = Weighted additive sum: 0.20×Activity + 0.20×Contribution + 0.20×Reputation
+ *               + 0.15×Connectivity + 0.15×Proximity + 0.10×Complementary
+ *               (optional ×1.15 CF boost, capped at 1.0)
  */
 class MemberRankingService
 {
@@ -79,8 +81,8 @@ class MemberRankingService
 
     // Complementary skills parameters
     const COMPLEMENTARY_ENABLED = true;
-    const COMPLEMENTARY_MATCH_BOOST = 1.8;
-    const COMPLEMENTARY_MUTUAL_BOOST = 2.5;     // Both can help each other
+    const COMPLEMENTARY_MATCH_BOOST = 1.15;
+    const COMPLEMENTARY_MUTUAL_BOOST = 1.3;     // Both can help each other
 
     // Cached configuration
     private static ?array $config = null;
@@ -239,18 +241,24 @@ class MemberRankingService
                 $hasInteraction
             );
 
-            // Calculate final score
-            $finalScore =
-                $scores['activity'] *
-                $scores['contribution'] *
-                $scores['reputation'] *
-                $scores['connectivity'] *
-                $scores['proximity'] *
-                $scores['complementary'];
+            // Calculate final score — weighted additive sum so one weak signal
+            // cannot destroy the entire ranking (replaces old multiplicative formula).
+            $weights = [
+                'activity'      => 0.20,
+                'contribution'  => 0.20,
+                'reputation'    => 0.20,
+                'connectivity'  => 0.15,
+                'proximity'     => 0.15,
+                'complementary' => 0.10,
+            ];
+            $finalScore = 0.0;
+            foreach ($weights as $component => $weight) {
+                $finalScore += ($scores[$component] ?? 0.5) * $weight;
+            }
 
             // Collaborative filtering boost: members suggested by CF get a small lift
             if (!empty($cfSuggestedIds[$memberId])) {
-                $finalScore *= 1.15;
+                $finalScore = min(1.0, $finalScore * 1.15);
             }
 
             $member['_community_rank'] = $finalScore;
@@ -301,7 +309,12 @@ class MemberRankingService
                 u.email,
                 u.avatar_url,
                 u.location, u.role,
-                u.created_at, u.last_login_at, u.last_active_at,
+                u.created_at,
+                COALESCE(
+                    (SELECT MAX(created_at) FROM feed_activity WHERE user_id = u.id AND tenant_id = ?),
+                    (SELECT MAX(created_at) FROM transactions WHERE (sender_id = u.id OR receiver_id = u.id) AND tenant_id = ?),
+                    u.created_at
+                ) AS last_active_at,
                 u.is_approved, u.is_verified,
                 u.profile_type, u.organization_name,
                 u.bio, u.skills,
@@ -335,7 +348,9 @@ class MemberRankingService
               AND LENGTH(u.avatar_url) > 0
         ";
 
-        $params = [$tenantId];
+        // The two extra $tenantId values are for the last_active_at subqueries in SELECT
+        // (feed_activity and transactions subqueries), before the WHERE tenant_id param.
+        $params = [$tenantId, $tenantId, $tenantId];
 
         // Exclude viewer
         if ($viewerId) {
@@ -369,8 +384,8 @@ class MemberRankingService
             $sql .= " AND EXISTS (SELECT 1 FROM listings WHERE user_id = u.id AND type = 'request' AND status = 'active')";
         }
 
-        // Order by community_rank
-        $sql .= " ORDER BY community_rank DESC, u.last_login_at DESC";
+        // Order by community_rank, then by last_active_at as tiebreaker
+        $sql .= " ORDER BY community_rank DESC, last_active_at DESC";
 
         // Limit and Offset for pagination/infinite scroll
         if (!empty($filters['limit'])) {
@@ -500,8 +515,9 @@ class MemberRankingService
     {
         $config = self::getConfig();
 
-        // Check last login
-        $lastLogin = $member['last_login_at'] ?? null;
+        // Use last_active_at proxy (computed in SQL) — last_login_at does not exist
+        // in the users table; the SQL query provides last_active_at via a COALESCE subquery.
+        $lastLogin = $member['last_active_at'] ?? null;
         if (!$lastLogin) {
             return $config['activity_minimum'];
         }
@@ -609,6 +625,34 @@ class MemberRankingService
 
         // 4. Profile completeness bonus (max +0.16)
         $score += self::calculateProfileCompletenessBonus($member);
+
+        // 5. Review-based reputation signals
+        // Query reviews received by this member within the same tenant.
+        try {
+            $tenantId = TenantContext::getId();
+            $memberId = (int)($member['id'] ?? 0);
+            if ($memberId > 0) {
+                $reviewData = Database::query(
+                    "SELECT AVG(rating) as avg_rating, COUNT(*) as review_count
+                     FROM reviews
+                     WHERE receiver_id = ? AND tenant_id = ?",
+                    [$memberId, $tenantId]
+                )->fetch(\PDO::FETCH_ASSOC);
+
+                if ($reviewData && $reviewData['review_count'] !== null) {
+                    $avgRating   = (float)($reviewData['avg_rating'] ?? 0);
+                    $reviewCount = (int)($reviewData['review_count'] ?? 0);
+
+                    if ($avgRating >= 4.0 && $reviewCount >= 2) {
+                        $score += 0.15;
+                    } elseif ($avgRating >= 3.0 && $reviewCount >= 1) {
+                        $score += 0.08;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Reviews table may not exist on all tenants — silently skip
+        }
 
         return min(1.0, max($config['reputation_minimum'], $score));
     }
