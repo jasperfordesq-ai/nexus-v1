@@ -388,53 +388,55 @@
     "title": "Entwicklungsstatus: {{stage}}",
     "where_we_are": {
       "title": "Wo wir jetzt stehen",
-      "paragraph1": "Project NEXUS befindet sich derzeit im Release Candidate (RC) — der letzten Phase vor einem vollständigen öffentlichen Start. Wir haben die Feature-Vollständigkeit für V1 erreicht, und die Plattform wird aktiv von echten Gemeinschaften genutzt. Unser Fokus liegt nun auf Härtung, Leistung und dem Auffinden von Grenzfall-Fehlern, bevor wir die allgemeine Verfügbarkeit erklären.",
-      "paragraph2": "Alles, was Sie hier sehen, läuft auf Produktionsinfrastruktur (Azure, Cloudflare, MariaDB). Ihre Daten sind echt und werden ernst genommen. Wir befinden uns nicht in einer isolierten Demo-Umgebung."
+      "paragraph1": "Project NEXUS befindet sich derzeit im Release Candidate (RC) — der letzten Phase vor der Erklärung der allgemeinen Verfügbarkeit. Die Plattform ist funktionsvollständig für V1 und läuft aktiv bei mehreren Gemeinschaften weltweit. Unser Fokus liegt nun auf Stabilitätshärtung, Leistungsoptimierung und der Behebung von Grenzfall-Problemen vor dem vollständigen öffentlichen Start.",
+      "paragraph2": "Alles, was Sie hier sehen, läuft auf Produktionsinfrastruktur (Azure, Cloudflare, MariaDB, Redis). Ihre Daten sind echt und werden mit der gleichen Sorgfalt wie jedes Live-System behandelt. Dies ist keine Demo- oder Sandbox-Umgebung."
     },
     "whats_stable": {
       "title": "Was stabil ist und funktioniert",
-      "item1": "Mitgliederregistrierung, Anmeldung und Einführung",
-      "item2": "Zeitguthaben-Portemonnaie — Verdienen, Ausgeben und Transaktionsverlauf anzeigen",
-      "item3": "Angebote — Erstellen, Durchsuchen und Austausche anfragen",
-      "item4": "Nachrichten — Direktgespräche zwischen Mitgliedern",
-      "item5": "Veranstaltungen — Erstellen, Entdecken und Anmeldung für Gemeinschaftsveranstaltungen",
-      "item6": "Gruppen — Gemeinschaftsuntergruppen mit Mitgliederverwaltung",
-      "item7": "Erfolge und Gamification (XP, Abzeichen, Rangliste)",
-      "item8": "Admin-Panel — Mandantenkonfiguration, Benutzerverwaltung, Moderation",
-      "item9": "Multi-Mandanten-Architektur — jede Gemeinschaft hat isolierte Daten",
-      "item10": "E-Mail-Benachrichtigungen (Registrierung, Austauschanfragen, Nachrichten)",
-      "item11": "Dunkelmodus, Barrierefreiheit und mobilfreundliche Benutzeroberfläche"
+      "item1": "Mitgliederregistrierung, Anmeldung, Zwei-Faktor-Authentifizierung (TOTP + WebAuthn) und Einführung",
+      "item2": "Zeitguthaben-Portemonnaie — Verdienen, Ausgeben, Überweisungen und vollständiger Transaktionsverlauf",
+      "item3": "Angebote — Erstellen, Durchsuchen, Smart Matching und Austausche anfragen",
+      "item4": "Nachrichten — Direktgespräche mit Lesebestätigungen und Echtzeit-Updates",
+      "item5": "Veranstaltungen — Erstellen, Entdecken, RSVPs und Kalenderexport",
+      "item6": "Gruppen — Gemeinschaftsuntergruppen mit Diskussionen, Rollen und Moderation",
+      "item7": "Ehrenamt — Angebote, Schichten, Bewerbungen und Stundenerfassung",
+      "item8": "Erfolge und Gamification — XP, Abzeichen, Herausforderungen, Rangliste und Nexus Score",
+      "item9": "Admin-Panel — Mandantenkonfiguration, Benutzerverwaltung, Analytik und Moderation",
+      "item10": "Multi-Mandanten-Architektur — mehrere Gemeinschaften, jede mit vollständig isolierten Daten",
+      "item11": "7 Sprachen — Englisch, Irisch, Deutsch, Französisch, Italienisch, Portugiesisch und Spanisch",
+      "item12": "E-Mail-Benachrichtigungen, Push-Benachrichtigungen (FCM) und In-App-Echtzeit-Benachrichtigungen",
+      "item13": "Dunkelmodus, Barrierefreiheit (WCAG 2.1 AA) und mobilfreundliche Benutzeroberfläche"
     },
     "whats_rough": {
       "title": "Was noch holprig sein kann",
-      "item1": "Freiwilligenmodul — neueres Feature, weniger kampferprobt",
-      "item2": "Föderationsfunktionen (gemeinschaftsübergreifend) — experimentell, mögliche Grenzfälle",
-      "item3": "KI-Chat-Assistent — abhängig von OpenAI API; Prompts und Kontext werden noch optimiert",
-      "item4": "Push-Benachrichtigungen (mobil) — mögliche Zustellverzögerungen auf einigen Geräten",
-      "item5": "Einige Admin-Berichtsdiagramme können in Grenzfällen falsche Daten anzeigen",
-      "item6": "Lokalisierung — die Plattform ist global bereit, aber derzeit nur auf Englisch"
+      "item1": "Föderationsfunktionen (gemeinschaftsübergreifend) — funktionsfähig, sammelt aber noch reale Grenzfälle",
+      "item2": "KI-Chat-Assistent — abhängig von externen KI-Anbietern; Antwortqualität variiert je nach Konfiguration",
+      "item3": "Nexus Score-Aufschlüsselung — neu gestartet; Bewertungsgewichte können angepasst werden, wenn Nutzungsdaten wachsen",
+      "item4": "Smart-Feed-Ranking — EdgeRank-Algorithmus ist live, aber Kaltstart-Verhalten für neue Mitglieder wird noch optimiert",
+      "item5": "Push-Benachrichtigungen (mobil) — mögliche Zustellverzögerungen auf einigen Geräten oder Browsern",
+      "item6": "Nicht-englische Übersetzungen — KI-generiert und noch nicht von Muttersprachlern überprüft"
     },
     "how_we_catch_bugs": {
       "title": "Wie wir Fehler finden",
       "intro": "Wir verwenden einen mehrschichtigen Ansatz, um Probleme schnell zu finden und zu beheben:",
       "method1_bold": "Automatisierte Tests",
-      "method1_text": "PHP-Unit-Tests und React-Komponententests laufen bei jedem Commit",
+      "method1_text": "250+ PHP-Unit-/Integrationstests und React-Komponententests laufen bei jedem Commit",
       "method2_bold": "Sentry-Fehlerverfolgung",
       "method2_text": "Ausnahmen auf Frontend und Backend werden in Echtzeit erfasst",
       "method3_bold": "Cloudflare-Analytik",
-      "method3_text": "Verkehrsanomalien und Fehlerspitzen werden überwacht",
+      "method3_text": "Verkehrsanomalien und Fehlerspitzen werden kontinuierlich überwacht",
       "method4_bold": "Manuelle QA",
-      "method4_text": "Kern-Benutzerreisen werden vor jeder Bereitstellung getestet",
+      "method4_text": "Kern-Benutzerreisen werden über mehrere Mandantenkonfigurationen hinweg vor jeder Bereitstellung getestet",
       "method5_bold": "Community-Tests",
-      "method5_text": "Echte Benutzer helfen uns, Grenzfälle in der Produktion zu entdecken"
+      "method5_text": "Echte Mitglieder mehrerer aktiver Gemeinschaften helfen uns, Grenzfälle in der Produktion zu entdecken"
     },
     "how_to_help": {
       "title": "Wie Sie helfen können",
       "report_bug_title": "Einen Fehler melden",
       "report_bug_description": "Haben Sie etwas Fehlerhaftes gefunden? Bitte eröffnen Sie ein Issue auf GitHub — das ist der schnellste Weg, uns eine Lösung vorzulegen. Beschreiben Sie, was Sie getan haben, was Sie erwartet haben und was tatsächlich passiert ist.",
       "github_link": "Ein Issue auf GitHub eröffnen",
-      "become_tester_title": "Tester werden",
-      "become_tester_description": "Wenn Sie eine Zeitbank oder ein Gemeinschaftsnetzwerk betreiben und Project NEXUS mit Ihren Mitgliedern ausprobieren möchten, würden wir gerne mit Ihnen zusammenarbeiten. Kontaktieren Sie uns über GitHub Discussions oder die Kontaktseite."
+      "become_tester_title": "Ihre Gemeinschaft zu NEXUS bringen",
+      "become_tester_description": "Wenn Sie eine Zeitbank oder ein Gemeinschaftsnetzwerk betreiben und der Plattform beitreten möchten, würden wir gerne mit Ihnen zusammenarbeiten. Kontaktieren Sie uns über GitHub Discussions oder die Kontaktseite — wir unterstützen Gemeinschaften aller Größen."
     },
     "security": {
       "title": "Sicherheitsmeldung",

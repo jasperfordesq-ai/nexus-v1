@@ -142,37 +142,55 @@
     "title": "Estado de desarrollo: {{stage}}",
     "where_we_are": {
       "title": "Dónde estamos ahora",
-      "paragraph1": "Project NEXUS está actualmente en Release Candidate (RC) — la etapa final antes del lanzamiento público completo. Hemos alcanzado la completitud de funciones para V1, y la plataforma está en uso activo por comunidades reales. Nuestro enfoque ahora es el endurecimiento, rendimiento y captura de errores de casos extremos antes de declarar la Disponibilidad General.",
-      "paragraph2": "Todo lo que ves aquí se ejecuta en infraestructura de producción (Azure, Cloudflare, MariaDB). Tus datos son reales y tratados seriamente. No estamos en un entorno de demostración aislado."
+      "paragraph1": "Project NEXUS está actualmente en Release Candidate (RC) — la etapa final antes de declarar la Disponibilidad General. La plataforma está funcionalmente completa para V1 y opera en vivo en múltiples comunidades activas en todo el mundo. Nuestro enfoque ahora es el endurecimiento de la estabilidad, la optimización del rendimiento y la resolución de problemas en casos extremos antes del lanzamiento público completo.",
+      "paragraph2": "Todo lo que ves aquí se ejecuta en infraestructura de producción (Azure, Cloudflare, MariaDB, Redis). Tus datos son reales y tratados con el mismo cuidado que cualquier sistema en vivo. No se trata de un entorno de demostración o sandbox."
     },
     "whats_stable": {
       "title": "Qué es estable y funciona",
-      "item1": "Registro de miembros, inicio de sesión e incorporación", "item2": "Billetera de créditos de tiempo — ganar, gastar y ver historial de transacciones",
-      "item3": "Anuncios — publicar, explorar y solicitar intercambios", "item4": "Mensajería — conversaciones directas entre miembros",
-      "item5": "Eventos — crear, descubrir e inscribirse en eventos comunitarios", "item6": "Grupos — subgrupos comunitarios con gestión de miembros",
-      "item7": "Logros y gamificación (XP, insignias, clasificación)", "item8": "Panel de administración — configuración del tenant, gestión de usuarios, moderación",
-      "item9": "Arquitectura multi-tenant — cada comunidad tiene datos aislados", "item10": "Notificaciones por correo (registro, solicitudes de intercambio, mensajes)",
-      "item11": "Modo oscuro, accesibilidad e interfaz responsive para móvil"
+      "item1": "Registro de miembros, inicio de sesión, autenticación de dos factores (TOTP + WebAuthn) e incorporación",
+      "item2": "Billetera de créditos de tiempo — ganar, gastar, transferencias e historial completo de transacciones",
+      "item3": "Anuncios — publicar, explorar, coincidencia inteligente y solicitar intercambios",
+      "item4": "Mensajería — conversaciones directas con confirmaciones de lectura y actualizaciones en tiempo real",
+      "item5": "Eventos — crear, descubrir, RSVPs y exportación de calendario",
+      "item6": "Grupos — subgrupos comunitarios con discusiones, roles y moderación",
+      "item7": "Voluntariado — oportunidades, turnos, solicitudes y registro de horas",
+      "item8": "Logros y gamificación — XP, insignias, desafíos, clasificación y Puntuación Nexus",
+      "item9": "Panel de administración — configuración del tenant, gestión de usuarios, análisis y moderación",
+      "item10": "Arquitectura multi-tenant — múltiples comunidades, cada una con datos completamente aislados",
+      "item11": "7 idiomas — inglés, irlandés, alemán, francés, italiano, portugués y español",
+      "item12": "Notificaciones por correo, notificaciones push (FCM) y alertas en tiempo real en la app",
+      "item13": "Modo oscuro, accesibilidad (WCAG 2.1 AA) e interfaz responsive para móvil"
     },
     "whats_rough": {
       "title": "Lo que aún puede tener problemas",
-      "item1": "Módulo de oportunidades de voluntariado — función más nueva, menos probada", "item2": "Funciones de federación (entre comunidades) — experimentales, pueden tener casos extremos",
-      "item3": "Asistente de chat IA — depende de la API de OpenAI; los prompts y el contexto aún se están ajustando", "item4": "Notificaciones push (móvil) — pueden tener retrasos de entrega en algunos dispositivos",
-      "item5": "Algunos gráficos de informes del admin pueden mostrar datos incorrectos en casos extremos", "item6": "Localización — la plataforma está preparada para ser global pero por ahora solo está en inglés"
+      "item1": "Funciones de federación (entre comunidades) — funcionales pero aún acumulando casos extremos del mundo real",
+      "item2": "Asistente de chat IA — depende de proveedores de IA externos; la calidad de las respuestas varía según la configuración",
+      "item3": "Desglose de la Puntuación Nexus — recién lanzado; los pesos de puntuación pueden ajustarse a medida que crecen los datos de uso",
+      "item4": "Clasificación del feed inteligente — el algoritmo EdgeRank está activo pero el comportamiento de arranque en frío para nuevos miembros aún se está ajustando",
+      "item5": "Notificaciones push (móvil) — pueden tener retrasos de entrega en algunos dispositivos o navegadores",
+      "item6": "Traducciones no inglesas — generadas por IA y aún no revisadas por hablantes nativos"
     },
     "how_we_catch_bugs": {
-      "title": "Cómo detectamos errores", "intro": "Usamos un enfoque multicapa para detectar y corregir problemas rápidamente:",
-      "method1_bold": "Pruebas automatizadas", "method1_text": "Pruebas unitarias PHP y pruebas de componentes React se ejecutan en cada commit",
-      "method2_bold": "Seguimiento de errores Sentry", "method2_text": "Las excepciones tanto en frontend como en backend se capturan en tiempo real",
-      "method3_bold": "Analíticas de Cloudflare", "method3_text": "Se monitorean anomalías de tráfico y picos de errores",
-      "method4_bold": "QA manual", "method4_text": "Los recorridos principales del usuario se prueban antes de cada despliegue",
-      "method5_bold": "Pruebas comunitarias", "method5_text": "Los usuarios reales nos ayudan a descubrir casos extremos en producción"
+      "title": "Cómo detectamos errores",
+      "intro": "Usamos un enfoque multicapa para detectar y corregir problemas rápidamente:",
+      "method1_bold": "Pruebas automatizadas",
+      "method1_text": "250+ pruebas unitarias/de integración PHP y pruebas de componentes React se ejecutan en cada commit",
+      "method2_bold": "Seguimiento de errores Sentry",
+      "method2_text": "las excepciones tanto en frontend como en backend se capturan en tiempo real",
+      "method3_bold": "Analíticas de Cloudflare",
+      "method3_text": "se monitorizan continuamente anomalías de tráfico y picos de errores",
+      "method4_bold": "QA manual",
+      "method4_text": "los recorridos principales del usuario se prueban en múltiples configuraciones de tenant antes de cada despliegue",
+      "method5_bold": "Pruebas comunitarias",
+      "method5_text": "miembros reales de múltiples comunidades activas nos ayudan a descubrir casos extremos en producción"
     },
     "how_to_help": {
       "title": "Cómo ayudar",
-      "report_bug_title": "Reportar un error", "report_bug_description": "¿Encontraste algo roto? Por favor abre un issue en GitHub — es la forma más rápida de poner una corrección frente a nosotros. Incluye qué estabas haciendo, qué esperabas y qué realmente sucedió.",
+      "report_bug_title": "Reportar un error",
+      "report_bug_description": "¿Encontraste algo roto? Por favor abre un issue en GitHub — es la forma más rápida de poner una corrección frente a nosotros. Incluye qué estabas haciendo, qué esperabas y qué realmente sucedió.",
       "github_link": "Abrir un issue en GitHub",
-      "become_tester_title": "Conviértete en tester", "become_tester_description": "Si gestionas un banco de tiempo o red comunitaria y quieres probar Project NEXUS con tus miembros, nos encantaría trabajar contigo. Contáctanos a través de GitHub Discussions o la página de contacto."
+      "become_tester_title": "Trae tu comunidad a NEXUS",
+      "become_tester_description": "Si gestionas un banco de tiempo o red comunitaria y quieres unirte a la plataforma, nos encantaría trabajar contigo. Contáctanos a través de GitHub Discussions o la página de contacto — apoyamos comunidades de todos los tamaños."
     },
     "security": {
       "title": "Divulgación de seguridad",

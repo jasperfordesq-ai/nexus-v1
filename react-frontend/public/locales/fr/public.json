@@ -388,53 +388,55 @@
     "title": "Statut de développement : {{stage}}",
     "where_we_are": {
       "title": "Où nous en sommes",
-      "paragraph1": "Project NEXUS est actuellement en Release Candidate (RC) — l'étape finale avant un lancement public complet. Nous avons atteint la complétude fonctionnelle pour la V1, et la plateforme est activement utilisée par de vraies communautés. Notre focus est maintenant le durcissement, la performance et la détection des bugs en cas limites avant de déclarer la disponibilité générale.",
-      "paragraph2": "Tout ce que vous voyez ici fonctionne sur une infrastructure de production (Azure, Cloudflare, MariaDB). Vos données sont réelles et traitées sérieusement. Nous ne sommes pas dans un environnement de démonstration isolé."
+      "paragraph1": "Project NEXUS est actuellement en Release Candidate (RC) — l'étape finale avant de déclarer la disponibilité générale. La plateforme est fonctionnellement complète pour la V1 et fonctionne en direct dans plusieurs communautés actives dans le monde entier. Notre focus est désormais sur le durcissement de la stabilité, l'optimisation des performances et la résolution des problèmes en cas limites avant le lancement public complet.",
+      "paragraph2": "Tout ce que vous voyez ici fonctionne sur une infrastructure de production (Azure, Cloudflare, MariaDB, Redis). Vos données sont réelles et traitées avec le même soin que n'importe quel système en direct. Il ne s'agit pas d'un environnement de démonstration ou de bac à sable."
     },
     "whats_stable": {
       "title": "Ce qui est stable et fonctionnel",
-      "item1": "Inscription des membres, connexion et intégration",
-      "item2": "Portefeuille de crédits-temps — gagner, dépenser et consulter l'historique des transactions",
-      "item3": "Annonces — publier, parcourir et demander des échanges",
-      "item4": "Messagerie — conversations directes entre membres",
-      "item5": "Événements — créer, découvrir et s'inscrire aux événements communautaires",
-      "item6": "Groupes — sous-groupes communautaires avec gestion des membres",
-      "item7": "Réalisations et gamification (XP, badges, classement)",
-      "item8": "Panneau d'administration — configuration du locataire, gestion des utilisateurs, modération",
-      "item9": "Architecture multi-locataires — chaque communauté a des données isolées",
-      "item10": "Notifications par e-mail (inscription, demandes d'échange, messages)",
-      "item11": "Mode sombre, accessibilité et interface responsive mobile"
+      "item1": "Inscription des membres, connexion, authentification à deux facteurs (TOTP + WebAuthn) et intégration",
+      "item2": "Portefeuille de crédits-temps — gagner, dépenser, transferts et historique complet des transactions",
+      "item3": "Annonces — publier, parcourir, correspondance intelligente et demander des échanges",
+      "item4": "Messagerie — conversations directes avec accusés de lecture et mises à jour en temps réel",
+      "item5": "Événements — créer, découvrir, RSVPs et export de calendrier",
+      "item6": "Groupes — sous-groupes communautaires avec discussions, rôles et modération",
+      "item7": "Bénévolat — opportunités, créneaux, candidatures et suivi des heures",
+      "item8": "Réalisations et gamification — XP, badges, défis, classement et Score Nexus",
+      "item9": "Panneau d'administration — configuration du locataire, gestion des utilisateurs, analytique et modération",
+      "item10": "Architecture multi-locataires — plusieurs communautés, chacune avec des données entièrement isolées",
+      "item11": "7 langues — anglais, irlandais, allemand, français, italien, portugais et espagnol",
+      "item12": "Notifications par e-mail, notifications push (FCM) et alertes en temps réel dans l'application",
+      "item13": "Mode sombre, accessibilité (WCAG 2.1 AA) et interface responsive mobile"
     },
     "whats_rough": {
       "title": "Ce qui peut encore être imparfait",
-      "item1": "Module d'opportunités de bénévolat — fonctionnalité plus récente, moins éprouvée",
-      "item2": "Fonctionnalités de fédération (inter-communautés) — expérimentales, cas limites possibles",
-      "item3": "Assistant IA Chat — dépend de l'API OpenAI ; les prompts et le contexte sont encore en cours d'ajustement",
-      "item4": "Notifications push (mobile) — retards de livraison possibles sur certains appareils",
-      "item5": "Certains graphiques de rapports admin peuvent afficher des données incorrectes dans les cas limites",
-      "item6": "Localisation — la plateforme est prête pour le monde entier mais uniquement en anglais pour le moment"
+      "item1": "Fonctionnalités de fédération (inter-communautés) — fonctionnelles mais accumulant encore des cas limites réels",
+      "item2": "Assistant IA Chat — dépend de fournisseurs d'IA externes ; la qualité des réponses varie selon la configuration",
+      "item3": "Détail du Score Nexus — nouvellement lancé ; les pondérations de notation pourraient être ajustées à mesure que les données d'utilisation croissent",
+      "item4": "Classement du fil intelligent — l'algorithme EdgeRank est en direct mais le comportement de démarrage à froid pour les nouveaux membres est encore en cours d'optimisation",
+      "item5": "Notifications push (mobile) — retards de livraison possibles sur certains appareils ou navigateurs",
+      "item6": "Traductions non anglophones — générées par IA et pas encore vérifiées par des locuteurs natifs"
     },
     "how_we_catch_bugs": {
       "title": "Comment nous détectons les bugs",
       "intro": "Nous utilisons une approche multi-couches pour détecter et corriger rapidement les problèmes :",
       "method1_bold": "Tests automatisés",
-      "method1_text": "les tests unitaires PHP et les tests de composants React s'exécutent à chaque commit",
+      "method1_text": "250+ tests unitaires/d'intégration PHP et tests de composants React s'exécutent à chaque commit",
       "method2_bold": "Suivi des erreurs Sentry",
       "method2_text": "les exceptions sur le frontend et le backend sont capturées en temps réel",
       "method3_bold": "Analytique Cloudflare",
-      "method3_text": "les anomalies de trafic et les pics d'erreurs sont surveillés",
+      "method3_text": "les anomalies de trafic et les pics d'erreurs sont surveillés en continu",
       "method4_bold": "QA manuelle",
-      "method4_text": "les parcours utilisateurs principaux sont testés avant chaque déploiement",
+      "method4_text": "les parcours utilisateurs principaux sont testés sur plusieurs configurations de locataires avant chaque déploiement",
       "method5_bold": "Tests communautaires",
-      "method5_text": "les vrais utilisateurs nous aident à découvrir les cas limites en production"
+      "method5_text": "de vrais membres de plusieurs communautés actives nous aident à détecter les cas limites en production"
     },
     "how_to_help": {
       "title": "Comment aider",
       "report_bug_title": "Signaler un bug",
       "report_bug_description": "Vous avez trouvé quelque chose de cassé ? Veuillez ouvrir un ticket sur GitHub — c'est le moyen le plus rapide de nous soumettre une correction. Indiquez ce que vous faisiez, ce que vous attendiez et ce qui s'est réellement passé.",
       "github_link": "Ouvrir un ticket sur GitHub",
-      "become_tester_title": "Devenir testeur",
-      "become_tester_description": "Si vous gérez une banque de temps ou un réseau communautaire et souhaitez essayer Project NEXUS avec vos membres, nous serions ravis de travailler avec vous. Contactez-nous via les Discussions GitHub ou la page de contact."
+      "become_tester_title": "Rejoindre la plateforme avec votre communauté",
+      "become_tester_description": "Si vous gérez une banque de temps ou un réseau communautaire et souhaitez rejoindre la plateforme, nous serions ravis de travailler avec vous. Contactez-nous via les Discussions GitHub ou la page de contact — nous accueillons les communautés de toutes tailles."
     },
     "security": {
       "title": "Divulgation de sécurité",
