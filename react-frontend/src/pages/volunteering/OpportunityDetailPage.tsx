@@ -54,12 +54,11 @@ import { logError } from '@/lib/logger';
 
 interface Shift {
   id: number;
-  date: string;
   start_time: string;
   end_time: string;
-  capacity: number;
-  spots_taken: number;
-  status: string;
+  capacity: number | null;
+  signup_count: number;
+  spots_available: number | null;
 }
 
 interface Application {
@@ -178,7 +177,7 @@ export function OpportunityDetailPage() {
   }
 
   const opp = opportunity;
-  const upcomingShifts = (opp.shifts || []).filter((s) => new Date(s.date) >= new Date());
+  const upcomingShifts = (opp.shifts || []).filter((s) => new Date(s.start_time) >= new Date());
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
@@ -313,19 +312,19 @@ export function OpportunityDetailPage() {
                     <Calendar className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                     <div>
                       <p className="text-sm font-medium text-theme-primary">
-                        {new Date(shift.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                        {new Date(shift.start_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                       </p>
                       <p className="text-xs text-theme-subtle">
-                        {shift.start_time} — {shift.end_time}
+                        {new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} — {new Date(shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                     <span className="text-xs text-theme-muted">
-                      {shift.spots_taken}/{shift.capacity}
+                      {shift.signup_count}{shift.capacity ? `/${shift.capacity}` : ''}
                     </span>
-                    {shift.spots_taken < shift.capacity ? (
+                    {(shift.spots_available === null || shift.spots_available > 0) ? (
                       <Chip size="sm" variant="flat" color="success">Open</Chip>
                     ) : (
                       <Chip size="sm" variant="flat" color="danger">Full</Chip>
@@ -355,7 +354,7 @@ export function OpportunityDetailPage() {
                 {upcomingShifts.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-theme-muted">Select a shift (optional)</p>
-                    {upcomingShifts.filter((s) => s.spots_taken < s.capacity).map((shift) => (
+                    {upcomingShifts.filter((s) => s.spots_available === null || s.spots_available > 0).map((shift) => (
                       <Button
                         key={shift.id}
                         size="sm"
@@ -368,7 +367,7 @@ export function OpportunityDetailPage() {
                           selectedShiftId === shift.id ? null : shift.id
                         )}
                       >
-                        {new Date(shift.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} &middot; {shift.start_time} — {shift.end_time}
+                        {new Date(shift.start_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} &middot; {new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} — {new Date(shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </Button>
                     ))}
                   </div>

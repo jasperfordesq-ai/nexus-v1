@@ -1871,7 +1871,31 @@ class VolunteerApiController extends BaseApiController
         $stmt->execute([$userId, $tenantId]);
         $credentials = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $this->respondWithData(['credentials' => $credentials]);
+        $mapped = array_map(static function (array $row): array {
+            $type = (string)($row['credential_type'] ?? '');
+            $typeLabel = ucwords(str_replace('_', ' ', $type));
+
+            return [
+                'id' => (int)($row['id'] ?? 0),
+                // Canonical API fields
+                'credential_type' => $type,
+                'file_url' => $row['file_url'] ?? null,
+                'file_name' => $row['file_name'] ?? null,
+                'status' => $row['status'] ?? 'pending',
+                'expires_at' => $row['expires_at'] ?? null,
+                'created_at' => $row['created_at'] ?? null,
+                'updated_at' => $row['updated_at'] ?? null,
+                // Frontend compatibility aliases
+                'type' => $type,
+                'type_label' => $typeLabel,
+                'document_name' => $row['file_name'] ?? null,
+                'upload_date' => $row['created_at'] ?? null,
+                'expiry_date' => $row['expires_at'] ?? null,
+                'rejection_reason' => null,
+            ];
+        }, $credentials);
+
+        $this->respondWithData(['credentials' => $mapped]);
     }
 
     /**
@@ -1886,32 +1910,37 @@ class VolunteerApiController extends BaseApiController
         $this->rateLimit('vol_credential_upload', 10, 60);
 
         $tenantId = TenantContext::getId();
-        $type = $this->input('credential_type');
-        $expiresAt = $this->input('expires_at');
+        $type = trim((string)($this->input('credential_type') ?? $this->input('type') ?? ''));
+        $expiresAt = $this->input('expires_at') ?? $this->input('expiry_date');
 
         if (empty($type)) {
             $this->respondWithError('VALIDATION_ERROR', 'Credential type is required', 'credential_type');
         }
 
+        $uploadedFile = $_FILES['file'] ?? $_FILES['document'] ?? null;
+        if (empty($uploadedFile) || !isset($uploadedFile['error']) || $uploadedFile['error'] !== UPLOAD_ERR_OK) {
+            $this->respondWithError('VALIDATION_ERROR', 'A credential file is required', 'file');
+        }
+
         // Handle file upload
         $fileUrl = null;
         $fileName = null;
-        if (!empty($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+        if (!empty($uploadedFile) && $uploadedFile['error'] === UPLOAD_ERR_OK) {
             // Validate file type
             $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
             $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->file($_FILES['file']['tmp_name']);
+            $mimeType = $finfo->file($uploadedFile['tmp_name']);
             if (!in_array($mimeType, $allowedMimes, true)) {
                 $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPEG, PNG, and WebP files are allowed', 'file');
             }
 
             // 10 MB limit
-            if ($_FILES['file']['size'] > 10 * 1024 * 1024) {
+            if (($uploadedFile['size'] ?? 0) > 10 * 1024 * 1024) {
                 $this->respondWithError('VALIDATION_ERROR', 'File size must be under 10 MB', 'file');
             }
 
-            $fileUrl = \Nexus\Core\ImageUploader::upload($_FILES['file'], 'credentials');
-            $fileName = $_FILES['file']['name'] ?? null;
+            $fileUrl = \Nexus\Core\ImageUploader::upload($uploadedFile, 'credentials');
+            $fileName = $uploadedFile['name'] ?? null;
         }
 
         $db = \Nexus\Core\Database::getConnection();

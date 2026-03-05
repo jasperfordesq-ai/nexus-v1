@@ -45,7 +45,7 @@ try {
     $opps->execute([$tenantId]);
     $totalOpportunities = (int)$opps->fetchColumn();
 
-    $activeOpps = $db->prepare("SELECT COUNT(*) FROM vol_opportunities WHERE tenant_id = ? AND status = 'active'");
+    $activeOpps = $db->prepare("SELECT COUNT(*) FROM vol_opportunities WHERE tenant_id = ? AND is_active = 1 AND status IN ('open', 'active')");
     $activeOpps->execute([$tenantId]);
     $activeOpportunities = (int)$activeOpps->fetchColumn();
 } catch (\Exception $e) {
