@@ -38,10 +38,12 @@ class FeedRankingService
     const VITALITY_MINIMUM = 0.5;
 
     // Geospatial decay parameters (in kilometers)
-    const GEO_FULL_SCORE_RADIUS = 10;       // < 10km = 100% score
-    const GEO_DECAY_PER_INTERVAL = 0.10;    // 10% reduction per interval
-    const GEO_DECAY_INTERVAL = 10;          // Every 10km beyond threshold
-    const GEO_MINIMUM_SCORE = 0.1;          // Minimum 10% (never fully zero)
+    // Graduated global decay: <50km=1.0, ~500km≈0.87, ~2000km≈0.45, >8000km=0.15
+    // Uses 100km intervals so nearby countries score noticeably better than intercontinental.
+    const GEO_FULL_SCORE_RADIUS = 50;       // < 50km = 100% score (same region)
+    const GEO_DECAY_PER_INTERVAL = 0.03;    // 3% reduction per 100km interval
+    const GEO_DECAY_INTERVAL = 100;         // Every 100km beyond threshold
+    const GEO_MINIMUM_SCORE = 0.15;         // Minimum 15% (intercontinental always gets some signal)
 
     // Content Freshness Decay parameters (in hours)
     const FRESHNESS_FULL_HOURS = 24;        // Posts < 24 hours = 100% freshness
