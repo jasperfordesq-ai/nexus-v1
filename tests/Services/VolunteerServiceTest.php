@@ -67,17 +67,17 @@ class VolunteerServiceTest extends DatabaseTestCase
 
         // Create test opportunity
         Database::query(
-            "INSERT INTO vol_opportunities (organization_id, title, description, location, is_active, created_at)
-             VALUES (?, ?, ?, ?, 1, NOW())",
-            [self::$testOrgId, "Test Opportunity {$ts}", 'Help with community cleanup', 'Community Center']
+            "INSERT INTO vol_opportunities (tenant_id, organization_id, created_by, title, description, location, is_active, status, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, 1, 'open', NOW())",
+            [self::$testTenantId, self::$testOrgId, self::$testUserId, "Test Opportunity {$ts}", 'Help with community cleanup', 'Community Center']
         );
         self::$testOppId = (int)Database::getInstance()->lastInsertId();
 
         // Create test shift
         Database::query(
-            "INSERT INTO vol_shifts (opportunity_id, start_time, end_time, capacity)
-             VALUES (?, DATE_ADD(NOW(), INTERVAL 7 DAY), DATE_ADD(NOW(), INTERVAL 7 DAY) + INTERVAL 2 HOUR, 10)",
-            [self::$testOppId]
+            "INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity)
+             VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), DATE_ADD(DATE_ADD(NOW(), INTERVAL 7 DAY), INTERVAL 2 HOUR), 10)",
+            [self::$testTenantId, self::$testOppId]
         );
         self::$testShiftId = (int)Database::getInstance()->lastInsertId();
     }

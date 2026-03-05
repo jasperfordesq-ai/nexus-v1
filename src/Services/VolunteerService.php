@@ -1438,11 +1438,15 @@ class VolunteerService
      * @param int $id Organization ID
      * @return array|null
      */
-    public static function getOrganizationById(int $id): ?array
+    public static function getOrganizationById(int $id, bool $includeNonApproved = false): ?array
     {
         $org = VolOrganization::find($id);
 
         if (!$org) {
+            return null;
+        }
+
+        if (!$includeNonApproved && ($org['status'] ?? null) !== 'approved') {
             return null;
         }
 
