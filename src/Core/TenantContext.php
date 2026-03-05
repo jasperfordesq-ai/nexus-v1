@@ -274,11 +274,11 @@ class TenantContext
             // Fallback
         }
 
-        // 6. Hard Fallback (if DB fails)
+        // 6. Hard Fallback (if DB fails) — uses TenantFeatureConfig defaults
         self::$tenant = [
             'id' => 1,
             'name' => 'Project NEXUS',
-            'features' => '{"listings": true, "groups": true, "blog": true}'
+            'features' => json_encode(\Nexus\Services\TenantFeatureConfig::FEATURE_DEFAULTS)
         ];
         self::$basePath = '';
     }
@@ -417,18 +417,16 @@ class TenantContext
     public static function hasFeature($feature)
     {
         $tenant = self::get();
-        if (empty($tenant['features'])) {
-            return false;
+
+        $dbFeatures = null;
+        if (!empty($tenant['features'])) {
+            $dbFeatures = is_string($tenant['features'])
+                ? json_decode($tenant['features'], true)
+                : $tenant['features'];
         }
 
-        $features = is_string($tenant['features'])
-            ? json_decode($tenant['features'], true)
-            : $tenant['features'];
-
-        // Backwards compatibility: Blog is enabled by default if not strictly disabled
-        if ($feature === 'blog' && !isset($features['blog'])) {
-            return true;
-        }
+        // Merge with defaults so new tenants (features=NULL) get correct defaults
+        $features = \Nexus\Services\TenantFeatureConfig::mergeFeatures($dbFeatures);
 
         return !empty($features[$feature]);
     }

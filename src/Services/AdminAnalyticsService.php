@@ -416,15 +416,15 @@ class AdminAnalyticsService
      */
     public static function getDashboardSummary($skipCache = false)
     {
-        // Try cache first (unless skipped)
+        $tenantId = TenantContext::getId();
+
+        // Try cache first (unless skipped) — scoped by tenant
         if (!$skipCache) {
-            $cached = RedisCache::get('admin:dashboard:summary');
+            $cached = RedisCache::get('admin:dashboard:summary', $tenantId);
             if ($cached !== null) {
                 return $cached;
             }
         }
-
-        $tenantId = TenantContext::getId();
 
         // Get highest balances, org summary, and pending requests in one query
         $combinedResult = Database::query(
@@ -484,8 +484,8 @@ class AdminAnalyticsService
             'pending_requests' => (int) ($combinedResult['pending_requests'] ?? 0),
         ];
 
-        // Cache for 3 minutes (balances real-time needs with performance)
-        RedisCache::set('admin:dashboard:summary', $summary, 180);
+        // Cache for 3 minutes (balances real-time needs with performance) — scoped by tenant
+        RedisCache::set('admin:dashboard:summary', $summary, 180, $tenantId);
 
         return $summary;
     }
@@ -497,6 +497,6 @@ class AdminAnalyticsService
      */
     public static function clearDashboardCache(): bool
     {
-        return RedisCache::delete('admin:dashboard:summary');
+        return RedisCache::delete('admin:dashboard:summary', TenantContext::getId());
     }
 }

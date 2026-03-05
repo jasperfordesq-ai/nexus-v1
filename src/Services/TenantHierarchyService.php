@@ -149,9 +149,21 @@ class TenantHierarchyService
                 [$newPath, $tenantId]
             );
 
-            // Seed default categories and attributes
+            // Seed all default data for the new tenant
             \Nexus\Models\Attribute::seedDefaults($tenantId);
             \Nexus\Models\Category::seedDefaults($tenantId);
+            TenantSettingsService::seedDefaults((int)$tenantId);
+            \Nexus\Models\Menu::seedDefaults((int)$tenantId);
+            SkillTaxonomyService::seedDefaults((int)$tenantId);
+
+            // Seed default features if not explicitly provided
+            if (empty($data['features'])) {
+                $defaultFeatures = json_encode(TenantFeatureConfig::FEATURE_DEFAULTS);
+                Database::query(
+                    "UPDATE tenants SET features = ? WHERE id = ?",
+                    [$defaultFeatures, $tenantId]
+                );
+            }
 
             Database::commit();
 

@@ -8,6 +8,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 use Nexus\Services\TokenService;
 use Nexus\Services\TotpService;
 use Nexus\Services\TwoFactorChallengeManager;
@@ -342,7 +343,7 @@ class AuthController extends BaseApiController
         $name = $data['name'] ?? ''; // Still accept 'name' from API for compatibility, but split it
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
-        $tenant_id = $data['tenant_id'] ?? 1;
+        $tenant_id = $data['tenant_id'] ?? TenantContext::getId();
 
         // SECURITY: Check if registration is open for this tenant
         if (!\Nexus\Services\TenantSettingsService::isRegistrationOpen((int) $tenant_id)) {
@@ -479,7 +480,7 @@ class AuthController extends BaseApiController
                 'user' => [
                     'id' => $_SESSION['user_id'],
                     'role' => $_SESSION['user_role'] ?? 'member',
-                    'tenant_id' => $_SESSION['tenant_id'] ?? 1
+                    'tenant_id' => $_SESSION['tenant_id'] ?? TenantContext::getId()
                 ]
             ]);
         }
