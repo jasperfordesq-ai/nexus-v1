@@ -388,53 +388,55 @@
     "title": "Stádas forbartha: {{stage}}",
     "where_we_are": {
       "title": "Cá bhfuilimid anois",
-      "paragraph1": "Tá Project NEXUS faoi láthair in Iarrthóir Eisiúna (RC) — an chéim dheireanach roimh sheoladh poiblí iomlán. Tá iomlánú gnéithe bainte amach againn do V1, agus tá an t-ardán in úsáid ghníomhach ag pobail chearta. Tá ár bhfócas anois ar chrua-dhaingniú, feidhmíocht, agus fabhtanna cás-imeallacha a ghabháil roimh Infhaighteacht Ghinearálta a fhógairt.",
-      "paragraph2": "Tá gach rud a fheiceann tú anseo ag rith ar bhonneagar táirgthe (Azure, Cloudflare, MariaDB). Tá do shonraí fíor agus caitear go dáiríre leo. Nílimid i dtimpeallacht taispeána scoite."
+      "paragraph1": "Tá Project NEXUS faoi láthair in Iarrthóir Eisiúna (RC) — an chéim dheireanach roimh Infhaighteacht Ghinearálta a fhógairt. Tá an t-ardán iomlán ó thaobh gnéithe de do V1 agus tá sé ar siúl i measc il-phobail ghníomhacha ar fud an domhain. Tá ár bhfócas anois ar chrua-dhaingniú cobhsaíochta, tiúnadh feidhmíochta, agus saincheisteanna cás-imeallach a réiteach roimh an seoladh poiblí iomlán.",
+      "paragraph2": "Tá gach rud a fheiceann tú anseo ag rith ar bhonneagar táirgthe (Azure, Cloudflare, MariaDB, Redis). Tá do shonraí fíor agus caitear leo le cúram mar aon chóras beo. Ní timpeallacht taispeána nó bosca gainimh é seo."
     },
     "whats_stable": {
       "title": "Cad atá cobhsaí agus ag obair",
-      "item1": "Clárú ball, logáil isteach, agus tástáil",
-      "item2": "Sparán creidmheasanna ama — tuilleamh, caiteachas, agus stair idirbheart a fheiceáil",
-      "item3": "Liostaí — postáil, brabhsáil, agus malartuithe a iarraidh",
-      "item4": "Teachtaireachtaí — comhráite díreacha idir baill",
-      "item5": "Imeachtaí — cruthú, aimsiú, agus clárú d'imeachtaí pobail",
-      "item6": "Grúpaí — fo-ghrúpaí pobail le bainistíocht ball",
-      "item7": "Éachtaí agus cluichíocht (XP, suaitheantais, clár ceannairí)",
-      "item8": "Painéal riaracháin — cumraíocht tionónta, bainistíocht úsáideoirí, modhnóireacht",
-      "item9": "Ailtireacht il-tionónta — tá sonraí scoite ag gach pobal",
-      "item10": "Fógraí ríomhphoist (clárú, iarratais mhalartaithe, teachtaireachtaí)",
-      "item11": "Mód dorcha, inrochtaineacht, agus comhéadan freagrach do ghutháin"
+      "item1": "Clárú ball, logáil isteach, fíordheimhniú dhá fhachtóir (TOTP + WebAuthn), agus tástáil",
+      "item2": "Sparán creidmheasanna ama — tuilleamh, caiteachas, aistrithe, agus stair idirbheart iomlán",
+      "item3": "Liostaí — postáil, brabhsáil, meaitseáil chliste, agus malartuithe a iarraidh",
+      "item4": "Teachtaireachtaí — comhráite díreacha le admhálacha léite agus nuashonruithe fíor-ama",
+      "item5": "Imeachtaí — cruthú, aimsiú, RSVPanna, agus onnmhairiú féilire",
+      "item6": "Grúpaí — fo-ghrúpaí pobail le pléití, róil, agus modhnóireacht",
+      "item7": "Deonaíocht — deiseanna, sealaí, iarratais, agus logáil uaireanta",
+      "item8": "Éachtaí agus cluichíocht — XP, suaitheantais, dúshláin, clár ceannairí, agus Scór Nexus",
+      "item9": "Painéal riaracháin — cumraíocht tionónta, bainistíocht úsáideoirí, anailísíocht, agus modhnóireacht",
+      "item10": "Ailtireacht il-tionónta — il-phobail, gach ceann le sonraí atá scoite go hiomlán",
+      "item11": "7 teanga — Béarla, Gaeilge, Gearmáinis, Fraincis, Iodáilis, Portaingéilis, agus Spáinnis",
+      "item12": "Fógraí ríomhphoist, fógraí brú (FCM), agus foláirimh fíor-ama san aip",
+      "item13": "Mód dorcha, inrochtaineacht (WCAG 2.1 AA), agus comhéadan freagrach do ghutháin"
     },
     "whats_rough": {
       "title": "Cad a d'fhéadfadh a bheith garbh fós",
-      "item1": "Modúl deiseanna deonacha — gné níos nuaí, níos lú tástáilte",
-      "item2": "Gnéithe cónaidhme (tras-phobail) — turgnamhach, d'fhéadfadh cásanna imeallcha a bheith ann",
-      "item3": "Cúntóir Comhrá AI — ag brath ar API OpenAI; tá leideanna agus comhthéacs fós á gcoigeartú",
-      "item4": "Fógraí brú (soghluaiste) — d'fhéadfadh moilleanna seachadta a bheith ann ar roinnt gléasanna",
-      "item5": "D'fhéadfadh roinnt cairteacha tuairiscithe riaracháin sonraí míchruinne a thaispeáint i gcásanna imeallcha",
-      "item6": "Logánú — tá an t-ardán réidh go domhanda ach Béarla amháin faoi láthair"
+      "item1": "Gnéithe cónaidhme (tras-phobail) — feidhmiúil ach fós ag bailiú cásanna imeallcha ón domhan fíor",
+      "item2": "Cúntóir Comhrá AI — ag brath ar sholáthraithe AI seachtracha; athraíonn cáilíocht freagraí de réir cumraíochta",
+      "item3": "Scór Nexus mionsonraithe — nuaseolta; d'fhéadfaí meáchain scórála a choigeartú de réir mar a fhaightear sonraí úsáide",
+      "item4": "Rangú aiste cliste — tá an algartam EdgeRank beo ach tá iompraíocht tús-fhuar do bhaill nua fós á tiúnadh",
+      "item5": "Fógraí brú (soghluaiste) — d'fhéadfadh moilleanna seachadta a bheith ann ar roinnt gléasanna nó brabhsálaithe",
+      "item6": "Aistriúcháin neamh-Bhéarla — ginte ag AI agus gan athbhreithniú ag cainteoirí dúchais fós"
     },
     "how_we_catch_bugs": {
       "title": "Conas a ghabháimid fabhtanna",
       "intro": "Úsáidimid cur chuige il-shraitheach chun fabhtanna a ghabháil agus a dheisiú go tapa:",
       "method1_bold": "Tástálacha uathoibríocha",
-      "method1_text": "ritheann tástálacha aonaid PHP agus tástálacha comhpháirteanna React ar gach gealltanas",
+      "method1_text": "250+ tástáil aonaid/imeasctha PHP agus tástálacha comhpháirteanna React ar gach gealltanas",
       "method2_bold": "Rianú earráidí Sentry",
       "method2_text": "gabhtar eisceachtaí ar an gcomhéadan agus ar an gcúlchóras i bhfíor-am",
       "method3_bold": "Anailísíocht Cloudflare",
-      "method3_text": "déantar monatóireacht ar aimhrialtachtaí tráchta agus spící earráide",
+      "method3_text": "déantar monatóireacht leanúnach ar aimhrialtachtaí tráchta agus spící earráide",
       "method4_bold": "Dearbhú Cáilíochta Láimhe",
-      "method4_text": "tástáiltear croí-thurais úsáideoirí roimh gach imscaradh",
+      "method4_text": "tástáiltear croí-thurais úsáideoirí trasna cumraíochtaí tionónta iolracha roimh gach imscaradh",
       "method5_bold": "Tástáil phobail",
-      "method5_text": "cabhraíonn fíor-úsáideoirí linn cásanna imeallcha a aimsiú sa táirgeadh"
+      "method5_text": "cabhraíonn baill fhíora trasna il-phobail ghníomhacha linn cásanna imeallcha a aithint sa táirgeadh"
     },
     "how_to_help": {
       "title": "Conas cabhrú",
       "report_bug_title": "Tuairiscigh fabht",
       "report_bug_description": "Ar aimsigh tú rud éigin briste? Oscail saincheist ar GitHub le do thoil — is é an bealach is tapúla é chun deisiúchán a fháil os ár gcomhair. Cuir san áireamh cad a bhí tú ag déanamh, cad a bhí ag súil agat, agus cad a tharla i ndáiríre.",
       "github_link": "Oscail saincheist ar GitHub",
-      "become_tester_title": "Bí i do thástálaí",
-      "become_tester_description": "Má ritheann tú banc ama nó líonra pobail agus más mian leat Project NEXUS a thriail le do bhaill, ba bhreá linn oibriú leat. Déan teagmháil trí Phlé GitHub nó an leathanach teagmhála."
+      "become_tester_title": "Tabhair do phobal chuig NEXUS",
+      "become_tester_description": "Má ritheann tú banc ama nó líonra pobail agus más mian leat páirt a ghlacadh san ardán, ba bhreá linn oibriú leat. Déan teagmháil trí Phlé GitHub nó an leathanach teagmhála — tacaímid le pobail de mhéideanna ar bith."
     },
     "security": {
       "title": "Nochtadh slándála",

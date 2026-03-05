@@ -388,53 +388,55 @@
     "title": "Development status: {{stage}}",
     "where_we_are": {
       "title": "Where we are now",
-      "paragraph1": "Project NEXUS is currently in Release Candidate (RC) — the final stage before a full public launch. We have reached feature-completeness for V1, and the platform is in active use by real communities. Our focus now is hardening, performance, and catching edge-case bugs before we declare General Availability.",
-      "paragraph2": "Everything you see here is running on production infrastructure (Azure, Cloudflare, MariaDB). Your data is real and treated seriously. We are not in a sandboxed demo environment."
+      "paragraph1": "Project NEXUS is currently in Release Candidate (RC) — the final stage before declaring General Availability. The platform is feature-complete for V1 and is running live across multiple active communities worldwide. Our focus is now on stability hardening, performance tuning, and resolving edge-case issues before the full public launch.",
+      "paragraph2": "Everything you see here runs on production infrastructure (Azure, Cloudflare, MariaDB, Redis). Your data is real and treated with the same care as any live system. This is not a demo or sandbox environment."
     },
     "whats_stable": {
       "title": "What's stable and working",
-      "item1": "Member registration, login, and onboarding",
-      "item2": "Time credit wallet — earning, spending, and viewing transaction history",
-      "item3": "Listings — posting, browsing, and requesting exchanges",
-      "item4": "Messaging — direct conversations between members",
-      "item5": "Events — creating, discovering, and signing up for community events",
-      "item6": "Groups — community sub-groups with member management",
-      "item7": "Achievements and gamification (XP, badges, leaderboard)",
-      "item8": "Admin panel — tenant configuration, user management, moderation",
-      "item9": "Multi-tenant architecture — each community has isolated data",
-      "item10": "Email notifications (registration, exchange requests, messages)",
-      "item11": "Dark mode, accessibility, and mobile-responsive UI"
+      "item1": "Member registration, login, two-factor auth (TOTP + WebAuthn), and onboarding",
+      "item2": "Time credit wallet — earning, spending, transfers, and full transaction history",
+      "item3": "Listings — posting, browsing, smart matching, and requesting exchanges",
+      "item4": "Messaging — direct conversations with read receipts and real-time updates",
+      "item5": "Events — creating, discovering, RSVPs, and calendar export",
+      "item6": "Groups — community sub-groups with discussions, roles, and moderation",
+      "item7": "Volunteering — opportunities, shifts, applications, and hours logging",
+      "item8": "Achievements and gamification — XP, badges, challenges, leaderboard, and Nexus Score",
+      "item9": "Admin panel — tenant configuration, user management, analytics, and moderation",
+      "item10": "Multi-tenant architecture — multiple communities, each with fully isolated data",
+      "item11": "7 languages — English, Irish, German, French, Italian, Portuguese, and Spanish",
+      "item12": "Email notifications, push notifications (FCM), and in-app real-time alerts",
+      "item13": "Dark mode, accessibility (WCAG 2.1 AA), and mobile-responsive UI"
     },
     "whats_rough": {
       "title": "What may still be rough",
-      "item1": "Volunteering opportunities module — newer feature, less battle-tested",
-      "item2": "Federation (cross-community) features — experimental, may have edge cases",
-      "item3": "AI Chat assistant — depends on OpenAI API; prompts and context still being tuned",
-      "item4": "Push notifications (mobile) — may have delivery delays on some devices",
-      "item5": "Some admin reporting charts may show incorrect data in edge cases",
-      "item6": "Localisation — the platform is global-ready but English-only for now"
+      "item1": "Federation (cross-community) features — functional but still accumulating real-world edge cases",
+      "item2": "AI Chat assistant — depends on external AI providers; response quality varies by configuration",
+      "item3": "Nexus Score breakdown — newly launched; scoring weights may be adjusted as usage data grows",
+      "item4": "Smart feed ranking — EdgeRank algorithm is live but cold-start behaviour for new members is still being tuned",
+      "item5": "Push notifications (mobile) — may have delivery delays on some devices or browsers",
+      "item6": "Non-English translations — AI-generated and not yet reviewed by native speakers"
     },
     "how_we_catch_bugs": {
       "title": "How we catch bugs",
       "intro": "We use a multi-layer approach to catch and fix issues quickly:",
       "method1_bold": "Automated tests",
-      "method1_text": "PHP unit tests and React component tests run on every commit",
+      "method1_text": "250+ PHP unit/integration tests and React component tests run on every commit",
       "method2_bold": "Sentry error tracking",
       "method2_text": "exceptions on both frontend and backend are captured in real time",
       "method3_bold": "Cloudflare analytics",
-      "method3_text": "traffic anomalies and error spikes are monitored",
+      "method3_text": "traffic anomalies and error spikes are monitored continuously",
       "method4_bold": "Manual QA",
-      "method4_text": "core user journeys are tested before each deployment",
+      "method4_text": "core user journeys are tested across multiple tenant configurations before each deployment",
       "method5_bold": "Community testing",
-      "method5_text": "real users help us discover edge cases in production"
+      "method5_text": "real members across multiple active communities help us surface edge cases in production"
     },
     "how_to_help": {
       "title": "How to help",
       "report_bug_title": "Report a bug",
       "report_bug_description": "Found something broken? Please open an issue on GitHub — it's the fastest way to get a fix in front of us. Include what you were doing, what you expected, and what actually happened.",
       "github_link": "Open an issue on GitHub",
-      "become_tester_title": "Become a tester",
-      "become_tester_description": "If you run a timebank or community network and want to try Project NEXUS with your members, we'd love to work with you. Reach out via GitHub Discussions or the contact page."
+      "become_tester_title": "Bring your community onto NEXUS",
+      "become_tester_description": "If you run a timebank or community network and want to join the platform, we'd love to work with you. Reach out via GitHub Discussions or the contact page — we support communities of all sizes."
     },
     "security": {
       "title": "Security disclosure",
