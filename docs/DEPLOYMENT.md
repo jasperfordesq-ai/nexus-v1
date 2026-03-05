@@ -214,6 +214,10 @@ docker compose logs db --tail=50         # Database
 
 ## Running Database Migrations on Production
 
+> **Automated migrations (recommended):** As of March 2026, `safe-deploy.sh` automatically detects and runs pending migrations during both `quick` and `full` deploys. You no longer need to run migrations manually. The `status` command also shows pending migration count.
+
+### Manual Method (if needed)
+
 `php scripts/safe_migrate.php` **does NOT work** via `docker exec` because:
 - `bootstrap.php`, `scripts/`, and `migrations/` are **NOT volume-mounted** into `nexus-php-app`
 - Only `httpdocs/`, `src/`, `views/`, `config/` are mounted (read-only)
