@@ -82,6 +82,8 @@ class SmartMatchingEngine
     private static ?array $userDataCache = [];
     private static ?array $configCache = null;
     private static ?bool $userBlocksTableExistsCache = null;
+    /** @var array<int, array{name: string, parent_id: int|null}> */
+    private static array $categoryCache = [];
 
     /**
      * Get configuration from tenant settings
@@ -144,6 +146,7 @@ class SmartMatchingEngine
         self::$configCache = null;
         self::$userDataCache = [];
         self::$userBlocksTableExistsCache = null;
+        self::$categoryCache = [];
     }
 
     // =========================================================================
@@ -222,6 +225,9 @@ class SmartMatchingEngine
                     $candidate['distance_km'] = $matchResult['distance'];
                     $candidate['matched_listing'] = $myListing['title'];
                     $candidate['match_type'] = $matchResult['type'];
+                    if (isset($matchResult['_debug_scores'])) {
+                        $candidate['_debug_scores'] = $matchResult['_debug_scores'];
+                    }
 
                     $matches[] = $candidate;
                     $seenIds[] = $candidate['id'];
@@ -247,7 +253,7 @@ class SmartMatchingEngine
                 foreach ($matches as &$match) {
                     if (isset($semanticSet[$match['id'] ?? 0])) {
                         // Blend: 75% original score + 25% semantic boost
-                        $match['match_score'] = min(1.0, $match['match_score'] * 1.1);
+                        $match['match_score'] = min(1.0, $match['match_score'] * 1.3);
                     }
                 }
                 unset($match);
@@ -262,7 +268,7 @@ class SmartMatchingEngine
             $knnSet = array_flip($knnRecs);
             foreach ($matches as &$match) {
                 if (isset($knnSet[$match['id'] ?? 0])) {
-                    $match['match_score'] = min(1.0, ($match['match_score'] ?? 0) * 1.12);
+                    $match['match_score'] = min(1.0, ($match['match_score'] ?? 0) * 1.4);
                 }
             }
             unset($match);
@@ -272,7 +278,19 @@ class SmartMatchingEngine
         usort($matches, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
 
         // Limit results
-        return array_slice($matches, 0, $limit);
+        $results = array_slice($matches, 0, $limit);
+
+        // Record match impressions for learning (fire-and-forget)
+        if ($userId && !empty($results)) {
+            foreach (array_slice($results, 0, 20) as $match) {
+                $listingId = $match['id'] ?? $match['source_id'] ?? null;
+                if ($listingId) {
+                    MatchLearningService::recordInteraction($userId, $listingId, 'impression');
+                }
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -407,13 +425,27 @@ class SmartMatchingEngine
             // ML service not available, continue without boost
         }
 
-        return [
+        $result = [
             'score' => $finalScore,
             'reasons' => $reasons,
             'breakdown' => $scores,
             'distance' => round($distance, 1),
             'type' => $matchType,
         ];
+
+        // Attach per-component debug scores when debug mode is requested
+        if (($_GET['debug'] ?? null) === 'true') {
+            $result['_debug_scores'] = [
+                'category' => round(($scores['category'] ?? 0) * 100),
+                'skill' => round(($scores['skill'] ?? 0) * 100),
+                'proximity' => round(($scores['proximity'] ?? 0) * 100),
+                'freshness' => round(($scores['freshness'] ?? 0) * 100),
+                'reciprocity' => round(($scores['reciprocity'] ?? 0) * 100),
+                'quality' => round(($scores['quality'] ?? 0) * 100),
+            ];
+        }
+
+        return $result;
     }
 
     // =========================================================================
@@ -421,42 +453,150 @@ class SmartMatchingEngine
     // =========================================================================
 
     /**
-     * Calculate category match score
+     * Fetch and cache a category row (name + parent_id) by ID.
+     *
+     * @param int $categoryId
+     * @return array{name: string, parent_id: int|null}|null
      */
-    private static function calculateCategoryScore(array $myListing, array $candidate): float
+    private static function fetchCategory(int $categoryId): ?array
     {
-        // Exact category match
-        if ($myListing['category_id'] && $myListing['category_id'] === $candidate['category_id']) {
-            return 1.0;
+        if (isset(self::$categoryCache[$categoryId])) {
+            return self::$categoryCache[$categoryId];
         }
 
-        // TODO: Add related category matching (parent/child categories)
-        // For now, no category match = 0.3 base score
-        return 0.3;
+        try {
+            $row = Database::query(
+                "SELECT name, parent_id FROM categories WHERE id = ?",
+                [$categoryId]
+            )->fetch();
+
+            if ($row) {
+                self::$categoryCache[$categoryId] = [
+                    'name'      => (string)$row['name'],
+                    'parent_id' => isset($row['parent_id']) ? (int)$row['parent_id'] : null,
+                ];
+                return self::$categoryCache[$categoryId];
+            }
+        } catch (\Exception $e) {
+            // DB unavailable — return null and let caller fall back
+        }
+
+        return null;
     }
 
     /**
-     * Calculate skill/keyword matching score
+     * Calculate category match score.
+     *
+     * Scoring tiers:
+     *   1.0 — exact same category
+     *   0.7 — different categories that share the same parent
+     *   0.15–0.80 — name similarity via similar_text()  (no parent overlap)
+     */
+    private static function calculateCategoryScore(array $myListing, array $candidate): float
+    {
+        $myId        = $myListing['category_id']   ?? null;
+        $candidateId = $candidate['category_id']   ?? null;
+
+        // Exact match
+        if ($myId && $myId === $candidateId) {
+            return 1.0;
+        }
+
+        // No categories to compare — use minimum fallback
+        if (!$myId || !$candidateId) {
+            return 0.15;
+        }
+
+        $myCat        = self::fetchCategory((int)$myId);
+        $candidateCat = self::fetchCategory((int)$candidateId);
+
+        // Shared parent check (e.g. both under "Home & Garden")
+        if (
+            $myCat !== null && $candidateCat !== null &&
+            $myCat['parent_id'] !== null &&
+            $myCat['parent_id'] === $candidateCat['parent_id']
+        ) {
+            return 0.7;
+        }
+
+        // Name-similarity fallback via similar_text()
+        if ($myCat !== null && $candidateCat !== null) {
+            similar_text($myCat['name'], $candidateCat['name'], $pct);
+            // 0 % similar → 0.15,  100 % similar → 0.80
+            return (float)max(0.15, $pct / 100 * 0.8);
+        }
+
+        return 0.15;
+    }
+
+    /**
+     * Porter Stemmer — simplified suffix-stripping implementation.
+     *
+     * Strips common English inflection suffixes so that e.g.
+     * "teaching", "teaches", "teacher" all map to "teach".
+     *
+     * Length guards (≥4 chars before stripping) prevent over-stemming
+     * short words such as "ares" → "ar".
+     *
+     * @param string $word Already-lowercased word
+     * @return string Stemmed word
+     */
+    private static function stemWord(string $word): string
+    {
+        $len = strlen($word);
+
+        // "ing" suffix — require stem ≥ 4 chars so "sing" stays "sing"
+        if ($len > 6 && substr($word, -3) === 'ing') {
+            return substr($word, 0, $len - 3);
+        }
+
+        // "ed" suffix
+        if ($len > 5 && substr($word, -2) === 'ed') {
+            return substr($word, 0, $len - 2);
+        }
+
+        // "er" suffix
+        if ($len > 5 && substr($word, -2) === 'er') {
+            return substr($word, 0, $len - 2);
+        }
+
+        // "es" suffix
+        if ($len > 4 && substr($word, -2) === 'es') {
+            return substr($word, 0, $len - 2);
+        }
+
+        // "s" suffix (avoid stripping "ss")
+        if ($len > 4 && substr($word, -1) === 's' && substr($word, -2) !== 'ss') {
+            return substr($word, 0, $len - 1);
+        }
+
+        return $word;
+    }
+
+    /**
+     * Calculate skill/keyword matching score using Jaccard similarity
+     * over stemmed keyword sets.
      */
     private static function calculateSkillScore(array $userData, array $myListing, array $candidate): float
     {
-        // Extract keywords from user skills and listing
-        $userSkills = self::extractKeywords($userData['skills'] ?? '');
-        $myKeywords = self::extractKeywords($myListing['title'] . ' ' . ($myListing['description'] ?? ''));
+        // Extract (now stemmed) keywords from user skills and listing
+        $userSkills        = self::extractKeywords($userData['skills'] ?? '');
+        $myKeywords        = self::extractKeywords($myListing['title'] . ' ' . ($myListing['description'] ?? ''));
         $candidateKeywords = self::extractKeywords($candidate['title'] . ' ' . ($candidate['description'] ?? ''));
 
         // Combine user skills with their listing keywords
         $allUserKeywords = array_unique(array_merge($userSkills, $myKeywords));
 
         if (empty($allUserKeywords) || empty($candidateKeywords)) {
-            return 0.5; // Neutral score if no keywords
+            return 0.4; // Slightly penalise missing skills rather than being fully neutral
         }
 
-        // Calculate intersection
+        // Jaccard similarity: |A ∩ B| / |A ∪ B|
         $matches = array_intersect($allUserKeywords, $candidateKeywords);
-        $matchRatio = count($matches) / max(count($candidateKeywords), 1);
+        $union   = count(array_unique(array_merge($allUserKeywords, $candidateKeywords)));
+        $jaccard = $union > 0 ? count($matches) / $union : 0;
 
-        return min(1.0, $matchRatio * 1.5); // Boost slightly, cap at 1.0
+        return min(1.0, $jaccard * 1.5);
     }
 
     /**
@@ -718,8 +858,13 @@ class SmartMatchingEngine
         preg_match_all('/\b[a-z]{3,}\b/', $text, $matches);
         $words = $matches[0] ?? [];
 
-        // Remove stop words and duplicates
+        // Remove stop words
         $keywords = array_diff($words, $stopWords);
+
+        // Apply Porter stemming so inflected forms match their stem
+        $keywords = array_map([self::class, 'stemWord'], $keywords);
+
+        // Deduplicate after stemming
         $keywords = array_unique($keywords);
 
         return array_values($keywords);
@@ -965,12 +1110,37 @@ class SmartMatchingEngine
 
         $results = Database::query($sql, $params)->fetchAll();
 
-        // Add basic match info
+        // Add basic match info with quality-based cold-start scores (range 35–65).
+        // Listings with images, long descriptions, and verified owners score higher
+        // than bare-minimum listings, so the feed has meaningful ordering immediately.
         foreach ($results as &$listing) {
-            $listing['match_score'] = 50; // Neutral score for cold start
+            $coldScore = 35; // Floor
+
+            // +10 for a meaningful description (≥ QUALITY_MIN_DESCRIPTION chars)
+            $descLen = strlen($listing['description'] ?? '');
+            if ($descLen >= self::QUALITY_MIN_DESCRIPTION) {
+                $coldScore += 10;
+            }
+            // +5 more for a long description (≥ 2× minimum)
+            if ($descLen >= self::QUALITY_MIN_DESCRIPTION * 2) {
+                $coldScore += 5;
+            }
+
+            // +10 for having an image
+            if (!empty($listing['image_url'])) {
+                $coldScore += 10;
+            }
+
+            // +5 for verified owner
+            if (!empty($listing['author_verified']) || !empty($listing['is_verified'])) {
+                $coldScore += 5;
+            }
+
+            // Cap at 65 (cold-start ceiling)
+            $listing['match_score']   = min(65, $coldScore);
             $listing['match_reasons'] = ['Nearby listing that might interest you'];
-            $listing['match_type'] = 'cold_start';
-            $listing['distance_km'] = $listing['distance_km'] ?? null;
+            $listing['match_type']    = 'cold_start';
+            $listing['distance_km']   = $listing['distance_km'] ?? null;
         }
 
         return $results;
