@@ -24,7 +24,6 @@ import {
   Divider,
 } from '@heroui/react';
 import {
-  Newspaper,
   BarChart3,
   ShoppingBag,
   Calendar,
@@ -35,7 +34,6 @@ import { useTenant } from '@/contexts';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ComposeSubmitProvider } from './ComposeSubmitContext';
 import { MobileComposeOverlay } from './MobileComposeOverlay';
-import { PostTab } from './tabs/PostTab';
 import { PollTab } from './tabs/PollTab';
 import { ListingTab } from './tabs/ListingTab';
 import { EventTab } from './tabs/EventTab';
@@ -45,19 +43,18 @@ import { TemplatePicker } from './shared/TemplatePicker';
 import type { ComposeHubProps, ComposeTab, ComposeTabConfig } from './types';
 
 const ALL_TABS: ComposeTabConfig[] = [
-  { key: 'post', label: 'Post', icon: Newspaper },
-  { key: 'poll', label: 'Poll', icon: BarChart3, gate: { type: 'feature', key: 'polls' } },
   { key: 'listing', label: 'Listing', icon: ShoppingBag, gate: { type: 'module', key: 'listings' } },
   { key: 'event', label: 'Event', icon: Calendar, gate: { type: 'feature', key: 'events' } },
   { key: 'goal', label: 'Goal', icon: Target, gate: { type: 'feature', key: 'goals' } },
+  { key: 'poll', label: 'Poll', icon: BarChart3, gate: { type: 'feature', key: 'polls' } },
 ];
 
-const TABS_WITH_GROUPS: ComposeTab[] = ['post', 'poll', 'event'];
+const TABS_WITH_GROUPS: ComposeTab[] = ['poll', 'event'];
 
 export function ComposeHub({
   isOpen,
   onClose,
-  defaultTab = 'post',
+  defaultTab = 'listing',
   onSuccess,
   groupId,
 }: ComposeHubProps) {
@@ -93,7 +90,7 @@ export function ComposeHub({
   };
 
   const activeConfig = ALL_TABS.find((tc) => tc.key === activeTab);
-  const ActiveIcon = activeConfig?.icon ?? Newspaper;
+  const ActiveIcon = activeConfig?.icon ?? ShoppingBag;
 
   const tabProps = {
     onSuccess: handleSuccess,
@@ -114,7 +111,6 @@ export function ComposeHub({
         </div>
       )}
 
-      {activeTab === 'post' && <PostTab {...tabProps} />}
       {activeTab === 'poll' && <PollTab {...tabProps} />}
       {activeTab === 'listing' && <ListingTab {...tabProps} />}
       {activeTab === 'event' && <EventTab {...tabProps} />}

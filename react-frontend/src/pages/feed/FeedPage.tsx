@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -46,7 +47,7 @@ import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
 import { TrendingHashtags } from '@/components/hashtags/TrendingHashtags';
 import { TopEndorsedWidget } from '@/components/endorsements/TopEndorsedWidget';
-import { useAuth, useToast, usePusherOptional } from '@/contexts';
+import { useAuth, useToast, usePusherOptional, useTenant } from '@/contexts';
 import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -88,6 +89,8 @@ export function FeedPage() {
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const pusher = usePusherOptional();
+  const navigate = useNavigate();
+  const { tenantPath } = useTenant();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +102,7 @@ export function FeedPage() {
 
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
-  const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('post');
+  const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('listing');
 
   // Report modal
   const { isOpen: isReportOpen, onOpen: onReportOpen, onClose: onReportClose } = useDisclosure();
@@ -553,7 +556,14 @@ export function FeedPage() {
         isOpen={isCreateOpen}
         onClose={onCreateClose}
         defaultTab={composeDefaultTab}
-        onSuccess={() => { cursorRef.current = undefined; loadFeed(); }}
+        onSuccess={(type) => {
+          if (type === 'poll') {
+            navigate(tenantPath('/polls'));
+          } else {
+            cursorRef.current = undefined;
+            loadFeed();
+          }
+        }}
       />
 
       {/* Report Post Modal */}
