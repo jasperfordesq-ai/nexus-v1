@@ -43,7 +43,7 @@ class CrossModuleMatchingService
         // Get user profile for matching
         $userProfile = self::getUserProfile($userId, $tenantId);
         if (!$userProfile) {
-            return ['items' => [], 'total' => 0];
+            return ['matches' => [], 'total' => 0];
         }
 
         // Match across each enabled module
