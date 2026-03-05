@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Textarea, Avatar, Spinner } from '@heroui/react';
 import { X, Send, Search, User, AlertCircle } from 'lucide-react';
@@ -230,7 +231,7 @@ export function TransferModal({
   const parsedAmount = parseFloat(formData.amount) || 0;
   const isOverBalance = parsedAmount > currentBalance;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -511,7 +512,8 @@ export function TransferModal({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
