@@ -592,8 +592,12 @@ class SmartMatchingEngine
      */
     private static function calculateSkillScore(array $userData, array $myListing, array $candidate): float
     {
-        // Extract (now stemmed) keywords from user skills and listing
-        $userSkills        = self::extractKeywords($userData['skills'] ?? '');
+        // Use proficiency-weighted skill keys when available, fall back to plain text
+        $proficiencyKeys = $userData['skills_proficiency_keys'] ?? null;
+        $userSkills      = $proficiencyKeys !== null
+            ? $proficiencyKeys
+            : self::extractKeywords($userData['skills'] ?? '');
+
         $myKeywords        = self::extractKeywords($myListing['title'] . ' ' . ($myListing['description'] ?? ''));
         $candidateKeywords = self::extractKeywords($candidate['title'] . ' ' . ($candidate['description'] ?? ''));
 
@@ -608,6 +612,17 @@ class SmartMatchingEngine
         $matches = array_intersect($allUserKeywords, $candidateKeywords);
         $union   = count(array_unique(array_merge($allUserKeywords, $candidateKeywords)));
         $jaccard = $union > 0 ? count($matches) / $union : 0;
+
+        // Apply proficiency multiplier on matching skills (expert skills count more)
+        $skillsWeighted = $userData['skills_weighted'] ?? [];
+        if (!empty($skillsWeighted) && !empty($matches)) {
+            $totalWeight = 0.0;
+            foreach ($matches as $m) {
+                $totalWeight += $skillsWeighted[$m] ?? 1.0;
+            }
+            $avgWeight = $totalWeight / count($matches); // 0.6–1.6
+            $jaccard  *= min(1.4, $avgWeight);
+        }
 
         return min(1.0, $jaccard * 1.5);
     }
@@ -941,6 +956,13 @@ class SmartMatchingEngine
         )->fetch();
 
         if ($user) {
+            // Enrich with proficiency-weighted skills from user_skills table
+            $weighted = SkillTaxonomyService::getProficiencyWeightedSkills($userId, $tenantId);
+            $user['skills_weighted'] = $weighted;
+            // Override plain 'skills' string with proficiency-aware keywords when available
+            if (!empty($weighted)) {
+                $user['skills_proficiency_keys'] = array_keys($weighted);
+            }
             self::$userDataCache[$userId] = $user;
         }
 

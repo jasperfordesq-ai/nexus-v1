@@ -433,6 +433,43 @@ class SkillTaxonomyService
     }
 
     /**
+     * Get a user's skills as a name→weight map based on proficiency level.
+     *
+     * Weights: beginner=0.6, intermediate=1.0, advanced=1.3, expert=1.6
+     * Used by ranking/matching algorithms to give stronger signal to expert skills.
+     *
+     * @return array<string, float>  ['skill_name_lowercase' => weight]
+     */
+    public static function getProficiencyWeightedSkills(int $userId, int $tenantId): array
+    {
+        static $cache = [];
+        $key = "{$tenantId}:{$userId}";
+        if (isset($cache[$key])) {
+            return $cache[$key];
+        }
+
+        $weights = ['beginner' => 0.6, 'intermediate' => 1.0, 'advanced' => 1.3, 'expert' => 1.6];
+
+        try {
+            $rows = Database::query(
+                "SELECT skill_name, proficiency FROM user_skills
+                 WHERE user_id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            )->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return $cache[$key] = [];
+        }
+
+        $result = [];
+        foreach ($rows as $row) {
+            $name   = strtolower(trim($row['skill_name']));
+            $result[$name] = $weights[$row['proficiency']] ?? 1.0;
+        }
+
+        return $cache[$key] = $result;
+    }
+
+    /**
      * Get skills breakdown for a category (with user counts)
      */
     public static function getCategorySkills(int $categoryId): array

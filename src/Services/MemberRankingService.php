@@ -210,11 +210,14 @@ class MemberRankingService
 
         // Collaborative filtering: CF-suggested member IDs for the viewer
         $cfSuggestedIds = [];
+        // Proficiency-weighted skills for the viewer (skill → weight map)
+        $viewerSkillWeights = [];
         if ($viewerId) {
             $tenantId = TenantContext::getId();
             foreach (CollaborativeFilteringService::getSuggestedMembers($viewerId, $tenantId, 20) as $sid) {
                 $cfSuggestedIds[$sid] = true;
             }
+            $viewerSkillWeights = SkillTaxonomyService::getProficiencyWeightedSkills($viewerId, $tenantId);
         }
 
         $rankedMembers = [];
@@ -259,6 +262,24 @@ class MemberRankingService
             // Collaborative filtering boost: members suggested by CF get a small lift
             if (!empty($cfSuggestedIds[$memberId])) {
                 $finalScore = min(1.0, $finalScore * 1.15);
+            }
+
+            // Proficiency-gap boost: if member offers a skill the viewer has at beginner/intermediate
+            // level, they are a strong learning/exchange match → up to +8% boost
+            if (!empty($viewerSkillWeights)) {
+                $memberSkillText = strtolower($member['skills'] ?? '');
+                if (!empty($memberSkillText)) {
+                    $memberSkills = array_map('trim', explode(',', $memberSkillText));
+                    $gapBoost = 0.0;
+                    foreach ($memberSkills as $ms) {
+                        $w = $viewerSkillWeights[$ms] ?? null;
+                        // Only boost when viewer has the skill at beginner (0.6) or intermediate (1.0)
+                        if ($w !== null && $w <= 1.0) {
+                            $gapBoost += (1.0 - $w) * 0.04; // max 0.04 per skill gap
+                        }
+                    }
+                    $finalScore = min(1.0, $finalScore + min(0.08, $gapBoost));
+                }
             }
 
             $member['_community_rank'] = $finalScore;
