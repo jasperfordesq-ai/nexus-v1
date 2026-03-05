@@ -755,10 +755,10 @@ class AiChatController extends BaseAiController
         try {
             $db = Database::getConnection();
 
-            // Tenant Guard
+            // Tenant Guard — TenantContext::getId() always returns ≥1
             if ($tenantId < 1) {
-                error_log("Smart Context Engine: Invalid tenant $tenantId, defaulting to Master Tenant");
-                $tenantId = 1;
+                error_log("Smart Context Engine: Invalid tenant $tenantId — cannot proceed without valid tenant");
+                return '';
             }
 
             // Intent Detection

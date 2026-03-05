@@ -344,7 +344,7 @@ class GroupExchangeService
         // Validate all provider balances upfront
         foreach ($splits as $providerId => $receivers) {
             $totalSending = array_sum($receivers);
-            $stmt = Database::query("SELECT balance FROM users WHERE id = ?", [$providerId]);
+            $stmt = Database::query("SELECT balance FROM users WHERE id = ? AND tenant_id = ?", [$providerId, TenantContext::getId()]);
             $user = $stmt->fetch();
 
             if (!$user || (float) $user['balance'] < $totalSending) {

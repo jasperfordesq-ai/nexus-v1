@@ -486,10 +486,10 @@ class AiApiController extends BaseApiController
             // ========================================
             // TENANT GUARD (Priority 1: Tenant Isolation)
             // ========================================
-            // Validate tenant exists - use user's actual tenant or fallback to Master (1)
+            // Validate tenant exists — TenantContext::getId() always returns ≥1
             if ($tenantId < 1) {
-                error_log("Smart Context Engine: Invalid tenant $tenantId, defaulting to Master Tenant");
-                $tenantId = 1; // Master Tenant fallback
+                error_log("Smart Context Engine: Invalid tenant $tenantId — cannot proceed without valid tenant");
+                return '';
             }
 
             // ========================================

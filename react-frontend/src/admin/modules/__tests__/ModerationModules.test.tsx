@@ -33,6 +33,7 @@ vi.mock('@/contexts', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
+  AuthProvider: ({ children }: any) => <>{children}</>,
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
     tenantSlug: 'test',
@@ -45,13 +46,23 @@ vi.mock('@/contexts', () => ({
   useNotifications: vi.fn(() => ({ counts: { messages: 0, notifications: 0 } })),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 1, first_name: 'Admin', last_name: 'User', name: 'Admin User', role: 'admin', is_super_admin: true, tenant_id: 2 },
+    isAuthenticated: true,
+    logout: vi.fn(),
+  })),
+  AuthProvider: ({ children }: any) => <>{children}</>,
+}));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // Moderation modules import useApi and useToast directly from specific paths
 vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/hooks/useApi', () => ({
   useApi: vi.fn(() => ({
-    data: { data: [], meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } },
+    data: [],
+    meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
     isLoading: false,
     error: null,
     execute: vi.fn(),
