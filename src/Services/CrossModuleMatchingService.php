@@ -158,19 +158,22 @@ class CrossModuleMatchingService
                 $score = self::calculateListingScore($profile, $listing);
                 if ($score > 0) {
                     $matches[] = [
-                        'source' => 'listing',
+                        'id' => (int)$listing['id'],
+                        'source_type' => 'listing',
                         'source_id' => (int)$listing['id'],
                         'title' => $listing['title'],
                         'description' => mb_substr($listing['description'] ?? '', 0, 200),
                         'type' => $listing['type'] ?? 'offer',
                         'category' => $listing['category_name'] ?? null,
+                        'match_score' => $score,
                         'score' => $score,
-                        'match_reasons' => self::getListingMatchReasons($profile, $listing),
-                        'user' => [
+                        'reasons' => self::getListingMatchReasons($profile, $listing),
+                        'matched_user' => [
                             'id' => (int)$listing['owner_id'],
                             'name' => $listing['owner_name'],
                             'avatar_url' => $listing['owner_avatar'],
                         ],
+                        'matched_at' => date('Y-m-d\TH:i:s\Z'),
                         'location' => $listing['location'] ?? null,
                         'distance_km' => self::calculateDistance(
                             $profile['latitude'] ?? null,
@@ -199,8 +202,8 @@ class CrossModuleMatchingService
         try {
             $limitInt = (int)$limit;
             $stmt = Database::query(
-                "SELECT j.id, j.title, j.description, j.location, j.skills_required,
-                        j.organization_id, o.name as org_name
+                "SELECT j.id, j.title, j.description, j.location, j.latitude, j.longitude,
+                        j.skills_required, j.organization_id, o.name as org_name
                  FROM job_vacancies j
                  LEFT JOIN organizations o ON j.organization_id = o.id
                  WHERE j.tenant_id = ? AND j.status = 'active'
@@ -218,28 +221,57 @@ class CrossModuleMatchingService
                     : [];
 
                 $score = self::calculateSkillOverlapScore($userSkills, $requiredSkills);
-                // Boost for location match
-                if (!empty($profile['location']) && !empty($job['location'])) {
-                    if (stripos($job['location'], $profile['location']) !== false ||
-                        stripos($profile['location'], $job['location']) !== false) {
+
+                // Boost for location match — prefer haversine over string comparison
+                $profileLat = isset($profile['latitude']) ? (float)$profile['latitude'] : null;
+                $profileLon = isset($profile['longitude']) ? (float)$profile['longitude'] : null;
+                $itemLat    = isset($job['latitude']) ? (float)$job['latitude'] : null;
+                $itemLon    = isset($job['longitude']) ? (float)$job['longitude'] : null;
+
+                if ($profileLat && $profileLon && $itemLat && $itemLon) {
+                    $earthR = 6371;
+                    $dLat   = deg2rad($itemLat - $profileLat);
+                    $dLon   = deg2rad($itemLon - $profileLon);
+                    $a      = sin($dLat / 2) * sin($dLat / 2)
+                            + cos(deg2rad($profileLat)) * cos(deg2rad($itemLat))
+                            * sin($dLon / 2) * sin($dLon / 2);
+                    $distKm = $earthR * 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    if ($distKm < 10) {
+                        $score = min(100, $score + 20);
+                    } elseif ($distKm < 25) {
+                        $score = min(100, $score + 12);
+                    } elseif ($distKm < 50) {
+                        $score = min(100, $score + 6);
+                    }
+                } elseif (!empty($profile['location']) && !empty($job['location'])) {
+                    // Fallback to string similarity if no coordinates
+                    similar_text(strtolower($profile['location']), strtolower($job['location']), $pct);
+                    if ($pct > 70) {
                         $score = min(100, $score + 15);
+                    } elseif ($pct > 40) {
+                        $score = min(100, $score + 7);
                     }
                 }
 
                 if ($score > 0) {
                     $matches[] = [
-                        'source' => 'job',
+                        'id' => (int)$job['id'],
+                        'source_type' => 'job',
                         'source_id' => (int)$job['id'],
                         'title' => $job['title'],
                         'description' => mb_substr($job['description'] ?? '', 0, 200),
                         'type' => 'job',
                         'category' => null,
+                        'match_score' => $score,
                         'score' => $score,
-                        'match_reasons' => self::getSkillMatchReasons($userSkills, $requiredSkills, 'qualification'),
-                        'user' => null,
+                        'reasons' => self::getSkillMatchReasons($userSkills, $requiredSkills, 'qualification'),
+                        'matched_user' => null,
+                        'matched_at' => date('Y-m-d\TH:i:s\Z'),
                         'organization' => $job['org_name'] ?? null,
                         'location' => $job['location'] ?? null,
-                        'distance_km' => null,
+                        'distance_km' => ($profileLat && $profileLon && $itemLat && $itemLon)
+                            ? self::calculateDistance($profileLat, $profileLon, $itemLat, $itemLon)
+                            : null,
                     ];
                 }
             }
@@ -261,8 +293,8 @@ class CrossModuleMatchingService
         try {
             $limitInt = (int)$limit;
             $stmt = Database::query(
-                "SELECT v.id, v.title, v.description, v.location, v.skills_needed,
-                        v.start_date, v.end_date,
+                "SELECT v.id, v.title, v.description, v.location, v.latitude, v.longitude,
+                        v.skills_needed, v.start_date, v.end_date,
                         o.name as org_name
                  FROM volunteer_opportunities v
                  LEFT JOIN organizations o ON v.organization_id = o.id
@@ -282,20 +314,56 @@ class CrossModuleMatchingService
 
                 $score = self::calculateSkillOverlapScore($userSkills, $neededSkills);
 
+                // Boost for location match — prefer haversine over string comparison
+                $profileLat = isset($profile['latitude']) ? (float)$profile['latitude'] : null;
+                $profileLon = isset($profile['longitude']) ? (float)$profile['longitude'] : null;
+                $itemLat    = isset($vol['latitude']) ? (float)$vol['latitude'] : null;
+                $itemLon    = isset($vol['longitude']) ? (float)$vol['longitude'] : null;
+
+                if ($profileLat && $profileLon && $itemLat && $itemLon) {
+                    $earthR = 6371;
+                    $dLat   = deg2rad($itemLat - $profileLat);
+                    $dLon   = deg2rad($itemLon - $profileLon);
+                    $a      = sin($dLat / 2) * sin($dLat / 2)
+                            + cos(deg2rad($profileLat)) * cos(deg2rad($itemLat))
+                            * sin($dLon / 2) * sin($dLon / 2);
+                    $distKm = $earthR * 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    if ($distKm < 10) {
+                        $score = min(100, $score + 20);
+                    } elseif ($distKm < 25) {
+                        $score = min(100, $score + 12);
+                    } elseif ($distKm < 50) {
+                        $score = min(100, $score + 6);
+                    }
+                } elseif (!empty($profile['location']) && !empty($vol['location'])) {
+                    // Fallback to string similarity if no coordinates
+                    similar_text(strtolower($profile['location']), strtolower($vol['location']), $pct);
+                    if ($pct > 70) {
+                        $score = min(100, $score + 15);
+                    } elseif ($pct > 40) {
+                        $score = min(100, $score + 7);
+                    }
+                }
+
                 if ($score > 0) {
                     $matches[] = [
-                        'source' => 'volunteering',
+                        'id' => (int)$vol['id'],
+                        'source_type' => 'volunteering',
                         'source_id' => (int)$vol['id'],
                         'title' => $vol['title'],
                         'description' => mb_substr($vol['description'] ?? '', 0, 200),
                         'type' => 'volunteering',
                         'category' => null,
+                        'match_score' => $score,
                         'score' => $score,
-                        'match_reasons' => self::getSkillMatchReasons($userSkills, $neededSkills, 'skill'),
-                        'user' => null,
+                        'reasons' => self::getSkillMatchReasons($userSkills, $neededSkills, 'skill'),
+                        'matched_user' => null,
+                        'matched_at' => date('Y-m-d\TH:i:s\Z'),
                         'organization' => $vol['org_name'] ?? null,
                         'location' => $vol['location'] ?? null,
-                        'distance_km' => null,
+                        'distance_km' => ($profileLat && $profileLon && $itemLat && $itemLon)
+                            ? self::calculateDistance($profileLat, $profileLon, $itemLat, $itemLon)
+                            : null,
                     ];
                 }
             }
@@ -323,7 +391,7 @@ class CrossModuleMatchingService
             // Find groups user is NOT a member of
             $stmt = Database::query(
                 "SELECT g.id, g.name, g.description, g.image_url, g.cached_member_count as member_count,
-                        g.location, g.visibility,
+                        g.location, g.latitude, g.longitude, g.visibility,
                         u.name as owner_name
                  FROM `groups` g
                  JOIN users u ON g.owner_id = u.id
@@ -350,20 +418,56 @@ class CrossModuleMatchingService
                     $score = min(100, $score + 5);
                 }
 
+                // Boost for location match — prefer haversine over string comparison
+                $profileLat = isset($profile['latitude']) ? (float)$profile['latitude'] : null;
+                $profileLon = isset($profile['longitude']) ? (float)$profile['longitude'] : null;
+                $itemLat    = isset($group['latitude']) ? (float)$group['latitude'] : null;
+                $itemLon    = isset($group['longitude']) ? (float)$group['longitude'] : null;
+
+                if ($profileLat && $profileLon && $itemLat && $itemLon) {
+                    $earthR = 6371;
+                    $dLat   = deg2rad($itemLat - $profileLat);
+                    $dLon   = deg2rad($itemLon - $profileLon);
+                    $a      = sin($dLat / 2) * sin($dLat / 2)
+                            + cos(deg2rad($profileLat)) * cos(deg2rad($itemLat))
+                            * sin($dLon / 2) * sin($dLon / 2);
+                    $distKm = $earthR * 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    if ($distKm < 10) {
+                        $score = min(100, $score + 20);
+                    } elseif ($distKm < 25) {
+                        $score = min(100, $score + 12);
+                    } elseif ($distKm < 50) {
+                        $score = min(100, $score + 6);
+                    }
+                } elseif (!empty($profile['location']) && !empty($group['location'])) {
+                    // Fallback to string similarity if no coordinates
+                    similar_text(strtolower($profile['location']), strtolower($group['location']), $pct);
+                    if ($pct > 70) {
+                        $score = min(100, $score + 15);
+                    } elseif ($pct > 40) {
+                        $score = min(100, $score + 7);
+                    }
+                }
+
                 if ($score > 0) {
                     $matches[] = [
-                        'source' => 'group',
+                        'id' => (int)$group['id'],
+                        'source_type' => 'group',
                         'source_id' => (int)$group['id'],
                         'title' => $group['name'],
                         'description' => mb_substr($group['description'] ?? '', 0, 200),
                         'type' => 'group',
                         'category' => null,
+                        'match_score' => $score,
                         'score' => $score,
-                        'match_reasons' => ['Interest overlap with group topics'],
-                        'user' => null,
+                        'reasons' => ['Interest overlap with group topics'],
+                        'matched_user' => null,
+                        'matched_at' => date('Y-m-d\TH:i:s\Z'),
                         'member_count' => $memberCount,
                         'location' => $group['location'] ?? null,
-                        'distance_km' => null,
+                        'distance_km' => ($profileLat && $profileLon && $itemLat && $itemLon)
+                            ? self::calculateDistance($profileLat, $profileLon, $itemLat, $itemLon)
+                            : null,
                     ];
                 }
             }
@@ -425,7 +529,12 @@ class CrossModuleMatchingService
     }
 
     /**
-     * Calculate skill overlap score between two skill arrays
+     * Calculate skill overlap score between two skill arrays using Jaccard similarity.
+     *
+     * Jaccard = |intersection| / |union|
+     *
+     * Unlike the old precision-only formula (overlap / required), Jaccard penalises
+     * large mismatches in either direction, giving a fairer similarity measure.
      */
     private static function calculateSkillOverlapScore(array $userSkills, array $requiredSkills): int
     {
@@ -434,13 +543,14 @@ class CrossModuleMatchingService
         }
 
         $overlap = count(array_intersect($userSkills, $requiredSkills));
-        $total = count($requiredSkills);
+        $union   = count($userSkills) + count($requiredSkills) - $overlap;
 
-        if ($total === 0) {
+        if ($union === 0) {
             return 0;
         }
 
-        return (int)round(($overlap / $total) * 100);
+        $jaccard = $overlap / $union;
+        return (int)round($jaccard * 100);
     }
 
     /**
