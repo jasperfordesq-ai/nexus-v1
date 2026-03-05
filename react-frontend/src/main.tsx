@@ -18,7 +18,9 @@ initSentry();
 
 // Register PWA service worker (production only — dev uses Vite HMR)
 if (import.meta.env.PROD) {
-  import('virtual:pwa-register').then(({ registerSW }) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore — virtual:pwa-register is provided by vite-plugin-pwa at build time
+  import('virtual:pwa-register').then(({ registerSW }: { registerSW: (opts?: { immediate?: boolean }) => void }) => {
     registerSW({ immediate: true });
   });
 }
