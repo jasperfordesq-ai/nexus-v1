@@ -130,43 +130,77 @@ vi.mock('@/admin/components/ConfirmModal', () => ({
   ConfirmModal: () => null,
 }));
 
-// Mock admin API modules used by super-admin components
-vi.mock('@/admin/api/adminApi', () => ({
-  adminSuper: {
-    getDashboard: vi.fn().mockResolvedValue({ success: true, data: {} }),
-    getTenants: vi.fn().mockResolvedValue({ success: true, data: [] }),
-    getTenant: vi.fn().mockResolvedValue({
-      success: true,
-      data: {
-        id: 1, name: 'Test Tenant', slug: 'test', domain: 'test.example.com',
-        status: 'active', is_hub: false, parent_id: null,
-        configuration: {}, features: {}, modules: {},
-        created_at: '2026-01-01', user_count: 10,
+// Complete adminSuper mock covering all methods used by super-admin components
+const mockAdminSuper = vi.hoisted(() => ({
+  // Dashboard & Audit
+  getDashboard: vi.fn().mockResolvedValue({ success: true, data: {} }),
+  getAudit: vi.fn().mockResolvedValue({ success: true, data: { data: [], meta: { page: 1, total_pages: 1, per_page: 25, total: 0 } } }),
+  getAuditLog: vi.fn().mockResolvedValue({ success: true, data: { data: [], meta: { page: 1, total_pages: 1, per_page: 25, total: 0 } } }),
+  exportAuditLog: vi.fn().mockResolvedValue({ success: true }),
+  // Tenant management
+  listTenants: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  getTenants: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  getTenant: vi.fn().mockResolvedValue({
+    success: true,
+    data: {
+      id: 1, name: 'Test Tenant', slug: 'test', domain: 'test.example.com',
+      status: 'active', is_hub: false, parent_id: null,
+      configuration: {}, features: {}, modules: {},
+      created_at: '2026-01-01', user_count: 10,
+    },
+  }),
+  createTenant: vi.fn().mockResolvedValue({ success: true }),
+  updateTenant: vi.fn().mockResolvedValue({ success: true }),
+  deleteTenant: vi.fn().mockResolvedValue({ success: true }),
+  reactivateTenant: vi.fn().mockResolvedValue({ success: true }),
+  toggleHub: vi.fn().mockResolvedValue({ success: true }),
+  moveTenant: vi.fn().mockResolvedValue({ success: true }),
+  getHierarchy: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  updateHierarchy: vi.fn().mockResolvedValue({ success: true }),
+  // Federation system controls
+  getFederationStatus: vi.fn().mockResolvedValue({
+    success: true,
+    data: {
+      system_controls: {
+        federation_enabled: true, whitelist_mode_enabled: false, is_locked_down: false,
+        lockdown_reason: null, cross_tenant_profiles_enabled: true, cross_tenant_messaging_enabled: true,
+        cross_tenant_transactions_enabled: false, cross_tenant_listings_enabled: true,
+        cross_tenant_events_enabled: false, cross_tenant_groups_enabled: false,
       },
-    }),
-    createTenant: vi.fn().mockResolvedValue({ success: true }),
-    updateTenant: vi.fn().mockResolvedValue({ success: true }),
-    deleteTenant: vi.fn().mockResolvedValue({ success: true }),
-    getHierarchy: vi.fn().mockResolvedValue({ success: true, data: [] }),
-    updateHierarchy: vi.fn().mockResolvedValue({ success: true }),
-    getAuditLog: vi.fn().mockResolvedValue({
-      success: true,
-      data: { data: [], meta: { page: 1, total_pages: 1, per_page: 25, total: 0 } },
-    }),
-    exportAuditLog: vi.fn().mockResolvedValue({ success: true }),
-  },
+      whitelisted_count: 0,
+      partnership_stats: { active: 0, pending: 0, suspended: 0, terminated: 0 },
+      recent_audit: [],
+    },
+  }),
+  getSystemControls: vi.fn().mockResolvedValue({
+    success: true,
+    data: {
+      federation_enabled: true, whitelist_mode_enabled: false, is_locked_down: false,
+      lockdown_reason: null, cross_tenant_profiles_enabled: true, cross_tenant_messaging_enabled: true,
+      cross_tenant_transactions_enabled: false, cross_tenant_listings_enabled: true,
+      cross_tenant_events_enabled: false, cross_tenant_groups_enabled: false,
+    },
+  }),
+  updateSystemControls: vi.fn().mockResolvedValue({ success: true }),
+  emergencyLockdown: vi.fn().mockResolvedValue({ success: true }),
+  liftLockdown: vi.fn().mockResolvedValue({ success: true }),
+  // Federation whitelist
+  getWhitelist: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  addToWhitelist: vi.fn().mockResolvedValue({ success: true }),
+  removeFromWhitelist: vi.fn().mockResolvedValue({ success: true }),
+  // Federation partnerships
+  getFederationPartnerships: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  suspendPartnership: vi.fn().mockResolvedValue({ success: true }),
+  terminatePartnership: vi.fn().mockResolvedValue({ success: true }),
+  // Federation tenant features
+  getTenantFederationFeatures: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  updateTenantFederationFeature: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-// Also mock the relative path import for SuperAuditLog
-vi.mock('../../../api/adminApi', () => ({
-  adminSuper: {
-    getAuditLog: vi.fn().mockResolvedValue({
-      success: true,
-      data: { data: [], meta: { page: 1, total_pages: 1, per_page: 25, total: 0 } },
-    }),
-    exportAuditLog: vi.fn().mockResolvedValue({ success: true }),
-  },
-}));
+vi.mock('@/admin/api/adminApi', () => ({ adminSuper: mockAdminSuper }));
+
+// Also mock the relative path import used by some super-admin components
+vi.mock('../../../api/adminApi', () => ({ adminSuper: mockAdminSuper }));
 
 // Mock admin API types
 vi.mock('@/admin/api/types', () => ({}));

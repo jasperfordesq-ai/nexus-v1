@@ -11,9 +11,7 @@ $hSubtitle = 'Send a follow-up to recipients who didn\'t open: ' . htmlspecialch
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'Newsletter';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 
 $canResend = $resendInfo['can_resend'] ?? false;
 $daysRemaining = $resendInfo['days_remaining'] ?? 0;
@@ -185,7 +183,5 @@ $totalSent = $resendInfo['total_sent'] ?? 0;
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

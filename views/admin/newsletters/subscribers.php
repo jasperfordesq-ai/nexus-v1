@@ -20,9 +20,7 @@ $hSubtitle = 'Manage your newsletter mailing list';
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'Newsletter Admin';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 ?>
 
 <div class="newsletter-admin-wrapper">
@@ -407,7 +405,5 @@ document.addEventListener('keydown', function(e) {
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

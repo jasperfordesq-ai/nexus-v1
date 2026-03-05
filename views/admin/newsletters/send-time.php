@@ -12,9 +12,7 @@ $hSubtitle = 'Find the best times to send your newsletters based on subscriber e
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'Analytics';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 
 $hasData = $recommendations['has_data'] ?? false;
 $bestTimes = $recommendations['recommendations'] ?? [];
@@ -303,7 +301,5 @@ $maxValue = $heatmap['max_value'] ?? 0;
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

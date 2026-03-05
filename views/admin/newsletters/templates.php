@@ -11,9 +11,7 @@ $hSubtitle = 'Pre-built and custom email templates for your newsletters';
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'Templates';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 ?>
 
 <div class="newsletter-admin-wrapper">
@@ -217,7 +215,5 @@ else {
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

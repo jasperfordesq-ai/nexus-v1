@@ -155,6 +155,42 @@ class CronController
     }
 
     /**
+     * Log a sub-task executed within runAll() to cron_logs.
+     * Called after each sub-task so the admin page shows per-job last run times.
+     */
+    private function logSubTask(string $jobId, string $status, string $output, float $startTime): void
+    {
+        $duration = microtime(true) - $startTime;
+        try {
+            Database::query(
+                "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, ?, ?, ?, NULL, NULL)",
+                [$jobId, $status, substr($output, 0, 65000), round($duration, 2)]
+            );
+        } catch (\Exception $e) {
+            // Silently fail — don't break the cron run
+        }
+    }
+
+    /**
+     * Execute a sub-task within runAll(), capturing output and logging to cron_logs.
+     */
+    private function runSubTask(string $jobId, callable $task): string
+    {
+        $start = microtime(true);
+        $status = 'success';
+        ob_start();
+        try {
+            $task();
+        } catch (\Throwable $e) {
+            echo "Error: " . $e->getMessage() . "\n";
+            $status = 'error';
+        }
+        $output = ob_get_clean() ?: '';
+        $this->logSubTask($jobId, $status, $output, $start);
+        return $output;
+    }
+
+    /**
      * Run Daily Digest
      * Should be triggered once every 24 hours via cron job.
      * URI: /cron/daily-digest
@@ -676,164 +712,160 @@ class CronController
             // ── EVERY RUN (every minute) ──
             $taskNum++;
             echo "[{$taskNum}] Processing instant queue...\n";
-            $this->runInstantQueueInternal();
+            echo $this->runSubTask('process-queue', fn() => $this->runInstantQueueInternal());
 
             $taskNum++;
             echo "\n[{$taskNum}] Processing newsletter queue...\n";
-            $this->processNewsletterQueueInternal();
+            echo $this->runSubTask('process-newsletter-queue', fn() => $this->processNewsletterQueueInternal());
 
             // ── EVERY 5 MINUTES ──
             if ($minute % 5 === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Processing scheduled newsletters...\n";
-                try {
+                echo $this->runSubTask('process-newsletters', function () {
                     $processed = NewsletterService::processScheduled();
                     echo "   Processed $processed scheduled newsletters.\n";
-                } catch (\Exception $e) {
-                    echo "   Error: " . $e->getMessage() . "\n";
-                }
+                });
             }
 
             // ── EVERY 15 MINUTES ──
             if ($minute % 15 === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Processing recurring newsletters...\n";
-                try {
+                echo $this->runSubTask('process-recurring', function () {
                     $processed = NewsletterService::processRecurring();
                     echo "   Processed $processed recurring newsletters.\n";
-                } catch (\Exception $e) {
-                    echo "   Error: " . $e->getMessage() . "\n";
-                }
+                });
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Event reminders...\n";
-                $this->eventRemindersInternal();
+                echo $this->runSubTask('event-reminders', fn() => $this->eventRemindersInternal());
             }
 
             // ── EVERY 30 MINUTES ──
             if ($minute % 30 === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Batch geocoding...\n";
-                $this->geocodeBatchInternal();
+                echo $this->runSubTask('geocode-batch', fn() => $this->geocodeBatchInternal());
             }
 
             if ($minute === 30) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Warming match cache...\n";
-                $this->warmMatchCacheInternal();
+                echo $this->runSubTask('warm-match-cache', fn() => $this->warmMatchCacheInternal());
             }
 
             // ── HOURLY (at :00) ──
             if ($minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Hot match notifications...\n";
-                $this->notifyHotMatchesInternal();
+                echo $this->runSubTask('notify-hot-matches', fn() => $this->notifyHotMatchesInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Gamification campaigns...\n";
-                $this->gamificationCampaignsInternal();
+                echo $this->runSubTask('gamification-campaigns', fn() => $this->gamificationCampaignsInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Abuse detection...\n";
-                $this->abuseDetectionInternal();
+                echo $this->runSubTask('abuse-detection', fn() => $this->abuseDetectionInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Cleaning sessions & tokens...\n";
-                $this->cleanSessionsAndTokensInternal();
+                echo $this->runSubTask('cleanup-sessions', fn() => $this->cleanSessionsAndTokensInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Expiring monitoring restrictions...\n";
-                $this->expireMonitoringRestrictionsInternal();
+                echo $this->runSubTask('expire-monitoring', fn() => $this->expireMonitoringRestrictionsInternal());
             }
 
             // ── HOURLY (at :30) ──
             if ($minute === 30) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Challenge expiry check...\n";
-                $this->gamificationChallengeCheckInternal();
+                echo $this->runSubTask('gamification-challenges', fn() => $this->gamificationChallengeCheckInternal());
             }
 
             // ── DAILY ──
             if ($hour === 0 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Running daily cleanup...\n";
-                $this->cleanupInternal();
+                echo $this->runSubTask('cleanup', fn() => $this->cleanupInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Leaderboard snapshot...\n";
-                $this->gamificationLeaderboardSnapshotInternal();
+                echo $this->runSubTask('gamification-leaderboard', fn() => $this->gamificationLeaderboardSnapshotInternal());
             }
 
             if ($hour === 1 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Streak milestones...\n";
-                $this->gamificationStreakMilestonesInternal();
+                echo $this->runSubTask('gamification-streaks', fn() => $this->gamificationStreakMilestonesInternal());
             }
 
             if ($hour === 3 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Gamification daily tasks...\n";
-                $this->gamificationDailyInternal();
+                echo $this->runSubTask('gamification-daily', fn() => $this->gamificationDailyInternal());
             }
 
             if ($hour === 6 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Recurring shift generation...\n";
-                $this->recurringShiftGenerationInternal();
+                echo $this->runSubTask('recurring-shifts', fn() => $this->recurringShiftGenerationInternal());
             }
 
             if ($hour === 7 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Abuse daily report...\n";
-                $this->abuseDetectionDailyReportInternal();
+                echo $this->runSubTask('abuse-daily-report', fn() => $this->abuseDetectionDailyReportInternal());
             }
 
             if ($hour === 8 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Processing daily digest...\n";
-                $this->processDigest('daily');
+                echo $this->runSubTask('daily-digest', fn() => $this->processDigest('daily'));
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Balance alerts...\n";
-                $this->balanceAlertsInternal();
+                echo $this->runSubTask('balance-alerts', fn() => $this->balanceAlertsInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Goal reminders...\n";
-                $this->goalRemindersInternal();
+                echo $this->runSubTask('goal-reminders', fn() => $this->goalRemindersInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Listing expiry processing...\n";
-                $this->listingExpiryInternal();
+                echo $this->runSubTask('listing-expiry', fn() => $this->listingExpiryInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Listing expiry reminders...\n";
-                $this->listingExpiryRemindersInternal();
+                echo $this->runSubTask('listing-expiry-reminders', fn() => $this->listingExpiryRemindersInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Job expiry processing...\n";
-                $this->jobExpiryInternal();
+                echo $this->runSubTask('job-expiry', fn() => $this->jobExpiryInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Featured job expiry...\n";
-                $this->featuredJobExpiryInternal();
+                echo $this->runSubTask('featured-job-expiry', fn() => $this->featuredJobExpiryInternal());
             }
 
             if ($hour === 2 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Inactive member detection...\n";
-                $this->inactiveMemberDetectionInternal();
+                echo $this->runSubTask('inactive-members', fn() => $this->inactiveMemberDetectionInternal());
             }
 
             if ($hour === 9 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Match digest daily...\n";
-                $this->matchDigestInternal('daily');
+                echo $this->runSubTask('match-digest-daily', fn() => $this->matchDigestInternal('daily'));
 
                 // Fortnightly digest: runs every other Monday (weeks where ISO week number is even)
                 if ($dayOfWeek === 1 && (int)date('W') % 2 === 0) {
                     $taskNum++;
                     echo "\n[{$taskNum}] Match digest fortnightly...\n";
-                    $this->matchDigestInternal('fortnightly');
+                    echo $this->runSubTask('match-digest-fortnightly', fn() => $this->matchDigestInternal('fortnightly'));
                 }
             }
 
@@ -841,39 +873,39 @@ class CronController
             if ($dayOfWeek === 5 && $hour === 17 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Processing weekly digest...\n";
-                $this->processDigest('weekly');
+                echo $this->runSubTask('weekly-digest', fn() => $this->processDigest('weekly'));
             }
 
             if ($dayOfWeek === 0 && $hour === 2 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Abuse cleanup...\n";
-                $this->abuseDetectionCleanupInternal();
+                echo $this->runSubTask('abuse-cleanup', fn() => $this->abuseDetectionCleanupInternal());
             }
 
             if ($dayOfWeek === 0 && $hour === 3 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Gamification cleanup...\n";
-                $this->gamificationCleanupInternal();
+                echo $this->runSubTask('gamification-cleanup', fn() => $this->gamificationCleanupInternal());
             }
 
             if ($dayOfWeek === 1 && $hour === 4 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Gamification weekly digest...\n";
-                $this->gamificationWeeklyDigestInternal();
+                echo $this->runSubTask('gamification-weekly-digest', fn() => $this->gamificationWeeklyDigestInternal());
             }
 
             if ($dayOfWeek === 1 && $hour === 9 && $minute === 0) {
                 $taskNum++;
                 echo "\n[{$taskNum}] Federation weekly digest...\n";
-                $this->processFederationWeeklyDigestInternal();
+                echo $this->runSubTask('federation-weekly-digest', fn() => $this->processFederationWeeklyDigestInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Group weekly digests...\n";
-                $this->groupWeeklyDigestsInternal();
+                echo $this->runSubTask('group-weekly-digest', fn() => $this->groupWeeklyDigestsInternal());
 
                 $taskNum++;
                 echo "\n[{$taskNum}] Match digest weekly...\n";
-                $this->matchDigestInternal('weekly');
+                echo $this->runSubTask('match-digest-weekly', fn() => $this->matchDigestInternal('weekly'));
             }
 
             echo "\n=== Cron Run Complete ({$taskNum} tasks checked) ===\n";

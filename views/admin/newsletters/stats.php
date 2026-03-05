@@ -11,9 +11,7 @@ $hSubtitle = 'Performance metrics for: ' . htmlspecialchars($newsletter['subject
 $hGradient = 'mt-hero-gradient-brand';
 $hType = 'Analytics';
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 
 // Calculate rates
 $totalSent = $stats['total_sent'] ?? 0;
@@ -457,7 +455,5 @@ $abResults = $abResults ?? null;
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>

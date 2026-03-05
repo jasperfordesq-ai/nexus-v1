@@ -4,8 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Batch render tests for Moderation admin modules:
- * - CommentsModeration, FeedModeration, ReportsManagement, ReviewsModeration
+ * Batch render tests for simple admin modules:
+ * - EventsAdmin, GoalsAdmin, IdeationAdmin, JobsAdmin, PerformanceDashboard, PollsAdmin
  *
  * Smoke tests only — verify each component renders without crashing.
  */
@@ -57,7 +57,6 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
-// Moderation modules import useApi and useToast directly from specific paths
 vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/hooks/useApi', () => ({
   useApi: vi.fn(() => ({
@@ -94,7 +93,6 @@ vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-// Mock admin components imported by moderation modules (they use direct path imports)
 vi.mock('@/admin/components/PageHeader', () => ({
   default: ({ children }: any) => <div>{children}</div>,
   PageHeader: ({ children }: any) => <div>{children}</div>,
@@ -105,46 +103,25 @@ vi.mock('@/admin/components/ConfirmModal', () => ({
   ConfirmModal: () => null,
 }));
 
-// Mock admin API modules used by moderation components
-vi.mock('@/admin/api/adminApi', () => ({
-  adminSuper: {
-    listTenants: vi.fn().mockResolvedValue({ success: true, data: [] }),
-  },
-  adminModeration: {
-    getComments: vi.fn().mockResolvedValue({
-      success: true,
-      data: { data: [], meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } },
-    }),
-    getFeedPosts: vi.fn().mockResolvedValue({
-      success: true,
-      data: { data: [], meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } },
-    }),
-    getReports: vi.fn().mockResolvedValue({
-      success: true,
-      data: { data: [], meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } },
-    }),
-    getReportStats: vi.fn().mockResolvedValue({
-      success: true,
-      data: { total: 0, pending: 0, resolved: 0, dismissed: 0 },
-    }),
-    getReviews: vi.fn().mockResolvedValue({
-      success: true,
-      data: { data: [], meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } },
-    }),
-    hideComment: vi.fn().mockResolvedValue({ success: true }),
-    deleteComment: vi.fn().mockResolvedValue({ success: true }),
-    hideFeedPost: vi.fn().mockResolvedValue({ success: true }),
-    deleteFeedPost: vi.fn().mockResolvedValue({ success: true }),
-    resolveReport: vi.fn().mockResolvedValue({ success: true }),
-    dismissReport: vi.fn().mockResolvedValue({ success: true }),
-    flagReview: vi.fn().mockResolvedValue({ success: true }),
-    hideReview: vi.fn().mockResolvedValue({ success: true }),
-    deleteReview: vi.fn().mockResolvedValue({ success: true }),
-  },
+vi.mock('@/admin/components/DataTable', () => ({
+  DataTable: ({ children }: any) => <div>{children}</div>,
+  StatusBadge: () => null,
+  Column: undefined,
 }));
 
-// Mock admin API types
-vi.mock('@/admin/api/types', () => ({}));
+vi.mock('@/lib/tenant-routing', () => ({
+  tenantPath: (p: string) => `/test${p}`,
+}));
+
+// Mock the barrel re-export from ../../components used by these modules
+vi.mock('../../components', () => ({
+  PageHeader: ({ children }: any) => <div>{children}</div>,
+  DataTable: ({ children }: any) => <div>{children}</div>,
+  ConfirmModal: () => null,
+  EmptyState: () => null,
+  StatusBadge: () => null,
+  Column: undefined,
+}));
 
 // ─── Wrapper ─────────────────────────────────────────────────────────────────
 
@@ -158,46 +135,68 @@ function W({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ─── CommentsModeration ─────────────────────────────────────────────────────
+// ─── EventsAdmin ─────────────────────────────────────────────────────────────
 
-import CommentsModeration from '../moderation/CommentsModeration';
+import EventsAdmin from '../events/EventsAdmin';
 
-describe('CommentsModeration', () => {
+describe('EventsAdmin', () => {
   it('renders without crashing', () => {
-    const { container } = render(<W><CommentsModeration /></W>);
+    const { container } = render(<W><EventsAdmin /></W>);
     expect(container.querySelector('div')).toBeTruthy();
   });
 });
 
-// ─── FeedModeration ─────────────────────────────────────────────────────────
+// ─── GoalsAdmin ──────────────────────────────────────────────────────────────
 
-import FeedModeration from '../moderation/FeedModeration';
+import GoalsAdmin from '../goals/GoalsAdmin';
 
-describe('FeedModeration', () => {
+describe('GoalsAdmin', () => {
   it('renders without crashing', () => {
-    const { container } = render(<W><FeedModeration /></W>);
+    const { container } = render(<W><GoalsAdmin /></W>);
     expect(container.querySelector('div')).toBeTruthy();
   });
 });
 
-// ─── ReportsManagement ──────────────────────────────────────────────────────
+// ─── IdeationAdmin ───────────────────────────────────────────────────────────
 
-import ReportsManagement from '../moderation/ReportsManagement';
+import IdeationAdmin from '../ideation/IdeationAdmin';
 
-describe('ReportsManagement', () => {
+describe('IdeationAdmin', () => {
   it('renders without crashing', () => {
-    const { container } = render(<W><ReportsManagement /></W>);
+    const { container } = render(<W><IdeationAdmin /></W>);
     expect(container.querySelector('div')).toBeTruthy();
   });
 });
 
-// ─── ReviewsModeration ──────────────────────────────────────────────────────
+// ─── JobsAdmin ───────────────────────────────────────────────────────────────
 
-import ReviewsModeration from '../moderation/ReviewsModeration';
+import JobsAdmin from '../jobs/JobsAdmin';
 
-describe('ReviewsModeration', () => {
+describe('JobsAdmin', () => {
   it('renders without crashing', () => {
-    const { container } = render(<W><ReviewsModeration /></W>);
+    const { container } = render(<W><JobsAdmin /></W>);
+    expect(container.querySelector('div')).toBeTruthy();
+  });
+});
+
+// ─── PerformanceDashboard ────────────────────────────────────────────────────
+
+import PerformanceDashboard from '../performance/PerformanceDashboard';
+
+describe('PerformanceDashboard', () => {
+  it('renders without crashing', () => {
+    const { container } = render(<W><PerformanceDashboard /></W>);
+    expect(container.querySelector('div')).toBeTruthy();
+  });
+});
+
+// ─── PollsAdmin ──────────────────────────────────────────────────────────────
+
+import PollsAdmin from '../polls/PollsAdmin';
+
+describe('PollsAdmin', () => {
+  it('renders without crashing', () => {
+    const { container } = render(<W><PollsAdmin /></W>);
     expect(container.querySelector('div')).toBeTruthy();
   });
 });

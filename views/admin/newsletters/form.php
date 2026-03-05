@@ -40,9 +40,7 @@ if ($tinymceApiKey === 'no-api-key') {
     }
 }
 
-else {
-    require __DIR__ . '/../../layouts/modern/header.php';
-}
+require __DIR__ . '/../../layouts/modern/header.php';
 ?>
 
 <!-- TinyMCE Rich Text Editor -->
@@ -2633,7 +2631,5 @@ async function generateAIContent() {
 </style>
 
 <?php
-else {
-    require __DIR__ . '/../../layouts/modern/footer.php';
-}
+require __DIR__ . '/../../layouts/modern/footer.php';
 ?>
