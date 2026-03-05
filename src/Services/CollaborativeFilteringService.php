@@ -70,7 +70,7 @@ class CollaborativeFilteringService
         }
 
         $similar = self::itemBasedRecommendations($listingId, $interactions, $limit);
-        RedisCache::set($cacheKey, $similar, $tenantId, self::CACHE_TTL_SECONDS);
+        RedisCache::set($cacheKey, $similar, self::CACHE_TTL_SECONDS, $tenantId);
 
         return $similar;
     }
@@ -108,7 +108,7 @@ class CollaborativeFilteringService
         }
 
         $similar = self::itemBasedRecommendations($userId, $interactions, $limit);
-        RedisCache::set($cacheKey, $similar, $tenantId, self::CACHE_TTL_SECONDS);
+        RedisCache::set($cacheKey, $similar, self::CACHE_TTL_SECONDS, $tenantId);
 
         return $similar;
     }
@@ -192,7 +192,7 @@ class CollaborativeFilteringService
         arsort($listingScores);
         $result = array_map('intval', array_keys(array_slice($listingScores, 0, $limit, true)));
 
-        RedisCache::set($cacheKey, $result, $tenantId, self::CACHE_TTL_SECONDS);
+        RedisCache::set($cacheKey, $result, self::CACHE_TTL_SECONDS, $tenantId);
 
         return $result;
     }

@@ -17,47 +17,67 @@ class DigestService
 {
     public static function sendWeeklyDigests()
     {
-        $db = Database::getInstance();
+        // Loop all active tenants — each tenant gets their own digest content
+        $tenants = Database::query(
+            "SELECT id, name FROM tenants WHERE is_active = 1"
+        )->fetchAll();
 
-        // 1. Fetch Content from last 7 days
-        $start = date('Y-m-d H:i:s', strtotime('-7 days'));
-
-        $newOffers = Listing::getRecent('offer', 5, $start);
-        $newRequests = Listing::getRecent('request', 5, $start);
-        $upcomingEvents = Event::upcoming(1, 5); // Global tenant 1 for now, or loop tenants
-        // Note: For MVP we assume Tenant 1 or handle loop. 
-        // Let's simpler: Just fetch global for now or loop all active tenants.
-        // For simplicity: Single Tenant (1) for this MVP.
-        $tenantId = 1;
-
-        if (empty($newOffers) && empty($newRequests) && empty($upcomingEvents)) {
-            echo "No new content to send.\n";
-            return;
-        }
-
-        // 2. Fetch Users who want digests
-        $users = Database::query("SELECT id, name, email FROM users WHERE tenant_id = ? AND receive_digests = 1", [$tenantId])->fetchAll();
-
-        echo "Found " . count($users) . " subscribers.\n";
-
-        // 3. Send Emails
         $mailer = new Mailer();
-        $count = 0;
+        $totalCount = 0;
 
-        foreach ($users as $user) {
-            $html = self::renderTemplate($user, $newOffers, $newRequests, $upcomingEvents);
+        foreach ($tenants as $tenant) {
+            $tenantId = (int) $tenant['id'];
+            echo "Processing tenant {$tenantId} ({$tenant['name']})...\n";
 
-            try {
-                // In a real system, queue this. For MVP, direct send.
-                $mailer->send($user['email'], "Weekly Community Updates", $html);
-                $count++;
-                echo "Sent to {$user['email']}\n";
-            } catch (\Exception $e) {
-                echo "Failed to send to {$user['email']}: " . $e->getMessage() . "\n";
+            $start = date('Y-m-d H:i:s', strtotime('-7 days'));
+
+            // Fetch tenant-scoped content
+            $newOffers = Database::query(
+                "SELECT l.*, u.name as user_name FROM listings l
+                 JOIN users u ON l.user_id = u.id
+                 WHERE l.tenant_id = ? AND l.type = 'offer' AND l.status = 'active'
+                   AND l.created_at >= ?
+                 ORDER BY l.created_at DESC LIMIT 5",
+                [$tenantId, $start]
+            )->fetchAll();
+
+            $newRequests = Database::query(
+                "SELECT l.*, u.name as user_name FROM listings l
+                 JOIN users u ON l.user_id = u.id
+                 WHERE l.tenant_id = ? AND l.type = 'request' AND l.status = 'active'
+                   AND l.created_at >= ?
+                 ORDER BY l.created_at DESC LIMIT 5",
+                [$tenantId, $start]
+            )->fetchAll();
+
+            $upcomingEvents = Event::upcoming($tenantId, 5);
+
+            if (empty($newOffers) && empty($newRequests) && empty($upcomingEvents)) {
+                echo "  No new content for tenant {$tenantId}.\n";
+                continue;
+            }
+
+            // Fetch users who want digests for this tenant
+            $users = Database::query(
+                "SELECT id, name, email FROM users WHERE tenant_id = ? AND receive_digests = 1",
+                [$tenantId]
+            )->fetchAll();
+
+            echo "  Found " . count($users) . " subscribers.\n";
+
+            foreach ($users as $user) {
+                $html = self::renderTemplate($user, $newOffers, $newRequests, $upcomingEvents);
+
+                try {
+                    $mailer->send($user['email'], "Weekly Community Updates", $html);
+                    $totalCount++;
+                } catch (\Exception $e) {
+                    echo "  Failed to send to {$user['email']}: " . $e->getMessage() . "\n";
+                }
             }
         }
 
-        echo "Sent $count digests.\n";
+        echo "Sent $totalCount digests across " . count($tenants) . " tenants.\n";
     }
 
     private static function renderTemplate($user, $offers, $requests, $events)

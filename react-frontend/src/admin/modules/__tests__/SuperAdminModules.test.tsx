@@ -35,6 +35,7 @@ vi.mock('@/contexts', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
+  AuthProvider: ({ children }: any) => <>{children}</>,
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
     tenantSlug: 'test',
@@ -47,18 +48,31 @@ vi.mock('@/contexts', () => ({
   useNotifications: vi.fn(() => ({ counts: { messages: 0, notifications: 0 } })),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 1, first_name: 'Admin', last_name: 'User', name: 'Admin User', role: 'admin', is_super_admin: true, tenant_id: 2 },
+    isAuthenticated: true,
+    logout: vi.fn(),
+  })),
+  AuthProvider: ({ children }: any) => <>{children}</>,
+}));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // Super-admin modules import from specific hook/context paths
-vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
-vi.mock('@/hooks/useApi', () => ({
-  useApi: vi.fn(() => ({
-    data: null,
-    isLoading: false,
-    error: null,
-    execute: vi.fn(),
-  })),
-}));
+vi.mock('@/hooks/useApi', () => {
+  const mockData: any[] = [];
+  const mockMeta = { current_page: 1, last_page: 1, per_page: 25, total: 0 };
+  return {
+    useApi: vi.fn(() => ({
+      data: mockData,
+      meta: mockMeta,
+      isLoading: false,
+      error: null,
+      execute: vi.fn(),
+    }))
+  };
+});
 
 vi.mock('@/contexts/ToastContext', () => ({
   useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), showToast: vi.fn() })),

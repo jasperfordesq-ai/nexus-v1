@@ -591,8 +591,8 @@ class TenantHierarchyService
 
         try {
             Database::query(
-                "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
-                [$userId]
+                "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
 
             // Audit log
@@ -638,8 +638,8 @@ class TenantHierarchyService
 
         try {
             Database::query(
-                "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?",
-                [$userId]
+                "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ? AND tenant_id = ?",
+                [$userId, (int)$user['tenant_id']]
             );
 
             // Audit log
