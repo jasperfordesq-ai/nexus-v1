@@ -198,7 +198,8 @@ class ListingRankingService
         $searchTerm = $options['search'] ?? null;
 
         // Collaborative filtering: find CF-similar listing IDs based on viewer's saves
-        $cfSimilarIds = [];
+        $cfSimilarIds    = [];
+        $cfUserSuggestIds = [];
         if ($viewerId) {
             $tenantId        = TenantContext::getId();
             $savedListingIds = self::getViewerSavedListingIds($viewerId);
@@ -206,6 +207,10 @@ class ListingRankingService
                 foreach (CollaborativeFilteringService::getSimilarListings($savedId, $tenantId, 10) as $sid) {
                     $cfSimilarIds[$sid] = true;
                 }
+            }
+            // User-user CF: listings saved by similar users
+            foreach (CollaborativeFilteringService::getSuggestedListingsForUser($viewerId, $tenantId, 20) as $sid) {
+                $cfUserSuggestIds[$sid] = true;
             }
         }
 
@@ -230,9 +235,13 @@ class ListingRankingService
                 $scores['quality'] *
                 $scores['reciprocity'];
 
-            // Collaborative filtering boost: listings similar to what viewer saved
+            // Item-based CF boost: listings similar to what viewer saved
             if (!empty($cfSimilarIds[$listing['id'] ?? 0])) {
                 $finalScore *= 1.15;
+            }
+            // User-user CF boost: listings saved by similar users
+            if (!empty($cfUserSuggestIds[$listing['id'] ?? 0])) {
+                $finalScore *= 1.10;
             }
 
             $listing['_match_rank'] = $finalScore;
