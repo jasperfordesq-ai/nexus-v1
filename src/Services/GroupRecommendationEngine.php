@@ -376,7 +376,17 @@ class GroupRecommendationEngine
     }
 
     /**
-     * Rank and filter recommendations
+     * Rank and filter recommendations with MMR diversity reranking.
+     *
+     * After exclusions and type-filtering, applies Maximal Marginal Relevance (MMR)
+     * to balance relevance against redundancy. Groups that share the same type as
+     * already-selected groups are penalised, preventing 10 near-identical results.
+     *
+     * MMR reference:
+     *   Carbonell & Goldstein (1998) "The use of MMR, diversity-based reranking for
+     *   reordering documents and producing summaries." SIGIR '98.
+     *
+     * λ = 0.7: strong relevance bias while still avoiding mono-type lists.
      */
     private static function rankAndFilter($scores, $excludeIds, $tenantId, $limit, $options)
     {
@@ -398,8 +408,67 @@ class GroupRecommendationEngine
             $scores = array_intersect_key($scores, array_flip($validGroupIds));
         }
 
-        // Limit results
-        return array_slice($scores, 0, $limit, true);
+        // Skip MMR when fewer candidates than limit — nothing to diversify
+        if (count($scores) <= $limit) {
+            return array_slice($scores, 0, $limit, true);
+        }
+
+        // Load group types for candidate groups (needed for similarity measure)
+        $candidateIds = array_keys($scores);
+        $placeholders = implode(',', array_fill(0, count($candidateIds), '?'));
+        try {
+            $typeRows = Database::query(
+                "SELECT id, type_id FROM `groups` WHERE id IN ($placeholders)",
+                $candidateIds
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            // Degrade gracefully — return simple top-N if query fails
+            return array_slice($scores, 0, $limit, true);
+        }
+        $groupTypes = [];
+        foreach ($typeRows as $row) {
+            $groupTypes[(int)$row['id']] = (int)($row['type_id'] ?? 0);
+        }
+
+        // MMR greedy selection
+        $lambda    = 0.7;  // relevance weight (1 - lambda = diversity weight)
+        $selected  = [];   // [groupId => score]
+        $remaining = $scores;
+
+        while (count($selected) < $limit && !empty($remaining)) {
+            $bestId  = null;
+            $bestMmr = PHP_INT_MIN;
+
+            foreach ($remaining as $groupId => $relevance) {
+                // Similarity to already-selected set: fraction that share the same type
+                $sim = 0.0;
+                if (!empty($selected)) {
+                    $groupType     = $groupTypes[$groupId] ?? 0;
+                    $sameTypeCount = 0;
+                    foreach (array_keys($selected) as $selId) {
+                        if ($groupType > 0 && ($groupTypes[$selId] ?? 0) === $groupType) {
+                            $sameTypeCount++;
+                        }
+                    }
+                    $sim = $sameTypeCount / count($selected);
+                }
+
+                $mmr = $lambda * $relevance - (1.0 - $lambda) * $sim;
+                if ($mmr > $bestMmr) {
+                    $bestMmr = $mmr;
+                    $bestId  = $groupId;
+                }
+            }
+
+            if ($bestId === null) {
+                break;
+            }
+
+            $selected[$bestId] = $remaining[$bestId];
+            unset($remaining[$bestId]);
+        }
+
+        return $selected;
     }
 
     /**

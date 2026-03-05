@@ -113,6 +113,90 @@ class CollaborativeFilteringService
         return $similar;
     }
 
+    /**
+     * User-user collaborative filtering: recommend listings liked by similar users.
+     *
+     * Uses the member transaction graph to find users similar to $userId, then
+     * aggregates the listings those users have saved. This is the second CF signal
+     * dimension (item-item being the first).
+     *
+     * Reference: Resnick et al. (1994) "GroupLens: an open architecture for
+     * collaborative filtering of netnews." CSCW '94.
+     *
+     * @param int $userId   Source user
+     * @param int $tenantId Tenant scope
+     * @param int $limit    Max results
+     * @return int[]        Recommended listing IDs, ranked by aggregated similarity
+     */
+    public static function getSuggestedListingsForUser(int $userId, int $tenantId, int $limit = 10): array
+    {
+        $cacheKey = "cf_uu_listings_{$tenantId}_{$userId}_{$limit}";
+        $cached   = RedisCache::get($cacheKey, $tenantId);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        // Step 1 — Find similar users via transaction graph (user-user matrix)
+        $memberInteractions = self::loadMemberInteractions($tenantId);
+        if (empty($memberInteractions) || !isset($memberInteractions[$userId])) {
+            return self::getPopularListingsFallback($tenantId, $limit);
+        }
+
+        // Compute similarity between $userId and all other users
+        $sourceVector = $memberInteractions[$userId];
+        $similarities = [];
+        foreach ($memberInteractions as $candidateId => $candidateVector) {
+            if ($candidateId === $userId) {
+                continue;
+            }
+            $commonPartners = array_intersect_key($sourceVector, $candidateVector);
+            if (count($commonPartners) < self::MIN_COMMON_USERS) {
+                continue;
+            }
+            $sim = self::cosineSimilarity($sourceVector, $candidateVector);
+            if ($sim > 0.0) {
+                $similarities[$candidateId] = $sim;
+            }
+        }
+
+        if (empty($similarities)) {
+            return self::getPopularListingsFallback($tenantId, $limit);
+        }
+
+        // Top-N similar users (enough to get a rich listing pool without over-fetching)
+        arsort($similarities);
+        $topUserIds = array_keys(array_slice($similarities, 0, 20, true));
+
+        // Step 2 — Load listing saves for those similar users
+        $listingInteractions = self::loadListingInteractions($tenantId);
+        if (empty($listingInteractions)) {
+            return self::getPopularListingsFallback($tenantId, $limit);
+        }
+
+        // Aggregate: listing score = Σ (user_similarity × save_weight)
+        $listingScores = [];
+        foreach ($topUserIds as $similarUserId) {
+            $simWeight = $similarities[$similarUserId];
+            $savedListings = $listingInteractions[$similarUserId] ?? [];
+            foreach ($savedListings as $listingId => $saveWeight) {
+                $listingScores[$listingId] = ($listingScores[$listingId] ?? 0.0) + $simWeight * $saveWeight;
+            }
+        }
+
+        // Remove listings the source user has already interacted with
+        $userSaved = $listingInteractions[$userId] ?? [];
+        foreach (array_keys($userSaved) as $alreadySeen) {
+            unset($listingScores[$alreadySeen]);
+        }
+
+        arsort($listingScores);
+        $result = array_map('intval', array_keys(array_slice($listingScores, 0, $limit, true)));
+
+        RedisCache::set($cacheKey, $result, $tenantId, self::CACHE_TTL_SECONDS);
+
+        return $result;
+    }
+
     // =========================================================================
     // CORE ALGORITHM
     // =========================================================================

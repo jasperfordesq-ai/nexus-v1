@@ -86,6 +86,7 @@ class SearchService
                 'words', 'typo', 'proximity', 'attribute', 'sort', 'exactness',
             ]);
             $listingsIndex->updateSynonyms(self::synonyms());
+            $listingsIndex->updateTypoTolerance(self::typoToleranceConfig());
 
             // ── Users index ────────────────────────────────────────────────
             try {
@@ -104,6 +105,7 @@ class SearchService
                 'words', 'typo', 'proximity', 'attribute', 'sort', 'exactness',
             ]);
             $usersIndex->updateSynonyms(self::synonyms());
+            $usersIndex->updateTypoTolerance(self::typoToleranceConfig());
         } catch (\Throwable $e) {
             error_log('SearchService::ensureIndexes error — ' . $e->getMessage());
         }
@@ -119,31 +121,110 @@ class SearchService
      *
      * @return array<string, string[]>
      */
+    /**
+     * Meilisearch typo-tolerance configuration.
+     *
+     * - oneTypo:  words ≥ 5 chars allow 1 typo (default 5, reduced to 4 to catch short misspellings)
+     * - twoTypos: words ≥ 9 chars allow 2 typos (kept at default 9)
+     * - disableOnWords: short exact tokens where typos cause false matches
+     * - disableOnAttributes: structured fields where typos cause false matches
+     *
+     * @return array<string, mixed>
+     */
+    private static function typoToleranceConfig(): array
+    {
+        return [
+            'enabled'    => true,
+            'minWordSizeForTypos' => [
+                'oneTypo'  => 4,  // "garen" → "garden" (down from default 5)
+                'twoTypos' => 9,  // keep default
+            ],
+            'disableOnWords'      => [
+                // Short tokens that shouldn't fuzzy-match across meanings
+                'diy', 'it', 'hr', 'pr', 'ai', 'ml', 'ux', 'uk', 'eu', 'us',
+            ],
+            'disableOnAttributes' => ['tenant_id', 'status', 'type'],
+        ];
+    }
+
+    /**
+     * Platform-wide synonym dictionary for Meilisearch.
+     *
+     * Keys are canonical terms; values are arrays of equivalent terms.
+     * Meilisearch synonym matching is bi-directional when using updateSynonyms().
+     *
+     * @return array<string, string[]>
+     */
     private static function synonyms(): array
     {
         return [
-            // Timebanking core vocabulary
-            'timebank'      => ['time bank', 'time banking', 'timebanking', 'community exchange', 'time credit'],
-            'time credit'   => ['hour credit', 'credit', 'time token', 'community hour'],
-            'offer'         => ['offering', 'provide', 'available', 'service offered'],
-            'request'       => ['need', 'seeking', 'wanted', 'help needed', 'looking for'],
-            'volunteer'     => ['volunteering', 'voluntary', 'unpaid', 'community service'],
-            'skill'         => ['skills', 'expertise', 'ability', 'capability', 'experience'],
+            // ── Timebanking core vocabulary ──────────────────────────────────
+            'timebank'       => ['time bank', 'time banking', 'timebanking', 'community exchange', 'time credit'],
+            'time credit'    => ['hour credit', 'credit', 'time token', 'community hour', 'hour token'],
+            'offer'          => ['offering', 'provide', 'available', 'service offered', 'can help with'],
+            'request'        => ['need', 'seeking', 'wanted', 'help needed', 'looking for', 'require', 'requires'],
+            'volunteer'      => ['volunteering', 'voluntary', 'unpaid', 'community service', 'pro bono'],
+            'skill'          => ['skills', 'expertise', 'ability', 'capability', 'experience', 'proficiency'],
+            'exchange'       => ['swap', 'trade', 'barter', 'reciprocal', 'mutual aid'],
+            'community'      => ['neighbourhood', 'neighborhood', 'local', 'area', 'district', 'town'],
 
-            // Common service categories
-            'gardening'     => ['garden', 'landscaping', 'yard work', 'horticulture'],
-            'cooking'       => ['baking', 'meal preparation', 'food', 'chef'],
-            'teaching'      => ['tutoring', 'lessons', 'instruction', 'training', 'coaching'],
-            'transport'     => ['transportation', 'driving', 'lift', 'car', 'vehicle'],
-            'childcare'     => ['babysitting', 'childminding', 'childminder', 'kids', 'children'],
-            'elderly care'  => ['senior care', 'care for elderly', 'older people', 'companionship'],
-            'it support'    => ['computer help', 'tech support', 'technology', 'computing'],
-            'diy'           => ['handyman', 'repairs', 'home repair', 'fixing', 'maintenance'],
-            'language'      => ['translation', 'interpreter', 'bilingual', 'foreign language'],
-            'music'         => ['musician', 'instrument', 'singing', 'vocals', 'band'],
-            'photography'   => ['photo', 'photographer', 'camera', 'videography'],
-            'wellness'      => ['health', 'wellbeing', 'fitness', 'exercise', 'yoga'],
-            'sewing'        => ['tailoring', 'alterations', 'mending', 'knitting', 'crochet'],
+            // ── Home & Garden ────────────────────────────────────────────────
+            'gardening'      => ['garden', 'landscaping', 'yard work', 'horticulture', 'planting', 'weeding', 'lawn'],
+            'diy'            => ['handyman', 'repairs', 'home repair', 'fixing', 'maintenance', 'odd jobs', 'odd-jobs'],
+            'cleaning'       => ['housekeeping', 'tidying', 'domestic', 'household', 'spring clean', 'declutter'],
+            'decorating'     => ['painting', 'wallpapering', 'decorating', 'interior', 'renovation'],
+            'plumbing'       => ['pipes', 'leaks', 'water', 'boiler', 'radiator', 'heating'],
+            'electrical'     => ['wiring', 'electrics', 'sockets', 'lighting', 'fuses', 'circuit'],
+            'carpentry'      => ['woodwork', 'joinery', 'furniture', 'shelves', 'cabinets', 'timber'],
+            'moving'         => ['removals', 'relocation', 'moving house', 'packing', 'unpacking'],
+
+            // ── Food & Cooking ───────────────────────────────────────────────
+            'cooking'        => ['baking', 'meal preparation', 'food', 'chef', 'cuisine', 'recipe', 'catering'],
+            'shopping'       => ['grocery', 'errands', 'supermarket', 'food shopping', 'collection'],
+            'meal delivery'  => ['food delivery', 'meals on wheels', 'drop off food', 'meal prep'],
+
+            // ── Care & Support ───────────────────────────────────────────────
+            'childcare'      => ['babysitting', 'childminding', 'childminder', 'kids', 'children', 'after school'],
+            'elderly care'   => ['senior care', 'care for elderly', 'older people', 'companionship', 'home help', 'befriending'],
+            'disability'     => ['accessible', 'mobility', 'wheelchair', 'carer', 'support worker', 'personal assistant'],
+            'mental health'  => ['wellbeing', 'counselling', 'counseling', 'therapy', 'emotional support', 'talking'],
+            'pet care'       => ['dog walking', 'pet sitting', 'animal care', 'cat sitting', 'vet run'],
+
+            // ── Education & Learning ─────────────────────────────────────────
+            'teaching'       => ['tutoring', 'lessons', 'instruction', 'training', 'coaching', 'mentoring', 'tutor'],
+            'language'       => ['translation', 'interpreter', 'bilingual', 'foreign language', 'english classes', 'esl'],
+            'reading'        => ['literacy', 'books', 'reading club', 'library', 'story time'],
+            'maths'          => ['mathematics', 'numeracy', 'arithmetic', 'algebra', 'statistics', 'math'],
+            'computing'      => ['it support', 'computer help', 'tech support', 'technology', 'digital skills', 'internet help'],
+
+            // ── Transport & Errands ──────────────────────────────────────────
+            'transport'      => ['transportation', 'driving', 'lift', 'car', 'vehicle', 'ride', 'car share'],
+            'cycling'        => ['bike', 'bicycle', 'cycle repair', 'puncture', 'cycle maintenance'],
+            'deliveries'     => ['courier', 'collection', 'pick up', 'drop off', 'posting', 'parcels'],
+
+            // ── Creative & Arts ──────────────────────────────────────────────
+            'music'          => ['musician', 'instrument', 'singing', 'vocals', 'band', 'guitar', 'piano', 'choir'],
+            'photography'    => ['photo', 'photographer', 'camera', 'videography', 'video', 'filming', 'editing'],
+            'art'            => ['drawing', 'painting', 'illustration', 'craft', 'sculpture', 'pottery', 'ceramics'],
+            'writing'        => ['copywriting', 'editing', 'proofreading', 'content', 'blogging', 'journalism'],
+            'design'         => ['graphic design', 'web design', 'ux', 'ui', 'branding', 'logo', 'typography'],
+            'sewing'         => ['tailoring', 'alterations', 'mending', 'knitting', 'crochet', 'embroidery', 'dressmaking'],
+
+            // ── Wellness & Fitness ───────────────────────────────────────────
+            'wellness'       => ['health', 'wellbeing', 'fitness', 'exercise', 'yoga', 'pilates', 'meditation'],
+            'sport'          => ['sports', 'football', 'swimming', 'running', 'gym', 'athletics', 'team sport'],
+            'massage'        => ['physiotherapy', 'physio', 'sports massage', 'reflexology', 'reiki'],
+
+            // ── Professional & Admin ─────────────────────────────────────────
+            'admin'          => ['administration', 'office', 'paperwork', 'forms', 'filing', 'data entry'],
+            'legal'          => ['law', 'solicitor', 'advice', 'contract', 'rights', 'tribunal'],
+            'finance'        => ['accounting', 'bookkeeping', 'tax', 'budget', 'financial advice'],
+            'cv'             => ['resume', 'job application', 'interview prep', 'career advice', 'cover letter'],
+
+            // ── Technology ───────────────────────────────────────────────────
+            'web development' => ['programming', 'coding', 'developer', 'website', 'html', 'css', 'javascript'],
+            'social media'   => ['facebook', 'instagram', 'twitter', 'online presence', 'digital marketing'],
+            'data'           => ['spreadsheet', 'excel', 'database', 'analysis', 'reporting'],
         ];
     }
 
