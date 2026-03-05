@@ -240,6 +240,7 @@ function useAdminNav(): NavSection[] {
           { label: 'SEO Overview', href: '/admin/seo', icon: Search },
           { label: '404 Tracking', href: '/admin/404-errors', icon: AlertTriangle },
           { label: 'Diagnostics', href: '/admin/matching-diagnostic', icon: Stethoscope },
+          { label: 'Match Debug Panel', href: '/admin/match-debug', icon: Target },
         ],
       },
       {

@@ -81,7 +81,7 @@ class CrossModuleMatchingService
         $allMatches = array_slice(array_values($allMatches), 0, $limit);
 
         return [
-            'items' => $allMatches,
+            'matches' => $allMatches,
             'total' => count($allMatches),
         ];
     }
@@ -154,10 +154,11 @@ class CrossModuleMatchingService
 
             $listings = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+            $debugMode = ($_GET['debug'] ?? null) === 'true';
             foreach ($listings as $listing) {
                 $score = self::calculateListingScore($profile, $listing);
                 if ($score > 0) {
-                    $matches[] = [
+                    $matchItem = [
                         'id' => (int)$listing['id'],
                         'source_type' => 'listing',
                         'source_id' => (int)$listing['id'],
@@ -182,6 +183,10 @@ class CrossModuleMatchingService
                             $listing['longitude'] ?? null
                         ),
                     ];
+                    if ($debugMode) {
+                        $matchItem['_debug_scores'] = self::getListingDebugScores($profile, $listing);
+                    }
+                    $matches[] = $matchItem;
                 }
             }
         } catch (\Exception $e) {
@@ -526,6 +531,58 @@ class CrossModuleMatchingService
         }
 
         return (int)round($skillScore * 0.6 + $proximityScore * 0.3 + $reciprocityScore * 0.1);
+    }
+
+    /**
+     * Return per-component debug scores for a listing match (for ?debug=true).
+     *
+     * @return array{category: int, skill: int, proximity: int, freshness: int, reciprocity: int, quality: int}
+     */
+    private static function getListingDebugScores(array $profile, array $listing): array
+    {
+        $userSkills = $profile['skills_array'];
+        $listingKeywords = self::extractKeywords(($listing['title'] ?? '') . ' ' . ($listing['description'] ?? ''));
+
+        $skillScore = self::calculateKeywordOverlapScore($userSkills, $listingKeywords);
+
+        $proximityScore = 0;
+        $distance = self::calculateDistance(
+            $profile['latitude'] ?? null,
+            $profile['longitude'] ?? null,
+            $listing['latitude'] ?? null,
+            $listing['longitude'] ?? null
+        );
+        if ($distance !== null) {
+            if ($distance <= 5) {
+                $proximityScore = 100;
+            } elseif ($distance <= 15) {
+                $proximityScore = 75;
+            } elseif ($distance <= 30) {
+                $proximityScore = 50;
+            } elseif ($distance <= 50) {
+                $proximityScore = 25;
+            }
+        }
+
+        $reciprocityScore = 0;
+        $ownerSkills = !empty($listing['owner_skills'])
+            ? array_map('trim', array_map('strtolower', explode(',', $listing['owner_skills'])))
+            : [];
+        if (!empty($ownerSkills) && !empty($userSkills)) {
+            $overlap = count(array_intersect($userSkills, $ownerSkills));
+            if ($overlap > 0) {
+                $reciprocityScore = min(100, $overlap * 30);
+            }
+        }
+
+        return [
+            'category' => 0,
+            'skill' => $skillScore,
+            'proximity' => $proximityScore,
+            'freshness' => 0,
+            'reciprocity' => $reciprocityScore,
+            'quality' => 0,
+        ];
     }
 
     /**
