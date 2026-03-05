@@ -17,6 +17,7 @@ use Nexus\Models\VolReview;
 use Nexus\Models\OrgMember;
 use Nexus\Models\ActivityLog;
 use Nexus\Models\Transaction;
+use Nexus\Services\NotificationDispatcher;
 
 /**
  * VolunteerService - Business logic for volunteering operations
@@ -451,8 +452,25 @@ class VolunteerService
 
             $appId = $db->lastInsertId();
 
-            // Notify org owner
+            // Notify org owner — in-app bell + email
             try {
+                $orgOwnerId = (int)($opp['org_owner_id'] ?? 0);
+                if ($orgOwnerId > 0) {
+                    $applier = \Nexus\Models\User::findById($userId);
+                    $applierName = $applier ? trim(($applier['first_name'] ?? '') . ' ' . ($applier['last_name'] ?? '')) : 'Someone';
+                    $notifContent = "{$applierName} applied for your volunteer opportunity: {$opp['title']}";
+                    $notifLink = '/volunteering/opportunities/' . $opportunityId . '/applications';
+                    NotificationDispatcher::dispatch(
+                        $orgOwnerId,
+                        'volunteering',
+                        $opportunityId,
+                        'vol_application_received',
+                        $notifContent,
+                        $notifLink,
+                        "<p>{$notifContent}</p>",
+                        true
+                    );
+                }
                 if (!empty($opp['org_email'])) {
                     $mailer = new \Nexus\Core\Mailer();
                     $subject = "New Volunteer Application: " . $opp['title'];
@@ -724,7 +742,7 @@ class VolunteerService
 
         // Get application with ownership check and tenant scoping
         $stmt = $db->prepare("
-            SELECT a.*, org.user_id as org_owner_id
+            SELECT a.*, opp.title, org.user_id as org_owner_id
             FROM vol_applications a
             JOIN vol_opportunities opp ON a.opportunity_id = opp.id
             JOIN vol_organizations org ON opp.organization_id = org.id
@@ -749,9 +767,23 @@ class VolunteerService
             $stmt = $db->prepare("UPDATE vol_applications SET status = ? WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$status, $applicationId, $tenantId]);
 
-            // Notify applicant
+            // Notify applicant — in-app bell + email
             try {
-                $applicant = \Nexus\Models\User::findById($app['user_id']);
+                $applicantId = (int)$app['user_id'];
+                $oppTitle = $app['title'] ?? 'your volunteer opportunity';
+                $statusLabel = $status === 'approved' ? 'approved' : 'declined';
+                $notifContent = "Your volunteer application has been {$statusLabel}: {$oppTitle}";
+                $notifLink = '/volunteering/my-applications';
+                NotificationDispatcher::dispatch(
+                    $applicantId,
+                    'volunteering',
+                    (int)$app['opportunity_id'],
+                    'vol_application_' . $statusLabel,
+                    $notifContent,
+                    $notifLink,
+                    "<p>{$notifContent}</p>"
+                );
+                $applicant = \Nexus\Models\User::findById($applicantId);
                 if ($applicant && !empty($applicant['email'])) {
                     $mailer = new \Nexus\Core\Mailer();
                     $subject = "Update on your Volunteer Application";
