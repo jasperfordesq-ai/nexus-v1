@@ -76,7 +76,7 @@ export function WaitlistTab() {
       setIsLoading(true);
       setError(null);
 
-      const response = await api.get<{ data: WaitlistEntry[] }>(
+      const response = await api.get<WaitlistEntry[]>(
         '/v2/volunteering/my-waitlists'
       );
 

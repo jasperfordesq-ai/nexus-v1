@@ -1101,6 +1101,7 @@ class VolunteerService
     public static function getMyHours(int $userId, array $filters = []): array
     {
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
         $limit = min($filters['limit'] ?? 20, 50);
         $cursor = $filters['cursor'] ?? null;
@@ -1118,9 +1119,9 @@ class VolunteerService
             FROM vol_logs l
             LEFT JOIN vol_organizations org ON l.organization_id = org.id
             LEFT JOIN vol_opportunities opp ON l.opportunity_id = opp.id
-            WHERE l.user_id = ?
+            WHERE l.user_id = ? AND l.tenant_id = ?
         ";
-        $params = [$userId];
+        $params = [$userId, $tenantId];
 
         if (!empty($filters['status'])) {
             $sql .= " AND l.status = ?";
@@ -1368,7 +1369,7 @@ class VolunteerService
 
         $sql = "
             SELECT vo.*, u.name as owner_name, u.avatar_url as owner_avatar,
-                   (SELECT COUNT(*) FROM vol_opportunities WHERE organization_id = vo.id AND is_active = 1) as opportunity_count
+                   (SELECT COUNT(*) FROM vol_opportunities WHERE organization_id = vo.id AND tenant_id = vo.tenant_id AND is_active = 1) as opportunity_count
             FROM vol_organizations vo
             JOIN users u ON vo.user_id = u.id
             WHERE vo.tenant_id = ? AND vo.status = 'approved'
