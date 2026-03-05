@@ -21,6 +21,7 @@ use Nexus\Models\VolShift;
 class VolunteerEmergencyAlertService
 {
     private static array $errors = [];
+    private static array $columnCache = [];
 
     public static function getErrors(): array
     {
@@ -420,11 +421,19 @@ class VolunteerEmergencyAlertService
 
             try {
                 // Add as recipient
-                $stmt = $db->prepare("
-                    INSERT INTO vol_emergency_alert_recipients (alert_id, user_id, notified_at, response)
-                    VALUES (?, ?, NOW(), 'pending')
-                ");
-                $stmt->execute([$alertId, $candidate['user_id']]);
+                if (self::hasColumn('vol_emergency_alert_recipients', 'tenant_id')) {
+                    $stmt = $db->prepare("
+                        INSERT INTO vol_emergency_alert_recipients (alert_id, tenant_id, user_id, notified_at, response)
+                        VALUES (?, ?, ?, NOW(), 'pending')
+                    ");
+                    $stmt->execute([$alertId, $tenantId, $candidate['user_id']]);
+                } else {
+                    $stmt = $db->prepare("
+                        INSERT INTO vol_emergency_alert_recipients (alert_id, user_id, notified_at, response)
+                        VALUES (?, ?, NOW(), 'pending')
+                    ");
+                    $stmt->execute([$alertId, $candidate['user_id']]);
+                }
 
                 // Send notification
                 $priorityLabel = strtoupper($priority);
@@ -493,11 +502,19 @@ class VolunteerEmergencyAlertService
 
         foreach ($extraVolunteers as $v) {
             try {
-                $stmt2 = $db->prepare("
-                    INSERT IGNORE INTO vol_emergency_alert_recipients (alert_id, user_id, notified_at, response)
-                    VALUES (?, ?, NOW(), 'pending')
-                ");
-                $stmt2->execute([$alertId, $v['user_id']]);
+                if (self::hasColumn('vol_emergency_alert_recipients', 'tenant_id')) {
+                    $stmt2 = $db->prepare("
+                        INSERT IGNORE INTO vol_emergency_alert_recipients (alert_id, tenant_id, user_id, notified_at, response)
+                        VALUES (?, ?, ?, NOW(), 'pending')
+                    ");
+                    $stmt2->execute([$alertId, $tenantId, $v['user_id']]);
+                } else {
+                    $stmt2 = $db->prepare("
+                        INSERT IGNORE INTO vol_emergency_alert_recipients (alert_id, user_id, notified_at, response)
+                        VALUES (?, ?, NOW(), 'pending')
+                    ");
+                    $stmt2->execute([$alertId, $v['user_id']]);
+                }
 
                 NotificationDispatcher::dispatch(
                     (int)$v['user_id'],
@@ -539,5 +556,30 @@ class VolunteerEmergencyAlertService
         }
 
         return false;
+    }
+
+    private static function hasColumn(string $table, string $column): bool
+    {
+        $cacheKey = "{$table}.{$column}";
+        if (array_key_exists($cacheKey, self::$columnCache)) {
+            return self::$columnCache[$cacheKey];
+        }
+
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = ?
+                  AND COLUMN_NAME = ?
+            ");
+            $stmt->execute([$table, $column]);
+            self::$columnCache[$cacheKey] = ((int)$stmt->fetchColumn()) > 0;
+        } catch (\Throwable $e) {
+            self::$columnCache[$cacheKey] = false;
+        }
+
+        return self::$columnCache[$cacheKey];
     }
 }

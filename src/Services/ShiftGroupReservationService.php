@@ -19,6 +19,7 @@ use Nexus\Models\VolShift;
 class ShiftGroupReservationService
 {
     private static array $errors = [];
+    private static array $columnCache = [];
 
     public static function getErrors(): array
     {
@@ -65,6 +66,11 @@ class ShiftGroupReservationService
 
         if (!$group) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            return null;
+        }
+
+        if (!self::canManageGroup($groupId, $reservedBy, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can reserve slots for this group'];
             return null;
         }
 
@@ -123,14 +129,24 @@ class ShiftGroupReservationService
             return false;
         }
 
+        if (!self::canManageReservation((int)$reservation['group_id'], (int)$reservation['reserved_by'], $leaderUserId, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
+            return false;
+        }
+
         if ((int)$reservation['filled_slots'] >= (int)$reservation['reserved_slots']) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'All reserved slots are filled'];
             return false;
         }
 
         // Check if user is already in this reservation
-        $stmt = $db->prepare("SELECT id FROM vol_shift_group_members WHERE reservation_id = ? AND user_id = ? AND status = 'confirmed'");
-        $stmt->execute([$reservationId, $userId]);
+        if (self::hasColumn('vol_shift_group_members', 'tenant_id')) {
+            $stmt = $db->prepare("SELECT id FROM vol_shift_group_members WHERE reservation_id = ? AND user_id = ? AND status = 'confirmed' AND tenant_id = ?");
+            $stmt->execute([$reservationId, $userId, $tenantId]);
+        } else {
+            $stmt = $db->prepare("SELECT id FROM vol_shift_group_members WHERE reservation_id = ? AND user_id = ? AND status = 'confirmed'");
+            $stmt->execute([$reservationId, $userId]);
+        }
         if ($stmt->fetch()) {
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'User is already in this group reservation'];
             return false;
@@ -139,8 +155,13 @@ class ShiftGroupReservationService
         try {
             $db->beginTransaction();
 
-            $stmt = $db->prepare("INSERT INTO vol_shift_group_members (reservation_id, user_id, status, created_at) VALUES (?, ?, 'confirmed', NOW())");
-            $stmt->execute([$reservationId, $userId]);
+            if (self::hasColumn('vol_shift_group_members', 'tenant_id')) {
+                $stmt = $db->prepare("INSERT INTO vol_shift_group_members (reservation_id, tenant_id, user_id, status, created_at) VALUES (?, ?, ?, 'confirmed', NOW())");
+                $stmt->execute([$reservationId, $tenantId, $userId]);
+            } else {
+                $stmt = $db->prepare("INSERT INTO vol_shift_group_members (reservation_id, user_id, status, created_at) VALUES (?, ?, 'confirmed', NOW())");
+                $stmt->execute([$reservationId, $userId]);
+            }
 
             $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET filled_slots = filled_slots + 1 WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$reservationId, $tenantId]);
@@ -182,15 +203,26 @@ class ShiftGroupReservationService
         $db = Database::getConnection();
 
         // Verify reservation belongs to this tenant
-        $stmt = $db->prepare("SELECT id FROM vol_shift_group_reservations WHERE id = ? AND tenant_id = ?");
+        $stmt = $db->prepare("SELECT id, group_id, reserved_by FROM vol_shift_group_reservations WHERE id = ? AND tenant_id = ?");
         $stmt->execute([$reservationId, $tenantId]);
-        if (!$stmt->fetch()) {
+        $reservation = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$reservation) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
             return false;
         }
 
-        $stmt = $db->prepare("SELECT id FROM vol_shift_group_members WHERE reservation_id = ? AND user_id = ? AND status = 'confirmed'");
-        $stmt->execute([$reservationId, $userId]);
+        if (!self::canManageReservation((int)$reservation['group_id'], (int)$reservation['reserved_by'], $leaderUserId, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
+            return false;
+        }
+
+        if (self::hasColumn('vol_shift_group_members', 'tenant_id')) {
+            $stmt = $db->prepare("SELECT id FROM vol_shift_group_members WHERE reservation_id = ? AND user_id = ? AND status = 'confirmed' AND tenant_id = ?");
+            $stmt->execute([$reservationId, $userId, $tenantId]);
+        } else {
+            $stmt = $db->prepare("SELECT id FROM vol_shift_group_members WHERE reservation_id = ? AND user_id = ? AND status = 'confirmed'");
+            $stmt->execute([$reservationId, $userId]);
+        }
         $member = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$member) {
@@ -201,8 +233,13 @@ class ShiftGroupReservationService
         try {
             $db->beginTransaction();
 
-            $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE id = ?");
-            $stmt->execute([$member['id']]);
+            if (self::hasColumn('vol_shift_group_members', 'tenant_id')) {
+                $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE id = ? AND tenant_id = ?");
+                $stmt->execute([$member['id'], $tenantId]);
+            } else {
+                $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE id = ?");
+                $stmt->execute([$member['id']]);
+            }
 
             $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET filled_slots = GREATEST(filled_slots - 1, 0) WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$reservationId, $tenantId]);
@@ -227,12 +264,17 @@ class ShiftGroupReservationService
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT * FROM vol_shift_group_reservations WHERE id = ? AND reserved_by = ? AND status = 'active' AND tenant_id = ?");
-        $stmt->execute([$reservationId, $leaderUserId, $tenantId]);
+        $stmt = $db->prepare("SELECT * FROM vol_shift_group_reservations WHERE id = ? AND status = 'active' AND tenant_id = ?");
+        $stmt->execute([$reservationId, $tenantId]);
         $reservation = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$reservation) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found or you are not the group leader'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            return false;
+        }
+
+        if (!self::canManageReservation((int)$reservation['group_id'], (int)$reservation['reserved_by'], $leaderUserId, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can cancel this reservation'];
             return false;
         }
 
@@ -242,8 +284,13 @@ class ShiftGroupReservationService
             $stmt = $db->prepare("UPDATE vol_shift_group_reservations SET status = 'cancelled' WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$reservationId, $tenantId]);
 
-            $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE reservation_id = ? AND tenant_id = ?");
-            $stmt->execute([$reservationId, $tenantId]);
+            if (self::hasColumn('vol_shift_group_members', 'tenant_id')) {
+                $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE reservation_id = ? AND tenant_id = ?");
+                $stmt->execute([$reservationId, $tenantId]);
+            } else {
+                $stmt = $db->prepare("UPDATE vol_shift_group_members SET status = 'cancelled' WHERE reservation_id = ?");
+                $stmt->execute([$reservationId]);
+            }
 
             $db->commit();
             return true;
@@ -439,5 +486,83 @@ class ShiftGroupReservationService
         $reservedSlots = (int)$stmt->fetch(\PDO::FETCH_ASSOC)['total'];
 
         return max(0, (int)$shift['capacity'] - $regularSignups - $reservedSlots);
+    }
+
+    private static function canManageReservation(int $groupId, int $reservedBy, int $userId, int $tenantId): bool
+    {
+        if ($reservedBy === $userId) {
+            return true;
+        }
+
+        return self::canManageGroup($groupId, $userId, $tenantId);
+    }
+
+    private static function canManageGroup(int $groupId, int $userId, int $tenantId): bool
+    {
+        if (self::isTenantAdmin($userId, $tenantId)) {
+            return true;
+        }
+
+        try {
+            $db = Database::getConnection();
+
+            $ownerStmt = $db->prepare("SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? AND owner_id = ? LIMIT 1");
+            $ownerStmt->execute([$groupId, $tenantId, $userId]);
+            if ($ownerStmt->fetch()) {
+                return true;
+            }
+
+            $memberStmt = $db->prepare("
+                SELECT id
+                FROM group_members
+                WHERE group_id = ?
+                  AND user_id = ?
+                  AND status = 'active'
+                  AND role IN ('owner', 'admin')
+                LIMIT 1
+            ");
+            $memberStmt->execute([$groupId, $userId]);
+            return (bool)$memberStmt->fetch();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    private static function isTenantAdmin(int $userId, int $tenantId): bool
+    {
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("SELECT role FROM users WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$userId, $tenantId]);
+            $role = $stmt->fetchColumn();
+            return in_array($role, ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'], true);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    private static function hasColumn(string $table, string $column): bool
+    {
+        $cacheKey = "{$table}.{$column}";
+        if (array_key_exists($cacheKey, self::$columnCache)) {
+            return self::$columnCache[$cacheKey];
+        }
+
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = ?
+                  AND COLUMN_NAME = ?
+            ");
+            $stmt->execute([$table, $column]);
+            self::$columnCache[$cacheKey] = ((int)$stmt->fetchColumn()) > 0;
+        } catch (\Throwable $e) {
+            self::$columnCache[$cacheKey] = false;
+        }
+
+        return self::$columnCache[$cacheKey];
     }
 }

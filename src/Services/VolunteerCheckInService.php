@@ -49,6 +49,11 @@ class VolunteerCheckInService
             return null;
         }
 
+        if (!self::hasApprovedShiftAssignment($shiftId, $userId, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not approved for this shift'];
+            return null;
+        }
+
         $db = Database::getConnection();
 
         // Check if token already exists
@@ -156,6 +161,11 @@ class VolunteerCheckInService
             return null;
         }
 
+        if (!self::hasApprovedShiftAssignment((int)$checkin['shift_id'], (int)$checkin['user_id'], $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'This check-in is no longer valid for the assigned volunteer'];
+            return null;
+        }
+
         if ($checkin['status'] === 'checked_in') {
             // Already checked in — return info but don't error
             return [
@@ -233,7 +243,7 @@ class VolunteerCheckInService
 
         $db = Database::getConnection();
 
-        $stmt = $db->prepare("SELECT id, status FROM vol_shift_checkins WHERE qr_token = ? AND tenant_id = ?");
+        $stmt = $db->prepare("SELECT id, shift_id, user_id, status FROM vol_shift_checkins WHERE qr_token = ? AND tenant_id = ?");
         $stmt->execute([$token, $tenantId]);
         $checkin = $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -244,6 +254,11 @@ class VolunteerCheckInService
 
         if ($checkin['status'] !== 'checked_in') {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Volunteer is not currently checked in'];
+            return false;
+        }
+
+        if (!self::hasApprovedShiftAssignment((int)$checkin['shift_id'], (int)$checkin['user_id'], $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'This check-out is no longer valid for the assigned volunteer'];
             return false;
         }
 
@@ -290,7 +305,6 @@ class VolunteerCheckInService
                 'status' => $c['status'],
                 'checked_in_at' => $c['checked_in_at'],
                 'checked_out_at' => $c['checked_out_at'],
-                'qr_token' => $c['qr_token'],
             ];
         }, $checkins);
     }
@@ -304,8 +318,13 @@ class VolunteerCheckInService
      */
     public static function getUserCheckIn(int $shiftId, int $userId): ?array
     {
+        self::$errors = [];
         $tenantId = TenantContext::getId();
         $db = Database::getConnection();
+
+        if (!self::hasApprovedShiftAssignment($shiftId, $userId, $tenantId)) {
+            return null;
+        }
 
         $stmt = $db->prepare("SELECT * FROM vol_shift_checkins WHERE shift_id = ? AND user_id = ? AND tenant_id = ?");
         $stmt->execute([$shiftId, $userId, $tenantId]);
@@ -331,5 +350,25 @@ class VolunteerCheckInService
     private static function createUniqueToken(): string
     {
         return bin2hex(random_bytes(32));
+    }
+
+    /**
+     * Ensure the user is approved for this exact shift assignment.
+     */
+    private static function hasApprovedShiftAssignment(int $shiftId, int $userId, int $tenantId): bool
+    {
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("
+                SELECT id
+                FROM vol_applications
+                WHERE shift_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?
+                LIMIT 1
+            ");
+            $stmt->execute([$shiftId, $userId, $tenantId]);
+            return (bool)$stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }
