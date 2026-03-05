@@ -47,6 +47,7 @@ import { GlassCard } from '@/components/ui';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { ReviewModal } from '@/components/reviews';
+import { TransferModal } from '@/components/wallet';
 import { ProfileFeed } from '@/components/profile/ProfileFeed';
 import { VerificationBadgeRow, VerificationBadgeSummary } from '@/components/verification/VerificationBadge';
 import { EndorseButton } from '@/components/endorsements/EndorseButton';
@@ -140,6 +141,8 @@ export function ProfilePage() {
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
   const [reviewsAvailable, setReviewsAvailable] = useState(true);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [currentBalance, setCurrentBalance] = useState(0);
 
   // Resolve "me" alias (from gamification notification links) to own profile
   const resolvedId = id === 'me' ? undefined : id;
@@ -575,15 +578,19 @@ export function ProfilePage() {
                     )}
                     {/* Send credits */}
                     {isAuthenticated && (
-                      <Link to={tenantPath(`/wallet?to=${profile.id}`)}>
-                        <Button
-                          variant="flat"
-                          className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                          startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
-                        >
-                          {t('send_credits')}
-                        </Button>
-                      </Link>
+                      <Button
+                        variant="flat"
+                        className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                        startContent={<ArrowUpRight className="w-4 h-4" aria-hidden="true" />}
+                        onPress={() => {
+                          api.get<{ balance: number }>('/v2/wallet/balance').then((res) => {
+                            if (res.success && res.data) setCurrentBalance(res.data.balance);
+                          });
+                          setIsTransferModalOpen(true);
+                        }}
+                      >
+                        {t('send_credits')}
+                      </Button>
                     )}
                   </>
                 )}
@@ -1006,6 +1013,20 @@ export function ProfilePage() {
           receiverId={profile.id}
           receiverName={profile.name || ''}
           receiverAvatar={profile.avatar_url || ''}
+        />
+      )}
+
+      {/* Transfer Credits Modal */}
+      {profile && (
+        <TransferModal
+          isOpen={isTransferModalOpen}
+          onClose={() => setIsTransferModalOpen(false)}
+          currentBalance={currentBalance}
+          onTransferComplete={() => {
+            setIsTransferModalOpen(false);
+            toast.success(t('credits_sent_success', { name: profile.name }));
+          }}
+          initialRecipientId={profile.id}
         />
       )}
     </motion.div>
