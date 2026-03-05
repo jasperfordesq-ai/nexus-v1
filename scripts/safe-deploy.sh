@@ -98,6 +98,17 @@ protect_compose_yml() {
     fi
 }
 
+# Temporarily remove skip-worktree, reset the file to tracked HEAD state,
+# then re-apply skip-worktree. This allows 'git reset --hard origin/main'
+# to succeed even when compose.yml differs from the repo version.
+pre_reset_compose_yml() {
+    if git ls-files --error-unmatch compose.yml > /dev/null 2>&1; then
+        git update-index --no-skip-worktree compose.yml 2>/dev/null || true
+        git checkout HEAD -- compose.yml 2>/dev/null || true
+        git update-index --skip-worktree compose.yml 2>/dev/null || true
+    fi
+}
+
 # --- Fix #4 (Prevention): Validate Dockerfiles before build ---
 # Confirms dev and prod Dockerfiles have the expected base images,
 # catching accidental file swaps before they reach the container layer.
@@ -463,9 +474,10 @@ deploy_quick() {
     # Save current state
     save_current_commit
 
-    # Git pull
+    # Git pull — must clear skip-worktree before reset or it fails
     log_info "Fetching latest from GitHub..."
     git fetch origin main
+    pre_reset_compose_yml
     log_info "Resetting to origin/main..."
     git reset --hard origin/main
 
@@ -517,9 +529,10 @@ deploy_full() {
     # Save current state
     save_current_commit
 
-    # Git pull
+    # Git pull — must clear skip-worktree before reset or it fails
     log_info "Fetching latest from GitHub..."
     git fetch origin main
+    pre_reset_compose_yml
     log_info "Resetting to origin/main..."
     git reset --hard origin/main
 
