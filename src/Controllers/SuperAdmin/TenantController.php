@@ -307,7 +307,7 @@ class TenantController
         } else {
             $this->redirectWithError('/super-admin/tenants/' . $tenantId . '/edit', $result['error']);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -353,7 +353,7 @@ class TenantController
         } else {
             $this->redirectWithError('/super-admin/tenants/' . $tenantId, $result['error']);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -441,6 +441,6 @@ class TenantController
     {
         $_SESSION['flash_error'] = $error;
         header('Location: ' . $url);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

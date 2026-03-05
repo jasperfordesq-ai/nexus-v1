@@ -800,7 +800,7 @@ class OrgWalletController
 
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -814,7 +814,7 @@ class OrgWalletController
             $_SESSION['flash_type'] = $type;
         }
         header('Location: ' . TenantContext::getBasePath() . $path);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

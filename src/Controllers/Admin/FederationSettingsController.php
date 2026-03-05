@@ -34,7 +34,7 @@ class FederationSettingsController
 
         if (!isset($_SESSION['user_id']) || (!$isAdmin && !$isSuper && !$isAdminSession)) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 

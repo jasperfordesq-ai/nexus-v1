@@ -28,7 +28,7 @@ class GroupAdminController
         // Must be admin
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -120,7 +120,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         $groupId = $_POST['group_id'] ?? 0;
@@ -129,7 +129,7 @@ class GroupAdminController
         $group = Group::findById($groupId);
         if (!$group) {
             http_response_code(404);
-            echo 'Group not found'; exit;
+            echo 'Group not found'; if (!defined('TESTING')) { exit; }
         }
 
         // Toggle featured status
@@ -141,7 +141,7 @@ class GroupAdminController
         );
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups?featured=' . $newStatus);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -151,7 +151,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         $groupId = $_POST['group_id'] ?? 0;
@@ -159,7 +159,7 @@ class GroupAdminController
         $group = Group::findById($groupId);
         if (!$group) {
             http_response_code(404);
-            echo 'Group not found'; exit;
+            echo 'Group not found'; if (!defined('TESTING')) { exit; }
         }
 
         // Log the deletion
@@ -173,7 +173,7 @@ class GroupAdminController
         Database::query("DELETE FROM `groups` WHERE id = ? AND tenant_id = ?", [$groupId, $tenantId]);
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups?deleted=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -183,7 +183,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         $analytics = $this->getAnalytics();
@@ -251,7 +251,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         View::render('admin/groups/recommendations', [
@@ -266,7 +266,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         $groupId = $_GET['id'] ?? 0;
@@ -274,7 +274,7 @@ class GroupAdminController
 
         if (!$group) {
             http_response_code(404);
-            echo 'Group not found'; exit;
+            echo 'Group not found'; if (!defined('TESTING')) { exit; }
         }
 
         // Get members with details
@@ -325,7 +325,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         $groupId = $_POST['group_id'] ?? 0;
@@ -335,7 +335,7 @@ class GroupAdminController
         $group = Group::findById($groupId);
         if (!$group) {
             echo json_encode(['success' => false, 'message' => 'Group not found']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         switch ($action) {
@@ -381,11 +381,11 @@ class GroupAdminController
 
             default:
                 echo json_encode(['success' => false, 'message' => 'Invalid action']);
-                exit;
+                if (!defined('TESTING')) { exit; }
         }
 
         echo json_encode(['success' => true, 'message' => 'Action completed successfully']);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -395,7 +395,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         // Handle form submission
@@ -421,7 +421,7 @@ class GroupAdminController
             GroupConfigurationService::setMultiple($configs);
 
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/settings?saved=1');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $config = GroupConfigurationService::getAll();
@@ -441,7 +441,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         // Handle form submission
@@ -471,7 +471,7 @@ class GroupAdminController
             }
 
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/policies?saved=1');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $policies = GroupPolicyRepository::getAllPolicies();
@@ -492,7 +492,7 @@ class GroupAdminController
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Access denied']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $action = $_POST['action'] ?? '';
@@ -500,7 +500,7 @@ class GroupAdminController
 
         if (empty($groupIds) || !is_array($groupIds)) {
             echo json_encode(['success' => false, 'message' => 'No groups selected']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // OPTIMIZED: Use single query for bulk operations instead of loops
@@ -515,7 +515,7 @@ class GroupAdminController
 
         if (empty($groupIds)) {
             echo json_encode(['success' => false, 'message' => 'Invalid group IDs']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Build placeholders for IN clause
@@ -577,7 +577,7 @@ class GroupAdminController
         }
 
         echo json_encode(['success' => true, 'message' => "$count groups updated"]); // nosemgrep: echoed-request — output is JSON-encoded
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -587,7 +587,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         $format = $_GET['format'] ?? 'csv';
@@ -640,7 +640,7 @@ class GroupAdminController
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         echo $csv; // nosemgrep: echoed-request — output is CSV data with Content-Type: text/csv download
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -650,7 +650,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         // Get pending flags
@@ -677,7 +677,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             echo json_encode(['success' => false, 'message' => 'Access denied']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $flagId = $_POST['flag_id'] ?? 0;
@@ -691,7 +691,7 @@ class GroupAdminController
             'success' => $success,
             'message' => $success ? 'Moderation action completed' : 'Failed to complete action'
         ]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -701,7 +701,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         // Get pending approval requests
@@ -728,7 +728,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             echo json_encode(['success' => false, 'message' => 'Access denied']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $requestId = $_POST['request_id'] ?? 0;
@@ -760,7 +760,7 @@ class GroupAdminController
             'success' => $success,
             'message' => $message
         ]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -770,7 +770,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo 'Access denied'; exit;
+            echo 'Access denied'; if (!defined('TESTING')) { exit; }
         }
 
         // Handle form submission
@@ -789,12 +789,12 @@ class GroupAdminController
                 GroupFeatureToggleService::bulkSet($features);
 
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/features?saved=1');
-                exit;
+                if (!defined('TESTING')) { exit; }
             } elseif ($action === 'reset_defaults') {
                 GroupFeatureToggleService::resetToDefaults();
 
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/groups/features?reset=1');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         }
 
@@ -818,7 +818,7 @@ class GroupAdminController
     {
         if (empty($_SESSION['is_admin'])) {
             echo json_encode(['success' => false, 'message' => 'Access denied']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $feature = $_POST['feature'] ?? '';
@@ -827,7 +827,7 @@ class GroupAdminController
 
         if (empty($feature)) {
             echo json_encode(['success' => false, 'message' => 'Feature key required']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate dependencies if enabling
@@ -843,7 +843,7 @@ class GroupAdminController
                     'success' => false,
                     'message' => 'Cannot enable: Missing dependencies - ' . implode(', ', $missingLabels)
                 ]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         }
 
@@ -861,7 +861,7 @@ class GroupAdminController
                 ? ($enabled ? "$label enabled" : "$label disabled")
                 : 'Failed to update feature'
         ]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

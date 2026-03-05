@@ -209,6 +209,6 @@ class SitemapController
         }
 
         echo '</urlset>';
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

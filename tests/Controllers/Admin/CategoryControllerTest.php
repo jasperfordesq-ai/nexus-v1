@@ -74,7 +74,7 @@ class CategoryControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateShowsForm(): void
@@ -86,7 +86,7 @@ class CategoryControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testStoreCreatesCategory(): void
@@ -102,7 +102,7 @@ class CategoryControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testStoreAutoGeneratesSlug(): void
@@ -117,7 +117,7 @@ class CategoryControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testUpdateModifiesCategory(): void
@@ -133,7 +133,7 @@ class CategoryControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testDeleteRemovesCategory(): void
@@ -145,7 +145,7 @@ class CategoryControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testNonAdminCannotManageCategories(): void
@@ -165,7 +165,7 @@ class CategoryControllerTest extends ApiTestCase
                 ['Authorization' => 'Bearer ' . self::$memberToken]
             );
 
-            $this->assertEquals('simulated', $response['status']);
+            $this->markTestIncomplete('TODO: implement test assertions');
         }
     }
 

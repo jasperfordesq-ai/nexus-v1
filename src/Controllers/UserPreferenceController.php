@@ -25,7 +25,7 @@ class UserPreferenceController
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Parse Input
@@ -43,11 +43,11 @@ class UserPreferenceController
                 User::updateNotificationPreferences($userId, $currentPrefs);
 
                 echo json_encode(['success' => true, 'push_enabled' => $pushEnabled]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             } catch (\Exception $e) {
                 http_response_code(500);
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         }
 
@@ -59,13 +59,13 @@ class UserPreferenceController
         if (!in_array($contextType, ['global', 'group', 'thread'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid context type']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (!in_array($frequency, ['instant', 'daily', 'weekly', 'off'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid frequency']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if ($contextType === 'global') {
@@ -84,7 +84,7 @@ class UserPreferenceController
             if (!$contextId) {
                 http_response_code(400);
                 echo json_encode(['success' => false, 'message' => 'Context ID required']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         }
 
@@ -105,6 +105,6 @@ class UserPreferenceController
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

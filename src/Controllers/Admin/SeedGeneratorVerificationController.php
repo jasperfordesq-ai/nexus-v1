@@ -25,7 +25,7 @@ class SeedGeneratorVerificationController
         if (!$isAdmin) {
             http_response_code(403);
             echo "Access denied. Admin privileges required.";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 

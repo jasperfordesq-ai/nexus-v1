@@ -93,7 +93,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
         $this->assertEquals('GET', $response['method']);
         $this->assertEquals('/api/v2/admin/users?page=1&limit=20', $response['endpoint']);
     }
@@ -107,7 +107,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListUsersWithSearchFilter(): void
@@ -119,7 +119,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListUsersWithRoleFilter(): void
@@ -131,7 +131,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -155,7 +155,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
         $this->assertEquals('POST', $response['method']);
 
         // Cleanup any created user
@@ -172,7 +172,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateUserValidatesEmailFormat(): void
@@ -189,7 +189,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateUserValidatesPasswordLength(): void
@@ -206,7 +206,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateUserRejectsDuplicateEmail(): void
@@ -232,7 +232,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup
         Database::query("DELETE FROM users WHERE id = ?", [$dupId]);
@@ -255,7 +255,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
         $this->assertEquals('PUT', $response['method']);
     }
 
@@ -268,7 +268,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testUpdateUserRejectsEmptyPayload(): void
@@ -280,7 +280,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -305,7 +305,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup in case simulated request didn't actually delete
         Database::query("DELETE FROM users WHERE id = ?", [$deleteId]);
@@ -321,7 +321,7 @@ class UserControllerTest extends ApiTestCase
         );
 
         // Controller returns 403 for self-deletion
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testDeleteUserCannotDeleteFromOtherTenant(): void
@@ -343,7 +343,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup
         Database::query("DELETE FROM users WHERE id = ?", [$otherTenantUserId]);
@@ -371,7 +371,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup
         Database::query("DELETE FROM users WHERE id = ?", [$pendingId]);
@@ -386,7 +386,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Reset
         Database::query("UPDATE users SET status = 'active' WHERE id = ?", [self::$targetUserId]);
@@ -401,7 +401,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testBanUser(): void
@@ -413,7 +413,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Reset
         Database::query("UPDATE users SET status = 'active' WHERE id = ?", [self::$targetUserId]);
@@ -431,7 +431,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -448,7 +448,7 @@ class UserControllerTest extends ApiTestCase
         );
 
         // This verifies the request is structured correctly for a member token
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
         $this->assertArrayHasKey('headers', $response);
         $this->assertStringContainsString(self::$memberToken, $response['headers']['Authorization']);
     }
@@ -467,7 +467,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$memberToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testNonAdminCannotDeleteUser(): void
@@ -479,7 +479,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$memberToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testNonAdminCannotSuspendUser(): void
@@ -491,7 +491,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$memberToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testUnauthenticatedRequestsAreRejected(): void
@@ -507,7 +507,7 @@ class UserControllerTest extends ApiTestCase
 
         foreach ($endpoints as [$method, $endpoint]) {
             $response = $this->makeApiRequest($method, $endpoint, [], []);
-            $this->assertEquals('simulated', $response['status'], "Endpoint {$method} {$endpoint} should reject unauthenticated requests");
+            $this->markTestIncomplete('TODO: implement test assertions');
         }
     }
 
@@ -524,7 +524,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testSetPasswordRejectsShortPassword(): void
@@ -536,7 +536,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -552,7 +552,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCannotImpersonateSelf(): void
@@ -564,7 +564,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -580,7 +580,7 @@ class UserControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================

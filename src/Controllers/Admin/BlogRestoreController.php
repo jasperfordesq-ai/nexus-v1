@@ -17,7 +17,7 @@ class BlogRestoreController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -28,7 +28,7 @@ class BlogRestoreController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "Access Denied - Admin privileges required";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -138,7 +138,7 @@ class BlogRestoreController
         }
 
         echo json_encode($result);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function uploadForm()
@@ -158,7 +158,7 @@ class BlogRestoreController
 
         if (!isset($_FILES['sql_file']) || $_FILES['sql_file']['error'] !== UPLOAD_ERR_OK) {
             echo json_encode(['success' => false, 'error' => 'No file uploaded or upload error']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $file = $_FILES['sql_file'];
@@ -168,7 +168,7 @@ class BlogRestoreController
         // Validate file extension
         if (!preg_match('/\.sql$/i', $filename)) {
             echo json_encode(['success' => false, 'error' => 'File must be a .sql file']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Create exports directory if it doesn't exist
@@ -192,7 +192,7 @@ class BlogRestoreController
         } else {
             echo json_encode(['success' => false, 'error' => 'Failed to save uploaded file']);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function import()
@@ -205,7 +205,7 @@ class BlogRestoreController
         $filename = $_POST['filename'] ?? null;
         if (!$filename) {
             echo json_encode(['success' => false, 'error' => 'No filename provided']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $exportDir = __DIR__ . '/../../../exports';
@@ -213,7 +213,7 @@ class BlogRestoreController
 
         if (!file_exists($filepath)) {
             echo json_encode(['success' => false, 'error' => 'Export file not found']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -227,7 +227,7 @@ class BlogRestoreController
             $backupResult = $this->createBackup();
             if (!$backupResult['success']) {
                 echo json_encode(['success' => false, 'error' => 'Backup failed: ' . $backupResult['error']]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Read SQL file and parse safely
@@ -244,7 +244,7 @@ class BlogRestoreController
                     'success' => false,
                     'error' => 'Invalid SQL file: ' . implode('; ', $parsed['errors'])
                 ]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $insertedCount = 0;
@@ -312,7 +312,7 @@ class BlogRestoreController
             ]);
         }
 
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -539,7 +539,7 @@ class BlogRestoreController
             if (empty($posts)) {
                 http_response_code(404);
                 echo 'No posts found to export';
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Generate SQL
@@ -558,12 +558,12 @@ class BlogRestoreController
             header('Content-Length: ' . strlen($sql));
 
             echo $sql; // nosemgrep: echoed-request — output is SQL export with Content-Type: application/sql download; $sql built from database data
-            exit;
+            if (!defined('TESTING')) { exit; }
 
         } catch (\Exception $e) {
             http_response_code(500);
             echo 'Export failed. Please try again.';
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 

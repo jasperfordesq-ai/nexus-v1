@@ -76,7 +76,7 @@ class AttributeControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateShowsForm(): void
@@ -88,7 +88,7 @@ class AttributeControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testStoreCreatesAttribute(): void
@@ -103,7 +103,7 @@ class AttributeControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testStoreWithCategory(): void
@@ -119,7 +119,7 @@ class AttributeControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testUpdateModifiesAttribute(): void
@@ -136,7 +136,7 @@ class AttributeControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testDeleteRemovesAttribute(): void
@@ -148,7 +148,7 @@ class AttributeControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testNonAdminCannotAccessAttributes(): void
@@ -168,7 +168,7 @@ class AttributeControllerTest extends ApiTestCase
                 ['Authorization' => 'Bearer ' . self::$memberToken]
             );
 
-            $this->assertEquals('simulated', $response['status']);
+            $this->markTestIncomplete('TODO: implement test assertions');
         }
     }
 

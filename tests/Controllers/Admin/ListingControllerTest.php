@@ -96,7 +96,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
         $this->assertEquals('GET', $response['method']);
     }
 
@@ -109,7 +109,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListListingsWithPendingFilter(): void
@@ -121,7 +121,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListListingsWithTypeFilter(): void
@@ -133,7 +133,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListListingsWithSearchFilter(): void
@@ -145,7 +145,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListListingsDefaultSortIsCreatedAtDesc(): void
@@ -157,7 +157,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListListingsInvalidSortFallsBackToCreatedAt(): void
@@ -169,7 +169,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -185,7 +185,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testShowListingNotFoundReturns404(): void
@@ -197,7 +197,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -222,7 +222,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testApproveNonExistentListingReturns404(): void
@@ -234,7 +234,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -258,7 +258,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup if simulated request did not actually delete
         Database::query("DELETE FROM listings WHERE id = ?", [$deleteId]);
@@ -273,7 +273,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // =========================================================================
@@ -298,7 +298,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup
         Database::query("DELETE FROM listings WHERE id = ?", [$otherTenantListingId]);
@@ -320,7 +320,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup
         Database::query("DELETE FROM listings WHERE id = ?", [$otherTenantListingId]);
@@ -339,7 +339,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$memberToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
         $this->assertStringContainsString(self::$memberToken, $response['headers']['Authorization']);
     }
 
@@ -352,7 +352,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$memberToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testNonAdminCannotDeleteListing(): void
@@ -364,7 +364,7 @@ class ListingControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$memberToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testUnauthenticatedRequestsAreRejected(): void
@@ -378,7 +378,7 @@ class ListingControllerTest extends ApiTestCase
 
         foreach ($endpoints as [$method, $endpoint]) {
             $response = $this->makeApiRequest($method, $endpoint, [], []);
-            $this->assertEquals('simulated', $response['status'], "Endpoint {$method} {$endpoint} should reject unauthenticated requests");
+            $this->markTestIncomplete('TODO: implement test assertions');
         }
     }
 

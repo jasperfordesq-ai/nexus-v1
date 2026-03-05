@@ -59,6 +59,6 @@ class RobotsController
         // Sitemaps are always at the root of the "site" definition
         echo "Sitemap: {$scheme}://{$host}{$baseUrl}/sitemap.xml\n";
 
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

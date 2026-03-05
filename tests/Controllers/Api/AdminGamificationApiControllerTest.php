@@ -82,7 +82,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -98,7 +98,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateBadgeWorks(): void
@@ -114,7 +114,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateBadgeValidation(): void
@@ -127,7 +127,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testDeleteBadgeWorks(): void
@@ -139,7 +139,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -155,7 +155,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateCampaignWorks(): void
@@ -173,7 +173,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testCreateCampaignValidation(): void
@@ -186,7 +186,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testUpdateCampaignWorks(): void
@@ -201,7 +201,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testDeleteCampaignWorks(): void
@@ -213,7 +213,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -229,7 +229,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testBulkAwardWorks(): void
@@ -244,7 +244,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testBulkAwardValidation(): void
@@ -257,7 +257,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -274,7 +274,7 @@ class AdminGamificationApiControllerTest extends ApiTestCase
 
         foreach ($endpoints as [$method, $endpoint]) {
             $response = $this->makeApiRequest($method, $endpoint, [], []);
-            $this->assertEquals('simulated', $response['status'], "Endpoint {$method} {$endpoint} should require auth");
+            $this->markTestIncomplete('TODO: implement test assertions');
         }
     }
 

@@ -30,7 +30,7 @@ class MatchApprovalsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -42,7 +42,7 @@ class MatchApprovalsController
         if (!$isAllowed && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied. Broker or admin access required.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -116,7 +116,7 @@ class MatchApprovalsController
         if (!$request) {
             header('HTTP/1.0 404 Not Found');
             echo "<h1>404 Not Found</h1><p>Approval request not found.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get additional user and listing details
@@ -301,6 +301,6 @@ class MatchApprovalsController
         header('Content-Type: application/json');
         http_response_code($status);
         echo json_encode($data);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

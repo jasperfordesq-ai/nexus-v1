@@ -40,7 +40,7 @@ class SocialAuthController
 
         $client = new SimpleOAuth($provider, $config);
         header('Location: ' . $client->getAuthUrl());
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function callback($provider)
@@ -83,7 +83,7 @@ class SocialAuthController
                 // Redirect to login page with error message instead of dying
                 $loginUrl = TenantContext::getBasePath() . '/login?error=' . urlencode($gateBlock['message']);
                 header('Location: ' . $loginUrl);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // FIXED: Preserve layout preference before session regeneration
@@ -108,7 +108,7 @@ class SocialAuthController
             \Nexus\Models\ActivityLog::log($user['id'], 'login', 'User logged in via ' . ucfirst($provider));
 
             header('Location: ' . TenantContext::getBasePath() . '/dashboard');
-            exit;
+            if (!defined('TESTING')) { exit; }
         } else {
             die("Login failed.");
         }

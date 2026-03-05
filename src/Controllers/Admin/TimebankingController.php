@@ -32,7 +32,7 @@ class TimebankingController
 
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -43,7 +43,7 @@ class TimebankingController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -732,7 +732,7 @@ class TimebankingController
 
         if (strlen($query) < 2) {
             echo json_encode(['success' => true, 'users' => []]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();
@@ -754,7 +754,7 @@ class TimebankingController
         )->fetchAll();
 
         echo json_encode(['success' => true, 'users' => $users]); // nosemgrep: echoed-request — output is JSON-encoded; query uses prepared statements
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -767,6 +767,6 @@ class TimebankingController
             $_SESSION['flash_type'] = $type;
         }
         header('Location: ' . TenantContext::getBasePath() . $path);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

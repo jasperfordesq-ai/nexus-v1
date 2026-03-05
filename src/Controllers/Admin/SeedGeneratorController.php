@@ -54,7 +54,7 @@ class SeedGeneratorController
         if (!$isAdmin) {
             http_response_code(403);
             echo "Access denied. Admin privileges required.";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -217,7 +217,7 @@ class SeedGeneratorController
         header('Content-Length: ' . strlen($script));
 
         echo $script;
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -233,7 +233,7 @@ class SeedGeneratorController
         header('Content-Length: ' . strlen($sql));
 
         echo $sql;
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -417,7 +417,7 @@ class SeedGeneratorController
         }
 
         header('Location: /admin-legacy/seed-generator');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

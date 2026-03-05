@@ -42,7 +42,7 @@ class PermissionApiController
         if (!$isAdmin && !$isSuperAdmin) {
             http_response_code(401);
             echo json_encode(['error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 

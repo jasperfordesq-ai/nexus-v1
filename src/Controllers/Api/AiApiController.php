@@ -987,7 +987,7 @@ class AiApiController extends BaseApiController
                 echo "data: " . json_encode(['error' => 'AI provider is not configured. Please configure API keys in Admin > AI Settings.']) . "\n\n";
                 ob_flush();
                 flush();
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Save user message
@@ -1043,7 +1043,7 @@ class AiApiController extends BaseApiController
             flush();
         }
 
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**

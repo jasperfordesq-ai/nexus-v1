@@ -16,7 +16,7 @@ class CategoryController
         // 1. Check Login
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // 2. Check Role (Admin OR Super Admin OR Tenant Admin)
@@ -28,7 +28,7 @@ class CategoryController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -58,7 +58,7 @@ class CategoryController
 
         Category::create($data);
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/categories');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function edit($id)
@@ -81,7 +81,7 @@ class CategoryController
 
         Category::update($id, $data);
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/categories');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function delete($id)
@@ -89,7 +89,7 @@ class CategoryController
         $this->requireAdmin();
         Category::delete($id);
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/categories');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     private function slugify($text)

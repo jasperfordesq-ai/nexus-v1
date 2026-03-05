@@ -23,7 +23,7 @@ class NotificationController
         $userId = $_SESSION['user_id'] ?? 0;
         if (!$userId) {
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $notifications = Notification::getLatest($userId, 10);
@@ -34,7 +34,7 @@ class NotificationController
             'notifications' => $notifications,
             'unread_count' => $unreadCount
         ]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // API: Mark as read
@@ -47,7 +47,7 @@ class NotificationController
         $userId = $_SESSION['user_id'] ?? 0;
         if (!$userId) {
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // CSRF Verification - check multiple header name variations
@@ -63,7 +63,7 @@ class NotificationController
             http_response_code(403);
             error_log("CSRF Failed for markRead. Token: '$token'. Available headers: " . json_encode(array_keys($headers)));
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF Token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $raw = file_get_contents('php://input');
@@ -77,15 +77,15 @@ class NotificationController
         if (isset($input['id'])) {
             Notification::markRead($input['id'], $userId);
             echo json_encode(['success' => true]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         } elseif (isset($input['all']) && ($input['all'] === true || $input['all'] === 'true')) {
             Notification::markAllRead($userId);
             echo json_encode(['success' => true]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         echo json_encode(['success' => false, 'error' => 'Missing id or all parameter']);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
     // API: Lightweight Polling (Unread Count)
     public function poll()
@@ -97,7 +97,7 @@ class NotificationController
         $userId = $_SESSION['user_id'] ?? 0;
         if (!$userId) {
             echo json_encode(['success' => false, 'count' => 0]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Optimize: Only count unread, no fetches
@@ -107,7 +107,7 @@ class NotificationController
             'success' => true,
             'count' => $unreadCount
         ]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // API: Delete Notification
@@ -120,7 +120,7 @@ class NotificationController
         $userId = $_SESSION['user_id'] ?? 0;
         if (!$userId) {
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // CSRF Verification
@@ -129,7 +129,7 @@ class NotificationController
         if (!\Nexus\Core\Csrf::verify($token)) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Invalid CSRF Token']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $raw = file_get_contents('php://input');
@@ -145,11 +145,11 @@ class NotificationController
             Notification::deleteAll($userId);
         } else {
             echo json_encode(['success' => false, 'error' => 'Missing ID or Action']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         echo json_encode(['success' => true]);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // PAGE: Manage Notifications
@@ -161,7 +161,7 @@ class NotificationController
         $userId = $_SESSION['user_id'] ?? 0;
         if (!$userId) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Handle Mark All Read POST action BEFORE any output
@@ -169,7 +169,7 @@ class NotificationController
             \Nexus\Core\Csrf::verifyOrDie();
             Notification::markAllRead($userId);
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/notifications');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $notifications = Notification::getAll($userId, 50); // Get last 50 (all, including read)

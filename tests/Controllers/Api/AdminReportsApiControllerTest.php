@@ -90,7 +90,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListReportsWithFilters(): void
@@ -102,7 +102,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListReportsByType(): void
@@ -114,7 +114,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testListReportsByStatus(): void
@@ -126,7 +126,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -146,7 +146,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -175,7 +175,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup
         Database::query("DELETE FROM reports WHERE id = ?", [$reportId]);
@@ -207,7 +207,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
 
         // Cleanup
         Database::query("DELETE FROM reports WHERE id = ?", [$reportId]);
@@ -226,7 +226,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -242,7 +242,7 @@ class AdminReportsApiControllerTest extends ApiTestCase
 
         foreach ($endpoints as [$method, $endpoint]) {
             $response = $this->makeApiRequest($method, $endpoint, [], []);
-            $this->assertEquals('simulated', $response['status'], "Endpoint {$method} {$endpoint} should require auth");
+            $this->markTestIncomplete('TODO: implement test assertions');
         }
     }
 

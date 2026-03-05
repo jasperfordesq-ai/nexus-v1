@@ -65,7 +65,7 @@ class ListingController
                         'count' => count($listings)
                     ]
                 ]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         } elseif ($search) {
             $listings = Listing::search($search);
@@ -76,7 +76,7 @@ class ListingController
             if ($isApi) {
                 header('Content-Type: application/json');
                 echo json_encode(['data' => $listings]);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         } else {
             // Use MatchRank algorithm if enabled, otherwise fall back to default
@@ -142,13 +142,13 @@ class ListingController
         if (!$listing) {
             header("HTTP/1.0 404 Not Found");
             echo "Listing not found or access denied.";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Handle AJAX actions for likes/comments
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $this->handleListingAjax($listing);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Set SEO Data Dynamic
@@ -198,7 +198,7 @@ class ListingController
         $this->checkFeature();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
         $categories = \Nexus\Models\Category::getByType('listing');
 
@@ -238,7 +238,7 @@ class ListingController
         \Nexus\Core\Csrf::verifyOrDie();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -258,7 +258,7 @@ class ListingController
         if (!$userCheck) {
             error_log("ListingController::store - User ID {$userId} not found after retries. Possible DB issue or deleted user.");
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login?error=session_check_failed');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $title = $_POST['title'] ?? '';
@@ -342,7 +342,7 @@ class ListingController
             \Nexus\Models\ActivityLog::log($userId, $action, $title, true, '/listings/' . $listingId);
 
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/listings');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         echo "Error: Missing required fields.";
@@ -353,7 +353,7 @@ class ListingController
         $this->checkFeature();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $listing = Listing::find($id);
@@ -363,7 +363,7 @@ class ListingController
         if (!$listing || ($listing['user_id'] != $_SESSION['user_id'] && !$isAdmin)) {
             header("HTTP/1.0 403 Forbidden");
             echo "Access Denied";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $categories = \Nexus\Models\Category::getByType('listing');
@@ -404,7 +404,7 @@ class ListingController
         \Nexus\Core\Csrf::verifyOrDie();
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $id = $_POST['id'] ?? null;
@@ -502,7 +502,7 @@ class ListingController
             }
 
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/listings/' . $id);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         echo "Error: Missing required fields.";
@@ -514,7 +514,7 @@ class ListingController
         // 1. Method Check
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // 2. Identify Input Type (JSON vs Form)
@@ -544,10 +544,10 @@ class ListingController
             if ($wantsJson) {
                 header('Content-Type: application/json');
                 echo json_encode(['error' => 'Unauthenticated']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // 4. Listing Check
@@ -555,7 +555,7 @@ class ListingController
             if ($wantsJson) {
                 header('Content-Type: application/json');
                 echo json_encode(['error' => 'No ID']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             die("No ID provided");
         }
@@ -565,10 +565,10 @@ class ListingController
             if ($wantsJson) {
                 header('Content-Type: application/json');
                 echo json_encode(['error' => 'Listing not found or unauthorized']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             echo "Access Denied";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // 5. Execute Delete
@@ -581,7 +581,7 @@ class ListingController
         } else {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/listings');
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

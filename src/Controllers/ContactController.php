@@ -258,6 +258,6 @@ HTML;
     {
         $basePath = TenantContext::getBasePath();
         header("Location: {$basePath}{$path}");
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

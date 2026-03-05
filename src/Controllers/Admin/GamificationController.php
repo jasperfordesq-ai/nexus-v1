@@ -22,7 +22,7 @@ class GamificationController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -33,7 +33,7 @@ class GamificationController
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Access Denied.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -143,7 +143,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?rechecked=' . $processed . '&awarded=' . $badgesAwarded);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -159,13 +159,13 @@ class GamificationController
 
         if (empty($userIds) || empty($badgeKey)) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=missing_data');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $badge = GamificationService::getBadgeByKey($badgeKey);
         if (!$badge) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=invalid_badge');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $awarded = 0;
@@ -184,7 +184,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?bulk_awarded=' . $awarded);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -199,13 +199,13 @@ class GamificationController
 
         if (empty($badgeKey)) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=missing_badge');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $badge = GamificationService::getBadgeByKey($badgeKey);
         if (!$badge) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?error=invalid_badge');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $users = User::getAll();
@@ -226,7 +226,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?all_awarded=' . $awarded);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -244,7 +244,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?xp_reset=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -263,7 +263,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification?badges_cleared=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -324,7 +324,7 @@ class GamificationController
         $campaign = AchievementCampaignService::getCampaign($id);
         if (!$campaign) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $badges = GamificationService::getBadgeDefinitions();
@@ -363,7 +363,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?saved=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -380,7 +380,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?activated=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -397,7 +397,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?paused=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -414,7 +414,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?deleted=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -433,7 +433,7 @@ class GamificationController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/gamification/campaigns?run=1&awarded=' . ($result['awarded'] ?? 0));
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -452,6 +452,6 @@ class GamificationController
 
         header('Content-Type: application/json');
         echo json_encode(['count' => count($users)]); // nosemgrep: echoed-request — output is JSON-encoded with Content-Type: application/json
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

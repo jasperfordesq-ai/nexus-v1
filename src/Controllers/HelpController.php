@@ -172,7 +172,7 @@ class HelpController
             if (TenantContext::getId() !== 1 && !TenantContext::hasFeature($article['module_tag'])) {
                 header("HTTP/1.0 404 Not Found");
                 echo "<h1>Module Disabled</h1><p>This help topic relates to a feature that is not active for this community.</p>";
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         }
 

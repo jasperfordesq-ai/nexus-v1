@@ -26,7 +26,7 @@ class AchievementsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -34,7 +34,7 @@ class AchievementsController
 
         if (!$dashboardData) {
             header('Location: ' . TenantContext::getBasePath() . '/');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         View::render('achievements/index', [
@@ -94,7 +94,7 @@ class AchievementsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -178,7 +178,7 @@ class AchievementsController
 
         $referer = UrlHelper::safeReferer(TenantContext::getBasePath() . '/achievements/badges');
         header('Location: ' . $referer . '?showcase_updated=1');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -188,7 +188,7 @@ class AchievementsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -220,7 +220,7 @@ class AchievementsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -244,7 +244,7 @@ class AchievementsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];
@@ -269,7 +269,7 @@ class AchievementsController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $_SESSION['user_id'];

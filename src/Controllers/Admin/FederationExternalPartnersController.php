@@ -69,7 +69,7 @@ class FederationExternalPartnersController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/external-partners/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate required fields
@@ -79,14 +79,14 @@ class FederationExternalPartnersController
         if (empty($name) || empty($baseUrl)) {
             $_SESSION['flash_error'] = 'Name and Base URL are required.';
             header('Location: /admin-legacy/federation/external-partners/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate URL format
         if (!filter_var($baseUrl, FILTER_VALIDATE_URL)) {
             $_SESSION['flash_error'] = 'Please enter a valid URL.';
             header('Location: /admin-legacy/federation/external-partners/create');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $result = FederationExternalPartnerService::create([
@@ -114,7 +114,7 @@ class FederationExternalPartnersController
             session_write_close();
             header('Location: /admin-legacy/federation/external-partners/create');
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -131,7 +131,7 @@ class FederationExternalPartnersController
         if (!$partner) {
             $_SESSION['flash_error'] = 'Partner not found.';
             header('Location: /admin-legacy/federation/external-partners');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $logs = FederationExternalPartnerService::getLogs($id, 50);
@@ -161,7 +161,7 @@ class FederationExternalPartnersController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/external-partners/' . $id);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate required fields
@@ -171,7 +171,7 @@ class FederationExternalPartnersController
         if (empty($name) || empty($baseUrl)) {
             $_SESSION['flash_error'] = 'Name and Base URL are required.';
             header('Location: /admin-legacy/federation/external-partners/' . $id);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $result = FederationExternalPartnerService::update($id, [
@@ -198,7 +198,7 @@ class FederationExternalPartnersController
 
         session_write_close();
         header('Location: /admin-legacy/federation/external-partners/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -218,7 +218,7 @@ class FederationExternalPartnersController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
             header('Location: /admin-legacy/federation/external-partners/' . $id);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $result = FederationExternalPartnerService::testConnection($id, $tenantId);
@@ -233,7 +233,7 @@ class FederationExternalPartnersController
 
         session_write_close();
         header('Location: /admin-legacy/federation/external-partners/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -252,7 +252,7 @@ class FederationExternalPartnersController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request.';
             header('Location: /admin-legacy/federation/external-partners');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $result = FederationExternalPartnerService::updateStatus($id, 'suspended', $tenantId, $user['id']);
@@ -265,7 +265,7 @@ class FederationExternalPartnersController
 
         session_write_close();
         header('Location: /admin-legacy/federation/external-partners/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -284,7 +284,7 @@ class FederationExternalPartnersController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request.';
             header('Location: /admin-legacy/federation/external-partners');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $result = FederationExternalPartnerService::updateStatus($id, 'active', $tenantId, $user['id']);
@@ -297,7 +297,7 @@ class FederationExternalPartnersController
 
         session_write_close();
         header('Location: /admin-legacy/federation/external-partners/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -316,7 +316,7 @@ class FederationExternalPartnersController
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request.';
             header('Location: /admin-legacy/federation/external-partners');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $result = FederationExternalPartnerService::delete($id, $tenantId, $user['id']);
@@ -329,6 +329,6 @@ class FederationExternalPartnersController
 
         session_write_close();
         header('Location: /admin-legacy/federation/external-partners');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

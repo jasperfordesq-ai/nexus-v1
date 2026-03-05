@@ -17,7 +17,7 @@ class AdminController
     {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // GOD MODE: Bypass all permission checks
@@ -53,7 +53,7 @@ class AdminController
     {
         header('HTTP/1.0 403 Forbidden');
         echo "<h1>403 Forbidden</h1><p>You do not have permission to access this area.</p><a href='" . \Nexus\Core\TenantContext::getBasePath() . "/dashboard'>Go Home</a>";
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function index()
@@ -716,7 +716,7 @@ class AdminController
 
         echo "<p><a href='/admin-legacy/smart-match-users' style='color:#60a5fa;'>← Back to Smart Match Users</a></p>";
         echo "</body></html>";
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function smartMatchUsers()
@@ -805,7 +805,7 @@ class AdminController
                 ]);
                 ob_end_flush();
             }
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Handle AJAX request for completion notification
@@ -851,7 +851,7 @@ class AdminController
                 ]);
                 ob_end_flush();
             }
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Render the interface (for non-AJAX requests)
@@ -931,7 +931,7 @@ class AdminController
                 'batch' => $results,
                 'hasMore' => count($groups) === $batchSize
             ]);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Render the geocoding interface
@@ -1721,7 +1721,7 @@ class AdminController
                 'message' => 'Ranking update failed. Check server logs for details.'
             ]);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -1912,7 +1912,7 @@ class AdminController
             $_SESSION['flash_error'] = 'Failed to create deliverable.';
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability/create');
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -1926,7 +1926,7 @@ class AdminController
         $deliverable = \Nexus\Models\Deliverable::findById($id);
         if (!$deliverable) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get milestones, comments, and history
@@ -1959,7 +1959,7 @@ class AdminController
         $deliverable = \Nexus\Models\Deliverable::findById($id);
         if (!$deliverable) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get users and groups for assignment dropdowns
@@ -2017,7 +2017,7 @@ class AdminController
         }
 
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability/view/' . $id);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -2038,7 +2038,7 @@ class AdminController
         }
 
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/deliverability');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

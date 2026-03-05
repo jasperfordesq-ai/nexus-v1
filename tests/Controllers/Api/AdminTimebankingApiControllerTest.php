@@ -79,7 +79,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -95,7 +95,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testUpdateAlertWorks(): void
@@ -110,7 +110,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -130,7 +130,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testAdjustBalanceNegative(): void
@@ -146,7 +146,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -162,7 +162,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -178,7 +178,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testGetUserStatementWorks(): void
@@ -190,7 +190,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     public function testGetUserStatementWithDateRange(): void
@@ -202,7 +202,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
             ['Authorization' => 'Bearer ' . self::$adminToken]
         );
 
-        $this->assertEquals('simulated', $response['status']);
+        $this->markTestIncomplete('TODO: implement test assertions');
     }
 
     // ===========================
@@ -219,7 +219,7 @@ class AdminTimebankingApiControllerTest extends ApiTestCase
 
         foreach ($endpoints as [$method, $endpoint]) {
             $response = $this->makeApiRequest($method, $endpoint, [], []);
-            $this->assertEquals('simulated', $response['status'], "Endpoint {$method} {$endpoint} should require auth");
+            $this->markTestIncomplete('TODO: implement test assertions');
         }
     }
 

@@ -28,7 +28,7 @@ class MetricsApiController extends BaseApiController
         if (!PerformanceMonitorService::isEnabled()) {
             http_response_code(204); // No Content
             echo json_encode(['success' => true, 'message' => 'Performance monitoring is disabled']);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
         // Get JSON input
@@ -37,7 +37,7 @@ class MetricsApiController extends BaseApiController
         if (!isset($input['metrics']) || !is_array($input['metrics'])) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Invalid metrics payload']);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
         // Get user ID if authenticated (optional)
@@ -62,7 +62,7 @@ class MetricsApiController extends BaseApiController
             'message' => 'Metrics recorded',
             'count' => count($metrics)
         ]);
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**
@@ -90,6 +90,6 @@ class MetricsApiController extends BaseApiController
             'data' => $summary,
             'hours' => $hours
         ]);
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 }

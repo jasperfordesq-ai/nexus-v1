@@ -657,7 +657,7 @@ class GroupAnalyticsController
 
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -680,7 +680,7 @@ class GroupAnalyticsController
     {
         http_response_code(404);
         echo "<h1>404 Not Found</h1>";
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -690,6 +690,6 @@ class GroupAnalyticsController
     {
         http_response_code(403);
         echo "<h1>403 Forbidden</h1><p>$message</p>";
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }

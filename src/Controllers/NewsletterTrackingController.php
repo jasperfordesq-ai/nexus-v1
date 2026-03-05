@@ -57,7 +57,7 @@ class NewsletterTrackingController
             // Fallback to homepage if URL decode fails
             $basePath = TenantContext::getBasePath();
             header('Location: ' . $basePath . '/');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if ($data && $newsletterId > 0) {
@@ -79,7 +79,7 @@ class NewsletterTrackingController
 
         // Redirect to the original URL
         header('Location: ' . $url);
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -97,7 +97,7 @@ class NewsletterTrackingController
         header('Expires: 0');
 
         echo $pixel;
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

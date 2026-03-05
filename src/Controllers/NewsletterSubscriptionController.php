@@ -44,7 +44,7 @@ class NewsletterSubscriptionController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['flash_error'] = 'Please enter a valid email address.';
             header('Location: ' . TenantContext::getBasePath() . '/newsletter/subscribe');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Check if already subscribed
@@ -52,7 +52,7 @@ class NewsletterSubscriptionController
         if ($existing && $existing['status'] === 'active') {
             $_SESSION['flash_success'] = 'You are already subscribed to our newsletter!';
             header('Location: ' . TenantContext::getBasePath() . '/newsletter/subscribe');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Create subscriber (pending confirmation)
@@ -66,7 +66,7 @@ class NewsletterSubscriptionController
 
         $_SESSION['flash_success'] = 'Please check your email to confirm your subscription.';
         header('Location: ' . TenantContext::getBasePath() . '/newsletter/subscribe');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -169,7 +169,7 @@ class NewsletterSubscriptionController
         if (empty($token)) {
             http_response_code(400);
             echo 'Invalid token';
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $subscriber = NewsletterSubscriber::unsubscribe($token, 'one-click');
@@ -186,7 +186,7 @@ class NewsletterSubscriptionController
             http_response_code(400);
             echo 'Invalid or expired token';
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

@@ -1359,7 +1359,7 @@ class AdminUsersApiController extends BaseApiController
         fputcsv($output, ['John', 'Smith', 'john@example.com', '', 'member']);
 
         fclose($output);
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**

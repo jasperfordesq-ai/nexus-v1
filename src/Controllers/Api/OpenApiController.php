@@ -41,7 +41,7 @@ class OpenApiController extends BaseApiController
                     'message' => 'OpenAPI specification not found'
                 ]]
             ]);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
         // Parse YAML and convert to JSON
@@ -57,13 +57,13 @@ class OpenApiController extends BaseApiController
                     'message' => 'Failed to parse OpenAPI specification'
                 ]]
             ]);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
         header('Content-Type: application/json');
         header('Cache-Control: public, max-age=3600'); // Cache for 1 hour
         echo json_encode($spec, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**
@@ -84,13 +84,13 @@ class OpenApiController extends BaseApiController
                     'message' => 'OpenAPI specification not found'
                 ]]
             ]);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
         header('Content-Type: application/x-yaml');
         header('Cache-Control: public, max-age=3600'); // Cache for 1 hour
         readfile(self::SPEC_PATH);
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**
@@ -113,7 +113,7 @@ class OpenApiController extends BaseApiController
                     'message' => 'API documentation is disabled in production'
                 ]]
             ]);
-            exit;
+            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
         // Get the base URL for the spec
@@ -158,7 +158,7 @@ class OpenApiController extends BaseApiController
     </script>
 </body>
 </html>';
-        exit;
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
     /**

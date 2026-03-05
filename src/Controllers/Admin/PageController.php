@@ -21,10 +21,10 @@ class PageController
                 header('Content-Type: application/json');
                 http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $role = $_SESSION['user_role'] ?? '';
@@ -37,11 +37,11 @@ class PageController
                 header('Content-Type: application/json');
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'Access denied']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             header('HTTP/1.0 403 Forbidden');
             echo "Access Denied";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -68,7 +68,7 @@ class PageController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if (!isset($_GET['confirm']) || $_GET['confirm'] !== '1') {
                 header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
         }
 
@@ -107,7 +107,7 @@ class PageController
 
         if (!$page) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $seo = \Nexus\Models\SeoMetadata::get('page', $id);
@@ -139,7 +139,7 @@ class PageController
         if (!$page) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Page not found']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get blocks from request
@@ -166,7 +166,7 @@ class PageController
         if (!$page) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Page not found']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $blocks = \Nexus\PageBuilder\PageRenderer::getBlocks($id);
@@ -190,7 +190,7 @@ class PageController
             $page = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
             if (!$page) {
                 echo json_encode(['success' => false, 'error' => 'Page not found']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Get input
@@ -212,7 +212,7 @@ class PageController
             // Validate title
             if (empty($title)) {
                 echo json_encode(['success' => false, 'error' => 'Title cannot be empty']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Validate slug uniqueness
@@ -224,14 +224,14 @@ class PageController
 
                 if ($slugExists) {
                     echo json_encode(['success' => false, 'error' => 'This URL slug is already in use']);
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
             }
 
             // Prevent path traversal
             if (strpos($slug, '..') !== false || strpos($slug, '/') !== false) {
                 echo json_encode(['success' => false, 'error' => 'Invalid slug format']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Update page
@@ -251,12 +251,12 @@ class PageController
             }
 
             echo json_encode(['success' => true, 'message' => 'Settings saved successfully']);
-            exit;
+            if (!defined('TESTING')) { exit; }
 
         } catch (\Exception $e) {
             error_log("Page settings save error: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Failed to save settings']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -287,7 +287,7 @@ class PageController
         if (!$page) {
             http_response_code(404);
             echo "Page not found";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Render preview (bypasses is_published check)
@@ -307,7 +307,7 @@ class PageController
             $id = $_POST['id'] ?? null;
             if (!$id) {
                 echo json_encode(['success' => false, 'error' => 'No page ID provided']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $tenantId = TenantContext::getId();
@@ -317,7 +317,7 @@ class PageController
             $existingPage = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
             if (!$existingPage) {
                 echo json_encode(['success' => false, 'error' => 'Page not found']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Build Data with validation
@@ -353,7 +353,7 @@ class PageController
 
                 if ($slugExists) {
                     echo json_encode(['success' => false, 'error' => 'This URL slug is already in use. Please choose a different one.']);
-                    exit;
+                    if (!defined('TESTING')) { exit; }
                 }
             }
 
@@ -401,12 +401,12 @@ class PageController
             $message = $isAutosave ? 'Draft saved' : 'Page saved successfully';
             // nosemgrep: echoed-request — output is JSON-encoded; $isAutosave is boolean
             echo json_encode(['success' => true, 'message' => $message, 'autosave' => $isAutosave]);
-            exit;
+            if (!defined('TESTING')) { exit; }
 
         } catch (\Exception $e) {
             error_log("Page save error: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Failed to save page. Please try again.']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -444,7 +444,7 @@ class PageController
         $page = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
         if (!$page) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Get versions with user info
@@ -481,7 +481,7 @@ class PageController
 
             if (!$version) {
                 echo json_encode(['success' => false, 'error' => 'Version not found']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             echo json_encode([
@@ -495,12 +495,12 @@ class PageController
                     'created_at' => date('M j, Y g:i A', strtotime($version['created_at']))
                 ]
             ]);
-            exit;
+            if (!defined('TESTING')) { exit; }
 
         } catch (\Exception $e) {
             error_log("Version content error: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Failed to load version']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -515,7 +515,7 @@ class PageController
 
             if (!$versionId || !$pageId) {
                 echo json_encode(['success' => false, 'error' => 'Missing parameters']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $tenantId = TenantContext::getId();
@@ -525,14 +525,14 @@ class PageController
             $currentPage = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$pageId, $tenantId])->fetch();
             if (!$currentPage) {
                 echo json_encode(['success' => false, 'error' => 'Page not found']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Get version to restore
             $version = Database::query("SELECT * FROM page_versions WHERE id = ? AND page_id = ?", [$versionId, $pageId])->fetch();
             if (!$version) {
                 echo json_encode(['success' => false, 'error' => 'Version not found']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             // Save current state as new version before restoring
@@ -545,12 +545,12 @@ class PageController
             );
 
             echo json_encode(['success' => true, 'message' => 'Version restored successfully']);
-            exit;
+            if (!defined('TESTING')) { exit; }
 
         } catch (\Exception $e) {
             error_log("Version restore error: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Failed to restore version']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -563,7 +563,7 @@ class PageController
         $original = Database::query("SELECT * FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
         if (!$original) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Generate new slug
@@ -607,7 +607,7 @@ class PageController
             $order = $_POST['order'] ?? [];
             if (empty($order) || !is_array($order)) {
                 echo json_encode(['success' => false, 'error' => 'Invalid order data']);
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
 
             $tenantId = TenantContext::getId();
@@ -620,12 +620,12 @@ class PageController
             }
 
             echo json_encode(['success' => true, 'message' => 'Order updated']);
-            exit;
+            if (!defined('TESTING')) { exit; }
 
         } catch (\Exception $e) {
             error_log("Reorder error: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Failed to update order']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -637,7 +637,7 @@ class PageController
         $id = $_POST['page_id'] ?? null;
         if (!$id) {
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/pages');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $tenantId = TenantContext::getId();

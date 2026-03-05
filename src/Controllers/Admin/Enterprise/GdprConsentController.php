@@ -187,7 +187,7 @@ class GdprConsentController extends BaseEnterpriseController
         if (!$consentType) {
             $_SESSION['flash_error'] = 'Consent type not found';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $consents = Database::query(
@@ -289,7 +289,7 @@ class GdprConsentController extends BaseEnterpriseController
         if (empty($consentType)) {
             $_SESSION['flash_error'] = 'Please select a consent type to backfill.';
             header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         try {
@@ -331,7 +331,7 @@ class GdprConsentController extends BaseEnterpriseController
         }
 
         header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/enterprise/gdpr/consents');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

@@ -32,7 +32,7 @@ class FederationStreamController
         if (!$user) {
             http_response_code(401);
             echo "data: " . json_encode(['error' => 'Unauthorized']) . "\n\n";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $user['id'];
@@ -42,7 +42,7 @@ class FederationStreamController
         if (!FederationUserService::isUserOptedIn($userId, $tenantId)) {
             http_response_code(403);
             echo "data: " . json_encode(['error' => 'Not opted into federation']) . "\n\n";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         // Set SSE headers

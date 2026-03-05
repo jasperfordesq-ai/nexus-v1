@@ -797,7 +797,7 @@ class VolunteerApiController extends BaseApiController
             return;
         }
 
-        $org = VolunteerService::getOrganizationById($orgId);
+        $org = VolunteerService::getOrganizationById($orgId, true);
         $this->respondWithData($org, null, 201);
     }
 
@@ -1332,7 +1332,7 @@ class VolunteerApiController extends BaseApiController
 
         header('Content-Type: text/html; charset=utf-8');
         echo $html;
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     // ========================================
@@ -1356,6 +1356,13 @@ class VolunteerApiController extends BaseApiController
             $token = \Nexus\Services\VolunteerCheckInService::generateToken($shiftId, $userId);
             if ($token) {
                 $checkin = \Nexus\Services\VolunteerCheckInService::getUserCheckIn($shiftId, $userId);
+            } else {
+                $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
+                if (!empty($errors)) {
+                    $status = $this->getErrorStatus($errors);
+                    $this->respondWithErrors($errors, $status);
+                    return;
+                }
             }
         }
 
@@ -1414,8 +1421,13 @@ class VolunteerApiController extends BaseApiController
     public function shiftCheckIns(int $shiftId): void
     {
         $this->checkFeature();
-        $this->getUserId();
+        $userId = $this->getUserId();
         $this->rateLimit('volunteering_shift_checkins', 60, 60);
+
+        if (!$this->canManageShift($shiftId, $userId)) {
+            $this->respondWithError('FORBIDDEN', 'You do not have permission to view check-ins for this shift', null, 403);
+            return;
+        }
 
         $checkins = \Nexus\Services\VolunteerCheckInService::getShiftCheckIns($shiftId);
 
@@ -1709,10 +1721,17 @@ class VolunteerApiController extends BaseApiController
     public function recurringPatterns(int $opportunityId): void
     {
         $this->checkFeature();
-        $this->getUserId();
+        $userId = $this->getUserId();
         $this->rateLimit('volunteering_recurring_list', 60, 60);
 
-        $patterns = \Nexus\Services\RecurringShiftService::getPatternsForOpportunity($opportunityId);
+        $patterns = \Nexus\Services\RecurringShiftService::getPatternsForOpportunity($opportunityId, $userId);
+
+        $errors = \Nexus\Services\RecurringShiftService::getErrors();
+        if (!empty($errors)) {
+            $status = $this->getErrorStatus($errors);
+            $this->respondWithErrors($errors, $status);
+            return;
+        }
 
         $this->respondWithData(['patterns' => $patterns]);
     }
@@ -1760,13 +1779,13 @@ class VolunteerApiController extends BaseApiController
     public function updateRecurringPattern(int $patternId): void
     {
         $this->checkFeature();
-        $this->getUserId();
+        $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('volunteering_recurring_update', 10, 60);
 
         $data = $this->getAllInput();
 
-        $success = \Nexus\Services\RecurringShiftService::updatePattern($patternId, $data);
+        $success = \Nexus\Services\RecurringShiftService::updatePattern($patternId, $data, $userId);
 
         if (!$success) {
             $errors = \Nexus\Services\RecurringShiftService::getErrors();
@@ -1786,11 +1805,11 @@ class VolunteerApiController extends BaseApiController
     public function deleteRecurringPattern(int $patternId): void
     {
         $this->checkFeature();
-        $this->getUserId();
+        $userId = $this->getUserId();
         $this->verifyCsrf();
         $this->rateLimit('volunteering_recurring_delete', 10, 60);
 
-        $deactivated = \Nexus\Services\RecurringShiftService::deactivatePattern($patternId);
+        $deactivated = \Nexus\Services\RecurringShiftService::deactivatePattern($patternId, $userId);
 
         if (!$deactivated) {
             $errors = \Nexus\Services\RecurringShiftService::getErrors();
@@ -1799,7 +1818,7 @@ class VolunteerApiController extends BaseApiController
             return;
         }
 
-        $deleted = \Nexus\Services\RecurringShiftService::deleteFutureShifts($patternId);
+        $deleted = \Nexus\Services\RecurringShiftService::deleteFutureShifts($patternId, $userId);
 
         $this->respondWithData([
             'message' => 'Recurring pattern deactivated',
@@ -1820,6 +1839,48 @@ class VolunteerApiController extends BaseApiController
             return $this->getUserId();
         } catch (\Exception $e) {
             return null;
+        }
+    }
+
+    /**
+     * Check if the user can coordinate/manage a shift.
+     */
+    private function canManageShift(int $shiftId, int $userId): bool
+    {
+        try {
+            $tenantId = \Nexus\Core\TenantContext::getId();
+            $db = \Nexus\Core\Database::getConnection();
+
+            $stmt = $db->prepare("
+                SELECT org.id AS organization_id, org.user_id AS org_owner_id
+                FROM vol_shifts s
+                JOIN vol_opportunities opp ON s.opportunity_id = opp.id
+                JOIN vol_organizations org ON opp.organization_id = org.id
+                WHERE s.id = ? AND s.tenant_id = ? AND opp.tenant_id = ? AND org.tenant_id = ?
+                LIMIT 1
+            ");
+            $stmt->execute([$shiftId, $tenantId, $tenantId, $tenantId]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                return false;
+            }
+
+            if ((int)$row['org_owner_id'] === $userId) {
+                return true;
+            }
+
+            if (\Nexus\Models\OrgMember::isAdmin((int)$row['organization_id'], $userId)) {
+                return true;
+            }
+
+            $roleStmt = $db->prepare("SELECT role FROM users WHERE id = ? AND tenant_id = ?");
+            $roleStmt->execute([$userId, $tenantId]);
+            $role = $roleStmt->fetchColumn();
+
+            return in_array($role, ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'], true);
+        } catch (\Throwable $e) {
+            return false;
         }
     }
 

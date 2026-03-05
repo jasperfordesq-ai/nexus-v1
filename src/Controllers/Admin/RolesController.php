@@ -34,7 +34,7 @@ class RolesController
 
         if (!$isAdmin && !$isSuperAdmin) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 

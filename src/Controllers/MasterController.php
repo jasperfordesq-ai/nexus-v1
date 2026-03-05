@@ -18,7 +18,7 @@ class MasterController
         if (!isset($_SESSION['user_id']) || empty($_SESSION['is_super_admin'])) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Only Super Admins can access this area.</p>";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
     }
 
@@ -89,7 +89,7 @@ class MasterController
                 }
 
                 header('Location: /super-admin?msg=tenant_created');
-                exit;
+                if (!defined('TESTING')) { exit; }
             } catch (\PDOException $e) {
                 echo "Error creating tenant: " . $e->getMessage();
             }
@@ -123,7 +123,7 @@ class MasterController
         }
 
         header('Location: /super-admin/tenant/edit?id=' . $tenantId . '&msg=admin_added');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function deleteAdmin()
@@ -142,7 +142,7 @@ class MasterController
         }
 
         header('Location: /super-admin/tenant/edit?id=' . $tenantId . '&msg=admin_removed');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function edit()
@@ -154,7 +154,7 @@ class MasterController
 
         if (!$tenant) {
             echo "Tenant not found.";
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         \Nexus\Core\View::render('admin/super-admin/tenant-edit', [
@@ -220,7 +220,7 @@ class MasterController
         ]);
 
         header('Location: /super-admin?msg=tenant_updated');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function updateConfig()
@@ -228,7 +228,7 @@ class MasterController
         // Enforce Super Admin
         if (empty($_SESSION['is_super_admin'])) {
             header("HTTP/1.1 403 Forbidden");
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         $input = json_decode(file_get_contents('php://input'), true);
@@ -238,7 +238,7 @@ class MasterController
         if (!$tenantId || !$config) {
             header("HTTP/1.1 400 Bad Request");
             echo json_encode(['error' => 'Missing tenant_id or config']);
-            exit;
+            if (!defined('TESTING')) { exit; }
         }
 
         if (\Nexus\Models\Tenant::updateConfig($tenantId, $config)) {
@@ -248,7 +248,7 @@ class MasterController
             header("HTTP/1.1 500 Server Error");
             echo json_encode(['error' => 'Update failed']);
         }
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function users()
@@ -271,14 +271,14 @@ class MasterController
             // Strict check: don't delete self!
             if ($userId == $_SESSION['user_id']) {
                 header('Location: /super-admin/users?error=cannot_delete_self');
-                exit;
+                if (!defined('TESTING')) { exit; }
             }
             // Use raw query for cross-tenant deletion
             Database::query("DELETE FROM users WHERE id = ?", [$userId]);
         }
 
         header('Location: /super-admin/users?deleted=true');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 
     public function approveUser()
@@ -292,6 +292,6 @@ class MasterController
         }
 
         header('Location: /super-admin/users?approved=true');
-        exit;
+        if (!defined('TESTING')) { exit; }
     }
 }
