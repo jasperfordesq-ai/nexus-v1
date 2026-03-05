@@ -105,6 +105,7 @@ const ExchangeDetailPage = lazyWithRetry(() => import('@/pages/exchanges/Exchang
 const RequestExchangePage = lazyWithRetry(() => import('@/pages/exchanges/RequestExchangePage'));
 const LeaderboardPage = lazyWithRetry(() => import('@/pages/leaderboard/LeaderboardPage'));
 const AchievementsPage = lazyWithRetry(() => import('@/pages/achievements/AchievementsPage'));
+const NexusScorePage = lazyWithRetry(() => import('@/pages/nexus-score/NexusScorePage'));
 const GoalsPage = lazyWithRetry(() => import('@/pages/goals/GoalsPage'));
 const PollsPage = lazyWithRetry(() => import('@/pages/polls/PollsPage'));
 const JobsPage = lazyWithRetry(() => import('@/pages/jobs/JobsPage'));
@@ -508,6 +509,13 @@ function AppRoutes() {
             <FeatureGate feature="gamification" fallback={<ComingSoonPage feature="Leaderboard" />}>
               <FeatureErrorBoundary featureName="Leaderboard">
                 <LeaderboardPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="nexus-score" element={
+            <FeatureGate feature="gamification" fallback={<ComingSoonPage feature="NexusScore" />}>
+              <FeatureErrorBoundary featureName="NexusScore">
+                <NexusScorePage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

@@ -100,6 +100,7 @@ $router->add('PUT', '/api/v2/gamification/showcase', 'Nexus\Controllers\Api\Gami
 $router->add('GET', '/api/v2/gamification/seasons', 'Nexus\Controllers\Api\GamificationV2ApiController@seasons');
 $router->add('GET', '/api/v2/gamification/seasons/current', 'Nexus\Controllers\Api\GamificationV2ApiController@currentSeason');
 $router->add('POST', '/api/v2/gamification/challenges/{id}/claim', 'Nexus\Controllers\Api\GamificationV2ApiController@claimChallenge');
+$router->add('GET', '/api/v2/gamification/nexus-score', 'Nexus\Controllers\Api\GamificationV2ApiController@nexusScore');
 
 // ============================================
 // API V2 - VOLUNTEERING (Full Module)
