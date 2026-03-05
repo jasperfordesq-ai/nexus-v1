@@ -339,8 +339,25 @@ $router->add('DELETE', '/api/v2/admin/insurance/{id}', 'Nexus\Controllers\Api\Ad
 $router->add('GET', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@index');
 $router->add('POST', '/api/v2/admin/newsletters', 'Nexus\Controllers\Api\AdminNewsletterApiController@store');
 $router->add('GET', '/api/v2/admin/newsletters/subscribers', 'Nexus\Controllers\Api\AdminNewsletterApiController@subscribers');
+$router->add('POST', '/api/v2/admin/newsletters/subscribers', 'Nexus\Controllers\Api\AdminNewsletterApiController@addSubscriber');
+$router->add('POST', '/api/v2/admin/newsletters/subscribers/import', 'Nexus\Controllers\Api\AdminNewsletterApiController@importSubscribers');
+$router->add('GET', '/api/v2/admin/newsletters/subscribers/export', 'Nexus\Controllers\Api\AdminNewsletterApiController@exportSubscribers');
+$router->add('POST', '/api/v2/admin/newsletters/subscribers/sync', 'Nexus\Controllers\Api\AdminNewsletterApiController@syncPlatformMembers');
+$router->add('DELETE', '/api/v2/admin/newsletters/subscribers/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@removeSubscriber');
 $router->add('GET', '/api/v2/admin/newsletters/segments', 'Nexus\Controllers\Api\AdminNewsletterApiController@segments');
+$router->add('POST', '/api/v2/admin/newsletters/segments', 'Nexus\Controllers\Api\AdminNewsletterApiController@storeSegment');
+$router->add('POST', '/api/v2/admin/newsletters/segments/preview', 'Nexus\Controllers\Api\AdminNewsletterApiController@previewSegment');
+$router->add('GET', '/api/v2/admin/newsletters/segments/suggestions', 'Nexus\Controllers\Api\AdminNewsletterApiController@getSegmentSuggestions');
+$router->add('GET', '/api/v2/admin/newsletters/segments/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@showSegment');
+$router->add('PUT', '/api/v2/admin/newsletters/segments/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@updateSegment');
+$router->add('DELETE', '/api/v2/admin/newsletters/segments/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@destroySegment');
 $router->add('GET', '/api/v2/admin/newsletters/templates', 'Nexus\Controllers\Api\AdminNewsletterApiController@templates');
+$router->add('POST', '/api/v2/admin/newsletters/templates', 'Nexus\Controllers\Api\AdminNewsletterApiController@storeTemplate');
+$router->add('GET', '/api/v2/admin/newsletters/templates/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@showTemplate');
+$router->add('PUT', '/api/v2/admin/newsletters/templates/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@updateTemplate');
+$router->add('DELETE', '/api/v2/admin/newsletters/templates/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@destroyTemplate');
+$router->add('POST', '/api/v2/admin/newsletters/templates/{id}/duplicate', 'Nexus\Controllers\Api\AdminNewsletterApiController@duplicateTemplate');
+$router->add('GET', '/api/v2/admin/newsletters/templates/{id}/preview', 'Nexus\Controllers\Api\AdminNewsletterApiController@previewTemplate');
 $router->add('GET', '/api/v2/admin/newsletters/analytics', 'Nexus\Controllers\Api\AdminNewsletterApiController@analytics');
 $router->add('GET', '/api/v2/admin/newsletters/bounces', 'Nexus\Controllers\Api\AdminNewsletterApiController@getBounces');
 $router->add('GET', '/api/v2/admin/newsletters/suppression-list', 'Nexus\Controllers\Api\AdminNewsletterApiController@getSuppressionList');
@@ -351,6 +368,8 @@ $router->add('GET', '/api/v2/admin/newsletters/diagnostics', 'Nexus\Controllers\
 $router->add('GET', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@show');
 $router->add('GET', '/api/v2/admin/newsletters/{id}/resend-info', 'Nexus\Controllers\Api\AdminNewsletterApiController@getResendInfo');
 $router->add('POST', '/api/v2/admin/newsletters/{id}/resend', 'Nexus\Controllers\Api\AdminNewsletterApiController@resend');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/stats', 'Nexus\Controllers\Api\AdminNewsletterApiController@stats');
+$router->add('POST', '/api/v2/admin/newsletters/{id}/ab-winner', 'Nexus\Controllers\Api\AdminNewsletterApiController@selectAbWinner');
 $router->add('PUT', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@update');
 $router->add('DELETE', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@destroy');
 

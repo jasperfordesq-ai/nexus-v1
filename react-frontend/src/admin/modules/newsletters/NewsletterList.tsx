@@ -12,7 +12,7 @@ import { useState, useCallback, useEffect } from 'react';
 import {
   Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from '@heroui/react';
-import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy, Send } from 'lucide-react';
+import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy, Send, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -135,11 +135,19 @@ export function NewsletterList() {
           </DropdownTrigger>
           <DropdownMenu aria-label="Newsletter actions" onAction={(key) => {
             if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));
+            else if (key === 'stats') navigate(tenantPath(`/admin/newsletters/${item.id}/stats`));
             else if (key === 'duplicate') handleDuplicate(item);
             else if (key === 'resend') setResendTarget(item.id);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
             <DropdownItem key="edit" startContent={<Edit size={14} />}>Edit</DropdownItem>
+            <DropdownItem
+              key="stats"
+              startContent={<BarChart3 size={14} />}
+              classNames={{ base: item.status === 'sent' ? '' : 'hidden' }}
+            >
+              Stats
+            </DropdownItem>
             <DropdownItem key="duplicate" startContent={<Copy size={14} />}>Duplicate</DropdownItem>
             <DropdownItem
               key="resend"
