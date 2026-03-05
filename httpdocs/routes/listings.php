@@ -19,7 +19,8 @@ $router->add('GET', '/api/v2/categories', function () {
             $type = 'listing';
         }
         $categories = \Nexus\Models\Category::getByType($type);
-        echo json_encode(['data' => $categories]); // nosemgrep: echoed-request — json_encode + Content-Type: application/json
+        // nosemgrep: php.lang.security.injection.echoed-request.echoed-request -- json_encode + Content-Type: application/json
+        echo json_encode(['data' => $categories]);
     } catch (\Throwable $e) {
         error_log("API /v2/categories error: " . $e->getMessage());
         header('Content-Type: application/json');
