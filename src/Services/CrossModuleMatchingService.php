@@ -47,9 +47,12 @@ class CrossModuleMatchingService
             return ['matches' => [], 'total' => 0];
         }
 
+        // Load dismissed listing IDs so we can exclude them
+        $dismissedListingIds = self::getDismissedListingIds($userId, $tenantId);
+
         // Match across each enabled module
         if (in_array('listings', $modules)) {
-            $listingMatches = self::matchListings($userId, $userProfile, $tenantId, $limit, $debugMode);
+            $listingMatches = self::matchListings($userId, $userProfile, $tenantId, $limit, $debugMode, $dismissedListingIds);
             $allMatches = array_merge($allMatches, $listingMatches);
         }
 
@@ -126,7 +129,24 @@ class CrossModuleMatchingService
     /**
      * Match against listings (skills offered vs needed)
      */
-    private static function matchListings(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false): array
+    /**
+     * Load listing IDs the user has dismissed (to exclude from results)
+     */
+    private static function getDismissedListingIds(int $userId, int $tenantId): array
+    {
+        try {
+            $stmt = Database::query(
+                "SELECT listing_id FROM match_dismissals WHERE tenant_id = ? AND user_id = ?",
+                [$tenantId, $userId]
+            );
+            return array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'listing_id');
+        } catch (\Throwable $e) {
+            // Table may not exist yet — degrade gracefully
+            return [];
+        }
+    }
+
+    private static function matchListings(int $userId, array $profile, int $tenantId, int $limit, bool $debugMode = false, array $dismissedIds = []): array
     {
         $matches = [];
         $userSkills = $profile['skills_array'];
@@ -136,6 +156,16 @@ class CrossModuleMatchingService
         }
 
         try {
+            // Build dismissal exclusion clause
+            $dismissSql = '';
+            $params = [$tenantId, $userId];
+            if (!empty($dismissedIds)) {
+                $placeholders = implode(',', array_fill(0, count($dismissedIds), '?'));
+                $dismissSql = " AND l.id NOT IN ($placeholders)";
+                $params = array_merge($params, $dismissedIds);
+            }
+            $params[] = (int)$limit;
+
             // Find listings that need skills the user has (offers) and vice versa
             $stmt = Database::query(
                 "SELECT l.id, l.title, l.description, l.type, l.category_id,
@@ -146,10 +176,10 @@ class CrossModuleMatchingService
                  FROM listings l
                  JOIN users u ON l.user_id = u.id
                  LEFT JOIN categories c ON l.category_id = c.id
-                 WHERE l.tenant_id = ? AND l.user_id != ? AND l.status = 'active'
+                 WHERE l.tenant_id = ? AND l.user_id != ? AND l.status = 'active'{$dismissSql}
                  ORDER BY l.created_at DESC
                  LIMIT ?",
-                [$tenantId, $userId, (int)$limit]
+                $params
             );
 
             $listings = $stmt->fetchAll(\PDO::FETCH_ASSOC);
