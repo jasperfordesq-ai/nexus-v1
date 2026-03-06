@@ -150,6 +150,24 @@ class SkillTaxonomyApiController extends BaseApiController
         $this->respondWithData($results);
     }
 
+    /**
+     * GET /api/v2/skills/members?skill=SkillName
+     */
+    public function getMembersWithSkill(): void
+    {
+        $this->rateLimit('skills_members', 30, 60);
+
+        $skillName = $this->query('skill', '');
+        if (strlen($skillName) < 1) {
+            $this->respondWithData([]);
+        }
+
+        $limit = $this->queryInt('limit', 30, 1, 50);
+        $members = SkillTaxonomyService::getMembersWithSkill($skillName, $limit);
+
+        $this->respondWithData($members);
+    }
+
     // =============================================
     // USER SKILL ENDPOINTS
     // =============================================

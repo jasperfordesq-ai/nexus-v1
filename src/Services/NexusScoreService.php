@@ -151,9 +151,9 @@ class NexusScoreService
                 COUNT(*) as review_count,
                 SUM(CASE WHEN rating >= 4 THEN 1 ELSE 0 END) as positive_reviews
             FROM reviews
-            WHERE receiver_id = ?
+            WHERE receiver_id = ? AND tenant_id = ?
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId, $tenantId]);
         $reviewData = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Get transaction success rate
@@ -255,8 +255,8 @@ class NexusScoreService
     private function calculateActivityScore(int $userId, int $tenantId): array
     {
         // Count listings
-        $stmt = $this->db->prepare("SELECT COUNT(*) as listing_count FROM listings WHERE user_id = ? AND status = 'active'");
-        $stmt->execute([$userId]);
+        $stmt = $this->db->prepare("SELECT COUNT(*) as listing_count FROM listings WHERE user_id = ? AND tenant_id = ? AND status = 'active'");
+        $stmt->execute([$userId, $tenantId]);
         $listingCount = (int)$stmt->fetchColumn();
 
         // Count event participation (if events table exists)
@@ -380,7 +380,7 @@ class NexusScoreService
                 SELECT COUNT(*)
                 FROM post_likes pl
                 JOIN feed_posts fp ON pl.post_id = fp.id
-                WHERE fp.user_id = ? AND pl.tenant_id = ?
+                WHERE fp.user_id = ? AND fp.tenant_id = ?
             ");
             $stmt->execute([$userId, $tenantId]);
             $likesReceived = (int)$stmt->fetchColumn();

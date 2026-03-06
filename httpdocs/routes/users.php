@@ -195,6 +195,7 @@ $router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiCon
 // ============================================
 $router->add('GET', '/api/v2/skills/categories', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getCategories');
 $router->add('GET', '/api/v2/skills/search', 'Nexus\Controllers\Api\SkillTaxonomyApiController@search');
+$router->add('GET', '/api/v2/skills/members', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getMembersWithSkill');
 $router->add('GET', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getCategoryById');
 $router->add('POST', '/api/v2/skills/categories', 'Nexus\Controllers\Api\SkillTaxonomyApiController@createCategory');
 $router->add('PUT', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@updateCategory');

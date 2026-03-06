@@ -195,13 +195,29 @@ class TenantHierarchyService
                 error_log("TenantHierarchyService: page seeding skipped for tenant {$tenantId}: " . $pageErr->getMessage());
             }
 
-            // Seed default features if not explicitly provided
-            if (empty($data['features'])) {
-                $defaultFeatures = json_encode(TenantFeatureConfig::FEATURE_DEFAULTS);
-                Database::query(
-                    "UPDATE tenants SET features = ? WHERE id = ?",
-                    [$defaultFeatures, $tenantId]
+            // Seed default features — enable ALL features for new tenants
+            $allFeaturesEnabled = array_map(fn() => true, TenantFeatureConfig::FEATURE_DEFAULTS);
+            if (!empty($data['features'])) {
+                // Merge user-provided features over all-enabled defaults
+                $allFeaturesEnabled = array_merge($allFeaturesEnabled, $data['features']);
+            }
+            Database::query(
+                "UPDATE tenants SET features = ? WHERE id = ?",
+                [json_encode($allFeaturesEnabled), $tenantId]
+            );
+
+            // Seed federation tenant features so federation API recognises this tenant
+            try {
+                FederationFeatureService::enableTenantFeature(
+                    FederationFeatureService::TENANT_FEDERATION_ENABLED,
+                    (int)$tenantId
                 );
+                FederationFeatureService::enableTenantFeature(
+                    FederationFeatureService::TENANT_APPEAR_IN_DIRECTORY,
+                    (int)$tenantId
+                );
+            } catch (\Exception $fedErr) {
+                error_log("TenantHierarchyService: federation seeding skipped for tenant {$tenantId}: " . $fedErr->getMessage());
             }
 
             Database::commit();

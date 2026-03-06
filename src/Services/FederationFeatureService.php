@@ -653,16 +653,16 @@ class FederationFeatureService
     private static function getSystemDefaults(): array
     {
         return [
-            'federation_enabled' => 0,
-            'whitelist_mode_enabled' => 1,
+            'federation_enabled' => 1,
+            'whitelist_mode_enabled' => 0,
             'emergency_lockdown_active' => 0,
-            'max_federation_level' => 0,
-            'cross_tenant_profiles_enabled' => 0,
-            'cross_tenant_messaging_enabled' => 0,
-            'cross_tenant_transactions_enabled' => 0,
-            'cross_tenant_listings_enabled' => 0,
-            'cross_tenant_events_enabled' => 0,
-            'cross_tenant_groups_enabled' => 0,
+            'max_federation_level' => 4,
+            'cross_tenant_profiles_enabled' => 1,
+            'cross_tenant_messaging_enabled' => 1,
+            'cross_tenant_transactions_enabled' => 1,
+            'cross_tenant_listings_enabled' => 1,
+            'cross_tenant_events_enabled' => 1,
+            'cross_tenant_groups_enabled' => 1,
         ];
     }
 
@@ -676,13 +676,13 @@ class FederationFeatureService
                 'label' => 'Federation Enabled',
                 'description' => 'Enable federation features for this tenant',
                 'category' => 'core',
-                'default' => false,
+                'default' => true,
             ],
             self::TENANT_APPEAR_IN_DIRECTORY => [
                 'label' => 'Appear in Directory',
                 'description' => 'Show this tenant in the federation directory',
                 'category' => 'core',
-                'default' => false,
+                'default' => true,
             ],
             self::TENANT_AUTO_ACCEPT_HIERARCHY => [
                 'label' => 'Auto-Accept Hierarchy',
@@ -694,42 +694,42 @@ class FederationFeatureService
                 'label' => 'Cross-Tenant Profiles',
                 'description' => 'Allow member profiles to be visible to partner timebanks',
                 'category' => 'features',
-                'default' => false,
+                'default' => true,
                 'requires_system' => self::SYSTEM_PROFILES_ENABLED,
             ],
             self::TENANT_MESSAGING_ENABLED => [
                 'label' => 'Cross-Tenant Messaging',
                 'description' => 'Allow members to message users from partner timebanks',
                 'category' => 'features',
-                'default' => false,
+                'default' => true,
                 'requires_system' => self::SYSTEM_MESSAGING_ENABLED,
             ],
             self::TENANT_TRANSACTIONS_ENABLED => [
                 'label' => 'Cross-Tenant Transactions',
                 'description' => 'Allow time credit exchanges with partner timebanks',
                 'category' => 'features',
-                'default' => false,
+                'default' => true,
                 'requires_system' => self::SYSTEM_TRANSACTIONS_ENABLED,
             ],
             self::TENANT_LISTINGS_ENABLED => [
                 'label' => 'Cross-Tenant Listings',
                 'description' => 'Allow listings to be visible to partner timebanks',
                 'category' => 'features',
-                'default' => false,
+                'default' => true,
                 'requires_system' => self::SYSTEM_LISTINGS_ENABLED,
             ],
             self::TENANT_EVENTS_ENABLED => [
                 'label' => 'Cross-Tenant Events',
                 'description' => 'Allow events to be visible to partner timebanks',
                 'category' => 'features',
-                'default' => false,
+                'default' => true,
                 'requires_system' => self::SYSTEM_EVENTS_ENABLED,
             ],
             self::TENANT_GROUPS_ENABLED => [
                 'label' => 'Cross-Tenant Groups',
                 'description' => 'Allow groups to accept members from partner timebanks',
                 'category' => 'features',
-                'default' => false,
+                'default' => true,
                 'requires_system' => self::SYSTEM_GROUPS_ENABLED,
             ],
         ];
@@ -760,7 +760,7 @@ class FederationFeatureService
                     max_federation_level, cross_tenant_profiles_enabled, cross_tenant_messaging_enabled,
                     cross_tenant_transactions_enabled, cross_tenant_listings_enabled,
                     cross_tenant_events_enabled, cross_tenant_groups_enabled, created_at
-                ) VALUES (1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, NOW())
+                ) VALUES (1, 1, 0, 0, 4, 1, 1, 1, 1, 1, 1, NOW())
                 ON DUPLICATE KEY UPDATE id = id"
             );
         } catch (\Exception $e) {

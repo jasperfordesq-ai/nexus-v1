@@ -786,9 +786,12 @@ class GamificationV2ApiController extends BaseApiController
                     'color' => $tierColor,
                 ],
                 'breakdown'   => $formatted,
-                'insights'    => $scoreData['insights'] ?? [],
+                'insights'    => array_map(function ($i) {
+                    return is_array($i) ? ($i['message'] ?? $i['title'] ?? '') : (string) $i;
+                }, $scoreData['insights'] ?? []),
             ]);
         } catch (\Throwable $e) {
+            error_log("NexusScore error for user {$userId}: " . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             $this->respondWithError(
                 ApiErrorCodes::SERVER_INTERNAL_ERROR,
                 'Failed to load NexusScore',
