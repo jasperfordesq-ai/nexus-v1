@@ -40,6 +40,8 @@ export async function isBiometricAvailable(): Promise<boolean> {
 
 interface WebAuthnCredential {
   credential_id: string;
+  device_name: string | null;
+  authenticator_type: string | null;
   created_at: string;
   last_used_at: string | null;
 }
@@ -50,10 +52,41 @@ interface WebAuthnStatus {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Device / Platform Detection
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type DevicePlatform = 'windows' | 'mac' | 'iphone' | 'ipad' | 'android' | 'linux' | 'unknown';
+
+export function detectPlatform(): DevicePlatform {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/iphone/.test(ua)) return 'iphone';
+  if (/ipad/.test(ua) || (/macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'ipad';
+  if (/android/.test(ua)) return 'android';
+  if (/windows/.test(ua)) return 'windows';
+  if (/macintosh|mac os/.test(ua)) return 'mac';
+  if (/linux/.test(ua)) return 'linux';
+  return 'unknown';
+}
+
+export function getDefaultDeviceName(): string {
+  const platform = detectPlatform();
+  const names: Record<DevicePlatform, string> = {
+    windows: 'Windows PC',
+    mac: 'Mac',
+    iphone: 'iPhone',
+    ipad: 'iPad',
+    android: 'Android device',
+    linux: 'Linux PC',
+    unknown: 'Device',
+  };
+  return names[platform];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Registration (Enroll a new biometric credential)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function registerBiometric(): Promise<{ success: boolean; error?: string }> {
+export async function registerBiometric(deviceName?: string): Promise<{ success: boolean; error?: string }> {
   try {
     // Step 1: Get registration challenge from server
     const challengeRes = await api.post<{
@@ -101,6 +134,7 @@ export async function registerBiometric(): Promise<{ success: boolean; error?: s
       type: credential.type,
       response: credential.response,
       authenticatorAttachment: credential.authenticatorAttachment,
+      device_name: deviceName || getDefaultDeviceName(),
     });
 
     if (!verifyRes.success) {

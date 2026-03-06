@@ -107,9 +107,11 @@ class WebAuthnApiController extends BaseApiController
                 ['type' => 'public-key', 'alg' => -257]  // RS256
             ],
             'authenticatorSelection' => [
-                'authenticatorAttachment' => 'platform',
+                // No authenticatorAttachment — allow ALL authenticators:
+                // Windows Hello, Touch ID, Face ID, Android biometrics, security keys, phones
                 'userVerification' => 'preferred',
-                'residentKey' => 'preferred'
+                'residentKey' => 'preferred',
+                'requireResidentKey' => false,
             ],
             'timeout' => 60000,
             'attestation' => 'none',
@@ -248,17 +250,28 @@ class WebAuthnApiController extends BaseApiController
             $transports = json_encode($input['response']['transports']);
         }
 
+        // Device name from client (user agent detection or explicit label)
+        $deviceName = null;
+        if (!empty($input['device_name']) && is_string($input['device_name'])) {
+            $deviceName = mb_substr(trim($input['device_name']), 0, 100);
+        }
+
+        // Detect authenticator type from attachment hint
+        $authenticatorType = $input['authenticatorAttachment'] ?? null;
+
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            INSERT INTO webauthn_credentials (user_id, tenant_id, credential_id, public_key, sign_count, transports, created_at)
-            VALUES (?, ?, ?, ?, 0, ?, NOW())
+            INSERT INTO webauthn_credentials (user_id, tenant_id, credential_id, public_key, sign_count, transports, device_name, authenticator_type, created_at)
+            VALUES (?, ?, ?, ?, 0, ?, ?, ?, NOW())
         ");
         $stmt->execute([
             $userId,
             TenantContext::getId(),
             $input['id'],
             $publicKey,
-            $transports
+            $transports,
+            $deviceName,
+            $authenticatorType,
         ]);
 
         // Consume challenge (delete from store - single use)
@@ -709,7 +722,7 @@ class WebAuthnApiController extends BaseApiController
 
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            SELECT credential_id, created_at, last_used_at
+            SELECT credential_id, device_name, authenticator_type, created_at, last_used_at
             FROM webauthn_credentials
             WHERE user_id = ? AND tenant_id = ?
             ORDER BY created_at DESC
