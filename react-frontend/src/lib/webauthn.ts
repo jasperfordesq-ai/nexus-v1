@@ -123,6 +123,17 @@ export async function registerBiometric(
       ...(attachment ? { authenticatorAttachment: attachment } : {}),
     };
 
+    // WebAuthn Level 3 "hints" tell the browser which UI to prioritize:
+    // 'client-device' = Windows Hello / Touch ID / platform authenticator
+    // 'hybrid' = phone/tablet via QR code
+    // 'security-key' = USB security key
+    let hints: Array<'client-device' | 'hybrid' | 'security-key'> | undefined;
+    if (attachment === 'platform') {
+      hints = ['client-device'];
+    } else if (attachment === 'cross-platform') {
+      hints = ['hybrid', 'security-key'];
+    }
+
     const optionsJSON: PublicKeyCredentialCreationOptionsJSON = {
       challenge: serverOptions.challenge,
       rp: serverOptions.rp,
@@ -132,6 +143,7 @@ export async function registerBiometric(
       timeout: serverOptions.timeout,
       attestation: serverOptions.attestation as PublicKeyCredentialCreationOptionsJSON['attestation'],
       excludeCredentials: (serverOptions.excludeCredentials ?? []) as PublicKeyCredentialCreationOptionsJSON['excludeCredentials'],
+      ...(hints ? { hints } : {}),
     };
 
     // Step 3: Trigger browser biometric prompt
@@ -197,11 +209,13 @@ export async function authenticateWithBiometric(
     const serverOptions = challengeRes.data;
 
     // Step 2: Map to SimpleWebAuthn format
+    // Use 'client-device' hint to prioritize Windows Hello / Touch ID / platform authenticator
     const optionsJSON: PublicKeyCredentialRequestOptionsJSON = {
       challenge: serverOptions.challenge,
       rpId: serverOptions.rpId,
       timeout: serverOptions.timeout,
       userVerification: serverOptions.userVerification as PublicKeyCredentialRequestOptionsJSON['userVerification'],
+      hints: ['client-device'],
       allowCredentials: serverOptions.allowCredentials?.map(c => {
         const desc: { type: 'public-key'; id: string; transports?: string[] } = {
           id: c.id,
