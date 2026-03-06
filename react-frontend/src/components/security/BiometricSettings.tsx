@@ -112,6 +112,10 @@ const PLATFORM_INSTRUCTIONS: Record<DevicePlatform, { title: string; steps: stri
 };
 
 export function BiometricSettings() {
+  // Biometric/passkey feature temporarily disabled pending full audit
+  return null;
+
+  // eslint-disable-next-line no-unreachable
   const { t } = useTranslation('settings');
   const toast = useToast();
 
