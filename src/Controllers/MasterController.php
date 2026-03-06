@@ -34,6 +34,9 @@ class MasterController
         ]);
     }
 
+    /**
+     * @deprecated Legacy form handler — delegates to TenantHierarchyService for full seeding.
+     */
     public function createTenant()
     {
         $this->checkSuperAdmin();
@@ -41,12 +44,13 @@ class MasterController
 
         $name = $_POST['name'] ?? '';
         $slug = $_POST['slug'] ?? '';
-        $domain = $_POST['domain'] ?? null;
-        $tagline = $_POST['tagline'] ?? null;
-        $description = $_POST['description'] ?? null;
 
-        // Default Features
-        $features = json_encode([
+        if (!$name || !$slug) {
+            echo "Name and slug are required.";
+            return;
+        }
+
+        $features = [
             'listings' => isset($_POST['feat_listings']),
             'groups'   => isset($_POST['feat_groups']),
             'wallet'   => isset($_POST['feat_wallet']),
@@ -57,42 +61,47 @@ class MasterController
             'goals'    => isset($_POST['feat_goals']),
             'blog'     => isset($_POST['feat_blog']),
             'help_center' => isset($_POST['feat_help_center']),
-        ]);
+        ];
 
-        if ($name && $slug) {
-            $sql = "INSERT INTO tenants (name, slug, domain, tagline, description, features) VALUES (?, ?, ?, ?, ?, ?)";
-            try {
-                Database::query($sql, [$name, $slug, $domain, $tagline, $description, $features]);
-                $tenantId = Database::lastInsertId();
+        $data = [
+            'name'        => $name,
+            'slug'        => $slug,
+            'domain'      => $_POST['domain'] ?? null,
+            'tagline'     => $_POST['tagline'] ?? null,
+            'description' => $_POST['description'] ?? null,
+            'features'    => $features,
+        ];
 
-                // Create Initial Admin
-                $adminName = $_POST['admin_name'] ?? '';
-                $adminEmail = $_POST['admin_email'] ?? '';
-                $adminPass = $_POST['admin_password'] ?? '';
+        $result = \Nexus\Services\TenantHierarchyService::createTenant($data, 1);
 
-                if ($adminName && $adminEmail && $adminPass) {
-                    $parts = explode(' ', $adminName, 2);
-                    $firstName = $parts[0];
-                    $lastName = $parts[1] ?? '';
+        if ($result['success']) {
+            $tenantId = $result['tenant_id'];
 
-                    $hash = password_hash($adminPass, PASSWORD_DEFAULT);
+            // Create Initial Admin if provided
+            $adminName = $_POST['admin_name'] ?? '';
+            $adminEmail = $_POST['admin_email'] ?? '';
+            $adminPass = $_POST['admin_password'] ?? '';
+
+            if ($adminName && $adminEmail && $adminPass) {
+                $parts = explode(' ', $adminName, 2);
+                $firstName = $parts[0];
+                $lastName = $parts[1] ?? '';
+
+                $hash = password_hash($adminPass, PASSWORD_DEFAULT);
+                try {
                     Database::query(
                         "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?, ?, 'admin', 1)",
                         [$tenantId, trim($firstName . ' ' . $lastName), $firstName, $lastName, $adminEmail, $hash]
                     );
-
-                    // Initialize Default SEO Metadata
-                    Database::query(
-                        "INSERT INTO seo_metadata (tenant_id, entity_type, entity_id, meta_title, meta_description) VALUES (?, 'global', NULL, ?, ?)",
-                        [$tenantId, $name, $tagline ?: $description]
-                    );
+                } catch (\Exception $e) {
+                    error_log("MasterController: Failed to create initial admin for tenant {$tenantId}: " . $e->getMessage());
                 }
-
-                header('Location: /super-admin?msg=tenant_created');
-                if (!defined('TESTING')) { exit; }
-            } catch (\PDOException $e) {
-                echo "Error creating tenant: " . $e->getMessage();
             }
+
+            header('Location: /super-admin?msg=tenant_created');
+            if (!defined('TESTING')) { exit; }
+        } else {
+            echo "Error creating tenant: " . htmlspecialchars($result['error'] ?? 'Unknown error');
         }
     }
 

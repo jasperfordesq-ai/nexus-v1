@@ -64,6 +64,65 @@ class Page
     }
 
     /**
+     * Seed placeholder pages for a new tenant (About, Privacy, Terms).
+     * Idempotent: skips pages whose slug already exists for the tenant.
+     */
+    public static function seedDefaults(int $tenantId): void
+    {
+        $defaults = [
+            [
+                'title'         => 'About',
+                'slug'          => 'about',
+                'content'       => '<p>Welcome to our community. This page can be customised from the admin panel.</p>',
+                'is_published'  => 1,
+                'show_in_menu'  => 1,
+                'menu_location' => 'about',
+            ],
+            [
+                'title'         => 'Privacy Policy',
+                'slug'          => 'privacy',
+                'content'       => '<p>Your privacy is important to us. Please update this page with your community\'s privacy policy.</p>',
+                'is_published'  => 1,
+                'show_in_menu'  => 1,
+                'menu_location' => 'footer',
+            ],
+            [
+                'title'         => 'Terms of Service',
+                'slug'          => 'terms',
+                'content'       => '<p>Please update this page with your community\'s terms of service.</p>',
+                'is_published'  => 1,
+                'show_in_menu'  => 1,
+                'menu_location' => 'footer',
+            ],
+        ];
+
+        $db = Database::getConnection();
+
+        foreach ($defaults as $page) {
+            // Skip if slug already exists for this tenant
+            $exists = $db->prepare("SELECT id FROM pages WHERE tenant_id = ? AND slug = ?");
+            $exists->execute([$tenantId, $page['slug']]);
+            if ($exists->fetch()) {
+                continue;
+            }
+
+            $stmt = $db->prepare(
+                "INSERT INTO pages (tenant_id, title, slug, content, is_published, show_in_menu, menu_location, sort_order, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())"
+            );
+            $stmt->execute([
+                $tenantId,
+                $page['title'],
+                $page['slug'],
+                $page['content'],
+                $page['is_published'],
+                $page['show_in_menu'],
+                $page['menu_location'],
+            ]);
+        }
+    }
+
+    /**
      * Update page settings (slug, publish status, menu settings)
      * @param int $id
      * @param int $tenantId

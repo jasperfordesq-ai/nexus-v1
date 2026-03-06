@@ -181,11 +181,12 @@ class Newsletter
      */
     public static function getRecurringReady()
     {
-        $sql = "SELECT * FROM newsletters
-                WHERE is_recurring = 1
-                AND status IN ('draft', 'sent')
-                AND (recurring_end_date IS NULL OR recurring_end_date >= CURDATE())
-                ORDER BY id ASC";
+        $sql = "SELECT n.* FROM newsletters n
+                INNER JOIN tenants t ON n.tenant_id = t.id AND t.is_active = 1
+                WHERE n.is_recurring = 1
+                AND n.status IN ('draft', 'sent')
+                AND (n.recurring_end_date IS NULL OR n.recurring_end_date >= CURDATE())
+                ORDER BY n.id ASC";
 
         $newsletters = Database::query($sql)->fetchAll();
         $ready = [];

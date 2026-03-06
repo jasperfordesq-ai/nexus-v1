@@ -118,6 +118,16 @@ class Attribute
             ['name' => 'Online Only',           'type' => 'any',    'input' => 'checkbox'],
         ];
 
+        // Check if defaults already exist for this tenant (idempotent)
+        $existing = Database::query(
+            "SELECT COUNT(*) as cnt FROM attributes WHERE tenant_id = ?",
+            [$tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        if ($existing && (int)$existing['cnt'] > 0) {
+            return;
+        }
+
         $sql = "INSERT INTO attributes (tenant_id, name, target_type, input_type) VALUES (?, ?, ?, ?)";
 
         foreach ($defaults as $attr) {

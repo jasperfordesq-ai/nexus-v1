@@ -285,7 +285,8 @@ export function TenantForm() {
                   value={formData.slug}
                   onChange={(e) => {
                     setSlugAutoGen(false);
-                    setFormData({ ...formData, slug: e.target.value });
+                    const sanitized = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                    setFormData({ ...formData, slug: sanitized });
                   }}
                   description={slugAutoGen ? 'Auto-generated from name. Edit to customize.' : 'URL-friendly identifier.'}
                   isRequired
@@ -368,7 +369,7 @@ export function TenantForm() {
                   <Input
                     label="Slug"
                     value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
                     isRequired
                   />
                   <Input

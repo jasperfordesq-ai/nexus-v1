@@ -23,6 +23,11 @@ class Tenant
      */
     public static function create($name, $slug, $domain = null)
     {
+        trigger_error(
+            'Tenant::create() is deprecated — use TenantHierarchyService::createTenant() which seeds all defaults',
+            E_USER_DEPRECATED
+        );
+
         $sql = "INSERT INTO tenants (name, slug, domain, path, depth) VALUES (?, ?, ?, '', 0)";
         Database::query($sql, [$name, $slug, $domain]);
         $tenantId = Database::lastInsertId();

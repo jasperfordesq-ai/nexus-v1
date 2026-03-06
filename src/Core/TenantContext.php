@@ -298,8 +298,11 @@ class TenantContext
 
     /**
      * Set tenant context by ID (for cron jobs, admin areas, etc.)
+     *
+     * @param int $tenantId
+     * @return bool True if tenant was found and set, false otherwise
      */
-    public static function setById($tenantId)
+    public static function setById($tenantId): bool
     {
         $db = Database::getConnection();
         $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
@@ -309,7 +312,11 @@ class TenantContext
         if ($tenant) {
             self::$tenant = $tenant;
             // Keep basePath as-is (empty for admin routes)
+            return true;
         }
+
+        error_log("TenantContext::setById() — tenant ID {$tenantId} not found");
+        return false;
     }
 
     public static function getBasePath()

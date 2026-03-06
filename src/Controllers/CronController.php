@@ -1136,8 +1136,10 @@ class CronController
 
         // Find users who have match notification frequency set to this value
         // and have at least one listing (so we can generate matches for them)
-        $sql = "SELECT DISTINCT u.id, u.name, u.email, mp.notification_frequency
+        // Scoped to active tenants only — deactivated communities should not receive digests
+        $sql = "SELECT DISTINCT u.id, u.name, u.email, u.tenant_id, mp.notification_frequency
                 FROM users u
+                INNER JOIN tenants t ON u.tenant_id = t.id AND t.is_active = 1
                 LEFT JOIN match_preferences mp ON u.id = mp.user_id
                 WHERE u.status = 'active'
                 AND u.id IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')
@@ -1166,6 +1168,9 @@ class CronController
 
         foreach ($users as $user) {
             try {
+                // Set tenant context for this user so notifications use correct branding
+                TenantContext::setById($user['tenant_id']);
+
                 // Get fresh matches for this user (24h daily, 7d weekly, 14d fortnightly)
                 $lookbackHours = match ($frequency) {
                     'daily' => 24,
@@ -1459,7 +1464,7 @@ class CronController
      */
     private function forEachTenant(callable $callback): void
     {
-        $tenants = Database::query("SELECT id, slug FROM tenants")->fetchAll(\PDO::FETCH_ASSOC);
+        $tenants = Database::query("SELECT id, slug FROM tenants WHERE is_active = 1")->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($tenants as $tenant) {
             try {
                 TenantContext::setById($tenant['id']);

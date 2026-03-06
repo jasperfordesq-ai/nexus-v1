@@ -45,40 +45,7 @@ class TenantHierarchyService
             $slug = self::generateSlug($name);
         }
 
-        // Check slug uniqueness
-        $existing = Database::query(
-            "SELECT id FROM tenants WHERE slug = ?",
-            [$slug]
-        )->fetch();
-
-        if ($existing) {
-            return ['success' => false, 'tenant_id' => null, 'error' => 'Slug already exists'];
-        }
-
-        // Check domain uniqueness if provided
         $domain = trim($data['domain'] ?? '') ?: null;
-        if ($domain) {
-            $existingDomain = Database::query(
-                "SELECT id FROM tenants WHERE domain = ?",
-                [$domain]
-            )->fetch();
-
-            if ($existingDomain) {
-                return ['success' => false, 'tenant_id' => null, 'error' => 'Domain already in use'];
-            }
-        }
-
-        // Get parent info
-        $parent = Database::query(
-            "SELECT path, depth FROM tenants WHERE id = ?",
-            [$parentId]
-        )->fetch(\PDO::FETCH_ASSOC);
-
-        if (!$parent) {
-            return ['success' => false, 'tenant_id' => null, 'error' => 'Parent tenant not found'];
-        }
-
-        $newDepth = (int)$parent['depth'] + 1;
 
         // Determine sub-tenant settings
         $allowsSubtenants = (bool)($data['allows_subtenants'] ?? false);
@@ -86,6 +53,42 @@ class TenantHierarchyService
 
         try {
             Database::beginTransaction();
+
+            // Uniqueness checks inside transaction to prevent TOCTOU race
+            $existing = Database::query(
+                "SELECT id FROM tenants WHERE slug = ?",
+                [$slug]
+            )->fetch();
+
+            if ($existing) {
+                Database::rollback();
+                return ['success' => false, 'tenant_id' => null, 'error' => 'Slug already exists'];
+            }
+
+            if ($domain) {
+                $existingDomain = Database::query(
+                    "SELECT id FROM tenants WHERE domain = ?",
+                    [$domain]
+                )->fetch();
+
+                if ($existingDomain) {
+                    Database::rollback();
+                    return ['success' => false, 'tenant_id' => null, 'error' => 'Domain already in use'];
+                }
+            }
+
+            // Re-validate parent inside transaction
+            $parent = Database::query(
+                "SELECT path, depth FROM tenants WHERE id = ?",
+                [$parentId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$parent) {
+                Database::rollback();
+                return ['success' => false, 'tenant_id' => null, 'error' => 'Parent tenant not found'];
+            }
+
+            $newDepth = (int)$parent['depth'] + 1;
 
             // Encode features JSON if provided
             $featuresJson = null;
@@ -157,11 +160,40 @@ class TenantHierarchyService
             );
 
             // Seed all default data for the new tenant
-            \Nexus\Models\Attribute::seedDefaults($tenantId);
-            \Nexus\Models\Category::seedDefaults($tenantId);
-            TenantSettingsService::seedDefaults((int)$tenantId);
-            \Nexus\Models\Menu::seedDefaults((int)$tenantId);
-            SkillTaxonomyService::seedDefaults((int)$tenantId);
+            // Core seeders — tables guaranteed to exist but wrapped for resilience
+            try {
+                \Nexus\Models\Attribute::seedDefaults($tenantId);
+            } catch (\Exception $attrErr) {
+                error_log("TenantHierarchyService: attribute seeding failed for tenant {$tenantId}: " . $attrErr->getMessage());
+            }
+            try {
+                \Nexus\Models\Category::seedDefaults($tenantId);
+            } catch (\Exception $catErr) {
+                error_log("TenantHierarchyService: category seeding failed for tenant {$tenantId}: " . $catErr->getMessage());
+            }
+            try {
+                TenantSettingsService::seedDefaults((int)$tenantId);
+            } catch (\Exception $settErr) {
+                error_log("TenantHierarchyService: settings seeding failed for tenant {$tenantId}: " . $settErr->getMessage());
+            }
+            try {
+                \Nexus\Models\Menu::seedDefaults((int)$tenantId);
+            } catch (\Exception $menuErr) {
+                error_log("TenantHierarchyService: menu seeding failed for tenant {$tenantId}: " . $menuErr->getMessage());
+            }
+            // Skills seeding is non-critical — table may not exist on fresh installs
+            try {
+                SkillTaxonomyService::seedDefaults((int)$tenantId);
+            } catch (\Exception $skillErr) {
+                error_log("TenantHierarchyService: skill seeding skipped for tenant {$tenantId}: " . $skillErr->getMessage());
+            }
+
+            // Pages seeding is non-critical — table may not exist on fresh installs
+            try {
+                \Nexus\Models\Page::seedDefaults((int)$tenantId);
+            } catch (\Exception $pageErr) {
+                error_log("TenantHierarchyService: page seeding skipped for tenant {$tenantId}: " . $pageErr->getMessage());
+            }
 
             // Seed default features if not explicitly provided
             if (empty($data['features'])) {
@@ -174,16 +206,20 @@ class TenantHierarchyService
 
             Database::commit();
 
-            // Audit log
-            SuperAdminAuditService::log(
-                'tenant_created',
-                'tenant',
-                (int)$tenantId,
-                $name,
-                null,
-                ['parent_id' => $parentId, 'slug' => $slug, 'path' => $newPath],
-                "Created tenant '{$name}' under parent ID {$parentId}"
-            );
+            // Audit log (wrapped in try-catch so audit failure doesn't mask success)
+            try {
+                SuperAdminAuditService::log(
+                    'tenant_created',
+                    'tenant',
+                    (int)$tenantId,
+                    $name,
+                    null,
+                    ['parent_id' => $parentId, 'slug' => $slug, 'path' => $newPath],
+                    "Created tenant '{$name}' under parent ID {$parentId}"
+                );
+            } catch (\Exception $auditErr) {
+                error_log("TenantHierarchyService: audit log failed for tenant {$tenantId}: " . $auditErr->getMessage());
+            }
 
             return [
                 'success' => true,
@@ -223,6 +259,9 @@ class TenantHierarchyService
             return ['success' => false, 'error' => 'Tenant not found'];
         }
 
+        try {
+            Database::beginTransaction();
+
         // Build update fields
         $updates = [];
         $params = [];
@@ -233,7 +272,7 @@ class TenantHierarchyService
             $params[] = trim($data['name']);
         }
 
-        // Slug (check uniqueness)
+        // Slug (check uniqueness inside transaction to prevent TOCTOU race)
         if (isset($data['slug']) && trim($data['slug']) !== '' && $data['slug'] !== $tenant['slug']) {
             $existing = Database::query(
                 "SELECT id FROM tenants WHERE slug = ? AND id != ?",
@@ -241,6 +280,7 @@ class TenantHierarchyService
             )->fetch();
 
             if ($existing) {
+                Database::rollback();
                 return ['success' => false, 'error' => 'Slug already exists'];
             }
 
@@ -248,7 +288,7 @@ class TenantHierarchyService
             $params[] = trim($data['slug']);
         }
 
-        // Domain (check uniqueness)
+        // Domain (check uniqueness inside transaction)
         if (array_key_exists('domain', $data)) {
             $domain = trim($data['domain']) ?: null;
             if ($domain && $domain !== $tenant['domain']) {
@@ -258,6 +298,7 @@ class TenantHierarchyService
                 )->fetch();
 
                 if ($existing) {
+                    Database::rollback();
                     return ['success' => false, 'error' => 'Domain already in use'];
                 }
             }
@@ -311,6 +352,7 @@ class TenantHierarchyService
         if (isset($data['is_active'])) {
             // Prevent deactivating Master tenant
             if ($tenantId === 1 && !$data['is_active']) {
+                Database::rollback();
                 return ['success' => false, 'error' => 'Cannot deactivate Master tenant'];
             }
             $updates[] = "is_active = ?";
@@ -340,18 +382,21 @@ class TenantHierarchyService
         }
 
         if (empty($updates)) {
+            Database::commit();
             return ['success' => true, 'error' => null]; // Nothing to update
         }
 
         $params[] = $tenantId;
 
-        try {
-            Database::query(
-                "UPDATE tenants SET " . implode(', ', $updates) . " WHERE id = ?",
-                $params
-            );
+        Database::query(
+            "UPDATE tenants SET " . implode(', ', $updates) . " WHERE id = ?",
+            $params
+        );
 
-            // Audit log
+        Database::commit();
+
+        // Audit log (post-commit, non-critical)
+        try {
             SuperAdminAuditService::log(
                 'tenant_updated',
                 'tenant',
@@ -361,10 +406,14 @@ class TenantHierarchyService
                 $data,
                 "Updated tenant '{$tenant['name']}'"
             );
+        } catch (\Exception $auditErr) {
+            error_log("TenantHierarchyService: audit log failed for tenant {$tenantId}: " . $auditErr->getMessage());
+        }
 
-            return ['success' => true, 'error' => null];
+        return ['success' => true, 'error' => null];
 
         } catch (\Exception $e) {
+            Database::rollback();
             error_log("TenantHierarchyService::updateTenant error for tenant {$tenantId}: " . $e->getMessage());
             $safeMessage = (getenv('APP_ENV') === 'development' || getenv('APP_ENV') === 'local')
                 ? 'Database error: ' . $e->getMessage()
@@ -402,25 +451,14 @@ class TenantHierarchyService
             return ['success' => false, 'error' => "Cannot delete tenant with {$childCount} sub-tenant(s). Delete children first."];
         }
 
+        // Hard delete is not yet implemented — reject explicitly rather than silently soft-deleting
+        if ($hardDelete) {
+            return ['success' => false, 'error' => 'Hard delete is not yet implemented. Use soft delete (deactivate) instead.'];
+        }
+
         try {
-            if ($hardDelete) {
-                // WARNING: This permanently deletes the tenant
-                // All related data (users, listings, etc.) should be handled first
-
-                Database::beginTransaction();
-
-                // Delete related data (be careful here!)
-                // For now, we'll just deactivate instead
-                Database::query("UPDATE tenants SET is_active = 0 WHERE id = ?", [$tenantId]);
-
-                // Uncomment below for actual hard delete (dangerous!)
-                // Database::query("DELETE FROM tenants WHERE id = ?", [$tenantId]);
-
-                Database::commit();
-            } else {
-                // Soft delete (deactivate)
-                Database::query("UPDATE tenants SET is_active = 0 WHERE id = ?", [$tenantId]);
-            }
+            // Soft delete (deactivate)
+            Database::query("UPDATE tenants SET is_active = 0 WHERE id = ?", [$tenantId]);
 
             // Audit log
             $tenant = Database::query("SELECT name FROM tenants WHERE id = ?", [$tenantId])->fetch(\PDO::FETCH_ASSOC);
@@ -430,16 +468,13 @@ class TenantHierarchyService
                 $tenantId,
                 $tenant['name'] ?? 'Unknown',
                 null,
-                ['hard_delete' => $hardDelete],
-                $hardDelete ? "Hard deleted tenant" : "Deactivated tenant"
+                null,
+                "Deactivated tenant '{$tenant['name']}'"
             );
 
             return ['success' => true, 'error' => null];
 
         } catch (\Exception $e) {
-            if ($hardDelete) {
-                Database::rollback();
-            }
             error_log("TenantHierarchyService::deleteTenant error: " . $e->getMessage());
             return ['success' => false, 'error' => 'Database error'];
         }
@@ -465,11 +500,15 @@ class TenantHierarchyService
         }
 
         // Cannot move to self or descendant
-        $tenant = Database::query("SELECT path, depth FROM tenants WHERE id = ?", [$tenantId])->fetch(\PDO::FETCH_ASSOC);
+        $tenant = Database::query("SELECT path, depth, is_active FROM tenants WHERE id = ?", [$tenantId])->fetch(\PDO::FETCH_ASSOC);
         $newParent = Database::query("SELECT path, depth FROM tenants WHERE id = ?", [$newParentId])->fetch(\PDO::FETCH_ASSOC);
 
         if (!$tenant || !$newParent) {
             return ['success' => false, 'error' => 'Tenant not found'];
+        }
+
+        if (!(int)$tenant['is_active']) {
+            return ['success' => false, 'error' => 'Cannot move a deactivated tenant'];
         }
 
         // Check if new parent is a descendant of tenant (would create cycle)
@@ -681,13 +720,22 @@ class TenantHierarchyService
         $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
         $slug = trim($slug, '-');
 
-        // Ensure uniqueness
+        // Fallback if name sanitizes to empty (e.g. "!!!" or non-Latin chars)
+        if ($slug === '') {
+            $slug = 'tenant-' . time();
+        }
+
+        // Ensure uniqueness (capped at 100 attempts to prevent infinite loop)
         $baseSlug = $slug;
         $counter = 1;
 
         while (Database::query("SELECT id FROM tenants WHERE slug = ?", [$slug])->fetch()) {
             $slug = $baseSlug . '-' . $counter;
             $counter++;
+            if ($counter > 100) {
+                $slug = $baseSlug . '-' . bin2hex(random_bytes(4));
+                break;
+            }
         }
 
         return $slug;
