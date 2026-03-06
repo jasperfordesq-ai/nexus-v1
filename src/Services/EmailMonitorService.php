@@ -24,6 +24,8 @@ class EmailMonitorService
     private const METRIC_GMAIL_FAILURE = 'gmail_api_failure';
     private const METRIC_SMTP_SUCCESS = 'smtp_success';
     private const METRIC_SMTP_FAILURE = 'smtp_failure';
+    private const METRIC_SENDGRID_SUCCESS = 'sendgrid_success';
+    private const METRIC_SENDGRID_FAILURE = 'sendgrid_failure';
     private const METRIC_TOKEN_REFRESH = 'token_refresh';
     private const METRIC_TOKEN_REFRESH_FAILURE = 'token_refresh_failure';
     private const METRIC_FALLBACK_TO_SMTP = 'fallback_to_smtp';
@@ -39,6 +41,8 @@ class EmailMonitorService
 
         if ($provider === 'gmail_api') {
             $metric = $success ? self::METRIC_GMAIL_SUCCESS : self::METRIC_GMAIL_FAILURE;
+        } elseif ($provider === 'sendgrid') {
+            $metric = $success ? self::METRIC_SENDGRID_SUCCESS : self::METRIC_SENDGRID_FAILURE;
         } else {
             $metric = $success ? self::METRIC_SMTP_SUCCESS : self::METRIC_SMTP_FAILURE;
         }
@@ -115,6 +119,10 @@ class EmailMonitorService
                 'success' => self::getMetricValue(self::METRIC_SMTP_SUCCESS . "_{$suffix}", $tenantId),
                 'failure' => self::getMetricValue(self::METRIC_SMTP_FAILURE . "_{$suffix}", $tenantId),
             ],
+            'sendgrid' => [
+                'success' => self::getMetricValue(self::METRIC_SENDGRID_SUCCESS . "_{$suffix}", $tenantId),
+                'failure' => self::getMetricValue(self::METRIC_SENDGRID_FAILURE . "_{$suffix}", $tenantId),
+            ],
             'token_refresh' => [
                 'success' => self::getMetricValue(self::METRIC_TOKEN_REFRESH . "_{$suffix}", $tenantId),
                 'failure' => self::getMetricValue(self::METRIC_TOKEN_REFRESH_FAILURE . "_{$suffix}", $tenantId),
@@ -138,6 +146,12 @@ class EmailMonitorService
         $metrics['smtp']['total'] = $smtpTotal;
         $metrics['smtp']['success_rate'] = $smtpTotal > 0
             ? round(($metrics['smtp']['success'] / $smtpTotal) * 100, 2)
+            : 0;
+
+        $sendgridTotal = $metrics['sendgrid']['success'] + $metrics['sendgrid']['failure'];
+        $metrics['sendgrid']['total'] = $sendgridTotal;
+        $metrics['sendgrid']['success_rate'] = $sendgridTotal > 0
+            ? round(($metrics['sendgrid']['success'] / $sendgridTotal) * 100, 2)
             : 0;
 
         $tokenRefreshTotal = $metrics['token_refresh']['success'] + $metrics['token_refresh']['failure'];
@@ -181,6 +195,12 @@ class EmailMonitorService
         if ($hourly['gmail_api']['total'] > 0 && $hourly['gmail_api']['success_rate'] < 90) {
             $status = 'degraded';
             $issues[] = "Gmail API success rate below 90% (hourly): {$hourly['gmail_api']['success_rate']}%";
+        }
+
+        // Check SendGrid health (hourly)
+        if ($hourly['sendgrid']['total'] > 0 && $hourly['sendgrid']['success_rate'] < 90) {
+            $status = 'degraded';
+            $issues[] = "SendGrid success rate below 90% (hourly): {$hourly['sendgrid']['success_rate']}%";
         }
 
         // Check for excessive fallbacks
@@ -254,6 +274,7 @@ class EmailMonitorService
         $metrics = [
             self::METRIC_GMAIL_SUCCESS, self::METRIC_GMAIL_FAILURE,
             self::METRIC_SMTP_SUCCESS, self::METRIC_SMTP_FAILURE,
+            self::METRIC_SENDGRID_SUCCESS, self::METRIC_SENDGRID_FAILURE,
             self::METRIC_TOKEN_REFRESH, self::METRIC_TOKEN_REFRESH_FAILURE,
             self::METRIC_FALLBACK_TO_SMTP, self::METRIC_CIRCUIT_BREAKER_OPEN,
             self::METRIC_RATE_LIMIT_HIT,

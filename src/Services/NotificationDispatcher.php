@@ -117,9 +117,9 @@ class NotificationDispatcher
         // REFACTOR: Let's do a direct lookup approach.
 
         // Check exact match first
-        $sql = "SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = ? AND context_id = ? AND tenant_id = ?";
+        $sql = "SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = ? AND context_id = ?";
         $stmt = $db->prepare($sql);
-        $stmt->execute([$userId, $contextType, $contextId, TenantContext::getId()]);
+        $stmt->execute([$userId, $contextType, $contextId]);
         $row = $stmt->fetch();
         if ($row) return $row['frequency'];
 

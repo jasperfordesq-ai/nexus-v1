@@ -75,7 +75,7 @@ class EventNotificationService
                     $tenantName
                 );
 
-                $mailer = new Mailer();
+                $mailer = Mailer::forCurrentTenant();
                 $mailer->send($organizer['email'], "New RSVP: {$eventTitle} - {$tenantName}", $html);
             }
         } catch (\Throwable $e) {
@@ -168,7 +168,7 @@ class EventNotificationService
                     $tenantName
                 );
 
-                $mailer = new Mailer();
+                $mailer = Mailer::forCurrentTenant();
                 $mailer->send($attendee['email'], "Event Updated: {$eventTitle} - {$tenantName}", $html);
             }
         } catch (\Throwable $e) {

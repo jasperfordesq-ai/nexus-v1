@@ -93,7 +93,7 @@ class FederationEmailService
         );
 
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             return $mailer->send($recipient['email'], $subject, $html);
         } catch (\Throwable $e) {
             error_log("Failed to send federation message notification: " . $e->getMessage());
@@ -167,7 +167,7 @@ class FederationEmailService
         );
 
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             return $mailer->send($recipient['email'], $subject, $html);
         } catch (\Throwable $e) {
             error_log("Failed to send federation transaction notification: " . $e->getMessage());
@@ -243,7 +243,7 @@ class FederationEmailService
         );
 
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             return $mailer->send($sender['email'], $subject, $html);
         } catch (\Throwable $e) {
             error_log("Failed to send federation transaction confirmation: " . $e->getMessage());
@@ -322,7 +322,7 @@ class FederationEmailService
         );
 
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             return $mailer->send($user['email'], $subject, $html);
         } catch (\Throwable $e) {
             error_log("Failed to send federation digest: " . $e->getMessage());
@@ -827,7 +827,7 @@ HTML;
         }
 
         $success = true;
-        $mailer = new Mailer();
+        $mailer = Mailer::forCurrentTenant();
 
         foreach ($admins as $admin) {
             try {

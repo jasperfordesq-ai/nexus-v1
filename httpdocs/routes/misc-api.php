@@ -1149,3 +1149,9 @@ $router->add('GET', '/api/v2/admin/search/zero-results', 'Nexus\Controllers\Api\
 $router->add('GET',  '/api/v2/matches/all',           'Nexus\Controllers\Api\MatchingApiController@allMatches');
 $router->add('POST', '/api/v2/matches/{id}/dismiss', 'Nexus\Controllers\Api\MatchingApiController@dismiss');
 
+// ============================================
+// WEBHOOKS - External Service Callbacks
+// ============================================
+// SendGrid Event Webhook (unauthenticated — verified by signature)
+$router->add('POST', '/api/webhooks/sendgrid/events', 'Nexus\Controllers\Api\SendGridWebhookController@events');
+

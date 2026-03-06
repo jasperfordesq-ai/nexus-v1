@@ -236,6 +236,7 @@ function useAdminNav(): NavSection[] {
         icon: Sparkles,
         items: [
           { label: 'AI Settings', href: '/admin/ai-settings', icon: Brain },
+          { label: 'Email Settings', href: '/admin/email-settings', icon: Mail },
           { label: 'Algorithm Settings', href: '/admin/algorithm-settings', icon: Cpu },
           { label: 'SEO Overview', href: '/admin/seo', icon: Search },
           { label: '404 Tracking', href: '/admin/404-errors', icon: AlertTriangle },

@@ -603,7 +603,7 @@ class RegistrationApiController extends BaseApiController
                 return;
             }
 
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
 
             foreach ($admins as $admin) {
                 $html = EmailTemplate::render(
@@ -687,7 +687,7 @@ class RegistrationApiController extends BaseApiController
                 $siteName
             );
 
-            (new Mailer())->send($email, $subject, $html);
+            (Mailer::forCurrentTenant())->send($email, $subject, $html);
 
         } catch (\Exception $e) {
             // Log but don't fail registration if email fails

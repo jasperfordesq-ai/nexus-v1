@@ -507,7 +507,7 @@ class ConnectionService
                 return;
             }
 
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $frontendUrl = TenantContext::getFrontendUrl();
             $slugPrefix = TenantContext::getSlugPrefix();
             $profileLink = $frontendUrl . $slugPrefix . "/profile/{$requester['id']}";
@@ -539,7 +539,7 @@ class ConnectionService
                 return;
             }
 
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $frontendUrl = TenantContext::getFrontendUrl();
             $slugPrefix = TenantContext::getSlugPrefix();
             $profileLink = $frontendUrl . $slugPrefix . "/profile/{$receiver['id']}";

@@ -22,7 +22,7 @@ class DigestService
             "SELECT id, name FROM tenants WHERE is_active = 1"
         )->fetchAll();
 
-        $mailer = new Mailer();
+        $mailer = Mailer::forCurrentTenant();
         $totalCount = 0;
 
         foreach ($tenants as $tenant) {

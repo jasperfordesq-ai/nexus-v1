@@ -355,7 +355,7 @@ class NewsletterService
         $tenantName = $tenant['name'] ?? 'Project NEXUS';
 
         // Initialize the unified Mailer (handles both SMTP and Gmail API automatically)
-        $mailer = new Mailer();
+        $mailer = Mailer::forCurrentTenant();
 
         $pending = Newsletter::getQueuePending($newsletterId, $batchSize);
 

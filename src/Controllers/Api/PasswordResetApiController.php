@@ -272,7 +272,7 @@ class PasswordResetApiController extends BaseApiController
 
         // Send reset email
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
             $html = EmailTemplate::render(
