@@ -26,7 +26,7 @@
       "bash -c 'cd react-frontend && npx tsc --noEmit'"
     ],
     "src/**/*.php": [
-      "bash -c 'for f in \"$@\"; do php -l \"$f\" || exit 1; done' _"
+      "bash -c 'for f in \"$@\"; do rel=$(echo \"$f\" | sed \"s|.*/src/|src/|\"); docker exec nexus-php-app php -l \"$rel\" || exit 1; done' _"
     ]
   },
   "dependencies": {

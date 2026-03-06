@@ -222,6 +222,14 @@ class TenantHierarchyService
 
             Database::commit();
 
+            // Clear tenant list cache so the new tenant appears immediately
+            try {
+                RedisCache::delete('tenants_list_public');
+                RedisCache::delete('tenants_list_public_all');
+            } catch (\Exception $cacheErr) {
+                error_log("TenantHierarchyService: cache clear failed for tenant {$tenantId}: " . $cacheErr->getMessage());
+            }
+
             // Audit log (wrapped in try-catch so audit failure doesn't mask success)
             try {
                 SuperAdminAuditService::log(
