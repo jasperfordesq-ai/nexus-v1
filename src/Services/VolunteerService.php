@@ -451,6 +451,12 @@ class VolunteerService
             return null;
         }
 
+        // Cap message length
+        if (!empty($data['message']) && strlen($data['message']) > 1000) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Application message must be 1000 characters or fewer', 'field' => 'message'];
+            return null;
+        }
+
         // Validate shift if provided
         $shiftId = $data['shift_id'] ?? null;
         if ($shiftId) {
@@ -1049,6 +1055,31 @@ class VolunteerService
                 error_log("QR token generation failed: " . $e->getMessage());
             }
 
+            // Notify org owner
+            try {
+                $ownerStmt = $db->prepare("SELECT org.user_id as org_owner_id, opp.title FROM vol_opportunities opp JOIN vol_organizations org ON opp.organization_id = org.id WHERE opp.id = ? AND opp.tenant_id = ?");
+                $ownerStmt->execute([$opportunityId, TenantContext::getId()]);
+                $oppInfo = $ownerStmt->fetch(\PDO::FETCH_ASSOC);
+                if ($oppInfo && (int)$oppInfo['org_owner_id'] !== $userId) {
+                    $volunteer = \Nexus\Models\User::findById($userId);
+                    $volunteerName = $volunteer ? trim(($volunteer['first_name'] ?? '') . ' ' . ($volunteer['last_name'] ?? '')) : 'A volunteer';
+                    $shiftDate = date('D j M', strtotime($shift['start_time']));
+                    $content = "{$volunteerName} signed up for a shift on {$shiftDate}: {$oppInfo['title']}";
+                    NotificationDispatcher::dispatch(
+                        (int)$oppInfo['org_owner_id'],
+                        'volunteering',
+                        $opportunityId,
+                        'vol_shift_signup',
+                        $content,
+                        '/volunteering/opportunities/' . $opportunityId . '/applications',
+                        "<p>{$content}</p>",
+                        true
+                    );
+                }
+            } catch (\Throwable $e) {
+                // Silent fail
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::signUpForShift error: " . $e->getMessage());
@@ -1096,6 +1127,31 @@ class VolunteerService
                 ShiftWaitlistService::processSpotOpening($shiftId);
             } catch (\Throwable $e) {
                 error_log("Waitlist processing failed after cancellation: " . $e->getMessage());
+            }
+
+            // Notify org owner
+            try {
+                $ownerStmt = $db->prepare("SELECT org.user_id as org_owner_id, opp.title, opp.id as opportunity_id FROM vol_opportunities opp JOIN vol_organizations org ON opp.organization_id = org.id WHERE opp.id = ? AND opp.tenant_id = ?");
+                $ownerStmt->execute([$shift['opportunity_id'], TenantContext::getId()]);
+                $oppInfo = $ownerStmt->fetch(\PDO::FETCH_ASSOC);
+                if ($oppInfo && (int)$oppInfo['org_owner_id'] !== $userId) {
+                    $volunteer = \Nexus\Models\User::findById($userId);
+                    $volunteerName = $volunteer ? trim(($volunteer['first_name'] ?? '') . ' ' . ($volunteer['last_name'] ?? '')) : 'A volunteer';
+                    $shiftDate = date('D j M', strtotime($shift['start_time']));
+                    $content = "{$volunteerName} cancelled their shift on {$shiftDate}: {$oppInfo['title']}";
+                    NotificationDispatcher::dispatch(
+                        (int)$oppInfo['org_owner_id'],
+                        'volunteering',
+                        (int)$oppInfo['opportunity_id'],
+                        'vol_shift_cancelled',
+                        $content,
+                        '/volunteering/opportunities/' . $oppInfo['opportunity_id'] . '/applications',
+                        "<p>{$content}</p>",
+                        true
+                    );
+                }
+            } catch (\Throwable $e) {
+                // Silent fail
             }
 
             return true;
@@ -1165,6 +1221,17 @@ class VolunteerService
         if (!$org) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
             return null;
+        }
+
+        // If opportunity_id provided, verify user has an approved application for it
+        if (!empty($data['opportunity_id'])) {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("SELECT id FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?");
+            $stmt->execute([$data['opportunity_id'], $userId, TenantContext::getId()]);
+            if (!$stmt->fetch()) {
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have an approved application for this opportunity', 'field' => 'opportunity_id'];
+                return null;
+            }
         }
 
         try {
@@ -1328,6 +1395,24 @@ class VolunteerService
                 } catch (\Throwable $e) {
                     // Silent fail
                 }
+            }
+
+            // Notify volunteer
+            try {
+                $statusLabel = $status === 'approved' ? 'approved' : 'declined';
+                $hoursLabel = number_format((float)$log['hours'], 1);
+                $content = "Your {$hoursLabel} volunteering hours at {$org['name']} have been {$statusLabel}.";
+                NotificationDispatcher::dispatch(
+                    (int)$log['user_id'],
+                    'volunteering',
+                    $logId,
+                    'vol_hours_' . $statusLabel,
+                    $content,
+                    '/volunteering/hours',
+                    "<p>{$content}</p>"
+                );
+            } catch (\Throwable $e) {
+                // Silent fail
             }
 
             return true;
@@ -1620,16 +1705,44 @@ class VolunteerService
         }
 
         // Verify target exists
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
         if ($targetType === 'organization') {
             $org = VolOrganization::find($targetId);
             if (!$org) {
                 self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
                 return null;
             }
+            // Reviewer must have a verified hour log or approved application for this org
+            $historyStmt = $db->prepare("
+                SELECT 1 FROM vol_logs WHERE user_id = ? AND organization_id = ? AND status = 'approved' AND tenant_id = ?
+                UNION
+                SELECT 1 FROM vol_applications a
+                JOIN vol_opportunities opp ON a.opportunity_id = opp.id
+                WHERE a.user_id = ? AND opp.organization_id = ? AND a.status = 'approved' AND a.tenant_id = ?
+                LIMIT 1
+            ");
+            $historyStmt->execute([$reviewerId, $targetId, $tenantId, $reviewerId, $targetId, $tenantId]);
+            if (!$historyStmt->fetch()) {
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered with this organisation to leave a review'];
+                return null;
+            }
         } else {
             $user = \Nexus\Models\User::findById($targetId);
             if (!$user) {
                 self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+                return null;
+            }
+            // Reviewer must have co-volunteered — shared approved application at same org
+            $historyStmt = $db->prepare("
+                SELECT 1 FROM vol_applications a1
+                JOIN vol_applications a2 ON a1.opportunity_id = a2.opportunity_id
+                WHERE a1.user_id = ? AND a2.user_id = ? AND a1.status = 'approved' AND a2.status = 'approved' AND a1.tenant_id = ?
+                LIMIT 1
+            ");
+            $historyStmt->execute([$reviewerId, $targetId, $tenantId]);
+            if (!$historyStmt->fetch()) {
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered together to leave a review'];
                 return null;
             }
         }
