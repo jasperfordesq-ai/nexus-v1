@@ -189,5 +189,10 @@
     "fallback_name": "Mitglied",
     "load_failed": "Mitglieder konnten nicht geladen werden",
     "load_more_failed": "Weitere Mitglieder konnten nicht geladen werden"
+  },
+  "update_banner": {
+    "message": "Eine neue Version ist verfügbar.",
+    "update_now": "Jetzt aktualisieren",
+    "dismiss": "Aktualisierungsbenachrichtigung schließen"
   }
 }

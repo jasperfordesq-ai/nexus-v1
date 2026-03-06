@@ -12,14 +12,23 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, X } from 'lucide-react';
 import { Button } from '@heroui/react';
 
 export function UpdateAvailableBanner() {
+  const { t } = useTranslation('common');
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
+    // Fix race condition: if onNeedRefresh fired before React mounted,
+    // the custom event was missed. Check the global flag set by main.tsx.
+    if ((window as any).__nexus_updatePending) {
+      setShowBanner(true);
+      (window as any).__nexus_updatePending = false;
+    }
+
     function handleUpdateAvailable() {
       setShowBanner(true);
     }
@@ -48,26 +57,27 @@ export function UpdateAvailableBanner() {
     <AnimatePresence>
       {showBanner && (
         <motion.div
-          initial={{ y: -60, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -60, opacity: 0 }}
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed top-0 left-0 right-0 z-[70] pointer-events-none"
+          className="fixed top-0 left-0 right-0 z-[70] overflow-hidden"
+          role="status"
         >
-          <div className="bg-indigo-600 text-white text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-3 pointer-events-auto">
+          <div className="bg-indigo-600 text-white text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-3">
             <RefreshCw className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span>A new version is available.</span>
+            <span>{t('update_banner.message')}</span>
             <Button
               size="sm"
               className="bg-white text-indigo-700 font-semibold min-w-0 h-7 px-3"
               onPress={handleUpdate}
             >
-              Update now
+              {t('update_banner.update_now')}
             </Button>
             <button
               onClick={handleDismiss}
               className="ml-1 p-1 rounded hover:bg-indigo-500 transition-colors"
-              aria-label="Dismiss update notification"
+              aria-label={t('update_banner.dismiss')}
             >
               <X className="w-4 h-4" />
             </button>

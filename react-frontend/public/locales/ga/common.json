@@ -189,5 +189,10 @@
     "fallback_name": "Ball",
     "load_failed": "Theip ar luchtú ball",
     "load_more_failed": "Theip ar luchtú tuilleadh ball"
+  },
+  "update_banner": {
+    "message": "Tá leagan nua ar fáil.",
+    "update_now": "Nuashonraigh anois",
+    "dismiss": "Díbir fógra nuashonraithe"
   }
 }

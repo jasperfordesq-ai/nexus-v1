@@ -140,6 +140,9 @@ export function AuthLayout() {
       {/* Development status banner */}
       <DevelopmentStatusBanner />
 
+      {/* Service worker update banner — user-controlled, never auto-reloads */}
+      <UpdateAvailableBanner />
+
       {/* Language switcher — top-right on auth pages */}
       <div className="absolute top-4 right-4 z-20">
         <LanguageSwitcher />

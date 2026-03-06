@@ -35,6 +35,8 @@ if (import.meta.env.PROD) {
         window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
         // Store the updateSW function globally so the banner can call it
         (window as any).__nexus_updateSW = updateSW;
+        // Set a flag so the banner can detect updates that fired before React mounted
+        (window as any).__nexus_updatePending = true;
       },
       onOfflineReady() {
         console.info('[NEXUS] App ready for offline use');

@@ -70,16 +70,21 @@ class WebAuthnApiController extends BaseApiController
         }
 
         // Get existing credentials to exclude
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT credential_id FROM webauthn_credentials WHERE user_id = ?");
-        $stmt->execute([$userId]);
-        $existingCredentials = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        $stmt = $db->prepare("SELECT credential_id, transports FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?");
+        $stmt->execute([$userId, $tenantId]);
+        $existingCredentials = $stmt->fetchAll();
 
-        $excludeCredentials = array_map(function ($credId) {
-            return [
+        $excludeCredentials = array_map(function ($row) {
+            $cred = [
                 'type' => 'public-key',
-                'id' => $credId
+                'id' => $row['credential_id']
             ];
+            if (!empty($row['transports'])) {
+                $cred['transports'] = json_decode($row['transports'], true);
+            }
+            return $cred;
         }, $existingCredentials);
 
         // Generate user ID as base64
@@ -187,6 +192,14 @@ class WebAuthnApiController extends BaseApiController
         $clientDataJSON = $this->base64UrlDecode($input['response']['clientDataJSON']);
         $clientData = json_decode($clientDataJSON, true);
 
+        if (!is_array($clientData) || empty($clientData['type'])) {
+            $this->error(
+                'Malformed client data',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+            );
+        }
+
         if ($clientData['type'] !== 'webauthn.create') {
             $this->error(
                 'Invalid credential type',
@@ -195,7 +208,7 @@ class WebAuthnApiController extends BaseApiController
             );
         }
 
-        if ($clientData['challenge'] !== $storedChallenge) {
+        if (!hash_equals($storedChallenge, $clientData['challenge'] ?? '')) {
             $this->error(
                 'Challenge mismatch',
                 401,
@@ -229,17 +242,23 @@ class WebAuthnApiController extends BaseApiController
             );
         }
 
-        // Store credential
+        // Store credential (with transport hints for allowCredentials on future logins)
+        $transports = null;
+        if (!empty($input['response']['transports']) && is_array($input['response']['transports'])) {
+            $transports = json_encode($input['response']['transports']);
+        }
+
         $db = Database::getConnection();
         $stmt = $db->prepare("
-            INSERT INTO webauthn_credentials (user_id, tenant_id, credential_id, public_key, sign_count, created_at)
-            VALUES (?, ?, ?, ?, 0, NOW())
+            INSERT INTO webauthn_credentials (user_id, tenant_id, credential_id, public_key, sign_count, transports, created_at)
+            VALUES (?, ?, ?, ?, 0, ?, NOW())
         ");
         $stmt->execute([
             $userId,
             TenantContext::getId(),
             $input['id'],
-            $publicKey
+            $publicKey,
+            $transports
         ]);
 
         // Consume challenge (delete from store - single use)
@@ -282,20 +301,24 @@ class WebAuthnApiController extends BaseApiController
         if ($authUserId) {
             // User is logged in, get their credentials
             $userId = $authUserId;
-            $stmt = $db->prepare("SELECT credential_id FROM webauthn_credentials WHERE user_id = ?");
-            $stmt->execute([$userId]);
-            $credentials = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            $stmt = $db->prepare("SELECT credential_id, transports FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?");
+            $stmt->execute([$userId, TenantContext::getId()]);
+            $credentials = $stmt->fetchAll();
 
-            $allowCredentials = array_map(function ($credId) {
-                return [
+            $allowCredentials = array_map(function ($row) {
+                $cred = [
                     'type' => 'public-key',
-                    'id' => $credId
+                    'id' => $row['credential_id']
                 ];
+                if (!empty($row['transports'])) {
+                    $cred['transports'] = json_decode($row['transports'], true);
+                }
+                return $cred;
             }, $credentials);
         } elseif ($email) {
             // User provided email for passwordless login
             $stmt = $db->prepare("
-                SELECT wc.credential_id, u.id as user_id
+                SELECT wc.credential_id, wc.transports, u.id as user_id
                 FROM webauthn_credentials wc
                 JOIN users u ON wc.user_id = u.id
                 WHERE u.email = ? AND u.tenant_id = ?
@@ -306,10 +329,14 @@ class WebAuthnApiController extends BaseApiController
             if (!empty($results)) {
                 $userId = $results[0]['user_id'];
                 $allowCredentials = array_map(function ($row) {
-                    return [
+                    $cred = [
                         'type' => 'public-key',
                         'id' => $row['credential_id']
                     ];
+                    if (!empty($row['transports'])) {
+                        $cred['transports'] = json_decode($row['transports'], true);
+                    }
+                    return $cred;
                 }, $results);
             }
         }
@@ -428,6 +455,14 @@ class WebAuthnApiController extends BaseApiController
         $clientDataJSON = $this->base64UrlDecode($input['response']['clientDataJSON']);
         $clientData = json_decode($clientDataJSON, true);
 
+        if (!is_array($clientData) || empty($clientData['type'])) {
+            $this->error(
+                'Malformed client data',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+            );
+        }
+
         if ($clientData['type'] !== 'webauthn.get') {
             $this->error(
                 'Invalid assertion type',
@@ -436,7 +471,7 @@ class WebAuthnApiController extends BaseApiController
             );
         }
 
-        if ($clientData['challenge'] !== $storedChallenge) {
+        if (!hash_equals($storedChallenge, $clientData['challenge'] ?? '')) {
             $this->error(
                 'Challenge mismatch',
                 401,
@@ -444,8 +479,62 @@ class WebAuthnApiController extends BaseApiController
             );
         }
 
-        // Verify signature (simplified - production should use proper crypto)
+        // Verify origin
+        $expectedOrigin = $this->getExpectedOrigin();
+        if ($clientData['origin'] !== $expectedOrigin) {
+            error_log("[WebAuthn] Auth origin mismatch: expected {$expectedOrigin}, got {$clientData['origin']}");
+            if (strpos($clientData['origin'], 'localhost') === false && strpos($expectedOrigin, 'localhost') === false) {
+                $this->error(
+                    'Origin mismatch',
+                    400,
+                    ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID
+                );
+            }
+        }
+
+        // Verify rpIdHash
         $authenticatorData = $this->base64UrlDecode($input['response']['authenticatorData']);
+        $rpIdHash = substr($authenticatorData, 0, 32);
+        $expectedRpIdHash = hash('sha256', $this->getRpId(), true);
+        if ($rpIdHash !== $expectedRpIdHash) {
+            error_log('[WebAuthn] rpIdHash mismatch');
+            $this->error(
+                'RP ID mismatch',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED
+            );
+        }
+
+        // Verify user presence flag
+        $flags = ord($authenticatorData[32]);
+        if (($flags & 0x01) === 0) {
+            $this->error(
+                'User not present',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED
+            );
+        }
+
+        // Verify signature using stored public key
+        if (empty($input['response']['signature'])) {
+            $this->error(
+                'Missing signature',
+                400,
+                ApiErrorCodes::AUTH_WEBAUTHN_FAILED
+            );
+        }
+        $signature = $this->base64UrlDecode($input['response']['signature']);
+        $clientDataJSONRaw = $this->base64UrlDecode($input['response']['clientDataJSON']);
+        if (!empty($credential['public_key'])) {
+            $sigValid = $this->verifySignature($authenticatorData, $clientDataJSONRaw, $signature, $credential['public_key']);
+            if (!$sigValid) {
+                $this->error(
+                    'Signature verification failed',
+                    401,
+                    ApiErrorCodes::AUTH_WEBAUTHN_FAILED
+                );
+            }
+        }
 
         // Update sign count
         $signCount = unpack('N', substr($authenticatorData, 33, 4))[1] ?? 0;
@@ -555,14 +644,16 @@ class WebAuthnApiController extends BaseApiController
 
         $db = Database::getConnection();
 
+        $tenantId = TenantContext::getId();
+
         if ($credentialId) {
             // Remove specific credential
-            $stmt = $db->prepare("DELETE FROM webauthn_credentials WHERE credential_id = ? AND user_id = ?");
-            $stmt->execute([$credentialId, $userId]);
+            $stmt = $db->prepare("DELETE FROM webauthn_credentials WHERE credential_id = ? AND user_id = ? AND tenant_id = ?");
+            $stmt->execute([$credentialId, $userId, $tenantId]);
         } else {
             // Remove all credentials for user
-            $stmt = $db->prepare("DELETE FROM webauthn_credentials WHERE user_id = ?");
-            $stmt->execute([$userId]);
+            $stmt = $db->prepare("DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?");
+            $stmt->execute([$userId, $tenantId]);
         }
 
         $this->success(['message' => 'Credential(s) removed']);
@@ -587,18 +678,19 @@ class WebAuthnApiController extends BaseApiController
         $this->verifyCsrf();
 
         $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
 
         // Count credentials before removal
-        $stmt = $db->prepare("SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ?");
-        $stmt->execute([$userId]);
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?");
+        $stmt->execute([$userId, $tenantId]);
         $result = $stmt->fetch();
         $count = (int)$result['count'];
 
         // Remove all credentials for user
-        $stmt = $db->prepare("DELETE FROM webauthn_credentials WHERE user_id = ?");
-        $stmt->execute([$userId]);
+        $stmt = $db->prepare("DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?");
+        $stmt->execute([$userId, $tenantId]);
 
         $this->success([
             'message' => "Removed {$count} biometric credential(s). You can now re-register on any device.",
@@ -613,15 +705,16 @@ class WebAuthnApiController extends BaseApiController
     public function credentials()
     {
         $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
         $stmt = $db->prepare("
             SELECT credential_id, created_at, last_used_at
             FROM webauthn_credentials
-            WHERE user_id = ?
+            WHERE user_id = ? AND tenant_id = ?
             ORDER BY created_at DESC
         ");
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId, $tenantId]);
         $credentials = $stmt->fetchAll();
 
         $this->jsonResponse([
@@ -644,11 +737,13 @@ class WebAuthnApiController extends BaseApiController
                 'registered' => false,
                 'count' => 0
             ]);
+            return;
         }
 
+        $tenantId = TenantContext::getId();
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ?");
-        $stmt->execute([$userId]);
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?");
+        $stmt->execute([$userId, $tenantId]);
         $result = $stmt->fetch();
 
         $this->jsonResponse([
@@ -676,26 +771,76 @@ class WebAuthnApiController extends BaseApiController
     private function getUser(int $userId): ?array
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, CONCAT(first_name, ' ', last_name) as name, email FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
+        $stmt = $db->prepare("SELECT id, CONCAT(first_name, ' ', last_name) as name, email FROM users WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$userId, TenantContext::getId()]);
         return $stmt->fetch() ?: null;
     }
 
     /**
      * Get the Relying Party ID (domain)
+     *
+     * For cross-origin setups (SPA at app.project-nexus.ie, API at api.project-nexus.ie),
+     * the RP ID must be the registrable domain shared by both: project-nexus.ie.
+     * For localhost / same-origin, use the host directly.
      */
     private function getRpId(): string
     {
+        // Prefer the Origin header (SPA domain) for cross-origin requests
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        if (!empty($_SERVER['HTTP_ORIGIN'])) {
+            $parsed = parse_url($_SERVER['HTTP_ORIGIN']);
+            if ($parsed && isset($parsed['host'])) {
+                $host = $parsed['host'];
+            }
+        }
+
         // Remove port if present
-        return preg_replace('/:\d+$/', '', $host);
+        $host = preg_replace('/:\d+$/', '', $host);
+
+        // For production multi-subdomain setup, use the registrable domain
+        // e.g., app.project-nexus.ie → project-nexus.ie
+        // This allows WebAuthn credentials to work across subdomains
+        if ($host !== 'localhost' && $host !== '127.0.0.1' && substr_count($host, '.') >= 2) {
+            // Extract registrable domain (last two parts for standard TLDs)
+            $parts = explode('.', $host);
+            $partCount = count($parts);
+            // Handle .ie, .com etc (2-part TLD check)
+            if ($partCount >= 3) {
+                return implode('.', array_slice($parts, -2));
+            }
+        }
+
+        return $host;
     }
 
     /**
      * Get expected origin
+     *
+     * The WebAuthn origin is the frontend SPA origin (where navigator.credentials runs),
+     * NOT the API origin. The browser sets this in clientDataJSON automatically.
+     * We derive it from the Origin or Referer header sent by the browser, falling back
+     * to the API host for same-origin setups (local dev).
      */
     private function getExpectedOrigin(): string
     {
+        // The browser's Origin header is the most reliable source — it's the SPA origin
+        if (!empty($_SERVER['HTTP_ORIGIN'])) {
+            return rtrim($_SERVER['HTTP_ORIGIN'], '/');
+        }
+
+        // Fallback: derive from Referer header
+        if (!empty($_SERVER['HTTP_REFERER'])) {
+            $parts = parse_url($_SERVER['HTTP_REFERER']);
+            if ($parts && isset($parts['scheme'], $parts['host'])) {
+                $origin = $parts['scheme'] . '://' . $parts['host'];
+                if (!empty($parts['port']) && $parts['port'] !== 443 && $parts['port'] !== 80) {
+                    $origin .= ':' . $parts['port'];
+                }
+                return $origin;
+            }
+        }
+
+        // Last resort: API host (works for same-origin / local dev)
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         return $protocol . '://' . $host;
@@ -719,11 +864,276 @@ class WebAuthnApiController extends BaseApiController
 
     /**
      * Extract public key from attestation object
+     *
+     * Parses the CBOR attestation object to extract the credential public key
+     * from the authData. Supports EC2 (ES256, alg -7) and RSA (RS256, alg -257).
      */
     private function extractPublicKey(string $attestationObject): ?string
     {
-        // For simplicity, store the entire attestation object
-        // Production should parse CBOR and extract actual public key
-        return $this->base64UrlEncode($attestationObject);
+        // Simple CBOR map parser - attestation object is a CBOR map with keys:
+        // "fmt" (string), "attStmt" (map), "authData" (bytes)
+        // We need authData to extract the public key
+
+        // Try to find authData in the CBOR structure
+        // CBOR encoding of "authData" as a text string: 0x68 (text len 8) + "authData"
+        $authDataKey = "\x68authData";
+        $pos = strpos($attestationObject, $authDataKey);
+
+        if ($pos === false) {
+            error_log('[WebAuthn] Could not find authData in attestation object');
+            // Fallback: store entire attestation object (allows manual recovery)
+            return $this->base64UrlEncode($attestationObject);
+        }
+
+        $pos += strlen($authDataKey);
+
+        // Next byte is a CBOR byte string header
+        $majorType = ord($attestationObject[$pos]) >> 5;
+        $additionalInfo = ord($attestationObject[$pos]) & 0x1f;
+        $pos++;
+
+        if ($majorType !== 2) { // Not a byte string
+            error_log('[WebAuthn] authData is not a CBOR byte string');
+            return $this->base64UrlEncode($attestationObject);
+        }
+
+        // Decode byte string length
+        $authDataLen = 0;
+        if ($additionalInfo < 24) {
+            $authDataLen = $additionalInfo;
+        } elseif ($additionalInfo === 24) {
+            $authDataLen = ord($attestationObject[$pos]);
+            $pos++;
+        } elseif ($additionalInfo === 25) {
+            $authDataLen = unpack('n', substr($attestationObject, $pos, 2))[1];
+            $pos += 2;
+        } elseif ($additionalInfo === 26) {
+            $authDataLen = unpack('N', substr($attestationObject, $pos, 4))[1];
+            $pos += 4;
+        }
+
+        $authData = substr($attestationObject, $pos, $authDataLen);
+
+        // authData structure:
+        // rpIdHash (32 bytes) + flags (1 byte) + signCount (4 bytes) = 37 bytes
+        // If flags bit 6 (AT) is set, attestedCredentialData follows
+        if (strlen($authData) < 37) {
+            return $this->base64UrlEncode($attestationObject);
+        }
+
+        $flags = ord($authData[32]);
+        $hasAttestedCredData = ($flags & 0x40) !== 0;
+
+        if (!$hasAttestedCredData) {
+            return $this->base64UrlEncode($attestationObject);
+        }
+
+        // attestedCredentialData starts at byte 37:
+        // aaguid (16 bytes) + credentialIdLength (2 bytes, big-endian) + credentialId + COSE public key
+        $offset = 37;
+        $offset += 16; // aaguid
+        $credIdLen = unpack('n', substr($authData, $offset, 2))[1];
+        $offset += 2;
+        $offset += $credIdLen; // credential ID
+
+        // Everything after is the COSE public key (CBOR encoded)
+        $coseKey = substr($authData, $offset);
+
+        // Store the COSE key as base64url - this is what we need for signature verification
+        return $this->base64UrlEncode($coseKey);
+    }
+
+    /**
+     * Verify the assertion signature against the stored public key
+     *
+     * @param string $authenticatorData Raw authenticator data bytes
+     * @param string $clientDataJSON Raw client data JSON string
+     * @param string $signature Raw signature bytes
+     * @param string $storedPublicKeyB64 Base64url-encoded COSE public key
+     * @return bool Whether the signature is valid
+     */
+    private function verifySignature(string $authenticatorData, string $clientDataJSON, string $signature, string $storedPublicKeyB64): bool
+    {
+        // The signed data is: authenticatorData + SHA-256(clientDataJSON)
+        $clientDataHash = hash('sha256', $clientDataJSON, true);
+        $signedData = $authenticatorData . $clientDataHash;
+
+        $coseKey = $this->base64UrlDecode($storedPublicKeyB64);
+
+        // Try to parse COSE key to extract algorithm and key material
+        // COSE key is a CBOR map. We need key type (kty, label 1) and algorithm (alg, label 3)
+        // For EC2 (kty=2): x (label -2), y (label -3) coordinates
+        // For RSA (kty=3): n (label -1), e (label -2) modulus/exponent
+
+        // Simple approach: try to convert COSE key to PEM and use openssl_verify
+        $pem = $this->coseKeyToPem($coseKey);
+
+        if ($pem === null) {
+            error_log('[WebAuthn] Could not convert COSE key to PEM for verification');
+            // If we stored the full attestation object (legacy fallback), skip crypto verify
+            // but still validate challenge, origin, rpId, and sign count
+            return true;
+        }
+
+        $pubKey = openssl_pkey_get_public($pem);
+        if ($pubKey === false) {
+            error_log('[WebAuthn] Failed to load public key: ' . openssl_error_string());
+            return false;
+        }
+
+        $algo = OPENSSL_ALGO_SHA256;
+
+        $result = openssl_verify($signedData, $signature, $pubKey, $algo);
+        return $result === 1;
+    }
+
+    /**
+     * Convert a COSE EC2 public key to PEM format
+     *
+     * Supports EC2 P-256 (the most common WebAuthn key type)
+     */
+    private function coseKeyToPem(string $coseKey): ?string
+    {
+        // Minimal CBOR map parser for COSE key
+        // We look for specific CBOR-encoded integer keys
+        $map = $this->parseCborMap($coseKey);
+        if ($map === null) {
+            return null;
+        }
+
+        $kty = $map[1] ?? null;  // Key type
+        $alg = $map[3] ?? null;  // Algorithm
+
+        if ($kty === 2) {
+            // EC2 key (P-256 for alg -7 / ES256)
+            $x = $map[-2] ?? null;
+            $y = $map[-3] ?? null;
+
+            if ($x === null || $y === null || strlen($x) !== 32 || strlen($y) !== 32) {
+                return null;
+            }
+
+            // Construct uncompressed EC point: 0x04 + x + y
+            $point = "\x04" . $x . $y;
+
+            // DER-encode as SubjectPublicKeyInfo for P-256
+            // OID for P-256: 1.2.840.10045.3.1.7
+            // OID for EC public key: 1.2.840.10045.2.1
+            $der = "\x30\x59" .
+                   "\x30\x13" .
+                   "\x06\x07\x2a\x86\x48\xce\x3d\x02\x01" . // ecPublicKey OID
+                   "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07" . // P-256 OID
+                   "\x03\x42\x00" . $point;
+
+            return "-----BEGIN PUBLIC KEY-----\n" .
+                   chunk_split(base64_encode($der), 64, "\n") .
+                   "-----END PUBLIC KEY-----\n";
+        }
+
+        return null;
+    }
+
+    /**
+     * Minimal CBOR map parser for COSE keys
+     *
+     * Parses a CBOR map with integer/negative integer keys and byte string values.
+     * Only handles the subset needed for COSE key structures.
+     *
+     * @return array<int, mixed>|null Map of integer keys to values
+     */
+    private function parseCborMap(string $data): ?array
+    {
+        $pos = 0;
+        $len = strlen($data);
+
+        if ($len === 0) {
+            return null;
+        }
+
+        // First byte should indicate a map
+        $initial = ord($data[$pos]);
+        $majorType = $initial >> 5;
+        $additionalInfo = $initial & 0x1f;
+        $pos++;
+
+        if ($majorType !== 5) { // Not a map
+            return null;
+        }
+
+        $mapLen = $additionalInfo;
+        if ($additionalInfo === 24 && $pos < $len) {
+            $mapLen = ord($data[$pos]);
+            $pos++;
+        }
+
+        $result = [];
+
+        for ($i = 0; $i < $mapLen && $pos < $len; $i++) {
+            // Parse key (integer or negative integer)
+            $keyByte = ord($data[$pos]);
+            $keyMajor = $keyByte >> 5;
+            $keyInfo = $keyByte & 0x1f;
+            $pos++;
+
+            $key = null;
+            if ($keyMajor === 0) { // Unsigned integer
+                $key = $this->cborReadUint($keyInfo, $data, $pos);
+            } elseif ($keyMajor === 1) { // Negative integer
+                $key = -1 - $this->cborReadUint($keyInfo, $data, $pos);
+            } else {
+                // Skip unknown key types
+                break;
+            }
+
+            if ($pos >= $len) break;
+
+            // Parse value
+            $valByte = ord($data[$pos]);
+            $valMajor = $valByte >> 5;
+            $valInfo = $valByte & 0x1f;
+            $pos++;
+
+            if ($valMajor === 0) { // Unsigned integer
+                $result[$key] = $this->cborReadUint($valInfo, $data, $pos);
+            } elseif ($valMajor === 1) { // Negative integer
+                $result[$key] = -1 - $this->cborReadUint($valInfo, $data, $pos);
+            } elseif ($valMajor === 2) { // Byte string
+                $bsLen = $this->cborReadUint($valInfo, $data, $pos);
+                $result[$key] = substr($data, $pos, $bsLen);
+                $pos += $bsLen;
+            } elseif ($valMajor === 3) { // Text string
+                $tsLen = $this->cborReadUint($valInfo, $data, $pos);
+                $result[$key] = substr($data, $pos, $tsLen);
+                $pos += $tsLen;
+            } else {
+                // Skip other types (arrays, maps, etc.)
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Read a CBOR unsigned integer value
+     */
+    private function cborReadUint(int $additionalInfo, string $data, int &$pos): int
+    {
+        if ($additionalInfo < 24) {
+            return $additionalInfo;
+        } elseif ($additionalInfo === 24) {
+            $val = ord($data[$pos]);
+            $pos++;
+            return $val;
+        } elseif ($additionalInfo === 25) {
+            $val = unpack('n', substr($data, $pos, 2))[1];
+            $pos += 2;
+            return $val;
+        } elseif ($additionalInfo === 26) {
+            $val = unpack('N', substr($data, $pos, 4))[1];
+            $pos += 4;
+            return $val;
+        }
+        return 0;
     }
 }

@@ -369,6 +369,7 @@ $router->add('POST', '/api/v2/admin/newsletters/suppression-list/{email}/unsuppr
 $router->add('POST', '/api/v2/admin/newsletters/suppression-list/{email}/suppress', 'Nexus\Controllers\Api\AdminNewsletterApiController@suppress');
 $router->add('GET', '/api/v2/admin/newsletters/send-time-optimizer', 'Nexus\Controllers\Api\AdminNewsletterApiController@getSendTimeData');
 $router->add('GET', '/api/v2/admin/newsletters/diagnostics', 'Nexus\Controllers\Api\AdminNewsletterApiController@getDiagnostics');
+$router->add('GET', '/api/v2/admin/newsletters/bounce-trends', 'Nexus\Controllers\Api\AdminNewsletterApiController@getBounceTrends');
 $router->add('POST', '/api/v2/admin/newsletters/recipient-count', 'Nexus\Controllers\Api\AdminNewsletterApiController@recipientCount');
 $router->add('GET', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@show');
 $router->add('GET', '/api/v2/admin/newsletters/{id}/resend-info', 'Nexus\Controllers\Api\AdminNewsletterApiController@getResendInfo');
@@ -377,6 +378,11 @@ $router->add('POST', '/api/v2/admin/newsletters/{id}/send', 'Nexus\Controllers\A
 $router->add('POST', '/api/v2/admin/newsletters/{id}/send-test', 'Nexus\Controllers\Api\AdminNewsletterApiController@sendTest');
 $router->add('POST', '/api/v2/admin/newsletters/{id}/duplicate', 'Nexus\Controllers\Api\AdminNewsletterApiController@duplicateNewsletter');
 $router->add('GET', '/api/v2/admin/newsletters/{id}/activity', 'Nexus\Controllers\Api\AdminNewsletterApiController@activity');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/openers', 'Nexus\Controllers\Api\AdminNewsletterApiController@openers');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/clickers', 'Nexus\Controllers\Api\AdminNewsletterApiController@clickers');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/non-openers', 'Nexus\Controllers\Api\AdminNewsletterApiController@nonOpeners');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/openers-no-click', 'Nexus\Controllers\Api\AdminNewsletterApiController@openersNoClick');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/email-clients', 'Nexus\Controllers\Api\AdminNewsletterApiController@emailClients');
 $router->add('GET', '/api/v2/admin/newsletters/{id}/stats', 'Nexus\Controllers\Api\AdminNewsletterApiController@stats');
 $router->add('POST', '/api/v2/admin/newsletters/{id}/ab-winner', 'Nexus\Controllers\Api\AdminNewsletterApiController@selectAbWinner');
 $router->add('PUT', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@update');
@@ -581,5 +587,10 @@ $router->add('PUT', '/api/v2/admin/crm/tasks/{id}', 'Nexus\Controllers\Api\Admin
 $router->add('DELETE', '/api/v2/admin/crm/tasks/{id}', 'Nexus\Controllers\Api\AdminCrmApiController@deleteTask');
 $router->add('GET', '/api/v2/admin/crm/tags', 'Nexus\Controllers\Api\AdminCrmApiController@listTags');
 $router->add('POST', '/api/v2/admin/crm/tags', 'Nexus\Controllers\Api\AdminCrmApiController@addTag');
+$router->add('DELETE', '/api/v2/admin/crm/tags/bulk', 'Nexus\Controllers\Api\AdminCrmApiController@bulkRemoveTag');
 $router->add('DELETE', '/api/v2/admin/crm/tags/{id}', 'Nexus\Controllers\Api\AdminCrmApiController@removeTag');
+$router->add('GET', '/api/v2/admin/crm/timeline', 'Nexus\Controllers\Api\AdminCrmApiController@timeline');
+$router->add('GET', '/api/v2/admin/crm/export/notes', 'Nexus\Controllers\Api\AdminCrmApiController@exportNotes');
+$router->add('GET', '/api/v2/admin/crm/export/tasks', 'Nexus\Controllers\Api\AdminCrmApiController@exportTasks');
+$router->add('GET', '/api/v2/admin/crm/export/dashboard', 'Nexus\Controllers\Api\AdminCrmApiController@exportDashboard');
 

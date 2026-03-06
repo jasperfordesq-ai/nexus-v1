@@ -78,6 +78,7 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
+import { BiometricSettings } from '@/components/security/BiometricSettings';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { SkillSelector } from '@/components/skills/SkillSelector';
 import type { UserSkill } from '@/components/skills/SkillSelector';
@@ -1750,6 +1751,9 @@ export function SettingsPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Biometric / Passkey Authentication */}
+                <BiometricSettings />
               </div>
             </GlassCard>
 

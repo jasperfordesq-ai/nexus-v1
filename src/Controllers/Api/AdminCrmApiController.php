@@ -29,6 +29,11 @@ use Nexus\Core\TenantContext;
  * - GET    /api/v2/admin/crm/tags              - List all tags
  * - POST   /api/v2/admin/crm/tags              - Add tag to member
  * - DELETE /api/v2/admin/crm/tags/{id}         - Remove tag
+ * - DELETE /api/v2/admin/crm/tags/bulk?tag=   - Bulk remove tag
+ * - GET    /api/v2/admin/crm/timeline          - Member activity timeline
+ * - GET    /api/v2/admin/crm/export/notes      - CSV export of notes
+ * - GET    /api/v2/admin/crm/export/tasks      - CSV export of tasks
+ * - GET    /api/v2/admin/crm/export/dashboard  - CSV export of dashboard stats
  */
 class AdminCrmApiController extends BaseApiController
 {
@@ -233,6 +238,7 @@ class AdminCrmApiController extends BaseApiController
 
         $userId = isset($_GET['user_id']) ? (int) $_GET['user_id'] : null;
         $category = isset($_GET['category']) ? trim($_GET['category']) : null;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : null;
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $limit = min(100, max(1, (int) ($_GET['limit'] ?? 20)));
         $offset = ($page - 1) * $limit;
@@ -251,8 +257,17 @@ class AdminCrmApiController extends BaseApiController
             $params[] = $category;
         }
 
+        if ($search && mb_strlen($search) >= 2) {
+            $searchTerm = '%' . $search . '%';
+            $where .= " AND (mn.content LIKE ? OR u.name LIKE ?)";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
         $total = (int) Database::query(
-            "SELECT COUNT(*) as cnt FROM member_notes mn WHERE {$where}",
+            "SELECT COUNT(*) as cnt FROM member_notes mn
+             LEFT JOIN users u ON u.id = mn.user_id
+             WHERE {$where}",
             $params
         )->fetch()['cnt'];
 
@@ -443,6 +458,7 @@ class AdminCrmApiController extends BaseApiController
         $status = isset($_GET['status']) ? trim($_GET['status']) : null;
         $priority = isset($_GET['priority']) ? trim($_GET['priority']) : null;
         $assignedTo = isset($_GET['assigned_to']) ? (int) $_GET['assigned_to'] : null;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : null;
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $limit = min(100, max(1, (int) ($_GET['limit'] ?? 20)));
         $offset = ($page - 1) * $limit;
@@ -465,6 +481,13 @@ class AdminCrmApiController extends BaseApiController
         if ($assignedTo) {
             $where .= " AND ct.assigned_to = ?";
             $params[] = $assignedTo;
+        }
+
+        if ($search && mb_strlen($search) >= 2) {
+            $searchTerm = '%' . $search . '%';
+            $where .= " AND (ct.title LIKE ? OR ct.description LIKE ?)";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
         }
 
         $total = (int) Database::query(
@@ -683,7 +706,7 @@ class AdminCrmApiController extends BaseApiController
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * GET /api/v2/admin/crm/tags?user_id=
+     * GET /api/v2/admin/crm/tags?user_id=&tag=
      */
     public function listTags(): void
     {
@@ -691,6 +714,7 @@ class AdminCrmApiController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $userId = isset($_GET['user_id']) ? (int) $_GET['user_id'] : null;
+        $tagFilter = isset($_GET['tag']) ? trim($_GET['tag']) : null;
 
         if ($userId) {
             $tags = Database::query(
@@ -700,6 +724,16 @@ class AdminCrmApiController extends BaseApiController
                  WHERE mt.tenant_id = ? AND mt.user_id = ?
                  ORDER BY mt.tag ASC",
                 [$tenantId, $userId]
+            )->fetchAll();
+        } elseif ($tagFilter) {
+            // Return all member tags for a specific tag name
+            $tags = Database::query(
+                "SELECT mt.*, u.name as user_name, u.avatar_url as user_avatar
+                 FROM member_tags mt
+                 LEFT JOIN users u ON u.id = mt.user_id
+                 WHERE mt.tenant_id = ? AND mt.tag = ?
+                 ORDER BY mt.created_at DESC",
+                [$tenantId, $tagFilter]
             )->fetchAll();
         } else {
             // Return tag summary (unique tags with counts)
@@ -777,6 +811,39 @@ class AdminCrmApiController extends BaseApiController
     }
 
     /**
+     * DELETE /api/v2/admin/crm/tags/bulk?tag=
+     * Remove all instances of a tag across all members.
+     */
+    public function bulkRemoveTag(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $tag = isset($_GET['tag']) ? trim($_GET['tag']) : '';
+        if (!$tag) {
+            $this->jsonResponse(['error' => 'tag parameter is required'], 400);
+            return;
+        }
+
+        $count = (int) Database::query(
+            "SELECT COUNT(*) as cnt FROM member_tags WHERE tenant_id = ? AND tag = ?",
+            [$tenantId, $tag]
+        )->fetch()['cnt'];
+
+        if ($count === 0) {
+            $this->jsonResponse(['error' => 'Tag not found'], 404);
+            return;
+        }
+
+        Database::query(
+            "DELETE FROM member_tags WHERE tenant_id = ? AND tag = ?",
+            [$tenantId, $tag]
+        );
+
+        $this->jsonResponse(['success' => true, 'deleted' => $count]);
+    }
+
+    /**
      * DELETE /api/v2/admin/crm/tags/{id}
      */
     public function removeTag(int $id): void
@@ -823,5 +890,302 @@ class AdminCrmApiController extends BaseApiController
         )->fetchAll();
 
         $this->jsonResponse($admins);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Activity Timeline
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/v2/admin/crm/timeline?user_id=&type=&days=&page=&limit=
+     */
+    public function timeline(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $userId = isset($_GET['user_id']) ? (int) $_GET['user_id'] : null;
+        $type = isset($_GET['type']) ? trim($_GET['type']) : null;
+        $days = isset($_GET['days']) ? (int) $_GET['days'] : 30;
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $limit = min(100, max(1, (int) ($_GET['limit'] ?? 25)));
+        $offset = ($page - 1) * $limit;
+
+        // Build timeline from multiple sources using UNION ALL
+        $unions = [];
+        $params = [];
+        $countParams = [];
+
+        // 1. Logins (from users.last_login_at — we use activity_log if available, else users)
+        if (!$type || $type === 'login') {
+            $unions[] = "SELECT 'login' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         'Logged in' as description, NULL as metadata, u.last_login_at as created_at
+                         FROM users u WHERE u.tenant_id = ? AND u.last_login_at IS NOT NULL"
+                         . ($userId ? " AND u.id = ?" : "")
+                         . ($days > 0 ? " AND u.last_login_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+            $params[] = $tenantId;
+            $countParams[] = $tenantId;
+            if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+            if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+        }
+
+        // 2. Signups
+        if (!$type || $type === 'signup') {
+            $unions[] = "SELECT 'signup' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         'Registered an account' as description, NULL as metadata, u.created_at as created_at
+                         FROM users u WHERE u.tenant_id = ?"
+                         . ($userId ? " AND u.id = ?" : "")
+                         . ($days > 0 ? " AND u.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+            $params[] = $tenantId;
+            $countParams[] = $tenantId;
+            if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+            if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+        }
+
+        // 3. Listings created
+        if (!$type || $type === 'listing_created') {
+            try {
+                Database::query("SELECT 1 FROM listings LIMIT 1");
+                $unions[] = "SELECT 'listing_created' as activity_type, l.user_id, u.name as user_name, u.avatar_url as user_avatar,
+                             CONCAT('Created listing: ', l.title) as description, NULL as metadata, l.created_at
+                             FROM listings l LEFT JOIN users u ON u.id = l.user_id
+                             WHERE l.tenant_id = ?"
+                             . ($userId ? " AND l.user_id = ?" : "")
+                             . ($days > 0 ? " AND l.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+                $params[] = $tenantId;
+                $countParams[] = $tenantId;
+                if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+                if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+            } catch (\Throwable $e) {
+                // Table doesn't exist
+            }
+        }
+
+        // 4. Exchanges completed
+        if (!$type || $type === 'exchange_completed') {
+            try {
+                Database::query("SELECT 1 FROM transactions LIMIT 1");
+                $unions[] = "SELECT 'exchange_completed' as activity_type, t.sender_id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                             CONCAT('Completed exchange with ', r.name) as description, NULL as metadata, t.created_at
+                             FROM transactions t
+                             LEFT JOIN users u ON u.id = t.sender_id
+                             LEFT JOIN users r ON r.id = t.receiver_id
+                             WHERE t.tenant_id = ? AND t.status = 'completed'"
+                             . ($userId ? " AND t.sender_id = ?" : "")
+                             . ($days > 0 ? " AND t.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+                $params[] = $tenantId;
+                $countParams[] = $tenantId;
+                if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+                if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+            } catch (\Throwable $e) {
+                // Table doesn't exist
+            }
+        }
+
+        // 5. Notes added
+        if (!$type || $type === 'note_added') {
+            try {
+                $unions[] = "SELECT 'note_added' as activity_type, mn.user_id, u.name as user_name, u.avatar_url as user_avatar,
+                             CONCAT('Note added by ', a.name, ': ', LEFT(mn.content, 80)) as description, NULL as metadata, mn.created_at
+                             FROM member_notes mn
+                             LEFT JOIN users u ON u.id = mn.user_id
+                             LEFT JOIN users a ON a.id = mn.author_id
+                             WHERE mn.tenant_id = ?"
+                             . ($userId ? " AND mn.user_id = ?" : "")
+                             . ($days > 0 ? " AND mn.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+                $params[] = $tenantId;
+                $countParams[] = $tenantId;
+                if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+                if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+            } catch (\Throwable $e) {
+                // Table doesn't exist
+            }
+        }
+
+        // 6. Coordinator tasks created
+        if (!$type || $type === 'task_created') {
+            try {
+                Database::query("SELECT 1 FROM coordinator_tasks LIMIT 1");
+                $unions[] = "SELECT 'task_created' as activity_type, ct.created_by as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                             CONCAT('Created task: ', ct.title) as description, NULL as metadata, ct.created_at
+                             FROM coordinator_tasks ct LEFT JOIN users u ON u.id = ct.created_by
+                             WHERE ct.tenant_id = ?"
+                             . ($userId ? " AND ct.created_by = ?" : "")
+                             . ($days > 0 ? " AND ct.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+                $params[] = $tenantId;
+                $countParams[] = $tenantId;
+                if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+                if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+            } catch (\Throwable $e) {
+                // Table doesn't exist
+            }
+        }
+
+        // 7. Group joins
+        if (!$type || $type === 'group_joined') {
+            try {
+                Database::query("SELECT 1 FROM group_members LIMIT 1");
+                $unions[] = "SELECT 'group_joined' as activity_type, gm.user_id, u.name as user_name, u.avatar_url as user_avatar,
+                             CONCAT('Joined group: ', g.name) as description, NULL as metadata, gm.created_at
+                             FROM group_members gm
+                             LEFT JOIN users u ON u.id = gm.user_id
+                             LEFT JOIN `groups` g ON g.id = gm.group_id
+                             WHERE gm.tenant_id = ?"
+                             . ($userId ? " AND gm.user_id = ?" : "")
+                             . ($days > 0 ? " AND gm.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+                $params[] = $tenantId;
+                $countParams[] = $tenantId;
+                if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+                if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+            } catch (\Throwable $e) {
+                // Table doesn't exist
+            }
+        }
+
+        // 8. Profile updated (users.updated_at != created_at)
+        if (!$type || $type === 'profile_updated') {
+            $unions[] = "SELECT 'profile_updated' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         'Updated their profile' as description, NULL as metadata, u.updated_at as created_at
+                         FROM users u WHERE u.tenant_id = ? AND u.updated_at > u.created_at"
+                         . ($userId ? " AND u.id = ?" : "")
+                         . ($days > 0 ? " AND u.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
+            $params[] = $tenantId;
+            $countParams[] = $tenantId;
+            if ($userId) { $params[] = $userId; $countParams[] = $userId; }
+            if ($days > 0) { $params[] = $days; $countParams[] = $days; }
+        }
+
+        if (empty($unions)) {
+            $this->jsonResponse(['data' => [], 'meta' => ['total' => 0, 'page' => $page, 'limit' => $limit, 'pages' => 0]]);
+            return;
+        }
+
+        $unionSql = implode(" UNION ALL ", $unions);
+
+        // Count
+        $total = (int) Database::query(
+            "SELECT COUNT(*) as cnt FROM ({$unionSql}) AS timeline",
+            $countParams
+        )->fetch()['cnt'];
+
+        // Data
+        $params[] = $limit;
+        $params[] = $offset;
+        $entries = Database::query(
+            "SELECT * FROM ({$unionSql}) AS timeline ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            $params
+        )->fetchAll();
+
+        // Add sequential IDs for frontend keying
+        foreach ($entries as $i => &$entry) {
+            $entry['id'] = ($page - 1) * $limit + $i + 1;
+        }
+
+        $this->jsonResponse([
+            'data' => $entries,
+            'meta' => [
+                'total' => $total,
+                'page' => $page,
+                'limit' => $limit,
+                'pages' => (int) ceil($total / $limit),
+            ],
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CSV Exports
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/v2/admin/crm/export/notes
+     */
+    public function exportNotes(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $notes = Database::query(
+            "SELECT mn.id, mn.user_id, u.name as user_name, mn.content, mn.category,
+                    mn.is_pinned, a.name as author_name, mn.created_at, mn.updated_at
+             FROM member_notes mn
+             LEFT JOIN users u ON u.id = mn.user_id
+             LEFT JOIN users a ON a.id = mn.author_id
+             WHERE mn.tenant_id = ?
+             ORDER BY mn.created_at DESC",
+            [$tenantId]
+        )->fetchAll();
+
+        $this->sendCsv('crm-notes', ['ID', 'User ID', 'User Name', 'Content', 'Category', 'Pinned', 'Author', 'Created', 'Updated'], $notes);
+    }
+
+    /**
+     * GET /api/v2/admin/crm/export/tasks
+     */
+    public function exportTasks(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $tasks = Database::query(
+            "SELECT ct.id, ct.title, ct.description, ct.priority, ct.status,
+                    assigned.name as assigned_to_name, member.name as related_member,
+                    ct.due_date, ct.completed_at, creator.name as created_by_name, ct.created_at
+             FROM coordinator_tasks ct
+             LEFT JOIN users assigned ON assigned.id = ct.assigned_to
+             LEFT JOIN users creator ON creator.id = ct.created_by
+             LEFT JOIN users member ON member.id = ct.user_id
+             WHERE ct.tenant_id = ?
+             ORDER BY ct.created_at DESC",
+            [$tenantId]
+        )->fetchAll();
+
+        $this->sendCsv('crm-tasks', ['ID', 'Title', 'Description', 'Priority', 'Status', 'Assigned To', 'Related Member', 'Due Date', 'Completed At', 'Created By', 'Created'], $tasks);
+    }
+
+    /**
+     * GET /api/v2/admin/crm/export/dashboard
+     */
+    public function exportDashboard(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $totalMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'];
+        $activeMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->fetch()['cnt'];
+        $newThisMonth = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->fetch()['cnt'];
+        $pendingApprovals = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->fetch()['cnt'];
+        $approvedMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->fetch()['cnt'];
+        $retentionRate = $approvedMembers > 0 ? round(($activeMembers / $approvedMembers) * 100, 1) : 0;
+
+        $rows = [
+            ['metric' => 'Total Members', 'value' => $totalMembers],
+            ['metric' => 'Active Members', 'value' => $activeMembers],
+            ['metric' => 'New This Month', 'value' => $newThisMonth],
+            ['metric' => 'Pending Approvals', 'value' => $pendingApprovals],
+            ['metric' => 'Retention Rate', 'value' => $retentionRate . '%'],
+        ];
+
+        $this->sendCsv('crm-dashboard', ['Metric', 'Value'], $rows);
+    }
+
+    /**
+     * Send CSV response
+     */
+    private function sendCsv(string $filename, array $headers, array $rows): void
+    {
+        $date = date('Y-m-d');
+        header('Content-Type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"{$filename}-{$date}.csv\"");
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, $headers);
+
+        foreach ($rows as $row) {
+            fputcsv($output, array_values($row));
+        }
+
+        fclose($output);
+        exit;
     }
 }

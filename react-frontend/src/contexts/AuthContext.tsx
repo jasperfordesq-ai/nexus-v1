@@ -38,6 +38,7 @@ import type {
   TwoFactorVerifyRequest,
   RegisterRequest,
 } from '@/types';
+import { authenticateWithBiometric } from '@/lib/webauthn';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -71,6 +72,7 @@ interface AuthContextValue extends AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<LoginResult>;
+  loginWithBiometric: (email?: string) => Promise<LoginResult>;
   verify2FA: (request: TwoFactorVerifyRequest) => Promise<boolean>;
   register: (data: RegisterRequest) => Promise<RegisterResult>;
   logout: () => Promise<void>;
@@ -252,6 +254,74 @@ export function AuthProvider({ children }: AuthProviderProps) {
       twoFactorToken: null,
       twoFactorMethods: [],
     });
+
+    return { success: true, requires2FA: false };
+  }, []);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Biometric / WebAuthn Login
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const loginWithBiometric = useCallback(async (email?: string): Promise<LoginResult> => {
+    setState((prev) => ({ ...prev, status: 'loading', error: null }));
+
+    const result = await authenticateWithBiometric(email);
+
+    if (!result.success || !result.data) {
+      // User cancelled the biometric prompt — return to idle silently
+      const wasCancelled = result.error?.includes('cancelled');
+      setState((prev) => ({
+        ...prev,
+        status: wasCancelled ? 'idle' : 'error',
+        error: wasCancelled ? null : (result.error ?? 'Biometric login failed'),
+      }));
+      return { success: false, requires2FA: false, error: wasCancelled ? undefined : result.error };
+    }
+
+    const { user, access_token, refresh_token } = result.data;
+
+    tokenManager.setAccessToken(access_token);
+    tokenManager.setRefreshToken(refresh_token);
+
+    // Set Sentry user context
+    setSentryUser(user as unknown as User);
+    captureAuthEvent('biometric_login', user.id);
+
+    wasAuthenticated.current = true;
+
+    // Fetch full user profile (biometric auth response has minimal user data)
+    try {
+      const profileRes = await api.get<User>('/v2/users/me');
+      if (profileRes.success && profileRes.data) {
+        if (profileRes.data.preferred_language) {
+          i18n.changeLanguage(profileRes.data.preferred_language);
+        }
+        setState({
+          user: profileRes.data,
+          status: 'authenticated',
+          error: null,
+          twoFactorToken: null,
+          twoFactorMethods: [],
+        });
+      } else {
+        // Token works but profile fetch failed — set minimal user data
+        setState({
+          user: user as unknown as User,
+          status: 'authenticated',
+          error: null,
+          twoFactorToken: null,
+          twoFactorMethods: [],
+        });
+      }
+    } catch {
+      setState({
+        user: user as unknown as User,
+        status: 'authenticated',
+        error: null,
+        twoFactorToken: null,
+        twoFactorMethods: [],
+      });
+    }
 
     return { success: true, requires2FA: false };
   }, []);
@@ -517,6 +587,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isAuthenticated: state.status === 'authenticated',
       isLoading: state.status === 'loading',
       login,
+      loginWithBiometric,
       verify2FA,
       register,
       logout,
@@ -524,7 +595,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       clearError,
       cancel2FA,
     }),
-    [state, login, verify2FA, register, logout, refreshUser, clearError, cancel2FA]
+    [state, login, loginWithBiometric, verify2FA, register, logout, refreshUser, clearError, cancel2FA]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

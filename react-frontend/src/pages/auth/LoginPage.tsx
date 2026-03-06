@@ -17,13 +17,14 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2, Fingerprint } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
+import { isBiometricAvailable } from '@/lib/webauthn';
 
 interface Tenant {
   id: number;
@@ -44,6 +45,7 @@ export function LoginPage() {
     error,
     isAuthenticated,
     login,
+    loginWithBiometric,
     verify2FA,
     clearError,
     cancel2FA,
@@ -72,12 +74,21 @@ export function LoginPage() {
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [resendVerificationSent, setResendVerificationSent] = useState(false);
 
+  // Biometric login state
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+
   // Redirect after successful login (preserve tenant slug prefix)
   const from = (location.state as { from?: string })?.from || tenantPath('/dashboard');
 
   // Clear stale auth tokens on mount — login page should always start clean
   useEffect(() => {
     tokenManager.clearTokens();
+  }, []);
+
+  // Check if biometric login is available on this device
+  useEffect(() => {
+    isBiometricAvailable().then(setBiometricAvailable);
   }, []);
 
   // Tenant is "resolved from URL" only when there's an explicit URL slug or
@@ -183,6 +194,20 @@ export function LoginPage() {
       // Silently handle — the endpoint always returns success for security
     } finally {
       setIsResendingVerification(false);
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    if (!selectedTenantId) return;
+    setBiometricLoading(true);
+    tokenManager.clearTokens();
+    tokenManager.setTenantId(selectedTenantId);
+
+    const result = await loginWithBiometric(email || undefined);
+    setBiometricLoading(false);
+
+    if (result.success) {
+      navigate(from, { replace: true });
     }
   };
 
@@ -432,6 +457,37 @@ export function LoginPage() {
                       {t('login.submit')}
                     </Button>
                   </form>
+
+                  {/* Biometric Login */}
+                  {biometricAvailable && selectedTenantId && (
+                    <>
+                      <div className="relative flex items-center my-5">
+                        <div className="flex-grow border-t border-[var(--border-default)]" />
+                        <span className="flex-shrink mx-3 text-xs text-theme-subtle">
+                          {t('login.or', { defaultValue: 'or' })}
+                        </span>
+                        <div className="flex-grow border-t border-[var(--border-default)]" />
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="bordered"
+                        onPress={handleBiometricLogin}
+                        isLoading={biometricLoading}
+                        isDisabled={isLoading}
+                        className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10"
+                        size="lg"
+                        startContent={
+                          !biometricLoading ? (
+                            <Fingerprint className="w-5 h-5 text-indigo-500" />
+                          ) : undefined
+                        }
+                        spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+                      >
+                        {t('login.biometric_login', { defaultValue: 'Sign in with biometrics' })}
+                      </Button>
+                    </>
+                  )}
 
                   {/* Divider */}
                   <Divider className="my-6 bg-[var(--border-default)]" />
