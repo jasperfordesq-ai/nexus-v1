@@ -160,17 +160,26 @@ export function NewsletterStats() {
   const [error, setError] = useState<string | null>(null);
   const [selectingWinner, setSelectingWinner] = useState(false);
   const [resendOpen, setResendOpen] = useState(false);
+  const [emailClients, setEmailClients] = useState<Array<{ client: string; count: number }>>([]);
 
   const loadStats = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     setError(null);
     try {
-      const res = await adminNewsletters.getStats(Number(id));
-      if (res.success && res.data) {
-        setData(res.data as unknown as StatsData);
+      const nid = Number(id);
+      const [statsRes, clientsRes] = await Promise.all([
+        adminNewsletters.getStats(nid),
+        adminNewsletters.getEmailClients(nid),
+      ]);
+      if (statsRes.success && statsRes.data) {
+        setData(statsRes.data as unknown as StatsData);
       } else {
         setError('Newsletter not found');
+      }
+      if (clientsRes.success && clientsRes.data) {
+        const raw = clientsRes.data as unknown as { email_clients?: Array<{ client: string; count: number }> };
+        setEmailClients(raw?.email_clients ?? []);
       }
     } catch {
       setError('Failed to load newsletter stats');
@@ -627,6 +636,31 @@ export function NewsletterStats() {
           </Card>
         )}
       </div>
+
+      {/* ── Email Client Breakdown ── */}
+      {emailClients.length > 0 && (
+        <Card shadow="sm" className="mb-6">
+          <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
+            <Mail size={18} className="text-default-400" />
+            <h3 className="text-lg font-semibold text-foreground">Email Clients</h3>
+          </CardHeader>
+          <CardBody className="px-5 pb-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              {emailClients.map((ec) => {
+                const ecTotal = emailClients.reduce((s, c) => s + c.count, 0);
+                const pct = ecTotal > 0 ? Math.round((ec.count / ecTotal) * 100) : 0;
+                return (
+                  <div key={ec.client} className="text-center">
+                    <p className="text-2xl font-bold text-foreground">{pct}%</p>
+                    <p className="text-sm text-default-500">{ec.client}</p>
+                    <p className="text-xs text-default-400">{ec.count.toLocaleString()} opens</p>
+                  </div>
+                );
+              })}
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       {/* ── Top Links ── */}
       {top_links.length > 0 && (

@@ -17,6 +17,7 @@ interface StatCardProps {
   icon: LucideIcon;
   trend?: number;
   trendLabel?: string;
+  description?: string;
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'secondary' | 'default';
   loading?: boolean;
 }
@@ -36,6 +37,7 @@ export function StatCard({
   icon: Icon,
   trend,
   trendLabel,
+  description,
   color = 'primary',
   loading = false,
 }: StatCardProps) {
@@ -53,6 +55,9 @@ export function StatCard({
             <p className="text-2xl font-bold text-foreground">
               {typeof value === 'number' ? value.toLocaleString() : value}
             </p>
+          )}
+          {description && (
+            <p className="mt-0.5 text-xs text-default-400">{description}</p>
           )}
           {trend !== undefined && (
             <div className="mt-0.5 flex items-center gap-1">

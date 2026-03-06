@@ -1704,6 +1704,117 @@ class AdminNewsletterApiController extends BaseApiController
                 }
             }
 
+            // ── Device breakdown (from user agents) ──
+            $deviceStats = ['desktop' => 0, 'mobile' => 0, 'tablet' => 0, 'unknown' => 0];
+            if ($this->tableExists('newsletter_opens')) {
+                try {
+                    $uaRows = Database::query(
+                        "SELECT user_agent FROM newsletter_opens
+                         WHERE tenant_id = ? AND newsletter_id = ? AND user_agent IS NOT NULL",
+                        [$tenantId, $id]
+                    )->fetchAll() ?: [];
+                    foreach ($uaRows as $uaRow) {
+                        $ua = strtolower($uaRow['user_agent'] ?? '');
+                        if (strpos($ua, 'mobile') !== false || strpos($ua, 'android') !== false || strpos($ua, 'iphone') !== false) {
+                            $deviceStats['mobile']++;
+                        } elseif (strpos($ua, 'tablet') !== false || strpos($ua, 'ipad') !== false) {
+                            $deviceStats['tablet']++;
+                        } elseif (strpos($ua, 'windows') !== false || strpos($ua, 'macintosh') !== false || strpos($ua, 'linux') !== false) {
+                            $deviceStats['desktop']++;
+                        } else {
+                            $deviceStats['unknown']++;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Keep defaults
+                }
+            }
+
+            // ── Recent activity (last 20 opens+clicks) ──
+            $recentActivity = [];
+            try {
+                $activityParts = [];
+                if ($this->tableExists('newsletter_opens')) {
+                    $activityParts[] = "(SELECT 'open' as action_type, email, opened_at as action_at, NULL as url
+                                         FROM newsletter_opens WHERE tenant_id = ? AND newsletter_id = ?)";
+                }
+                if ($this->tableExists('newsletter_clicks')) {
+                    $activityParts[] = "(SELECT 'click' as action_type, email, clicked_at as action_at, url
+                                         FROM newsletter_clicks WHERE tenant_id = ? AND newsletter_id = ?)";
+                }
+                if (!empty($activityParts)) {
+                    $params = [];
+                    foreach ($activityParts as $p) {
+                        $params[] = $tenantId;
+                        $params[] = $id;
+                    }
+                    $activitySql = implode(' UNION ALL ', $activityParts) . ' ORDER BY action_at DESC LIMIT 20';
+                    $recentActivity = Database::query($activitySql, $params)->fetchAll() ?: [];
+                    $recentActivity = array_map(function ($row) {
+                        return [
+                            'action_type' => $row['action_type'] ?? 'open',
+                            'email' => $row['email'] ?? '',
+                            'action_at' => $row['action_at'] ?? '',
+                            'url' => $row['url'] ?? null,
+                        ];
+                    }, $recentActivity);
+                }
+            } catch (\Exception $e) {
+                // No activity data
+            }
+
+            // ── Peak engagement (max opens in one hour) ──
+            $peakOpens = 0;
+            $peakHour = null;
+            if (!empty($timeline)) {
+                foreach ($timeline as $point) {
+                    if ($point['opens'] > $peakOpens) {
+                        $peakOpens = $point['opens'];
+                        $peakHour = $point['hour'];
+                    }
+                }
+            }
+
+            // ── Add A/B rates + split info ──
+            if ($abTest !== null) {
+                // Count sent per variant
+                $aSent = 0;
+                $bSent = 0;
+                if ($this->tableExists('newsletter_queue')) {
+                    try {
+                        $variantCounts = Database::query(
+                            "SELECT subject_variant, COUNT(*) as cnt
+                             FROM newsletter_queue
+                             WHERE newsletter_id = ? AND tenant_id = ? AND status IN ('sent', 'failed')
+                             GROUP BY subject_variant",
+                            [$id, $tenantId]
+                        )->fetchAll() ?: [];
+                        foreach ($variantCounts as $vc) {
+                            $v = $vc['subject_variant'] ?? 'a';
+                            $c = (int) ($vc['cnt'] ?? 0);
+                            if ($v === 'b') {
+                                $bSent = $c;
+                            } else {
+                                $aSent += $c;
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Fallback: split total evenly
+                        $splitPct = (int) ($newsletter['ab_split_percentage'] ?? 50);
+                        $aSent = (int) round($delivery['total_sent'] * $splitPct / 100);
+                        $bSent = $delivery['total_sent'] - $aSent;
+                    }
+                }
+                $abTest['subject_a_sent'] = $aSent;
+                $abTest['subject_b_sent'] = $bSent;
+                $abTest['subject_a_open_rate'] = $aSent > 0 ? round(($abTest['subject_a_opens'] / $aSent) * 100, 1) : 0;
+                $abTest['subject_b_open_rate'] = $bSent > 0 ? round(($abTest['subject_b_opens'] / $bSent) * 100, 1) : 0;
+                $abTest['subject_a_click_rate'] = $aSent > 0 ? round(($abTest['subject_a_clicks'] / $aSent) * 100, 1) : 0;
+                $abTest['subject_b_click_rate'] = $bSent > 0 ? round(($abTest['subject_b_clicks'] / $bSent) * 100, 1) : 0;
+                $abTest['split_percentage'] = (int) ($newsletter['ab_split_percentage'] ?? 50);
+                $abTest['winner_metric'] = $newsletter['ab_winner_metric'] ?? 'opens';
+            }
+
             $this->respondWithData([
                 'newsletter' => [
                     'id' => (int) $newsletter['id'],
@@ -1724,6 +1835,12 @@ class AdminNewsletterApiController extends BaseApiController
                 'ab_test' => $abTest,
                 'timeline' => $timeline,
                 'top_links' => $topLinks,
+                'device_stats' => $deviceStats,
+                'recent_activity' => $recentActivity,
+                'peak_engagement' => [
+                    'max_opens_per_hour' => $peakOpens,
+                    'peak_hour' => $peakHour,
+                ],
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('FETCH_FAILED', 'Failed to fetch newsletter stats');
@@ -2086,15 +2203,37 @@ class AdminNewsletterApiController extends BaseApiController
             );
 
             $heatmapRaw = $stmt->fetchAll() ?: [];
-            $heatmap = [];
 
+            // Also get click data for the same period
+            $clicksBySlot = [];
+            if ($this->tableExists('newsletter_clicks')) {
+                try {
+                    $clickStmt = Database::query(
+                        "SELECT DAYOFWEEK(clicked_at) as day_of_week, HOUR(clicked_at) as hour,
+                                COUNT(*) as clicks
+                         FROM newsletter_clicks
+                         WHERE tenant_id = ? AND clicked_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                         GROUP BY DAYOFWEEK(clicked_at), HOUR(clicked_at)",
+                        [$tenantId, $days]
+                    );
+                    foreach ($clickStmt->fetchAll() ?: [] as $cRow) {
+                        $clicksBySlot[(int)$cRow['day_of_week'] . '_' . (int)$cRow['hour']] = (int)$cRow['clicks'];
+                    }
+                } catch (\Exception $e) {
+                    // No click data
+                }
+            }
+
+            $heatmap = [];
             foreach ($heatmapRaw as $row) {
+                $key = (int)$row['day_of_week'] . '_' . (int)$row['hour'];
+                $clicks = $clicksBySlot[$key] ?? 0;
                 $heatmap[] = [
                     'day_of_week' => (int)$row['day_of_week'],
                     'hour' => (int)$row['hour'],
-                    'engagement_score' => (int)$row['opens'],
+                    'engagement_score' => (int)$row['opens'] + ($clicks * 2),
                     'opens' => (int)$row['opens'],
-                    'clicks' => 0, // TODO: Join with clicks if needed
+                    'clicks' => $clicks,
                 ];
             }
 
@@ -2422,6 +2561,271 @@ class AdminNewsletterApiController extends BaseApiController
         } catch (\Exception $e) {
             $this->respondWithPaginatedCollection([], 0, $page, $perPage);
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Per-Subscriber Engagement Lists
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Get list of subscribers who opened a newsletter (deduplicated by email)
+     */
+    public function openers(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 50, 10, 200);
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $total = 0;
+            $items = [];
+
+            if ($this->tableExists('newsletter_opens')) {
+                $countRow = Database::query(
+                    "SELECT COUNT(DISTINCT email) as cnt FROM newsletter_opens WHERE newsletter_id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+                $total = (int) ($countRow['cnt'] ?? 0);
+
+                $items = Database::query(
+                    "SELECT email, MIN(opened_at) as first_opened, COUNT(*) as open_count
+                     FROM newsletter_opens
+                     WHERE newsletter_id = ? AND tenant_id = ?
+                     GROUP BY email
+                     ORDER BY first_opened DESC
+                     LIMIT ? OFFSET ?",
+                    [$id, $tenantId, $perPage, $offset]
+                )->fetchAll() ?: [];
+
+                $items = array_map(function ($row) {
+                    return [
+                        'email' => $row['email'] ?? '',
+                        'first_opened' => $row['first_opened'] ?? '',
+                        'open_count' => (int) ($row['open_count'] ?? 0),
+                    ];
+                }, $items);
+            }
+
+            $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
+        } catch (\Exception $e) {
+            $this->respondWithPaginatedCollection([], 0, $page, $perPage);
+        }
+    }
+
+    /**
+     * Get list of subscribers who clicked a link in a newsletter (deduplicated by email)
+     */
+    public function clickers(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 50, 10, 200);
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $total = 0;
+            $items = [];
+
+            if ($this->tableExists('newsletter_clicks')) {
+                $countRow = Database::query(
+                    "SELECT COUNT(DISTINCT email) as cnt FROM newsletter_clicks WHERE newsletter_id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+                $total = (int) ($countRow['cnt'] ?? 0);
+
+                $items = Database::query(
+                    "SELECT email, MIN(clicked_at) as first_clicked, COUNT(*) as click_count, COUNT(DISTINCT url) as unique_links
+                     FROM newsletter_clicks
+                     WHERE newsletter_id = ? AND tenant_id = ?
+                     GROUP BY email
+                     ORDER BY first_clicked DESC
+                     LIMIT ? OFFSET ?",
+                    [$id, $tenantId, $perPage, $offset]
+                )->fetchAll() ?: [];
+
+                $items = array_map(function ($row) {
+                    return [
+                        'email' => $row['email'] ?? '',
+                        'first_clicked' => $row['first_clicked'] ?? '',
+                        'click_count' => (int) ($row['click_count'] ?? 0),
+                        'unique_links' => (int) ($row['unique_links'] ?? 0),
+                    ];
+                }, $items);
+            }
+
+            $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
+        } catch (\Exception $e) {
+            $this->respondWithPaginatedCollection([], 0, $page, $perPage);
+        }
+    }
+
+    /**
+     * Get list of recipients who did NOT open a newsletter
+     */
+    public function nonOpeners(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 50, 10, 200);
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $total = 0;
+            $items = [];
+
+            if ($this->tableExists('newsletter_queue') && $this->tableExists('newsletter_opens')) {
+                $countRow = Database::query(
+                    "SELECT COUNT(*) as cnt
+                     FROM newsletter_queue q
+                     WHERE q.newsletter_id = ? AND q.tenant_id = ? AND q.status = 'sent'
+                     AND q.email NOT IN (
+                         SELECT DISTINCT email FROM newsletter_opens
+                         WHERE newsletter_id = ? AND tenant_id = ?
+                     )",
+                    [$id, $tenantId, $id, $tenantId]
+                )->fetch();
+                $total = (int) ($countRow['cnt'] ?? 0);
+
+                $items = Database::query(
+                    "SELECT q.email, q.sent_at, u.first_name, u.last_name
+                     FROM newsletter_queue q
+                     LEFT JOIN users u ON q.user_id = u.id
+                     WHERE q.newsletter_id = ? AND q.tenant_id = ? AND q.status = 'sent'
+                     AND q.email NOT IN (
+                         SELECT DISTINCT email FROM newsletter_opens
+                         WHERE newsletter_id = ? AND tenant_id = ?
+                     )
+                     ORDER BY q.sent_at DESC
+                     LIMIT ? OFFSET ?",
+                    [$id, $tenantId, $id, $tenantId, $perPage, $offset]
+                )->fetchAll() ?: [];
+
+                $items = array_map(function ($row) {
+                    $name = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+                    return [
+                        'email' => $row['email'] ?? '',
+                        'name' => $name ?: null,
+                        'sent_at' => $row['sent_at'] ?? '',
+                    ];
+                }, $items);
+            }
+
+            $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
+        } catch (\Exception $e) {
+            $this->respondWithPaginatedCollection([], 0, $page, $perPage);
+        }
+    }
+
+    /**
+     * Get list of subscribers who opened but didn't click
+     */
+    public function openersNoClick(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 50, 10, 200);
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $total = 0;
+            $items = [];
+
+            if ($this->tableExists('newsletter_opens') && $this->tableExists('newsletter_clicks')) {
+                $countRow = Database::query(
+                    "SELECT COUNT(DISTINCT o.email) as cnt
+                     FROM newsletter_opens o
+                     WHERE o.newsletter_id = ? AND o.tenant_id = ?
+                     AND o.email NOT IN (
+                         SELECT DISTINCT email FROM newsletter_clicks
+                         WHERE newsletter_id = ? AND tenant_id = ?
+                     )",
+                    [$id, $tenantId, $id, $tenantId]
+                )->fetch();
+                $total = (int) ($countRow['cnt'] ?? 0);
+
+                $items = Database::query(
+                    "SELECT o.email, MIN(o.opened_at) as first_opened, COUNT(*) as open_count,
+                            u.first_name, u.last_name
+                     FROM newsletter_opens o
+                     LEFT JOIN newsletter_queue q ON o.email = q.email AND q.newsletter_id = ?
+                     LEFT JOIN users u ON q.user_id = u.id
+                     WHERE o.newsletter_id = ? AND o.tenant_id = ?
+                     AND o.email NOT IN (
+                         SELECT DISTINCT email FROM newsletter_clicks
+                         WHERE newsletter_id = ? AND tenant_id = ?
+                     )
+                     GROUP BY o.email, u.first_name, u.last_name
+                     ORDER BY first_opened DESC
+                     LIMIT ? OFFSET ?",
+                    [$id, $id, $tenantId, $id, $tenantId, $perPage, $offset]
+                )->fetchAll() ?: [];
+
+                $items = array_map(function ($row) {
+                    $name = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+                    return [
+                        'email' => $row['email'] ?? '',
+                        'name' => $name ?: null,
+                        'first_opened' => $row['first_opened'] ?? '',
+                        'open_count' => (int) ($row['open_count'] ?? 0),
+                    ];
+                }, $items);
+            }
+
+            $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
+        } catch (\Exception $e) {
+            $this->respondWithPaginatedCollection([], 0, $page, $perPage);
+        }
+    }
+
+    /**
+     * Get email client breakdown for a newsletter
+     */
+    public function emailClients(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $clients = [];
+        if ($this->tableExists('newsletter_opens')) {
+            try {
+                $opens = Database::query(
+                    "SELECT user_agent FROM newsletter_opens
+                     WHERE tenant_id = ? AND newsletter_id = ? AND user_agent IS NOT NULL",
+                    [$tenantId, $id]
+                )->fetchAll() ?: [];
+
+                $counts = [];
+                foreach ($opens as $open) {
+                    $ua = strtolower($open['user_agent'] ?? '');
+                    $client = 'Other';
+                    if (strpos($ua, 'outlook') !== false) {
+                        $client = 'Outlook';
+                    } elseif (strpos($ua, 'gmail') !== false || strpos($ua, 'googleimageproxy') !== false) {
+                        $client = 'Gmail';
+                    } elseif ((strpos($ua, 'apple mail') !== false || strpos($ua, 'applewebkit') !== false) && strpos($ua, 'mobile') === false) {
+                        $client = 'Apple Mail';
+                    } elseif (strpos($ua, 'yahoo') !== false) {
+                        $client = 'Yahoo Mail';
+                    } elseif (strpos($ua, 'thunderbird') !== false) {
+                        $client = 'Thunderbird';
+                    }
+                    $counts[$client] = ($counts[$client] ?? 0) + 1;
+                }
+                arsort($counts);
+                foreach ($counts as $name => $count) {
+                    $clients[] = ['client' => $name, 'count' => $count];
+                }
+            } catch (\Exception $e) {
+                // No data
+            }
+        }
+
+        $this->respondWithData(['email_clients' => $clients]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
