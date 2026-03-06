@@ -702,7 +702,7 @@ class ListingController
             // DELETE COMMENT
             elseif ($action === 'delete_comment') {
                 $commentId = (int)($_POST['comment_id'] ?? 0);
-                $isSuperAdmin = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
+                $isSuperAdmin = !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
                 $result = \Nexus\Services\CommentService::deleteComment($commentId, $userId, $isSuperAdmin);
                 echo json_encode($result);
             }

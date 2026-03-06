@@ -61,7 +61,7 @@ class ReportController
         \Nexus\Core\Csrf::verifyOrDie();
         // Admin Check
         $role = $_SESSION['user_role'] ?? '';
-        $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_admin']);
+        $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_admin']);
         if (!$isAdmin) {
             die("Access Denied");
         }

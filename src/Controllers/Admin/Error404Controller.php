@@ -25,7 +25,7 @@ class Error404Controller
 
         $role = $_SESSION['user_role'] ?? '';
         $isAdmin = in_array($role, ['admin', 'tenant_admin']);
-        $isSuper = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
+        $isSuper = !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
         $isAdminSession = !empty($_SESSION['is_admin']);
 
         if (!$isAdmin && !$isSuper && !$isAdminSession) {
