@@ -5,14 +5,15 @@
 
 /**
  * Newsletter List
- * Displays all newsletters with status filtering and CRUD actions.
+ * Displays all newsletters with status filtering, send, duplicate, and CRUD actions.
+ * Parity: PHP Admin\NewsletterController::index()
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
+  Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Chip,
 } from '@heroui/react';
-import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy, Send, BarChart3 } from 'lucide-react';
+import { Mail, Plus, RefreshCw, MoreVertical, Edit, Trash2, Copy, Send, BarChart3, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -26,10 +27,13 @@ interface NewsletterItem {
   subject: string;
   status: string;
   recipients_count: number;
+  total_recipients: number;
   open_rate: number;
   click_rate: number;
   sent_at: string | null;
   created_at: string;
+  is_recurring: boolean;
+  ab_test_enabled: boolean;
 }
 
 export function NewsletterList() {
@@ -44,6 +48,8 @@ export function NewsletterList() {
   const [deleteTarget, setDeleteTarget] = useState<NewsletterItem | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [resendTarget, setResendTarget] = useState<number | null>(null);
+  const [sendTarget, setSendTarget] = useState<NewsletterItem | null>(null);
+  const [sendingId, setSendingId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -74,7 +80,7 @@ export function NewsletterList() {
     try {
       const res = await adminNewsletters.delete(deleteTarget.id);
       if (res.success) {
-        toast.success(`Newsletter "${deleteTarget.name}" deleted`);
+        toast.success(`Newsletter "${deleteTarget.subject || deleteTarget.name}" deleted`);
         setDeleteTarget(null);
         loadData();
       } else {
@@ -88,43 +94,77 @@ export function NewsletterList() {
 
   const handleDuplicate = async (item: NewsletterItem) => {
     try {
-      const res = await adminNewsletters.get(item.id);
-      if (res.success && res.data) {
-        const d = res.data as Record<string, unknown>;
-        const dupRes = await adminNewsletters.create({
-          name: `${d.name || item.name} (Copy)`,
-          subject: (d.subject as string) || item.subject,
-          content: (d.content as string) || '',
-          status: 'draft',
-        });
-        if (dupRes.success) {
-          toast.success('Newsletter duplicated');
-          loadData();
-        }
+      const res = await adminNewsletters.duplicateNewsletter(item.id);
+      if (res.success) {
+        toast.success('Newsletter duplicated as draft');
+        loadData();
+      } else {
+        toast.error('Failed to duplicate newsletter');
       }
     } catch {
       toast.error('Failed to duplicate newsletter');
     }
   };
 
+  const handleSendNow = async () => {
+    if (!sendTarget) return;
+    setSendingId(sendTarget.id);
+    try {
+      const res = await adminNewsletters.sendNewsletter(sendTarget.id);
+      if (res.success) {
+        const data = res.data as { queued?: number; message?: string };
+        toast.success(data.message || 'Newsletter queued for sending');
+        setSendTarget(null);
+        loadData();
+      } else {
+        toast.error((res as { error?: string }).error || 'Failed to send newsletter');
+      }
+    } catch {
+      toast.error('Failed to send newsletter');
+    }
+    setSendingId(null);
+  };
+
   const columns: Column<NewsletterItem>[] = [
-    { key: 'name', label: 'Name', sortable: true },
-    { key: 'subject', label: 'Subject', sortable: true },
+    {
+      key: 'subject', label: 'Subject', sortable: true,
+      render: (item) => (
+        <div className="min-w-0">
+          <p className="font-medium truncate">{item.subject || item.name}</p>
+          <div className="flex gap-1 mt-1">
+            {item.ab_test_enabled && <Chip size="sm" color="warning" variant="flat">A/B</Chip>}
+            {item.is_recurring && <Chip size="sm" color="secondary" variant="flat">Recurring</Chip>}
+          </div>
+        </div>
+      ),
+    },
     {
       key: 'status', label: 'Status', sortable: true,
       render: (item) => <StatusBadge status={item.status} />,
     },
     {
       key: 'recipients_count', label: 'Recipients',
-      render: (item) => <span>{(item.recipients_count || 0).toLocaleString()}</span>,
+      render: (item) => <span>{((item.total_recipients || item.recipients_count) || 0).toLocaleString()}</span>,
     },
     {
       key: 'open_rate', label: 'Open Rate',
       render: (item) => <span>{item.open_rate ? `${item.open_rate}%` : '--'}</span>,
     },
     {
-      key: 'created_at', label: 'Created', sortable: true,
-      render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+      key: 'click_rate', label: 'Click Rate',
+      render: (item) => <span>{item.click_rate ? `${item.click_rate}%` : '--'}</span>,
+    },
+    {
+      key: 'created_at', label: 'Date', sortable: true,
+      render: (item) => (
+        <span className="text-sm text-default-500">
+          {item.sent_at
+            ? new Date(item.sent_at).toLocaleDateString()
+            : item.created_at
+              ? new Date(item.created_at).toLocaleDateString()
+              : '--'}
+        </span>
+      ),
     },
     {
       key: 'actions' as keyof NewsletterItem, label: 'Actions',
@@ -136,25 +176,41 @@ export function NewsletterList() {
           <DropdownMenu aria-label="Newsletter actions" onAction={(key) => {
             if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));
             else if (key === 'stats') navigate(tenantPath(`/admin/newsletters/${item.id}/stats`));
+            else if (key === 'activity') navigate(tenantPath(`/admin/newsletters/${item.id}/activity`));
             else if (key === 'duplicate') handleDuplicate(item);
+            else if (key === 'send') setSendTarget(item);
             else if (key === 'resend') setResendTarget(item.id);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
             <DropdownItem key="edit" startContent={<Edit size={14} />}>Edit</DropdownItem>
             <DropdownItem
+              key="send"
+              startContent={<Send size={14} />}
+              className={item.status === 'draft' || item.status === 'scheduled' ? '' : 'hidden'}
+            >
+              Send Now
+            </DropdownItem>
+            <DropdownItem
               key="stats"
               startContent={<BarChart3 size={14} />}
-              classNames={{ base: item.status === 'sent' ? '' : 'hidden' }}
+              className={item.status === 'sent' || item.status === 'sending' ? '' : 'hidden'}
             >
               Stats
+            </DropdownItem>
+            <DropdownItem
+              key="activity"
+              startContent={<Activity size={14} />}
+              className={item.status === 'sent' ? '' : 'hidden'}
+            >
+              Activity Log
             </DropdownItem>
             <DropdownItem key="duplicate" startContent={<Copy size={14} />}>Duplicate</DropdownItem>
             <DropdownItem
               key="resend"
               startContent={<Send size={14} />}
-              classNames={{ base: item.status === 'sent' ? '' : 'hidden' }}
+              className={item.status === 'sent' ? '' : 'hidden'}
             >
-              Resend
+              Resend to Non-Openers
             </DropdownItem>
             <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">Delete</DropdownItem>
           </DropdownMenu>
@@ -200,10 +256,23 @@ export function NewsletterList() {
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
           title="Delete Newsletter"
-          message={`Are you sure you want to delete "${deleteTarget.name}"? This cannot be undone.`}
+          message={`Are you sure you want to delete "${deleteTarget.subject || deleteTarget.name}"? This cannot be undone.`}
           confirmLabel="Delete"
           confirmColor="danger"
           isLoading={deleting}
+        />
+      )}
+
+      {sendTarget && (
+        <ConfirmModal
+          isOpen={!!sendTarget}
+          onClose={() => setSendTarget(null)}
+          onConfirm={handleSendNow}
+          title="Send Newsletter Now"
+          message={`Are you sure you want to send "${sendTarget.subject || sendTarget.name}" to all targeted recipients? This action cannot be undone.`}
+          confirmLabel="Send Now"
+          confirmColor="primary"
+          isLoading={sendingId === sendTarget.id}
         />
       )}
 
