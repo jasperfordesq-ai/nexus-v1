@@ -38,6 +38,7 @@ export const RESERVED_PATHS = new Set([
   'chat',
   // Feature modules added 2026-03-01
   'ideation', 'jobs', 'polls', 'kb', 'activity', 'skills', 'reviews',
+  'nexus-score', 'verify-email',
   // Public/info pages
   'help', 'contact', 'about', 'faq', 'legal', 'terms', 'platform',
   'privacy', 'accessibility', 'cookies', 'development-status',
