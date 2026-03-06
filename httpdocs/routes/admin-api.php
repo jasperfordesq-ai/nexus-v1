@@ -430,6 +430,7 @@ $router->add('GET', '/api/v2/admin/federation/partnerships', 'Nexus\Controllers\
 $router->add('POST', '/api/v2/admin/federation/partnerships/{id}/approve', 'Nexus\Controllers\Api\AdminFederationApiController@approvePartnership');
 $router->add('POST', '/api/v2/admin/federation/partnerships/{id}/reject', 'Nexus\Controllers\Api\AdminFederationApiController@rejectPartnership');
 $router->add('POST', '/api/v2/admin/federation/partnerships/{id}/terminate', 'Nexus\Controllers\Api\AdminFederationApiController@terminatePartnership');
+$router->add('POST', '/api/v2/admin/federation/partnerships/request', 'Nexus\Controllers\Api\AdminFederationApiController@requestPartnership');
 $router->add('GET', '/api/v2/admin/federation/directory', 'Nexus\Controllers\Api\AdminFederationApiController@directory');
 $router->add('GET', '/api/v2/admin/federation/directory/profile', 'Nexus\Controllers\Api\AdminFederationApiController@profile');
 $router->add('PUT', '/api/v2/admin/federation/directory/profile', 'Nexus\Controllers\Api\AdminFederationApiController@updateProfile');

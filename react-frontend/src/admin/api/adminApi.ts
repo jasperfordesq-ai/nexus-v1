@@ -1010,7 +1010,18 @@ export const adminFederation = {
   terminatePartnership: (id: number) =>
     api.post('/v2/admin/federation/partnerships/' + id + '/terminate', {}),
 
-  getDirectory: () => api.get('/v2/admin/federation/directory'),
+  getDirectory: (params?: { search?: string; region?: string; category?: string; exclude_partnered?: boolean }) => {
+    const qs = new URLSearchParams();
+    if (params?.search) qs.set('search', params.search);
+    if (params?.region) qs.set('region', params.region);
+    if (params?.category) qs.set('category', params.category);
+    if (params?.exclude_partnered) qs.set('exclude_partnered', '1');
+    const suffix = qs.toString() ? '?' + qs.toString() : '';
+    return api.get('/v2/admin/federation/directory' + suffix);
+  },
+
+  requestPartnership: (targetTenantId: number, notes?: string) =>
+    api.post('/v2/admin/federation/partnerships/request', { target_tenant_id: targetTenantId, notes }),
 
   getProfile: () => api.get('/v2/admin/federation/directory/profile'),
 
