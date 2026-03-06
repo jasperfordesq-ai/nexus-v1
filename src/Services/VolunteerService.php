@@ -350,8 +350,32 @@ class VolunteerService
         try {
             $db = Database::getConnection();
             $tenantId = TenantContext::getId();
+
+            // Fetch pending applicants before deactivating
+            $pendingStmt = $db->prepare("SELECT user_id FROM vol_applications WHERE opportunity_id = ? AND status = 'pending' AND tenant_id = ?");
+            $pendingStmt->execute([$id, $tenantId]);
+            $pendingApplicants = $pendingStmt->fetchAll(\PDO::FETCH_COLUMN);
+
             $stmt = $db->prepare("UPDATE vol_opportunities SET is_active = 0 WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$id, $tenantId]);
+
+            // Notify pending applicants
+            try {
+                foreach ($pendingApplicants as $applicantId) {
+                    $content = "The volunteer opportunity \"{$opp['title']}\" is no longer available.";
+                    NotificationDispatcher::dispatch(
+                        (int)$applicantId,
+                        'volunteering',
+                        $id,
+                        'vol_opportunity_closed',
+                        $content,
+                        '/volunteering',
+                        "<p>{$content}</p>"
+                    );
+                }
+            } catch (\Throwable $e) {
+                // Silent fail
+            }
 
             // Hide from feed_activity
             try {
@@ -502,7 +526,13 @@ class VolunteerService
 
         $db = Database::getConnection();
         $tenantId = TenantContext::getId();
-        $stmt = $db->prepare("SELECT * FROM vol_applications WHERE id = ? AND tenant_id = ?");
+        $stmt = $db->prepare("
+            SELECT a.*, opp.title, opp.id as opportunity_id, org.user_id as org_owner_id
+            FROM vol_applications a
+            JOIN vol_opportunities opp ON a.opportunity_id = opp.id
+            JOIN vol_organizations org ON opp.organization_id = org.id
+            WHERE a.id = ? AND a.tenant_id = ?
+        ");
         $stmt->execute([$applicationId, $tenantId]);
         $app = $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -516,13 +546,41 @@ class VolunteerService
             return false;
         }
 
+        if ($app['status'] === 'approved') {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'You cannot withdraw an approved application. Please contact the organisation directly.'];
+            return false;
+        }
+
         try {
             $stmt = $db->prepare("DELETE FROM vol_applications WHERE id = ? AND tenant_id = ?");
             $stmt->execute([$applicationId, $tenantId]);
+
+            // Notify org owner
+            try {
+                $orgOwnerId = (int)($app['org_owner_id'] ?? 0);
+                if ($orgOwnerId > 0) {
+                    $withdrawer = \Nexus\Models\User::findById($userId);
+                    $withdrawerName = $withdrawer ? trim(($withdrawer['first_name'] ?? '') . ' ' . ($withdrawer['last_name'] ?? '')) : 'A volunteer';
+                    $content = "{$withdrawerName} withdrew their application for: {$app['title']}";
+                    NotificationDispatcher::dispatch(
+                        $orgOwnerId,
+                        'volunteering',
+                        (int)$app['opportunity_id'],
+                        'vol_application_withdrawn',
+                        $content,
+                        '/volunteering/opportunities/' . $app['opportunity_id'] . '/applications',
+                        "<p>{$content}</p>",
+                        true
+                    );
+                }
+            } catch (\Throwable $e) {
+                // Silent fail
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::withdrawApplication error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to withdraw application'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', "message" => 'Failed to withdraw application'];
             return false;
         }
     }
@@ -1088,6 +1146,11 @@ class VolunteerService
 
         if (empty($data['hours']) || $data['hours'] <= 0) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Hours must be greater than 0', 'field' => 'hours'];
+            return null;
+        }
+
+        if ($data['hours'] > 24) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot log more than 24 hours in a single entry', 'field' => 'hours'];
             return null;
         }
 
