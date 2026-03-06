@@ -7,16 +7,15 @@
 namespace Nexus\Tests\Controllers;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Controllers\MatchController;
 use Nexus\Services\MatchingService;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
 /**
- * MatchControllerTest - Tests for the MatchController
+ * MatchControllerTest - Tests for MatchingService
  *
- * Tests API endpoints and controller logic.
- * Note: These are unit tests, not integration tests.
+ * Tests matching service logic (preferences, interactions, suggestions).
+ * Note: These are service-level tests, not HTTP controller tests.
  */
 class MatchControllerTest extends TestCase
 {
@@ -24,7 +23,6 @@ class MatchControllerTest extends TestCase
     private static $testUserId;
     private static $testCategoryId;
     private static $testListingId;
-    private $controller;
 
     public static function setUpBeforeClass(): void
     {
@@ -86,8 +84,6 @@ class MatchControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->controller = new MatchController();
-
         // Simulate logged-in user
         $_SESSION['user_id'] = self::$testUserId;
 
@@ -147,7 +143,7 @@ class MatchControllerTest extends TestCase
         $this->assertIsArray($prefs);
         $this->assertEquals(25, $prefs['max_distance_km']);
         $this->assertEquals(50, $prefs['min_match_score']);
-        $this->assertEquals('daily', $prefs['notification_frequency']);
+        $this->assertEquals('fortnightly', $prefs['notification_frequency']);
     }
 
     /**
@@ -155,11 +151,13 @@ class MatchControllerTest extends TestCase
      */
     public function testPreferencesSaveAndRetrieve(): void
     {
+        // Note: savePreferences uses isset() for boolean flags, so to disable
+        // a flag, the key must be omitted entirely (not set to false).
         $newPrefs = [
             'max_distance_km' => 100,
             'min_match_score' => 30,
             'notification_frequency' => 'weekly',
-            'notify_hot_matches' => false,
+            // 'notify_hot_matches' omitted → 0
             'notify_mutual_matches' => true,
             'categories' => [self::$testCategoryId]
         ];
@@ -172,8 +170,8 @@ class MatchControllerTest extends TestCase
         $this->assertEquals(100, $retrieved['max_distance_km']);
         $this->assertEquals(30, $retrieved['min_match_score']);
         $this->assertEquals('weekly', $retrieved['notification_frequency']);
-        $this->assertFalse($retrieved['notify_hot_matches']);
-        $this->assertTrue($retrieved['notify_mutual_matches']);
+        $this->assertFalse((bool)$retrieved['notify_hot_matches']);
+        $this->assertTrue((bool)$retrieved['notify_mutual_matches']);
         $this->assertContains(self::$testCategoryId, $retrieved['categories']);
     }
 
@@ -355,7 +353,7 @@ class MatchControllerTest extends TestCase
      */
     public function testAllNotificationFrequencyOptions(): void
     {
-        $frequencies = ['instant', 'daily', 'weekly', 'never'];
+        $frequencies = ['daily', 'weekly', 'fortnightly', 'never'];
 
         foreach ($frequencies as $freq) {
             MatchingService::savePreferences(self::$testUserId, [

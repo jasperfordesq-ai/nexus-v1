@@ -101,12 +101,12 @@ class ListingJourneyTest extends DatabaseTestCase
             'description' => 'I can help with gardening tasks including weeding, planting, and maintenance.',
             'type' => 'offer',
             'category_id' => $this->testCategoryId,
-            'time_credits' => 2,
+            'price' => 2,
             'status' => 'active',
         ];
 
         Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, time_credits, status, created_at)
+            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, price, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
             [
                 $listingData['tenant_id'],
@@ -115,7 +115,7 @@ class ListingJourneyTest extends DatabaseTestCase
                 $listingData['description'],
                 $listingData['type'],
                 $listingData['category_id'],
-                $listingData['time_credits'],
+                $listingData['price'],
                 $listingData['status']
             ]
         );
@@ -279,7 +279,7 @@ class ListingJourneyTest extends DatabaseTestCase
     private function createTestListing(string $title, string $type): int
     {
         Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, time_credits, status, created_at)
+            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, price, status, created_at)
              VALUES (?, ?, ?, ?, ?, ?, 1, 'active', NOW())",
             [
                 self::$testTenantId,

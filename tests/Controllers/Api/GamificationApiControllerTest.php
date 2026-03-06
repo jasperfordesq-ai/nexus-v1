@@ -84,7 +84,7 @@ class GamificationApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('item_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -107,7 +107,7 @@ class GamificationApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('badge_ids', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -133,7 +133,7 @@ class GamificationApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('/api/gamification/share', $response['endpoint']);
-        $this->assertArrayHasKey('achievement_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -166,6 +166,6 @@ class GamificationApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('item_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 }

@@ -128,6 +128,17 @@ class OrgTransactionTest extends DatabaseTestCase
 
     public function testGetForOrganizationReturnsArray(): void
     {
+        // Insert data within this test (prior test data is rolled back)
+        OrgTransaction::log(
+            self::$testOrgId,
+            'user',
+            self::$testUserId,
+            'organization',
+            self::$testOrgId,
+            2.0,
+            'Test for getForOrganization'
+        );
+
         $transactions = OrgTransaction::getForOrganization(self::$testOrgId);
         $this->assertIsArray($transactions);
         $this->assertNotEmpty($transactions);
@@ -155,6 +166,17 @@ class OrgTransactionTest extends DatabaseTestCase
 
     public function testCountForOrganizationReturnsInt(): void
     {
+        // Insert data within this test (prior test data is rolled back)
+        OrgTransaction::log(
+            self::$testOrgId,
+            'user',
+            self::$testUserId,
+            'organization',
+            self::$testOrgId,
+            1.0,
+            'Test for count'
+        );
+
         $count = OrgTransaction::countForOrganization(self::$testOrgId);
         $this->assertIsInt($count);
         $this->assertGreaterThan(0, $count);

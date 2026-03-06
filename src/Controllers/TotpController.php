@@ -47,13 +47,13 @@ class TotpController
 
         if (empty($_SESSION['pending_2fa_user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         if (($_SESSION['pending_2fa_expires'] ?? 0) < time()) {
             unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
             header('Location: ' . TenantContext::getBasePath() . '/login?error=2fa_timeout');
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         $userId = (int)$_SESSION['pending_2fa_user_id'];
@@ -62,7 +62,7 @@ class TotpController
 
         if (empty($code)) {
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa?error=code_required');
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         // Try verification
@@ -75,7 +75,7 @@ class TotpController
         if (!$result['success']) {
             $error = urlencode($result['error'] ?? 'Invalid code');
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa?error=' . $error);
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         // 2FA successful - complete login
@@ -121,14 +121,14 @@ class TotpController
 
         if (!$userId) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         $code = trim($_POST['code'] ?? '');
 
         if (empty($code)) {
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa/setup?error=code_required');
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         $result = TotpService::completeSetup($userId, $code);
@@ -136,7 +136,7 @@ class TotpController
         if (!$result['success']) {
             $error = urlencode($result['error'] ?? 'Verification failed');
             header('Location: ' . TenantContext::getBasePath() . '/auth/2fa/setup?error=' . $error);
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         // Store backup codes in session for display
@@ -186,7 +186,7 @@ class TotpController
 
         if (empty($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         // Require password confirmation
@@ -196,7 +196,7 @@ class TotpController
         if (!$user || !password_verify($password, $user['password_hash'])) {
             $_SESSION['flash_error'] = 'Invalid password.';
             header('Location: ' . TenantContext::getBasePath() . '/settings/2fa');
-            if (!defined('TESTING')) { exit; }
+            if (!defined('TESTING')) { exit; } return;
         }
 
         $backupCodes = TotpService::generateBackupCodes($_SESSION['user_id']);

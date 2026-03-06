@@ -126,7 +126,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
     {
         // Step 1: User A creates an "offer" listing
         Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, time_credits, status, created_at)
+            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, price, status, created_at)
              VALUES (?, ?, ?, ?, 'offer', ?, 2, 'active', NOW())",
             [
                 self::$testTenantId,
@@ -141,7 +141,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
 
         // Step 2: User B creates a "request" listing
         Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, time_credits, status, created_at)
+            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, price, status, created_at)
              VALUES (?, ?, ?, ?, 'request', ?, 2, 'active', NOW())",
             [
                 self::$testTenantId,
@@ -163,7 +163,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
 
         // Step 3: User B requests exchange with User A
         Database::query(
-            "INSERT INTO exchanges (tenant_id, listing_id, requester_id, provider_id, status, time_credits, created_at)
+            "INSERT INTO exchanges (tenant_id, listing_id, requester_id, provider_id, status, price, created_at)
              VALUES (?, ?, ?, ?, 'pending', 2, NOW())",
             [
                 self::$testTenantId,
@@ -271,7 +271,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
     {
         // Create and complete an exchange
         Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, time_credits, status, created_at)
+            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, price, status, created_at)
              VALUES (?, ?, 'Computer Repair', 'Fix your computer issues', 'offer', ?, 3, 'active', NOW())",
             [self::$testTenantId, $this->userA_Id, $this->testCategoryId]
         );
@@ -279,7 +279,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
         $this->createdListingIds[] = $listingId;
 
         Database::query(
-            "INSERT INTO exchanges (tenant_id, listing_id, requester_id, provider_id, status, time_credits, created_at, completed_at)
+            "INSERT INTO exchanges (tenant_id, listing_id, requester_id, provider_id, status, price, created_at, completed_at)
              VALUES (?, ?, ?, ?, 'completed', 3, NOW(), NOW())",
             [self::$testTenantId, $listingId, $this->userB_Id, $this->userA_Id]
         );
@@ -288,7 +288,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
 
         // Step 1: User B reviews User A (provider)
         Database::query(
-            "INSERT INTO reviews (tenant_id, reviewer_id, reviewee_id, exchange_id, rating, comment, created_at)
+            "INSERT INTO reviews (tenant_id, reviewer_id, receiver_id, exchange_id, rating, comment, created_at)
              VALUES (?, ?, ?, ?, 5, 'Excellent service! Very professional.', NOW())",
             [self::$testTenantId, $this->userB_Id, $this->userA_Id, $exchangeId]
         );
@@ -297,7 +297,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
 
         // Step 2: User A reviews User B (requester)
         Database::query(
-            "INSERT INTO reviews (tenant_id, reviewer_id, reviewee_id, exchange_id, rating, comment, created_at)
+            "INSERT INTO reviews (tenant_id, reviewer_id, receiver_id, exchange_id, rating, comment, created_at)
              VALUES (?, ?, ?, ?, 5, 'Great communication, easy to work with.', NOW())",
             [self::$testTenantId, $this->userA_Id, $this->userB_Id, $exchangeId]
         );
@@ -320,7 +320,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
 
         $this->assertEquals(5, $review['rating']);
         $this->assertEquals($this->userB_Id, $review['reviewer_id']);
-        $this->assertEquals($this->userA_Id, $review['reviewee_id']);
+        $this->assertEquals($this->userA_Id, $review['receiver_id']);
         $this->assertStringContainsString('Excellent service', $review['comment']);
     }
 
@@ -331,7 +331,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
     {
         // Create a listing and exchange
         Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, time_credits, status, created_at)
+            "INSERT INTO listings (tenant_id, user_id, title, description, type, category_id, price, status, created_at)
              VALUES (?, ?, 'Tutoring Service', 'Math tutoring available', 'offer', ?, 2, 'active', NOW())",
             [self::$testTenantId, $this->userA_Id, $this->testCategoryId]
         );
@@ -340,7 +340,7 @@ class ExchangeJourneyTest extends DatabaseTestCase
 
         // Step 1: Create pending exchange
         Database::query(
-            "INSERT INTO exchanges (tenant_id, listing_id, requester_id, provider_id, status, time_credits, created_at)
+            "INSERT INTO exchanges (tenant_id, listing_id, requester_id, provider_id, status, price, created_at)
              VALUES (?, ?, ?, ?, 'pending', 2, NOW())",
             [self::$testTenantId, $listingId, $this->userB_Id, $this->userA_Id]
         );

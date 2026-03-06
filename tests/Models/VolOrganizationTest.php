@@ -146,6 +146,16 @@ class VolOrganizationTest extends DatabaseTestCase
 
     public function testFindByOwnerReturnsArray(): void
     {
+        // Insert data within this test (prior test data is rolled back)
+        VolOrganization::create(
+            self::$testTenantId,
+            self::$testUserId,
+            'Owner Lookup Org',
+            'Org for findByOwner test',
+            'owner@volorg.com',
+            'https://volorg.example.com'
+        );
+
         $orgs = VolOrganization::findByOwner(self::$testUserId);
         $this->assertIsArray($orgs);
         $this->assertNotEmpty($orgs);

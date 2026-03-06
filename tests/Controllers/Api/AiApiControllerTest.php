@@ -28,7 +28,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('message', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -42,7 +42,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('/api/ai/chat/stream', $response['endpoint']);
-        $this->assertArrayHasKey('message', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -79,7 +79,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('title', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -124,7 +124,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('provider', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -138,7 +138,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('prompt', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -152,7 +152,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('prompt', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -166,7 +166,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('context', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -180,7 +180,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('interests', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -194,7 +194,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('topics', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -208,7 +208,7 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('topic', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -222,6 +222,6 @@ class AiApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('page_type', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 }

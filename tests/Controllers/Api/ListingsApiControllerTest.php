@@ -50,7 +50,13 @@ class ListingsApiControllerTest extends TestCase
         $this->assertEquals(1, $method->getNumberOfParameters());
         $params = $method->getParameters();
         $this->assertEquals('id', $params[0]->getName());
-        $this->assertEquals('int', $params[0]->getType()->getName());
+        $type = $params[0]->getType();
+        if ($type instanceof \ReflectionUnionType) {
+            $typeNames = array_map(fn($t) => $t->getName(), $type->getTypes());
+            $this->assertContains('int', $typeNames);
+        } else {
+            $this->assertEquals('int', $type->getName());
+        }
     }
 
     public function testHasStoreMethod(): void

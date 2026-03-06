@@ -90,6 +90,13 @@ class AiUsageTest extends DatabaseTestCase
 
     public function testGetByUserIdReturnsArray(): void
     {
+        // Insert data within this test (prior test data is rolled back)
+        AiUsage::log(self::$testUserId, 'openai', 'chat', [
+            'tokens_input' => 50,
+            'tokens_output' => 100,
+            'cost_usd' => 0.003,
+        ]);
+
         $usage = AiUsage::getByUserId(self::$testUserId);
         $this->assertIsArray($usage);
         $this->assertNotEmpty($usage);

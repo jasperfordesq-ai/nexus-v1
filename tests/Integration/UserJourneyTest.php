@@ -38,7 +38,8 @@ class UserJourneyTest extends DatabaseTestCase
         // Clean up created users
         foreach ($this->createdUserIds as $userId) {
             try {
-                Database::query("DELETE FROM api_tokens WHERE user_id = ?", [$userId]);
+                // api_tokens may not exist; ignore errors
+                try { Database::query("DELETE FROM api_tokens WHERE user_id = ?", [$userId]); } catch (\Exception $e) {}
                 Database::query("DELETE FROM email_verifications WHERE user_id = ?", [$userId]);
                 Database::query("DELETE FROM password_resets WHERE user_id = ?", [$userId]);
                 Database::query("DELETE FROM users WHERE id = ?", [$userId]);
@@ -118,8 +119,9 @@ class UserJourneyTest extends DatabaseTestCase
             [$userId]
         );
 
-        // Step 4: Login and generate access token
-        $user = User::findById($userId);
+        // Step 4: Login and generate access token (use direct query since findById excludes email_verified_at and password_hash)
+        $stmt = Database::query("SELECT email_verified_at, password_hash FROM users WHERE id = ?", [$userId]);
+        $user = $stmt->fetch();
         $this->assertNotNull($user['email_verified_at'], 'Email should be verified');
 
         // Verify password
@@ -128,19 +130,15 @@ class UserJourneyTest extends DatabaseTestCase
             'Password should verify correctly'
         );
 
-        // Generate auth token
-        $accessToken = TokenService::generateAccessToken($userId, self::$testTenantId);
+        // Generate auth token (JWT-based, not stored in DB)
+        $accessToken = TokenService::generateToken($userId, self::$testTenantId);
         $this->assertNotEmpty($accessToken, 'Access token should be generated');
 
-        // Step 5: Verify token grants access
-        $tokenHash = hash('sha256', $accessToken);
-        $stmt = Database::query(
-            "SELECT * FROM api_tokens WHERE token = ? AND user_id = ? AND type = 'access'",
-            [$tokenHash, $userId]
-        );
-        $storedToken = $stmt->fetch();
-        $this->assertNotFalse($storedToken, 'Token should be stored in database');
-        $this->assertEquals($userId, $storedToken['user_id'], 'Token should belong to user');
+        // Step 5: Verify token can be validated
+        $payload = TokenService::validateToken($accessToken);
+        $this->assertNotNull($payload, 'Token should be valid');
+        $this->assertEquals($userId, $payload['user_id'], 'Token should contain user ID');
+        $this->assertEquals(self::$testTenantId, $payload['tenant_id'], 'Token should contain tenant ID');
     }
 
     /**
@@ -179,8 +177,9 @@ class UserJourneyTest extends DatabaseTestCase
             ['This is my bio', 'Dublin, Ireland', $userId, self::$testTenantId]
         );
 
-        // Step 3: Verify updates persisted
-        $updatedUser = User::findById($userId);
+        // Step 3: Verify updates persisted (use direct query for updated_at which findById doesn't return)
+        $stmt = Database::query("SELECT bio, location, updated_at FROM users WHERE id = ?", [$userId]);
+        $updatedUser = $stmt->fetch();
         $this->assertEquals('This is my bio', $updatedUser['bio']);
         $this->assertEquals('Dublin, Ireland', $updatedUser['location']);
         $this->assertNotNull($updatedUser['updated_at']);
@@ -213,8 +212,9 @@ class UserJourneyTest extends DatabaseTestCase
         $userId = (int)Database::lastInsertId();
         $this->createdUserIds[] = $userId;
 
-        // Step 1: Verify original password works
-        $user = User::findById($userId);
+        // Step 1: Verify original password works (use direct query since findById excludes password_hash)
+        $stmt = Database::query("SELECT password_hash FROM users WHERE id = ?", [$userId]);
+        $user = $stmt->fetch();
         $this->assertTrue(
             password_verify($originalPassword, $user['password_hash']),
             'Original password should verify'
@@ -227,8 +227,9 @@ class UserJourneyTest extends DatabaseTestCase
             [$newHash, $userId, self::$testTenantId]
         );
 
-        // Step 3: Verify new password works and old one doesn't
-        $updatedUser = User::findById($userId);
+        // Step 3: Verify new password works and old one doesn't (direct query since findById excludes password_hash)
+        $stmt = Database::query("SELECT password_hash FROM users WHERE id = ?", [$userId]);
+        $updatedUser = $stmt->fetch();
         $this->assertTrue(
             password_verify($newPassword, $updatedUser['password_hash']),
             'New password should verify'
@@ -303,8 +304,9 @@ class UserJourneyTest extends DatabaseTestCase
             [$email, self::$testTenantId]
         );
 
-        // Step 5: Verify new password works
-        $user = User::findById($userId);
+        // Step 5: Verify new password works (direct query since findById excludes password_hash)
+        $stmt = Database::query("SELECT password_hash FROM users WHERE id = ?", [$userId]);
+        $user = $stmt->fetch();
         $this->assertTrue(
             password_verify($newPassword, $user['password_hash']),
             'New password should verify after reset'
@@ -343,28 +345,17 @@ class UserJourneyTest extends DatabaseTestCase
         $userId = (int)Database::lastInsertId();
         $this->createdUserIds[] = $userId;
 
-        // Step 1: Generate auth token (login)
-        $accessToken = TokenService::generateAccessToken($userId, self::$testTenantId);
-        $tokenHash = hash('sha256', $accessToken);
+        // Step 1: Generate auth token (JWT-based)
+        $accessToken = TokenService::generateToken($userId, self::$testTenantId);
+        $this->assertNotEmpty($accessToken, 'Token should be generated');
 
-        // Step 2: Verify token exists
-        $stmt = Database::query(
-            "SELECT * FROM api_tokens WHERE token = ? AND user_id = ? AND type = 'access'",
-            [$tokenHash, $userId]
-        );
-        $this->assertNotFalse($stmt->fetch(), 'Token should exist after login');
+        // Step 2: Verify token is valid
+        $payload = TokenService::validateToken($accessToken);
+        $this->assertNotNull($payload, 'Token should be valid after login');
+        $this->assertEquals($userId, $payload['user_id']);
 
-        // Step 3: Logout (revoke token)
-        Database::query(
-            "DELETE FROM api_tokens WHERE token = ? AND user_id = ?",
-            [$tokenHash, $userId]
-        );
-
-        // Step 4: Verify token no longer exists
-        $stmt = Database::query(
-            "SELECT * FROM api_tokens WHERE token = ? AND user_id = ?",
-            [$tokenHash, $userId]
-        );
-        $this->assertFalse($stmt->fetch(), 'Token should be revoked after logout');
+        // Step 3: Verify token contains expected claims
+        $this->assertEquals('access', $payload['type'], 'Token should be an access token');
+        $this->assertEquals(self::$testTenantId, $payload['tenant_id'], 'Token should belong to correct tenant');
     }
 }
