@@ -16,6 +16,7 @@ import { MobileTabBar } from './MobileTabBar';
 import { Footer } from './Footer';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
+import { UpdateAvailableBanner } from '@/components/feedback/UpdateAvailableBanner';
 import { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
@@ -74,6 +75,9 @@ export function Layout({
 
       {/* Offline indicator */}
       <OfflineIndicator />
+
+      {/* Service worker update banner — user-controlled, never auto-reloads */}
+      <UpdateAvailableBanner />
 
       {/* Navigation */}
       {showNavbar && (

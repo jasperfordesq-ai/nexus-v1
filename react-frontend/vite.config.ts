@@ -21,7 +21,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       // Don't inject SW registration into index.html automatically —
       // we handle it in main.tsx so it only fires in production builds
       injectRegister: null,
