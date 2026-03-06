@@ -254,18 +254,58 @@ class AdminSuperApiController extends BaseApiController
             return;
         }
 
+        // Validate slug format (alphanumeric + hyphens only, no leading/trailing hyphens)
+        $slug = trim($input['slug'] ?? '');
+        if ($slug !== '' && !preg_match('/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/', $slug)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Slug must contain only lowercase letters, numbers, and hyphens', 'slug', 422);
+            return;
+        }
+
+        // Validate domain format if provided
+        $domain = trim($input['domain'] ?? '');
+        if ($domain !== '' && !preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i', $domain)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Domain must be a valid domain name', 'domain', 422);
+            return;
+        }
+
+        // Validate contact email if provided
+        $contactEmail = trim($input['contact_email'] ?? '');
+        if ($contactEmail !== '' && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_email must be a valid email address', 'contact_email', 422);
+            return;
+        }
+
+        // Validate contact phone if provided (international E.164 format)
+        $contactPhone = trim($input['contact_phone'] ?? '');
+        if ($contactPhone !== '' && !\Nexus\Core\Validator::isPhone($contactPhone)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_phone must be a valid international phone number', 'contact_phone', 422);
+            return;
+        }
+
+        // Validate latitude/longitude if provided
+        $latitude = $input['latitude'] ?? '';
+        $longitude = $input['longitude'] ?? '';
+        if ($latitude !== '' && (float)$latitude !== 0.0 && ((float)$latitude < -90 || (float)$latitude > 90)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Latitude must be between -90 and 90', 'latitude', 422);
+            return;
+        }
+        if ($longitude !== '' && (float)$longitude !== 0.0 && ((float)$longitude < -180 || (float)$longitude > 180)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Longitude must be between -180 and 180', 'longitude', 422);
+            return;
+        }
+
         $data = [
             'name' => $name,
-            'slug' => trim($input['slug'] ?? ''),
-            'domain' => trim($input['domain'] ?? ''),
+            'slug' => $slug,
+            'domain' => $domain,
             'tagline' => $input['tagline'] ?? '',
             'description' => $input['description'] ?? '',
             'allows_subtenants' => !empty($input['allows_subtenants']),
             'max_depth' => (int) ($input['max_depth'] ?? 2),
             'is_active' => isset($input['is_active']) ? (int) (bool) $input['is_active'] : 1,
             'features' => $input['features'] ?? null,
-            'contact_email' => $input['contact_email'] ?? '',
-            'contact_phone' => $input['contact_phone'] ?? '',
+            'contact_email' => $contactEmail,
+            'contact_phone' => $contactPhone,
             'address' => $input['address'] ?? '',
             // SEO fields
             'meta_title' => $input['meta_title'] ?? '',
@@ -278,8 +318,8 @@ class AdminSuperApiController extends BaseApiController
             'location_name' => $input['location_name'] ?? '',
             'country_code' => $input['country_code'] ?? '',
             'service_area' => $input['service_area'] ?? '',
-            'latitude' => $input['latitude'] ?? '',
-            'longitude' => $input['longitude'] ?? '',
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             // Social media fields
             'social_facebook' => $input['social_facebook'] ?? '',
             'social_twitter' => $input['social_twitter'] ?? '',
@@ -322,6 +362,54 @@ class AdminSuperApiController extends BaseApiController
         if (empty($input)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Request body is empty', null, 422);
             return;
+        }
+
+        // Validate slug format if being updated
+        if (isset($input['slug']) && trim($input['slug']) !== '') {
+            $slug = trim($input['slug']);
+            if (!preg_match('/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/', $slug)) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Slug must contain only lowercase letters, numbers, and hyphens', 'slug', 422);
+                return;
+            }
+        }
+
+        // Validate domain format if being updated
+        if (isset($input['domain']) && trim($input['domain']) !== '') {
+            $domain = trim($input['domain']);
+            if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i', $domain)) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Domain must be a valid domain name', 'domain', 422);
+                return;
+            }
+        }
+
+        // Validate contact email if being updated
+        if (isset($input['contact_email']) && trim($input['contact_email']) !== '') {
+            if (!filter_var(trim($input['contact_email']), FILTER_VALIDATE_EMAIL)) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_email must be a valid email address', 'contact_email', 422);
+                return;
+            }
+        }
+
+        // Validate contact phone if being updated (international E.164 format)
+        if (isset($input['contact_phone']) && trim($input['contact_phone']) !== '') {
+            if (!\Nexus\Core\Validator::isPhone(trim($input['contact_phone']))) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'contact_phone must be a valid international phone number', 'contact_phone', 422);
+                return;
+            }
+        }
+
+        // Validate latitude/longitude if being updated
+        if (isset($input['latitude']) && $input['latitude'] !== '' && (float)$input['latitude'] !== 0.0) {
+            if ((float)$input['latitude'] < -90 || (float)$input['latitude'] > 90) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Latitude must be between -90 and 90', 'latitude', 422);
+                return;
+            }
+        }
+        if (isset($input['longitude']) && $input['longitude'] !== '' && (float)$input['longitude'] !== 0.0) {
+            if ((float)$input['longitude'] < -180 || (float)$input['longitude'] > 180) {
+                $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Longitude must be between -180 and 180', 'longitude', 422);
+                return;
+            }
         }
 
         $result = TenantHierarchyService::updateTenant($tenantId, $input);

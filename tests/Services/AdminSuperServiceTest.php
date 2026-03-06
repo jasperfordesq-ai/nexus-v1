@@ -605,4 +605,243 @@ class AdminSuperServiceTest extends DatabaseTestCase
 
         $this->assertIsBool($result);
     }
+
+    // =========================================================================
+    // TenantHierarchyService — Comprehensive tenant creation tests
+    // =========================================================================
+
+    /**
+     * Helper: set up super admin session so TenantHierarchyService permission checks pass
+     */
+    private function setUpSuperAdminSession(): void
+    {
+        // Reset cached access from prior tests
+        \Nexus\Middleware\SuperPanelAccess::reset();
+
+        // Ensure the test user has is_super_admin flag
+        Database::query(
+            "UPDATE users SET is_super_admin = 1 WHERE id = ?",
+            [self::$testUserId]
+        );
+
+        // Ensure master tenant allows sub-tenants
+        Database::query(
+            "UPDATE tenants SET allows_subtenants = 1, max_depth = 5 WHERE id = 1"
+        );
+
+        // Set session so SuperPanelAccess::getAccess() finds the user
+        $_SESSION['user_id'] = self::$testUserId;
+        $_SESSION['is_super_admin'] = true;
+    }
+
+    /**
+     * Helper: create a tenant and return the result, cleaning up on success
+     */
+    private function createTestTenant(array $overrides = [], int $parentId = 1): array
+    {
+        $this->setUpSuperAdminSession();
+
+        $data = array_merge([
+            'name' => 'Test Tenant ' . uniqid(),
+            'slug' => 'test-tenant-' . uniqid(),
+        ], $overrides);
+
+        $result = TenantHierarchyService::createTenant($data, $parentId);
+
+        if ($result['success']) {
+            $this->tenantsToCleanUp[] = $result['tenant_id'];
+        }
+
+        return $result;
+    }
+
+    private array $tenantsToCleanUp = [];
+
+    protected function tearDown(): void
+    {
+        // Deactivate any tenants created during tests
+        foreach ($this->tenantsToCleanUp as $id) {
+            try {
+                Database::query("UPDATE tenants SET is_active = 0 WHERE id = ?", [$id]);
+            } catch (\Exception $e) {
+                // ignore cleanup errors
+            }
+        }
+        $this->tenantsToCleanUp = [];
+
+        // Clean up session and cached access
+        unset($_SESSION['user_id'], $_SESSION['is_super_admin']);
+        \Nexus\Middleware\SuperPanelAccess::reset();
+
+        parent::tearDown();
+    }
+
+    /**
+     * Duplicate slug should be rejected
+     */
+    public function testCreateTenantDuplicateSlugFails(): void
+    {
+        $slug = 'dup-slug-' . uniqid();
+
+        $first = $this->createTestTenant(['slug' => $slug]);
+        $this->assertTrue($first['success'], 'First tenant should succeed');
+
+        $second = $this->createTestTenant(['slug' => $slug]);
+        $this->assertFalse($second['success'], 'Duplicate slug should fail');
+        $this->assertStringContainsStringIgnoringCase('slug', $second['error']);
+    }
+
+    /**
+     * Duplicate domain should be rejected
+     */
+    public function testCreateTenantDuplicateDomainFails(): void
+    {
+        $domain = 'dup-' . uniqid() . '.example.com';
+
+        $first = $this->createTestTenant(['domain' => $domain]);
+        $this->assertTrue($first['success'], 'First tenant should succeed');
+
+        $second = $this->createTestTenant(['domain' => $domain]);
+        $this->assertFalse($second['success'], 'Duplicate domain should fail');
+        $this->assertStringContainsStringIgnoringCase('domain', $second['error']);
+    }
+
+    /**
+     * Created tenant should have default categories seeded
+     */
+    public function testCreateTenantSeedsCategories(): void
+    {
+        $result = $this->createTestTenant();
+        $this->assertTrue($result['success']);
+
+        $count = Database::query(
+            "SELECT COUNT(*) FROM categories WHERE tenant_id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+
+        $this->assertGreaterThan(0, (int)$count, 'Categories should be seeded');
+    }
+
+    /**
+     * Created tenant should have default attributes seeded
+     */
+    public function testCreateTenantSeedsAttributes(): void
+    {
+        $result = $this->createTestTenant();
+        $this->assertTrue($result['success']);
+
+        $count = Database::query(
+            "SELECT COUNT(*) FROM attributes WHERE tenant_id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+
+        $this->assertGreaterThan(0, (int)$count, 'Attributes should be seeded');
+    }
+
+    /**
+     * Created tenant should have default menus seeded
+     */
+    public function testCreateTenantSeedsMenus(): void
+    {
+        $result = $this->createTestTenant();
+        $this->assertTrue($result['success']);
+
+        $count = Database::query(
+            "SELECT COUNT(*) FROM menus WHERE tenant_id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+
+        $this->assertGreaterThan(0, (int)$count, 'Menus should be seeded');
+    }
+
+    /**
+     * Created tenant should have default settings seeded
+     */
+    public function testCreateTenantSeedsSettings(): void
+    {
+        $result = $this->createTestTenant();
+        $this->assertTrue($result['success']);
+
+        $count = Database::query(
+            "SELECT COUNT(*) FROM tenant_settings WHERE tenant_id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+
+        $this->assertGreaterThan(0, (int)$count, 'Settings should be seeded');
+    }
+
+    /**
+     * Created tenant should have features JSON populated (not NULL)
+     */
+    public function testCreateTenantSeedsDefaultFeatures(): void
+    {
+        $result = $this->createTestTenant();
+        $this->assertTrue($result['success']);
+
+        $features = Database::query(
+            "SELECT features FROM tenants WHERE id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+
+        $this->assertNotNull($features, 'Features should not be NULL');
+        $decoded = json_decode($features, true);
+        $this->assertIsArray($decoded, 'Features should be valid JSON');
+        $this->assertNotEmpty($decoded, 'Features should contain defaults');
+    }
+
+    /**
+     * Custom features should be preserved (not overwritten by defaults)
+     */
+    public function testCreateTenantPreservesCustomFeatures(): void
+    {
+        $customFeatures = ['listings' => true, 'events' => false, 'groups' => true];
+        $result = $this->createTestTenant(['features' => $customFeatures]);
+        $this->assertTrue($result['success']);
+
+        $features = Database::query(
+            "SELECT features FROM tenants WHERE id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+
+        $decoded = json_decode($features, true);
+        $this->assertTrue($decoded['listings'], 'Custom feature listings should be true');
+        $this->assertFalse($decoded['events'], 'Custom feature events should be false');
+        $this->assertTrue($decoded['groups'], 'Custom feature groups should be true');
+    }
+
+    /**
+     * Path should be correctly generated (parent path + tenant ID)
+     */
+    public function testCreateTenantGeneratesCorrectPath(): void
+    {
+        $result = $this->createTestTenant();
+        $this->assertTrue($result['success']);
+
+        $tenant = Database::query(
+            "SELECT path, depth FROM tenants WHERE id = ?",
+            [$result['tenant_id']]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        $this->assertStringContainsString((string)$result['tenant_id'], $tenant['path']);
+        $this->assertNotEmpty($tenant['path'], 'Path should be set');
+        $this->assertGreaterThan(0, (int)$tenant['depth']);
+    }
+
+    /**
+     * Slug auto-generation from name should work
+     */
+    public function testCreateTenantAutoGeneratesSlug(): void
+    {
+        $name = 'Auto Slug Test ' . uniqid();
+        $result = $this->createTestTenant(['name' => $name, 'slug' => '']);
+        $this->assertTrue($result['success']);
+
+        $slug = Database::query(
+            "SELECT slug FROM tenants WHERE id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+
+        $this->assertNotEmpty($slug, 'Slug should be auto-generated');
+        $this->assertMatchesRegularExpression('/^[a-z0-9-]+$/', $slug, 'Slug should be URL-safe');
+    }
 }

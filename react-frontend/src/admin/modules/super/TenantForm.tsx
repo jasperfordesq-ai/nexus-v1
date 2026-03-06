@@ -358,7 +358,7 @@ export function TenantForm() {
                 value={form.slug}
                 onValueChange={(v) => {
                   setSlugAutoGen(false);
-                  updateField('slug', v);
+                  updateField('slug', v.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                 }}
                 isRequired={!isEdit}
                 isDisabled={isEdit}

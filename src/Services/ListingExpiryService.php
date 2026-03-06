@@ -108,7 +108,7 @@ class ListingExpiryService
 
         try {
             $tenants = Database::query(
-                "SELECT id FROM tenants WHERE status = 'active'"
+                "SELECT id FROM tenants WHERE is_active = 1"
             )->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             error_log("[ListingExpiryService] Failed to fetch tenants: " . $e->getMessage());
@@ -161,11 +161,11 @@ class ListingExpiryService
         // Authorization: owner or admin
         if ((int)$listing['user_id'] !== $userId) {
             $user = Database::query(
-                "SELECT role, is_super_admin FROM users WHERE id = ?",
+                "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
                 [$userId]
             )->fetch(\PDO::FETCH_ASSOC);
 
-            if (!$user || ($user['role'] !== 'admin' && !$user['is_super_admin'])) {
+            if (!$user || (!in_array($user['role'], ['admin', 'tenant_admin']) && !$user['is_super_admin'] && !$user['is_tenant_super_admin'])) {
                 return ['success' => false, 'error' => 'You do not have permission to renew this listing', 'new_expires_at' => null];
             }
         }

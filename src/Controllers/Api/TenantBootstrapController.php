@@ -148,6 +148,13 @@ class TenantBootstrapController extends BaseApiController
 
         // Build bootstrap data from tenant context
         $tenant = TenantContext::get();
+
+        // Guard: if resolved tenant is inactive (e.g. stale token/header), reject
+        if (!empty($tenant['id']) && $tenant['id'] > 1 && empty($tenant['is_active'])) {
+            $this->respondWithError(\Nexus\Core\ApiErrorCodes::INVALID_TENANT, 'Tenant is inactive', null, 503);
+            return;
+        }
+
         $data = $this->buildBootstrapData($tenant);
 
         // Cache the result

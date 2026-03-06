@@ -282,6 +282,16 @@ class Menu
      */
     public static function seedDefaults($tenantId)
     {
+        // Skip if menus already exist for this tenant (idempotent)
+        $existing = Database::query(
+            "SELECT COUNT(*) as cnt FROM menus WHERE tenant_id = ?",
+            [$tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        if ($existing && (int)$existing['cnt'] > 0) {
+            return [];
+        }
+
         // Create main navigation menu
         $mainMenuId = self::create([
             'tenant_id' => $tenantId,
