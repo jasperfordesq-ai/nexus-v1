@@ -1109,7 +1109,7 @@ export interface SuperAdminTenantDetail extends SuperAdminTenant {
 }
 
 export interface CreateTenantPayload {
-  parent_id: number;
+  parent_id?: number;
   name: string;
   slug: string;
   domain?: string;
@@ -1119,6 +1119,7 @@ export interface CreateTenantPayload {
   max_depth?: number;
   is_active?: boolean;
   features?: Record<string, boolean>;
+  configuration?: Record<string, unknown>;
   contact_email?: string;
   contact_phone?: string;
   address?: string;
@@ -1169,6 +1170,7 @@ export interface UpdateTenantPayload {
   social_linkedin?: string;
   social_youtube?: string;
   features?: Record<string, boolean>;
+  configuration?: Record<string, unknown>;
 }
 
 export interface TenantHierarchyNode {
@@ -1772,4 +1774,89 @@ export interface Partnership {
   suspended_reason?: string | null;
   terminated_at?: string | null;
   terminated_reason?: string | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CRM (Member Notes, Coordinator Tasks, Tags)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface CrmDashboardStats {
+  total_members: number;
+  active_members: number;
+  new_this_month: number;
+  pending_approvals: number;
+  open_tasks: number;
+  overdue_tasks: number;
+  total_notes: number;
+  never_logged_in: number;
+  retention_rate: number;
+}
+
+export interface CrmFunnelStage {
+  name: string;
+  count: number;
+  color: string;
+}
+
+export interface CrmFunnelData {
+  stages: CrmFunnelStage[];
+  monthly_registrations: Array<{ month: string; count: number }>;
+}
+
+export interface MemberNote {
+  id: number;
+  tenant_id: number;
+  user_id: number;
+  author_id: number;
+  content: string;
+  category: 'general' | 'outreach' | 'support' | 'onboarding' | 'concern' | 'follow_up';
+  is_pinned: number;
+  created_at: string;
+  updated_at: string;
+  user_name: string;
+  user_avatar: string | null;
+  author_name: string;
+}
+
+export interface CoordinatorTask {
+  id: number;
+  tenant_id: number;
+  assigned_to: number;
+  user_id: number | null;
+  title: string;
+  description: string | null;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  due_date: string | null;
+  completed_at: string | null;
+  created_by: number;
+  created_at: string;
+  updated_at: string;
+  assigned_to_name: string;
+  created_by_name: string;
+  user_name: string | null;
+  user_avatar: string | null;
+}
+
+export interface MemberTag {
+  id: number;
+  tenant_id: number;
+  user_id: number;
+  tag: string;
+  created_by: number;
+  created_at: string;
+  user_name?: string;
+}
+
+export interface TagSummary {
+  tag: string;
+  member_count: number;
+}
+
+export interface CrmAdmin {
+  id: number;
+  name: string;
+  email: string;
+  avatar_url: string | null;
+  role: string;
 }
