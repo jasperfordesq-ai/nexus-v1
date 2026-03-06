@@ -206,6 +206,8 @@ export const adminUsers = {
     api.post(`/v2/admin/users/${userId}/impersonate`),
   setSuperAdmin: (userId: number, grant: boolean) =>
     api.put(`/v2/admin/users/${userId}/super-admin`, { grant }),
+  setGlobalSuperAdmin: (userId: number, grant: boolean) =>
+    api.put(`/v2/admin/users/${userId}/global-super-admin`, { grant }),
 
   recheckUserBadges: (userId: number) =>
     api.post<{ rechecked: boolean; user_id: number; badges: import('./types').AdminBadge[] }>(`/v2/admin/users/${userId}/badges/recheck`),

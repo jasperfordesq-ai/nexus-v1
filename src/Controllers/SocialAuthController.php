@@ -103,6 +103,7 @@ class SocialAuthController
             $_SESSION['user_email'] = $user['email']; // For biometric login
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
+            $_SESSION['is_tenant_super_admin'] = $user['is_tenant_super_admin'] ?? 0;
 
             // Log Activity
             \Nexus\Models\ActivityLog::log($user['id'], 'login', 'User logged in via ' . ucfirst($provider));

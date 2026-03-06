@@ -742,12 +742,12 @@ class ListingService
 
         // Check if user is admin
         $user = Database::query(
-            "SELECT role, is_super_admin FROM users WHERE id = ?",
+            "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
             [$userId]
         )->fetch(\PDO::FETCH_ASSOC);
 
         if ($user) {
-            if ($user['role'] === 'admin' || $user['is_super_admin']) {
+            if (in_array($user['role'], ['admin', 'tenant_admin']) || $user['is_super_admin'] || $user['is_tenant_super_admin']) {
                 return true;
             }
         }

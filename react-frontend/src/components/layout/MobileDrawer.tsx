@@ -435,7 +435,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             </div>
 
             {/* Admin Tools */}
-            {isAuthenticated && user && (user.role === 'admin' || user.role === 'tenant_admin' || user.role === 'super_admin' || user.is_admin || user.is_super_admin) && (
+            {isAuthenticated && user && (user.role === 'admin' || user.role === 'tenant_admin' || user.role === 'super_admin' || user.is_admin || user.is_super_admin || user.is_tenant_super_admin) && (
               <div>
                 <Divider className="bg-theme-elevated mb-4" />
                 <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">

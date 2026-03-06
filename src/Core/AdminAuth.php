@@ -11,7 +11,8 @@ namespace Nexus\Core;
  *
  * Hierarchy (highest to lowest):
  * 1. God (is_god=1) - Bypasses ALL permission checks, can manage everything
- * 2. Super Admin (is_super_admin=1) - Can access all tenants
+ * 2. Super Admin (is_super_admin=1) - Can access all tenants (global bypass)
+ * 2b. Tenant Super Admin (is_tenant_super_admin=1) - Can access tenant + sub-tenants (hierarchy-scoped)
  * 3. Admin (role=admin) - Full access to their tenant
  * 4. Tenant Admin (role=tenant_admin) - Can manage their tenant
  * 5. Newsletter Admin (role=newsletter_admin) - Newsletter module only
@@ -32,7 +33,7 @@ class AdminAuth
      */
     public static function isSuperAdmin(): bool
     {
-        return !empty($_SESSION['is_super_admin']) || self::isGod();
+        return !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']) || self::isGod();
     }
 
     /**
@@ -172,8 +173,8 @@ class AdminAuth
                 return false;
             }
 
-            // Can't manage super admins
-            if (!empty($targetUser['is_super_admin'])) {
+            // Can't manage super admins (global or tenant-scoped)
+            if (!empty($targetUser['is_super_admin']) || !empty($targetUser['is_tenant_super_admin'])) {
                 return false;
             }
 
@@ -213,7 +214,7 @@ class AdminAuth
 
         // Super admins can impersonate non-god, non-super-admin users
         if (self::isSuperAdmin()) {
-            return empty($targetUser['is_super_admin']);
+            return empty($targetUser['is_super_admin']) && empty($targetUser['is_tenant_super_admin']);
         }
 
         // Regular admins can only impersonate users in their tenant
@@ -227,7 +228,7 @@ class AdminAuth
 
             // Can't impersonate admins or super admins
             $targetRole = $targetUser['role'] ?? 'member';
-            if (in_array($targetRole, ['admin', 'super_admin']) || !empty($targetUser['is_super_admin'])) {
+            if (in_array($targetRole, ['admin', 'super_admin']) || !empty($targetUser['is_super_admin']) || !empty($targetUser['is_tenant_super_admin'])) {
                 return false;
             }
 

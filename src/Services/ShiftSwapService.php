@@ -414,19 +414,53 @@ class ShiftSwapService
     private static function executeSwap(array $swap): bool
     {
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
 
         try {
             $db->beginTransaction();
 
-            // Swap shift assignments in vol_applications
-            $tenantId = TenantContext::getId();
+            // Lock both assignments first so we either swap both or none.
+            $fromAppStmt = $db->prepare("
+                SELECT id
+                FROM vol_applications
+                WHERE user_id = ? AND shift_id = ? AND status = 'approved' AND tenant_id = ?
+                ORDER BY id ASC
+                LIMIT 1
+                FOR UPDATE
+            ");
+            $fromAppStmt->execute([$swap['from_user_id'], $swap['from_shift_id'], $tenantId]);
+            $fromApp = $fromAppStmt->fetch(\PDO::FETCH_ASSOC);
+
+            $toAppStmt = $db->prepare("
+                SELECT id
+                FROM vol_applications
+                WHERE user_id = ? AND shift_id = ? AND status = 'approved' AND tenant_id = ?
+                ORDER BY id ASC
+                LIMIT 1
+                FOR UPDATE
+            ");
+            $toAppStmt->execute([$swap['to_user_id'], $swap['to_shift_id'], $tenantId]);
+            $toApp = $toAppStmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$fromApp || !$toApp) {
+                $db->rollBack();
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'One or both volunteers are no longer assigned to the requested shifts'];
+                return false;
+            }
+
             // User A: from_shift -> to_shift
-            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE user_id = ? AND shift_id = ? AND status = 'approved' AND tenant_id = ?");
-            $stmt->execute([$swap['to_shift_id'], $swap['from_user_id'], $swap['from_shift_id'], $tenantId]);
+            $updateFromStmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE id = ? AND tenant_id = ?");
+            $updateFromStmt->execute([$swap['to_shift_id'], $fromApp['id'], $tenantId]);
 
             // User B: to_shift -> from_shift
-            $stmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE user_id = ? AND shift_id = ? AND status = 'approved' AND tenant_id = ?");
-            $stmt->execute([$swap['from_shift_id'], $swap['to_user_id'], $swap['to_shift_id'], $tenantId]);
+            $updateToStmt = $db->prepare("UPDATE vol_applications SET shift_id = ? WHERE id = ? AND tenant_id = ?");
+            $updateToStmt->execute([$swap['from_shift_id'], $toApp['id'], $tenantId]);
+
+            if ($updateFromStmt->rowCount() !== 1 || $updateToStmt->rowCount() !== 1) {
+                $db->rollBack();
+                self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to apply swap assignments atomically'];
+                return false;
+            }
 
             // Update swap status
             $stmt = $db->prepare("UPDATE vol_shift_swap_requests SET status = 'accepted' WHERE id = ? AND tenant_id = ?");
@@ -453,7 +487,9 @@ class ShiftSwapService
 
             return true;
         } catch (\Exception $e) {
-            $db->rollBack();
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
             error_log("ShiftSwapService::executeSwap error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to execute shift swap'];
             return false;

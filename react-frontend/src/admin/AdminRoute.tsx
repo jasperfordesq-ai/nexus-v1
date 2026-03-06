@@ -36,7 +36,8 @@ export function AdminRoute() {
     role === 'tenant_admin' ||
     role === 'super_admin' ||
     userRecord?.is_admin === true ||
-    userRecord?.is_super_admin === true;
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_tenant_super_admin === true;
 
   if (!isAdmin) {
     return <Navigate to={tenantPath('/dashboard')} replace />;

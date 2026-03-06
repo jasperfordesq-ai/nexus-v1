@@ -30,7 +30,7 @@ class RolesController
     private function requireAdmin(): void
     {
         $isAdmin = isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'super_admin', 'tenant_admin']);
-        $isSuperAdmin = !empty($_SESSION['is_super_admin']);
+        $isSuperAdmin = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
         if (!$isAdmin && !$isSuperAdmin) {
             header('Location: ' . TenantContext::getBasePath() . '/login');

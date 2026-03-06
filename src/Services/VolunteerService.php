@@ -928,11 +928,23 @@ class VolunteerService
         $limit = min($filters['limit'] ?? 20, 50);
         $cursor = $filters['cursor'] ?? null;
 
-        $cursorId = null;
+        $cursorStartTime = null;
+        $cursorShiftId = null;
+        $legacyCursorId = null;
         if ($cursor) {
             $decoded = base64_decode($cursor, true);
-            if ($decoded && is_numeric($decoded)) {
-                $cursorId = (int)$decoded;
+            if ($decoded !== false) {
+                $decodedCursor = json_decode($decoded, true);
+                if (
+                    is_array($decodedCursor)
+                    && isset($decodedCursor['start_time'], $decodedCursor['id'])
+                    && is_numeric($decodedCursor['id'])
+                ) {
+                    $cursorStartTime = (string)$decodedCursor['start_time'];
+                    $cursorShiftId = (int)$decodedCursor['id'];
+                } elseif (is_numeric($decoded)) {
+                    $legacyCursorId = (int)$decoded;
+                }
             }
         }
 
@@ -955,12 +967,19 @@ class VolunteerService
             $sql .= " AND s.start_time > NOW()";
         }
 
-        if ($cursorId) {
+        if ($cursorStartTime !== null && $cursorShiftId !== null) {
+            // Stable keyset pagination for ORDER BY start_time ASC, id ASC
+            $sql .= " AND (s.start_time > ? OR (s.start_time = ? AND s.id > ?))";
+            $params[] = $cursorStartTime;
+            $params[] = $cursorStartTime;
+            $params[] = $cursorShiftId;
+        } elseif ($legacyCursorId) {
+            // Backward compatibility for older numeric cursors
             $sql .= " AND s.id < ?";
-            $params[] = $cursorId;
+            $params[] = $legacyCursorId;
         }
 
-        $sql .= " ORDER BY s.start_time ASC, s.id DESC";
+        $sql .= " ORDER BY s.start_time ASC, s.id ASC";
         $sql .= " LIMIT " . ($limit + 1);
 
         $stmt = $db->prepare($sql);
@@ -974,9 +993,11 @@ class VolunteerService
 
         $items = [];
         $lastId = null;
+        $lastStartTime = null;
 
         foreach ($shifts as $shift) {
             $lastId = $shift['id'];
+            $lastStartTime = $shift['start_time'];
             $items[] = [
                 'id' => (int)$shift['id'],
                 'application_id' => (int)$shift['application_id'],
@@ -995,7 +1016,9 @@ class VolunteerService
 
         return [
             'items' => $items,
-            'cursor' => $hasMore && $lastId ? base64_encode((string)$lastId) : null,
+            'cursor' => $hasMore && $lastId && $lastStartTime
+                ? base64_encode(json_encode(['start_time' => $lastStartTime, 'id' => (int)$lastId]))
+                : null,
             'has_more' => $hasMore,
         ];
     }
@@ -1539,11 +1562,23 @@ class VolunteerService
         $limit = min($filters['limit'] ?? 20, 50);
         $cursor = $filters['cursor'] ?? null;
 
+        $cursorName = null;
         $cursorId = null;
+        $legacyCursorId = null;
         if ($cursor) {
             $decoded = base64_decode($cursor, true);
-            if ($decoded && is_numeric($decoded)) {
-                $cursorId = (int)$decoded;
+            if ($decoded !== false) {
+                $decodedCursor = json_decode($decoded, true);
+                if (
+                    is_array($decodedCursor)
+                    && isset($decodedCursor['name'], $decodedCursor['id'])
+                    && is_numeric($decodedCursor['id'])
+                ) {
+                    $cursorName = (string)$decodedCursor['name'];
+                    $cursorId = (int)$decodedCursor['id'];
+                } elseif (is_numeric($decoded)) {
+                    $legacyCursorId = (int)$decoded;
+                }
             }
         }
 
@@ -1563,9 +1598,16 @@ class VolunteerService
             $params[] = $searchTerm;
         }
 
-        if ($cursorId) {
-            $sql .= " AND vo.id < ?";
+        if ($cursorName !== null && $cursorId !== null) {
+            // Stable keyset pagination for ORDER BY name ASC, id DESC
+            $sql .= " AND (vo.name > ? OR (vo.name = ? AND vo.id < ?))";
+            $params[] = $cursorName;
+            $params[] = $cursorName;
             $params[] = $cursorId;
+        } elseif ($legacyCursorId) {
+            // Backward compatibility for older numeric cursors
+            $sql .= " AND vo.id < ?";
+            $params[] = $legacyCursorId;
         }
 
         $sql .= " ORDER BY vo.name ASC, vo.id DESC";
@@ -1582,9 +1624,11 @@ class VolunteerService
 
         $items = [];
         $lastId = null;
+        $lastName = null;
 
         foreach ($organizations as $org) {
             $lastId = $org['id'];
+            $lastName = $org['name'];
             $items[] = [
                 'id' => (int)$org['id'],
                 'name' => $org['name'],
@@ -1607,7 +1651,9 @@ class VolunteerService
 
         return [
             'items' => $items,
-            'cursor' => $hasMore && $lastId ? base64_encode((string)$lastId) : null,
+            'cursor' => $hasMore && $lastId && $lastName !== null
+                ? base64_encode(json_encode(['name' => $lastName, 'id' => (int)$lastId]))
+                : null,
             'has_more' => $hasMore,
         ];
     }

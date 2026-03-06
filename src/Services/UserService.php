@@ -175,6 +175,8 @@ class UserService
             $profile['role'] = $user['role'] ?? 'member';
             $profile['is_admin'] = in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']);
             $profile['is_super_admin'] = !empty($user['is_super_admin']);
+            $profile['is_god'] = !empty($user['is_god']);
+            $profile['is_tenant_super_admin'] = !empty($user['is_tenant_super_admin']);
             $profile['is_approved'] = (bool)($user['is_approved'] ?? false);
             $profile['privacy_profile'] = $user['privacy_profile'] ?? 'public';
             $profile['privacy_search'] = (bool)($user['privacy_search'] ?? true);

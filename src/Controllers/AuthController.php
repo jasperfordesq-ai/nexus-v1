@@ -189,6 +189,7 @@ class AuthController
             $_SESSION['user_role'] = $user['role'] ?? 'member';
             $_SESSION['role'] = $user['role'] ?? 'member'; // Add 'role' for backwards compatibility
             $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
+            $_SESSION['is_tenant_super_admin'] = $user['is_tenant_super_admin'] ?? 0;
             $_SESSION['is_god'] = $user['is_god'] ?? 0; // God mode: can manage super admins
             $_SESSION['tenant_id'] = $user['tenant_id']; // Store explicit tenant ID
             $_SESSION['user_avatar'] = $user['avatar_url'] ?? '/assets/img/defaults/default_avatar.png';
@@ -227,7 +228,7 @@ class AuthController
 
             // If user belongs to a different tenant (and is not a Super Admin acting globally), redirect them.
             // Security: Use strict comparison to prevent type juggling attacks
-            if ((int)$user['tenant_id'] !== (int)$currentTenantId && !$user['is_super_admin']) {
+            if ((int)$user['tenant_id'] !== (int)$currentTenantId && !$user['is_super_admin'] && !$user['is_tenant_super_admin']) {
                 $targetTenant = \Nexus\Models\Tenant::find($user['tenant_id']);
                 if ($targetTenant) {
                     header('Location: /' . $targetTenant['slug'] . '/home');
@@ -554,7 +555,7 @@ class AuthController
 
         $isGod = !empty($_SESSION['is_god']);
         $isAdmin = isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'super_admin', 'tenant_admin']);
-        $isSuperAdmin = !empty($_SESSION['is_super_admin']);
+        $isSuperAdmin = !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
         // Security: Only admins can impersonate (god bypasses all checks)
         if (!$isGod && !$isAdmin && !$isSuperAdmin) {
@@ -599,7 +600,7 @@ class AuthController
             }
 
             // Security: Prevent impersonating super admins (unless you are also super admin)
-            if (!empty($targetUser['is_super_admin']) && !$isSuperAdmin) {
+            if ((!empty($targetUser['is_super_admin']) || !empty($targetUser['is_tenant_super_admin'])) && !$isSuperAdmin) {
                 http_response_code(403);
                 die('Error: You cannot impersonate a super administrator');
             }
@@ -618,6 +619,7 @@ class AuthController
         $_SESSION['impersonating_as_admin_email'] = $_SESSION['user_email'];
         $_SESSION['impersonating_as_admin_role'] = $_SESSION['user_role'];
         $_SESSION['impersonating_as_admin_is_super'] = $_SESSION['is_super_admin'];
+        $_SESSION['impersonating_as_admin_is_tenant_super'] = $_SESSION['is_tenant_super_admin'] ?? 0;
         $_SESSION['impersonating_as_admin_tenant'] = $_SESSION['tenant_id'];
         $_SESSION['impersonating_as_admin_avatar'] = $_SESSION['user_avatar'];
 
@@ -641,6 +643,7 @@ class AuthController
         $_SESSION['user_role'] = $targetUser['role'] ?? 'member';
         $_SESSION['role'] = $targetUser['role'] ?? 'member';
         $_SESSION['is_super_admin'] = $targetUser['is_super_admin'] ?? 0;
+        $_SESSION['is_tenant_super_admin'] = $targetUser['is_tenant_super_admin'] ?? 0;
         $_SESSION['tenant_id'] = $targetUser['tenant_id'];
         $_SESSION['user_avatar'] = $targetUser['avatar_url'] ?? '/assets/img/defaults/default_avatar.png';
 
@@ -682,6 +685,7 @@ class AuthController
         $_SESSION['user_role'] = $_SESSION['impersonating_as_admin_role'];
         $_SESSION['role'] = $_SESSION['impersonating_as_admin_role'];
         $_SESSION['is_super_admin'] = $_SESSION['impersonating_as_admin_is_super'];
+        $_SESSION['is_tenant_super_admin'] = $_SESSION['impersonating_as_admin_is_tenant_super'] ?? 0;
         $_SESSION['tenant_id'] = $_SESSION['impersonating_as_admin_tenant'];
         $_SESSION['user_avatar'] = $_SESSION['impersonating_as_admin_avatar'];
 

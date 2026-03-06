@@ -1380,7 +1380,21 @@ class VolunteerApiController extends BaseApiController
      */
     public function verifyCheckIn(string $token): void
     {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
         $this->rateLimit('volunteering_checkin_verify', 30, 60);
+
+        $shiftId = \Nexus\Services\VolunteerCheckInService::getShiftIdByToken($token);
+        if ($shiftId === null) {
+            $this->respondWithError('NOT_FOUND', 'Invalid check-in code', null, 404);
+            return;
+        }
+
+        if (!$this->canManageShift($shiftId, $userId)) {
+            $this->respondWithError('FORBIDDEN', 'You do not have permission to verify check-ins for this shift', null, 403);
+            return;
+        }
 
         $result = \Nexus\Services\VolunteerCheckInService::verifyCheckIn($token);
 
@@ -1400,7 +1414,21 @@ class VolunteerApiController extends BaseApiController
      */
     public function checkOut(string $token): void
     {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
         $this->rateLimit('volunteering_checkout', 30, 60);
+
+        $shiftId = \Nexus\Services\VolunteerCheckInService::getShiftIdByToken($token);
+        if ($shiftId === null) {
+            $this->respondWithError('NOT_FOUND', 'Invalid check-in code', null, 404);
+            return;
+        }
+
+        if (!$this->canManageShift($shiftId, $userId)) {
+            $this->respondWithError('FORBIDDEN', 'You do not have permission to check out volunteers for this shift', null, 403);
+            return;
+        }
 
         $success = \Nexus\Services\VolunteerCheckInService::checkOut($token);
 

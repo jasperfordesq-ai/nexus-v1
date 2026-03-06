@@ -132,7 +132,7 @@ class AuthController extends BaseApiController
             $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?");
             $stmt->execute([$email]);
             $candidate = $stmt->fetch();
-            if ($candidate && (!empty($candidate['is_super_admin']) || ($candidate['role'] ?? '') === 'super_admin')) {
+            if ($candidate && (!empty($candidate['is_super_admin']) || !empty($candidate['is_tenant_super_admin']) || ($candidate['role'] ?? '') === 'super_admin')) {
                 $user = $candidate;
             }
         }
@@ -264,6 +264,7 @@ class AuthController extends BaseApiController
                 'role' => $user['role'],
                 'email' => $user['email'],
                 'is_super_admin' => !empty($user['is_super_admin']),
+                'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
             ], $isMobile);
             $refreshToken = TokenService::generateRefreshToken((int)$user['id'], (int)$user['tenant_id'], $isMobile);
 
@@ -283,6 +284,8 @@ class AuthController extends BaseApiController
                     'role' => $user['role'] ?? 'member',
                     'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin']) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']),
                     'is_super_admin' => !empty($user['is_super_admin']),
+                    'is_god' => !empty($user['is_god']),
+                    'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
                     'onboarding_completed' => (bool)($user['onboarding_completed'] ?? false),
                 ],
                 // New secure tokens for mobile apps
@@ -753,6 +756,7 @@ class AuthController extends BaseApiController
         $_SESSION['user_role'] = $user['role'] ?? 'member';
         $_SESSION['role'] = $user['role'] ?? 'member';
         $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
+        $_SESSION['is_tenant_super_admin'] = $user['is_tenant_super_admin'] ?? 0;
         $_SESSION['tenant_id'] = $user['tenant_id'];
         $_SESSION['user_avatar'] = $user['avatar_url'] ?? '/assets/img/defaults/default_avatar.png';
         $_SESSION['is_logged_in'] = true;
@@ -921,6 +925,7 @@ class AuthController extends BaseApiController
             'role' => $user['role'],
             'email' => $user['email'],
             'is_super_admin' => !empty($user['is_super_admin']),
+            'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
         ], $isMobile);
 
         // Get expiry times for response
@@ -1249,7 +1254,7 @@ class AuthController extends BaseApiController
 
         // Load user from DB
         $user = Database::query(
-            "SELECT id, first_name, last_name, email, role, tenant_id, avatar_url, is_super_admin, is_god, is_admin FROM users WHERE id = ?",
+            "SELECT id, first_name, last_name, email, role, tenant_id, avatar_url, is_super_admin, is_tenant_super_admin, is_god, is_admin FROM users WHERE id = ?",
             [(int)$userId]
         )->fetch();
 
@@ -1261,7 +1266,7 @@ class AuthController extends BaseApiController
 
         // Check admin privileges
         $adminRoles = ['admin', 'super_admin', 'tenant_admin'];
-        $isAdmin = in_array($user['role'], $adminRoles) || !empty($user['is_super_admin']) || !empty($user['is_god']);
+        $isAdmin = in_array($user['role'], $adminRoles) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']) || !empty($user['is_god']);
         if (!$isAdmin) {
             http_response_code(403);
             echo 'Admin access required';
@@ -1282,6 +1287,7 @@ class AuthController extends BaseApiController
         $_SESSION['user_role'] = $user['role'] ?? 'member';
         $_SESSION['role'] = $user['role'] ?? 'member';
         $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
+        $_SESSION['is_tenant_super_admin'] = $user['is_tenant_super_admin'] ?? 0;
         $_SESSION['is_god'] = $user['is_god'] ?? 0;
         $_SESSION['tenant_id'] = $user['tenant_id'];
         $_SESSION['user_avatar'] = $user['avatar_url'] ?? '/assets/img/defaults/default_avatar.png';

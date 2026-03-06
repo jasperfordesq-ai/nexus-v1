@@ -552,11 +552,12 @@ class EventsApiController extends BaseApiController
         $isAdmin = false;
         try {
             $adminCheck = Database::query(
-                "SELECT role, is_super_admin FROM users WHERE id = ? AND tenant_id = ?",
+                "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
             )->fetch();
             if ($adminCheck && (
                 !empty($adminCheck['is_super_admin']) ||
+                !empty($adminCheck['is_tenant_super_admin']) ||
                 in_array($adminCheck['role'], ['admin', 'tenant_admin'])
             )) {
                 $isAdmin = true;

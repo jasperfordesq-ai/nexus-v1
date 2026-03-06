@@ -1734,7 +1734,7 @@ class NewsletterController
         $role = $_SESSION['user_role'] ?? '';
         $allowedRoles = ['admin', 'newsletter_admin'];
 
-        if (!in_array($role, $allowedRoles) && empty($_SESSION['is_super_admin'])) {
+        if (!in_array($role, $allowedRoles) && empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
             if (!defined('TESTING')) { exit; }
         }

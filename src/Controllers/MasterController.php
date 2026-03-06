@@ -15,7 +15,7 @@ class MasterController
 {
     private function checkSuperAdmin()
     {
-        if (!isset($_SESSION['user_id']) || empty($_SESSION['is_super_admin'])) {
+        if (!isset($_SESSION['user_id']) || empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin'])) {
             header('HTTP/1.0 403 Forbidden');
             echo "<h1>403 Forbidden</h1><p>Only Super Admins can access this area.</p>";
             if (!defined('TESTING')) { exit; }
@@ -235,7 +235,7 @@ class MasterController
     public function updateConfig()
     {
         // Enforce Super Admin
-        if (empty($_SESSION['is_super_admin'])) {
+        if (empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin'])) {
             header("HTTP/1.1 403 Forbidden");
             if (!defined('TESTING')) { exit; }
         }

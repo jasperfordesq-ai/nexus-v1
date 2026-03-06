@@ -259,7 +259,8 @@ class MenuManager
         return [
             'id' => $_SESSION['user_id'],
             'role' => $_SESSION['user_role'] ?? 'user',
-            'is_super_admin' => $_SESSION['is_super_admin'] ?? false
+            'is_super_admin' => $_SESSION['is_super_admin'] ?? false,
+            'is_tenant_super_admin' => $_SESSION['is_tenant_super_admin'] ?? false
         ];
     }
 

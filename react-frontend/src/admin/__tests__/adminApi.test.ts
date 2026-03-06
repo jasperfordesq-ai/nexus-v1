@@ -170,6 +170,11 @@ describe('adminApi', () => {
       await adminUsers.setSuperAdmin(5, true);
       expect(mockPut).toHaveBeenCalledWith('/v2/admin/users/5/super-admin', { grant: true });
     });
+
+    it('setGlobalSuperAdmin calls PUT', async () => {
+      await adminUsers.setGlobalSuperAdmin(5, true);
+      expect(mockPut).toHaveBeenCalledWith('/v2/admin/users/5/global-super-admin', { grant: true });
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────────────

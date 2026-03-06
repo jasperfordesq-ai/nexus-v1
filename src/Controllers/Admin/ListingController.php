@@ -17,7 +17,7 @@ class ListingController
     {
         if (session_status() === PHP_SESSION_NONE) session_start();
         $role = $_SESSION['user_role'] ?? '';
-        $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_admin']);
+        $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_admin']);
         if (!$isAdmin) {
             header('Location: /login');
             if (!defined('TESTING')) { exit; }

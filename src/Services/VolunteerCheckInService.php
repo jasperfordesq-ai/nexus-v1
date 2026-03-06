@@ -274,6 +274,35 @@ class VolunteerCheckInService
     }
 
     /**
+     * Resolve shift ID from a check-in token in current tenant scope.
+     *
+     * @param string $token QR token
+     * @return int|null Shift ID or null if token is invalid
+     */
+    public static function getShiftIdByToken(string $token): ?int
+    {
+        self::$errors = [];
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        try {
+            $stmt = $db->prepare("SELECT shift_id FROM vol_shift_checkins WHERE qr_token = ? AND tenant_id = ? LIMIT 1");
+            $stmt->execute([$token, $tenantId]);
+            $shiftId = $stmt->fetchColumn();
+
+            if ($shiftId === false) {
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Invalid check-in code'];
+                return null;
+            }
+
+            return (int)$shiftId;
+        } catch (\Throwable $e) {
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to resolve check-in token'];
+            return null;
+        }
+    }
+
+    /**
      * Get check-in status for a shift
      *
      * @param int $shiftId Shift ID

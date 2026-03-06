@@ -101,7 +101,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { headerMenus, hasCustomMenus } = useMenuContext();
 
   // Compute admin status once — used for admin links in dropdown
-  const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin);
+  const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
 
   // Search state — can be controlled externally
   const [internalSearchOpen, setInternalSearchOpen] = useState(false);

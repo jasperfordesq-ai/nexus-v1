@@ -29,6 +29,8 @@ export interface User {
   skills?: string[];
   role?: 'member' | 'admin' | 'moderator' | 'tenant_admin' | 'super_admin';
   is_super_admin?: boolean;
+  is_god?: boolean;
+  is_tenant_super_admin?: boolean;
   is_admin?: boolean;
   status?: 'active' | 'inactive' | 'suspended' | 'pending';
   tenant_id?: number;

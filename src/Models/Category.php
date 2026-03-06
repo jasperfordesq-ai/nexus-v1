@@ -121,7 +121,7 @@ class Category
             ['name' => 'Events',            'slug' => 'events',            'color' => 'purple']
         ];
 
-        $sql = "INSERT INTO categories (tenant_id, name, slug, color, type) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT IGNORE INTO categories (tenant_id, name, slug, color, type) VALUES (?, ?, ?, ?, ?)";
 
         // Helper to insert batch
         $insertBatch = function ($items, $type) use ($tenantId, $sql) {

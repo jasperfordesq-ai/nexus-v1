@@ -313,6 +313,7 @@ class TotpController
         $_SESSION['user_role'] = $user['role'] ?? 'member';
         $_SESSION['role'] = $user['role'] ?? 'member';
         $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
+        $_SESSION['is_tenant_super_admin'] = $user['is_tenant_super_admin'] ?? 0;
         $_SESSION['is_god'] = $user['is_god'] ?? 0;
         $_SESSION['tenant_id'] = $user['tenant_id'];
         $_SESSION['user_avatar'] = $user['avatar_url'] ?? '/assets/img/defaults/default_avatar.png';

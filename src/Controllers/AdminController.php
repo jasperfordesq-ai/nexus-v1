@@ -31,7 +31,7 @@ class AdminController
         // 3. is_admin session flag (set during login for admin roles)
         $role = $_SESSION['user_role'] ?? '';
         $isAdmin = in_array($role, ['admin', 'tenant_admin']);
-        $isSuper = !empty($_SESSION['is_super_admin']);
+        $isSuper = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
         $isAdminSession = !empty($_SESSION['is_admin']);
 
         // Check if user has any admin privileges
@@ -327,7 +327,7 @@ class AdminController
     public function settings()
     {
         $this->checkAdmin();
-        $isSuper = !empty($_SESSION['is_super_admin']);
+        $isSuper = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
         // Global Config (Super Admin Only)
         $config = [];
@@ -383,7 +383,7 @@ class AdminController
         \Nexus\Core\Csrf::verifyOrDie();
 
         // LOCK: Only Super Admins can edit global env settings
-        if (empty($_SESSION['is_super_admin'])) {
+        if (empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin'])) {
             $this->forbidden();
         }
 
@@ -968,7 +968,7 @@ class AdminController
         $this->checkAdmin();
 
         // Only Super Admins can test (as they configure it)
-        if (empty($_SESSION['is_super_admin'])) {
+        if (empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin'])) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Super Admin access required']);
             return;
@@ -992,7 +992,7 @@ class AdminController
         $this->checkAdmin();
 
         // Only Super Admins can run this
-        if (empty($_SESSION['is_super_admin'])) {
+        if (empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin'])) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Super Admin access required']);
             return;
@@ -1240,7 +1240,7 @@ class AdminController
         $tenantId = \Nexus\Core\TenantContext::getId();
         $tenant = Database::query("SELECT * FROM tenants WHERE id = ?", [$tenantId])->fetch();
 
-        $isSuper = !empty($_SESSION['is_super_admin']);
+        $isSuper = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
         \Nexus\Core\View::render('admin/feed-algorithm', [
             'tenant' => $tenant,
@@ -1340,7 +1340,7 @@ class AdminController
         $tenantId = \Nexus\Core\TenantContext::getId();
         $tenant = Database::query("SELECT * FROM tenants WHERE id = ?", [$tenantId])->fetch();
 
-        $isSuper = !empty($_SESSION['is_super_admin']);
+        $isSuper = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
         // Get current configuration
         $configJson = $tenant['configuration'] ?? '{}';

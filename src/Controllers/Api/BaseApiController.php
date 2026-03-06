@@ -697,7 +697,7 @@ abstract class BaseApiController
     {
         // Check JWT claim first (set during login)
         $payload = $this->tokenPayload ?? [];
-        if (!empty($payload['is_super_admin'])) {
+        if (!empty($payload['is_super_admin']) || !empty($payload['is_tenant_super_admin'])) {
             return true;
         }
 
