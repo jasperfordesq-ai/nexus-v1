@@ -458,7 +458,7 @@ export function LoginPage() {
                     </Button>
                   </form>
 
-                  {/* Biometric Login */}
+                  {/* Passkey Login */}
                   {biometricAvailable && selectedTenantId && (
                     <>
                       <div className="relative flex items-center my-5">
@@ -484,8 +484,13 @@ export function LoginPage() {
                         }
                         spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                       >
-                        {t('login.biometric_login', { defaultValue: 'Sign in with biometrics' })}
+                        {t('login.biometric_login', { defaultValue: 'Sign in with passkey' })}
                       </Button>
+                      <p className="text-xs text-theme-muted text-center mt-1.5">
+                        {t('login.biometric_hint', {
+                          defaultValue: 'Windows Hello, Touch ID, Face ID, or Android biometrics',
+                        })}
+                      </p>
                     </>
                   )}
 
