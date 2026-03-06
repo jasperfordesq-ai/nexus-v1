@@ -152,6 +152,12 @@ const Redirects = lazy(() => import('./modules/advanced/Redirects'));
 const Error404Tracking = lazy(() => import('./modules/advanced/Error404Tracking'));
 const MatchDebugPanel = lazy(() => import('./modules/advanced/MatchDebugPanel'));
 
+// CRM module
+const CrmDashboard = lazy(() => import('./modules/crm/CrmDashboard'));
+const MemberNotes = lazy(() => import('./modules/crm/MemberNotes'));
+const CoordinatorTasks = lazy(() => import('./modules/crm/CoordinatorTasks'));
+const OnboardingFunnel = lazy(() => import('./modules/crm/OnboardingFunnel'));
+
 // System tools
 const AdminSettings = lazy(() => import('./modules/system/AdminSettings'));
 const TestRunner = lazy(() => import('./modules/system/TestRunner'));
@@ -243,6 +249,12 @@ export function AdminRoutes() {
       <Route path="users/create" element={<Lazy><UserCreate /></Lazy>} />
       <Route path="users/:id/edit" element={<Lazy><UserEdit /></Lazy>} />
       <Route path="users/:id/permissions" element={<Lazy><PermissionBrowser /></Lazy>} />
+
+      {/* ─── CRM ─── */}
+      <Route path="crm" element={<Lazy><CrmDashboard /></Lazy>} />
+      <Route path="crm/notes" element={<Lazy><MemberNotes /></Lazy>} />
+      <Route path="crm/tasks" element={<Lazy><CoordinatorTasks /></Lazy>} />
+      <Route path="crm/funnel" element={<Lazy><OnboardingFunnel /></Lazy>} />
 
       {/* ─── LISTINGS ─── */}
       <Route path="listings" element={<Lazy><ListingsAdmin /></Lazy>} />

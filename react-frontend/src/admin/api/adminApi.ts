@@ -115,6 +115,13 @@ import type {
   AdminReview,
   AdminReport,
   ModerationStats,
+  CrmDashboardStats,
+  CrmFunnelData,
+  MemberNote,
+  CoordinatorTask,
+  MemberTag,
+  TagSummary,
+  CrmAdmin,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1482,6 +1489,60 @@ export const adminModeration = {
 
   getReportStats: () =>
     api.get<ModerationStats>('/v2/admin/reports/stats'),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CRM (Member Notes, Coordinator Tasks, Tags, Funnel)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminCrm = {
+  // Dashboard
+  getDashboard: () =>
+    api.get<CrmDashboardStats>('/v2/admin/crm/dashboard'),
+
+  // Onboarding Funnel
+  getFunnel: () =>
+    api.get<CrmFunnelData>('/v2/admin/crm/funnel'),
+
+  // Admin list (for task assignment)
+  getAdmins: () =>
+    api.get<CrmAdmin[]>('/v2/admin/crm/admins'),
+
+  // Member Notes
+  getNotes: (params?: { user_id?: number; page?: number; limit?: number; category?: string }) =>
+    api.get<PaginatedResponse<MemberNote>>(`/v2/admin/crm/notes${buildQuery(params || {})}`),
+
+  createNote: (payload: { user_id: number; content: string; category?: string; is_pinned?: boolean }) =>
+    api.post<MemberNote>('/v2/admin/crm/notes', payload),
+
+  updateNote: (id: number, payload: { content?: string; category?: string; is_pinned?: boolean }) =>
+    api.put<MemberNote>(`/v2/admin/crm/notes/${id}`, payload),
+
+  deleteNote: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/crm/notes/${id}`),
+
+  // Coordinator Tasks
+  getTasks: (params?: { page?: number; limit?: number; status?: string; priority?: string; assigned_to?: number }) =>
+    api.get<PaginatedResponse<CoordinatorTask>>(`/v2/admin/crm/tasks${buildQuery(params || {})}`),
+
+  createTask: (payload: { title: string; description?: string; priority?: string; assigned_to?: number; user_id?: number; due_date?: string }) =>
+    api.post<CoordinatorTask>('/v2/admin/crm/tasks', payload),
+
+  updateTask: (id: number, payload: { title?: string; description?: string; priority?: string; status?: string; assigned_to?: number; user_id?: number; due_date?: string | null }) =>
+    api.put<CoordinatorTask>(`/v2/admin/crm/tasks/${id}`, payload),
+
+  deleteTask: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/crm/tasks/${id}`),
+
+  // Member Tags
+  getTags: (params?: { user_id?: number }) =>
+    api.get<MemberTag[] | TagSummary[]>(`/v2/admin/crm/tags${buildQuery(params || {})}`),
+
+  addTag: (payload: { user_id: number; tag: string }) =>
+    api.post<MemberTag>('/v2/admin/crm/tags', payload),
+
+  removeTag: (id: number) =>
+    api.delete<{ success: boolean }>(`/v2/admin/crm/tags/${id}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
