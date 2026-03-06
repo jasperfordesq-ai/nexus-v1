@@ -189,5 +189,10 @@
     "fallback_name": "Membro",
     "load_failed": "Impossibile caricare i membri",
     "load_more_failed": "Impossibile caricare altri membri"
+  },
+  "update_banner": {
+    "message": "È disponibile una nuova versione.",
+    "update_now": "Aggiorna ora",
+    "dismiss": "Ignora notifica di aggiornamento"
   }
 }

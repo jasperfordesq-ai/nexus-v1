@@ -19,6 +19,7 @@ import {
   ClipboardList, Plus, Calendar, AlertTriangle, CheckCircle,
   Clock, MoreVertical, Trash2, Edit3, User, Search,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
@@ -475,8 +476,8 @@ export default function CoordinatorTasks() {
                       {/* Related member + created by */}
                       <div className="flex flex-wrap items-center gap-4 mt-2">
                         {task.user_name && (
-                          <a
-                            href={tenantPath(`/admin/users/${task.user_id}/edit`)}
+                          <Link
+                            to={tenantPath(`/admin/users/${task.user_id}/edit`)}
                             className="flex items-center gap-2 text-xs text-default-500 hover:text-primary transition-colors"
                           >
                             <Avatar
@@ -486,7 +487,7 @@ export default function CoordinatorTasks() {
                               className="w-5 h-5"
                             />
                             <span>Related: {task.user_name}</span>
-                          </a>
+                          </Link>
                         )}
                         <span className="text-xs text-default-400">
                           Created by {task.created_by_name} &middot; {formatDateTime(task.created_at)}

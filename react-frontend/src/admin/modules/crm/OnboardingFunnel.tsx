@@ -97,7 +97,7 @@ export default function OnboardingFunnel() {
 
   if (error || !data) {
     return (
-      <div className="space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         <PageHeader
           title="Onboarding Funnel"
           description="Track member progression from signup to active participation"
@@ -126,7 +126,7 @@ export default function OnboardingFunnel() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
         title="Onboarding Funnel"
         description="Track member progression from signup to active participation"

@@ -2847,13 +2847,25 @@ class AdminNewsletterApiController extends BaseApiController
             ],
             'bounce_rate' => 0,
             'sender_score' => 100,
+            'sender_score_breakdown' => [
+                'bounce_penalty' => 0,
+                'complaint_penalty' => 0,
+                'failure_penalty' => 0,
+                'suppression_penalty' => 0,
+                'volume_bonus' => 0,
+            ],
             'configuration' => [
                 'smtp_configured' => !empty(getenv('SMTP_HOST')),
                 'api_configured' => !empty(getenv('USE_GMAIL_API')) && getenv('USE_GMAIL_API') !== 'false',
-                'tracking_enabled' => true,
+                'tracking_enabled' => $this->tableExists('newsletter_opens'),
             ],
             'health_status' => 'healthy',
         ];
+
+        $totalSent = 0;
+        $totalBounces = 0;
+        $totalComplaints = 0;
+        $totalSuppressed = 0;
 
         // Queue status
         if ($this->tableExists('newsletter_queue')) {
@@ -2871,23 +2883,28 @@ class AdminNewsletterApiController extends BaseApiController
                         $diagnostics['queue_status'][$status] = $count;
                     }
                 }
+
+                $totalSent = $diagnostics['queue_status']['sent'];
             } catch (\Exception $e) {
                 // Ignore
             }
         }
 
-        // Bounce rate
-        if ($this->tableExists('newsletter_bounces') && $this->tableExists('newsletter_queue')) {
+        // Bounce rate + complaint count
+        if ($this->tableExists('newsletter_bounces')) {
             try {
-                $totalSent = Database::query(
-                    "SELECT COUNT(*) as cnt FROM newsletter_queue WHERE tenant_id = ? AND status = 'sent'",
+                $bounceStats = Database::query(
+                    "SELECT bounce_type, COUNT(*) as cnt FROM newsletter_bounces WHERE tenant_id = ? GROUP BY bounce_type",
                     [$tenantId]
-                )->fetch()['cnt'] ?? 0;
+                )->fetchAll();
 
-                $totalBounces = Database::query(
-                    "SELECT COUNT(*) as cnt FROM newsletter_bounces WHERE tenant_id = ?",
-                    [$tenantId]
-                )->fetch()['cnt'] ?? 0;
+                foreach ($bounceStats as $row) {
+                    $count = (int)$row['cnt'];
+                    $totalBounces += $count;
+                    if (($row['bounce_type'] ?? '') === 'complaint') {
+                        $totalComplaints += $count;
+                    }
+                }
 
                 if ($totalSent > 0) {
                     $diagnostics['bounce_rate'] = round(($totalBounces / $totalSent) * 100, 2);
@@ -2897,13 +2914,130 @@ class AdminNewsletterApiController extends BaseApiController
             }
         }
 
-        // Determine health status
-        if ($diagnostics['bounce_rate'] > 10) {
+        // Suppression list size
+        if ($this->tableExists('newsletter_suppression_list')) {
+            try {
+                $totalSuppressed = (int)(Database::query(
+                    "SELECT COUNT(*) as cnt FROM newsletter_suppression_list WHERE tenant_id = ?",
+                    [$tenantId]
+                )->fetch()['cnt'] ?? 0);
+            } catch (\Exception $e) {
+                // Ignore
+            }
+        }
+
+        // Dynamic sender score calculation (0-100)
+        // Start at 100, subtract penalties, add small bonuses
+        $score = 100;
+        $breakdown = &$diagnostics['sender_score_breakdown'];
+
+        // Bounce rate penalty: -3 per percentage point (e.g. 5% bounce = -15)
+        $bouncePenalty = round($diagnostics['bounce_rate'] * 3, 1);
+        $bouncePenalty = min($bouncePenalty, 40); // cap at -40
+        $breakdown['bounce_penalty'] = $bouncePenalty;
+        $score -= $bouncePenalty;
+
+        // Complaint penalty: -10 per percentage point of complaints (severe)
+        if ($totalSent > 0) {
+            $complaintRate = ($totalComplaints / $totalSent) * 100;
+            $complaintPenalty = round($complaintRate * 10, 1);
+            $complaintPenalty = min($complaintPenalty, 30); // cap at -30
+            $breakdown['complaint_penalty'] = $complaintPenalty;
+            $score -= $complaintPenalty;
+        }
+
+        // Failure rate penalty: -2 per percentage point of failed sends
+        $totalAttempted = $diagnostics['queue_status']['total'];
+        if ($totalAttempted > 0) {
+            $failureRate = ($diagnostics['queue_status']['failed'] / $totalAttempted) * 100;
+            $failurePenalty = round($failureRate * 2, 1);
+            $failurePenalty = min($failurePenalty, 20); // cap at -20
+            $breakdown['failure_penalty'] = $failurePenalty;
+            $score -= $failurePenalty;
+        }
+
+        // Suppression ratio penalty: high suppression = poor list hygiene
+        if ($totalSent > 0) {
+            $suppressionRatio = ($totalSuppressed / $totalSent) * 100;
+            $suppressionPenalty = round($suppressionRatio * 1.5, 1);
+            $suppressionPenalty = min($suppressionPenalty, 15); // cap at -15
+            $breakdown['suppression_penalty'] = $suppressionPenalty;
+            $score -= $suppressionPenalty;
+        }
+
+        // Volume bonus: reward consistent sending (up to +5)
+        if ($totalSent >= 1000) {
+            $breakdown['volume_bonus'] = 5;
+            $score += 5;
+        } elseif ($totalSent >= 100) {
+            $breakdown['volume_bonus'] = 2;
+            $score += 2;
+        }
+
+        $diagnostics['sender_score'] = max(0, min(100, round($score)));
+
+        // Determine health status based on sender score + bounce rate
+        if ($diagnostics['bounce_rate'] > 10 || $diagnostics['sender_score'] < 50) {
             $diagnostics['health_status'] = 'critical';
-        } elseif ($diagnostics['bounce_rate'] > 5 || $diagnostics['queue_status']['failed'] > 10) {
+        } elseif ($diagnostics['bounce_rate'] > 5 || $diagnostics['queue_status']['failed'] > 10 || $diagnostics['sender_score'] < 70) {
             $diagnostics['health_status'] = 'warning';
         }
 
         $this->respondWithData($diagnostics);
+    }
+
+    /**
+     * Bounce reason trend analysis — weekly breakdown by bounce type
+     */
+    public function getBounceTrends(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (!$this->tableExists('newsletter_bounces')) {
+            $this->respondWithData(['trends' => [], 'summary' => []]);
+            return;
+        }
+
+        $weeks = $this->queryInt('weeks', 12, 1, 52);
+
+        try {
+            // Weekly breakdown by bounce type (last N weeks)
+            $trends = Database::query(
+                "SELECT
+                    DATE_FORMAT(bounced_at, '%x-W%v') as week_label,
+                    MIN(DATE(bounced_at)) as week_start,
+                    bounce_type,
+                    COUNT(*) as count
+                 FROM newsletter_bounces
+                 WHERE tenant_id = ?
+                   AND bounced_at >= DATE_SUB(NOW(), INTERVAL ? WEEK)
+                 GROUP BY week_label, bounce_type
+                 ORDER BY week_label ASC, bounce_type ASC",
+                [$tenantId, $weeks]
+            )->fetchAll() ?: [];
+
+            // Top bounce reasons with counts
+            $summary = Database::query(
+                "SELECT
+                    COALESCE(bounce_reason, 'Unknown') as reason,
+                    bounce_type,
+                    COUNT(*) as count
+                 FROM newsletter_bounces
+                 WHERE tenant_id = ?
+                   AND bounced_at >= DATE_SUB(NOW(), INTERVAL ? WEEK)
+                 GROUP BY bounce_reason, bounce_type
+                 ORDER BY count DESC
+                 LIMIT ?",
+                [$tenantId, $weeks, 10]
+            )->fetchAll() ?: [];
+
+            $this->respondWithData([
+                'trends' => $trends,
+                'summary' => $summary,
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithData(['trends' => [], 'summary' => []]);
+        }
     }
 }

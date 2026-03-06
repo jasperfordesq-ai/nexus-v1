@@ -189,5 +189,10 @@
     "fallback_name": "Member",
     "load_failed": "Failed to load members",
     "load_more_failed": "Failed to load more members"
+  },
+  "update_banner": {
+    "message": "A new version is available.",
+    "update_now": "Update now",
+    "dismiss": "Dismiss update notification"
   }
 }
