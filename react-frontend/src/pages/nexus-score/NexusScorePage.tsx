@@ -56,7 +56,7 @@ interface NexusScoreData {
     color: string;
   };
   breakdown: ScoreCategory[];
-  insights: string[];
+  insights: (string | Record<string, string>)[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -361,12 +361,15 @@ export default function NexusScorePage() {
               {t('nexus_score.insights_title', 'How to improve')}
             </h2>
             <ul className="space-y-2">
-              {(data.insights as string[]).map((insight, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-theme-subtle">
-                  <span className="text-indigo-400 font-bold mt-0.5">·</span>
-                  {insight}
-                </li>
-              ))}
+              {data.insights.map((insight, i) => {
+                const text = typeof insight === 'string' ? insight : (insight as Record<string, string>).message ?? (insight as Record<string, string>).title ?? '';
+                return (
+                  <li key={i} className="flex items-start gap-2 text-sm text-theme-subtle">
+                    <span className="text-indigo-400 font-bold mt-0.5">·</span>
+                    {text}
+                  </li>
+                );
+              })}
             </ul>
           </GlassCard>
         </motion.div>
