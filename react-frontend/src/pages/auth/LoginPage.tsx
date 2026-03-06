@@ -19,7 +19,7 @@ import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/re
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2, Fingerprint } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
@@ -52,6 +52,7 @@ export function LoginPage() {
     twoFactorMethods,
   } = useAuth();
   const { tenant, branding, tenantSlug, tenantPath, isLoading: tenantLoading } = useTenant();
+  const toast = useToast();
   const [searchParams] = useSearchParams();
 
   // Tenant state — only used when no tenant is resolved from URL/domain
@@ -208,6 +209,11 @@ export function LoginPage() {
 
     if (result.success) {
       navigate(from, { replace: true });
+    } else if (result.error?.includes('cancelled')) {
+      // User cancelled — do nothing
+    } else if (result.error?.includes('not found') || result.error?.includes('Credential not found')) {
+      // No passkey registered for this account
+      toast.error('No passkey found for this account. Log in with your password, then go to Settings to register a passkey.');
     }
   };
 
@@ -488,7 +494,7 @@ export function LoginPage() {
                       </Button>
                       <p className="text-xs text-theme-muted text-center mt-1.5">
                         {t('login.biometric_hint', {
-                          defaultValue: 'Windows Hello, Touch ID, Face ID, or Android biometrics',
+                          defaultValue: 'Already set up a passkey? Use it to sign in. No passkey yet? Log in above, then go to Settings to create one.',
                         })}
                       </p>
                     </>

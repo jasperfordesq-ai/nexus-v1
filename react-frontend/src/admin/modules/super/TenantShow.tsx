@@ -8,7 +8,7 @@
  * Displays full tenant information matching the PHP tenants/show.php view.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -98,6 +98,9 @@ export function TenantShow() {
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Guard ref to prevent Switch onValueChange re-entry (HeroUI fires on programmatic isSelected changes)
+  const togglingHub = useRef(false);
+
   // Move Tenant modal
   const moveModal = useDisclosure();
   const [moveParentId, setMoveParentId] = useState('');
@@ -140,8 +143,9 @@ export function TenantShow() {
         res = await adminSuper.reactivateTenant(tenant.id);
       }
       if (res.success) {
-        toast.success(tenant.is_active ? 'Tenant deactivated' : 'Tenant reactivated');
-        loadTenant();
+        const newActive = !tenant.is_active;
+        toast.success(newActive ? 'Tenant reactivated' : 'Tenant deactivated');
+        setTenant((prev) => prev ? { ...prev, is_active: newActive } : prev);
       } else {
         toast.error(res.error || 'Operation failed');
       }
@@ -150,18 +154,23 @@ export function TenantShow() {
   };
 
   const handleToggleHub = async () => {
-    if (!tenant) return;
+    if (!tenant || togglingHub.current) return;
+    togglingHub.current = true;
     setActionLoading(true);
+    const newValue = !tenant.allows_subtenants;
     try {
-      const res = await adminSuper.toggleHub(tenant.id, !tenant.allows_subtenants);
+      const res = await adminSuper.toggleHub(tenant.id, newValue);
       if (res.success) {
-        toast.success(tenant.allows_subtenants ? 'Hub disabled' : 'Hub enabled');
-        loadTenant();
+        toast.success(newValue ? 'Hub enabled' : 'Hub disabled');
+        // Optimistic update — avoids refetch which re-triggers Switch onValueChange
+        setTenant((prev) => prev ? { ...prev, allows_subtenants: newValue } : prev);
       } else {
         toast.error(res.error || 'Failed to toggle hub');
       }
     } catch { toast.error('An error occurred'); }
     setActionLoading(false);
+    // Release guard after a tick so the Switch settles
+    requestAnimationFrame(() => { togglingHub.current = false; });
   };
 
   const loadTenant = useCallback(async () => {
