@@ -53,6 +53,10 @@ import {
   Heart,
   Cog,
   Timer,
+  Contact,
+  StickyNote,
+  ClipboardList,
+  Filter,
   Activity,
   Crown,
   Network,
@@ -124,6 +128,17 @@ function useAdminNav(): NavSection[] {
         items: [
           { label: 'All Users', href: '/admin/users', icon: Users },
           { label: 'Pending Approvals', href: '/admin/users?filter=pending', icon: UserCheck },
+        ],
+      },
+      {
+        key: 'crm',
+        label: 'Member CRM',
+        icon: Contact,
+        items: [
+          { label: 'CRM Dashboard', href: '/admin/crm', icon: Contact },
+          { label: 'Member Notes', href: '/admin/crm/notes', icon: StickyNote },
+          { label: 'Coordinator Tasks', href: '/admin/crm/tasks', icon: ClipboardList },
+          { label: 'Onboarding Funnel', href: '/admin/crm/funnel', icon: Filter },
         ],
       },
       {
