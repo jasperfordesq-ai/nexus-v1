@@ -229,6 +229,15 @@ export function NewsletterStats() {
             >
               Back
             </Button>
+            {newsletter.status === 'sent' && (
+              <Button
+                variant="flat"
+                startContent={<BarChart3 size={16} />}
+                onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
+              >
+                Activity Log
+              </Button>
+            )}
             {nonOpenerCount > 0 && newsletter.status === 'sent' && (
               <Button
                 color="secondary"
