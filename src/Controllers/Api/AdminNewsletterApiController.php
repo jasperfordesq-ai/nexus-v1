@@ -98,8 +98,8 @@ class AdminNewsletterApiController extends BaseApiController
         $userId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $name = $this->input('name');
         $subject = $this->input('subject', '');
+        $name = $this->input('name') ?: $subject; // Fall back to subject if name not provided
         $previewText = $this->input('preview_text', '');
         $content = $this->input('content', '');
         $status = $this->input('status', 'draft');
@@ -109,9 +109,22 @@ class AdminNewsletterApiController extends BaseApiController
         $abTestEnabled = $this->input('ab_test_enabled') ? 1 : 0;
         $subjectB = $this->input('subject_b') ?: null;
         $templateId = $this->inputInt('template_id') ?: null;
+        $abSplitPercentage = $this->inputInt('ab_split_percentage') ?: 50;
+        $abWinnerMetric = $this->input('ab_winner_metric', 'opens');
+        $abAutoSelectWinner = $this->input('ab_auto_select_winner') ? 1 : 0;
+        $abAutoSelectAfterHours = $this->inputInt('ab_auto_select_after_hours') ?: null;
+        $targetCounties = $this->input('target_counties') ?: null;
+        $targetTowns = $this->input('target_towns') ?: null;
+        $targetGroups = $this->input('target_groups') ?: null;
+        $isRecurring = $this->input('is_recurring') ? 1 : 0;
+        $recurringFrequency = $this->input('recurring_frequency') ?: null;
+        $recurringDay = $this->inputInt('recurring_day') ?: null;
+        $recurringDayOfMonth = $this->inputInt('recurring_day_of_month') ?: null;
+        $recurringTime = $this->input('recurring_time') ?: null;
+        $recurringEndDate = $this->input('recurring_end_date') ?: null;
 
-        if (!$name) {
-            $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name');
+        if (!$name && !$subject) {
+            $this->respondWithError('VALIDATION_ERROR', 'Subject is required', 'subject');
             return;
         }
 
@@ -124,10 +137,18 @@ class AdminNewsletterApiController extends BaseApiController
             Database::query(
                 "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, status,
                     target_audience, segment_id, scheduled_at, ab_test_enabled, subject_b, template_id,
+                    ab_split_percentage, ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
+                    target_counties, target_towns, target_groups,
+                    is_recurring, recurring_frequency, recurring_day, recurring_day_of_month,
+                    recurring_time, recurring_end_date,
                     created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [$tenantId, $name, $subject, $previewText, $content, $status,
                  $targetAudience, $segmentId, $scheduledAt, $abTestEnabled, $subjectB, $templateId,
+                 $abSplitPercentage, $abWinnerMetric, $abAutoSelectWinner, $abAutoSelectAfterHours,
+                 $targetCounties, $targetTowns, $targetGroups,
+                 $isRecurring, $recurringFrequency, $recurringDay, $recurringDayOfMonth,
+                 $recurringTime, $recurringEndDate,
                  $userId]
             );
             $id = Database::lastInsertId();
@@ -153,7 +174,10 @@ class AdminNewsletterApiController extends BaseApiController
 
             $allowedFields = [
                 'name', 'subject', 'preview_text', 'content', 'status',
-                'target_audience', 'scheduled_at', 'subject_b', 'template_id',
+                'target_audience', 'scheduled_at', 'subject_b',
+                'target_counties', 'target_towns', 'target_groups',
+                'ab_winner_metric',
+                'recurring_frequency', 'recurring_time', 'recurring_end_date',
             ];
 
             foreach ($allowedFields as $field) {
@@ -165,7 +189,7 @@ class AdminNewsletterApiController extends BaseApiController
             }
 
             // Handle nullable int fields
-            foreach (['segment_id'] as $intField) {
+            foreach (['segment_id', 'template_id', 'ab_split_percentage', 'recurring_day', 'recurring_day_of_month', 'ab_auto_select_after_hours'] as $intField) {
                 $val = $this->input($intField);
                 if ($val !== null) {
                     $fields[] = "{$intField} = ?";
@@ -174,10 +198,12 @@ class AdminNewsletterApiController extends BaseApiController
             }
 
             // Handle boolean fields
-            $abVal = $this->input('ab_test_enabled');
-            if ($abVal !== null) {
-                $fields[] = "ab_test_enabled = ?";
-                $params[] = $abVal ? 1 : 0;
+            foreach (['ab_test_enabled', 'is_recurring', 'ab_auto_select_winner'] as $boolField) {
+                $val = $this->input($boolField);
+                if ($val !== null) {
+                    $fields[] = "{$boolField} = ?";
+                    $params[] = $val ? 1 : 0;
+                }
             }
 
             if (empty($fields)) {
@@ -505,6 +531,17 @@ class AdminNewsletterApiController extends BaseApiController
             'avg_open_rate' => 0,
             'avg_click_rate' => 0,
             'total_subscribers' => 0,
+            'totals' => [
+                'newsletters_sent' => 0,
+                'total_sent' => 0,
+                'total_failed' => 0,
+                'total_opens' => 0,
+                'unique_opens' => 0,
+                'total_clicks' => 0,
+                'unique_clicks' => 0,
+            ],
+            'monthly_breakdown' => [],
+            'top_performers' => [],
         ];
 
         if (!$this->tableExists('newsletters')) {
@@ -513,6 +550,7 @@ class AdminNewsletterApiController extends BaseApiController
         }
 
         try {
+            // Summary counts
             $stmt = Database::query(
                 "SELECT COUNT(*) as total, SUM(CASE WHEN status='sent' THEN 1 ELSE 0 END) as sent,
                         AVG(open_rate) as avg_open, AVG(click_rate) as avg_click
@@ -533,8 +571,69 @@ class AdminNewsletterApiController extends BaseApiController
             );
             $subRow = $subStmt->fetch();
             $data['total_subscribers'] = (int) ($subRow['cnt'] ?? 0);
+
+            // Full analytics from sent newsletters (mirrors legacy PHP admin)
+            $newsletters = \Nexus\Models\Newsletter::getAllSent();
+
+            $totals = &$data['totals'];
+            $monthlyStats = [];
+            $topPerformers = [];
+
+            foreach ($newsletters as $newsletter) {
+                $totals['newsletters_sent']++;
+                $totals['total_sent'] += (int) ($newsletter['total_sent'] ?? 0);
+                $totals['total_failed'] += (int) ($newsletter['total_failed'] ?? 0);
+                $totals['total_opens'] += (int) ($newsletter['total_opens'] ?? 0);
+                $totals['unique_opens'] += (int) ($newsletter['unique_opens'] ?? 0);
+                $totals['total_clicks'] += (int) ($newsletter['total_clicks'] ?? 0);
+                $totals['unique_clicks'] += (int) ($newsletter['unique_clicks'] ?? 0);
+
+                // Group by month
+                $sentAt = $newsletter['sent_at'] ?? null;
+                if ($sentAt) {
+                    $month = date('Y-m', strtotime($sentAt));
+                    if (!isset($monthlyStats[$month])) {
+                        $monthlyStats[$month] = [
+                            'month' => $month,
+                            'newsletters' => 0,
+                            'sent' => 0,
+                            'opens' => 0,
+                            'clicks' => 0,
+                        ];
+                    }
+                    $monthlyStats[$month]['newsletters']++;
+                    $monthlyStats[$month]['sent'] += (int) ($newsletter['total_sent'] ?? 0);
+                    $monthlyStats[$month]['opens'] += (int) ($newsletter['unique_opens'] ?? 0);
+                    $monthlyStats[$month]['clicks'] += (int) ($newsletter['unique_clicks'] ?? 0);
+                }
+
+                // Top performers (min 10 recipients)
+                $totalSent = (int) ($newsletter['total_sent'] ?? 0);
+                if ($totalSent >= 10) {
+                    $openRate = round(((int) ($newsletter['unique_opens'] ?? 0) / $totalSent) * 100, 1);
+                    $clickRate = round(((int) ($newsletter['unique_clicks'] ?? 0) / $totalSent) * 100, 1);
+                    $topPerformers[] = [
+                        'id' => (int) $newsletter['id'],
+                        'subject' => $newsletter['subject'] ?? '',
+                        'sent_at' => $newsletter['sent_at'] ?? '',
+                        'total_sent' => $totalSent,
+                        'open_rate' => $openRate,
+                        'click_rate' => $clickRate,
+                    ];
+                }
+            }
+
+            // Sort monthly by month ascending
+            ksort($monthlyStats);
+            $data['monthly_breakdown'] = array_values($monthlyStats);
+
+            // Sort top performers by open rate descending, take top 10
+            usort($topPerformers, function ($a, $b) {
+                return $b['open_rate'] <=> $a['open_rate'];
+            });
+            $data['top_performers'] = array_slice($topPerformers, 0, 10);
         } catch (\Exception $e) {
-            // Return defaults
+            // Return defaults on error
         }
 
         $this->respondWithData($data);
@@ -1719,8 +1818,8 @@ class AdminNewsletterApiController extends BaseApiController
                  LEFT JOIN newsletters n ON b.newsletter_id = n.id
                  {$where}
                  ORDER BY b.bounced_at DESC
-                 LIMIT {$limit} OFFSET {$offset}",
-                $params
+                 LIMIT ? OFFSET ?",
+                array_merge($params, [$limit, $offset])
             );
 
             $bounces = $stmt->fetchAll() ?: [];
@@ -1830,12 +1929,13 @@ class AdminNewsletterApiController extends BaseApiController
             $nonOpeners = Database::query(
                 "SELECT COUNT(*) as cnt
                  FROM newsletter_queue q
+                 INNER JOIN newsletters n ON n.id = q.newsletter_id AND n.tenant_id = ?
                  WHERE q.newsletter_id = ? AND q.status = 'sent'
                  AND q.email NOT IN (
                      SELECT DISTINCT email FROM newsletter_opens
-                     WHERE newsletter_id = ? AND tenant_id = ?
+                     WHERE newsletter_id = ?
                  )",
-                [$newsletterId, $newsletterId, $tenantId]
+                [$tenantId, $newsletterId, $newsletterId]
             )->fetch()['cnt'] ?? 0;
 
             // Count non-clickers (opened but didn't click)
@@ -1899,12 +1999,13 @@ class AdminNewsletterApiController extends BaseApiController
                 $stmt = Database::query(
                     "SELECT q.email
                      FROM newsletter_queue q
+                     INNER JOIN newsletters n ON n.id = q.newsletter_id AND n.tenant_id = ?
                      WHERE q.newsletter_id = ? AND q.status = 'sent'
                      AND q.email NOT IN (
                          SELECT DISTINCT email FROM newsletter_opens
-                         WHERE newsletter_id = ? AND tenant_id = ?
+                         WHERE newsletter_id = ?
                      )",
-                    [$newsletterId, $newsletterId, $tenantId]
+                    [$tenantId, $newsletterId, $newsletterId]
                 );
                 $recipients = array_column($stmt->fetchAll(), 'email');
             } elseif ($target === 'non_clickers') {
@@ -1936,9 +2037,9 @@ class AdminNewsletterApiController extends BaseApiController
             foreach ($recipients as $email) {
                 $trackingToken = bin2hex(random_bytes(16));
                 Database::query(
-                    "INSERT INTO newsletter_queue (newsletter_id, email, status, tracking_token, created_at)
-                     VALUES (?, ?, 'pending', ?, NOW())",
-                    [$newsletterId, $email, $trackingToken]
+                    "INSERT INTO newsletter_queue (tenant_id, newsletter_id, email, status, tracking_token, created_at)
+                     VALUES (?, ?, ?, 'pending', ?, NOW())",
+                    [$tenantId, $newsletterId, $email, $trackingToken]
                 );
                 $queuedCount++;
             }
@@ -2033,6 +2134,293 @@ class AdminNewsletterApiController extends BaseApiController
                 'recommendations' => [],
                 'insights' => 'Error loading send-time data.',
             ]);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Send / Test / Duplicate / Activity
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Send a newsletter immediately
+     */
+    public function sendNewsletter(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (!$this->tableExists('newsletters')) {
+            $this->respondWithError('TABLE_MISSING', 'Newsletter tables not available', null, 503);
+            return;
+        }
+
+        try {
+            $newsletter = Database::query(
+                "SELECT id, status, target_audience, segment_id FROM newsletters WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$newsletter) {
+                $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return;
+            }
+
+            if ($newsletter['status'] === 'sent') {
+                $this->respondWithError('ALREADY_SENT', 'Newsletter has already been sent');
+                return;
+            }
+
+            if ($newsletter['status'] === 'sending') {
+                $this->respondWithError('ALREADY_SENDING', 'Newsletter is currently being sent');
+                return;
+            }
+
+            $targetAudience = $newsletter['target_audience'] ?? 'all_members';
+            $segmentId = $newsletter['segment_id'] ?? null;
+
+            $queued = \Nexus\Services\NewsletterService::sendNow($id, $targetAudience, $segmentId);
+
+            $this->respondWithData([
+                'queued' => $queued,
+                'status' => 'sending',
+                'message' => "Newsletter queued for {$queued} recipients",
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithError('SEND_FAILED', $e->getMessage());
+        }
+    }
+
+    /**
+     * Send a test email to the current admin
+     */
+    public function sendTest(int $id): void
+    {
+        $userId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (!$this->tableExists('newsletters')) {
+            $this->respondWithError('TABLE_MISSING', 'Newsletter tables not available', null, 503);
+            return;
+        }
+
+        try {
+            $newsletter = Database::query(
+                "SELECT * FROM newsletters WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$newsletter) {
+                $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return;
+            }
+
+            $admin = Database::query(
+                "SELECT email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            )->fetch();
+
+            if (!$admin || empty($admin['email'])) {
+                $this->respondWithError('NO_EMAIL', 'Admin user has no email address');
+                return;
+            }
+
+            $tenantName = TenantContext::get('name') ?? 'Community';
+
+            $sampleRecipient = [
+                'email' => $admin['email'],
+                'first_name' => $admin['first_name'] ?? 'Admin',
+                'last_name' => $admin['last_name'] ?? 'User',
+                'name' => trim(($admin['first_name'] ?? '') . ' ' . ($admin['last_name'] ?? '')),
+            ];
+
+            $html = \Nexus\Services\NewsletterService::renderEmail(
+                $newsletter,
+                $tenantName,
+                'test-unsubscribe-token',
+                $sampleRecipient
+            );
+
+            $subject = '[TEST] ' . ($newsletter['subject'] ?? 'No Subject');
+
+            $sent = \Nexus\Core\Mailer::send($admin['email'], $subject, $html);
+
+            if ($sent) {
+                $this->respondWithData([
+                    'sent_to' => $admin['email'],
+                    'message' => "Test email sent to {$admin['email']}",
+                ]);
+            } else {
+                $this->respondWithError('SEND_FAILED', 'Failed to send test email. Check email configuration.');
+            }
+        } catch (\Exception $e) {
+            $this->respondWithError('SEND_FAILED', 'Failed to send test email: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get estimated recipient count for targeting preview
+     */
+    public function recipientCount(): void
+    {
+        $this->requireAdmin();
+
+        try {
+            $targetAudience = $this->input('target_audience', 'all_members');
+            $segmentId = $this->inputInt('segment_id');
+
+            if ($segmentId) {
+                $count = \Nexus\Services\NewsletterService::getSegmentRecipientCount($segmentId);
+            } else {
+                $count = \Nexus\Services\NewsletterService::getRecipientCount($targetAudience);
+            }
+
+            $this->respondWithData(['count' => $count]);
+        } catch (\Exception $e) {
+            $this->respondWithData(['count' => 0]);
+        }
+    }
+
+    /**
+     * Duplicate a newsletter as a new draft
+     */
+    public function duplicateNewsletter(int $id): void
+    {
+        $userId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (!$this->tableExists('newsletters')) {
+            $this->respondWithError('TABLE_MISSING', 'Newsletter tables not available', null, 503);
+            return;
+        }
+
+        try {
+            $newsletter = Database::query(
+                "SELECT name, subject, preview_text, content, target_audience, segment_id,
+                        ab_test_enabled, subject_b, ab_split_percentage, ab_winner_metric,
+                        ab_auto_select_winner, ab_auto_select_after_hours,
+                        target_counties, target_towns, target_groups, template_id,
+                        is_recurring, recurring_frequency, recurring_day, recurring_day_of_month,
+                        recurring_time, recurring_end_date
+                 FROM newsletters WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$newsletter) {
+                $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return;
+            }
+
+            $newSubject = ($newsletter['subject'] ?? 'Newsletter') . ' (Copy)';
+            $newName = ($newsletter['name'] ?? $newSubject) . ' (Copy)';
+
+            Database::query(
+                "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, status,
+                    target_audience, segment_id, ab_test_enabled, subject_b, ab_split_percentage,
+                    ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
+                    target_counties, target_towns, target_groups, template_id,
+                    is_recurring, recurring_frequency, recurring_day, recurring_day_of_month,
+                    recurring_time, recurring_end_date, created_by, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                [
+                    $tenantId, $newName, $newSubject, $newsletter['preview_text'], $newsletter['content'],
+                    $newsletter['target_audience'], $newsletter['segment_id'],
+                    $newsletter['ab_test_enabled'], $newsletter['subject_b'],
+                    $newsletter['ab_split_percentage'], $newsletter['ab_winner_metric'],
+                    $newsletter['ab_auto_select_winner'], $newsletter['ab_auto_select_after_hours'],
+                    $newsletter['target_counties'], $newsletter['target_towns'],
+                    $newsletter['target_groups'], $newsletter['template_id'],
+                    $newsletter['is_recurring'], $newsletter['recurring_frequency'],
+                    $newsletter['recurring_day'], $newsletter['recurring_day_of_month'],
+                    $newsletter['recurring_time'], $newsletter['recurring_end_date'],
+                    $userId,
+                ]
+            );
+
+            $newId = Database::lastInsertId();
+
+            $this->respondWithData([
+                'id' => (int) $newId,
+                'message' => 'Newsletter duplicated successfully',
+            ]);
+        } catch (\Exception $e) {
+            $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate newsletter: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get open/click activity log for a newsletter
+     */
+    public function activity(int $id): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $page = $this->queryInt('page', 1, 1);
+        $perPage = $this->queryInt('per_page', 50, 10, 200);
+        $offset = ($page - 1) * $perPage;
+        $type = $this->query('type', 'all');
+
+        if ($this->tableExists('newsletters')) {
+            $newsletter = Database::query(
+                "SELECT id FROM newsletters WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$newsletter) {
+                $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+                return;
+            }
+        }
+
+        $activities = [];
+
+        try {
+            if ($type === 'all' || $type === 'open') {
+                if ($this->tableExists('newsletter_opens')) {
+                    $opens = Database::query(
+                        "SELECT o.id, o.email, 'open' as action_type, o.opened_at as action_at, o.user_agent, o.ip_address, NULL as url
+                         FROM newsletter_opens o
+                         INNER JOIN newsletters n ON n.id = o.newsletter_id AND n.tenant_id = ?
+                         WHERE o.newsletter_id = ?
+                         ORDER BY o.opened_at DESC",
+                        [$tenantId, $id]
+                    )->fetchAll();
+                    $activities = array_merge($activities, $opens ?: []);
+                }
+            }
+
+            if ($type === 'all' || $type === 'click') {
+                if ($this->tableExists('newsletter_clicks')) {
+                    $clicks = Database::query(
+                        "SELECT c.id, c.email, 'click' as action_type, c.clicked_at as action_at, c.user_agent, c.ip_address, c.url
+                         FROM newsletter_clicks c
+                         INNER JOIN newsletters n ON n.id = c.newsletter_id AND n.tenant_id = ?
+                         WHERE c.newsletter_id = ?
+                         ORDER BY c.clicked_at DESC",
+                        [$tenantId, $id]
+                    )->fetchAll();
+                    $activities = array_merge($activities, $clicks ?: []);
+                }
+            }
+
+            usort($activities, function ($a, $b) {
+                return strtotime($b['action_at'] ?? '0') - strtotime($a['action_at'] ?? '0');
+            });
+
+            $totalCount = count($activities);
+            $activities = array_slice($activities, $offset, $perPage);
+
+            // Ensure each activity has a unique id (fallback if table lacks id column)
+            foreach ($activities as $i => &$activity) {
+                if (empty($activity['id'])) {
+                    $activity['id'] = $offset + $i + 1;
+                }
+            }
+            unset($activity);
+
+            $this->respondWithPaginatedCollection($activities, $totalCount, $page, $perPage);
+        } catch (\Exception $e) {
+            $this->respondWithPaginatedCollection([], 0, $page, $perPage);
         }
     }
 

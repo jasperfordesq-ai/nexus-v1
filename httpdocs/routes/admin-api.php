@@ -565,3 +565,19 @@ $router->add('POST', '/api/v2/admin/super/federation/partnerships/{id}/terminate
 $router->add('GET', '/api/v2/admin/super/federation/tenant/{id}/features', 'Nexus\Controllers\Api\AdminSuperApiController@federationGetTenantFeatures');
 $router->add('PUT', '/api/v2/admin/super/federation/tenant/{id}/features', 'Nexus\Controllers\Api\AdminSuperApiController@federationUpdateTenantFeature');
 
+// Admin CRM (Member Notes, Coordinator Tasks, Tags, Funnel)
+$router->add('GET', '/api/v2/admin/crm/dashboard', 'Nexus\Controllers\Api\AdminCrmApiController@dashboard');
+$router->add('GET', '/api/v2/admin/crm/funnel', 'Nexus\Controllers\Api\AdminCrmApiController@funnel');
+$router->add('GET', '/api/v2/admin/crm/admins', 'Nexus\Controllers\Api\AdminCrmApiController@listAdmins');
+$router->add('GET', '/api/v2/admin/crm/notes', 'Nexus\Controllers\Api\AdminCrmApiController@listNotes');
+$router->add('POST', '/api/v2/admin/crm/notes', 'Nexus\Controllers\Api\AdminCrmApiController@createNote');
+$router->add('PUT', '/api/v2/admin/crm/notes/{id}', 'Nexus\Controllers\Api\AdminCrmApiController@updateNote');
+$router->add('DELETE', '/api/v2/admin/crm/notes/{id}', 'Nexus\Controllers\Api\AdminCrmApiController@deleteNote');
+$router->add('GET', '/api/v2/admin/crm/tasks', 'Nexus\Controllers\Api\AdminCrmApiController@listTasks');
+$router->add('POST', '/api/v2/admin/crm/tasks', 'Nexus\Controllers\Api\AdminCrmApiController@createTask');
+$router->add('PUT', '/api/v2/admin/crm/tasks/{id}', 'Nexus\Controllers\Api\AdminCrmApiController@updateTask');
+$router->add('DELETE', '/api/v2/admin/crm/tasks/{id}', 'Nexus\Controllers\Api\AdminCrmApiController@deleteTask');
+$router->add('GET', '/api/v2/admin/crm/tags', 'Nexus\Controllers\Api\AdminCrmApiController@listTags');
+$router->add('POST', '/api/v2/admin/crm/tags', 'Nexus\Controllers\Api\AdminCrmApiController@addTag');
+$router->add('DELETE', '/api/v2/admin/crm/tags/{id}', 'Nexus\Controllers\Api\AdminCrmApiController@removeTag');
+
