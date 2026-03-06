@@ -1876,9 +1876,9 @@ class AdminConfigApiController extends BaseApiController
                  WHERE tenant_id = ? AND status = 'completed'",
                 [$tenantId]
             )->fetchColumn();
-            $cfData['member_pairs'] = (int)$memberTxns;
+            $cfData['member_interactions'] = (int)$memberTxns;
         } catch (\Throwable $e) {
-            $cfData['member_pairs'] = 0;
+            $cfData['member_interactions'] = 0;
         }
 
         // 3. Embeddings coverage
@@ -1894,9 +1894,11 @@ class AdminConfigApiController extends BaseApiController
 
             $embeddings['listing_count'] = (int)($embRows['listing'] ?? 0);
             $embeddings['user_count']    = (int)($embRows['user'] ?? 0);
+            $embeddings['total']         = $embeddings['listing_count'] + $embeddings['user_count'];
         } catch (\Throwable $e) {
             $embeddings['listing_count'] = 0;
             $embeddings['user_count']    = 0;
+            $embeddings['total']         = 0;
         }
 
         // 4. Algorithm enabled states
@@ -1913,11 +1915,11 @@ class AdminConfigApiController extends BaseApiController
         ];
 
         $this->respondWithData([
-            'fulltext_indexes'     => $fulltextIndexes,
-            'collaborative_filter' => $cfData,
-            'embeddings'           => $embeddings,
-            'enabled'              => $enabled,
-            'search'               => $searchHealth,
+            'fulltext'                => $fulltextIndexes,
+            'collaborative_filtering' => $cfData,
+            'embeddings'              => $embeddings,
+            'enabled'                 => $enabled,
+            'search'                  => $searchHealth,
         ]);
     }
 }
