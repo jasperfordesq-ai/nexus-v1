@@ -21,6 +21,7 @@ class EmailAdminApiController extends BaseApiController
      */
     public function status()
     {
+        $this->requireAdmin();
         $mailer = new Mailer();
         $providerType = $mailer->getProviderType();
 
@@ -56,6 +57,7 @@ class EmailAdminApiController extends BaseApiController
      */
     public function test()
     {
+        $this->requireAdmin();
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
         $to = $input['to'] ?? '';
 
@@ -87,6 +89,7 @@ class EmailAdminApiController extends BaseApiController
      */
     public function testGmail()
     {
+        $this->requireAdmin();
         $result = Mailer::testGmailConnection();
         return $this->jsonResponse(['data' => $result]);
     }
