@@ -172,7 +172,7 @@ export default function NexusScorePage() {
     setError(null);
 
     try {
-      const res = await api.get<{ data: NexusScoreData } | NexusScoreData>('/api/v2/gamification/nexus-score');
+      const res = await api.get<{ data: NexusScoreData } | NexusScoreData>('/v2/gamification/nexus-score');
       const payload = res.data && 'data' in res.data ? res.data.data : res.data;
       setData(payload as NexusScoreData);
     } catch (err) {
