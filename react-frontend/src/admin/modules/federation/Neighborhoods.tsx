@@ -105,8 +105,8 @@ export function Neighborhoods() {
     setLoading(true);
     try {
       const [neighborhoodsRes, tenantsRes] = await Promise.all([
-        api.get('/api/v2/admin/federation/neighborhoods'),
-        api.get('/api/v2/admin/federation/available-tenants'),
+        api.get('/v2/admin/federation/neighborhoods'),
+        api.get('/v2/admin/federation/available-tenants'),
       ]);
 
       if (neighborhoodsRes.success) {
@@ -136,7 +136,7 @@ export function Neighborhoods() {
     if (!newName.trim()) return;
     setCreating(true);
     try {
-      const res = await api.post('/api/v2/admin/federation/neighborhoods', {
+      const res = await api.post('/v2/admin/federation/neighborhoods', {
         name: newName.trim(),
         description: newDescription.trim() || undefined,
       });

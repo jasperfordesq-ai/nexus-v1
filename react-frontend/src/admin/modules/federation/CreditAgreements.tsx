@@ -117,8 +117,8 @@ export function CreditAgreements() {
     setLoading(true);
     try {
       const [agreementsRes, partnersRes] = await Promise.all([
-        api.get('/api/v2/admin/federation/credit-agreements'),
-        api.get('/api/v2/admin/federation/partners'),
+        api.get('/v2/admin/federation/credit-agreements'),
+        api.get('/v2/admin/federation/partners'),
       ]);
 
       if (agreementsRes.success) {
@@ -148,7 +148,7 @@ export function CreditAgreements() {
     if (!selectedPartner) return;
     setCreating(true);
     try {
-      const res = await api.post('/api/v2/admin/federation/credit-agreements', {
+      const res = await api.post('/v2/admin/federation/credit-agreements', {
         partner_tenant_id: parseInt(selectedPartner),
         exchange_rate: parseFloat(exchangeRate) || 1.0,
         monthly_limit: parseInt(monthlyLimit) || 100,

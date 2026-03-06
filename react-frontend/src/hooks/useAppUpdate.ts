@@ -51,7 +51,7 @@ export function useAppUpdate() {
 
     const checkUpdate = async () => {
       try {
-        const res = await api.post('/api/app/check-version', {
+        const res = await api.post('/app/check-version', {
           version: APP_VERSION,
           platform: 'android',
         });

@@ -160,9 +160,9 @@ export function SafeguardingDashboard() {
     setLoading(true);
     try {
       const [statsRes, flagsRes, assignmentsRes] = await Promise.all([
-        api.get('/api/v2/admin/safeguarding/dashboard'),
-        api.get('/api/v2/admin/safeguarding/flagged-messages'),
-        api.get('/api/v2/admin/safeguarding/assignments'),
+        api.get('/v2/admin/safeguarding/dashboard'),
+        api.get('/v2/admin/safeguarding/flagged-messages'),
+        api.get('/v2/admin/safeguarding/assignments'),
       ]);
 
       if (statsRes.success) {
@@ -223,7 +223,7 @@ export function SafeguardingDashboard() {
     if (!wardEmail.trim() || !guardianEmail.trim()) return;
     setCreating(true);
     try {
-      const res = await api.post('/api/v2/admin/safeguarding/assignments', {
+      const res = await api.post('/v2/admin/safeguarding/assignments', {
         ward_email: wardEmail.trim(),
         guardian_email: guardianEmail.trim(),
       });
