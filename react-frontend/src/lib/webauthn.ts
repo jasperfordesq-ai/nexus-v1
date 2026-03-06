@@ -86,7 +86,12 @@ export function getDefaultDeviceName(): string {
 // Registration (Enroll a new biometric credential)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function registerBiometric(deviceName?: string): Promise<{ success: boolean; error?: string }> {
+export type AuthenticatorAttachment = 'platform' | 'cross-platform' | undefined;
+
+export async function registerBiometric(
+  deviceName?: string,
+  attachment?: AuthenticatorAttachment,
+): Promise<{ success: boolean; error?: string }> {
   try {
     // Step 1: Get registration challenge from server
     const challengeRes = await api.post<{
@@ -112,12 +117,18 @@ export async function registerBiometric(deviceName?: string): Promise<{ success:
     const serverOptions = challengeRes.data;
 
     // Step 2: Map server response to SimpleWebAuthn format
+    // Allow frontend to override authenticatorAttachment for "this device" vs "other device"
+    const authSelection = {
+      ...serverOptions.authenticatorSelection,
+      ...(attachment ? { authenticatorAttachment: attachment } : {}),
+    };
+
     const optionsJSON: PublicKeyCredentialCreationOptionsJSON = {
       challenge: serverOptions.challenge,
       rp: serverOptions.rp,
       user: serverOptions.user,
       pubKeyCredParams: serverOptions.pubKeyCredParams,
-      authenticatorSelection: serverOptions.authenticatorSelection as PublicKeyCredentialCreationOptionsJSON['authenticatorSelection'],
+      authenticatorSelection: authSelection as PublicKeyCredentialCreationOptionsJSON['authenticatorSelection'],
       timeout: serverOptions.timeout,
       attestation: serverOptions.attestation as PublicKeyCredentialCreationOptionsJSON['attestation'],
       excludeCredentials: (serverOptions.excludeCredentials ?? []) as PublicKeyCredentialCreationOptionsJSON['excludeCredentials'],

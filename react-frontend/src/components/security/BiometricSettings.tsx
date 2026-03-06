@@ -8,7 +8,6 @@ import { Button, Spinner, Tooltip } from '@heroui/react';
 import {
   Fingerprint,
   Trash2,
-  Plus,
   AlertTriangle,
   CheckCircle,
   Monitor,
@@ -27,6 +26,7 @@ import {
   removeAllWebAuthnCredentials,
   detectPlatform,
   type DevicePlatform,
+  type AuthenticatorAttachment,
 } from '@/lib/webauthn';
 
 interface Credential {
@@ -57,9 +57,9 @@ const PLATFORM_INSTRUCTIONS: Record<DevicePlatform, { title: string; steps: stri
   windows: {
     title: 'Windows Hello',
     steps: [
-      'Click "Add Passkey" below — your browser will show the Windows Hello prompt.',
-      'Choose PIN, fingerprint, or face recognition to create your passkey.',
-      'If prompted to choose between "This device" and "A phone or tablet", pick "This device" for Windows Hello.',
+      'Click "This PC (Windows Hello / PIN)" to create a passkey using your Windows PIN, fingerprint, or face.',
+      'Or click "Phone, tablet, or security key" to register a different device.',
+      'If Windows Hello is not set up, go to Windows Settings > Accounts > Sign-in options to add a PIN first.',
     ],
   },
   mac: {
@@ -141,9 +141,9 @@ export function BiometricSettings() {
     loadCredentials();
   }, [loadCredentials]);
 
-  const handleRegister = async () => {
+  const handleRegister = async (attachment?: AuthenticatorAttachment) => {
     setRegistering(true);
-    const result = await registerBiometric();
+    const result = await registerBiometric(undefined, attachment);
     setRegistering(false);
 
     if (result.success) {
@@ -259,31 +259,18 @@ export function BiometricSettings() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Tooltip content="How to set up passkeys">
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              className="text-theme-subtle"
-              onPress={() => setShowInstructions(!showInstructions)}
-              aria-label="Show setup instructions"
-            >
-              <Info className="w-4 h-4" />
-            </Button>
-          </Tooltip>
+        <Tooltip content="How to set up passkeys">
           <Button
+            isIconOnly
             size="sm"
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-            onPress={handleRegister}
-            isLoading={registering}
-            startContent={!registering ? <Plus className="w-3.5 h-3.5" /> : undefined}
+            variant="light"
+            className="text-theme-subtle"
+            onPress={() => setShowInstructions(!showInstructions)}
+            aria-label="Show setup instructions"
           >
-            {hasCredentials
-              ? t('biometric_add_device', { defaultValue: 'Add Passkey' })
-              : t('biometric_enable', { defaultValue: 'Set Up' })}
+            <Info className="w-4 h-4" />
           </Button>
-        </div>
+        </Tooltip>
       </div>
 
       {/* Platform-specific instructions */}
@@ -304,6 +291,37 @@ export function BiometricSettings() {
           </div>
         </div>
       )}
+
+      {/* Registration buttons — two options */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Button
+          size="sm"
+          className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+          onPress={() => handleRegister('platform')}
+          isLoading={registering}
+          startContent={!registering ? <Monitor className="w-3.5 h-3.5" /> : undefined}
+        >
+          {platform === 'windows'
+            ? 'This PC (Windows Hello / PIN)'
+            : platform === 'mac'
+              ? 'This Mac (Touch ID)'
+              : platform === 'iphone' || platform === 'ipad'
+                ? 'This device (Face ID / Touch ID)'
+                : platform === 'android'
+                  ? 'This device (biometrics)'
+                  : 'This device'}
+        </Button>
+        <Button
+          size="sm"
+          variant="bordered"
+          className="flex-1 border-indigo-500/30 text-theme-primary"
+          onPress={() => handleRegister('cross-platform')}
+          isLoading={registering}
+          startContent={!registering ? <Smartphone className="w-3.5 h-3.5" /> : undefined}
+        >
+          Phone, tablet, or security key
+        </Button>
+      </div>
 
       {/* Registered credentials list */}
       {hasCredentials && (
@@ -374,8 +392,8 @@ export function BiometricSettings() {
         </div>
       )}
 
-      {/* Cross-device hint when no credentials yet */}
-      {!hasCredentials && !showInstructions && (
+      {/* Cross-device hint */}
+      {!showInstructions && (
         <p className="text-xs text-theme-muted">
           Works with Windows Hello, Touch ID, Face ID, Android biometrics, and security keys.{' '}
           <button
@@ -383,7 +401,7 @@ export function BiometricSettings() {
             className="text-indigo-500 hover:underline"
             onClick={() => setShowInstructions(true)}
           >
-            Learn how
+            Need help?
           </button>
         </p>
       )}
