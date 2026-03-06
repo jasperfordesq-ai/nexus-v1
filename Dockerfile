@@ -54,6 +54,9 @@ RUN docker-php-ext-configure gd \
 # Redis extension (for sessions/cache)
 RUN pecl install redis && docker-php-ext-enable redis
 
+# PCOV extension (for PHPUnit code coverage — lightweight, no overhead when disabled)
+RUN pecl install pcov && docker-php-ext-enable pcov
+
 # =============================================================================
 # Apache Configuration
 # =============================================================================
@@ -110,7 +113,7 @@ RUN printf '<IfModule remoteip_module>\n\
 
 # Pass environment variables to PHP via Apache
 # This ensures Docker env vars are available to PHP via $_SERVER and getenv()
-RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL SENTRY_DSN_PHP SENTRY_ENVIRONMENT SENTRY_TRACES_SAMPLE_RATE ADMIN_NOTIFICATION_EMAIL MEILISEARCH_HOST MEILISEARCH_KEY' >> /etc/apache2/conf-available/passenv.conf \
+RUN echo 'PassEnv DB_HOST DB_PORT DB_NAME DB_USER DB_PASS DB_TYPE REDIS_HOST REDIS_PORT APP_ENV APP_DEBUG APP_URL SENTRY_DSN_PHP SENTRY_ENVIRONMENT SENTRY_TRACES_SAMPLE_RATE ADMIN_NOTIFICATION_EMAIL MEILISEARCH_HOST MEILISEARCH_KEY SENDGRID_API_KEY SENDGRID_FROM_EMAIL SENDGRID_FROM_NAME EMAIL_ENCRYPTION_KEY USE_GMAIL_API GMAIL_CLIENT_ID GMAIL_CLIENT_SECRET GMAIL_REFRESH_TOKEN GMAIL_SENDER_EMAIL GMAIL_SENDER_NAME SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS SMTP_ENCRYPTION SMTP_FROM_EMAIL SMTP_FROM_NAME' >> /etc/apache2/conf-available/passenv.conf \
     && a2enconf passenv
 
 # =============================================================================

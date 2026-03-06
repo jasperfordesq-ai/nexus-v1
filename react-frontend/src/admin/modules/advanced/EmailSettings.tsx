@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Button, Select, SelectItem, Spinner, Chip } from '@heroui/react';
 import { Mail, Save, Send, Shield, Globe, Copy, Check } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { ApiResponse } from '@/lib/api';
@@ -78,6 +78,7 @@ const INITIAL_FORM: EmailSettingsForm = {
 export function EmailSettings() {
   usePageTitle('Admin - Email Settings');
   const toast = useToast();
+  const { tenant } = useTenant();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -220,7 +221,7 @@ export function EmailSettings() {
 
   return (
     <div>
-      <PageHeader title="Email Settings" description="Configure email delivery providers and settings" />
+      <PageHeader title="Email Settings" description={`Configure email delivery providers and settings for ${tenant?.name || 'this tenant'}`} />
 
       <div className="space-y-4">
         {/* Provider Selection */}

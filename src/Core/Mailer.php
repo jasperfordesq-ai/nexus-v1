@@ -302,6 +302,11 @@ class Mailer
             $email->addContent("text/plain", trim($plainText));
             $email->addContent("text/html", $body);
 
+            // Disable all tracking for transactional email (improves deliverability)
+            $email->setClickTracking(false, false);
+            $email->setOpenTracking(false);
+            $email->setSubscriptionTracking(false);
+
             // Custom args for webhook identification
             if ($this->tenantId) {
                 $email->addCustomArg('tenant_id', (string) $this->tenantId);
