@@ -23,13 +23,15 @@ import {
   GraduationCap,
   HandHelping,
   Megaphone,
+  Settings,
+  ArrowRight,
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -106,6 +108,7 @@ export function SkillsBrowsePage() {
   const { t } = useTranslation('common');
   usePageTitle(t('skills.browse_title', 'Browse Skills'));
   const { tenantPath } = useTenant();
+  const { isAuthenticated } = useAuth();
 
   // State
   const [categories, setCategories] = useState<SkillCategory[]>([]);
@@ -236,18 +239,59 @@ export function SkillsBrowsePage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div>
-        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <GraduationCap className="w-5 h-5 text-white" aria-hidden="true" />
+      {/* ── Hero / Explainer ──────────────────────────────────────────── */}
+      <GlassCard className="p-6 sm:p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-indigo-500/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="relative">
+          <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <GraduationCap className="w-5 h-5 text-white" aria-hidden="true" />
+            </div>
+            {t('skills.browse_title', 'Community Skills Directory')}
+          </h1>
+
+          <p className="text-theme-muted mt-3 text-sm leading-relaxed max-w-2xl">
+            {t(
+              'skills.explainer',
+              'Every member of your community has something to offer. This directory shows all the skills people have shared \u2014 from gardening and cooking to IT support and language tutoring. Browse by category, see who can help, and discover members offering or looking for specific skills.'
+            )}
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <div className="flex items-start gap-2">
+              <HandHelping className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
+              <p className="text-xs text-theme-subtle">
+                <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                  {t('skills.offering_label', 'Offering')}
+                </span>
+                {' \u2014 '}
+                {t('skills.offering_desc', 'members willing to share this skill with others')}
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <Megaphone className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" aria-hidden="true" />
+              <p className="text-xs text-theme-subtle">
+                <span className="font-medium text-blue-600 dark:text-blue-400">
+                  {t('skills.requesting_label', 'Requesting')}
+                </span>
+                {' \u2014 '}
+                {t('skills.requesting_desc', 'members looking to learn or receive help with this skill')}
+              </p>
+            </div>
           </div>
-          {t('skills.browse_title', 'Browse Skills')}
-        </h1>
-        <p className="text-theme-muted mt-1 text-sm">
-          {t('skills.browse_subtitle', 'Explore skill categories and find members with the expertise you need.')}
-        </p>
-      </div>
+
+          {isAuthenticated && (
+            <Link
+              to={tenantPath('/settings?tab=skills')}
+              className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:bg-indigo-500/20 transition-colors"
+            >
+              <Settings className="w-4 h-4" aria-hidden="true" />
+              {t('skills.add_your_skills', 'Add your own skills')}
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+      </GlassCard>
 
       {/* ── Stats ────────────────────────────────────────────────────────── */}
       {!isLoading && !error && categories.length > 0 && (
