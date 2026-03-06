@@ -595,7 +595,7 @@ export const adminBroker = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminGroups = {
-  list: (params: { page?: number; status?: string; search?: string } = {}) =>
+  list: (params: { page?: number; per_page?: number; status?: string; search?: string } = {}) =>
     api.get<PaginatedResponse<AdminGroup>>(
       `/v2/admin/groups${buildQuery(params)}`
     ),
@@ -942,6 +942,24 @@ export const adminNewsletters = {
 
   selectAbWinner: (id: number, winner: 'a' | 'b') =>
     api.post(`/v2/admin/newsletters/${id}/ab-winner`, { winner }),
+
+  // Send workflow
+  sendNewsletter: (id: number) =>
+    api.post(`/v2/admin/newsletters/${id}/send`, {}),
+
+  sendTest: (id: number) =>
+    api.post(`/v2/admin/newsletters/${id}/send-test`, {}),
+
+  getRecipientCount: (params: { target_audience: string; segment_id?: number }) =>
+    api.post('/v2/admin/newsletters/recipient-count', params),
+
+  // Duplicate
+  duplicateNewsletter: (id: number) =>
+    api.post(`/v2/admin/newsletters/${id}/duplicate`, {}),
+
+  // Activity log
+  getActivity: (id: number, params?: { page?: number; per_page?: number; type?: string }) =>
+    api.get(`/v2/admin/newsletters/${id}/activity${params ? buildQuery(params) : ''}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1109,6 +1127,10 @@ export const adminSettings = {
 
   getNativeAppSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/native-app'),
   updateNativeAppSettings: (data: Record<string, unknown>) => api.put('/v2/admin/config/native-app', data),
+
+  getEmailConfig: () => api.get<Record<string, unknown>>('/v2/admin/email/config'),
+  updateEmailConfig: (data: Record<string, unknown>) => api.put('/v2/admin/email/config', data),
+  testEmailProvider: (data: { to: string }) => api.post('/v2/admin/email/test-provider', data),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

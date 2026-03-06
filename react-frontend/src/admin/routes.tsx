@@ -102,6 +102,7 @@ const NewsletterBounces = lazy(() => import('./modules/newsletters/NewsletterBou
 const NewsletterSendTimeOptimizer = lazy(() => import('./modules/newsletters/NewsletterSendTimeOptimizer'));
 const NewsletterDiagnostics = lazy(() => import('./modules/newsletters/NewsletterDiagnostics'));
 const NewsletterStats = lazy(() => import('./modules/newsletters/NewsletterStats'));
+const NewsletterActivity = lazy(() => import('./modules/newsletters/NewsletterActivity'));
 
 // Volunteering module
 const VolunteeringOverview = lazy(() => import('./modules/volunteering/VolunteeringOverview'));
@@ -143,6 +144,7 @@ const SafeguardingDashboard = lazy(() => import('./modules/safeguarding/Safeguar
 
 // Advanced/SEO module
 const AiSettings = lazy(() => import('./modules/advanced/AiSettings'));
+const EmailSettings = lazy(() => import('./modules/advanced/EmailSettings'));
 const AlgorithmSettings = lazy(() => import('./modules/advanced/AlgorithmSettings'));
 const SeoOverview = lazy(() => import('./modules/advanced/SeoOverview'));
 const SeoAudit = lazy(() => import('./modules/advanced/SeoAudit'));
@@ -308,9 +310,11 @@ export function AdminRoutes() {
       <Route path="newsletters/send-time-optimizer" element={<Lazy><NewsletterSendTimeOptimizer /></Lazy>} />
       <Route path="newsletters/diagnostics" element={<Lazy><NewsletterDiagnostics /></Lazy>} />
       <Route path="newsletters/:id/stats" element={<Lazy><NewsletterStats /></Lazy>} />
+      <Route path="newsletters/:id/activity" element={<Lazy><NewsletterActivity /></Lazy>} />
 
       {/* ─── ADVANCED ─── */}
       <Route path="ai-settings" element={<Lazy><AiSettings /></Lazy>} />
+      <Route path="email-settings" element={<Lazy><EmailSettings /></Lazy>} />
       <Route path="feed-algorithm" element={<Navigate to="/admin/algorithm-settings" replace />} />
       <Route path="algorithm-settings" element={<Lazy><AlgorithmSettings /></Lazy>} />
       <Route path="seo" element={<Lazy><SeoOverview /></Lazy>} />

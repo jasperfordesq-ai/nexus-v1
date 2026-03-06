@@ -229,7 +229,7 @@ class GamificationEmailService
         $html = self::generateDigestHtml($user, $digest, $basePath, $siteName, $siteUrl);
 
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             return $mailer->send($user['email'], $subject, $html);
         } catch (\Throwable $e) {
             error_log("Failed to send digest to user {$user['id']}: " . $e->getMessage());
@@ -858,7 +858,7 @@ HTML;
         }
 
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             return $mailer->send($user['email'], $subject, $html);
         } catch (\Throwable $e) {
             error_log("Failed to send milestone email: " . $e->getMessage());

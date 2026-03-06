@@ -270,7 +270,7 @@ class SocialNotificationService
                 $tenantName
             );
 
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $mailer->send($owner['email'], $title . " - $tenantName", $html);
 
         } catch (\Throwable $e) {
@@ -304,7 +304,7 @@ class SocialNotificationService
                 $tenantName
             );
 
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $mailer->send($owner['email'], $title . " - $tenantName", $html);
 
         } catch (\Throwable $e) {
@@ -338,7 +338,7 @@ class SocialNotificationService
                 $tenantName
             );
 
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $mailer->send($owner['email'], $title . " - $tenantName", $html);
 
         } catch (\Throwable $e) {

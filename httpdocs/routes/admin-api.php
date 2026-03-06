@@ -129,6 +129,9 @@ $router->add('GET', '/api/v2/admin/system/activity-log', 'Nexus\Controllers\Api\
 $router->add('GET', '/api/v2/admin/email/status', 'Nexus\Controllers\Api\EmailAdminApiController@status');
 $router->add('POST', '/api/v2/admin/email/test', 'Nexus\Controllers\Api\EmailAdminApiController@test');
 $router->add('POST', '/api/v2/admin/email/test-gmail', 'Nexus\Controllers\Api\EmailAdminApiController@testGmail');
+$router->add('GET', '/api/v2/admin/email/config', 'Nexus\Controllers\Api\EmailAdminApiController@getConfig');
+$router->add('PUT', '/api/v2/admin/email/config', 'Nexus\Controllers\Api\EmailAdminApiController@updateConfig');
+$router->add('POST', '/api/v2/admin/email/test-provider', 'Nexus\Controllers\Api\EmailAdminApiController@testProvider');
 
 // Admin Matching - Config, Stats, Cache
 $router->add('GET', '/api/v2/admin/matching/config', 'Nexus\Controllers\Api\AdminMatchingApiController@getConfig');
@@ -365,9 +368,14 @@ $router->add('POST', '/api/v2/admin/newsletters/suppression-list/{email}/unsuppr
 $router->add('POST', '/api/v2/admin/newsletters/suppression-list/{email}/suppress', 'Nexus\Controllers\Api\AdminNewsletterApiController@suppress');
 $router->add('GET', '/api/v2/admin/newsletters/send-time-optimizer', 'Nexus\Controllers\Api\AdminNewsletterApiController@getSendTimeData');
 $router->add('GET', '/api/v2/admin/newsletters/diagnostics', 'Nexus\Controllers\Api\AdminNewsletterApiController@getDiagnostics');
+$router->add('POST', '/api/v2/admin/newsletters/recipient-count', 'Nexus\Controllers\Api\AdminNewsletterApiController@recipientCount');
 $router->add('GET', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@show');
 $router->add('GET', '/api/v2/admin/newsletters/{id}/resend-info', 'Nexus\Controllers\Api\AdminNewsletterApiController@getResendInfo');
 $router->add('POST', '/api/v2/admin/newsletters/{id}/resend', 'Nexus\Controllers\Api\AdminNewsletterApiController@resend');
+$router->add('POST', '/api/v2/admin/newsletters/{id}/send', 'Nexus\Controllers\Api\AdminNewsletterApiController@sendNewsletter');
+$router->add('POST', '/api/v2/admin/newsletters/{id}/send-test', 'Nexus\Controllers\Api\AdminNewsletterApiController@sendTest');
+$router->add('POST', '/api/v2/admin/newsletters/{id}/duplicate', 'Nexus\Controllers\Api\AdminNewsletterApiController@duplicateNewsletter');
+$router->add('GET', '/api/v2/admin/newsletters/{id}/activity', 'Nexus\Controllers\Api\AdminNewsletterApiController@activity');
 $router->add('GET', '/api/v2/admin/newsletters/{id}/stats', 'Nexus\Controllers\Api\AdminNewsletterApiController@stats');
 $router->add('POST', '/api/v2/admin/newsletters/{id}/ab-winner', 'Nexus\Controllers\Api\AdminNewsletterApiController@selectAbWinner');
 $router->add('PUT', '/api/v2/admin/newsletters/{id}', 'Nexus\Controllers\Api\AdminNewsletterApiController@update');

@@ -6,6 +6,8 @@
 
 namespace Nexus\Core;
 
+use Nexus\Models\EmailSettings;
+use Nexus\Services\EmailMonitorService;
 use Nexus\Services\RedisCache;
 
 class Mailer
@@ -25,6 +27,15 @@ class Mailer
     private $gmailClientSecret;
     private $gmailRefreshToken;
 
+    // SendGrid settings
+    private ?string $sendgridApiKey = null;
+
+    // Driver: 'smtp', 'gmail_api', or 'sendgrid'
+    private string $driver = 'smtp';
+
+    // Tenant context (null = platform-wide .env config)
+    private ?int $tenantId = null;
+
     // Redis cache keys
     private const CACHE_KEY_ACCESS_TOKEN = 'gmail_oauth_access_token';
     private const CACHE_KEY_TOKEN_EXPIRY = 'gmail_oauth_token_expiry';
@@ -38,25 +49,31 @@ class Mailer
     private const CIRCUIT_BREAKER_TIMEOUT = 300; // 5 minutes in seconds
     private const TOKEN_TTL = 3000; // 50 minutes in seconds (tokens expire at ~60 min)
 
-    public function __construct()
+    /**
+     * @param int|null $tenantId When provided, loads per-tenant email config from email_settings table.
+     *                           When null, uses platform-wide .env config (backwards-compatible).
+     */
+    public function __construct(?int $tenantId = null)
     {
-        // Read directly from .env file (more reliable than $_ENV)
+        $this->tenantId = $tenantId;
+
+        // Always load .env values as the base/fallback config
         $envValues = $this->loadEnvValues();
 
-        // Check if Gmail API is enabled
+        // Check if Gmail API is enabled (from .env)
         $useGmailApiRaw = $envValues['USE_GMAIL_API'] ?? 'false';
         $this->useGmailApi = strtolower($useGmailApiRaw) === 'true';
 
         if ($this->useGmailApi) {
-            // Gmail API credentials
             $this->gmailClientId = $envValues['GMAIL_CLIENT_ID'] ?? '';
             $this->gmailClientSecret = $envValues['GMAIL_CLIENT_SECRET'] ?? '';
             $this->gmailRefreshToken = $envValues['GMAIL_REFRESH_TOKEN'] ?? '';
             $this->fromEmail = $envValues['GMAIL_SENDER_EMAIL'] ?? $envValues['SMTP_FROM_EMAIL'] ?? '';
             $this->fromName = $envValues['GMAIL_SENDER_NAME'] ?? $envValues['SMTP_FROM_NAME'] ?? 'Project NEXUS';
+            $this->driver = 'gmail_api';
         }
 
-        // Always load SMTP credentials (used as primary when Gmail is disabled, or as fallback when Gmail fails)
+        // Always load SMTP credentials (used as primary when Gmail is disabled, or as fallback)
         $this->host = $envValues['SMTP_HOST'] ?? '';
         $this->port = $envValues['SMTP_PORT'] ?? 587;
         $this->username = $envValues['SMTP_USER'] ?? '';
@@ -66,6 +83,95 @@ class Mailer
         if (!$this->useGmailApi) {
             $this->fromEmail = $envValues['SMTP_FROM_EMAIL'] ?? '';
             $this->fromName = $envValues['SMTP_FROM_NAME'] ?? 'Project NEXUS';
+        }
+
+        // Load platform-wide SendGrid config from .env (if set)
+        $envSendGridKey = $envValues['SENDGRID_API_KEY'] ?? '';
+        if (!empty($envSendGridKey) && !$this->useGmailApi) {
+            $this->sendgridApiKey = $envSendGridKey;
+            $this->fromEmail = $envValues['SENDGRID_FROM_EMAIL'] ?? $this->fromEmail;
+            $this->fromName = $envValues['SENDGRID_FROM_NAME'] ?? $this->fromName;
+            $this->driver = 'sendgrid';
+        }
+
+        // Per-tenant override: if a tenant ID was provided, check email_settings
+        if ($tenantId !== null) {
+            $this->loadTenantConfig($tenantId);
+        }
+    }
+
+    /**
+     * Factory: create a Mailer configured for the current tenant context.
+     * Falls back to platform .env if no tenant-specific config exists.
+     */
+    public static function forCurrentTenant(): self
+    {
+        return new self(TenantContext::getId());
+    }
+
+    /**
+     * Load per-tenant email provider config from the email_settings table.
+     * Only overrides if the tenant has explicitly set an email_provider.
+     */
+    private function loadTenantConfig(int $tenantId): void
+    {
+        try {
+            $provider = EmailSettings::get($tenantId, 'email_provider');
+
+            if (!$provider || $provider === 'platform_default') {
+                return; // Use whatever .env configured
+            }
+
+            switch ($provider) {
+                case 'sendgrid':
+                    $apiKey = EmailSettings::get($tenantId, 'sendgrid_api_key');
+                    if (!empty($apiKey)) {
+                        $this->sendgridApiKey = $apiKey;
+                        $this->driver = 'sendgrid';
+                        $fromEmail = EmailSettings::get($tenantId, 'sendgrid_from_email');
+                        $fromName = EmailSettings::get($tenantId, 'sendgrid_from_name');
+                        if (!empty($fromEmail)) $this->fromEmail = $fromEmail;
+                        if (!empty($fromName)) $this->fromName = $fromName;
+                    }
+                    break;
+
+                case 'gmail_api':
+                    $clientId = EmailSettings::get($tenantId, 'gmail_client_id');
+                    $clientSecret = EmailSettings::get($tenantId, 'gmail_client_secret');
+                    $refreshToken = EmailSettings::get($tenantId, 'gmail_refresh_token');
+                    if (!empty($clientId) && !empty($clientSecret) && !empty($refreshToken)) {
+                        $this->gmailClientId = $clientId;
+                        $this->gmailClientSecret = $clientSecret;
+                        $this->gmailRefreshToken = $refreshToken;
+                        $this->useGmailApi = true;
+                        $this->driver = 'gmail_api';
+                        $senderEmail = EmailSettings::get($tenantId, 'gmail_sender_email');
+                        $senderName = EmailSettings::get($tenantId, 'gmail_sender_name');
+                        if (!empty($senderEmail)) $this->fromEmail = $senderEmail;
+                        if (!empty($senderName)) $this->fromName = $senderName;
+                    }
+                    break;
+
+                case 'smtp':
+                    $smtpHost = EmailSettings::get($tenantId, 'smtp_host');
+                    if (!empty($smtpHost)) {
+                        $this->host = $smtpHost;
+                        $this->port = EmailSettings::get($tenantId, 'smtp_port') ?? 587;
+                        $this->username = EmailSettings::get($tenantId, 'smtp_user') ?? '';
+                        $this->password = EmailSettings::get($tenantId, 'smtp_password') ?? '';
+                        $this->encryption = EmailSettings::get($tenantId, 'smtp_encryption') ?? 'tls';
+                        $this->driver = 'smtp';
+                        $this->useGmailApi = false;
+                        $fromEmail = EmailSettings::get($tenantId, 'smtp_from_email');
+                        $fromName = EmailSettings::get($tenantId, 'smtp_from_name');
+                        if (!empty($fromEmail)) $this->fromEmail = $fromEmail;
+                        if (!empty($fromName)) $this->fromName = $fromName;
+                    }
+                    break;
+            }
+        } catch (\Throwable $e) {
+            // If email_settings table doesn't exist yet or any error, fall back to .env
+            error_log("Mailer: Failed to load tenant config for tenant {$tenantId}: " . $e->getMessage());
         }
     }
 
@@ -117,6 +223,9 @@ class Mailer
             'SMTP_ENCRYPTION',
             'SMTP_FROM_EMAIL',
             'SMTP_FROM_NAME',
+            'SENDGRID_API_KEY',
+            'SENDGRID_FROM_EMAIL',
+            'SENDGRID_FROM_NAME',
         ];
 
         foreach ($envKeys as $key) {
@@ -132,16 +241,30 @@ class Mailer
 
     public function send($to, $subject, $body, $cc = null, $replyTo = null)
     {
-        // Default: USE_GMAIL_API=false (recommended - SMTP is more reliable)
-        // Set USE_GMAIL_API=true in .env only if you need Gmail API specifically
-        if ($this->useGmailApi) {
+        // Route based on configured driver
+        if ($this->driver === 'sendgrid') {
+            $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo);
+            if ($result) {
+                return true;
+            }
+
+            // SendGrid failed — fall back to SMTP if credentials are configured
+            if (!empty($this->host) && !empty($this->username)) {
+                error_log("Mailer: SendGrid failed, falling back to SMTP for: $to");
+                return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
+            }
+
+            error_log("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: $to");
+            return false;
+        }
+
+        if ($this->driver === 'gmail_api') {
             $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo);
             if ($result) {
                 return true;
             }
 
             // Gmail API failed — fall back to SMTP if credentials are configured
-            // Triggers: token refresh failure, rate limit exceeded, circuit breaker open, API errors
             if (!empty($this->host) && !empty($this->username)) {
                 error_log("Mailer: Gmail API failed, falling back to SMTP for: $to");
                 return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
@@ -150,7 +273,58 @@ class Mailer
             error_log("Mailer: Gmail API failed and no SMTP fallback configured. Email not sent to: $to");
             return false;
         }
+
         return $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo);
+    }
+
+    /**
+     * Send email via SendGrid Web API v3
+     */
+    private function sendViaSendGrid($to, $subject, $body, $cc = null, $replyTo = null): bool
+    {
+        try {
+            $email = new \SendGrid\Mail\Mail();
+            $email->setFrom($this->fromEmail, $this->fromName);
+            $email->setSubject($subject);
+            $email->addTo($to);
+
+            if ($cc) {
+                $email->addCc($cc);
+            }
+            if ($replyTo) {
+                $email->setReplyTo($replyTo);
+            }
+
+            // Plain text fallback
+            $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
+            $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
+            $plainText = preg_replace('/\n\s+/', "\n", $plainText);
+            $email->addContent("text/plain", trim($plainText));
+            $email->addContent("text/html", $body);
+
+            // Custom args for webhook identification
+            if ($this->tenantId) {
+                $email->addCustomArg('tenant_id', (string) $this->tenantId);
+                $email->addHeader('X-Nexus-Tenant', (string) $this->tenantId);
+            }
+
+            $sendgrid = new \SendGrid($this->sendgridApiKey);
+            $response = $sendgrid->send($email);
+
+            $statusCode = $response->statusCode();
+            if ($statusCode >= 200 && $statusCode < 300) {
+                EmailMonitorService::recordEmailSend('sendgrid', true, $this->tenantId);
+                return true;
+            }
+
+            error_log("SendGrid error ({$statusCode}): " . $response->body());
+            EmailMonitorService::recordEmailSend('sendgrid', false, $this->tenantId);
+            return false;
+        } catch (\Exception $e) {
+            error_log("SendGrid Error: " . $e->getMessage());
+            EmailMonitorService::recordEmailSend('sendgrid', false, $this->tenantId);
+            return false;
+        }
     }
 
     /**
@@ -564,8 +738,8 @@ class Mailer
     /**
      * Get current email provider type
      */
-    public function getProviderType()
+    public function getProviderType(): string
     {
-        return $this->useGmailApi ? 'gmail_api' : 'smtp';
+        return $this->driver;
     }
 }

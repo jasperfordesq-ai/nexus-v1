@@ -266,7 +266,7 @@ class GroupNotificationService
 
             $html = EmailTemplate::render($title, $subtitle, $body, $btnText, $fullUrl, $tenantName);
 
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
             $mailer->send($user['email'], "{$title} - {$tenantName}", $html);
         } catch (\Throwable $e) {
             error_log("GroupNotificationService::sendEmail error: " . $e->getMessage());

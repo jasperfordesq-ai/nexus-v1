@@ -311,7 +311,7 @@ class EmailVerificationApiController extends BaseApiController
 
         // Send verification email
         try {
-            $mailer = new Mailer();
+            $mailer = Mailer::forCurrentTenant();
 
             // Get tenant name
             $tenantName = 'Project NEXUS';
