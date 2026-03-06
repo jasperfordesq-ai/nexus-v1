@@ -488,6 +488,28 @@ class SkillTaxonomyService
         )->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Get members who have a specific skill (by name), with proficiency & flags.
+     *
+     * @return array<array{id:int, first_name:string, last_name:string, avatar:?string, proficiency:string, is_offering:int, is_requesting:int}>
+     */
+    public static function getMembersWithSkill(string $skillName, int $limit = 30): array
+    {
+        $tenantId = TenantContext::getId();
+
+        return Database::query(
+            "SELECT u.id, u.first_name, u.last_name, u.avatar,
+                    us.proficiency AS proficiency_level,
+                    us.is_offering, us.is_requesting
+             FROM user_skills us
+             JOIN users u ON u.id = us.user_id AND u.tenant_id = us.tenant_id
+             WHERE us.tenant_id = ? AND us.skill_name = ? AND u.status = 'active'
+             ORDER BY FIELD(us.proficiency, 'expert', 'advanced', 'intermediate', 'beginner'), u.first_name
+             LIMIT ?",
+            [$tenantId, $skillName, $limit]
+        )->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
     // =========================================================================
     // SEED / DEFAULTS
     // =========================================================================

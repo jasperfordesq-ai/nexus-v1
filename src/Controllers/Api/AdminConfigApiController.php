@@ -11,6 +11,7 @@ use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Services\RedisCache;
 use Nexus\Services\TenantFeatureConfig;
+use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FeedRankingService;
 use Nexus\Services\ListingRankingService;
 use Nexus\Services\MemberRankingService;
@@ -125,6 +126,23 @@ class AdminConfigApiController extends BaseApiController
             "UPDATE tenants SET features = ? WHERE id = ?",
             [json_encode($features), $tenantId]
         );
+
+        // Sync federation feature toggle to federation_tenant_features table
+        // The admin UI toggles tenants.features JSON, but the federation API
+        // checks federation_tenant_features — these must stay in sync.
+        if ($featureName === 'federation') {
+            if ((bool) $enabled) {
+                FederationFeatureService::enableTenantFeature(
+                    FederationFeatureService::TENANT_FEDERATION_ENABLED,
+                    $tenantId
+                );
+            } else {
+                FederationFeatureService::disableTenantFeature(
+                    FederationFeatureService::TENANT_FEDERATION_ENABLED,
+                    $tenantId
+                );
+            }
+        }
 
         // Clear bootstrap cache
         RedisCache::delete('tenant_bootstrap', $tenantId);
