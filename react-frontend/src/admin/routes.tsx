@@ -157,6 +157,8 @@ const CrmDashboard = lazy(() => import('./modules/crm/CrmDashboard'));
 const MemberNotes = lazy(() => import('./modules/crm/MemberNotes'));
 const CoordinatorTasks = lazy(() => import('./modules/crm/CoordinatorTasks'));
 const OnboardingFunnel = lazy(() => import('./modules/crm/OnboardingFunnel'));
+const MemberTags = lazy(() => import('./modules/crm/MemberTags'));
+const ActivityTimeline = lazy(() => import('./modules/crm/ActivityTimeline'));
 
 // System tools
 const AdminSettings = lazy(() => import('./modules/system/AdminSettings'));
@@ -254,6 +256,8 @@ export function AdminRoutes() {
       <Route path="crm" element={<Lazy><CrmDashboard /></Lazy>} />
       <Route path="crm/notes" element={<Lazy><MemberNotes /></Lazy>} />
       <Route path="crm/tasks" element={<Lazy><CoordinatorTasks /></Lazy>} />
+      <Route path="crm/tags" element={<Lazy><MemberTags /></Lazy>} />
+      <Route path="crm/timeline" element={<Lazy><ActivityTimeline /></Lazy>} />
       <Route path="crm/funnel" element={<Lazy><OnboardingFunnel /></Lazy>} />
 
       {/* ─── LISTINGS ─── */}

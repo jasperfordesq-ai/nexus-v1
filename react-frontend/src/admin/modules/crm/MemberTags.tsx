@@ -17,8 +17,9 @@ import {
   Chip, Spinner, Avatar,
 } from '@heroui/react';
 import { Tag, Plus, Trash2, Search, Users, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 
@@ -30,6 +31,7 @@ interface MemberTag {
   created_by: number;
   created_at: string;
   user_name?: string;
+  user_avatar?: string | null;
 }
 
 interface TagSummary {
@@ -41,6 +43,7 @@ type ViewMode = 'summary' | 'members';
 
 export function MemberTags() {
   usePageTitle('Admin - Member Tags');
+  const { tenantPath } = useTenant();
   const toast = useToast();
 
   // View state
@@ -89,26 +92,11 @@ export function MemberTags() {
   const loadMembersByTag = useCallback(async (tag: string) => {
     setMembersLoading(true);
     try {
-      // Load all tags, then filter client-side by tag name
-      // The API returns MemberTag[] when user_id is provided, but we need all members with a specific tag
-      // We load all tag summaries first, then get individual member tags
-      const res = await adminCrm.getTags();
+      const res = await adminCrm.getTags({ tag });
       if (res.success && res.data) {
-        // The API without user_id returns TagSummary[]; we need to find members with this tag
-        // Since the API returns MemberTag[] only when user_id is given, we'll load all and filter
-        // Actually, let's request all tags and filter — the API may support this differently
-        // For now, we fetch all and filter by tag name
         const payload = res.data as unknown;
         if (Array.isArray(payload)) {
-          // If we got TagSummary[], we need a different approach
-          // Let's check the first item to determine the type
-          if (payload.length > 0 && 'id' in payload[0]) {
-            setMemberTags((payload as MemberTag[]).filter(t => t.tag === tag));
-          } else {
-            // Got summaries — can't get individual members this way
-            // We'll need to use the data we have
-            setMemberTags([]);
-          }
+          setMemberTags(payload as MemberTag[]);
         }
       }
     } catch {
@@ -207,11 +195,14 @@ export function MemberTags() {
     if (!deleteSummaryTarget) return;
     setDeleting(true);
     try {
-      // To delete all instances of a tag, we need to load all member tags for this tag
-      // and delete them one by one — or rely on backend bulk delete
-      // For now, we'll inform the user to remove individually
-      toast.error('To remove a tag entirely, remove it from each member individually');
-      setDeleteSummaryTarget(null);
+      const res = await adminCrm.bulkRemoveTag(deleteSummaryTarget.tag);
+      if (res.success) {
+        toast.success(`Tag "${deleteSummaryTarget.tag}" removed from all members`);
+        setDeleteSummaryTarget(null);
+        loadTagSummaries();
+      } else {
+        toast.error('Failed to remove tag');
+      }
     } catch {
       toast.error('Failed to remove tag');
     }
@@ -376,14 +367,18 @@ export function MemberTags() {
               <CardBody className="flex flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <Avatar
+                    src={mt.user_avatar || undefined}
                     name={mt.user_name || `User #${mt.user_id}`}
                     size="sm"
                     className="shrink-0"
                   />
                   <div className="min-w-0">
-                    <p className="font-semibold text-foreground truncate">
+                    <Link
+                      to={tenantPath(`/admin/users/${mt.user_id}/edit`)}
+                      className="font-semibold text-foreground hover:text-primary transition-colors truncate block"
+                    >
                       {mt.user_name || `User #${mt.user_id}`}
-                    </p>
+                    </Link>
                     <p className="text-xs text-default-400">
                       User #{mt.user_id}
                     </p>
@@ -505,10 +500,10 @@ export function MemberTags() {
         isOpen={!!deleteSummaryTarget}
         onClose={() => setDeleteSummaryTarget(null)}
         onConfirm={handleDeleteSummaryTag}
-        title="Remove Tag"
-        message={`The tag "${deleteSummaryTarget?.tag}" is applied to ${deleteSummaryTarget?.member_count} ${deleteSummaryTarget?.member_count === 1 ? 'member' : 'members'}. To remove a tag entirely, remove it from each member individually by clicking on the tag card first.`}
-        confirmLabel="OK"
-        confirmColor="primary"
+        title="Remove Tag Entirely"
+        message={`Are you sure you want to remove the tag "${deleteSummaryTarget?.tag}" from all ${deleteSummaryTarget?.member_count} ${deleteSummaryTarget?.member_count === 1 ? 'member' : 'members'}? This action cannot be undone.`}
+        confirmLabel="Remove All"
+        confirmColor="danger"
         isLoading={deleting}
       />
     </div>

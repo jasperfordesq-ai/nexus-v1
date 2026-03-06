@@ -541,12 +541,37 @@ export interface NewsletterDiagnostics {
   };
   bounce_rate: number;
   sender_score: number;
+  sender_score_breakdown: {
+    bounce_penalty: number;
+    complaint_penalty: number;
+    failure_penalty: number;
+    suppression_penalty: number;
+    volume_bonus: number;
+  };
   configuration: {
     smtp_configured: boolean;
     api_configured: boolean;
     tracking_enabled: boolean;
   };
   health_status: 'healthy' | 'warning' | 'critical';
+}
+
+export interface BounceTrendEntry {
+  week_label: string;
+  week_start: string;
+  bounce_type: string;
+  count: number;
+}
+
+export interface BounceReasonSummary {
+  reason: string;
+  bounce_type: string;
+  count: number;
+}
+
+export interface BounceTrendsData {
+  trends: BounceTrendEntry[];
+  summary: BounceReasonSummary[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1861,4 +1886,15 @@ export interface CrmAdmin {
   email: string;
   avatar_url: string | null;
   role: string;
+}
+
+export interface TimelineEntry {
+  id: number;
+  user_id: number;
+  user_name: string;
+  user_avatar: string | null;
+  activity_type: string;
+  description: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
 }
