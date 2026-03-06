@@ -171,7 +171,31 @@ export function AlgorithmSettings() {
     setHealthLoading(true);
     try {
       const res = await adminSettings.getAlgorithmHealth();
-      setHealth((res.data ?? null) as HealthStatus | null);
+      const raw = (res.data ?? null) as Record<string, unknown> | null;
+      if (!raw) { setHealth(null); return; }
+
+      // Normalise backend keys to match frontend HealthStatus shape
+      const ft = (raw.fulltext ?? raw.fulltext_indexes ?? {}) as HealthStatus['fulltext'];
+      const cf = (raw.collaborative_filtering ?? raw.collaborative_filter ?? {}) as Record<string, number>;
+      const emb = (raw.embeddings ?? {}) as Record<string, number>;
+
+      setHealth({
+        fulltext: {
+          listings: ft?.listings ?? false,
+          users: ft?.users ?? false,
+          feed_activity: ft?.feed_activity ?? false,
+        },
+        collaborative_filtering: {
+          listing_interactions: cf?.listing_interactions ?? 0,
+          member_interactions: cf?.member_interactions ?? cf?.member_pairs ?? 0,
+        },
+        embeddings: {
+          listing_count: emb?.listing_count ?? 0,
+          user_count: emb?.user_count ?? 0,
+          total: emb?.total ?? ((emb?.listing_count ?? 0) + (emb?.user_count ?? 0)),
+        },
+        search: raw.search as HealthStatus['search'],
+      });
     } catch {
       // Health is optional — don't toast
     } finally {
