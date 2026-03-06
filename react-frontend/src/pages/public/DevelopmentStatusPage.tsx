@@ -63,27 +63,39 @@ export function DevelopmentStatusPage() {
           <h2 className="text-lg font-semibold">{t('dev_status.whats_stable.title')}</h2>
         </CardHeader>
         <Divider />
-        <CardBody>
-          <ul className="text-sm text-foreground-600 space-y-2 list-none">
-            {([
-              t('dev_status.whats_stable.item1'),
-              t('dev_status.whats_stable.item2'),
-              t('dev_status.whats_stable.item3'),
-              t('dev_status.whats_stable.item4'),
-              t('dev_status.whats_stable.item5'),
-              t('dev_status.whats_stable.item6'),
-              t('dev_status.whats_stable.item7'),
-              t('dev_status.whats_stable.item8'),
-              t('dev_status.whats_stable.item9'),
-              t('dev_status.whats_stable.item10'),
-              t('dev_status.whats_stable.item11'),
-            ]).map((item, index) => (
-              <li key={index} className="flex items-start gap-2">
-                <CheckCircle className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
+        <CardBody className="space-y-5">
+          {([
+            {
+              groupKey: 'core',
+              items: ['item1','item2','item3','item4','item5','item6'],
+            },
+            {
+              groupKey: 'member',
+              items: ['item1','item2','item3','item4','item5','item6','item7','item8','item9','item10','item11','item12','item13','item14','item15','item16','item17','item18','item19'],
+            },
+            {
+              groupKey: 'content',
+              items: ['item1','item2','item3','item4','item5','item6','item7'],
+            },
+            {
+              groupKey: 'platform',
+              items: ['item1','item2','item3','item4','item5','item6','item7','item8'],
+            },
+          ]).map(({ groupKey, items }) => (
+            <div key={groupKey}>
+              <p className="text-xs font-semibold uppercase tracking-wide text-foreground-400 mb-2">
+                {t(`dev_status.whats_stable.${groupKey}_title`)}
+              </p>
+              <ul className="text-sm text-foreground-600 space-y-1.5 list-none">
+                {items.map((item, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-success shrink-0 mt-0.5" aria-hidden="true" />
+                    {t(`dev_status.whats_stable.${groupKey}_${item}`)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </CardBody>
       </Card>
 
