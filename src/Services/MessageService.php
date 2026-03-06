@@ -55,12 +55,12 @@ class MessageService
         $cursor = $filters['cursor'] ?? null;
         $showArchived = !empty($filters['archived']);
 
-        // Decode cursor (it's the last conversation's latest message timestamp)
-        $cursorTime = null;
+        // Decode cursor (last conversation's latest message ID — unique, monotonic)
+        $cursorId = null;
         if ($cursor) {
             $decoded = base64_decode($cursor, true);
-            if ($decoded) {
-                $cursorTime = $decoded;
+            if ($decoded && ctype_digit($decoded)) {
+                $cursorId = (int)$decoded;
             }
         }
 
@@ -160,16 +160,20 @@ class MessageService
             $params['uid_arch2'] = $userId;
         }
 
-        // Apply cursor filter
-        if ($cursorTime) {
-            $sql .= " AND m.created_at < :cursor_time";
-            $params['cursor_time'] = $cursorTime;
+        // Apply cursor filter (message ID-based for uniqueness)
+        if ($cursorId) {
+            $sql .= " AND m.id < :cursor_id";
+            $params['cursor_id'] = $cursorId;
         }
 
-        $sql .= " ORDER BY m.created_at DESC LIMIT " . ($limit + 1);
+        $sql .= " ORDER BY m.id DESC LIMIT :pagination_limit";
+        $params['pagination_limit'] = $limit + 1;
 
         $stmt = $db->prepare($sql);
-        $stmt->execute($params);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+        }
+        $stmt->execute();
         $conversations = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // Check if there are more results
@@ -203,8 +207,8 @@ class MessageService
                 'unread_count' => (int)$conv['unread_count'],
             ];
 
-            // Set cursor to last item's timestamp
-            $nextCursor = $conv['last_message_at'];
+            // Set cursor to last item's message ID (unique, monotonic)
+            $nextCursor = $conv['last_message_id'];
         }
 
         return [
@@ -294,7 +298,7 @@ class MessageService
         $cursorId = null;
         if ($cursor) {
             $decoded = base64_decode($cursor, true);
-            if ($decoded && is_numeric($decoded)) {
+            if ($decoded && ctype_digit($decoded)) {
                 $cursorId = (int)$decoded;
             }
         }
@@ -365,10 +369,15 @@ class MessageService
             $sql .= " ORDER BY m.id DESC";
         }
 
-        $sql .= " LIMIT " . ($limit + 1);
+        $sql .= " LIMIT ?";
+        $params[] = $limit + 1;
 
         $stmt = $db->prepare($sql);
-        $stmt->execute($params);
+        // Bind LIMIT as integer to prevent string interpolation
+        foreach ($params as $i => $value) {
+            $stmt->bindValue($i + 1, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+        }
+        $stmt->execute();
         $messages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // Check if there are more results
@@ -1157,9 +1166,16 @@ class MessageService
         }
 
         $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
         $placeholders = implode(',', array_fill(0, count($messageIds), '?'));
-        $stmt = $db->prepare("SELECT id, message_id, file_url as url, file_type as type, file_name as name, file_size as size FROM message_attachments WHERE message_id IN ($placeholders)");
-        $stmt->execute($messageIds);
+        $hastenantCol = self::hasColumn('message_attachments', 'tenant_id');
+        $tenantFilter = $hastenantCol ? ' AND tenant_id = ?' : '';
+        $stmt = $db->prepare("SELECT id, message_id, file_url as url, file_type as type, file_name as name, file_size as size FROM message_attachments WHERE message_id IN ($placeholders){$tenantFilter}");
+        $params = $messageIds;
+        if ($hastenantCol) {
+            $params[] = $tenantId;
+        }
+        $stmt->execute($params);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // Convert relative URLs to absolute API URLs

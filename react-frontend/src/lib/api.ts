@@ -86,9 +86,13 @@ export interface PaginationMeta {
     other_user: {
       id: number;
       name: string;
-      avatar?: string | null;
-      tagline?: string;
+      first_name?: string;
+      last_name?: string;
+      avatar_url?: string | null;
+      is_online?: boolean;
     };
+    unread_count?: number;
+    message_count?: number;
   };
   // Allow additional meta fields from various endpoints
   [key: string]: unknown;
@@ -596,7 +600,7 @@ class ApiClient {
       const data = await response.json();
 
       if (response.ok) {
-        return { success: true, data: 'data' in data ? data.data : data };
+        return { success: true, data: 'data' in data ? data.data : data, meta: data.meta };
       }
 
       // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
