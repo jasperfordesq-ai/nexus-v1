@@ -234,7 +234,7 @@ class UserController
                 // If role is not admin, remove super admin status
                 $isSuperAdmin = false;
             }
-        } elseif (!empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin'])) {
+        } elseif (!empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin'])) {
             // Non-god super admins can only change role, not super admin status
             // Preserve existing is_super_admin value
             if ($role === 'super_admin') {

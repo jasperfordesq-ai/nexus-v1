@@ -24,7 +24,7 @@ class VolunteeringController
             if (!defined('TESTING')) { exit; }
         }
         $role = $_SESSION['user_role'] ?? '';
-        $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_admin']);
+        $isAdmin = in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_admin']);
         if (!$isAdmin) {
             header('HTTP/1.1 403 Forbidden');
             echo 'Access Denied: Admin privileges required';

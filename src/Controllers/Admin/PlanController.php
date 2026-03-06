@@ -33,7 +33,7 @@ class PlanController
         }
 
         // Only super admins can manage plans
-        $isSuper = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
+        $isSuper = !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
         if (!$isSuper) {
             if ($jsonResponse) {
