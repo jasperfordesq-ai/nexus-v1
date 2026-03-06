@@ -177,7 +177,7 @@ class EmailSettings
     /**
      * Decrypt a value
      */
-    private static function decrypt(string $value): string
+    private static function decrypt(string $value): ?string
     {
         $key = self::getEncryptionKey();
         $data = base64_decode($value);
@@ -191,7 +191,12 @@ class EmailSettings
 
         $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
 
-        return $decrypted !== false ? $decrypted : $value;
+        if ($decrypted === false) {
+            error_log("EmailSettings: decryption failed (possible key mismatch)");
+            return null;
+        }
+
+        return $decrypted;
     }
 
     /**

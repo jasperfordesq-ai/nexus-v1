@@ -371,7 +371,7 @@ class Mailer
                 throw new \Exception("cURL error: $curlError");
             }
 
-            if ($httpCode !== 200) {
+            if ($httpCode < 200 || $httpCode >= 300) {
                 $errorData = json_decode($response, true);
                 $errorMsg = $errorData['error']['message'] ?? $response;
                 throw new \Exception("Gmail API error ($httpCode): $errorMsg");
@@ -499,7 +499,7 @@ class Mailer
         ];
         error_log("Gmail token refresh response: " . json_encode($logData));
 
-        if ($httpCode !== 200) {
+        if ($httpCode < 200 || $httpCode >= 300) {
             error_log("Gmail token refresh failed (HTTP $httpCode): " . ($data['error_description'] ?? $response));
             return null;
         }

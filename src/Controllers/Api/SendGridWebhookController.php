@@ -52,13 +52,13 @@ class SendGridWebhookController extends BaseApiController
             $email = $event['email'] ?? '';
             $tenantId = (int) ($event['tenant_id'] ?? 0);
 
-            if (empty($email)) {
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 continue;
             }
 
             // Set tenant context for scoped queries
             if ($tenantId > 0) {
-                TenantContext::setId($tenantId);
+                TenantContext::setById($tenantId);
             }
 
             switch ($type) {
