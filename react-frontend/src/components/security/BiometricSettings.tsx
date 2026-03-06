@@ -293,11 +293,11 @@ export function BiometricSettings() {
         </div>
       )}
 
-      {/* Registration button */}
+      {/* Registration button — no attachment restriction, let browser show all options */}
       <Button
         size="md"
         className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-        onPress={() => handleRegister('platform')}
+        onPress={() => handleRegister(undefined)}
         isLoading={registering}
         startContent={!registering ? <Fingerprint className="w-4 h-4" /> : undefined}
       >
