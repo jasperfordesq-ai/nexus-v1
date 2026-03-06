@@ -293,36 +293,16 @@ export function BiometricSettings() {
         </div>
       )}
 
-      {/* Registration buttons — two options */}
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Button
-          size="sm"
-          className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-          onPress={() => handleRegister('platform')}
-          isLoading={registering}
-          startContent={!registering ? <Monitor className="w-3.5 h-3.5" /> : undefined}
-        >
-          {platform === 'windows'
-            ? 'This PC (Windows Hello / PIN)'
-            : platform === 'mac'
-              ? 'This Mac (Touch ID)'
-              : platform === 'iphone' || platform === 'ipad'
-                ? 'This device (Face ID / Touch ID)'
-                : platform === 'android'
-                  ? 'This device (biometrics)'
-                  : 'This device'}
-        </Button>
-        <Button
-          size="sm"
-          variant="bordered"
-          className="flex-1 border-indigo-500/30 text-theme-primary"
-          onPress={() => handleRegister('cross-platform')}
-          isLoading={registering}
-          startContent={!registering ? <Smartphone className="w-3.5 h-3.5" /> : undefined}
-        >
-          Phone, tablet, or security key
-        </Button>
-      </div>
+      {/* Registration button */}
+      <Button
+        size="md"
+        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+        onPress={() => handleRegister('platform')}
+        isLoading={registering}
+        startContent={!registering ? <Fingerprint className="w-4 h-4" /> : undefined}
+      >
+        {hasCredentials ? 'Add another passkey' : 'Create a passkey'}
+      </Button>
 
       {/* Registered credentials list */}
       {hasCredentials && (
