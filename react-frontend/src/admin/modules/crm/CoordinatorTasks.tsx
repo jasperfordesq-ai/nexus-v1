@@ -17,7 +17,7 @@ import {
 } from '@heroui/react';
 import {
   ClipboardList, Plus, Calendar, AlertTriangle, CheckCircle,
-  Clock, MoreVertical, Trash2, Edit3, User,
+  Clock, MoreVertical, Trash2, Edit3, User, Search,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -119,6 +119,7 @@ export default function CoordinatorTasks() {
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>('all');
   const [admins, setAdmins] = useState<AdminMember[]>([]);
   const [adminsLoaded, setAdminsLoaded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Modal state
   const createModal = useDisclosure();
@@ -145,6 +146,7 @@ export default function CoordinatorTasks() {
       };
       if (statusFilter !== 'all') params.status = statusFilter;
       if (priorityFilter !== 'all') params.priority = priorityFilter;
+      if (searchQuery.trim().length >= 2) params.search = searchQuery.trim();
 
       const res = await adminCrm.getTasks(params);
       if (res.success && res.data) {
@@ -161,7 +163,7 @@ export default function CoordinatorTasks() {
       setTasks([]);
     }
     setLoading(false);
-  }, [page, statusFilter, priorityFilter, toast]);
+  }, [page, statusFilter, priorityFilter, searchQuery, toast]);
 
   const loadAdmins = useCallback(async () => {
     if (adminsLoaded) return;
@@ -180,7 +182,7 @@ export default function CoordinatorTasks() {
   useEffect(() => { loadAdmins(); }, [loadAdmins]);
 
   // Reset page when filters change
-  useEffect(() => { setPage(1); }, [statusFilter, priorityFilter]);
+  useEffect(() => { setPage(1); }, [statusFilter, priorityFilter, searchQuery]);
 
   const resetForm = useCallback(() => {
     setFormTitle('');
@@ -276,7 +278,7 @@ export default function CoordinatorTasks() {
   }, [deleteModal]);
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
         title="Coordinator Tasks"
         description={`${total} task${total !== 1 ? 's' : ''} total`}
@@ -288,7 +290,7 @@ export default function CoordinatorTasks() {
       />
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 flex-wrap items-end">
         {/* Status tabs */}
         <div className="flex gap-1 p-1 bg-default-100 dark:bg-default-50 rounded-lg">
           {STATUS_TABS.map((tab) => (
@@ -316,6 +318,19 @@ export default function CoordinatorTasks() {
             <SelectItem key={opt.key}>{opt.label}</SelectItem>
           ))}
         </Select>
+
+        {/* Search */}
+        <Input
+          size="sm"
+          label="Search"
+          placeholder="Search tasks..."
+          className="max-w-[220px]"
+          startContent={<Search className="w-4 h-4" />}
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+          isClearable
+          onClear={() => setSearchQuery('')}
+        />
       </div>
 
       {/* Loading */}

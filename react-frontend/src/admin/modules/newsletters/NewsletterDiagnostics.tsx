@@ -233,12 +233,63 @@ export function NewsletterDiagnostics() {
                   <div>
                     <p className="text-sm text-default-600 mb-2">Sender Score</p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold text-success">
-                        {data?.sender_score || 100}
+                      <span className={`text-3xl font-bold ${
+                        (data?.sender_score ?? 100) >= 80 ? 'text-success' :
+                        (data?.sender_score ?? 100) >= 60 ? 'text-warning' : 'text-danger'
+                      }`}>
+                        {data?.sender_score ?? 100}
                       </span>
                       <span className="text-sm text-default-500">/ 100</span>
                     </div>
+                    <Progress
+                      value={data?.sender_score ?? 100}
+                      color={(data?.sender_score ?? 100) >= 80 ? 'success' : (data?.sender_score ?? 100) >= 60 ? 'warning' : 'danger'}
+                      size="sm"
+                      className="mt-2"
+                    />
                   </div>
+
+                  {data?.sender_score_breakdown && (
+                    <div className="space-y-1.5 pt-2 border-t border-default-200">
+                      <p className="text-xs font-medium text-default-500 mb-1">Score Breakdown</p>
+                      {data.sender_score_breakdown.bounce_penalty > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-default-600">Bounce penalty</span>
+                          <span className="text-danger font-medium">-{data.sender_score_breakdown.bounce_penalty}</span>
+                        </div>
+                      )}
+                      {data.sender_score_breakdown.complaint_penalty > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-default-600">Complaint penalty</span>
+                          <span className="text-danger font-medium">-{data.sender_score_breakdown.complaint_penalty}</span>
+                        </div>
+                      )}
+                      {data.sender_score_breakdown.failure_penalty > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-default-600">Failure penalty</span>
+                          <span className="text-danger font-medium">-{data.sender_score_breakdown.failure_penalty}</span>
+                        </div>
+                      )}
+                      {data.sender_score_breakdown.suppression_penalty > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-default-600">Suppression penalty</span>
+                          <span className="text-danger font-medium">-{data.sender_score_breakdown.suppression_penalty}</span>
+                        </div>
+                      )}
+                      {data.sender_score_breakdown.volume_bonus > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-default-600">Volume bonus</span>
+                          <span className="text-success font-medium">+{data.sender_score_breakdown.volume_bonus}</span>
+                        </div>
+                      )}
+                      {data.sender_score_breakdown.bounce_penalty === 0 &&
+                       data.sender_score_breakdown.complaint_penalty === 0 &&
+                       data.sender_score_breakdown.failure_penalty === 0 &&
+                       data.sender_score_breakdown.suppression_penalty === 0 && (
+                        <p className="text-xs text-success">No penalties — excellent list hygiene!</p>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </CardBody>
@@ -293,7 +344,7 @@ export function NewsletterDiagnostics() {
         </Card>
 
         {/* Recommendations */}
-        {data && data.health_status !== 'healthy' && (
+        {data && (data.health_status !== 'healthy' || (data.sender_score_breakdown?.complaint_penalty ?? 0) > 0 || (!data.configuration.smtp_configured && !data.configuration.api_configured)) && (
           <Card className="bg-warning-50 dark:bg-warning-50/10">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -304,10 +355,22 @@ export function NewsletterDiagnostics() {
             <CardBody>
               <ul className="space-y-2 text-sm text-warning-700 dark:text-warning-300">
                 {data.bounce_rate > 5 && (
-                  <li>• High bounce rate detected. Review your email list quality and consider removing invalid addresses.</li>
+                  <li>• High bounce rate ({data.bounce_rate.toFixed(1)}%) detected. Review your email list quality and consider removing invalid addresses.</li>
+                )}
+                {data.sender_score_breakdown?.complaint_penalty > 0 && (
+                  <li>• Spam complaints detected. Review email content and ensure recipients opted in. Consider adding a visible unsubscribe link.</li>
+                )}
+                {data.sender_score_breakdown?.suppression_penalty > 5 && (
+                  <li>• High suppression ratio is hurting your sender score. Clean up your mailing list by removing inactive or bounced addresses.</li>
                 )}
                 {queueFailed > 10 && (
                   <li>• {queueFailed} failed sends detected. Check SMTP configuration and email service status.</li>
+                )}
+                {data.sender_score < 70 && data.sender_score >= 50 && (
+                  <li>• Sender score is below 70. Focus on reducing bounces and complaints to improve deliverability.</li>
+                )}
+                {data.sender_score < 50 && (
+                  <li>• Sender score is critically low ({data.sender_score}/100). Immediate action needed — pause sending and clean your list.</li>
                 )}
                 {!data.configuration.smtp_configured && !data.configuration.api_configured && (
                   <li>• No email service configured. Set up SMTP or Gmail API to send newsletters.</li>

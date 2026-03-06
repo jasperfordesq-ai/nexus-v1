@@ -23,9 +23,12 @@ import {
   TrendingUp,
   ChevronRight,
   RefreshCw,
+  Download,
+  Tag,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { API_BASE, tokenManager } from '@/lib/api';
 import { adminCrm } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 
@@ -44,8 +47,10 @@ interface CrmDashboardData {
 const QUICK_ACTIONS = [
   { label: 'Member Notes', path: '/admin/crm/notes', icon: StickyNote, color: 'text-primary bg-primary/10' },
   { label: 'CRM Tasks', path: '/admin/crm/tasks', icon: ClipboardList, color: 'text-warning bg-warning/10' },
-  { label: 'Member Funnel', path: '/admin/crm/funnel', icon: TrendingUp, color: 'text-success bg-success/10' },
-  { label: 'All Members', path: '/admin/users', icon: Users, color: 'text-secondary bg-secondary/10' },
+  { label: 'Member Tags', path: '/admin/crm/tags', icon: Tag, color: 'text-secondary bg-secondary/10' },
+  { label: 'Activity Timeline', path: '/admin/crm/timeline', icon: Activity, color: 'text-danger bg-danger/10' },
+  { label: 'Onboarding Funnel', path: '/admin/crm/funnel', icon: TrendingUp, color: 'text-success bg-success/10' },
+  { label: 'All Members', path: '/admin/users', icon: Users, color: 'text-default bg-default/10' },
 ] as const;
 
 export function CrmDashboard() {
@@ -70,6 +75,24 @@ export function CrmDashboard() {
     }
   }, [toast]);
 
+  const handleExport = useCallback(async (type: 'dashboard' | 'notes' | 'tasks') => {
+    try {
+      const url = `${API_BASE}/v2/admin/crm/export/${type}`;
+      const token = tokenManager.getAccessToken();
+      const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `crm-${type}-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast.success(`${type} exported successfully`);
+    } catch {
+      toast.error(`Failed to export ${type}`);
+    }
+  }, [toast]);
+
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
@@ -83,19 +106,45 @@ export function CrmDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       <PageHeader
         title="Member CRM"
         description="Manage member relationships, notes, and follow-ups"
         actions={
-          <Button
-            variant="flat"
-            startContent={<RefreshCw size={16} />}
-            onPress={loadDashboard}
-            isLoading={loading}
-          >
-            Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="flat"
+              size="sm"
+              startContent={<Download size={14} />}
+              onPress={() => handleExport('dashboard')}
+            >
+              Export Stats
+            </Button>
+            <Button
+              variant="flat"
+              size="sm"
+              startContent={<Download size={14} />}
+              onPress={() => handleExport('notes')}
+            >
+              Export Notes
+            </Button>
+            <Button
+              variant="flat"
+              size="sm"
+              startContent={<Download size={14} />}
+              onPress={() => handleExport('tasks')}
+            >
+              Export Tasks
+            </Button>
+            <Button
+              variant="flat"
+              startContent={<RefreshCw size={16} />}
+              onPress={loadDashboard}
+              isLoading={loading}
+            >
+              Refresh
+            </Button>
+          </div>
         }
       />
 

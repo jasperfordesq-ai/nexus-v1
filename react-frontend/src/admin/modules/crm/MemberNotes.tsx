@@ -80,6 +80,7 @@ export function MemberNotes() {
   const [page, setPage] = useState(1);
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [filterUserId, setFilterUserId] = useState<string>(searchParams.get('user_id') || '');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Form modal state
   const formModal = useDisclosure();
@@ -102,6 +103,7 @@ export function MemberNotes() {
       const params: Record<string, string | number> = { page, limit: ITEMS_PER_PAGE };
       if (filterCategory) params.category = filterCategory;
       if (filterUserId) params.user_id = filterUserId;
+      if (searchQuery.trim().length >= 2) params.search = searchQuery.trim();
 
       const res = await adminCrm.getNotes(params);
       if (res.success && res.data) {
@@ -116,7 +118,7 @@ export function MemberNotes() {
       setNotes([]);
     }
     setLoading(false);
-  }, [page, filterCategory, filterUserId]);
+  }, [page, filterCategory, filterUserId, searchQuery]);
 
   useEffect(() => { loadNotes(); }, [loadNotes]);
 
@@ -260,6 +262,21 @@ export function MemberNotes() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3 mb-6">
+        <Input
+          label="Search"
+          placeholder="Search notes..."
+          className="w-56"
+          size="sm"
+          startContent={<Search size={14} />}
+          value={searchQuery}
+          onValueChange={(val) => {
+            setSearchQuery(val);
+            setPage(1);
+          }}
+          isClearable
+          onClear={() => { setSearchQuery(''); setPage(1); }}
+        />
+
         <Select
           label="Category"
           placeholder="All categories"
@@ -292,13 +309,14 @@ export function MemberNotes() {
           }}
         />
 
-        {(filterCategory || filterUserId) && (
+        {(filterCategory || filterUserId || searchQuery) && (
           <Button
             size="sm"
             variant="flat"
             onPress={() => {
               setFilterCategory('');
               setFilterUserId('');
+              setSearchQuery('');
               setPage(1);
             }}
           >

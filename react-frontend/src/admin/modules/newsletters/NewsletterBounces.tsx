@@ -13,12 +13,15 @@ import {
   Button, Card, CardBody, CardHeader, Tabs, Tab, Chip, Input,
   Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
 } from '@heroui/react';
-import { AlertTriangle, RefreshCw, Trash2, Download, Search } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Trash2, Download, Search, TrendingUp } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+} from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
-import type { NewsletterBounce, SuppressionListEntry } from '../../api/types';
+import type { NewsletterBounce, SuppressionListEntry, BounceTrendsData, BounceReasonSummary } from '../../api/types';
 
 export function NewsletterBounces() {
   usePageTitle('Admin - Newsletter Bounces');
@@ -36,6 +39,10 @@ export function NewsletterBounces() {
   const [totalBounces7d, setTotalBounces7d] = useState(0);
   const [hardBounces, setHardBounces] = useState(0);
   const [suppressedCount, setSuppressedCount] = useState(0);
+
+  // Trend data
+  const [trendData, setTrendData] = useState<{ week: string; hard: number; soft: number; complaint: number }[]>([]);
+  const [reasonSummary, setReasonSummary] = useState<BounceReasonSummary[]>([]);
 
   const loadBounces = useCallback(async () => {
     setLoading(true);
@@ -72,6 +79,43 @@ export function NewsletterBounces() {
     setLoading(false);
   }, []);
 
+  const loadTrends = useCallback(async () => {
+    try {
+      const res = await adminNewsletters.getBounceTrends({ weeks: 12 });
+      if (res.success && res.data) {
+        const raw = res.data as BounceTrendsData;
+        // Pivot trends into chart-friendly format: { week, hard, soft, complaint }
+        const weekMap = new Map<string, { week: string; hard: number; soft: number; complaint: number }>();
+        for (const entry of raw.trends) {
+          const label = entry.week_start?.slice(5) || entry.week_label; // "MM-DD" or "YYYY-WXX"
+          if (!weekMap.has(entry.week_label)) {
+            weekMap.set(entry.week_label, { week: label, hard: 0, soft: 0, complaint: 0 });
+          }
+          const row = weekMap.get(entry.week_label)!;
+          if (entry.bounce_type === 'hard') row.hard = entry.count;
+          else if (entry.bounce_type === 'soft') row.soft = entry.count;
+          else if (entry.bounce_type === 'complaint') row.complaint = entry.count;
+        }
+        setTrendData(Array.from(weekMap.values()));
+        setReasonSummary(raw.summary || []);
+      }
+    } catch {
+      // Non-critical — don't show error toast
+    }
+  }, []);
+
+  // Load trends + suppression count on mount (stat cards need both)
+  useEffect(() => {
+    loadTrends();
+    // Fetch suppression count for the stat card regardless of active tab
+    adminNewsletters.getSuppressionList().then((res) => {
+      if (res.success && res.data) {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setSuppressedCount(data.length);
+      }
+    }).catch(() => { /* non-critical */ });
+  }, [loadTrends]);
+
   useEffect(() => {
     if (activeTab === 'bounces') loadBounces();
     else loadSuppressionList();
@@ -95,11 +139,18 @@ export function NewsletterBounces() {
     setProcessing(false);
   };
 
+  const escapeCsvField = (field: string): string => {
+    let s = (field ?? '').replace(/"/g, '""');
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return `"${s}"`;
+  };
+
   const exportBounces = () => {
     const csv = [
       ['Email', 'Bounce Type', 'Reason', 'Campaign', 'Date'].join(','),
       ...bounces.map(b =>
-        [b.email, b.bounce_type, b.bounce_reason || '', b.newsletter_subject || '', b.bounced_at].join(',')
+        [b.email, b.bounce_type, b.bounce_reason || '', b.newsletter_subject || '', b.bounced_at]
+          .map(escapeCsvField).join(',')
       ),
     ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -188,6 +239,58 @@ export function NewsletterBounces() {
           </CardBody>
         </Card>
       </div>
+
+      {/* Bounce Trend Chart */}
+      {trendData.length > 0 && (
+        <div className="grid gap-6 md:grid-cols-3 mb-6">
+          <Card className="md:col-span-2">
+            <CardHeader className="flex gap-2 items-center">
+              <TrendingUp size={20} />
+              <span>Bounce Trends (12 weeks)</span>
+            </CardHeader>
+            <CardBody>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={trendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <XAxis dataKey="week" tick={{ fontSize: 12 }} />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="hard" name="Hard" fill="#f31260" stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="soft" name="Soft" fill="#f5a524" stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="complaint" name="Complaint" fill="#7828c8" stackId="a" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex gap-2 items-center">
+              <AlertTriangle size={20} />
+              <span>Top Bounce Reasons</span>
+            </CardHeader>
+            <CardBody>
+              {reasonSummary.length === 0 ? (
+                <p className="text-sm text-default-400">No data</p>
+              ) : (
+                <div className="space-y-2">
+                  {reasonSummary.map((r, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Chip size="sm" color={getBadgeColor(r.bounce_type)} variant="flat">
+                          {r.bounce_type}
+                        </Chip>
+                        <span className="text-xs text-default-600 truncate">{r.reason}</span>
+                      </div>
+                      <span className="text-xs font-semibold shrink-0">{r.count}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardBody>
+          </Card>
+        </div>
+      )}
 
       <Card>
         <CardHeader className="flex flex-col gap-3">

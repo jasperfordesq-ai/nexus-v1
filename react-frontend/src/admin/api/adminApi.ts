@@ -122,6 +122,7 @@ import type {
   MemberTag,
   TagSummary,
   CrmAdmin,
+  TimelineEntry,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1540,7 +1541,7 @@ export const adminCrm = {
     api.get<CrmAdmin[]>('/v2/admin/crm/admins'),
 
   // Member Notes
-  getNotes: (params?: { user_id?: number; page?: number; limit?: number; category?: string }) =>
+  getNotes: (params?: { user_id?: number; page?: number; limit?: number; category?: string; search?: string }) =>
     api.get<PaginatedResponse<MemberNote>>(`/v2/admin/crm/notes${buildQuery(params || {})}`),
 
   createNote: (payload: { user_id: number; content: string; category?: string; is_pinned?: boolean }) =>
@@ -1553,7 +1554,7 @@ export const adminCrm = {
     api.delete<{ success: boolean }>(`/v2/admin/crm/notes/${id}`),
 
   // Coordinator Tasks
-  getTasks: (params?: { page?: number; limit?: number; status?: string; priority?: string; assigned_to?: number }) =>
+  getTasks: (params?: { page?: number; limit?: number; status?: string; priority?: string; assigned_to?: number; search?: string }) =>
     api.get<PaginatedResponse<CoordinatorTask>>(`/v2/admin/crm/tasks${buildQuery(params || {})}`),
 
   createTask: (payload: { title: string; description?: string; priority?: string; assigned_to?: number; user_id?: number; due_date?: string }) =>
@@ -1566,7 +1567,7 @@ export const adminCrm = {
     api.delete<{ success: boolean }>(`/v2/admin/crm/tasks/${id}`),
 
   // Member Tags
-  getTags: (params?: { user_id?: number }) =>
+  getTags: (params?: { user_id?: number; tag?: string }) =>
     api.get<MemberTag[] | TagSummary[]>(`/v2/admin/crm/tags${buildQuery(params || {})}`),
 
   addTag: (payload: { user_id: number; tag: string }) =>
@@ -1574,6 +1575,18 @@ export const adminCrm = {
 
   removeTag: (id: number) =>
     api.delete<{ success: boolean }>(`/v2/admin/crm/tags/${id}`),
+
+  bulkRemoveTag: (tag: string) =>
+    api.delete<{ success: boolean; deleted: number }>(`/v2/admin/crm/tags/bulk?tag=${encodeURIComponent(tag)}`),
+
+  // Activity Timeline
+  getTimeline: (params?: { user_id?: number; type?: string; days?: number; page?: number; limit?: number }) =>
+    api.get<PaginatedResponse<TimelineEntry>>(`/v2/admin/crm/timeline${buildQuery(params || {})}`),
+
+  // CSV Exports (return blob URLs)
+  exportNotesUrl: () => '/v2/admin/crm/export/notes',
+  exportTasksUrl: () => '/v2/admin/crm/export/tasks',
+  exportDashboardUrl: () => '/v2/admin/crm/export/dashboard',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
