@@ -286,6 +286,8 @@ class AdminSuperApiController extends BaseApiController
             'social_instagram' => $input['social_instagram'] ?? '',
             'social_linkedin' => $input['social_linkedin'] ?? '',
             'social_youtube' => $input['social_youtube'] ?? '',
+            // Configuration JSON (languages, etc.)
+            'configuration' => $input['configuration'] ?? null,
         ];
 
         $result = TenantHierarchyService::createTenant($data, $parentId);

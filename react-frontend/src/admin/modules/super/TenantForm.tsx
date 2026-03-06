@@ -5,11 +5,11 @@
 
 /**
  * Tenant Create/Edit Form
- * Multi-tab form for tenant management: Details, Contact, SEO, Location, Social, Features.
+ * Multi-tab form for tenant management: Details, Contact, SEO, Location, Social, Languages, Features, Legal.
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   Card,
   CardBody,
@@ -24,17 +24,33 @@ import {
   Spinner,
   Checkbox,
 } from '@heroui/react';
-import { Building2, Save, ArrowLeft } from 'lucide-react';
+import {
+  Building2, Save, ArrowLeft, Calendar, Users, Trophy, Target, BookOpen, Library,
+  Heart, ArrowRightLeft, Network, Building, ShoppingBag, Wallet, MessageCircle,
+  LayoutDashboard, Rss, Eye,
+} from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components';
-import type { SuperAdminTenant, SuperAdminTenantDetail } from '../../api/types';
+import type { SuperAdminTenant, SuperAdminTenantDetail, CreateTenantPayload } from '../../api/types';
 
-const FEATURE_OPTIONS = [
-  'events', 'groups', 'gamification', 'goals', 'blog', 'resources',
-  'volunteering', 'exchange_workflow', 'federation', 'organisations',
-  'listings', 'wallet', 'messages', 'dashboard', 'feed',
+const FEATURE_META: { key: string; label: string; description: string; icon: typeof Calendar }[] = [
+  { key: 'listings', label: 'Listings', description: 'Offers & requests marketplace', icon: ShoppingBag },
+  { key: 'groups', label: 'Groups', description: 'Community groups and discussions', icon: Users },
+  { key: 'wallet', label: 'Wallet', description: 'Time credit wallet & transactions', icon: Wallet },
+  { key: 'events', label: 'Events', description: 'Community events with RSVPs', icon: Calendar },
+  { key: 'volunteering', label: 'Volunteering', description: 'Volunteer opportunities and hours', icon: Heart },
+  { key: 'resources', label: 'Resources', description: 'Shared resource library', icon: Library },
+  { key: 'gamification', label: 'Gamification', description: 'Badges, achievements, XP, leaderboards', icon: Trophy },
+  { key: 'goals', label: 'Goals', description: 'Personal and community goals', icon: Target },
+  { key: 'blog', label: 'Blog', description: 'Community blog and news posts', icon: BookOpen },
+  { key: 'exchange_workflow', label: 'Exchange Workflow', description: 'Structured exchanges with broker approval', icon: ArrowRightLeft },
+  { key: 'federation', label: 'Federation', description: 'Multi-community network and partnerships', icon: Network },
+  { key: 'organisations', label: 'Organisations', description: 'Organization profiles and management', icon: Building },
+  { key: 'messages', label: 'Messages', description: 'Private messaging between members', icon: MessageCircle },
+  { key: 'dashboard', label: 'Dashboard', description: 'Member dashboard overview', icon: LayoutDashboard },
+  { key: 'feed', label: 'Feed', description: 'Community activity feed', icon: Rss },
 ];
 
 const COUNTRY_CODES = [
@@ -79,6 +95,7 @@ const PLATFORM_LANGUAGES = [
 
 export function TenantForm() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const isEdit = !!id;
   usePageTitle(isEdit ? 'Super Admin - Edit Tenant' : 'Super Admin - Create Tenant');
   const { tenantPath } = useTenant();
@@ -99,7 +116,7 @@ export function TenantForm() {
     is_active: true,
     allows_subtenants: false,
     max_depth: 3,
-    parent_id: '' as string,
+    parent_id: '' as string, // Set from ?parent_id query param below
     // Contact
     contact_email: '',
     contact_phone: '',
@@ -127,11 +144,26 @@ export function TenantForm() {
     features: {} as Record<string, boolean>,
     // Languages
     default_language: 'en',
-    supported_languages: ['en', 'ga', 'de', 'fr', 'it'] as string[],
+    supported_languages: ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'] as string[],
+    // Legal documents
+    privacy_text: '',
+    terms_text: '',
   });
 
+  const [slugAutoGen, setSlugAutoGen] = useState(!isEdit);
+
   const updateField = (field: string, value: unknown) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => {
+      const updated = { ...prev, [field]: value };
+      // Auto-generate slug from name on create
+      if (field === 'name' && slugAutoGen && !isEdit) {
+        updated.slug = (value as string)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+      return updated;
+    });
   };
 
   const loadTenant = useCallback(async () => {
@@ -173,6 +205,8 @@ export function TenantForm() {
           features: tenant.features || {},
           default_language: (tenant.configuration as Record<string, unknown>)?.default_language as string || 'en',
           supported_languages: (tenant.configuration as Record<string, unknown>)?.supported_languages as string[] || ['en'],
+          privacy_text: (tenant.configuration as Record<string, unknown>)?.privacy_text as string || '',
+          terms_text: (tenant.configuration as Record<string, unknown>)?.terms_text as string || '',
         });
       }
     } catch {
@@ -191,6 +225,16 @@ export function TenantForm() {
       // Non-critical
     }
   }, []);
+
+  // Pre-fill parent_id from query param (e.g. ?parent_id=5 from "Create Sub-Tenant")
+  useEffect(() => {
+    if (!isEdit) {
+      const qParent = searchParams.get('parent_id');
+      if (qParent) {
+        setForm((prev) => ({ ...prev, parent_id: qParent }));
+      }
+    }
+  }, [isEdit, searchParams]);
 
   useEffect(() => {
     loadParentTenants();
@@ -216,21 +260,25 @@ export function TenantForm() {
         delete payload.parent_id;
       }
 
-      // Merge language settings into configuration JSON
+      // Merge language + legal settings into configuration JSON
       const existingConfig = (payload.configuration ?? {}) as Record<string, unknown>;
       payload.configuration = {
         ...existingConfig,
         default_language: form.default_language,
         supported_languages: form.supported_languages,
+        ...(form.privacy_text.trim() ? { privacy_text: form.privacy_text } : {}),
+        ...(form.terms_text.trim() ? { terms_text: form.terms_text } : {}),
       };
       delete payload.default_language;
       delete payload.supported_languages;
+      delete payload.privacy_text;
+      delete payload.terms_text;
 
       let res;
       if (isEdit) {
         res = await adminSuper.updateTenant(Number(id), payload);
       } else {
-        res = await adminSuper.createTenant(payload as never);
+        res = await adminSuper.createTenant(payload as unknown as CreateTenantPayload);
       }
 
       if (res.success) {
@@ -308,10 +356,13 @@ export function TenantForm() {
                 label="Slug"
                 placeholder="my-community"
                 value={form.slug}
-                onValueChange={(v) => updateField('slug', v)}
+                onValueChange={(v) => {
+                  setSlugAutoGen(false);
+                  updateField('slug', v);
+                }}
                 isRequired={!isEdit}
                 isDisabled={isEdit}
-                description={isEdit ? 'Slug cannot be changed after creation' : 'URL-safe identifier'}
+                description={isEdit ? 'Slug cannot be changed after creation' : slugAutoGen ? 'Auto-generated from name. Edit to customize.' : 'URL-safe identifier'}
               />
               <Input
                 label="Domain"
@@ -404,17 +455,36 @@ export function TenantForm() {
         <Tab key="seo" title="SEO">
           <Card shadow="sm">
             <CardBody className="space-y-4 p-6">
+              {/* Live SERP Preview */}
+              <div className="rounded-lg border border-default-200 p-4 bg-white dark:bg-default-50">
+                <p className="text-xs font-medium uppercase text-default-400 mb-2 flex items-center gap-1">
+                  <Eye size={12} /> Google Search Preview
+                </p>
+                <p className="text-lg text-[#1a0dab] dark:text-primary truncate">
+                  {form.meta_title || form.name || 'Page Title'}
+                </p>
+                <p className="text-sm text-[#006621] dark:text-success truncate">
+                  {form.domain ? `https://${form.domain}` : `https://${form.slug || 'tenant'}.project-nexus.ie`}
+                </p>
+                <p className="text-sm text-default-600 line-clamp-2">
+                  {form.meta_description || 'No description set. Add a meta description to improve search visibility.'}
+                </p>
+              </div>
               <Input
                 label="Meta Title"
                 placeholder="Page title for search engines"
                 value={form.meta_title}
                 onValueChange={(v) => updateField('meta_title', v)}
+                description={`${form.meta_title.length}/70 characters`}
+                maxLength={70}
               />
               <Textarea
                 label="Meta Description"
                 placeholder="Description for search engines..."
                 value={form.meta_description}
                 onValueChange={(v) => updateField('meta_description', v)}
+                description={`${form.meta_description.length}/180 characters`}
+                maxLength={180}
                 minRows={2}
               />
               <Input
@@ -422,6 +492,7 @@ export function TenantForm() {
                 placeholder="Main page heading"
                 value={form.h1_headline}
                 onValueChange={(v) => updateField('h1_headline', v)}
+                maxLength={100}
               />
               <Textarea
                 label="Hero Introduction"
@@ -435,13 +506,24 @@ export function TenantForm() {
                 placeholder="https://example.com/image.jpg"
                 value={form.og_image_url}
                 onValueChange={(v) => updateField('og_image_url', v)}
+                description="Image for social shares (1200x630 recommended)"
               />
-              <Input
+              <Select
                 label="Robots Directive"
-                placeholder="index, follow"
-                value={form.robots_directive}
-                onValueChange={(v) => updateField('robots_directive', v)}
-              />
+                placeholder="Select robots directive"
+                selectedKeys={form.robots_directive ? [form.robots_directive] : []}
+                onSelectionChange={(keys) => {
+                  const arr = Array.from(keys);
+                  updateField('robots_directive', arr.length > 0 ? String(arr[0]) : '');
+                }}
+                className="max-w-xs"
+                description="Search engine indexing instructions"
+              >
+                <SelectItem key="index, follow">index, follow (default)</SelectItem>
+                <SelectItem key="noindex, follow">noindex, follow</SelectItem>
+                <SelectItem key="index, nofollow">index, nofollow</SelectItem>
+                <SelectItem key="noindex, nofollow">noindex, nofollow</SelectItem>
+              </Select>
             </CardBody>
           </Card>
         </Tab>
@@ -601,22 +683,72 @@ export function TenantForm() {
               <p className="text-sm text-default-500 mb-4">
                 Toggle platform features for this tenant. Changes take effect immediately after save.
               </p>
-              <div className="space-y-3">
-                {FEATURE_OPTIONS.map((feature) => (
-                  <div key={feature} className="flex items-center justify-between">
-                    <span className="font-medium capitalize">
-                      {feature.replace(/_/g, ' ')}
-                    </span>
-                    <Switch
-                      isSelected={form.features[feature] ?? false}
-                      onValueChange={(v) =>
-                        updateField('features', { ...form.features, [feature]: v })
-                      }
-                      aria-label={`Toggle ${feature}`}
-                    />
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {FEATURE_META.map(({ key, label, description, icon: Icon }) => {
+                  const enabled = form.features[key] ?? false;
+                  return (
+                    <div
+                      key={key}
+                      className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${
+                        enabled ? 'border-success-200 bg-success-50 dark:border-success-800 dark:bg-success-50/10' : 'border-default-200'
+                      }`}
+                    >
+                      <Icon size={20} className={enabled ? 'text-success' : 'text-default-400'} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{label}</p>
+                        <p className="text-xs text-default-400 truncate">{description}</p>
+                      </div>
+                      <Switch
+                        size="sm"
+                        isSelected={enabled}
+                        onValueChange={(v) =>
+                          updateField('features', { ...form.features, [key]: v })
+                        }
+                        aria-label={`Toggle ${label}`}
+                      />
+                    </div>
+                  );
+                })}
               </div>
+            </CardBody>
+          </Card>
+        </Tab>
+        <Tab key="legal" title="Legal">
+          <Card shadow="sm">
+            <CardBody className="space-y-4 p-6">
+              <p className="text-sm text-default-500 mb-2">
+                Override the default privacy and terms pages with custom HTML content.
+                Leave empty to use the default tenant-specific documents.
+              </p>
+              <Textarea
+                label="Privacy Policy Override"
+                placeholder="Custom privacy policy HTML content..."
+                value={form.privacy_text}
+                onValueChange={(v) => updateField('privacy_text', v)}
+                minRows={4}
+                description="HTML allowed. Leave empty to use the default privacy page."
+              />
+              <Textarea
+                label="Terms of Service Override"
+                placeholder="Custom terms of service HTML content..."
+                value={form.terms_text}
+                onValueChange={(v) => updateField('terms_text', v)}
+                minRows={4}
+                description="HTML allowed. Leave empty to use the default terms page."
+              />
+              {(form.privacy_text.trim() || form.terms_text.trim()) && (
+                <Button
+                  variant="flat"
+                  color="warning"
+                  size="sm"
+                  onPress={() => {
+                    updateField('privacy_text', '');
+                    updateField('terms_text', '');
+                  }}
+                >
+                  Clear All & Use Defaults
+                </Button>
+              )}
             </CardBody>
           </Card>
         </Tab>

@@ -22,6 +22,13 @@ import {
   Input,
   Select,
   SelectItem,
+  Switch,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from '@heroui/react';
 import {
   Building2,
@@ -42,6 +49,10 @@ import {
   Linkedin,
   Youtube,
   UserPlus,
+  Plus,
+  MoveRight,
+  Power,
+  AlertTriangle,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -61,6 +72,8 @@ const LANGUAGE_LABELS: Record<string, string> = {
   de: 'Deutsch',
   fr: 'Français',
   it: 'Italiano',
+  pt: 'Português',
+  es: 'Español',
 };
 
 export function TenantShow() {
@@ -83,6 +96,73 @@ export function TenantShow() {
     role: 'admin',
   });
   const [addingAdmin, setAddingAdmin] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Move Tenant modal
+  const moveModal = useDisclosure();
+  const [moveParentId, setMoveParentId] = useState('');
+  const [hubTenants, setHubTenants] = useState<{ id: number; name: string }[]>([]);
+
+  // Load hub tenants for move dropdown
+  const loadHubTenants = useCallback(async () => {
+    try {
+      const res = await adminSuper.listTenants({ hub: true });
+      if (res.success && res.data) {
+        setHubTenants(Array.isArray(res.data) ? res.data : []);
+      }
+    } catch { /* non-critical */ }
+  }, []);
+
+  const handleMove = async () => {
+    if (!tenant || !moveParentId) return;
+    setActionLoading(true);
+    try {
+      const res = await adminSuper.moveTenant(tenant.id, Number(moveParentId));
+      if (res.success) {
+        toast.success('Tenant moved successfully');
+        moveModal.onClose();
+        loadTenant();
+      } else {
+        toast.error(res.error || 'Failed to move tenant');
+      }
+    } catch { toast.error('An error occurred'); }
+    setActionLoading(false);
+  };
+
+  const handleToggleActive = async () => {
+    if (!tenant) return;
+    setActionLoading(true);
+    try {
+      let res;
+      if (tenant.is_active) {
+        res = await adminSuper.deleteTenant(tenant.id);
+      } else {
+        res = await adminSuper.reactivateTenant(tenant.id);
+      }
+      if (res.success) {
+        toast.success(tenant.is_active ? 'Tenant deactivated' : 'Tenant reactivated');
+        loadTenant();
+      } else {
+        toast.error(res.error || 'Operation failed');
+      }
+    } catch { toast.error('An error occurred'); }
+    setActionLoading(false);
+  };
+
+  const handleToggleHub = async () => {
+    if (!tenant) return;
+    setActionLoading(true);
+    try {
+      const res = await adminSuper.toggleHub(tenant.id, !tenant.allows_subtenants);
+      if (res.success) {
+        toast.success(tenant.allows_subtenants ? 'Hub disabled' : 'Hub enabled');
+        loadTenant();
+      } else {
+        toast.error(res.error || 'Failed to toggle hub');
+      }
+    } catch { toast.error('An error occurred'); }
+    setActionLoading(false);
+  };
 
   const loadTenant = useCallback(async () => {
     if (!id) return;
@@ -435,7 +515,7 @@ export function TenantShow() {
                           : <XCircle size={12} />
                       }
                     >
-                      {feature.replace(/_/g, ' ')}
+                      {feature.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                     </Chip>
                   );
                 })}
@@ -661,7 +741,7 @@ export function TenantShow() {
             </CardBody>
           </Card>
 
-          {/* Actions */}
+          {/* Quick Actions */}
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <h3 className="text-lg font-semibold">Actions</h3>
@@ -676,6 +756,17 @@ export function TenantShow() {
               >
                 Edit Tenant
               </Button>
+              {tenant.allows_subtenants && (
+                <Button
+                  color="secondary"
+                  variant="flat"
+                  fullWidth
+                  startContent={<Plus size={16} />}
+                  onPress={() => navigate(tenantPath(`/admin/super/tenants/create?parent_id=${tenant.id}`))}
+                >
+                  Create Sub-Tenant
+                </Button>
+              )}
               <Button
                 variant="flat"
                 fullWidth
@@ -686,8 +777,129 @@ export function TenantShow() {
               </Button>
             </CardBody>
           </Card>
+
+          {/* Hub Settings */}
+          <Card shadow="sm">
+            <CardHeader className="pb-0">
+              <div className="flex items-center gap-2">
+                <Network size={18} className="text-primary" />
+                <h3 className="text-lg font-semibold">Hub Settings</h3>
+              </div>
+            </CardHeader>
+            <CardBody className="pt-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Sub-tenant Capability</p>
+                  <p className="text-xs text-default-400">
+                    {tenant.allows_subtenants ? 'This tenant can create sub-tenants' : 'Standard tenant'}
+                  </p>
+                </div>
+                <Switch
+                  isSelected={tenant.allows_subtenants}
+                  isDisabled={actionLoading}
+                  onValueChange={handleToggleHub}
+                  aria-label="Toggle hub capability"
+                />
+              </div>
+            </CardBody>
+          </Card>
+
+          {/* Move Tenant */}
+          {tenant.id !== 1 && (
+            <Card shadow="sm">
+              <CardHeader className="pb-0">
+                <div className="flex items-center gap-2">
+                  <MoveRight size={18} className="text-warning" />
+                  <h3 className="text-lg font-semibold">Move Tenant</h3>
+                </div>
+              </CardHeader>
+              <CardBody className="pt-3">
+                <p className="text-xs text-default-400 mb-3">
+                  Move this tenant under a different parent in the hierarchy.
+                </p>
+                <Button
+                  color="warning"
+                  variant="flat"
+                  fullWidth
+                  onPress={() => {
+                    loadHubTenants();
+                    moveModal.onOpen();
+                  }}
+                >
+                  Move to Different Parent
+                </Button>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* Danger Zone */}
+          {tenant.id !== 1 && (
+            <Card shadow="sm" className="border-danger-200 dark:border-danger-800">
+              <CardHeader className="pb-0">
+                <div className="flex items-center gap-2 text-danger">
+                  <AlertTriangle size={18} />
+                  <h3 className="text-lg font-semibold">Danger Zone</h3>
+                </div>
+              </CardHeader>
+              <CardBody className="pt-3">
+                <Button
+                  color={tenant.is_active ? 'danger' : 'success'}
+                  variant="flat"
+                  fullWidth
+                  isDisabled={actionLoading}
+                  startContent={<Power size={16} />}
+                  onPress={handleToggleActive}
+                >
+                  {tenant.is_active ? 'Deactivate Tenant' : 'Reactivate Tenant'}
+                </Button>
+                {tenant.is_active && (
+                  <p className="text-xs text-default-400 mt-2">
+                    Deactivating will prevent users from accessing this tenant.
+                  </p>
+                )}
+              </CardBody>
+            </Card>
+          )}
         </div>
       </div>
+
+      {/* Move Tenant Modal */}
+      <Modal isOpen={moveModal.isOpen} onClose={moveModal.onClose}>
+        <ModalContent>
+          <ModalHeader>Move Tenant</ModalHeader>
+          <ModalBody>
+            <p className="text-sm text-default-500 mb-3">
+              Select the new parent tenant for &ldquo;{tenant.name}&rdquo;.
+            </p>
+            <Select
+              label="New Parent Tenant"
+              placeholder="Select parent"
+              selectedKeys={moveParentId ? [moveParentId] : []}
+              onSelectionChange={(keys) => {
+                const arr = Array.from(keys);
+                setMoveParentId(arr.length > 0 ? String(arr[0]) : '');
+              }}
+            >
+              {hubTenants
+                .filter((t) => t.id !== tenant.id && t.id !== tenant.parent_id)
+                .map((t) => (
+                  <SelectItem key={String(t.id)}>{t.name}</SelectItem>
+                ))}
+            </Select>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={moveModal.onClose}>Cancel</Button>
+            <Button
+              color="warning"
+              isDisabled={!moveParentId}
+              isLoading={actionLoading}
+              onPress={handleMove}
+            >
+              Move
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -93,17 +93,23 @@ class TenantHierarchyService
                 $featuresJson = is_string($data['features']) ? $data['features'] : json_encode($data['features']);
             }
 
+            // Encode configuration JSON if provided (languages, etc.)
+            $configurationJson = null;
+            if (!empty($data['configuration'])) {
+                $configurationJson = is_string($data['configuration']) ? $data['configuration'] : json_encode($data['configuration']);
+            }
+
             // Insert tenant with all fields
             Database::query("
                 INSERT INTO tenants (
                     name, slug, domain, tagline, description,
                     parent_id, depth, allows_subtenants, max_depth,
-                    is_active, features, contact_email, contact_phone, address,
+                    is_active, features, configuration, contact_email, contact_phone, address,
                     meta_title, meta_description, h1_headline, hero_intro, og_image_url, robots_directive,
                     location_name, country_code, service_area, latitude, longitude,
                     social_facebook, social_twitter, social_instagram, social_linkedin, social_youtube,
                     created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ", [
                 $name,
                 $slug,
@@ -116,6 +122,7 @@ class TenantHierarchyService
                 $maxDepth,
                 isset($data['is_active']) ? (int)$data['is_active'] : 1,
                 $featuresJson,
+                $configurationJson,
                 trim($data['contact_email'] ?? '') ?: null,
                 trim($data['contact_phone'] ?? '') ?: null,
                 trim($data['address'] ?? '') ?: null,
