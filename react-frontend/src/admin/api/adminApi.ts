@@ -945,6 +945,8 @@ export const adminNewsletters = {
 
   // Diagnostics
   getDiagnostics: () => api.get('/v2/admin/newsletters/diagnostics'),
+  getBounceTrends: (params?: { weeks?: number }) =>
+    api.get(`/v2/admin/newsletters/bounce-trends${params?.weeks ? `?weeks=${params.weeks}` : ''}`),
 
   // Per-campaign stats
   getStats: (id: number) => api.get(`/v2/admin/newsletters/${id}/stats`),
@@ -969,6 +971,22 @@ export const adminNewsletters = {
   // Activity log
   getActivity: (id: number, params?: { page?: number; per_page?: number; type?: string }) =>
     api.get(`/v2/admin/newsletters/${id}/activity${params ? buildQuery(params) : ''}`),
+
+  // Per-subscriber engagement lists
+  getOpeners: (id: number, params?: { page?: number; per_page?: number }) =>
+    api.get(`/v2/admin/newsletters/${id}/openers${params ? buildQuery(params) : ''}`),
+
+  getClickers: (id: number, params?: { page?: number; per_page?: number }) =>
+    api.get(`/v2/admin/newsletters/${id}/clickers${params ? buildQuery(params) : ''}`),
+
+  getNonOpeners: (id: number, params?: { page?: number; per_page?: number }) =>
+    api.get(`/v2/admin/newsletters/${id}/non-openers${params ? buildQuery(params) : ''}`),
+
+  getOpenersNoClick: (id: number, params?: { page?: number; per_page?: number }) =>
+    api.get(`/v2/admin/newsletters/${id}/openers-no-click${params ? buildQuery(params) : ''}`),
+
+  getEmailClients: (id: number) =>
+    api.get(`/v2/admin/newsletters/${id}/email-clients`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

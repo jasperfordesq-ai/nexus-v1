@@ -26,6 +26,9 @@ import { HeroUIProvider } from '@heroui/react';
  * to load old chunk filenames that no longer exist (404). This catches that error
  * and forces a page reload to fetch the new index.html with correct chunk references.
  * Uses sessionStorage to prevent infinite reload loops.
+ *
+ * SAFETY: Never reloads while the user has focus in a text input, textarea, or
+ * contenteditable field — this prevents losing typed message drafts.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function lazyWithRetry(
@@ -43,6 +46,19 @@ function lazyWithRetry(
         error.name === 'ChunkLoadError';
 
       if (isChunkError) {
+        // Never reload while the user is actively typing in an input/textarea
+        const active = document.activeElement;
+        const isUserTyping = active instanceof HTMLInputElement ||
+          active instanceof HTMLTextAreaElement ||
+          active?.getAttribute('contenteditable') === 'true';
+
+        if (isUserTyping) {
+          // Skip the reload — the error boundary will show a "try again" UI
+          // instead of destroying the user's in-progress work
+          console.warn('[NEXUS] Chunk load error detected but user is typing — deferring reload');
+          throw error;
+        }
+
         const reloadKey = `chunk_reload_${window.location.pathname}`;
         const lastReload = sessionStorage.getItem(reloadKey);
         const now = Date.now();

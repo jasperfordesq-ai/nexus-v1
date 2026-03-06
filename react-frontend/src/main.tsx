@@ -17,11 +17,29 @@ import { initSentry, SentryErrorBoundary } from '@/lib/sentry';
 initSentry();
 
 // Register PWA service worker (production only — dev uses Vite HMR)
+// Uses "prompt" mode — new SW is installed but NOT activated until the user
+// explicitly accepts the update. This prevents mid-typing page reloads.
 if (import.meta.env.PROD) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore — virtual:pwa-register is provided by vite-plugin-pwa at build time
-  import('virtual:pwa-register').then(({ registerSW }: { registerSW: (opts?: { immediate?: boolean }) => void }) => {
-    registerSW({ immediate: true });
+  import('virtual:pwa-register').then(({ registerSW }: { registerSW: (opts?: {
+    immediate?: boolean;
+    onNeedRefresh?: () => void;
+    onOfflineReady?: () => void;
+  }) => (reloadPage?: boolean) => void }) => {
+    const updateSW = registerSW({
+      immediate: true,
+      onNeedRefresh() {
+        // Dispatch a custom event so the React app can show an update banner.
+        // The banner lets the user choose when to reload — never interrupt them.
+        window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
+        // Store the updateSW function globally so the banner can call it
+        (window as any).__nexus_updateSW = updateSW;
+      },
+      onOfflineReady() {
+        console.info('[NEXUS] App ready for offline use');
+      },
+    });
   });
 }
 
