@@ -464,8 +464,8 @@ export function LoginPage() {
                     </Button>
                   </form>
 
-                  {/* Passkey Login */}
-                  {biometricAvailable && selectedTenantId && (
+                  {/* Passkey Login — temporarily disabled pending full audit */}
+                  {false && biometricAvailable && selectedTenantId && (
                     <>
                       <div className="relative flex items-center my-5">
                         <div className="flex-grow border-t border-[var(--border-default)]" />
