@@ -55,57 +55,58 @@ function getDeviceLabel(cred: Credential): string {
 
 const PLATFORM_INSTRUCTIONS: Record<DevicePlatform, { title: string; steps: string[] }> = {
   windows: {
-    title: 'Windows Hello',
+    title: 'Setting up on Windows',
     steps: [
-      'Click "This PC (Windows Hello / PIN)" to create a passkey using your Windows PIN, fingerprint, or face.',
-      'Or click "Phone, tablet, or security key" to register a different device.',
-      'If Windows Hello is not set up, go to Windows Settings > Accounts > Sign-in options to add a PIN first.',
+      'Click "This PC" to create a passkey stored on this computer. You\'ll confirm with your Windows Hello PIN, fingerprint, or face.',
+      'Requirement: You must have Windows Hello set up first. Go to Windows Settings > Accounts > Sign-in options > PIN to set it up.',
+      'Or click "Phone, tablet, or security key" to scan a QR code with your phone instead.',
+      'To set up passkeys on your phone too, open this page on your phone and tap "This device".',
     ],
   },
   mac: {
-    title: 'Touch ID / iCloud Keychain',
+    title: 'Setting up on Mac',
     steps: [
-      'Click "Add Passkey" — your browser will prompt Touch ID.',
-      'Use your fingerprint or enter your Mac password to confirm.',
-      'The passkey syncs via iCloud Keychain to your other Apple devices.',
+      'Click "This Mac" — your browser will prompt Touch ID or your Mac password.',
+      'The passkey syncs via iCloud Keychain to your iPhone, iPad, and other Macs automatically.',
+      'Or click "Phone, tablet, or security key" to register a different device.',
     ],
   },
   iphone: {
-    title: 'Face ID / Touch ID',
+    title: 'Setting up on iPhone',
     steps: [
-      'Tap "Add Passkey" — your iPhone will prompt Face ID or Touch ID.',
-      'Confirm with your biometric to create the passkey.',
-      'The passkey syncs via iCloud Keychain to your other Apple devices.',
+      'Tap "This device" to create a passkey using Face ID or Touch ID.',
+      'The passkey is saved to iCloud Keychain and works on all your Apple devices.',
+      'You can also tap "Phone, tablet, or security key" to register a security key.',
     ],
   },
   ipad: {
-    title: 'Face ID / Touch ID',
+    title: 'Setting up on iPad',
     steps: [
-      'Tap "Add Passkey" — your iPad will prompt Face ID or Touch ID.',
-      'Confirm with your biometric to create the passkey.',
-      'The passkey syncs via iCloud Keychain to your other Apple devices.',
+      'Tap "This device" to create a passkey using Face ID or Touch ID.',
+      'The passkey is saved to iCloud Keychain and works on all your Apple devices.',
+      'You can also tap "Phone, tablet, or security key" to register a security key.',
     ],
   },
   android: {
-    title: 'Google Password Manager',
+    title: 'Setting up on Android',
     steps: [
-      'Tap "Add Passkey" — Android will show the passkey creation dialog.',
-      'Confirm with fingerprint, face, or screen lock.',
-      'The passkey is saved to your Google account and available on all your Android devices and Chrome browsers.',
+      'Tap "This device" to create a passkey using your fingerprint, face, or screen lock.',
+      'The passkey is saved to Google Password Manager and works on all your Android devices and Chrome browsers.',
+      'You can also tap "Phone, tablet, or security key" to register a security key.',
     ],
   },
   linux: {
-    title: 'Security Key / Browser Passkey',
+    title: 'Setting up on Linux',
     steps: [
-      'Click "Add Passkey" — your browser will prompt you.',
-      'You can use a USB security key or your browser\'s built-in passkey manager.',
+      'Click "This device" — your browser will use its built-in passkey manager.',
+      'Or click "Phone, tablet, or security key" to use a USB security key or scan a QR code with your phone.',
     ],
   },
   unknown: {
-    title: 'Passkey',
+    title: 'Setting up a passkey',
     steps: [
-      'Click "Add Passkey" — your browser will guide you through the setup.',
-      'You may use a built-in authenticator (fingerprint, face, PIN) or a phone/security key.',
+      'Click "This device" to create a passkey on the device you\'re using now.',
+      'Or click "Phone, tablet, or security key" to register a different device.',
     ],
   },
 };
@@ -120,7 +121,7 @@ export function BiometricSettings() {
   const [registering, setRegistering] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [removingAll, setRemovingAll] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true); // Auto-show on first visit
 
   const platform = detectPlatform();
   const instructions = PLATFORM_INSTRUCTIONS[platform];
@@ -392,16 +393,16 @@ export function BiometricSettings() {
         </div>
       )}
 
-      {/* Cross-device hint */}
+      {/* Multi-device tip */}
       {!showInstructions && (
         <p className="text-xs text-theme-muted">
-          Works with Windows Hello, Touch ID, Face ID, Android biometrics, and security keys.{' '}
+          Register a passkey on each device you use. To add your phone, open this page on your phone.{' '}
           <button
             type="button"
             className="text-indigo-500 hover:underline"
             onClick={() => setShowInstructions(true)}
           >
-            Need help?
+            Setup guide
           </button>
         </p>
       )}
