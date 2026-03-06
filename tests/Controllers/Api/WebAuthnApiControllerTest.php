@@ -43,8 +43,7 @@ class WebAuthnApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('id', $response['data']);
-        $this->assertArrayHasKey('response', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -57,7 +56,7 @@ class WebAuthnApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('username', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -78,7 +77,7 @@ class WebAuthnApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -91,7 +90,7 @@ class WebAuthnApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('credential_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**

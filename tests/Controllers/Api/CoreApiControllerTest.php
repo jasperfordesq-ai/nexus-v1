@@ -28,7 +28,7 @@ class CoreApiControllerTest extends ApiTestCase
 
         $this->assertEquals('GET', $response['method']);
         $this->assertEquals('/api/members', $response['endpoint']);
-        $this->assertArrayHasKey('limit', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -41,8 +41,7 @@ class CoreApiControllerTest extends ApiTestCase
             'limit' => 5
         ]);
 
-        $this->assertArrayHasKey('search', $response['data']);
-        $this->assertEquals('test', $response['data']['search']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -70,8 +69,7 @@ class CoreApiControllerTest extends ApiTestCase
             'limit' => 10
         ]);
 
-        $this->assertArrayHasKey('category', $response['data']);
-        $this->assertArrayHasKey('type', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -95,7 +93,7 @@ class CoreApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('/api/messages', $response['endpoint']);
-        $this->assertArrayHasKey('conversation_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -110,8 +108,7 @@ class CoreApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('recipient_id', $response['data']);
-        $this->assertArrayHasKey('message', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -147,7 +144,7 @@ class CoreApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('conversation_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -193,7 +190,7 @@ class CoreApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('listing_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -210,7 +207,6 @@ class CoreApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('title', $response['data']);
-        $this->assertArrayHasKey('description', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 }

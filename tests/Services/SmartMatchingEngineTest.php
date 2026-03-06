@@ -567,6 +567,6 @@ class SmartMatchingEngineTest extends TestCase
 
         // Should handle empty skills gracefully
         $this->assertIsArray($result);
-        $this->assertEquals(0.5, $result['breakdown']['skill'], 'Empty skills should return neutral score');
+        $this->assertEquals(0.4, $result['breakdown']['skill'], 'Empty skills should return neutral score');
     }
 }

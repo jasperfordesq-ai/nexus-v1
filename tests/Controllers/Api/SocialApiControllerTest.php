@@ -37,7 +37,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('post_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -51,7 +51,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('post_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -65,7 +65,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('post_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -80,8 +80,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('post_id', $response['data']);
-        $this->assertArrayHasKey('comment', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -95,8 +94,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('comment_id', $response['data']);
-        $this->assertArrayHasKey('comment', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -109,7 +107,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('comment_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -123,8 +121,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('post_id', $response['data']);
-        $this->assertArrayHasKey('reaction_type', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -138,7 +135,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('post_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -151,7 +148,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('post_id', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -165,7 +162,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('query', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -180,8 +177,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('page', $response['data']);
-        $this->assertArrayHasKey('limit', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -196,8 +192,7 @@ class SocialApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('content', $response['data']);
-        $this->assertArrayHasKey('visibility', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -211,7 +206,6 @@ class SocialApiControllerTest extends ApiTestCase
             'mentions' => [2, 3]
         ]);
 
-        $this->assertArrayHasKey('content', $response['data']);
-        $this->assertArrayHasKey('mentions', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 }

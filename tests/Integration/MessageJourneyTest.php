@@ -135,7 +135,7 @@ class MessageJourneyTest extends DatabaseTestCase
 
         // Step 2: User A sends a message to User B
         Database::query(
-            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, created_at)
+            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, created_at)
              VALUES (?, ?, ?, ?, ?, NOW())",
             [
                 self::$testTenantId,
@@ -182,7 +182,7 @@ class MessageJourneyTest extends DatabaseTestCase
 
         $this->assertEquals($this->userA_Id, $message['sender_id']);
         $this->assertEquals($this->userB_Id, $message['receiver_id']);
-        $this->assertStringContainsString('Hello Bob', $message['message']);
+        $this->assertStringContainsString('Hello Bob', $message['body']);
     }
 
     /**
@@ -212,7 +212,7 @@ class MessageJourneyTest extends DatabaseTestCase
         );
 
         Database::query(
-            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, is_read, created_at)
+            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, is_read, created_at)
              VALUES (?, ?, ?, ?, 'Unread message', 0, NOW())",
             [
                 self::$testTenantId,
@@ -271,7 +271,7 @@ class MessageJourneyTest extends DatabaseTestCase
 
         // Step 1: User A sends initial message
         Database::query(
-            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, created_at)
+            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, created_at)
              VALUES (?, ?, ?, ?, 'Initial message', NOW())",
             [
                 self::$testTenantId,
@@ -285,7 +285,7 @@ class MessageJourneyTest extends DatabaseTestCase
 
         // Step 2: User B replies to the message
         Database::query(
-            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, created_at)
+            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, created_at)
              VALUES (?, ?, ?, ?, 'Reply message', NOW())",
             [
                 self::$testTenantId,
@@ -299,7 +299,7 @@ class MessageJourneyTest extends DatabaseTestCase
 
         // Step 3: User A sends another reply
         Database::query(
-            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, created_at)
+            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, created_at)
              VALUES (?, ?, ?, ?, 'Follow-up message', NOW())",
             [
                 self::$testTenantId,
@@ -320,7 +320,7 @@ class MessageJourneyTest extends DatabaseTestCase
 
         // Step 5: Verify message order
         $stmt = Database::query(
-            "SELECT id, sender_id, message FROM messages WHERE conversation_id = ? ORDER BY created_at ASC",
+            "SELECT id, sender_id, body FROM messages WHERE conversation_id = ? ORDER BY created_at ASC",
             [$conversationId]
         );
         $messages = $stmt->fetchAll();
@@ -329,9 +329,9 @@ class MessageJourneyTest extends DatabaseTestCase
         $this->assertEquals($this->userA_Id, $messages[0]['sender_id']);
         $this->assertEquals($this->userB_Id, $messages[1]['sender_id']);
         $this->assertEquals($this->userA_Id, $messages[2]['sender_id']);
-        $this->assertStringContainsString('Initial', $messages[0]['message']);
-        $this->assertStringContainsString('Reply', $messages[1]['message']);
-        $this->assertStringContainsString('Follow-up', $messages[2]['message']);
+        $this->assertStringContainsString('Initial', $messages[0]['body']);
+        $this->assertStringContainsString('Reply', $messages[1]['body']);
+        $this->assertStringContainsString('Follow-up', $messages[2]['body']);
     }
 
     /**
@@ -361,7 +361,7 @@ class MessageJourneyTest extends DatabaseTestCase
         );
 
         Database::query(
-            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, created_at)
+            "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, created_at)
              VALUES (?, ?, ?, ?, 'Message to archive', NOW())",
             [
                 self::$testTenantId,
@@ -440,7 +440,7 @@ class MessageJourneyTest extends DatabaseTestCase
         // Step 1: Create 3 unread messages and 2 read messages
         for ($i = 0; $i < 3; $i++) {
             Database::query(
-                "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, is_read, created_at)
+                "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, is_read, created_at)
                  VALUES (?, ?, ?, ?, ?, 0, NOW())",
                 [
                     self::$testTenantId,
@@ -455,7 +455,7 @@ class MessageJourneyTest extends DatabaseTestCase
 
         for ($i = 0; $i < 2; $i++) {
             Database::query(
-                "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, message, is_read, created_at)
+                "INSERT INTO messages (tenant_id, conversation_id, sender_id, receiver_id, body, is_read, created_at)
                  VALUES (?, ?, ?, ?, ?, 1, NOW())",
                 [
                     self::$testTenantId,

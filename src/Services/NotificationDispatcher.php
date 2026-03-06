@@ -79,8 +79,8 @@ class NotificationDispatcher
         // 1. Thread Level (Specific Discussion)
         // Only if context is 'thread'
         if ($contextType === 'thread') {
-            $stmt = $db->prepare("SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = 'thread' AND context_id = ? AND tenant_id = ?");
-            $stmt->execute([$userId, $contextId, TenantContext::getId()]);
+            $stmt = $db->prepare("SELECT frequency FROM notification_settings WHERE user_id = ? AND context_type = 'thread' AND context_id = ?");
+            $stmt->execute([$userId, $contextId]);
             $res = $stmt->fetch();
             if ($res) return $res['frequency'];
 
@@ -153,10 +153,10 @@ class NotificationDispatcher
     private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null)
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("INSERT INTO notification_queue (tenant_id, user_id, activity_type, content_snippet, link, frequency, email_body, created_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')");
+        $stmt = $db->prepare("INSERT INTO notification_queue (user_id, activity_type, content_snippet, link, frequency, email_body, created_at, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'pending')");
         // Truncate content for snippet
         $snippet = substr($content, 0, 250);
-        $stmt->execute([TenantContext::getId(), $userId, $activityType, $snippet, $link, $frequency, $emailBody]);
+        $stmt->execute([$userId, $activityType, $snippet, $link, $frequency, $emailBody]);
     }
 
     /**

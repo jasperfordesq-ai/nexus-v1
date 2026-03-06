@@ -54,7 +54,6 @@ class Group
 
         if (empty($set)) return false;
 
-        $set[] = 'updated_at = NOW()';
         $params[] = $id;
         $params[] = TenantContext::getId();
         $sql = "UPDATE `groups` SET " . implode(', ', $set) . " WHERE id = ? AND tenant_id = ?";

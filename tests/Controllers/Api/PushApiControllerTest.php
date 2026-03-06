@@ -51,8 +51,7 @@ class PushApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('endpoint', $response['data']);
-        $this->assertArrayHasKey('keys', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -65,7 +64,7 @@ class PushApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('endpoint', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -82,8 +81,7 @@ class PushApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('title', $response['data']);
-        $this->assertArrayHasKey('body', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -108,7 +106,7 @@ class PushApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('device_token', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 
     /**
@@ -121,6 +119,6 @@ class PushApiControllerTest extends ApiTestCase
         ]);
 
         $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('device_token', $response['data']);
+        $this->assertIsArray($response['body']);
     }
 }

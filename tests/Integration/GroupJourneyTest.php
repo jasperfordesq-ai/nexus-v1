@@ -161,9 +161,9 @@ class GroupJourneyTest extends DatabaseTestCase
 
         // Step 2: Add creator as group admin
         Database::query(
-            "INSERT INTO group_members (group_id, user_id, tenant_id, role, status, joined_at, created_at)
-             VALUES (?, ?, ?, 'admin', 'active', NOW(), NOW())",
-            [$groupId, $this->groupCreatorId, self::$testTenantId]
+            "INSERT INTO group_members (group_id, user_id, role, status, joined_at, created_at)
+             VALUES (?, ?, 'admin', 'active', NOW(), NOW())",
+            [$groupId, $this->groupCreatorId]
         );
 
         // Verify creator membership
@@ -195,9 +195,9 @@ class GroupJourneyTest extends DatabaseTestCase
 
         // Add Member A to group
         Database::query(
-            "INSERT INTO group_members (group_id, user_id, tenant_id, role, status, joined_at, created_at)
-             VALUES (?, ?, ?, 'member', 'active', NOW(), NOW())",
-            [$groupId, $this->memberA_Id, self::$testTenantId]
+            "INSERT INTO group_members (group_id, user_id, role, status, joined_at, created_at)
+             VALUES (?, ?, 'member', 'active', NOW(), NOW())",
+            [$groupId, $this->memberA_Id]
         );
 
         // Step 5: Verify Member A is in group
@@ -224,9 +224,9 @@ class GroupJourneyTest extends DatabaseTestCase
 
         // Add members
         Database::query(
-            "INSERT INTO group_members (group_id, user_id, tenant_id, role, status, joined_at, created_at)
-             VALUES (?, ?, ?, 'admin', 'active', NOW(), NOW()), (?, ?, ?, 'member', 'active', NOW(), NOW())",
-            [$groupId, $this->groupCreatorId, self::$testTenantId, $groupId, $this->memberA_Id, self::$testTenantId]
+            "INSERT INTO group_members (group_id, user_id, role, status, joined_at, created_at)
+             VALUES (?, ?, 'admin', 'active', NOW(), NOW()), (?, ?, 'member', 'active', NOW(), NOW())",
+            [$groupId, $this->groupCreatorId, $groupId, $this->memberA_Id]
         );
 
         // Step 1: Creator posts to group feed
@@ -304,20 +304,17 @@ class GroupJourneyTest extends DatabaseTestCase
 
         // Add members
         Database::query(
-            "INSERT INTO group_members (group_id, user_id, tenant_id, role, status, joined_at, created_at)
-             VALUES (?, ?, ?, 'admin', 'active', NOW(), NOW()),
-                    (?, ?, ?, 'member', 'active', NOW(), NOW()),
-                    (?, ?, ?, 'member', 'active', NOW(), NOW())",
+            "INSERT INTO group_members (group_id, user_id, role, status, joined_at, created_at)
+             VALUES (?, ?, 'admin', 'active', NOW(), NOW()),
+                    (?, ?, 'member', 'active', NOW(), NOW()),
+                    (?, ?, 'member', 'active', NOW(), NOW())",
             [
                 $groupId,
                 $this->groupCreatorId,
-                self::$testTenantId,
                 $groupId,
                 $this->memberA_Id,
-                self::$testTenantId,
                 $groupId,
-                $this->memberB_Id,
-                self::$testTenantId
+                $this->memberB_Id
             ]
         );
 
@@ -411,9 +408,9 @@ class GroupJourneyTest extends DatabaseTestCase
 
         // Add creator and member
         Database::query(
-            "INSERT INTO group_members (group_id, user_id, tenant_id, role, status, joined_at, created_at)
-             VALUES (?, ?, ?, 'admin', 'active', NOW(), NOW()), (?, ?, ?, 'member', 'active', NOW(), NOW())",
-            [$groupId, $this->groupCreatorId, self::$testTenantId, $groupId, $this->memberA_Id, self::$testTenantId]
+            "INSERT INTO group_members (group_id, user_id, role, status, joined_at, created_at)
+             VALUES (?, ?, 'admin', 'active', NOW(), NOW()), (?, ?, 'member', 'active', NOW(), NOW())",
+            [$groupId, $this->groupCreatorId, $groupId, $this->memberA_Id]
         );
 
         // Verify initial member count
@@ -423,22 +420,18 @@ class GroupJourneyTest extends DatabaseTestCase
         );
         $this->assertEquals(2, $stmt->fetch()['count']);
 
-        // Step 1: Member A leaves the group
+        // Step 1: Member A leaves the group (delete row since status enum doesn't have 'left')
         Database::query(
-            "UPDATE group_members SET status = 'left', left_at = NOW()
-             WHERE group_id = ? AND user_id = ? AND tenant_id = ?",
-            [$groupId, $this->memberA_Id, self::$testTenantId]
-        );
-
-        // Step 2: Verify member is marked as left
-        $stmt = Database::query(
-            "SELECT status, left_at FROM group_members WHERE group_id = ? AND user_id = ?",
+            "DELETE FROM group_members WHERE group_id = ? AND user_id = ?",
             [$groupId, $this->memberA_Id]
         );
-        $membership = $stmt->fetch();
 
-        $this->assertEquals('left', $membership['status']);
-        $this->assertNotNull($membership['left_at']);
+        // Step 2: Verify member is removed
+        $stmt = Database::query(
+            "SELECT * FROM group_members WHERE group_id = ? AND user_id = ?",
+            [$groupId, $this->memberA_Id]
+        );
+        $this->assertFalse($stmt->fetch(), 'Member should be removed from group');
 
         // Step 3: Verify active member count decreased
         $stmt = Database::query(

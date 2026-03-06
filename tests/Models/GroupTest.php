@@ -272,7 +272,11 @@ class GroupTest extends DatabaseTestCase
 
     public function testAllFiltersBySearch(): void
     {
-        $groups = Group::all('Test Group');
+        // Fetch current group name (may have been updated by prior tests)
+        $currentGroup = Group::findById(self::$testGroupId);
+        $searchTerm = substr($currentGroup['name'], 0, 10); // Use first 10 chars of current name
+
+        $groups = Group::all($searchTerm);
 
         $this->assertIsArray($groups);
         // Should find our test group
