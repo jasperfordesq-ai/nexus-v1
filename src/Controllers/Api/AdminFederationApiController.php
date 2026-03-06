@@ -8,6 +8,8 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Services\FederationDirectoryService;
+use Nexus\Services\FederationPartnershipService;
 
 /**
  * Admin Federation API Controller
@@ -248,18 +250,94 @@ class AdminFederationApiController extends BaseApiController
     public function directory(): void
     {
         $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $filters = [];
+        if (!empty($_GET['search'])) {
+            $filters['search'] = substr(trim($_GET['search']), 0, 200);
+        }
+        if (!empty($_GET['region'])) {
+            $filters['region'] = substr(trim($_GET['region']), 0, 100);
+        }
+        if (!empty($_GET['category'])) {
+            $filters['category'] = substr(trim($_GET['category']), 0, 100);
+        }
+        if (!empty($_GET['exclude_partnered'])) {
+            $filters['exclude_partnered'] = true;
+        }
 
         try {
-            $stmt = Database::query(
-                "SELECT t.id, t.name, t.slug, t.is_active, t.created_at,
-                        (SELECT COUNT(*) FROM users u WHERE u.tenant_id = t.id AND u.status = 'active') as member_count
-                 FROM tenants t
-                 WHERE t.is_active = 1
-                 ORDER BY t.name ASC LIMIT 100"
-            );
-            $this->respondWithData($stmt->fetchAll() ?: []);
+            $communities = FederationDirectoryService::getDiscoverableTimebanks($tenantId, $filters);
+            $regions = FederationDirectoryService::getAvailableRegions();
+            $categories = FederationDirectoryService::getAvailableCategories();
+
+            $this->respondWithData([
+                'communities' => $communities,
+                'regions' => $regions,
+                'categories' => $categories,
+            ]);
         } catch (\Exception $e) {
-            $this->respondWithData([]);
+            // Fallback: federation tables may not exist yet
+            try {
+                $stmt = Database::query(
+                    "SELECT t.id, t.name, t.slug, t.is_active, t.created_at,
+                            (SELECT COUNT(*) FROM users u WHERE u.tenant_id = t.id AND u.status = 'active') as member_count
+                     FROM tenants t
+                     WHERE t.is_active = 1 AND t.id != ?
+                     ORDER BY t.name ASC LIMIT 100",
+                    [$tenantId]
+                );
+                $this->respondWithData([
+                    'communities' => $stmt->fetchAll() ?: [],
+                    'regions' => [],
+                    'categories' => [],
+                ]);
+            } catch (\Exception $e2) {
+                $this->respondWithData(['communities' => [], 'regions' => [], 'categories' => []]);
+            }
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/federation/partnerships/request
+     * Request a partnership with another community.
+     */
+    public function requestPartnership(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $userId = $this->getAuthUserId();
+
+        $input = $this->getAllInput();
+        $targetTenantId = (int) ($input['target_tenant_id'] ?? 0);
+        $notes = isset($input['notes']) ? substr(trim($input['notes']), 0, 1000) : null;
+
+        if ($targetTenantId <= 0) {
+            $this->respondWithError('VALIDATION_ERROR', 'Target community ID is required', 'target_tenant_id');
+            return;
+        }
+
+        if ($targetTenantId === $tenantId) {
+            $this->respondWithError('VALIDATION_ERROR', 'Cannot partner with your own community');
+            return;
+        }
+
+        try {
+            $result = FederationPartnershipService::requestPartnership(
+                $tenantId,
+                $targetTenantId,
+                $userId,
+                FederationPartnershipService::LEVEL_DISCOVERY,
+                $notes
+            );
+
+            if ($result['success']) {
+                $this->respondWithData($result, null, 201);
+            } else {
+                $this->respondWithError('REQUEST_FAILED', $result['error'] ?? 'Failed to send partnership request');
+            }
+        } catch (\Exception $e) {
+            $this->respondWithError('REQUEST_FAILED', 'Failed to send partnership request');
         }
     }
 
