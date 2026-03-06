@@ -88,6 +88,7 @@ class AdminVolunteeringApiController extends BaseApiController
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
+            return;
         }
         $tenantId = TenantContext::getId();
 
@@ -203,6 +204,7 @@ class AdminVolunteeringApiController extends BaseApiController
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
+            return;
         }
         $tenantId = TenantContext::getId();
 
@@ -232,7 +234,9 @@ class AdminVolunteeringApiController extends BaseApiController
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
+            return;
         }
+        $this->verifyCsrf();
         $tenantId = TenantContext::getId();
 
         if (!$id || !$this->tableExists('vol_applications')) {
@@ -271,7 +275,9 @@ class AdminVolunteeringApiController extends BaseApiController
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
+            return;
         }
+        $this->verifyCsrf();
         $tenantId = TenantContext::getId();
 
         if (!$id || !$this->tableExists('vol_applications')) {
@@ -308,6 +314,7 @@ class AdminVolunteeringApiController extends BaseApiController
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
+            return;
         }
         $tenantId = TenantContext::getId();
 

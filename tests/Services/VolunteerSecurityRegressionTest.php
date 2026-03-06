@@ -11,6 +11,7 @@ namespace Nexus\Tests\Services;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\ShiftGroupReservationService;
+use Nexus\Services\ShiftSwapService;
 use Nexus\Services\VolunteerCheckInService;
 use Nexus\Services\VolunteerService;
 use Nexus\Tests\DatabaseTestCase;
@@ -100,6 +101,64 @@ class VolunteerSecurityRegressionTest extends DatabaseTestCase
         $errors = ShiftGroupReservationService::getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame('FORBIDDEN', $errors[0]['code']);
+    }
+
+    public function testSwapApprovalFailsAtomicallyWhenOneAssignmentIsMissing(): void
+    {
+        $this->requireTables(['vol_shift_swap_requests']);
+
+        $ownerId = $this->createUser('swap-owner');
+        $fromUserId = $this->createUser('swap-from');
+        $toUserId = $this->createUser('swap-to');
+
+        [$opportunityId, $fromShiftId] = $this->createOpportunityAndShift($ownerId);
+        Database::query(
+            'INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity, created_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 4 DAY), DATE_ADD(DATE_ADD(NOW(), INTERVAL 4 DAY), INTERVAL 2 HOUR), 5, NOW())',
+            [self::TENANT_ID, $opportunityId]
+        );
+        $toShiftId = (int)Database::getInstance()->lastInsertId();
+
+        Database::query(
+            "INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, shift_id, status, created_at) VALUES (?, ?, ?, ?, 'approved', NOW())",
+            [self::TENANT_ID, $opportunityId, $fromUserId, $fromShiftId]
+        );
+        $fromAppId = (int)Database::getInstance()->lastInsertId();
+
+        Database::query(
+            "INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, shift_id, status, created_at) VALUES (?, ?, ?, ?, 'approved', NOW())",
+            [self::TENANT_ID, $opportunityId, $toUserId, $toShiftId]
+        );
+        $toAppId = (int)Database::getInstance()->lastInsertId();
+
+        Database::query(
+            "INSERT INTO vol_shift_swap_requests (tenant_id, from_user_id, to_user_id, from_shift_id, to_shift_id, status, requires_admin_approval, message, created_at) VALUES (?, ?, ?, ?, ?, 'admin_pending', 1, 'regression-test', NOW())",
+            [self::TENANT_ID, $fromUserId, $toUserId, $fromShiftId, $toShiftId]
+        );
+        $swapId = (int)Database::getInstance()->lastInsertId();
+
+        // Simulate stale state: target volunteer no longer assigned at approval time.
+        Database::query(
+            'UPDATE vol_applications SET shift_id = NULL WHERE id = ? AND tenant_id = ?',
+            [$toAppId, self::TENANT_ID]
+        );
+
+        $result = ShiftSwapService::adminDecision($swapId, $ownerId, 'approve');
+        $this->assertFalse($result);
+        $errors = ShiftSwapService::getErrors();
+        $this->assertNotEmpty($errors);
+        $this->assertSame('VALIDATION_ERROR', $errors[0]['code']);
+
+        $fromShiftAfter = (int)Database::query(
+            'SELECT shift_id FROM vol_applications WHERE id = ? AND tenant_id = ?',
+            [$fromAppId, self::TENANT_ID]
+        )->fetchColumn();
+        $this->assertSame($fromShiftId, $fromShiftAfter);
+
+        $swapStatus = (string)Database::query(
+            'SELECT status FROM vol_shift_swap_requests WHERE id = ? AND tenant_id = ?',
+            [$swapId, self::TENANT_ID]
+        )->fetchColumn();
+        $this->assertSame('admin_pending', $swapStatus);
     }
 
     private function createUser(string $prefix): int

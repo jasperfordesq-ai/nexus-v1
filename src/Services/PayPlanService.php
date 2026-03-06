@@ -27,7 +27,7 @@ class PayPlanService
         $tenantId = $tenantId ?? TenantContext::getId();
 
         // Super admins can access everything
-        if (isset($_SESSION['is_super_admin']) && $_SESSION['is_super_admin']) {
+        if (!empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin'])) {
             return ['allowed' => true];
         }
 
@@ -74,7 +74,7 @@ class PayPlanService
         $tenantId = $tenantId ?? TenantContext::getId();
 
         // Super admins can access everything
-        if (isset($_SESSION['is_super_admin']) && $_SESSION['is_super_admin']) {
+        if (!empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin'])) {
             return ['allowed' => true];
         }
 

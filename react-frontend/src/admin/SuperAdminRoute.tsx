@@ -24,7 +24,8 @@ export function SuperAdminRoute() {
   const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
-    userRecord?.is_super_admin === true;
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_tenant_super_admin === true;
 
   if (!isSuperAdmin) {
     return <Navigate to={tenantPath('/admin')} replace />;

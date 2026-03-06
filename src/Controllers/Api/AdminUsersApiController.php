@@ -141,7 +141,7 @@ class AdminUsersApiController extends BaseApiController
                         THEN u.organization_name
                     ELSE CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))
                 END as name,
-                u.email, u.avatar_url, u.location, u.role, u.is_approved, u.is_super_admin,
+                u.email, u.avatar_url, u.location, u.role, u.is_approved, u.is_super_admin, u.is_tenant_super_admin,
                 u.status, u.created_at, u.last_active_at, u.profile_type, u.organization_name,
                 u.tenant_id,
                 t.name as tenant_name,
@@ -186,6 +186,7 @@ class AdminUsersApiController extends BaseApiController
                 'role' => $row['role'] ?? 'member',
                 'status' => $status,
                 'is_super_admin' => (bool) ($row['is_super_admin'] ?? false),
+                'is_tenant_super_admin' => (bool) ($row['is_tenant_super_admin'] ?? false),
                 'balance' => (float) ($row['balance'] ?? 0),
                 'listing_count' => (int) ($row['listing_count'] ?? 0),
                 'profile_type' => $row['profile_type'] ?? 'individual',
@@ -213,7 +214,7 @@ class AdminUsersApiController extends BaseApiController
         if ($isSuperAdmin) {
             $user = Database::query(
                 "SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.location, u.bio, u.tagline, u.phone,
-                        u.role, u.status, u.is_approved, u.is_super_admin, u.balance, u.profile_type,
+                        u.role, u.status, u.is_approved, u.is_super_admin, u.is_god, u.is_tenant_super_admin, u.balance, u.profile_type,
                         u.organization_name, u.vetting_status, u.insurance_status, u.created_at, u.last_active_at,
                         u.email_verified_at, u.is_verified,
                         u.tenant_id, t.name as tenant_name
@@ -225,7 +226,7 @@ class AdminUsersApiController extends BaseApiController
         } else {
             $user = Database::query(
                 "SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.location, u.bio, u.tagline, u.phone,
-                        u.role, u.status, u.is_approved, u.is_super_admin, u.balance, u.profile_type,
+                        u.role, u.status, u.is_approved, u.is_super_admin, u.is_god, u.is_tenant_super_admin, u.balance, u.profile_type,
                         u.organization_name, u.vetting_status, u.insurance_status, u.created_at, u.last_active_at,
                         u.email_verified_at, u.is_verified,
                         u.tenant_id, t.name as tenant_name
@@ -289,6 +290,8 @@ class AdminUsersApiController extends BaseApiController
             'role' => $user['role'] ?? 'member',
             'status' => $status,
             'is_super_admin' => (bool) ($user['is_super_admin'] ?? false),
+            'is_god' => (bool) ($user['is_god'] ?? false),
+            'is_tenant_super_admin' => (bool) ($user['is_tenant_super_admin'] ?? false),
             'is_admin' => in_array($user['role'] ?? '', ['admin', 'tenant_admin']),
             'balance' => (float) ($user['balance'] ?? 0),
             'profile_type' => $user['profile_type'] ?? 'individual',
@@ -580,7 +583,7 @@ class AdminUsersApiController extends BaseApiController
         }
 
         // Prevent deleting super admins unless caller is super admin
-        if (!empty($user['is_super_admin'])) {
+        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
             $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Cannot delete a super admin', null, 403);
             return;
         }
@@ -939,7 +942,7 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        if (!empty($user['is_super_admin'])) {
+        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
             $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Cannot suspend a super admin', null, 403);
             return;
         }
@@ -989,7 +992,7 @@ class AdminUsersApiController extends BaseApiController
             return;
         }
 
-        if (!empty($user['is_super_admin'])) {
+        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
             $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Cannot ban a super admin', null, 403);
             return;
         }
@@ -1387,7 +1390,7 @@ class AdminUsersApiController extends BaseApiController
         }
 
         // Prevent impersonating super admins (security measure)
-        if (!empty($user['is_super_admin'])) {
+        if (!empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin'])) {
             $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Cannot impersonate a super admin', null, 403);
             return;
         }
@@ -1435,9 +1438,11 @@ class AdminUsersApiController extends BaseApiController
     /**
      * PUT /api/v2/admin/users/{id}/super-admin
      *
-     * Grant or revoke super admin status for a user.
+     * Grant or revoke TENANT super admin status for a user.
+     * This is hierarchy-scoped: the user gets super admin access for their tenant
+     * and any sub-tenants below it in the hierarchy.
      * Body: { grant: bool }
-     * Only callable by super admins.
+     * Only callable by admins who are themselves super admins.
      */
     public function setSuperAdmin(int $id): void
     {
@@ -1445,7 +1450,7 @@ class AdminUsersApiController extends BaseApiController
         $isSuperAdmin = $this->isAuthenticatedSuperAdmin();
         $tenantId = TenantContext::getId();
 
-        // Only super admins can grant/revoke super admin status
+        // Only super admins can grant/revoke tenant super admin status
         if (!$isSuperAdmin) {
             $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Only super admins can manage super admin status', null, 403);
             return;
@@ -1460,7 +1465,70 @@ class AdminUsersApiController extends BaseApiController
         $grant = (bool) ($this->input('grant', false));
 
         try {
-            // Super admins can manage users across all tenants
+            $user = Database::query(
+                "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ?",
+                [$id]
+            )->fetch();
+
+            if (!$user) {
+                $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+                return;
+            }
+
+            // Set is_tenant_super_admin (hierarchy-scoped) and role to tenant_admin
+            if ($grant) {
+                Database::query(
+                    "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
+                    [$id]
+                );
+            } else {
+                Database::query(
+                    "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?",
+                    [$id]
+                );
+            }
+
+            $action = $grant ? 'grant_tenant_super_admin' : 'revoke_tenant_super_admin';
+            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " tenant super admin for user #{$id}: {$user['email']} (tenant {$user['tenant_id']})");
+            if ($grant) {
+                AuditLogService::logAdminAction('grant_tenant_super_admin', $adminId, $id, ['email' => $user['email']]);
+            } else {
+                AuditLogService::logAdminAction('revoke_tenant_super_admin', $adminId, $id, ['email' => $user['email']]);
+            }
+
+            $this->respondWithData(['id' => $id, 'is_tenant_super_admin' => $grant]);
+        } catch (\Exception $e) {
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update super admin status', null, 500);
+        }
+    }
+
+    /**
+     * PUT /api/v2/admin/users/{id}/global-super-admin
+     *
+     * Grant or revoke GLOBAL super admin (is_super_admin) for a user.
+     * This bypasses all tenant isolation — use with extreme caution.
+     * Body: { grant: bool }
+     * Only callable by god users.
+     */
+    public function setGlobalSuperAdmin(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+
+        // Only god users can set global super admin
+        if (!User::isGod($adminId)) {
+            $this->respondWithError(ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 'Only god users can manage global super admin status', null, 403);
+            return;
+        }
+
+        // Prevent self-modification
+        if ($id === $adminId) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'You cannot modify your own super admin status', null, 422);
+            return;
+        }
+
+        $grant = (bool) ($this->input('grant', false));
+
+        try {
             $user = Database::query(
                 "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ?",
                 [$id]
@@ -1476,17 +1544,13 @@ class AdminUsersApiController extends BaseApiController
                 [$grant ? 1 : 0, $id]
             );
 
-            $action = $grant ? 'grant_super_admin' : 'revoke_super_admin';
-            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " super admin for user #{$id}: {$user['email']} (tenant {$user['tenant_id']})");
-            if ($grant) {
-                AuditLogService::logAdminAction('grant_super_admin', $adminId, $id, ['email' => $user['email']]);
-            } else {
-                AuditLogService::logSuperAdminRevoked($adminId, $id, $user['email']);
-            }
+            $action = $grant ? 'grant_global_super_admin' : 'revoke_global_super_admin';
+            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " global super admin for user #{$id}: {$user['email']} (tenant {$user['tenant_id']})");
+            AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user['email']]);
 
             $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
         } catch (\Exception $e) {
-            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update super admin status', null, 500);
+            $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update global super admin status', null, 500);
         }
     }
 

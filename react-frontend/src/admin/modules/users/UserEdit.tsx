@@ -57,7 +57,9 @@ export function UserEdit() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const isSuperAdmin = (currentUser as Record<string, unknown> | null)?.is_super_admin === true
+    || (currentUser as Record<string, unknown> | null)?.is_tenant_super_admin === true
     || (currentUser?.role as string) === 'super_admin';
+  const isGod = (currentUser as Record<string, unknown> | null)?.is_god === true;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -77,9 +79,13 @@ export function UserEdit() {
   const [profileType, setProfileType] = useState<'individual' | 'organisation'>('individual');
   const [organizationName, setOrganizationName] = useState('');
 
-  // Super admin toggle
-  const [isSuperAdminUser, setIsSuperAdminUser] = useState(false);
-  const [superAdminLoading, setSuperAdminLoading] = useState(false);
+  // Tenant super admin toggle (hierarchy-scoped)
+  const [isTenantSuperAdmin, setIsTenantSuperAdmin] = useState(false);
+  const [tenantSuperAdminLoading, setTenantSuperAdminLoading] = useState(false);
+
+  // Global super admin toggle (god-only, bypasses all tenant isolation)
+  const [isGlobalSuperAdmin, setIsGlobalSuperAdmin] = useState(false);
+  const [globalSuperAdminLoading, setGlobalSuperAdminLoading] = useState(false);
 
   // Impersonate
   const [impersonateLoading, setImpersonateLoading] = useState(false);
@@ -140,7 +146,8 @@ export function UserEdit() {
           || 'individual'
         );
         setOrganizationName(userData.organization_name || '');
-        setIsSuperAdminUser(userData.is_super_admin || false);
+        setIsTenantSuperAdmin(userData.is_tenant_super_admin || false);
+        setIsGlobalSuperAdmin(userData.is_super_admin || false);
       } else {
         setLoadError(res.error || 'Failed to load user');
       }
@@ -232,21 +239,39 @@ export function UserEdit() {
     }
   }
 
-  async function handleToggleSuperAdmin() {
+  async function handleToggleTenantSuperAdmin() {
     if (!id || !user) return;
-    setSuperAdminLoading(true);
+    setTenantSuperAdminLoading(true);
     try {
-      const res = await adminUsers.setSuperAdmin(Number(id), !isSuperAdminUser);
+      const res = await adminUsers.setSuperAdmin(Number(id), !isTenantSuperAdmin);
       if (res.success) {
-        setIsSuperAdminUser(!isSuperAdminUser);
-        toast.success(`Super admin ${!isSuperAdminUser ? 'granted' : 'revoked'} successfully`);
+        setIsTenantSuperAdmin(!isTenantSuperAdmin);
+        toast.success(`Tenant super admin ${!isTenantSuperAdmin ? 'granted' : 'revoked'} successfully`);
       } else {
-        toast.error(res.error || 'Failed to update super admin status');
+        toast.error(res.error || 'Failed to update tenant super admin status');
       }
     } catch {
-      toast.error('Failed to update super admin status');
+      toast.error('Failed to update tenant super admin status');
     } finally {
-      setSuperAdminLoading(false);
+      setTenantSuperAdminLoading(false);
+    }
+  }
+
+  async function handleToggleGlobalSuperAdmin() {
+    if (!id || !user) return;
+    setGlobalSuperAdminLoading(true);
+    try {
+      const res = await adminUsers.setGlobalSuperAdmin(Number(id), !isGlobalSuperAdmin);
+      if (res.success) {
+        setIsGlobalSuperAdmin(!isGlobalSuperAdmin);
+        toast.success(`Global super admin ${!isGlobalSuperAdmin ? 'granted' : 'revoked'} successfully`);
+      } else {
+        toast.error(res.error || 'Failed to update global super admin status');
+      }
+    } catch {
+      toast.error('Failed to update global super admin status');
+    } finally {
+      setGlobalSuperAdminLoading(false);
     }
   }
 
@@ -423,7 +448,7 @@ export function UserEdit() {
     );
   }
 
-  const canImpersonate = isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id;
+  const canImpersonate = isSuperAdmin && !user.is_super_admin && !user.is_god && user.id !== currentUser?.id;
 
   return (
     <div>
@@ -556,7 +581,7 @@ export function UserEdit() {
           </Card>
         </form>
 
-        {/* Super Admin Flag (only visible to super admins) */}
+        {/* Tenant Super Admin (hierarchy-scoped — visible to super admins) */}
         {isSuperAdmin && (
           <Card>
             <CardHeader className="px-6 pt-5 pb-0">
@@ -568,17 +593,49 @@ export function UserEdit() {
             <CardBody className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-foreground">Platform-Wide Super Admin</p>
+                  <p className="font-medium text-foreground">Tenant Super Admin</p>
                   <p className="text-sm text-default-500">
-                    Super admins can access and manage all tenants. Use with extreme caution.
+                    Can manage this tenant and any sub-tenants below it in the hierarchy.
                   </p>
                 </div>
                 <Switch
-                  isSelected={isSuperAdminUser}
-                  onValueChange={handleToggleSuperAdmin}
-                  isDisabled={superAdminLoading || user.id === currentUser?.id}
+                  isSelected={isTenantSuperAdmin}
+                  onValueChange={handleToggleTenantSuperAdmin}
+                  isDisabled={tenantSuperAdminLoading || user.id === currentUser?.id}
                   color="warning"
-                  aria-label="Toggle super admin status"
+                  aria-label="Toggle tenant super admin status"
+                />
+              </div>
+              {user.id === currentUser?.id && (
+                <p className="text-xs text-default-400 mt-2">You cannot modify your own super admin status.</p>
+              )}
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Global Super Admin (god-only — bypasses all tenant isolation) */}
+        {isGod && (
+          <Card className="border-2 border-danger/30">
+            <CardHeader className="px-6 pt-5 pb-0">
+              <div className="flex items-center gap-2">
+                <ShieldAlert size={18} className="text-danger" />
+                <h3 className="text-lg font-semibold text-danger">Global Super Admin (God Mode)</h3>
+              </div>
+            </CardHeader>
+            <CardBody className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">Platform-Wide Access</p>
+                  <p className="text-sm text-default-500">
+                    Bypasses ALL tenant isolation. Can access and manage every tenant on the platform. Use with extreme caution.
+                  </p>
+                </div>
+                <Switch
+                  isSelected={isGlobalSuperAdmin}
+                  onValueChange={handleToggleGlobalSuperAdmin}
+                  isDisabled={globalSuperAdminLoading || user.id === currentUser?.id}
+                  color="danger"
+                  aria-label="Toggle global super admin status"
                 />
               </div>
               {user.id === currentUser?.id && (

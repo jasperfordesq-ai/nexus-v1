@@ -26,7 +26,7 @@ class User
     {
         $tenantId = TenantContext::getId();
         // Allow user if they belong to this tenant OR if they are a super admin (accessing any tenant)
-        $sql = "SELECT * FROM users WHERE email = ? AND (tenant_id = ? OR is_super_admin = 1)";
+        $sql = "SELECT * FROM users WHERE email = ? AND (tenant_id = ? OR is_super_admin = 1 OR is_tenant_super_admin = 1)";
         return Database::query($sql, [$email, $tenantId])->fetch();
     }
 
@@ -131,15 +131,15 @@ class User
             END as name,
             organization_name,
             email, role, profile_type, balance, bio, tagline, location, latitude, longitude, skills, phone, avatar_url, created_at, tenant_id, is_approved,
-            privacy_profile, privacy_search, privacy_contact, is_super_admin, onboarding_completed{$gamificationColumns}{$onlineColumns}
+            privacy_profile, privacy_search, privacy_contact, is_super_admin, is_god, is_tenant_super_admin, onboarding_completed{$gamificationColumns}{$onlineColumns}
             FROM users WHERE id = ?";
 
         // Security: Add tenant isolation unless explicitly disabled or user is super_admin
         if ($enforceTenant && $tenantId) {
             // Allow access if: same tenant OR the target user is a super_admin OR current user is super_admin
-            $isSuperAdmin = !empty($_SESSION['is_super_admin']);
+            $isSuperAdmin = !empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
             if (!$isSuperAdmin) {
-                $sql .= " AND (tenant_id = ? OR is_super_admin = 1)";
+                $sql .= " AND (tenant_id = ? OR is_super_admin = 1 OR is_tenant_super_admin = 1)";
                 return Database::query($sql, [$id, $tenantId])->fetch();
             }
         }
@@ -158,7 +158,7 @@ class User
     {
         $tenantId = TenantContext::getId();
         // Allow super admins whose home tenant differs from current TenantContext
-        $sql = "UPDATE users SET avatar_url = ? WHERE id = ? AND (tenant_id = ? OR is_super_admin = 1)";
+        $sql = "UPDATE users SET avatar_url = ? WHERE id = ? AND (tenant_id = ? OR is_super_admin = 1 OR is_tenant_super_admin = 1)";
         $stmt = Database::query($sql, [$url, $id, $tenantId]);
         return $stmt->rowCount() > 0;
     }
@@ -325,7 +325,7 @@ class User
         // Handle users with NULL tenant_id (super admins / legacy users)
         // Also allow super admins who have tenant_id = 1 (master) but may be
         // logged in cross-tenant via a different tenant's URL.
-        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL OR is_super_admin = 1)";
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ? AND (tenant_id = ? OR tenant_id IS NULL OR is_super_admin = 1 OR is_tenant_super_admin = 1)";
         $params[] = $id;
         $params[] = $tenantId;
 
@@ -414,9 +414,9 @@ class User
             COUNT(l.id) as listing_count
             FROM users u
             LEFT JOIN listings l ON u.id = l.user_id AND l.status = 'active'
-            WHERE u.tenant_id = ? AND (u.role IN ('admin', 'super_admin', 'tenant_admin') OR u.is_super_admin = 1)
+            WHERE u.tenant_id = ? AND (u.role IN ('admin', 'super_admin', 'tenant_admin') OR u.is_super_admin = 1 OR u.is_tenant_super_admin = 1)
             GROUP BY u.id
-            ORDER BY u.is_super_admin DESC, u.created_at DESC
+            ORDER BY u.is_super_admin DESC, u.is_tenant_super_admin DESC, u.created_at DESC
         ";
         return Database::query($sql, [$tenantId])->fetchAll();
     }

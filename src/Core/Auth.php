@@ -147,8 +147,9 @@ class Auth
             return true;
         }
 
-        // Check super admin
-        if (!empty($_SESSION['is_super_admin']) || !empty($user['is_super_admin'])) {
+        // Check super admin (global or tenant-scoped)
+        if (!empty($_SESSION['is_super_admin']) || !empty($user['is_super_admin'])
+            || !empty($_SESSION['is_tenant_super_admin']) || !empty($user['is_tenant_super_admin'])) {
             return true;
         }
 

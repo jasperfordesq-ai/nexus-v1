@@ -119,6 +119,8 @@ export interface AdminUser {
   total_spent?: number;
   has_2fa_enabled: boolean;
   is_super_admin: boolean;
+  is_god?: boolean;
+  is_tenant_super_admin?: boolean;
   is_admin?: boolean;
   listing_count?: number;
   profile_type?: string;

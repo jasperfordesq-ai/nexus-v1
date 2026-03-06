@@ -37,7 +37,7 @@ class PermissionApiController
     private function requireAdmin(): void
     {
         $isAdmin = isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'super_admin', 'tenant_admin']);
-        $isSuperAdmin = !empty($_SESSION['is_super_admin']);
+        $isSuperAdmin = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
         if (!$isAdmin && !$isSuperAdmin) {
             http_response_code(401);
@@ -174,7 +174,7 @@ class PermissionApiController
     {
         try {
             $currentUserId = $this->getCurrentUserId();
-            $isSuperAdmin = !empty($_SESSION['is_super_admin']);
+            $isSuperAdmin = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
             // Super admins bypass permission checks
             if (!$isSuperAdmin && !$this->permService->can($currentUserId, 'roles.assign')) {
@@ -264,7 +264,7 @@ class PermissionApiController
     {
         try {
             $currentUserId = $this->getCurrentUserId();
-            $isSuperAdmin = !empty($_SESSION['is_super_admin']);
+            $isSuperAdmin = !empty($_SESSION['is_super_admin']) && empty($_SESSION['is_tenant_super_admin']) || !empty($_SESSION['is_tenant_super_admin']);
 
             // Super admins bypass permission checks
             if (!$isSuperAdmin && !$this->permService->can($currentUserId, 'users.edit_permissions')) {

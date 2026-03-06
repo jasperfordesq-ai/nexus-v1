@@ -31,6 +31,7 @@ $router->add('POST', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\A
 $router->add('DELETE', '/api/v2/admin/users/{id}/badges/{badgeId}', 'Nexus\Controllers\Api\AdminUsersApiController@removeBadge');
 $router->add('POST', '/api/v2/admin/users/{id}/impersonate', 'Nexus\Controllers\Api\AdminUsersApiController@impersonate');
 $router->add('PUT', '/api/v2/admin/users/{id}/super-admin', 'Nexus\Controllers\Api\AdminUsersApiController@setSuperAdmin');
+$router->add('PUT', '/api/v2/admin/users/{id}/global-super-admin', 'Nexus\Controllers\Api\AdminUsersApiController@setGlobalSuperAdmin');
 $router->add('POST', '/api/v2/admin/users/{id}/badges/recheck', 'Nexus\Controllers\Api\AdminUsersApiController@recheckBadges');
 $router->add('GET', '/api/v2/admin/users/{id}/consents', 'Nexus\Controllers\Api\AdminUsersApiController@getConsents');
 $router->add('POST', '/api/v2/admin/users/{id}/password', 'Nexus\Controllers\Api\AdminUsersApiController@setPassword');

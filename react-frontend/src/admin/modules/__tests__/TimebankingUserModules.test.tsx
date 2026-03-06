@@ -176,6 +176,7 @@ vi.mock('@/admin/api/adminApi', () => ({
     importUsers: vi.fn().mockResolvedValue({ success: true, data: { imported: 0, skipped: 0, errors: [], total_rows: 0 } }),
     downloadImportTemplate: vi.fn(),
     setSuperAdmin: vi.fn().mockResolvedValue({ success: true }),
+    setGlobalSuperAdmin: vi.fn().mockResolvedValue({ success: true }),
     removeBadge: vi.fn().mockResolvedValue({ success: true }),
     recheckUserBadges: vi.fn().mockResolvedValue({ success: true, data: { badges: [] } }),
     setPassword: vi.fn().mockResolvedValue({ success: true }),

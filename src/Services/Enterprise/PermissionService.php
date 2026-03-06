@@ -354,19 +354,20 @@ class PermissionService
     private function isSuperAdmin(int $userId): bool
     {
         // Check session first for performance
-        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $userId && !empty($_SESSION['is_super_admin'])) {
+        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $userId
+            && (!empty($_SESSION['is_super_admin']) || !empty($_SESSION['is_tenant_super_admin']))) {
             return true;
         }
 
         // Check database
         $result = Database::query("
-            SELECT is_super_admin
+            SELECT is_super_admin, is_tenant_super_admin
             FROM users
             WHERE id = ?
             LIMIT 1
         ", [$userId])->fetch();
 
-        return !empty($result['is_super_admin']);
+        return !empty($result['is_super_admin']) || !empty($result['is_tenant_super_admin']);
     }
 
     /**

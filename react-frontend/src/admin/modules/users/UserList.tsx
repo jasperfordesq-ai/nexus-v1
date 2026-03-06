@@ -59,7 +59,9 @@ export function UserList() {
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();
   const { user: currentUser } = useAuth();
-  const isSuperAdmin = (currentUser as Record<string, unknown> | null)?.is_super_admin === true || (currentUser?.role as string) === 'super_admin';
+  const isSuperAdmin = (currentUser as Record<string, unknown> | null)?.is_super_admin === true
+    || (currentUser as Record<string, unknown> | null)?.is_tenant_super_admin === true
+    || (currentUser?.role as string) === 'super_admin';
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
