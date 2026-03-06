@@ -6,10 +6,11 @@
 /**
  * Newsletter Stats
  * Detailed per-campaign statistics page for a single newsletter.
- * Shows delivery, engagement, A/B test results, timeline, and top links.
+ * Shows delivery funnel, engagement metrics, device breakdown,
+ * A/B test results, timeline, top links, recent activity, and quick actions.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton,
@@ -18,10 +19,12 @@ import {
 } from '@heroui/react';
 import {
   ArrowLeft, CheckCircle, Eye, MousePointer, BarChart3,
-  Trophy, Send, Mail, ExternalLink, Clock,
+  Trophy, Send, Mail, ExternalLink, Clock, Monitor, Smartphone,
+  Tablet, HelpCircle, Copy, FileText, TrendingUp,
 } from 'lucide-react';
 import {
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, PieChart, Pie, Cell,
 } from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -72,6 +75,14 @@ interface AbTestData {
   subject_a_clicks: number;
   subject_b_opens: number;
   subject_b_clicks: number;
+  subject_a_sent: number;
+  subject_b_sent: number;
+  subject_a_open_rate: number;
+  subject_b_open_rate: number;
+  subject_a_click_rate: number;
+  subject_b_click_rate: number;
+  split_percentage: number;
+  winner_metric: string;
   winner: string | null;
   winning_margin: number;
 }
@@ -88,6 +99,25 @@ interface TopLink {
   unique_clicks: number;
 }
 
+interface DeviceStats {
+  desktop: number;
+  mobile: number;
+  tablet: number;
+  unknown: number;
+}
+
+interface RecentActivityItem {
+  action_type: 'open' | 'click';
+  email: string;
+  action_at: string;
+  url: string | null;
+}
+
+interface PeakEngagement {
+  max_opens_per_hour: number;
+  peak_hour: number | null;
+}
+
 interface StatsData {
   newsletter: NewsletterInfo;
   delivery: DeliveryStats;
@@ -95,7 +125,26 @@ interface StatsData {
   ab_test: AbTestData | null;
   timeline: TimelinePoint[];
   top_links: TopLink[];
+  device_stats: DeviceStats;
+  recent_activity: RecentActivityItem[];
+  peak_engagement: PeakEngagement;
 }
+
+// ─── Constants ──────────────────────────────────────────────────────────────
+
+const DEVICE_COLORS: Record<string, string> = {
+  desktop: 'hsl(var(--heroui-primary))',
+  mobile: 'hsl(var(--heroui-success))',
+  tablet: 'hsl(var(--heroui-warning))',
+  unknown: 'hsl(var(--heroui-default-400))',
+};
+
+const DEVICE_ICONS: Record<string, typeof Monitor> = {
+  desktop: Monitor,
+  mobile: Smartphone,
+  tablet: Tablet,
+  unknown: HelpCircle,
+};
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -147,6 +196,23 @@ export function NewsletterStats() {
     }
     setSelectingWinner(false);
   };
+
+  // Device chart data
+  const deviceChartData = useMemo(() => {
+    if (!data?.device_stats) return [];
+    return Object.entries(data.device_stats)
+      .filter(([, count]) => count > 0)
+      .map(([device, count]) => ({
+        name: device.charAt(0).toUpperCase() + device.slice(1),
+        value: count,
+        color: DEVICE_COLORS[device] || DEVICE_COLORS.unknown,
+      }));
+  }, [data?.device_stats]);
+
+  const deviceTotal = useMemo(() => {
+    if (!data?.device_stats) return 0;
+    return Object.values(data.device_stats).reduce((sum, c) => sum + c, 0);
+  }, [data?.device_stats]);
 
   // ── Loading State ──
   if (loading) {
@@ -211,7 +277,7 @@ export function NewsletterStats() {
     );
   }
 
-  const { newsletter, delivery, engagement, ab_test, timeline, top_links } = data;
+  const { newsletter, delivery, engagement, ab_test, timeline, top_links, device_stats, recent_activity, peak_engagement } = data;
   const nonOpenerCount = delivery.delivered - engagement.unique_opens;
 
   return (
@@ -221,7 +287,7 @@ export function NewsletterStats() {
         title={newsletter.subject || newsletter.name}
         description="Campaign performance metrics"
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}
@@ -281,33 +347,67 @@ export function NewsletterStats() {
         </CardBody>
       </Card>
 
-      {/* ── Metrics Row ── */}
+      {/* ── Metrics Row (with unique counts) ── */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Success Rate"
           value={`${engagement.success_rate}%`}
           icon={CheckCircle}
           color="success"
+          description={`${delivery.delivered.toLocaleString()} delivered`}
         />
         <StatCard
           label="Open Rate"
           value={`${engagement.open_rate}%`}
           icon={Eye}
           color="primary"
+          description={`${engagement.unique_opens.toLocaleString()} unique opens`}
         />
         <StatCard
           label="Click Rate"
           value={`${engagement.click_rate}%`}
           icon={MousePointer}
           color="warning"
+          description={`${engagement.unique_clicks.toLocaleString()} unique clicks`}
         />
         <StatCard
           label="Click-to-Open Rate"
           value={`${engagement.click_to_open_rate}%`}
           icon={BarChart3}
           color="secondary"
+          description={`${engagement.total_clicks.toLocaleString()} total clicks`}
         />
       </div>
+
+      {/* ── Engagement Funnel ── */}
+      <Card shadow="sm" className="mb-6">
+        <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
+          <TrendingUp size={18} className="text-default-400" />
+          <h3 className="text-lg font-semibold text-foreground">Engagement Funnel</h3>
+        </CardHeader>
+        <CardBody className="space-y-4 px-5 pb-5">
+          <FunnelBar
+            label="Delivered"
+            value={delivery.delivered}
+            total={delivery.delivered}
+            color="primary"
+          />
+          <FunnelBar
+            label="Opened"
+            value={engagement.unique_opens}
+            total={delivery.delivered}
+            color="secondary"
+            rate={engagement.open_rate}
+          />
+          <FunnelBar
+            label="Clicked"
+            value={engagement.unique_clicks}
+            total={delivery.delivered}
+            color="success"
+            rate={engagement.click_rate}
+          />
+        </CardBody>
+      </Card>
 
       {/* ── Delivery Stats Card ── */}
       <Card shadow="sm" className="mb-6">
@@ -352,6 +452,9 @@ export function NewsletterStats() {
                 subject={ab_test.subject_a}
                 opens={ab_test.subject_a_opens}
                 clicks={ab_test.subject_a_clicks}
+                sent={ab_test.subject_a_sent}
+                openRate={ab_test.subject_a_open_rate}
+                clickRate={ab_test.subject_a_click_rate}
                 isWinner={ab_test.winner === 'a'}
                 isLeading={!ab_test.winner && ab_test.subject_a_opens > ab_test.subject_b_opens}
                 chipColor="primary"
@@ -361,18 +464,25 @@ export function NewsletterStats() {
                 subject={ab_test.subject_b}
                 opens={ab_test.subject_b_opens}
                 clicks={ab_test.subject_b_clicks}
+                sent={ab_test.subject_b_sent}
+                openRate={ab_test.subject_b_open_rate}
+                clickRate={ab_test.subject_b_click_rate}
                 isWinner={ab_test.winner === 'b'}
                 isLeading={!ab_test.winner && ab_test.subject_b_opens > ab_test.subject_a_opens}
                 chipColor="warning"
               />
             </div>
 
-            {/* Select Winner Buttons */}
-            {!ab_test.winner && (
-              <div className="flex flex-wrap items-center gap-3 border-t border-divider pt-4">
-                <span className="text-sm text-default-500">
-                  Winning margin: {ab_test.winning_margin}%
-                </span>
+            {/* Split info + Select Winner Buttons */}
+            <div className="flex flex-wrap items-center gap-3 border-t border-divider pt-4">
+              <span className="text-sm text-default-500">
+                Split: {ab_test.split_percentage}% A / {100 - ab_test.split_percentage}% B
+                &bull; Winning metric: {ab_test.winner_metric === 'clicks' ? 'Click Rate' : 'Open Rate'}
+                {ab_test.winning_margin > 0 && (
+                  <> &bull; Margin: {ab_test.winning_margin}%</>
+                )}
+              </span>
+              {!ab_test.winner && (
                 <div className="ml-auto flex gap-2">
                   <Button
                     size="sm"
@@ -393,70 +503,130 @@ export function NewsletterStats() {
                     Select B as Winner
                   </Button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </CardBody>
         </Card>
       )}
 
-      {/* ── Engagement Timeline ── */}
-      {timeline.length > 0 && (
-        <Card shadow="sm" className="mb-6">
-          <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
-            <Clock size={18} className="text-default-400" />
-            <h3 className="text-lg font-semibold text-foreground">Engagement Timeline</h3>
-            <span className="ml-auto text-xs text-default-400">First 48 hours after send</span>
-          </CardHeader>
-          <CardBody className="px-5 pb-5">
-            <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={timeline} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-default-200" />
-                  <XAxis
-                    dataKey="hour"
-                    tickFormatter={(h: number) => `${h}h`}
-                    fontSize={12}
-                    className="fill-default-500"
-                  />
-                  <YAxis fontSize={12} className="fill-default-500" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--heroui-content1))',
-                      borderColor: 'hsl(var(--heroui-divider))',
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                    }}
-                    labelFormatter={(h) => `Hour ${h}`}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="opens"
-                    name="Opens"
-                    stroke="hsl(var(--heroui-primary))"
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="clicks"
-                    name="Clicks"
-                    stroke="hsl(var(--heroui-success))"
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <Divider className="my-3" />
-            <p className="text-center text-sm text-default-400">
-              Total opens: {engagement.total_opens.toLocaleString()} | Total clicks: {engagement.total_clicks.toLocaleString()}
-            </p>
-          </CardBody>
-        </Card>
-      )}
+      {/* ── Device Breakdown + Engagement Timeline side by side ── */}
+      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Device Breakdown */}
+        {deviceTotal > 0 && (
+          <Card shadow="sm" className="lg:col-span-1">
+            <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
+              <Monitor size={18} className="text-default-400" />
+              <h3 className="text-lg font-semibold text-foreground">Devices</h3>
+            </CardHeader>
+            <CardBody className="px-5 pb-5">
+              <div className="mx-auto h-48 w-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={deviceChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {deviceChartData.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number | undefined, name?: string) => {
+                        const v = value ?? 0;
+                        return [
+                          `${v.toLocaleString()} (${deviceTotal > 0 ? Math.round((v / deviceTotal) * 100) : 0}%)`,
+                          name ?? '',
+                        ];
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-3">
+                {Object.entries(device_stats || {}).map(([device, count]) => {
+                  if (count === 0) return null;
+                  const Icon = DEVICE_ICONS[device] || HelpCircle;
+                  const pct = deviceTotal > 0 ? Math.round((count / deviceTotal) * 100) : 0;
+                  return (
+                    <div key={device} className="flex items-center gap-2 text-sm">
+                      <Icon size={14} style={{ color: DEVICE_COLORS[device] }} />
+                      <span className="capitalize text-default-600">{device}</span>
+                      <span className="ml-auto font-semibold">{pct}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Engagement Timeline */}
+        {timeline.length > 0 && (
+          <Card shadow="sm" className={deviceTotal > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
+            <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
+              <Clock size={18} className="text-default-400" />
+              <h3 className="text-lg font-semibold text-foreground">Engagement Timeline</h3>
+              <span className="ml-auto text-xs text-default-400">First 48 hours after send</span>
+            </CardHeader>
+            <CardBody className="px-5 pb-5">
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={timeline} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-default-200" />
+                    <XAxis
+                      dataKey="hour"
+                      tickFormatter={(h: number) => `${h}h`}
+                      fontSize={12}
+                      className="fill-default-500"
+                    />
+                    <YAxis fontSize={12} className="fill-default-500" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--heroui-content1))',
+                        borderColor: 'hsl(var(--heroui-divider))',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                      }}
+                      labelFormatter={(h) => `Hour ${h}`}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="opens"
+                      name="Opens"
+                      stroke="hsl(var(--heroui-primary))"
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="clicks"
+                      name="Clicks"
+                      stroke="hsl(var(--heroui-success))"
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <Divider className="my-3" />
+              <p className="text-center text-sm text-default-400">
+                Total opens: {engagement.total_opens.toLocaleString()} | Total clicks: {engagement.total_clicks.toLocaleString()}
+                {peak_engagement && peak_engagement.max_opens_per_hour > 0 && (
+                  <> | Peak: {peak_engagement.max_opens_per_hour} opens at hour {peak_engagement.peak_hour}</>
+                )}
+              </p>
+            </CardBody>
+          </Card>
+        )}
+      </div>
 
       {/* ── Top Links ── */}
       {top_links.length > 0 && (
@@ -484,7 +654,7 @@ export function NewsletterStats() {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline break-all"
+                        className="break-all text-sm text-primary hover:underline"
                       >
                         {link.url.length > 80 ? link.url.substring(0, 80) + '...' : link.url}
                       </a>
@@ -503,6 +673,122 @@ export function NewsletterStats() {
         </Card>
       )}
 
+      {/* ── Recent Activity (inline) ── */}
+      {recent_activity && recent_activity.length > 0 && (
+        <Card shadow="sm" className="mb-6">
+          <CardHeader className="flex flex-row items-center justify-between px-5 pb-0 pt-5">
+            <div className="flex items-center gap-2">
+              <BarChart3 size={18} className="text-default-400" />
+              <h3 className="text-lg font-semibold text-foreground">Recent Activity</h3>
+            </div>
+            {newsletter.status === 'sent' && (
+              <Button
+                size="sm"
+                variant="light"
+                onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
+              >
+                View All
+              </Button>
+            )}
+          </CardHeader>
+          <CardBody className="px-5 pb-5">
+            <div className="max-h-80 overflow-y-auto">
+              <Table
+                aria-label="Recent newsletter activity"
+                removeWrapper
+                classNames={{ th: 'text-default-500 text-xs uppercase', td: 'py-2' }}
+              >
+                <TableHeader>
+                  <TableColumn>Event</TableColumn>
+                  <TableColumn>Email</TableColumn>
+                  <TableColumn>Time</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {recent_activity.map((item, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          color={item.action_type === 'open' ? 'primary' : 'success'}
+                        >
+                          {item.action_type === 'open' ? 'Opened' : 'Clicked'}
+                        </Chip>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <span className="text-sm">{item.email}</span>
+                          {item.action_type === 'click' && item.url && (
+                            <div className="mt-0.5 max-w-xs truncate text-xs text-default-400">
+                              {item.url}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-default-500">
+                          {new Date(item.action_at).toLocaleString(undefined, {
+                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                          })}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* ── Quick Actions ── */}
+      <Card shadow="sm" className="mb-6">
+        <CardHeader className="px-5 pb-0 pt-5">
+          <h3 className="text-lg font-semibold text-foreground">Actions</h3>
+        </CardHeader>
+        <CardBody className="px-5 pb-5">
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="flat"
+              startContent={<FileText size={16} />}
+              onPress={() => {
+                window.open(`/api/v2/admin/newsletters/${id}/preview`, '_blank');
+              }}
+            >
+              View Email Content
+            </Button>
+            <Button
+              variant="flat"
+              startContent={<Copy size={16} />}
+              onPress={async () => {
+                try {
+                  const res = await adminNewsletters.duplicateNewsletter(Number(id));
+                  if (res.success) {
+                    toast.success('Newsletter duplicated as draft');
+                    navigate(tenantPath('/admin/newsletters'));
+                  } else {
+                    toast.error('Failed to duplicate');
+                  }
+                } catch {
+                  toast.error('Failed to duplicate');
+                }
+              }}
+            >
+              Duplicate Newsletter
+            </Button>
+            {newsletter.status === 'sent' && (
+              <Button
+                variant="flat"
+                startContent={<BarChart3 size={16} />}
+                onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
+              >
+                Full Activity Log
+              </Button>
+            )}
+          </div>
+        </CardBody>
+      </Card>
+
       {/* ── Resend Modal ── */}
       {resendOpen && (
         <NewsletterResend
@@ -517,6 +803,40 @@ export function NewsletterStats() {
 }
 
 // ─── Sub-Components ─────────────────────────────────────────────────────────
+
+function FunnelBar({
+  label,
+  value,
+  total,
+  color,
+  rate,
+}: {
+  label: string;
+  value: number;
+  total: number;
+  color: 'primary' | 'secondary' | 'success';
+  rate?: number;
+}) {
+  const pct = total > 0 ? (value / total) * 100 : 0;
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-sm">
+        <span className="text-default-600">{label}</span>
+        <span className="font-semibold text-foreground">
+          {value.toLocaleString()}
+          {rate !== undefined && <span className="ml-1 text-default-400">({rate}%)</span>}
+        </span>
+      </div>
+      <Progress
+        value={pct}
+        color={color}
+        size="md"
+        aria-label={`${label}: ${value}`}
+        className="h-3"
+      />
+    </div>
+  );
+}
 
 function DeliveryBar({
   label,
@@ -551,6 +871,9 @@ function AbVariantCard({
   subject,
   opens,
   clicks,
+  sent,
+  openRate,
+  clickRate,
   isWinner,
   isLeading,
   chipColor,
@@ -559,6 +882,9 @@ function AbVariantCard({
   subject: string;
   opens: number;
   clicks: number;
+  sent: number;
+  openRate: number;
+  clickRate: number;
   isWinner: boolean;
   isLeading: boolean;
   chipColor: 'primary' | 'warning';
@@ -582,15 +908,23 @@ function AbVariantCard({
           )}
         </div>
         <p className="text-sm italic text-default-600">&quot;{subject}&quot;</p>
-        <div className="grid grid-cols-2 gap-3 text-center">
+        <div className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="text-2xl font-bold text-primary">{opens.toLocaleString()}</p>
-            <p className="text-xs text-default-500">Opens</p>
+            <p className="text-2xl font-bold text-primary">{openRate}%</p>
+            <p className="text-xs text-default-500">Open Rate</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-success">{clicks.toLocaleString()}</p>
-            <p className="text-xs text-default-500">Clicks</p>
+            <p className="text-2xl font-bold text-success">{clickRate}%</p>
+            <p className="text-xs text-default-500">Click Rate</p>
           </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{sent.toLocaleString()}</p>
+            <p className="text-xs text-default-500">Sent</p>
+          </div>
+        </div>
+        <div className="flex justify-center gap-4 border-t border-divider pt-2 text-xs text-default-400">
+          <span>{opens.toLocaleString()} opens</span>
+          <span>{clicks.toLocaleString()} clicks</span>
         </div>
       </CardBody>
     </Card>

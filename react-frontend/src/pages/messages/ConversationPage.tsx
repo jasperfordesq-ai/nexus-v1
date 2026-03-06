@@ -255,18 +255,19 @@ export function ConversationPage() {
 
       // API returns messages as data with conversation info in meta
       const response = await api.get<Message[]>(`/v2/messages/${targetId}`);
-      if (response.success && response.data && response.meta?.conversation) {
-        const messages = response.data;
+      const meta = response.meta;
+      if (response.success && response.data && meta?.conversation) {
+        const messages = response.data as Message[];
         setConversation({
-          meta: response.meta.conversation as ConversationMeta,
+          meta: meta.conversation as ConversationMeta,
           messages,
         });
 
         // Track pagination state from response
         setPagination({
-          olderCursor: response.meta.cursor || null,
+          olderCursor: meta.cursor || null,
           newerCursor: null,
-          hasOlderMessages: response.meta.has_more || false,
+          hasOlderMessages: meta.has_more || false,
           hasNewerMessages: false,
         });
 
@@ -276,6 +277,17 @@ export function ConversationPage() {
         }
 
         // Scroll to bottom on initial load
+        setTimeout(() => scrollToBottom(), 100);
+      } else if (response.success && response.data && response.data.length > 0) {
+        // Fallback: messages loaded but meta.conversation missing — recover gracefully
+        const messages = response.data as Message[];
+        setConversation({
+          meta: { id: parseInt(targetId, 10), other_user: { id: parseInt(targetId, 10), name: '' } },
+          messages,
+        });
+        if (messages.length > 0) {
+          lastMessageIdRef.current = messages[messages.length - 1].id;
+        }
         setTimeout(() => scrollToBottom(), 100);
       } else {
         // No existing conversation - this might be a new conversation
