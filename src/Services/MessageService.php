@@ -879,13 +879,13 @@ class MessageService
         // Check if is_edited column exists
         $hasEditedColumn = self::hasColumn('messages', 'is_edited');
 
-        // Update the message
+        // Update the message — scope by tenant_id for defence in depth
         if ($hasEditedColumn) {
-            $stmt = $db->prepare("UPDATE messages SET body = ?, is_edited = 1, edited_at = NOW() WHERE id = ?");
+            $stmt = $db->prepare("UPDATE messages SET body = ?, is_edited = 1, edited_at = NOW() WHERE id = ? AND tenant_id = ?");
         } else {
-            $stmt = $db->prepare("UPDATE messages SET body = ? WHERE id = ?");
+            $stmt = $db->prepare("UPDATE messages SET body = ? WHERE id = ? AND tenant_id = ?");
         }
-        $stmt->execute([$newBody, $messageId]);
+        $stmt->execute([$newBody, $messageId, $tenantId]);
 
         return [
             'id' => $messageId,
@@ -1010,9 +1010,9 @@ class MessageService
 
         $reactions['_users'] = $userReactions;
 
-        // Update the message
-        $stmt = $db->prepare("UPDATE messages SET reactions = ? WHERE id = ?");
-        $stmt->execute([json_encode($reactions), $messageId]);
+        // Update the message — scope by tenant_id for defence in depth
+        $stmt = $db->prepare("UPDATE messages SET reactions = ? WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([json_encode($reactions), $messageId, $tenantId]);
 
         return $wasAdded;
     }

@@ -669,6 +669,13 @@ class EventService
     {
         self::$errors = [];
 
+        // Validate event belongs to this tenant before any mutation
+        $event = Event::find($eventId);
+        if (!$event) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            return false;
+        }
+
         $db = Database::getConnection();
 
         try {
@@ -950,8 +957,8 @@ class EventService
 
         try {
             $db->prepare(
-                "UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND user_id = ? AND status = 'waiting'"
-            )->execute([$eventId, $userId]);
+                "UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND user_id = ? AND status = 'waiting' AND tenant_id = ?"
+            )->execute([$eventId, $userId, TenantContext::getId()]);
             return true;
         } catch (\Exception $e) {
             error_log("EventService::removeFromWaitlist error: " . $e->getMessage());
@@ -992,8 +999,8 @@ class EventService
 
             // Promote: update waitlist status
             $db->prepare(
-                "UPDATE event_waitlist SET status = 'promoted', promoted_at = NOW() WHERE id = ?"
-            )->execute([$next['id']]);
+                "UPDATE event_waitlist SET status = 'promoted', promoted_at = NOW() WHERE id = ? AND tenant_id = ?"
+            )->execute([$next['id'], TenantContext::getId()]);
 
             // Set RSVP to going
             EventRsvp::rsvp($eventId, (int)$next['user_id'], 'going');
@@ -1193,8 +1200,8 @@ class EventService
         $db = Database::getConnection();
         try {
             $db->prepare(
-                "UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND user_id = ? AND status = 'pending'"
-            )->execute([$eventId, $userId]);
+                "UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND user_id = ? AND status = 'pending' AND tenant_id = ?"
+            )->execute([$eventId, $userId, TenantContext::getId()]);
         } catch (\Exception $e) {
             error_log("EventService::cancelReminders error: " . $e->getMessage());
         }
@@ -1276,15 +1283,15 @@ class EventService
 
                     // Mark as sent
                     $db->prepare(
-                        "UPDATE event_reminders SET status = 'sent', sent_at = NOW() WHERE id = ?"
-                    )->execute([$reminder['id']]);
+                        "UPDATE event_reminders SET status = 'sent', sent_at = NOW() WHERE id = ? AND tenant_id = ?"
+                    )->execute([$reminder['id'], $reminder['tenant_id']]);
 
                     $sentCount++;
                 } catch (\Exception $e) {
                     error_log("Failed to send reminder {$reminder['id']}: " . $e->getMessage());
                     $db->prepare(
-                        "UPDATE event_reminders SET status = 'failed' WHERE id = ?"
-                    )->execute([$reminder['id']]);
+                        "UPDATE event_reminders SET status = 'failed' WHERE id = ? AND tenant_id = ?"
+                    )->execute([$reminder['id'], $reminder['tenant_id']]);
                 }
             }
         } catch (\Exception $e) {
@@ -1338,13 +1345,13 @@ class EventService
 
             // Cancel all pending reminders
             $db->prepare("
-                UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND status = 'pending'
-            ")->execute([$eventId]);
+                UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND status = 'pending' AND tenant_id = ?
+            ")->execute([$eventId, $tenantId]);
 
             // Cancel all waitlist entries
             $db->prepare("
-                UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND status = 'waiting'
-            ")->execute([$eventId]);
+                UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND status = 'waiting' AND tenant_id = ?
+            ")->execute([$eventId, $tenantId]);
 
             // Notify all RSVPs (going + interested)
             self::notifyCancellation($eventId, $event['title'], $reason, $tenantId);

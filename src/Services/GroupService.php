@@ -13,6 +13,7 @@ use Nexus\Models\GroupDiscussion;
 use Nexus\Models\GroupPost;
 use Nexus\Models\User;
 use Nexus\Models\Notification;
+use Nexus\Services\NotificationDispatcher;
 
 /**
  * GroupService - Business logic for groups
@@ -431,6 +432,12 @@ class GroupService
 
         try {
             $db = Database::getConnection();
+            $tenantId = TenantContext::getId();
+
+            // Fetch active members before deleting — to notify them
+            $memberStmt = $db->prepare("SELECT user_id FROM group_members WHERE group_id = ? AND status = 'active' AND user_id != ?");
+            $memberStmt->execute([$id, $userId]);
+            $memberIds = $memberStmt->fetchAll(\PDO::FETCH_COLUMN);
 
             // Delete group members
             $db->prepare("DELETE FROM group_members WHERE group_id = ?")->execute([$id]);
@@ -444,8 +451,25 @@ class GroupService
             $db->prepare("DELETE FROM group_discussions WHERE group_id = ?")->execute([$id]);
 
             // Delete the group — scoped by tenant
-            $tenantId = TenantContext::getId();
             $db->prepare("DELETE FROM `groups` WHERE id = ? AND tenant_id = ?")->execute([$id, $tenantId]);
+
+            // Notify all former members
+            try {
+                $content = "The group \"{$group['name']}\" has been deleted by its owner.";
+                foreach ($memberIds as $memberId) {
+                    NotificationDispatcher::dispatch(
+                        (int)$memberId,
+                        'global',
+                        0,
+                        'group_deleted',
+                        $content,
+                        '/groups',
+                        "<p>{$content}</p>"
+                    );
+                }
+            } catch (\Throwable $e) {
+                // Silent fail — group is already deleted
+            }
 
             return true;
         } catch (\Exception $e) {

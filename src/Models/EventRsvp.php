@@ -7,51 +7,70 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class EventRsvp
 {
     public static function rsvp($eventId, $userId, $status)
     {
-        // Insert or Update (Upsert logic)
-        // Check existence first
-        $exists = Database::query("SELECT id FROM event_rsvps WHERE event_id = ? AND user_id = ?", [$eventId, $userId])->fetch();
+        $tenantId = TenantContext::getId();
+        // Insert or Update (Upsert logic) — scope by tenant via events JOIN
+        $exists = Database::query(
+            "SELECT r.id FROM event_rsvps r
+             JOIN events e ON r.event_id = e.id
+             WHERE r.event_id = ? AND r.user_id = ? AND e.tenant_id = ?",
+            [$eventId, $userId, $tenantId]
+        )->fetch();
 
         if ($exists) {
-            Database::query("UPDATE event_rsvps SET status = ? WHERE id = ?", [$status, $exists['id']]);
+            Database::query("UPDATE event_rsvps SET status = ? WHERE id = ? AND event_id = ?", [$status, $exists['id'], $eventId]);
         } else {
-            Database::query("INSERT INTO event_rsvps (event_id, user_id, status) VALUES (?, ?, ?)", [$eventId, $userId, $status]);
+            Database::query("INSERT INTO event_rsvps (event_id, user_id, status, tenant_id) VALUES (?, ?, ?, ?)", [$eventId, $userId, $status, $tenantId]);
         }
     }
 
     public static function getUserStatus($eventId, $userId)
     {
-        $res = Database::query("SELECT status FROM event_rsvps WHERE event_id = ? AND user_id = ?", [$eventId, $userId])->fetch();
+        $tenantId = TenantContext::getId();
+        $res = Database::query(
+            "SELECT r.status FROM event_rsvps r
+             JOIN events e ON r.event_id = e.id
+             WHERE r.event_id = ? AND r.user_id = ? AND e.tenant_id = ?",
+            [$eventId, $userId, $tenantId]
+        )->fetch();
         return $res ? $res['status'] : null;
     }
 
     public static function getAttendees($eventId)
     {
-        $sql = "SELECT r.*, u.name, u.avatar_url 
+        $tenantId = TenantContext::getId();
+        $sql = "SELECT r.*, u.name, u.avatar_url
                 FROM event_rsvps r
                 JOIN users u ON r.user_id = u.id
-                WHERE r.event_id = ? AND r.status IN ('going', 'attended')
+                JOIN events e ON r.event_id = e.id
+                WHERE r.event_id = ? AND e.tenant_id = ? AND r.status IN ('going', 'attended')
                 ORDER BY r.created_at DESC";
-        return Database::query($sql, [$eventId])->fetchAll();
+        return Database::query($sql, [$eventId, $tenantId])->fetchAll();
     }
 
     public static function getInvited($eventId)
     {
-        $sql = "SELECT r.*, u.name, u.avatar_url 
+        $tenantId = TenantContext::getId();
+        $sql = "SELECT r.*, u.name, u.avatar_url
                 FROM event_rsvps r
                 JOIN users u ON r.user_id = u.id
-                WHERE r.event_id = ? AND r.status = 'invited'
+                JOIN events e ON r.event_id = e.id
+                WHERE r.event_id = ? AND e.tenant_id = ? AND r.status = 'invited'
                 ORDER BY r.created_at DESC";
-        return Database::query($sql, [$eventId])->fetchAll();
+        return Database::query($sql, [$eventId, $tenantId])->fetchAll();
     }
 
     public static function getCount($eventId, $status = 'going')
     {
-        $sql = "SELECT COUNT(*) FROM event_rsvps WHERE event_id = ? AND status = ?";
-        return Database::query($sql, [$eventId, $status])->fetchColumn();
+        $tenantId = TenantContext::getId();
+        $sql = "SELECT COUNT(*) FROM event_rsvps r
+                JOIN events e ON r.event_id = e.id
+                WHERE r.event_id = ? AND e.tenant_id = ? AND r.status = ?";
+        return Database::query($sql, [$eventId, $tenantId, $status])->fetchColumn();
     }
 }

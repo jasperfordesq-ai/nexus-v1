@@ -228,8 +228,8 @@ class ExchangeWorkflowService
         }
 
         Database::query(
-            "UPDATE exchange_requests SET broker_id = ?, broker_notes = ? WHERE id = ?",
-            [$brokerId, $notes, $exchangeId]
+            "UPDATE exchange_requests SET broker_id = ?, broker_notes = ? WHERE id = ? AND tenant_id = ?",
+            [$brokerId, $notes, $exchangeId, $exchange['tenant_id']]
         );
 
         $success = self::updateStatus($exchangeId, self::STATUS_ACCEPTED, $brokerId, 'broker', $notes ?: 'Broker approved');
@@ -264,8 +264,8 @@ class ExchangeWorkflowService
         }
 
         Database::query(
-            "UPDATE exchange_requests SET broker_id = ?, broker_notes = ? WHERE id = ?",
-            [$brokerId, $reason, $exchangeId]
+            "UPDATE exchange_requests SET broker_id = ?, broker_notes = ? WHERE id = ? AND tenant_id = ?",
+            [$brokerId, $reason, $exchangeId, $exchange['tenant_id']]
         );
 
         $success = self::updateStatus($exchangeId, self::STATUS_CANCELLED, $brokerId, 'broker', $reason);
@@ -487,8 +487,8 @@ class ExchangeWorkflowService
         try {
             // Update exchange with final hours
             Database::query(
-                "UPDATE exchange_requests SET final_hours = ? WHERE id = ?",
-                [$finalHours, $exchangeId]
+                "UPDATE exchange_requests SET final_hours = ? WHERE id = ? AND tenant_id = ?",
+                [$finalHours, $exchangeId, $exchange['tenant_id']]
             );
 
             // Create transaction
@@ -496,8 +496,8 @@ class ExchangeWorkflowService
 
             if ($transactionId) {
                 Database::query(
-                    "UPDATE exchange_requests SET transaction_id = ? WHERE id = ?",
-                    [$transactionId, $exchangeId]
+                    "UPDATE exchange_requests SET transaction_id = ? WHERE id = ? AND tenant_id = ?",
+                    [$transactionId, $exchangeId, $exchange['tenant_id']]
                 );
             }
 
@@ -901,8 +901,8 @@ class ExchangeWorkflowService
         }
 
         $result = Database::query(
-            "UPDATE exchange_requests SET status = ? WHERE id = ?",
-            [$newStatus, $exchangeId]
+            "UPDATE exchange_requests SET status = ? WHERE id = ? AND tenant_id = ?",
+            [$newStatus, $exchangeId, $exchange['tenant_id']]
         );
 
         if ($result) {
