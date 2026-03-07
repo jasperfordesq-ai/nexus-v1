@@ -20,6 +20,12 @@ class User
         $name = trim($firstName . ' ' . $lastName);
         $sql = "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, location, phone, profile_type, organization_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Database::query($sql, [$tenantId, $name, $firstName, $lastName, $email, $hash, $location, $phone, $profileType, $orgName]);
+
+        // Seed federation settings (all features enabled by default)
+        $userId = (int)Database::lastInsertId();
+        if ($userId > 0) {
+            self::seedFederationSettings($userId);
+        }
     }
 
     public static function findByEmail($email)
@@ -912,7 +918,36 @@ class User
             $options['is_tenant_super_admin'] ?? 0
         ]);
 
-        return (int)Database::lastInsertId();
+        $userId = (int)Database::lastInsertId();
+
+        // Seed federation settings (all features enabled by default)
+        if ($userId > 0) {
+            self::seedFederationSettings($userId);
+        }
+
+        return $userId;
+    }
+
+    /**
+     * Seed federation_user_settings row for a new user (all features ON by default).
+     * Uses INSERT IGNORE so it's safe to call even if a row already exists.
+     */
+    public static function seedFederationSettings(int $userId): void
+    {
+        try {
+            Database::query(
+                "INSERT IGNORE INTO federation_user_settings (
+                    user_id, federation_optin, profile_visible_federated,
+                    messaging_enabled_federated, transactions_enabled_federated,
+                    appear_in_federated_search, show_skills_federated,
+                    show_location_federated, service_reach, opted_in_at, created_at
+                ) VALUES (?, 1, 1, 1, 1, 1, 1, 0, 'local_only', NOW(), NOW())",
+                [$userId]
+            );
+        } catch (\Exception $e) {
+            // Non-critical — federation settings will fall back to defaults
+            error_log("User::seedFederationSettings error for user {$userId}: " . $e->getMessage());
+        }
     }
 
     /**

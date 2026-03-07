@@ -66,11 +66,30 @@ class IdentityProviderHealthApiController extends BaseApiController
             $passedCount = (int)($stats['passed'] ?? 0);
             $successRate = $totalSessions > 0 ? round(($passedCount / $totalSessions) * 100, 1) : null;
 
+            // Measure provider API latency (isAvailable check)
+            $latencyStart = microtime(true);
+            $isAvailable = $provider->isAvailable($tenantId);
+            $latencyMs = round((microtime(true) - $latencyStart) * 1000, 1);
+
+            // Average time-to-complete for passed sessions (last 30 days)
+            $avgCompletion = Database::query(
+                "SELECT AVG(TIMESTAMPDIFF(SECOND, created_at, completed_at)) as avg_seconds
+                 FROM identity_verification_sessions
+                 WHERE tenant_id = ? AND provider_slug = ? AND status = 'passed'
+                   AND completed_at > DATE_SUB(NOW(), INTERVAL 30 DAY)",
+                [$tenantId, $slug]
+            )->fetch();
+            $avgCompletionSeconds = $avgCompletion['avg_seconds'] !== null
+                ? round((float)$avgCompletion['avg_seconds'])
+                : null;
+
             $health[] = [
                 'slug' => $slug,
                 'name' => $provider->getName(),
-                'available' => $provider->isAvailable($tenantId),
+                'available' => $isAvailable,
                 'supported_levels' => $provider->getSupportedLevels(),
+                'latency_ms' => $latencyMs,
+                'avg_completion_seconds' => $avgCompletionSeconds,
                 'stats' => [
                     'total_sessions' => $totalSessions,
                     'passed' => $passedCount,

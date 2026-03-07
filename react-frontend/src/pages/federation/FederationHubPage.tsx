@@ -146,7 +146,7 @@ const quickLinks = [
     icon: Settings,
     title: 'Federation Settings',
     description: 'Manage your federation preferences',
-    href: '/settings',
+    href: '/federation/settings',
     gradient: 'from-gray-500 to-slate-500',
   },
 ];

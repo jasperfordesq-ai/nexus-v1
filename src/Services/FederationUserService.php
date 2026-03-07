@@ -28,15 +28,15 @@ class FederationUserService
             )->fetch(\PDO::FETCH_ASSOC);
 
             if (!$settings) {
-                // Return defaults - all OFF
+                // Return defaults - all ON (users opt out if they want)
                 return [
                     'user_id' => $userId,
-                    'federation_optin' => false,
-                    'profile_visible_federated' => false,
-                    'messaging_enabled_federated' => false,
-                    'transactions_enabled_federated' => false,
-                    'appear_in_federated_search' => false,
-                    'show_skills_federated' => false,
+                    'federation_optin' => true,
+                    'profile_visible_federated' => true,
+                    'messaging_enabled_federated' => true,
+                    'transactions_enabled_federated' => true,
+                    'appear_in_federated_search' => true,
+                    'show_skills_federated' => true,
                     'show_location_federated' => false,
                     'service_reach' => 'local_only',
                     'travel_radius_km' => null,
@@ -62,12 +62,12 @@ class FederationUserService
             error_log("FederationUserService::getUserSettings error: " . $e->getMessage());
             return [
                 'user_id' => $userId,
-                'federation_optin' => false,
-                'profile_visible_federated' => false,
-                'messaging_enabled_federated' => false,
-                'transactions_enabled_federated' => false,
-                'appear_in_federated_search' => false,
-                'show_skills_federated' => false,
+                'federation_optin' => true,
+                'profile_visible_federated' => true,
+                'messaging_enabled_federated' => true,
+                'transactions_enabled_federated' => true,
+                'appear_in_federated_search' => true,
+                'show_skills_federated' => true,
                 'show_location_federated' => false,
                 'service_reach' => 'local_only',
                 'travel_radius_km' => null,
@@ -88,12 +88,12 @@ class FederationUserService
             )->fetch();
 
             // Prepare values
-            $federationOptin = (int)($settings['federation_optin'] ?? false);
-            $profileVisible = (int)($settings['profile_visible_federated'] ?? false);
-            $messagingEnabled = (int)($settings['messaging_enabled_federated'] ?? false);
-            $transactionsEnabled = (int)($settings['transactions_enabled_federated'] ?? false);
-            $appearInSearch = (int)($settings['appear_in_federated_search'] ?? false);
-            $showSkills = (int)($settings['show_skills_federated'] ?? false);
+            $federationOptin = (int)($settings['federation_optin'] ?? true);
+            $profileVisible = (int)($settings['profile_visible_federated'] ?? true);
+            $messagingEnabled = (int)($settings['messaging_enabled_federated'] ?? true);
+            $transactionsEnabled = (int)($settings['transactions_enabled_federated'] ?? true);
+            $appearInSearch = (int)($settings['appear_in_federated_search'] ?? true);
+            $showSkills = (int)($settings['show_skills_federated'] ?? true);
             $showLocation = (int)($settings['show_location_federated'] ?? false);
             $serviceReach = $settings['service_reach'] ?? 'local_only';
             $travelRadius = isset($settings['travel_radius_km']) && $settings['travel_radius_km'] !== ''
@@ -189,7 +189,8 @@ class FederationUserService
                 [$userId]
             )->fetch(\PDO::FETCH_ASSOC);
 
-            return (bool)($result['federation_optin'] ?? false);
+            // No row means default (opted in)
+            return (bool)($result['federation_optin'] ?? true);
 
         } catch (\Exception $e) {
             return false;
@@ -219,14 +220,16 @@ class FederationUserService
     {
         try {
             $sql = "SELECT u.id, u.name, u.avatar_url, u.bio, u.location, u.skills,
-                           fus.service_reach, fus.travel_radius_km, fus.show_skills_federated,
-                           fus.show_location_federated
+                           COALESCE(fus.service_reach, 'local_only') AS service_reach,
+                           fus.travel_radius_km,
+                           COALESCE(fus.show_skills_federated, 1) AS show_skills_federated,
+                           COALESCE(fus.show_location_federated, 0) AS show_location_federated
                     FROM users u
-                    INNER JOIN federation_user_settings fus ON u.id = fus.user_id
+                    LEFT JOIN federation_user_settings fus ON u.id = fus.user_id
                     WHERE u.tenant_id = ?
                     AND u.status = 'active'
-                    AND fus.federation_optin = 1
-                    AND fus.appear_in_federated_search = 1";
+                    AND COALESCE(fus.federation_optin, 1) = 1
+                    AND COALESCE(fus.appear_in_federated_search, 1) = 1";
 
             $params = [$tenantId];
 

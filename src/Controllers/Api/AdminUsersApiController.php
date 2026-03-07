@@ -1321,6 +1321,12 @@ class AdminUsersApiController extends BaseApiController
                     ]
                 );
 
+                // Seed federation settings for the new user
+                $newUserId = (int)Database::lastInsertId();
+                if ($newUserId > 0) {
+                    User::seedFederationSettings($newUserId);
+                }
+
                 $results['imported']++;
             } catch (\Exception $e) {
                 $results['errors'][] = "Row {$row}: " . $e->getMessage();
