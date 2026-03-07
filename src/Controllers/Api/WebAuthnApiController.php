@@ -464,6 +464,44 @@ class WebAuthnApiController extends BaseApiController
     }
 
     /**
+     * POST /api/webauthn/rename
+     * Rename a WebAuthn credential's device name
+     */
+    public function rename()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->error('Method not allowed. Use POST request.', 405, ApiErrorCodes::VALIDATION_ERROR);
+        }
+
+        $this->verifyCsrf();
+        $userId = $this->requireAuth();
+        $input = $this->getInput();
+        $credentialId = $input['credential_id'] ?? null;
+        $newName = $input['device_name'] ?? null;
+
+        if (!$credentialId || !$newName) {
+            $this->error('credential_id and device_name are required', 400, ApiErrorCodes::VALIDATION_ERROR);
+        }
+
+        $newName = mb_substr(trim($newName), 0, 100);
+        if (empty($newName)) {
+            $this->error('device_name cannot be empty', 400, ApiErrorCodes::VALIDATION_ERROR);
+        }
+
+        $tenantId = TenantContext::getId();
+        $stmt = Database::query(
+            "UPDATE webauthn_credentials SET device_name = ? WHERE credential_id = ? AND user_id = ? AND tenant_id = ?",
+            [$newName, $credentialId, $userId, $tenantId]
+        );
+
+        if ($stmt->rowCount() === 0) {
+            $this->error('Credential not found', 404, ApiErrorCodes::NOT_FOUND);
+        }
+
+        $this->jsonResponse(['success' => true, 'device_name' => $newName]);
+    }
+
+    /**
      * POST /api/webauthn/remove-all
      */
     public function removeAll()

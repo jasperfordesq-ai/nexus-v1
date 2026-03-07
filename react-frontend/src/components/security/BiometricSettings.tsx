@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Button,
+  Input,
   Spinner,
   Tooltip,
   Modal,
@@ -17,6 +18,7 @@ import {
 } from '@heroui/react';
 import {
   Fingerprint,
+  Pencil,
   Trash2,
   AlertTriangle,
   CheckCircle,
@@ -33,6 +35,7 @@ import {
   registerBiometric,
   getWebAuthnCredentials,
   removeWebAuthnCredential,
+  renameWebAuthnCredential,
   removeAllWebAuthnCredentials,
   detectPlatform,
   type DevicePlatform,
@@ -131,6 +134,8 @@ export function BiometricSettings() {
   const [registering, setRegistering] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [removingAll, setRemovingAll] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
   const [showInstructions, setShowInstructions] = useState(true); // Auto-show on first visit
 
   const platform = detectPlatform();
@@ -195,6 +200,24 @@ export function BiometricSettings() {
     } else {
       toast.error(t('passkey_remove_all_failed', { defaultValue: 'Failed to remove credentials' }));
     }
+  };
+
+  const handleRename = async (credentialId: string) => {
+    const trimmed = editName.trim();
+    if (!trimmed) {
+      setEditingId(null);
+      return;
+    }
+    const success = await renameWebAuthnCredential(credentialId, trimmed);
+    if (success) {
+      setCredentials(prev =>
+        prev.map(c => c.credential_id === credentialId ? { ...c, device_name: trimmed } : c),
+      );
+      toast.success(t('passkey_renamed', { defaultValue: 'Passkey renamed.' }));
+    } else {
+      toast.error(t('passkey_rename_failed', { defaultValue: 'Failed to rename passkey' }));
+    }
+    setEditingId(null);
   };
 
   // Not supported — show info message
@@ -328,12 +351,29 @@ export function BiometricSettings() {
                 <div className="flex items-center gap-3 min-w-0">
                   <DeviceIcon className="w-4 h-4 text-theme-muted flex-shrink-0" aria-hidden="true" />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-theme-primary truncate">
-                      {getDeviceLabel(cred)}{' '}
-                      <span className="text-theme-subtle font-mono text-xs">
-                        ...{cred.credential_id.slice(-8)}
-                      </span>
-                    </p>
+                    {editingId === cred.credential_id ? (
+                      <Input
+                        size="sm"
+                        variant="underlined"
+                        value={editName}
+                        onValueChange={setEditName}
+                        autoFocus
+                        className="max-w-[200px]"
+                        aria-label={t('passkey_rename_input', { defaultValue: 'New passkey name' })}
+                        onBlur={() => handleRename(cred.credential_id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleRename(cred.credential_id);
+                          if (e.key === 'Escape') setEditingId(null);
+                        }}
+                      />
+                    ) : (
+                      <p className="text-sm font-medium text-theme-primary truncate">
+                        {getDeviceLabel(cred)}{' '}
+                        <span className="text-theme-subtle font-mono text-xs">
+                          ...{cred.credential_id.slice(-8)}
+                        </span>
+                      </p>
+                    )}
                     <div className="flex items-center gap-2 text-xs text-theme-subtle">
                       <span>
                         {t('biometric_registered_on', { defaultValue: 'Registered' })}{' '}
@@ -351,17 +391,32 @@ export function BiometricSettings() {
                     </div>
                   </div>
                 </div>
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  className="text-red-500 hover:bg-red-500/10"
-                  onPress={() => handleRemove(cred.credential_id)}
-                  isLoading={removingId === cred.credential_id}
-                  aria-label={t('biometric_remove', { defaultValue: 'Remove passkey' })}
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="text-theme-subtle hover:bg-theme-hover"
+                    onPress={() => {
+                      setEditingId(cred.credential_id);
+                      setEditName(getDeviceLabel(cred));
+                    }}
+                    aria-label={t('passkey_rename', { defaultValue: 'Rename passkey' })}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="text-red-500 hover:bg-red-500/10"
+                    onPress={() => handleRemove(cred.credential_id)}
+                    isLoading={removingId === cred.credential_id}
+                    aria-label={t('biometric_remove', { defaultValue: 'Remove passkey' })}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
               </div>
             );
           })}

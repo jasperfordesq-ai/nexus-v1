@@ -21,6 +21,7 @@
 !/docs/database-migrations.md
 !/docs/DEPLOYMENT.md
 !/docs/SYSTEM_AUDIT_*.md
+!/docs/API_REFERENCE.md
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md

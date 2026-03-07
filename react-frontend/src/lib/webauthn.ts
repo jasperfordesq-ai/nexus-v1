@@ -40,11 +40,15 @@ export async function isPlatformAuthenticatorAvailable(): Promise<boolean> {
   return platformAuthenticatorIsAvailable();
 }
 
-/** Check if passkey features should be shown (any WebAuthn support) */
+/** Check if passkey features should be shown.
+ * Requires a platform authenticator (Windows Hello / Touch ID / Android biometric)
+ * to be enrolled. This prevents showing the passkey UI on machines that have
+ * no Hello PIN/face/fingerprint set up, which would cause a confusing empty
+ * Windows Security dialog with no options.
+ */
 export async function isBiometricAvailable(): Promise<boolean> {
-  // Return true if browser supports WebAuthn at all — cross-device passkeys
-  // work even without a platform authenticator
-  return browserSupportsWebAuthn();
+  if (!browserSupportsWebAuthn()) return false;
+  return platformAuthenticatorIsAvailable();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -411,6 +415,11 @@ export async function getWebAuthnCredentials(): Promise<WebAuthnCredential[]> {
 
 export async function removeWebAuthnCredential(credentialId: string): Promise<boolean> {
   const res = await api.post('/webauthn/remove', { credential_id: credentialId });
+  return res.success;
+}
+
+export async function renameWebAuthnCredential(credentialId: string, deviceName: string): Promise<boolean> {
+  const res = await api.post('/webauthn/rename', { credential_id: credentialId, device_name: deviceName });
   return res.success;
 }
 
