@@ -29,9 +29,22 @@ import { api } from '@/lib/api';
 // Feature Detection
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function isBiometricAvailable(): Promise<boolean> {
+/** Check if WebAuthn is supported at all (for login page passkey button) */
+export function isWebAuthnSupported(): boolean {
+  return browserSupportsWebAuthn();
+}
+
+/** Check if a platform authenticator is available (Windows Hello, Touch ID, etc.) */
+export async function isPlatformAuthenticatorAvailable(): Promise<boolean> {
   if (!browserSupportsWebAuthn()) return false;
   return platformAuthenticatorIsAvailable();
+}
+
+/** Check if passkey features should be shown (any WebAuthn support) */
+export async function isBiometricAvailable(): Promise<boolean> {
+  // Return true if browser supports WebAuthn at all — cross-device passkeys
+  // work even without a platform authenticator
+  return browserSupportsWebAuthn();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -231,24 +244,21 @@ export async function authenticateWithBiometric(
     const serverOptions = challengeRes.data;
 
     // Step 2: Map to SimpleWebAuthn format
-    // Use 'client-device' hint to prioritize Windows Hello / Touch ID / platform authenticator
+    // No hints restriction — let the browser show all available options
+    // (platform authenticator, cross-device/phone, security key)
     const optionsJSON: PublicKeyCredentialRequestOptionsJSON = {
       challenge: serverOptions.challenge,
       rpId: serverOptions.rpId,
       timeout: serverOptions.timeout,
       userVerification: serverOptions.userVerification as PublicKeyCredentialRequestOptionsJSON['userVerification'],
-      hints: ['client-device'],
-      allowCredentials: serverOptions.allowCredentials?.map(c => {
-        const desc: { type: 'public-key'; id: string; transports?: string[] } = {
-          id: c.id,
-          type: c.type,
-        };
-        if (c.transports) desc.transports = c.transports;
-        return desc;
-      }) as PublicKeyCredentialRequestOptionsJSON['allowCredentials'],
+      allowCredentials: serverOptions.allowCredentials?.map(c => ({
+        id: c.id,
+        type: c.type,
+        ...(c.transports ? { transports: c.transports } : {}),
+      })) as PublicKeyCredentialRequestOptionsJSON['allowCredentials'],
     };
 
-    // Step 3: Trigger browser biometric prompt
+    // Step 3: Trigger browser passkey prompt
     const assertion: AuthenticationResponseJSON = await startAuthentication({ optionsJSON });
 
     // Step 4: Send assertion to server for verification
@@ -278,6 +288,110 @@ export async function authenticateWithBiometric(
       return { success: false, error: 'Biometric login was cancelled.' };
     }
     return { success: false, error: message };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Conditional Mediation (Passkey Autofill)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Check if conditional mediation (passkey autofill) is supported.
+ * Requires: autocomplete="username webauthn" on the email/username input.
+ */
+export async function isConditionalMediationAvailable(): Promise<boolean> {
+  if (!browserSupportsWebAuthn()) return false;
+  if (typeof PublicKeyCredential === 'undefined') return false;
+  if (typeof PublicKeyCredential.isConditionalMediationAvailable !== 'function') return false;
+  try {
+    return await PublicKeyCredential.isConditionalMediationAvailable();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Start conditional mediation — browser will show passkey suggestions
+ * in the username field's autofill dropdown. Call on page load.
+ *
+ * Returns the auth result if a passkey is selected, or null if aborted/unavailable.
+ * The caller should pass an AbortController signal to cancel when unmounting.
+ */
+export async function startConditionalAuthentication(
+  abortSignal?: AbortSignal,
+): Promise<{
+  success: boolean;
+  data?: {
+    user: { id: number; first_name: string; last_name: string; email: string };
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+  };
+  error?: string;
+} | null> {
+  try {
+    // Get challenge from server (no email — discoverable credential flow)
+    const challengeRes = await api.post<{
+      challenge: string;
+      challenge_id: string;
+      rpId: string;
+      timeout: number;
+      userVerification: string;
+      allowCredentials?: Array<{ type: 'public-key'; id: string; transports?: string[] }>;
+    }>('/webauthn/auth-challenge', {}, { skipAuth: true });
+
+    if (!challengeRes.success || !challengeRes.data) {
+      return null;
+    }
+
+    const serverOptions = challengeRes.data;
+
+    const optionsJSON: PublicKeyCredentialRequestOptionsJSON = {
+      challenge: serverOptions.challenge,
+      rpId: serverOptions.rpId,
+      timeout: serverOptions.timeout,
+      userVerification: serverOptions.userVerification as PublicKeyCredentialRequestOptionsJSON['userVerification'],
+      // Empty allowCredentials for discoverable credential flow
+    };
+
+    // Start conditional authentication — this waits for user to interact
+    // with the autofill dropdown
+    const assertion: AuthenticationResponseJSON = await startAuthentication({
+      optionsJSON,
+      useBrowserAutofill: true,
+    });
+
+    // If we got here and the signal was aborted, bail
+    if (abortSignal?.aborted) return null;
+
+    // Verify with server
+    const verifyRes = await api.post<{
+      success: boolean;
+      user: { id: number; first_name: string; last_name: string; email: string };
+      access_token: string;
+      refresh_token: string;
+      expires_in: number;
+    }>('/webauthn/auth-verify', {
+      challenge_id: serverOptions.challenge_id,
+      id: assertion.id,
+      rawId: assertion.rawId,
+      type: assertion.type,
+      response: assertion.response,
+      authenticatorAttachment: assertion.authenticatorAttachment,
+    }, { skipAuth: true });
+
+    if (!verifyRes.success || !verifyRes.data) {
+      return { success: false, error: verifyRes.error || 'Passkey authentication failed' };
+    }
+
+    return { success: true, data: verifyRes.data };
+  } catch (err: unknown) {
+    // AbortError is expected when component unmounts or user navigates away
+    if (err instanceof Error && err.name === 'AbortError') return null;
+    const message = err instanceof Error ? err.message : '';
+    if (message.includes('NotAllowedError') || message.includes('cancelled')) return null;
+    // Conditional mediation failures are not user-facing errors
+    return null;
   }
 }
 

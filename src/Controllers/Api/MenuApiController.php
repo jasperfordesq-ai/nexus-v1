@@ -33,13 +33,8 @@ class MenuApiController extends BaseApiController
      */
     public function index()
     {
-        // Auth is optional - menus might be public
-        $userId = null;
-        try {
-            $userId = $this->requireAuth();
-        } catch (\Exception $e) {
-            // Guest access allowed
-        }
+        // Auth is optional — menus are available to guests too
+        $userId = $this->getOptionalUserId();
 
         $tenantId = TenantContext::getId();
         if (!$tenantId) {
@@ -94,13 +89,8 @@ class MenuApiController extends BaseApiController
      */
     public function show($slug)
     {
-        // Auth is optional
-        $userId = null;
-        try {
-            $userId = $this->requireAuth();
-        } catch (\Exception $e) {
-            // Guest access allowed
-        }
+        // Auth is optional — menus are available to guests too
+        $userId = $this->getOptionalUserId();
 
         $tenantId = TenantContext::getId();
         if (!$tenantId) {
@@ -138,13 +128,8 @@ class MenuApiController extends BaseApiController
      */
     public function config()
     {
-        // Auth is optional
-        $userId = null;
-        try {
-            $userId = $this->requireAuth();
-        } catch (\Exception $e) {
-            // Guest access allowed
-        }
+        // Auth is optional — config is available to guests too
+        $userId = $this->getOptionalUserId();
 
         $tenantId = TenantContext::getId();
         if (!$tenantId) {
@@ -188,13 +173,8 @@ class MenuApiController extends BaseApiController
      */
     public function mobile()
     {
-        // Auth is optional
-        $userId = null;
-        try {
-            $userId = $this->requireAuth();
-        } catch (\Exception $e) {
-            // Guest access allowed
-        }
+        // Auth is optional — mobile menus are available to guests too
+        $userId = $this->getOptionalUserId();
 
         $tenantId = TenantContext::getId();
         if (!$tenantId) {

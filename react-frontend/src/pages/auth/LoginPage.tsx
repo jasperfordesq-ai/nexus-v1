@@ -13,7 +13,7 @@
  * 3. No URL tenant and no bootstrap tenant → show community dropdown (multi-tenant chooser)
  */
 
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,7 +24,11 @@ import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
-import { isBiometricAvailable } from '@/lib/webauthn';
+import {
+  isBiometricAvailable,
+  isConditionalMediationAvailable,
+  startConditionalAuthentication,
+} from '@/lib/webauthn';
 
 interface Tenant {
   id: number;
@@ -75,9 +79,10 @@ export function LoginPage() {
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [resendVerificationSent, setResendVerificationSent] = useState(false);
 
-  // Biometric login state
+  // Passkey login state
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
+  const conditionalAbortRef = useRef<AbortController | null>(null);
 
   // Redirect after successful login (preserve tenant slug prefix)
   const from = (location.state as { from?: string })?.from || tenantPath('/dashboard');
@@ -87,10 +92,40 @@ export function LoginPage() {
     tokenManager.clearTokens();
   }, []);
 
-  // Check if biometric login is available on this device
+  // Check if passkey login is available on this device
   useEffect(() => {
     isBiometricAvailable().then(setBiometricAvailable);
   }, []);
+
+  // Start conditional mediation (passkey autofill) when a tenant is selected
+  const startConditionalAuth = useCallback(async () => {
+    if (!selectedTenantId) return;
+    const supported = await isConditionalMediationAvailable();
+    if (!supported) return;
+
+    // Abort any previous conditional auth
+    conditionalAbortRef.current?.abort();
+    const controller = new AbortController();
+    conditionalAbortRef.current = controller;
+
+    // Set tenant for API calls
+    tokenManager.setTenantId(selectedTenantId);
+
+    const result = await startConditionalAuthentication(controller.signal);
+    if (result?.success && result.data) {
+      // Passkey autofill succeeded — store tokens and reload to bootstrap auth
+      tokenManager.setAccessToken(result.data.access_token);
+      tokenManager.setRefreshToken(result.data.refresh_token);
+      window.location.href = from;
+    }
+  }, [selectedTenantId, from]);
+
+  useEffect(() => {
+    startConditionalAuth();
+    return () => {
+      conditionalAbortRef.current?.abort();
+    };
+  }, [startConditionalAuth]);
 
   // Tenant is "resolved from URL" only when there's an explicit URL slug or
   // the hostname is a custom tenant domain (not the generic app.* domain).
@@ -403,7 +438,7 @@ export function LoginPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
                       isRequired
-                      autoComplete="email"
+                      autoComplete="username webauthn"
                       classNames={{
                         inputWrapper: 'glass-card',
                         label: 'text-theme-muted',
@@ -464,8 +499,8 @@ export function LoginPage() {
                     </Button>
                   </form>
 
-                  {/* Passkey Login — temporarily disabled pending full audit */}
-                  {false && biometricAvailable && selectedTenantId && (
+                  {/* Passkey Login */}
+                  {biometricAvailable && selectedTenantId && (
                     <>
                       <div className="relative flex items-center my-5">
                         <div className="flex-grow border-t border-[var(--border-default)]" />
@@ -490,11 +525,11 @@ export function LoginPage() {
                         }
                         spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                       >
-                        {t('login.biometric_login', { defaultValue: 'Sign in with passkey' })}
+                        {t('login.passkey_login', { defaultValue: 'Sign in with a passkey' })}
                       </Button>
                       <p className="text-xs text-theme-muted text-center mt-1.5">
-                        {t('login.biometric_hint', {
-                          defaultValue: 'Already set up a passkey? Use it to sign in. No passkey yet? Log in above, then go to Settings to create one.',
+                        {t('login.passkey_hint', {
+                          defaultValue: 'Use a passkey from this device or another device. No passkey yet? Log in with your password, then set one up in Settings.',
                         })}
                       </p>
                     </>

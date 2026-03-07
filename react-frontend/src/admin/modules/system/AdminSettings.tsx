@@ -10,7 +10,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner } from '@heroui/react';
-import { Settings, Save } from 'lucide-react';
+import { Settings, Save, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { PageHeader } from '../../components';
@@ -166,8 +167,13 @@ export function AdminSettings() {
         </Card>
 
         <Card shadow="sm">
-          <CardHeader>
+          <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Registration & Access</h3>
+            <Link to="../settings/registration-policy">
+              <Button size="sm" variant="flat" color="primary" startContent={<ShieldCheck size={14} />}>
+                Advanced Policy
+              </Button>
+            </Link>
           </CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
