@@ -5,14 +5,13 @@
 
 /**
  * Main Navigation Bar
- * Responsive header with desktop nav and mobile menu trigger
- * Desktop uses grouped dropdowns for cleaner layout
- * Theme-aware styling for light and dark modes
+ * Responsive header with utility bar, desktop nav, and mobile menu trigger.
+ * Desktop uses grouped dropdowns and a mega menu for cleaner layout.
+ * Theme-aware styling for light and dark modes.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
   Avatar,
@@ -22,9 +21,6 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownSection,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
 } from '@heroui/react';
 import {
   Hexagon,
@@ -55,7 +51,6 @@ import {
   FolderOpen,
   Heart,
   Building2,
-  X,
   Globe,
   Info,
   FileText,
@@ -75,16 +70,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { api, tokenManager, API_BASE } from '@/lib/api';
+import { navigateToLegacyAdmin } from '@/lib/nav-helpers';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
-
-interface SearchSuggestion {
-  id: number;
-  title?: string;
-  name?: string;
-  type: 'listing' | 'user' | 'event' | 'group';
-}
+import { SearchOverlay } from '@/components/layout/SearchOverlay';
+import { MegaMenu } from '@/components/layout/MegaMenu';
 
 interface NavbarProps {
   onMobileMenuOpen?: () => void;
@@ -103,7 +93,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { resolvedTheme, toggleTheme } = useTheme();
   const { headerMenus, hasCustomMenus } = useMenuContext();
 
-  // Compute admin status once — used for admin links in dropdown
+  // Compute admin status once
   const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
 
   // Search state — can be controlled externally
@@ -113,8 +103,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     setInternalSearchOpen(open);
     onSearchOpenChange?.(open);
   }, [onSearchOpenChange]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Dropdown state - controlled to fix close behavior
   const [communityOpen, setCommunityOpen] = useState(false);
@@ -122,7 +110,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const [createOpen, setCreateOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
 
-  // Close ALL dropdowns — used before navigation to prevent stale open state
   const closeAllDropdowns = useCallback(() => {
     setCommunityOpen(false);
     setMoreOpen(false);
@@ -130,7 +117,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     setUserOpen(false);
   }, []);
 
-  // Controlled onOpenChange handlers — close OTHER dropdowns when one opens
   const handleCommunityOpenChange = useCallback((open: boolean) => {
     if (open) { setMoreOpen(false); setCreateOpen(false); setUserOpen(false); }
     setCommunityOpen(open);
@@ -148,13 +134,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     setUserOpen(open);
   }, []);
 
-  // Navigate after closing dropdown — ensures state update flushes before route change
   const dropdownNavigate = useCallback((path: string) => {
     closeAllDropdowns();
-    // Use requestAnimationFrame to let React flush the close state update
-    // before navigate() triggers a re-render from route change.
-    // Without this, React may batch the setState(false) + navigate re-render
-    // and the dropdown sees stale isOpen=true during the transition.
     requestAnimationFrame(() => {
       navigate(path);
     });
@@ -166,31 +147,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     navigate(tenantPath('/login'));
   };
 
-  /** Navigate to legacy admin via form POST (creates PHP session from JWT) */
-  const navigateToLegacyAdmin = useCallback(() => {
-    const t = tokenManager.getAccessToken();
-    const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin;
-    if (t) {
-      const f = document.createElement('form');
-      f.method = 'POST';
-      f.action = `${phpOrigin}/api/auth/admin-session`;
-      f.style.display = 'none';
-      const ti = document.createElement('input');
-      ti.name = 'token';
-      ti.value = t;
-      f.appendChild(ti);
-      const ri = document.createElement('input');
-      ri.name = 'redirect';
-      ri.value = '/admin-legacy';
-      f.appendChild(ri);
-      document.body.appendChild(f);
-      f.submit();
-    } else {
-      window.location.href = `${phpOrigin}/admin-legacy`;
-    }
-  }, []);
-
-  // Close all dropdowns when route changes (safety net)
+  // Close all dropdowns when route changes
   useEffect(() => {
     closeAllDropdowns();
   }, [location.pathname, closeAllDropdowns]);
@@ -202,123 +159,20 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         e.preventDefault();
         setIsSearchOpen(true);
       }
-      if (e.key === 'Escape' && isSearchOpen) {
-        setIsSearchOpen(false);
-        setSearchQuery('');
-      }
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isSearchOpen]);
-
-  // Auto-focus search input when opened
-  useEffect(() => {
-    if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [isSearchOpen]);
-
-  // Live search suggestions
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const suggestionsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Debounced suggestions fetch
-  useEffect(() => {
-    if (suggestionsTimerRef.current) {
-      clearTimeout(suggestionsTimerRef.current);
-    }
-
-    if (!isSearchOpen || searchQuery.trim().length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    suggestionsTimerRef.current = setTimeout(async () => {
-      try {
-        setIsLoadingSuggestions(true);
-        const response = await api.get<Record<string, SearchSuggestion[]>>(
-          `/v2/search/suggestions?q=${encodeURIComponent(searchQuery.trim())}&limit=5`
-        );
-        if (response.success && response.data) {
-          // Flatten all suggestion types into one array
-          const allSuggestions: SearchSuggestion[] = [];
-          const data = response.data;
-          if (data.listings) allSuggestions.push(...data.listings.map((s: SearchSuggestion) => ({ ...s, type: 'listing' as const })));
-          if (data.users) allSuggestions.push(...data.users.map((s: SearchSuggestion) => ({ ...s, type: 'user' as const })));
-          if (data.events) allSuggestions.push(...data.events.map((s: SearchSuggestion) => ({ ...s, type: 'event' as const })));
-          if (data.groups) allSuggestions.push(...data.groups.map((s: SearchSuggestion) => ({ ...s, type: 'group' as const })));
-          setSuggestions(allSuggestions.slice(0, 8));
-        }
-      } catch {
-        // Silently fail — suggestions are non-critical
-      } finally {
-        setIsLoadingSuggestions(false);
-      }
-    }, 250);
-
-    return () => {
-      if (suggestionsTimerRef.current) {
-        clearTimeout(suggestionsTimerRef.current);
-      }
-    };
-  }, [searchQuery, isSearchOpen]);
-
-  // Reset selection when suggestions change
-  useEffect(() => {
-    setSelectedIndex(-1);
-  }, [suggestions]);
-
-  const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (suggestions.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedIndex((prev) => (prev + 1) % suggestions.length);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
-    } else if (e.key === 'Enter' && selectedIndex >= 0) {
-      e.preventDefault();
-      handleSuggestionClick(suggestions[selectedIndex]);
-    }
-  }, [suggestions, selectedIndex]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleSearchSubmit = useCallback((e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (selectedIndex >= 0 && suggestions.length > 0) {
-      handleSuggestionClick(suggestions[selectedIndex]);
-      return;
-    }
-    if (searchQuery.trim()) {
-      navigate(tenantPath(`/search?q=${encodeURIComponent(searchQuery.trim())}`));
-      setIsSearchOpen(false);
-      setSearchQuery('');
-      setSuggestions([]);
-    }
-  }, [searchQuery, navigate, selectedIndex, suggestions]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleSuggestionClick = useCallback((suggestion: SearchSuggestion) => {
-    const pathMap: Record<string, string> = {
-      listing: tenantPath(`/listings/${suggestion.id}`),
-      user: tenantPath(`/profile/${suggestion.id}`),
-      event: tenantPath(`/events/${suggestion.id}`),
-      group: tenantPath(`/groups/${suggestion.id}`),
-    };
-    navigate(pathMap[suggestion.type] || tenantPath('/search'));
-    setIsSearchOpen(false);
-    setSearchQuery('');
-    setSuggestions([]);
-  }, [navigate]);
+  }, [setIsSearchOpen]);
 
   // Check if current path matches any in a group
   const isActiveGroup = (paths: string[]) => {
     return paths.some(path => location.pathname.startsWith(path));
   };
 
-  // Community dropdown items
-  const communityItems = [
+  // ─── Memoized nav item arrays ──────────────────────────────────────────────
+  const isHourTimebank = tenant?.slug === 'hour-timebank';
+
+  const communityItems = useMemo(() => [
     { label: t('nav.members'), desc: t('nav_desc.members'), href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
     { label: t('nav.connections'), desc: t('nav_desc.connections'), href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
     { label: t('nav.events'), desc: t('nav_desc.events'), href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
@@ -331,10 +185,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.polls'), desc: t('nav_desc.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' as const },
     { label: t('nav.jobs'), desc: t('nav_desc.jobs'), href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.ideation'), desc: t('nav_desc.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' as const },
-  ].filter(item => hasFeature(item.feature));
+  ].filter(item => hasFeature(item.feature)), [t, tenantPath, hasFeature]);
 
-  // Activity dropdown items — filtered by feature flags and module flags
-  const activityItems = [
+  const activityItems = useMemo(() => [
     { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
     { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
     { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
@@ -347,28 +200,24 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.activity', 'My Activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
     { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' as const },
   ].filter(item => {
-    if (item.feature && !hasFeature(item.feature)) return false;
-    if (item.module && !hasModule(item.module)) return false;
+    if ('feature' in item && item.feature && !hasFeature(item.feature)) return false;
+    if ('module' in item && item.module && !hasModule(item.module)) return false;
     return true;
-  });
+  }), [t, tenantPath, hasFeature, hasModule]);
 
-  // Federation dropdown items — only shown when federation feature is enabled
-  const federationItems = hasFeature('federation') ? [
+  const federationItems = useMemo(() => hasFeature('federation') ? [
     { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
     { label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
     { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
     { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
     { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
     { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
-  ] : [];
+  ] : [], [t, tenantPath, hasFeature]);
 
-  // About dropdown — universal items + tenant-specific items + dynamic CMS pages
-  const isHourTimebank = tenant?.slug === 'hour-timebank';
-  const aboutItems = [
+  const aboutItems = useMemo(() => [
     { label: t('nav.about'), desc: t('nav_desc.about'), href: tenantPath('/about'), icon: Info },
     { label: t('nav.faq'), desc: t('nav_desc.faq'), href: tenantPath('/faq'), icon: HelpCircle },
     { label: t('nav.timebanking_guide'), desc: t('nav_desc.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
-    // Tenant 2 (hOUR Timebank) specific pages — these contain hardcoded org content
     ...(isHourTimebank ? [
       { label: t('nav.partner_with_us'), desc: t('nav_desc.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
       { label: t('nav.social_prescribing'), desc: t('nav_desc.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
@@ -382,382 +231,222 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       href: tenantPath(`/page/${p.slug}`),
       icon: FileText,
     })),
-  ];
+  ], [t, tenantPath, isHourTimebank, tenant?.menu_pages?.about]);
 
-  const communityPaths = communityItems.map(i => i.href);
-  const activityPaths = activityItems.map(i => i.href);
-  const federationPaths = federationItems.map(i => i.href);
-  const aboutPaths = aboutItems.map(i => i.href);
-
-  // "More" dropdown combines Activity, Federation, and About
-  const morePaths = [...activityPaths, ...federationPaths, ...aboutPaths];
+  const communityPaths = useMemo(() => communityItems.map(i => i.href), [communityItems]);
+  const morePaths = useMemo(() => [
+    ...activityItems.map(i => i.href),
+    ...federationItems.map(i => i.href),
+    ...aboutItems.map(i => i.href),
+  ], [activityItems, federationItems, aboutItems]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip">
-      {/* Utility Bar — slim top strip for secondary actions */}
-      <div className="hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)]">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-end gap-1 h-8">
-            {/* Help Center — authenticated users */}
-            {isAuthenticated && (
-              <Button
-                variant="light"
-                size="sm"
-                className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs"
-                onPress={() => navigate(tenantPath('/help'))}
-              >
-                <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
-                {t('user_menu.help_center')}
-              </Button>
-            )}
-            {/* Admin links — admin users only */}
-            {isAuthenticated && isAdmin && (
-              <>
-                <span className="text-[var(--border-default)] text-xs select-none">|</span>
+    <>
+      {/* Skip to content link — accessible to keyboard/screen reader users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[500] focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-medium"
+      >
+        {t('accessibility.skip_to_content', 'Skip to main content')}
+      </a>
+
+      <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip">
+        {/* Utility Bar — slim top strip for secondary actions */}
+        <div className="hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)]">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-end gap-1 h-8 flex-nowrap overflow-x-auto">
+              {/* Help Center — authenticated users */}
+              {isAuthenticated && (
                 <Button
                   variant="light"
                   size="sm"
-                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs"
-                  onPress={() => navigate('/admin')}
+                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
+                  onPress={() => navigate(tenantPath('/help'))}
                 >
-                  <Shield className="w-3.5 h-3.5" aria-hidden="true" />
-                  {t('user_menu.admin_panel')}
+                  <HelpCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  <span className="hidden md:inline">{t('user_menu.help_center')}</span>
                 </Button>
-                <Button
-                  variant="light"
-                  size="sm"
-                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs"
-                  onPress={navigateToLegacyAdmin}
-                >
-                  <LayoutDashboard className="w-3.5 h-3.5" aria-hidden="true" />
-                  {t('user_menu.legacy_admin')}
-                </Button>
-              </>
-            )}
-            {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none">|</span>}
-            <LanguageSwitcher />
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              className="text-theme-muted hover:text-theme-primary w-7 h-7 min-w-7"
-              onPress={toggleTheme}
-              aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-            >
-              {resolvedTheme === 'dark' ? (
-                <Sun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-              ) : (
-                <Moon className="w-3.5 h-3.5 text-indigo-500" aria-hidden="true" />
               )}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Navigation Bar */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Left Section: Mobile Menu + Brand */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Mobile Menu Toggle */}
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              className="lg:hidden text-theme-muted hover:text-theme-primary"
-              onPress={onMobileMenuOpen}
-              aria-label="Open menu"
-            >
-              <Menu className="w-5 h-5" aria-hidden="true" />
-            </Button>
-
-            {/* Brand */}
-            <Link to={tenantPath('/')} className="flex items-center gap-2">
-              {branding.logo ? (
-                <img
-                  src={branding.logo}
-                  alt={branding.name}
-                  className="h-8 sm:h-9 w-auto object-contain"
-                />
-              ) : (
-                <motion.div
-                  whileHover={{ rotate: 180 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <Hexagon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
-                </motion.div>
-              )}
-              <span className="font-bold text-lg sm:text-xl text-gradient hidden min-[480px]:inline">
-                {branding.name}
-              </span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation — API-driven when custom menus exist, hardcoded fallback otherwise */}
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
-            {hasCustomMenus ? (
-              <DesktopMenuItems menus={headerMenus} />
-            ) : (
-            <>
-            {/* Dashboard - Direct Link (module-gated) */}
-            {hasModule('dashboard') && (
-              <NavLink
-                to={tenantPath('/dashboard')}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-theme-active text-theme-primary'
-                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                  }`
-                }
-              >
-                <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
-                <span>{t('nav.dashboard')}</span>
-              </NavLink>
-            )}
-
-            {/* Feed - Direct Link (module-gated) */}
-            {hasModule('feed') && (
-              <NavLink
-                to={tenantPath('/feed')}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-theme-active text-theme-primary'
-                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                  }`
-                }
-              >
-                <Newspaper className="w-4 h-4" aria-hidden="true" />
-                <span>{t('nav.feed')}</span>
-              </NavLink>
-            )}
-
-            {/* Listings - Direct Link (module-gated) */}
-            {hasModule('listings') && (
-              <NavLink
-                to={tenantPath('/listings')}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-theme-active text-theme-primary'
-                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                  }`
-                }
-              >
-                <ListTodo className="w-4 h-4" aria-hidden="true" />
-                <span>{t('nav.listings')}</span>
-              </NavLink>
-            )}
-
-            {/* Messages - Direct Link with Badge (module-gated) */}
-            {hasModule('messages') && (
-              <NavLink
-                to={tenantPath('/messages')}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-theme-active text-theme-primary'
-                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                  }`
-                }
-              >
-                <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                <span>{t('nav.messages')}</span>
-                {counts.messages > 0 && isAuthenticated && (
-                  <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
-                    {counts.messages > 99 ? '99+' : counts.messages}
-                  </span>
-                )}
-              </NavLink>
-            )}
-
-            {/* Community Dropdown */}
-            {communityItems.length > 0 && (
-              <Dropdown placement="bottom-start" isOpen={communityOpen} onOpenChange={handleCommunityOpenChange} shouldBlockScroll={false}>
-                <DropdownTrigger>
+              {/* Admin links — admin users only */}
+              {isAuthenticated && isAdmin && (
+                <>
+                  <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
                   <Button
                     variant="light"
                     size="sm"
-                    className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all ${
-                      isActiveGroup(communityPaths)
+                    className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
+                    onPress={() => navigate('/admin')}
+                    aria-label={t('user_menu.admin_panel')}
+                  >
+                    <Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span className="hidden md:inline">{t('user_menu.admin_panel')}</span>
+                  </Button>
+                  <Button
+                    variant="light"
+                    size="sm"
+                    className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
+                    onPress={navigateToLegacyAdmin}
+                    aria-label={t('user_menu.legacy_admin')}
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span className="hidden md:inline">{t('user_menu.legacy_admin')}</span>
+                  </Button>
+                </>
+              )}
+              {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>}
+              <LanguageSwitcher />
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                className="text-theme-muted hover:text-theme-primary w-7 h-7 min-w-7 shrink-0"
+                onPress={toggleTheme}
+                aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {resolvedTheme === 'dark' ? (
+                  <Sun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                ) : (
+                  <Moon className="w-3.5 h-3.5 text-indigo-500" aria-hidden="true" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Navigation Bar */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            {/* Left Section: Mobile Menu + Brand */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Mobile Menu Toggle */}
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                className="lg:hidden text-theme-muted hover:text-theme-primary"
+                onPress={onMobileMenuOpen}
+                aria-label="Open menu"
+              >
+                <Menu className="w-5 h-5" aria-hidden="true" />
+              </Button>
+
+              {/* Brand */}
+              <Link to={tenantPath('/')} className="flex items-center gap-2">
+                {branding.logo ? (
+                  <img
+                    src={branding.logo}
+                    alt={branding.name}
+                    className="h-8 sm:h-9 w-auto object-contain"
+                  />
+                ) : (
+                  <Hexagon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                )}
+                <span className="font-bold text-lg sm:text-xl text-gradient hidden min-[480px]:inline">
+                  {branding.name}
+                </span>
+              </Link>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
+              {hasCustomMenus ? (
+                <DesktopMenuItems menus={headerMenus} />
+              ) : (
+              <>
+              {/* Dashboard */}
+              {hasModule('dashboard') && (
+                <NavLink
+                  to={tenantPath('/dashboard')}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isActive
                         ? 'bg-theme-active text-theme-primary'
                         : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                    }`}
-                    endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
-                  >
-                    <Users className="w-4 h-4" aria-hidden="true" />
-                    {t('nav.community')}
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="Community navigation"
-                  className="min-w-[220px]"
-                  classNames={{
-                    base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
-                  }}
-                  onAction={(key) => {
-                    dropdownNavigate(String(key));
-                  }}
+                    }`
+                  }
                 >
-                  {communityItems.map((item) => (
-                    <DropdownItem
-                      key={item.href}
-                      description={item.desc}
-                      startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                      className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
-                    >
-                      {item.label}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-            )}
+                  <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('nav.dashboard')}</span>
+                </NavLink>
+              )}
 
-            {/* More — Multi-column mega menu */}
-            <Popover placement="bottom-start" isOpen={moreOpen} onOpenChange={handleMoreOpenChange} shouldBlockScroll={false} offset={8}>
-              <PopoverTrigger>
-                <Button
-                  variant="light"
-                  size="sm"
-                  className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all ${
-                    isActiveGroup(morePaths)
-                      ? 'bg-theme-active text-theme-primary'
-                      : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                  }`}
-                  endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
+              {/* Feed */}
+              {hasModule('feed') && (
+                <NavLink
+                  to={tenantPath('/feed')}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-theme-active text-theme-primary'
+                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                    }`
+                  }
                 >
-                  <Menu className="w-4 h-4" aria-hidden="true" />
-                  {t('nav.more')}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl max-h-[75vh] overflow-y-auto">
-                <nav className="grid grid-cols-2 gap-0 min-w-[480px] p-2" style={federationItems.length > 0 ? { gridTemplateColumns: 'repeat(3, 1fr)', minWidth: '640px' } : undefined} aria-label="More navigation">
-                  {/* Column 1: Activity */}
-                  {activityItems.length > 0 && (
-                    <div className="p-2">
-                      <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{t('sections.activity')}</p>
-                      <div className="space-y-0.5">
-                        {activityItems.map((item) => (
-                          <button
-                            key={item.href}
-                            onClick={() => dropdownNavigate(item.href)}
-                            className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                              location.pathname.startsWith(item.href)
-                                ? 'bg-theme-active text-theme-primary'
-                                : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                            }`}
-                          >
-                            <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium leading-tight">{item.label}</p>
-                              {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                  <Newspaper className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('nav.feed')}</span>
+                </NavLink>
+              )}
+
+              {/* Listings */}
+              {hasModule('listings') && (
+                <NavLink
+                  to={tenantPath('/listings')}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-theme-active text-theme-primary'
+                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                    }`
+                  }
+                >
+                  <ListTodo className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('nav.listings')}</span>
+                </NavLink>
+              )}
+
+              {/* Messages */}
+              {hasModule('messages') && (
+                <NavLink
+                  to={tenantPath('/messages')}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-theme-active text-theme-primary'
+                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                    }`
+                  }
+                >
+                  <MessageSquare className="w-4 h-4" aria-hidden="true" />
+                  <span>{t('nav.messages')}</span>
+                  {counts.messages > 0 && isAuthenticated && (
+                    <span className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full">
+                      {counts.messages > 99 ? '99+' : counts.messages}
+                    </span>
                   )}
+                </NavLink>
+              )}
 
-                  {/* Column 2: Federation (if enabled) */}
-                  {federationItems.length > 0 && (
-                    <div className="p-2 border-l border-[var(--border-default)]">
-                      <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{t('sections.partner_communities')}</p>
-                      <div className="space-y-0.5">
-                        {federationItems.map((item) => (
-                          <button
-                            key={item.href}
-                            onClick={() => dropdownNavigate(item.href)}
-                            className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                              location.pathname.startsWith(item.href)
-                                ? 'bg-theme-active text-theme-primary'
-                                : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                            }`}
-                          >
-                            <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium leading-tight">{item.label}</p>
-                              {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Column 2/3: About */}
-                  <div className={`p-2 ${activityItems.length > 0 ? 'border-l border-[var(--border-default)]' : ''}`}>
-                    <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{t('sections.about')}</p>
-                    <div className="space-y-0.5">
-                      {aboutItems.map((item) => (
-                        <button
-                          key={item.href}
-                          onClick={() => dropdownNavigate(item.href)}
-                          className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                            location.pathname.startsWith(item.href)
-                              ? 'bg-theme-active text-theme-primary'
-                              : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                          }`}
-                        >
-                          <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium leading-tight">{item.label}</p>
-                            {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </nav>
-              </PopoverContent>
-            </Popover>
-            </>
-            )}
-          </nav>
-
-          {/* User Actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            {isAuthenticated ? (
-              <>
-                {/* Search Trigger - Desktop: styled button, Mobile: icon */}
-                <Button
-                  variant="flat"
-                  size="sm"
-                  className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-theme-default bg-theme-elevated hover:bg-theme-hover text-theme-subtle text-sm h-auto"
-                  onPress={() => setIsSearchOpen(true)}
-                  aria-label="Search (Ctrl+K)"
-                >
-                  <Search className="w-4 h-4" aria-hidden="true" />
-                  <span className="text-theme-subtle">Search...</span>
-                  <kbd className="ml-2 hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-theme-hover text-[10px] font-medium text-theme-subtle border border-theme-default">
-                    <span className="text-xs">⌘</span>K
-                  </kbd>
-                </Button>
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  className="flex md:hidden text-theme-muted hover:text-theme-primary"
-                  onPress={() => setIsSearchOpen(true)}
-                  aria-label="Search"
-                >
-                  <Search className="w-5 h-5" aria-hidden="true" />
-                </Button>
-
-                {/* Create Button - Desktop only */}
-                <Dropdown placement="bottom-end" isOpen={createOpen} onOpenChange={handleCreateOpenChange} shouldBlockScroll={false}>
+              {/* Community Dropdown */}
+              {communityItems.length > 0 && (
+                <Dropdown placement="bottom-start" isOpen={communityOpen} onOpenChange={handleCommunityOpenChange} shouldBlockScroll={false}>
                   <DropdownTrigger>
                     <Button
-                      isIconOnly
+                      variant="light"
                       size="sm"
-                      className="hidden sm:flex bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                      aria-label="Create new"
+                      className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all ${
+                        isActiveGroup(communityPaths)
+                          ? 'bg-theme-active text-theme-primary'
+                          : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                      }`}
+                      endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
                     >
-                      <Plus className="w-4 h-4" aria-hidden="true" />
+                      <Users className="w-4 h-4" aria-hidden="true" />
+                      {t('nav.community')}
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
-                    aria-label="Create actions"
+                    aria-label="Community navigation"
+                    className="min-w-[220px]"
                     classNames={{
                       base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
                     }}
@@ -765,310 +454,265 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       dropdownNavigate(String(key));
                     }}
                   >
-                    <DropdownItem
-                      key={tenantPath('/listings/create')}
-                      startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
-                    >
-                      {t('create.new_listing')}
-                    </DropdownItem>
-                    {hasFeature('events') ? (
+                    {communityItems.map((item) => (
                       <DropdownItem
-                        key={tenantPath('/events/create')}
-                        startContent={<Calendar className="w-4 h-4" aria-hidden="true" />}
+                        key={item.href}
+                        description={item.desc}
+                        startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
+                        className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
                       >
-                        {t('create.new_event')}
+                        {item.label}
                       </DropdownItem>
-                    ) : null}
+                    ))}
                   </DropdownMenu>
                 </Dropdown>
+              )}
 
-                {/* Language Switcher — mobile only (desktop uses utility bar) */}
-                <div className="sm:hidden">
-                  <LanguageSwitcher />
-                </div>
+              {/* More — Multi-column mega menu */}
+              <MegaMenu
+                isOpen={moreOpen}
+                onOpenChange={handleMoreOpenChange}
+                isActive={isActiveGroup(morePaths)}
+                activityItems={activityItems}
+                federationItems={federationItems}
+                aboutItems={aboutItems}
+                onNavigate={dropdownNavigate}
+              />
+              </>
+              )}
+            </nav>
 
-                {/* Notifications */}
-                <Badge
-                  content={unreadCount > 99 ? '99+' : unreadCount}
-                  color="danger"
-                  size="sm"
-                  isInvisible={unreadCount === 0}
-                  placement="top-right"
-                >
-                  <Button
-                    isIconOnly
-                    variant="light"
-                    size="sm"
-                    className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
-                    onPress={() => navigate(tenantPath('/notifications'))}
-                    aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-                  >
-                    <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
-                  </Button>
-                </Badge>
+            {/* User Actions */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Search Trigger — visible to all users */}
+              <Button
+                variant="flat"
+                size="sm"
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-theme-default bg-theme-elevated hover:bg-theme-hover text-theme-subtle text-sm h-auto"
+                onPress={() => setIsSearchOpen(true)}
+                aria-label="Search (Ctrl+K)"
+              >
+                <Search className="w-4 h-4" aria-hidden="true" />
+                <span className="text-theme-subtle">{t('search.placeholder')}</span>
+                <kbd className="ml-2 hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-theme-hover text-[10px] font-medium text-theme-subtle border border-theme-default">
+                  <span className="text-xs">⌘</span>K
+                </kbd>
+              </Button>
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                className="flex md:hidden text-theme-muted hover:text-theme-primary"
+                onPress={() => setIsSearchOpen(true)}
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5" aria-hidden="true" />
+              </Button>
 
-                {/* User Dropdown - Enhanced */}
-                <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>
-                  <DropdownTrigger>
-                    <Avatar
-                      as="button"
-                      name={`${user?.first_name} ${user?.last_name}`}
-                      src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
-                      size="sm"
-                      className="cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
-                      showFallback
-                    />
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    aria-label="User actions"
-                    classNames={{
-                      base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl min-w-[220px] max-h-[70vh] overflow-y-auto',
-                    }}
-                    onAction={(key) => {
-                      const k = String(key);
-                      if (k === 'theme') { toggleTheme(); closeAllDropdowns(); return; }
-                      if (k === 'logout') { handleLogout(); return; }
-                      if (k === 'profile-header') return;
-                      dropdownNavigate(k);
-                    }}
-                  >
-                    <DropdownSection showDivider>
-                      <DropdownItem
-                        key="profile-header"
-                        className="h-14 gap-2 cursor-default"
-                        textValue="Profile"
-                        isReadOnly
+              {isAuthenticated ? (
+                <>
+                  {/* Create Button */}
+                  <Dropdown placement="bottom-end" isOpen={createOpen} onOpenChange={handleCreateOpenChange} shouldBlockScroll={false}>
+                    <DropdownTrigger>
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        className="hidden sm:flex bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                        aria-label="Create new"
                       >
-                        <p className="font-semibold text-theme-primary">
-                          {user?.first_name} {user?.last_name}
-                        </p>
-                        <p className="text-sm text-theme-subtle">{user?.email}</p>
-                      </DropdownItem>
-                    </DropdownSection>
-
-                    <DropdownSection showDivider>
+                        <Plus className="w-4 h-4" aria-hidden="true" />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      aria-label="Create actions"
+                      classNames={{
+                        base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
+                      }}
+                      onAction={(key) => {
+                        dropdownNavigate(String(key));
+                      }}
+                    >
                       <DropdownItem
-                        key={tenantPath('/profile')}
-                        startContent={<UserCircle className="w-4 h-4" aria-hidden="true" />}
+                        key={tenantPath('/listings/create')}
+                        startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
                       >
-                        {t('user_menu.my_profile')}
+                        {t('create.new_listing')}
                       </DropdownItem>
-                      {hasModule('wallet') ? (
+                      {hasFeature('events') ? (
                         <DropdownItem
-                          key={tenantPath('/wallet')}
-                          startContent={<Wallet className="w-4 h-4" aria-hidden="true" />}
-                          endContent={
-                            <span className="text-xs text-theme-subtle">
-                              {user?.balance ?? 0}h
-                            </span>
-                          }
+                          key={tenantPath('/events/create')}
+                          startContent={<Calendar className="w-4 h-4" aria-hidden="true" />}
                         >
-                          {t('user_menu.wallet')}
+                          {t('create.new_event')}
                         </DropdownItem>
                       ) : null}
-                      <DropdownItem
-                        key={tenantPath('/settings')}
-                        startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('user_menu.settings')}
-                      </DropdownItem>
-                    </DropdownSection>
+                    </DropdownMenu>
+                  </Dropdown>
 
-                    <DropdownSection showDivider>
-                      <DropdownItem
-                        key="theme"
-                        startContent={
-                          resolvedTheme === 'dark' ? (
-                            <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                          ) : (
-                            <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-                          )
-                        }
-                      >
-                        {resolvedTheme === 'dark' ? t('user_menu.light_mode') : t('user_menu.dark_mode')}
-                      </DropdownItem>
-                    </DropdownSection>
+                  {/* Language Switcher — mobile only (desktop uses utility bar) */}
+                  <div className="sm:hidden">
+                    <LanguageSwitcher />
+                  </div>
 
-                    <DropdownSection>
-                      <DropdownItem
-                        key="logout"
-                        color="danger"
-                        startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
-                        className="text-red-500 dark:text-red-400"
-                      >
-                        {t('user_menu.log_out')}
-                      </DropdownItem>
-                    </DropdownSection>
-                  </DropdownMenu>
-                </Dropdown>
-              </>
-            ) : (
-              <>
-                {/* Theme Toggle + Language Switcher — mobile only (desktop uses utility bar) */}
-                <div className="flex items-center gap-1 sm:hidden">
-                  <Button
-                    isIconOnly
-                    variant="light"
+                  {/* Notifications */}
+                  <Badge
+                    content={unreadCount > 99 ? '99+' : unreadCount}
+                    color="danger"
                     size="sm"
-                    className="text-theme-muted hover:text-theme-primary"
-                    onPress={toggleTheme}
-                    aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                    isInvisible={unreadCount === 0}
+                    placement="top-right"
                   >
-                    {resolvedTheme === 'dark' ? (
-                      <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                    ) : (
-                      <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-                    )}
-                  </Button>
-                  <LanguageSwitcher />
-                </div>
-
-                <Link to={tenantPath('/login')}>
-                  <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary">
-                    {t('auth.log_in')}
-                  </Button>
-                </Link>
-                <Link to={tenantPath('/register')}>
-                  <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
-                    {t('auth.sign_up')}
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-      {/* Search Overlay */}
-      <AnimatePresence>
-        {isSearchOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
-              onClick={() => { setIsSearchOpen(false); setSearchQuery(''); setSuggestions([]); }}
-            />
-
-            {/* Search Panel */}
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="fixed top-20 sm:top-28 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
-            >
-              <div className="bg-[var(--surface-dropdown)] rounded-xl border border-[var(--border-default)] shadow-2xl overflow-hidden">
-                <form onSubmit={handleSearchSubmit} className="flex items-center px-4 py-3 gap-3">
-                  <Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
-                    placeholder={t('search.placeholder')}
-                    className="flex-1 bg-transparent text-theme-primary placeholder:text-theme-subtle outline-none text-base"
-                    aria-label="Search"
-                    aria-autocomplete="list"
-                    aria-activedescendant={selectedIndex >= 0 ? `suggestion-${selectedIndex}` : undefined}
-                  />
-                  {searchQuery && (
                     <Button
                       isIconOnly
                       variant="light"
                       size="sm"
-                      onPress={() => setSearchQuery('')}
-                      className="text-theme-subtle hover:text-theme-primary min-w-6 w-6 h-6"
-                      aria-label="Clear search"
+                      className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
+                      onPress={() => navigate(tenantPath('/notifications'))}
+                      aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
                     >
-                      <X className="w-4 h-4" aria-hidden="true" />
+                      <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                     </Button>
-                  )}
-                  <kbd className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)]">
-                    ESC
-                  </kbd>
-                </form>
+                  </Badge>
 
-                {/* Suggestions or Quick Links */}
-                <div className="border-t border-[var(--border-default)] px-4 py-3 max-h-64 overflow-y-auto">
-                  {suggestions.length > 0 ? (
-                    <>
-                      <p className="text-xs text-theme-subtle mb-2">{t('search.suggestions')}</p>
-                      <div className="space-y-1" role="listbox" aria-label="Search suggestions">
-                        {suggestions.map((suggestion, index) => {
-                          const typeLabels: Record<string, { label: string; color: string }> = {
-                            listing: { label: t('search.type_listing'), color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-                            user: { label: t('search.type_member'), color: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
-                            event: { label: t('search.type_event'), color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
-                            group: { label: t('search.type_group'), color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
-                          };
-                          const typeInfo = typeLabels[suggestion.type] || { label: suggestion.type, color: 'bg-[var(--surface-elevated)] text-theme-subtle' };
-                          const isSelected = index === selectedIndex;
+                  {/* User Dropdown */}
+                  <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>
+                    <DropdownTrigger>
+                      <Avatar
+                        as="button"
+                        name={`${user?.first_name} ${user?.last_name}`}
+                        src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
+                        size="sm"
+                        className="cursor-pointer ring-2 ring-transparent hover:ring-indigo-500/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
+                        showFallback
+                      />
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      aria-label="User actions"
+                      classNames={{
+                        base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl min-w-[220px] max-h-[70vh] overflow-y-auto',
+                      }}
+                      onAction={(key) => {
+                        const k = String(key);
+                        if (k === 'theme') { toggleTheme(); closeAllDropdowns(); return; }
+                        if (k === 'logout') { handleLogout(); return; }
+                        if (k === 'profile-header') return;
+                        dropdownNavigate(k);
+                      }}
+                    >
+                      <DropdownSection showDivider>
+                        <DropdownItem
+                          key="profile-header"
+                          className="h-14 gap-2 cursor-default"
+                          textValue="Profile"
+                          isReadOnly
+                        >
+                          <p className="font-semibold text-theme-primary">
+                            {user?.first_name} {user?.last_name}
+                          </p>
+                          <p className="text-sm text-theme-subtle">{user?.email}</p>
+                        </DropdownItem>
+                      </DropdownSection>
 
-                          return (
-                            <Button
-                              id={`suggestion-${index}`}
-                              key={`${suggestion.type}-${suggestion.id}`}
-                              variant="light"
-                              fullWidth
-                              role="option"
-                              aria-selected={isSelected}
-                              onPress={() => handleSuggestionClick(suggestion)}
-                              onMouseEnter={() => setSelectedIndex(index)}
-                              className={`flex items-center justify-between px-3 py-2 rounded-lg text-left h-auto min-h-0 ${
-                                isSelected
-                                  ? 'bg-indigo-50 dark:bg-indigo-500/10'
-                                  : 'hover:bg-[var(--surface-hover)]'
-                              }`}
-                            >
-                              <span className="text-sm text-theme-primary truncate">
-                                {suggestion.title || suggestion.name}
+                      <DropdownSection showDivider>
+                        <DropdownItem
+                          key={tenantPath('/profile')}
+                          startContent={<UserCircle className="w-4 h-4" aria-hidden="true" />}
+                        >
+                          {t('user_menu.my_profile')}
+                        </DropdownItem>
+                        {hasModule('wallet') ? (
+                          <DropdownItem
+                            key={tenantPath('/wallet')}
+                            startContent={<Wallet className="w-4 h-4" aria-hidden="true" />}
+                            endContent={
+                              <span className="text-xs text-theme-subtle">
+                                {user?.balance ?? 0}h
                               </span>
-                              <span className={`text-[10px] px-2 py-0.5 rounded-full ${typeInfo.color} ml-2 flex-shrink-0`}>
-                                {typeInfo.label}
-                              </span>
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  ) : isLoadingSuggestions ? (
-                    <div className="flex items-center gap-2 py-2">
-                      <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-xs text-theme-subtle">{t('search.searching')}</span>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-xs text-theme-subtle mb-2">{t('search.quick_links')}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          { label: t('nav.listings'), path: tenantPath('/listings') },
-                          { label: t('nav.members'), path: tenantPath('/members') },
-                          { label: t('nav.events'), path: tenantPath('/events') },
-                          { label: t('support.help_center'), path: tenantPath('/help') },
-                        ].map((link) => (
-                          <Button
-                            key={link.path}
-                            variant="flat"
-                            size="sm"
-                            onPress={() => { navigate(link.path); setIsSearchOpen(false); setSearchQuery(''); }}
-                            className="px-3 py-1.5 rounded-lg bg-[var(--surface-elevated)] text-sm text-theme-muted hover:text-theme-primary hover:bg-[var(--surface-hover)]"
+                            }
                           >
-                            {link.label}
-                          </Button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </header>
+                            {t('user_menu.wallet')}
+                          </DropdownItem>
+                        ) : null}
+                        <DropdownItem
+                          key={tenantPath('/settings')}
+                          startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
+                        >
+                          {t('user_menu.settings')}
+                        </DropdownItem>
+                      </DropdownSection>
+
+                      <DropdownSection showDivider>
+                        <DropdownItem
+                          key="theme"
+                          startContent={
+                            resolvedTheme === 'dark' ? (
+                              <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                            ) : (
+                              <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                            )
+                          }
+                        >
+                          {resolvedTheme === 'dark' ? t('user_menu.light_mode') : t('user_menu.dark_mode')}
+                        </DropdownItem>
+                      </DropdownSection>
+
+                      <DropdownSection>
+                        <DropdownItem
+                          key="logout"
+                          color="danger"
+                          startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
+                          className="text-red-500 dark:text-red-400"
+                        >
+                          {t('user_menu.log_out')}
+                        </DropdownItem>
+                      </DropdownSection>
+                    </DropdownMenu>
+                  </Dropdown>
+                </>
+              ) : (
+                <>
+                  {/* Theme Toggle + Language Switcher — mobile only (desktop uses utility bar) */}
+                  <div className="flex items-center gap-1 sm:hidden">
+                    <Button
+                      isIconOnly
+                      variant="light"
+                      size="sm"
+                      className="text-theme-muted hover:text-theme-primary"
+                      onPress={toggleTheme}
+                      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                    >
+                      {resolvedTheme === 'dark' ? (
+                        <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                      ) : (
+                        <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                      )}
+                    </Button>
+                    <LanguageSwitcher />
+                  </div>
+
+                  <Link to={tenantPath('/login')}>
+                    <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary">
+                      {t('auth.log_in')}
+                    </Button>
+                  </Link>
+                  <Link to={tenantPath('/register')}>
+                    <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium">
+                      {t('auth.sign_up')}
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Search Overlay */}
+        <SearchOverlay
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+        />
+      </header>
+    </>
   );
 }
 

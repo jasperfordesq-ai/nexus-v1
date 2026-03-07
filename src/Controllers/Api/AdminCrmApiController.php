@@ -1029,8 +1029,8 @@ class AdminCrmApiController extends BaseApiController
                              CONCAT('Joined group: ', g.name) as description, NULL as metadata, gm.created_at
                              FROM group_members gm
                              LEFT JOIN users u ON u.id = gm.user_id
-                             LEFT JOIN `groups` g ON g.id = gm.group_id
-                             WHERE gm.tenant_id = ?"
+                             INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ?
+                             WHERE 1=1"
                              . ($userId ? " AND gm.user_id = ?" : "")
                              . ($days > 0 ? " AND gm.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)" : "");
                 $params[] = $tenantId;
