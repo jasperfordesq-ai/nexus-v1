@@ -166,7 +166,8 @@
     "notifications_unread": "Fógraí, {{count}} gan léamh",
     "switch_to_light": "Athraigh go mód solais",
     "switch_to_dark": "Athraigh go mód dorcha",
-    "skip_to_content": "Téigh go dtí an príomhábhar"
+    "skip_to_content": "Téigh go dtí an príomhábhar",
+    "menu_opened": "Roghchlár nascleanúna oscailte"
   },
   "cookie_consent": {
     "banner_label": "Toiliú fianán",

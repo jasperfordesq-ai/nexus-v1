@@ -2156,4 +2156,36 @@ class CronController
             echo "   Error: " . $e->getMessage() . "\n";
         }
     }
+
+    // ─── Identity Verification Cron ─────────────────────────────────────
+
+    /**
+     * Send reminder emails for abandoned verification sessions (24h+ old).
+     * Schedule: every hour.
+     */
+    public function verificationReminders()
+    {
+        $this->checkAccess();
+        try {
+            $sent = \Nexus\Services\Identity\RegistrationOrchestrationService::sendVerificationReminders();
+            echo json_encode(['success' => true, 'reminders_sent' => $sent]);
+        } catch (\Throwable $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Expire verification sessions older than 72 hours.
+     * Schedule: daily.
+     */
+    public function expireVerifications()
+    {
+        $this->checkAccess();
+        try {
+            $expired = \Nexus\Services\Identity\RegistrationOrchestrationService::expireAbandonedSessions();
+            echo json_encode(['success' => true, 'sessions_expired' => $expired]);
+        } catch (\Throwable $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
 }

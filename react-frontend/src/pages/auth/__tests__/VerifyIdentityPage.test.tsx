@@ -1,0 +1,265 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Tests for VerifyIdentityPage
+ *
+ * Tests:
+ * - Renders loading state initially
+ * - Shows verification start button when status is 'start'
+ * - Shows "Passed" state when verification is complete
+ * - Shows "Failed" state with retry button
+ * - Handles API error gracefully
+ */
+
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { HeroUIProvider } from '@heroui/react';
+
+// ─── Common mocks ────────────────────────────────────────────────────────────
+
+const mockGet = vi.fn();
+const mockPost = vi.fn();
+
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: (...args: unknown[]) => mockGet(...args),
+    post: (...args: unknown[]) => mockPost(...args),
+    put: vi.fn().mockResolvedValue({ success: true }),
+    delete: vi.fn().mockResolvedValue({ success: true }),
+  },
+  tokenManager: { getTenantId: vi.fn(), getAccessToken: vi.fn() },
+}));
+
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+vi.mock('@/contexts', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 1, first_name: 'Test', last_name: 'User', name: 'Test User', role: 'member', tenant_id: 2 },
+    isAuthenticated: true,
+    logout: vi.fn(),
+  })),
+  useTenant: vi.fn(() => ({
+    tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
+    tenantSlug: 'test',
+    branding: { name: 'Test Community' },
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+    tenantPath: (p: string) => `/test${p}`,
+  })),
+  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), showToast: vi.fn() })),
+  useNotifications: vi.fn(() => ({ counts: { messages: 0, notifications: 0 } })),
+}));
+
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+
+vi.mock('@/components/ui', () => ({
+  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="glass-card" className={className}>{children}</div>
+  ),
+}));
+
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: Record<string, unknown>) => {
+      const { variants, initial, animate, layout, ...rest } = props;
+      return <div {...rest}>{children as React.ReactNode}</div>;
+    },
+  },
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function renderWithProviders(ui: React.ReactElement) {
+  return render(
+    <HeroUIProvider>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </HeroUIProvider>
+  );
+}
+
+const mockStatusPendingVerification = {
+  status: 'pending_verification',
+  email_verified: true,
+  is_approved: false,
+  verification_status: 'none',
+  verification_provider: 'mock',
+  registration_mode: 'verified_identity',
+  latest_session: null,
+};
+
+const mockStatusPassed = {
+  status: 'pending_admin_review',
+  email_verified: true,
+  is_approved: false,
+  verification_status: 'passed',
+  verification_provider: 'mock',
+  registration_mode: 'verified_identity',
+  latest_session: {
+    id: 1,
+    status: 'completed',
+    provider: 'mock',
+    created_at: '2026-03-07T10:00:00Z',
+    completed_at: '2026-03-07T10:05:00Z',
+    failure_reason: null,
+  },
+};
+
+const mockStatusFailed = {
+  status: 'verification_failed',
+  email_verified: true,
+  is_approved: false,
+  verification_status: 'failed',
+  verification_provider: 'mock',
+  registration_mode: 'verified_identity',
+  latest_session: {
+    id: 2,
+    status: 'failed',
+    provider: 'mock',
+    created_at: '2026-03-07T10:00:00Z',
+    completed_at: '2026-03-07T10:05:00Z',
+    failure_reason: 'Document could not be verified',
+  },
+};
+
+const mockStatusActive = {
+  status: 'active',
+  email_verified: true,
+  is_approved: true,
+  verification_status: 'passed',
+  verification_provider: 'mock',
+  registration_mode: 'verified_identity',
+  latest_session: null,
+};
+
+// ─── Tests ───────────────────────────────────────────────────────────────────
+
+describe('VerifyIdentityPage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders loading state initially', async () => {
+    // Never resolve so it stays in loading
+    mockGet.mockReturnValue(new Promise(() => {}));
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    expect(screen.getByText('Checking verification status...')).toBeTruthy();
+  });
+
+  it('shows start verification button when status is pending_verification', async () => {
+    mockGet.mockResolvedValue({ success: true, data: mockStatusPendingVerification });
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Verify your identity')).toBeTruthy();
+    });
+
+    expect(screen.getByText('Start verification')).toBeTruthy();
+    expect(screen.getByText(/valid government-issued photo ID/)).toBeTruthy();
+  });
+
+  it('shows passed state when verification is complete', async () => {
+    mockGet.mockResolvedValue({ success: true, data: mockStatusPassed });
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Identity verified')).toBeTruthy();
+    });
+
+    expect(screen.getByText(/identity has been successfully verified/)).toBeTruthy();
+    expect(screen.getByText('Awaiting admin approval')).toBeTruthy();
+  });
+
+  it('shows failed state with retry button', async () => {
+    mockGet.mockResolvedValue({ success: true, data: mockStatusFailed });
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Verification unsuccessful')).toBeTruthy();
+    });
+
+    expect(screen.getByText(/unable to verify your identity/)).toBeTruthy();
+    expect(screen.getByText('Document could not be verified')).toBeTruthy();
+    expect(screen.getByText('Try again')).toBeTruthy();
+  });
+
+  it('shows active state when account is already verified', async () => {
+    mockGet.mockResolvedValue({ success: true, data: mockStatusActive });
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Account verified')).toBeTruthy();
+    });
+
+    expect(screen.getByText(/fully verified and active/)).toBeTruthy();
+    expect(screen.getByText('Go to Dashboard')).toBeTruthy();
+  });
+
+  it('handles API error gracefully', async () => {
+    mockGet.mockRejectedValue(new Error('Network error'));
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Something went wrong')).toBeTruthy();
+    });
+
+    expect(screen.getByText(/Unable to check verification status/)).toBeTruthy();
+    expect(screen.getByText('Try again')).toBeTruthy();
+  });
+
+  it('displays community branding name', async () => {
+    mockGet.mockResolvedValue({ success: true, data: mockStatusPassed });
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Community')).toBeTruthy();
+    });
+  });
+
+  it('shows login prompt when not authenticated', async () => {
+    // Override useAuth to return unauthenticated
+    const { useAuth } = await import('@/contexts');
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      logout: vi.fn(),
+    } as any);
+
+    const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
+    renderWithProviders(<VerifyIdentityPage />);
+
+    expect(screen.getByText('Please log in to verify your identity.')).toBeTruthy();
+    expect(screen.getByText('Go to Login')).toBeTruthy();
+  });
+});

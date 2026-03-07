@@ -197,17 +197,27 @@ class AdminToolsApiController extends BaseApiController
     public function get404Errors(): void
     {
         $this->requireAdmin();
-        $tenantId = TenantContext::getId();
+
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 50)));
+        $offset = ($page - 1) * $perPage;
 
         $errors = [];
+        $total = 0;
 
         try {
+            $total = (int) Database::query(
+                "SELECT COUNT(*) FROM error_404_log WHERE resolved = 0"
+            )->fetchColumn();
+
             $errors = Database::query(
                 "SELECT id, url, referer, hit_count,
                         first_seen_at, last_seen_at, resolved
                  FROM error_404_log
                  WHERE resolved = 0
-                 ORDER BY hit_count DESC, last_seen_at DESC"
+                 ORDER BY hit_count DESC, last_seen_at DESC
+                 LIMIT ? OFFSET ?",
+                [$perPage, $offset]
             )->fetchAll();
 
             $errors = array_map(function ($row) {
@@ -225,7 +235,12 @@ class AdminToolsApiController extends BaseApiController
             $errors = [];
         }
 
-        $this->respondWithData($errors);
+        $this->respondWithData([
+            'items' => $errors,
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+        ]);
     }
 
     /**

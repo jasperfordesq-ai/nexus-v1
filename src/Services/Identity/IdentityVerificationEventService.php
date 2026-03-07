@@ -118,4 +118,42 @@ class IdentityVerificationEventService
             [$sessionId]
         )->fetchAll();
     }
+
+    /**
+     * Get all verification events for a tenant (admin audit log).
+     *
+     * @param int         $tenantId
+     * @param int         $limit
+     * @param int         $offset
+     * @param string|null $eventType  Filter by event type (optional)
+     * @return array{events: array, total: int}
+     */
+    public static function getForTenant(int $tenantId, int $limit = 50, int $offset = 0, ?string $eventType = null): array
+    {
+        $params = [$tenantId];
+        $whereExtra = '';
+        if ($eventType) {
+            $whereExtra = ' AND event_type = ?';
+            $params[] = $eventType;
+        }
+
+        $total = (int) Database::query(
+            "SELECT COUNT(*) FROM identity_verification_events WHERE tenant_id = ?" . $whereExtra,
+            $params
+        )->fetchColumn();
+
+        $params[] = $limit;
+        $params[] = $offset;
+        $events = Database::query(
+            "SELECT e.*, u.first_name, u.last_name, u.email as user_email
+             FROM identity_verification_events e
+             LEFT JOIN users u ON u.id = e.user_id
+             WHERE e.tenant_id = ?" . $whereExtra . "
+             ORDER BY e.created_at DESC
+             LIMIT ? OFFSET ?",
+            $params
+        )->fetchAll();
+
+        return ['events' => $events, 'total' => $total];
+    }
 }

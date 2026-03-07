@@ -8,7 +8,7 @@
  * Monitor and manage 404 error occurrences across the platform.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Spinner } from '@heroui/react';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
@@ -31,23 +31,35 @@ export function Error404Tracking() {
 
   const [errors, setErrors] = useState<Error404Entry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [deleteTarget, setDeleteTarget] = useState<Error404Entry | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const mounted = useRef(true);
 
-  const fetchErrors = useCallback(async () => {
+  const fetchErrors = useCallback(async (p = 1) => {
     setLoading(true);
     try {
-      const res = await adminTools.get404Errors();
-      setErrors(Array.isArray(res) ? res : (res.data ?? []));
+      const res = await adminTools.get404Errors(p) as unknown as {
+        items?: Error404Entry[];
+        total?: number;
+        page?: number;
+      };
+      if (!mounted.current) return;
+      setErrors(res.items ?? []);
+      setTotalItems(res.total ?? 0);
+      setPage(res.page ?? 1);
     } catch {
       toast.error('Failed to load 404 errors');
     } finally {
-      setLoading(false);
+      if (mounted.current) setLoading(false);
     }
   }, [toast]);
 
   useEffect(() => {
-    fetchErrors();
+    mounted.current = true;
+    fetchErrors(1);
+    return () => { mounted.current = false; };
   }, [fetchErrors]);
 
   const handleDelete = async () => {
@@ -142,7 +154,11 @@ export function Error404Tracking() {
           columns={columns}
           data={errors}
           searchable={false}
-          onRefresh={fetchErrors}
+          onRefresh={() => fetchErrors(page)}
+          totalItems={totalItems}
+          page={page}
+          pageSize={50}
+          onPageChange={(p) => fetchErrors(p)}
         />
       )}
 

@@ -35,6 +35,7 @@ import {
   ChevronLeft,
   MailCheck,
   ShieldCheck,
+  Ticket,
 } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
@@ -113,6 +114,12 @@ export function RegisterPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
 
+  // Invite code state (for invite_only tenants)
+  const [inviteCode, setInviteCode] = useState('');
+  const [inviteCodeValid, setInviteCodeValid] = useState<boolean | null>(null);
+  const [inviteCodeChecking, setInviteCodeChecking] = useState(false);
+  const [requiresInviteCode, setRequiresInviteCode] = useState(false);
+
   // Post-registration pending state (verification/approval required)
   const [pendingResult, setPendingResult] = useState<RegisterResult | null>(null);
 
@@ -159,6 +166,24 @@ export function RegisterPage() {
     fetchTenants();
   }, [tenantSlug, searchParams, tenant?.id]);
 
+  // Fetch registration info when tenant is resolved (to know if invite code is required)
+  useEffect(() => {
+    const effectiveTenantId = selectedTenantId || (tenant?.id ? String(tenant.id) : '');
+    if (!effectiveTenantId) return;
+
+    const fetchRegInfo = async () => {
+      try {
+        const res = await api.get<{ registration_mode: string; requires_invite_code: boolean }>('/v2/auth/registration-info', { skipAuth: true });
+        if (res.success && res.data) {
+          setRequiresInviteCode(res.data.requires_invite_code);
+        }
+      } catch {
+        // Non-critical — default to no invite code required
+      }
+    };
+    fetchRegInfo();
+  }, [selectedTenantId, tenant?.id]);
+
   // Handle tenant selection
   const handleTenantChange = (keys: unknown) => {
     const selectedKeys = keys as Set<string>;
@@ -193,9 +218,29 @@ export function RegisterPage() {
     }
   }, [firstName, lastName, email, password, passwordConfirm, location, phone]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Validate invite code (debounced on blur)
+  const validateInviteCode = async () => {
+    if (!inviteCode.trim() || inviteCode.trim().length < 4) {
+      setInviteCodeValid(null);
+      return;
+    }
+    setInviteCodeChecking(true);
+    try {
+      const res = await api.post<{ valid: boolean; reason: string | null }>('/v2/auth/validate-invite', { code: inviteCode.trim().toUpperCase() }, { skipAuth: true });
+      if (res.success && res.data) {
+        setInviteCodeValid(res.data.valid);
+      }
+    } catch {
+      setInviteCodeValid(null);
+    } finally {
+      setInviteCodeChecking(false);
+    }
+  };
+
   // Validation for each step
   // tenant?.id means TenantContext already resolved the tenant (custom domain or slug route)
-  const isStep1Valid = !!tenant?.id || tenants.length === 0 || tenants.length === 1 || !!selectedTenantId;
+  const tenantSelected = !!tenant?.id || tenants.length === 0 || tenants.length === 1 || !!selectedTenantId;
+  const isStep1Valid = tenantSelected && (!requiresInviteCode || inviteCodeValid === true);
   const isStep2Valid =
     firstName.trim() &&
     lastName.trim() &&
@@ -282,6 +327,7 @@ export function RegisterPage() {
       phone: phone || undefined,
       terms_accepted: termsAccepted,
       newsletter_opt_in: newsletterOptIn,
+      invite_code: requiresInviteCode ? inviteCode.trim().toUpperCase() : undefined,
     });
 
     if (result.success) {
@@ -308,7 +354,8 @@ export function RegisterPage() {
     passwordValid &&
     passwordsMatch &&
     (profileType === 'individual' || organizationName.trim()) &&
-    (tenants.length === 0 || !!selectedTenantId || !!tenant?.id);
+    (tenants.length === 0 || !!selectedTenantId || !!tenant?.id) &&
+    (!requiresInviteCode || inviteCodeValid === true);
 
   // Step progress percentage
   const progressPercent = (currentStep / STEPS.length) * 100;
@@ -450,6 +497,42 @@ export function RegisterPage() {
                     'glass-card border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
+                }}
+              />
+            )}
+
+            {/* Invite Code - Only show for invite_only tenants */}
+            {requiresInviteCode && (
+              <Input
+                type="text"
+                label={t('register.invite_code_label', { defaultValue: 'Invite Code' })}
+                placeholder={t('register.invite_code_placeholder', { defaultValue: 'Enter your invite code' })}
+                value={inviteCode}
+                onChange={(e) => {
+                  setInviteCode(e.target.value.toUpperCase());
+                  setInviteCodeValid(null);
+                }}
+                onBlur={validateInviteCode}
+                startContent={<Ticket className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+                endContent={
+                  inviteCodeChecking ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-theme-subtle" aria-hidden="true" />
+                  ) : inviteCodeValid === true ? (
+                    <Check className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+                  ) : inviteCodeValid === false ? (
+                    <X className="w-4 h-4 text-red-500" aria-hidden="true" />
+                  ) : null
+                }
+                isRequired
+                isInvalid={inviteCodeValid === false}
+                errorMessage={inviteCodeValid === false ? t('register.invite_code_invalid', { defaultValue: 'This invite code is invalid or has been used' }) : ''}
+                description={inviteCodeValid !== false ? t('register.invite_code_description', { defaultValue: 'You need an invite code from a community administrator to register' }) : undefined}
+                classNames={{
+                  inputWrapper:
+                    'glass-card border-glass-border hover:border-glass-border-hover',
+                  label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle uppercase tracking-widest',
+                  description: 'text-theme-subtle text-xs',
                 }}
               />
             )}

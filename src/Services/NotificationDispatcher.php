@@ -1660,6 +1660,39 @@ HTML;
         self::queueNotification($userId, 'verification_failed', $content, $link, 'instant', $htmlContent);
     }
 
+    /**
+     * Notify tenant admins when a user's identity verification completes.
+     */
+    public static function dispatchVerificationCompletedToAdmins(int $userId, string $status): void
+    {
+        $tenantId = \Nexus\Core\TenantContext::getId();
+        $user = \Nexus\Core\Database::query(
+            "SELECT first_name, last_name, email FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetch();
+
+        if (!$user) return;
+
+        $userName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
+        $email = $user['email'] ?? '';
+        $isPassed = $status === 'passed';
+
+        $content = $isPassed
+            ? "Identity verification passed for {$userName} ({$email})"
+            : "Identity verification failed for {$userName} ({$email})";
+        $link = "/admin/members";
+
+        // Notify all admins of this tenant
+        $admins = \Nexus\Core\Database::query(
+            "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'super_admin') AND status = 'active'",
+            [$tenantId]
+        )->fetchAll();
+
+        foreach ($admins as $admin) {
+            Notification::create((int) $admin['id'], $content, $link, 'admin_verification_update');
+        }
+    }
+
     private static function buildVerificationPassedEmail(): string
     {
         $tenant = \Nexus\Core\TenantContext::get();

@@ -148,4 +148,57 @@ class IdentityVerificationSessionService
             [$tenantId, $limit, $offset]
         )->fetchAll();
     }
+
+    /**
+     * Get abandoned sessions (created/started but not completed within $hoursOld hours).
+     * Used by cron to send reminder emails.
+     *
+     * @param int $hoursOld  Sessions older than this many hours
+     * @param int $limit
+     * @return array Sessions with user info
+     */
+    public static function getAbandoned(int $hoursOld = 24, int $limit = 100): array
+    {
+        return Database::query(
+            "SELECT ivs.*, u.first_name, u.last_name, u.email, u.tenant_id
+             FROM identity_verification_sessions ivs
+             JOIN users u ON u.id = ivs.user_id
+             WHERE ivs.status IN ('created', 'started')
+               AND ivs.created_at < DATE_SUB(NOW(), INTERVAL ? HOUR)
+               AND ivs.reminder_sent_at IS NULL
+             ORDER BY ivs.created_at ASC
+             LIMIT ?",
+            [$hoursOld, $limit]
+        )->fetchAll();
+    }
+
+    /**
+     * Mark a session as having had a reminder sent.
+     */
+    public static function markReminderSent(int $sessionId): void
+    {
+        Database::query(
+            "UPDATE identity_verification_sessions SET reminder_sent_at = NOW() WHERE id = ?",
+            [$sessionId]
+        );
+    }
+
+    /**
+     * Expire sessions older than the given hours that are still in created/started status.
+     *
+     * @param int $hoursOld  Sessions older than this many hours
+     * @return int Number of sessions expired
+     */
+    public static function expireAbandoned(int $hoursOld = 72): int
+    {
+        $stmt = Database::query(
+            "UPDATE identity_verification_sessions
+             SET status = 'expired', completed_at = NOW(), updated_at = NOW()
+             WHERE status IN ('created', 'started')
+               AND created_at < DATE_SUB(NOW(), INTERVAL ? HOUR)",
+            [$hoursOld]
+        );
+
+        return $stmt->rowCount();
+    }
 }
