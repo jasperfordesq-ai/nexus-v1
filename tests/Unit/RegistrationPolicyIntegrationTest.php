@@ -172,7 +172,8 @@ class RegistrationPolicyIntegrationTest extends TestCase
         $this->assertContains('verified_identity', $modes);
         $this->assertContains('government_id', $modes);
         $this->assertContains('invite_only', $modes);
-        $this->assertCount(5, $modes);
+        $this->assertContains('waitlist', $modes);
+        $this->assertCount(6, $modes);
     }
 
     public function testValidVerificationLevelsConstant(): void

@@ -69,6 +69,9 @@ class RegistrationOrchestrationService
             case 'invite_only':
                 return self::handleInviteOnly($userId, $tenantId, $policy);
 
+            case 'waitlist':
+                return self::handleWaitlist($userId, $tenantId, $policy);
+
             default:
                 // Unknown mode — safe fallback to approval
                 return self::handleOpenWithApproval($userId, $tenantId, $policy);
@@ -476,6 +479,43 @@ class RegistrationOrchestrationService
             'verification_session' => null,
             'next_steps' => ['Your account is pending review.'],
             'message' => 'Registration received. An administrator will review your request.',
+        ];
+    }
+
+    private static function handleWaitlist(int $userId, int $tenantId, array $policy): array
+    {
+        // Waitlist: user is placed on the waitlist, admin activates in order
+        Database::query(
+            "UPDATE users SET verification_status = 'waitlisted' WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+
+        // Calculate position on waitlist
+        $position = Database::query(
+            "SELECT COUNT(*) AS pos FROM users
+             WHERE tenant_id = ? AND verification_status = 'waitlisted' AND is_approved = 0
+               AND created_at <= (SELECT created_at FROM users WHERE id = ? AND tenant_id = ?)",
+            [$tenantId, $userId, $tenantId]
+        )->fetch()['pos'] ?? 0;
+
+        IdentityVerificationEventService::log(
+            $tenantId,
+            $userId,
+            'waitlist_joined',
+            null, null,
+            IdentityVerificationEventService::ACTOR_SYSTEM,
+            ['position' => (int) $position]
+        );
+
+        return [
+            'action' => 'waitlisted',
+            'requires_verification' => false,
+            'requires_approval' => false,
+            'requires_waitlist' => true,
+            'waitlist_position' => (int) $position,
+            'verification_session' => null,
+            'next_steps' => ["You're on the waitlist! Your position: #{$position}."],
+            'message' => "You've been added to the waitlist. We'll notify you when a spot opens up.",
         ];
     }
 

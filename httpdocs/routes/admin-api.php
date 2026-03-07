@@ -83,6 +83,7 @@ $router->add('GET', '/api/v2/admin/identity/sessions', 'Nexus\Controllers\Api\Re
 $router->add('GET', '/api/v2/admin/identity/audit-log', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getAuditLog');
 $router->add('POST', '/api/v2/admin/identity/sessions/{id}/approve', 'Nexus\Controllers\Api\RegistrationPolicyApiController@adminApproveVerification');
 $router->add('POST', '/api/v2/admin/identity/sessions/{id}/reject', 'Nexus\Controllers\Api\RegistrationPolicyApiController@adminRejectVerification');
+$router->add('GET', '/api/v2/admin/identity/provider-health', 'Nexus\Controllers\Api\IdentityProviderHealthApiController@getProviderHealth');
 $router->add('GET', '/api/v2/admin/invite-codes', 'Nexus\Controllers\Api\RegistrationPolicyApiController@listInviteCodes');
 $router->add('POST', '/api/v2/admin/invite-codes', 'Nexus\Controllers\Api\RegistrationPolicyApiController@generateInviteCodes');
 $router->add('DELETE', '/api/v2/admin/invite-codes/{id}', 'Nexus\Controllers\Api\RegistrationPolicyApiController@deactivateInviteCode');

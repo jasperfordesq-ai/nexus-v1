@@ -382,6 +382,7 @@ class RegistrationPolicyApiController extends BaseApiController
             'registration_mode' => $policy['registration_mode'],
             'requires_invite_code' => $policy['registration_mode'] === 'invite_only',
             'requires_verification' => in_array($policy['registration_mode'], ['verified_identity', 'government_id'], true),
+            'is_waitlist' => $policy['registration_mode'] === 'waitlist',
         ]);
     }
 }

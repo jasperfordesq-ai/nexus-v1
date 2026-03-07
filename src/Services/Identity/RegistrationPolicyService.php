@@ -24,6 +24,7 @@ class RegistrationPolicyService
         'verified_identity',
         'government_id',
         'invite_only',
+        'waitlist',
     ];
 
     /** Valid verification levels */
