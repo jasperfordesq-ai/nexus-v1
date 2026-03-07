@@ -170,6 +170,7 @@ export interface RegisterRequest {
   phone?: string;
   terms_accepted: boolean;
   newsletter_opt_in?: boolean;
+  invite_code?: string;
 }
 
 export interface RegisterResponse {

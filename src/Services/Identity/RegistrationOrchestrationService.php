@@ -224,6 +224,9 @@ class RegistrationOrchestrationService
             [$dbStatus, $completedAt, $userId, $tenantId]
         );
 
+        // Notify admins of verification result (both pass and fail)
+        \Nexus\Services\NotificationDispatcher::dispatchVerificationCompletedToAdmins($userId, $verificationStatus);
+
         if ($verificationStatus === 'passed') {
             // Send verification passed email
             \Nexus\Services\NotificationDispatcher::dispatchVerificationPassed($userId);
@@ -474,5 +477,152 @@ class RegistrationOrchestrationService
             'next_steps' => ['Your account is pending review.'],
             'message' => 'Registration received. An administrator will review your request.',
         ];
+    }
+
+    /**
+     * Admin review: approve or reject a verification session.
+     *
+     * @param int    $sessionId  identity_verification_sessions.id
+     * @param int    $adminId    The admin performing the review
+     * @param string $decision   'approve' or 'reject'
+     * @return array Result with status and message
+     * @throws \InvalidArgumentException If session not found or invalid decision
+     */
+    public static function adminReview(int $sessionId, int $adminId, string $decision): array
+    {
+        if (!in_array($decision, ['approve', 'reject'], true)) {
+            throw new \InvalidArgumentException('Decision must be "approve" or "reject".');
+        }
+
+        $session = IdentityVerificationSessionService::getById($sessionId);
+        if (!$session) {
+            throw new \InvalidArgumentException('Verification session not found.');
+        }
+
+        $tenantId = (int) $session['tenant_id'];
+        $userId = (int) $session['user_id'];
+
+        // Verify tenant matches current context
+        if ($tenantId !== TenantContext::getId()) {
+            throw new \InvalidArgumentException('Session does not belong to this tenant.');
+        }
+
+        if ($decision === 'approve') {
+            // Update session status to passed
+            IdentityVerificationSessionService::updateStatus($sessionId, 'passed', null, null, null);
+
+            // Activate the user
+            Database::query(
+                "UPDATE users SET is_approved = 1, verification_status = 'passed', verification_completed_at = ? WHERE id = ? AND tenant_id = ?",
+                [date('Y-m-d H:i:s'), $userId, $tenantId]
+            );
+
+            // Log admin approved event
+            IdentityVerificationEventService::log(
+                $tenantId,
+                $userId,
+                IdentityVerificationEventService::EVENT_ADMIN_APPROVED,
+                $sessionId,
+                $adminId,
+                IdentityVerificationEventService::ACTOR_ADMIN,
+                ['decision' => 'approve', 'admin_id' => $adminId],
+                \Nexus\Core\ClientIp::get(),
+                $_SERVER['HTTP_USER_AGENT'] ?? null
+            );
+
+            // Log account activated event
+            IdentityVerificationEventService::log(
+                $tenantId,
+                $userId,
+                IdentityVerificationEventService::EVENT_ACCOUNT_ACTIVATED,
+                $sessionId,
+                $adminId,
+                IdentityVerificationEventService::ACTOR_ADMIN,
+                ['reason' => 'admin_approved']
+            );
+
+            // Notify the user
+            \Nexus\Services\NotificationDispatcher::dispatchVerificationPassed($userId);
+
+            return [
+                'status' => 'approved',
+                'message' => 'User has been approved and activated.',
+                'user_id' => $userId,
+                'session_id' => $sessionId,
+            ];
+        } else {
+            // Reject
+            IdentityVerificationSessionService::updateStatus(
+                $sessionId,
+                'failed',
+                null,
+                null,
+                'Rejected by administrator'
+            );
+
+            // Update user verification status
+            Database::query(
+                "UPDATE users SET verification_status = 'failed', verification_completed_at = ? WHERE id = ? AND tenant_id = ?",
+                [date('Y-m-d H:i:s'), $userId, $tenantId]
+            );
+
+            // Log admin rejected event
+            IdentityVerificationEventService::log(
+                $tenantId,
+                $userId,
+                IdentityVerificationEventService::EVENT_ADMIN_REJECTED,
+                $sessionId,
+                $adminId,
+                IdentityVerificationEventService::ACTOR_ADMIN,
+                ['decision' => 'reject', 'admin_id' => $adminId],
+                \Nexus\Core\ClientIp::get(),
+                $_SERVER['HTTP_USER_AGENT'] ?? null
+            );
+
+            // Notify the user
+            \Nexus\Services\NotificationDispatcher::dispatchVerificationFailed($userId, 'Rejected by administrator');
+
+            return [
+                'status' => 'rejected',
+                'message' => 'User verification has been rejected.',
+                'user_id' => $userId,
+                'session_id' => $sessionId,
+            ];
+        }
+    }
+
+    /**
+     * Send reminder emails for abandoned verification sessions (24h+).
+     * Intended to run hourly via cron.
+     *
+     * @return int Number of reminders sent
+     */
+    public static function sendVerificationReminders(): int
+    {
+        $abandoned = IdentityVerificationSessionService::getAbandoned(24, 100);
+        $count = 0;
+
+        foreach ($abandoned as $row) {
+            try {
+                \Nexus\Services\NotificationDispatcher::dispatchVerificationReminder((int) $row['user_id']);
+                IdentityVerificationSessionService::markReminderSent((int) $row['id']);
+                $count++;
+            } catch (\Throwable $e) {
+                error_log("[VerificationReminder] Failed for session {$row['id']}: " . $e->getMessage());
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Expire verification sessions older than 72 hours.
+     * Intended to run daily via cron.
+     *
+     * @return int Number of sessions expired
+     */
+    public static function expireAbandonedSessions(): int
+    {
+        return IdentityVerificationSessionService::expireAbandoned(72);
     }
 }

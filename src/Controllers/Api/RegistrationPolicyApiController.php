@@ -121,6 +121,31 @@ class RegistrationPolicyApiController extends BaseApiController
         $this->respondWithData($sessions);
     }
 
+    /**
+     * GET /api/v2/admin/identity/audit-log
+     *
+     * Returns verification audit events for the current tenant.
+     * Query params: ?event_type=verification_passed&limit=50&offset=0
+     */
+    public function getAuditLog(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $limit = min($this->inputInt('limit', 50), 100);
+        $offset = max($this->inputInt('offset', 0), 0);
+        $eventType = $this->input('event_type', null);
+
+        $result = \Nexus\Services\Identity\IdentityVerificationEventService::getForTenant(
+            $tenantId,
+            $limit,
+            $offset,
+            $eventType
+        );
+
+        $this->respondWithData($result);
+    }
+
     // ─── User-Facing Endpoints ───────────────────────────────────────────
 
     /**
@@ -146,9 +171,16 @@ class RegistrationPolicyApiController extends BaseApiController
      */
     public function startVerification(): void
     {
+        // Rate limit: 5 verification starts per user per hour
         $user = $this->requireAuth();
         $tenantId = (int) $user['tenant_id'];
         $userId = (int) $user['id'];
+
+        if (\Nexus\Services\RateLimitService::check("verify:start:$userId", 5, 3600)) {
+            header('Retry-After: 3600');
+            $this->respondWithError(ApiErrorCodes::RATE_LIMIT_EXCEEDED, 'Too many verification attempts. Please try again later.', null, 429);
+        }
+        \Nexus\Services\RateLimitService::increment("verify:start:$userId", 3600);
 
         try {
             $result = RegistrationOrchestrationService::initiateVerification($userId, $tenantId);
@@ -159,6 +191,74 @@ class RegistrationPolicyApiController extends BaseApiController
                 $e->getMessage(),
                 null,
                 503
+            );
+        }
+    }
+
+    // ─── Admin Review Endpoints ──────────────────────────────────────────
+
+    /**
+     * POST /api/v2/admin/identity/sessions/{id}/approve
+     *
+     * Approve a pending verification session. Activates the user.
+     */
+    public function adminApproveVerification(): void
+    {
+        $admin = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $sessionId = (int) $this->getRouteParam('id');
+
+        if (!$sessionId) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Session ID required', null, 400);
+            return;
+        }
+
+        try {
+            $result = RegistrationOrchestrationService::adminReview(
+                $sessionId,
+                (int) $admin['id'],
+                'approve'
+            );
+            $this->respondWithData($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_INVALID_VALUE,
+                $e->getMessage(),
+                null,
+                422
+            );
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/identity/sessions/{id}/reject
+     *
+     * Reject a pending verification session. Marks verification as failed.
+     */
+    public function adminRejectVerification(): void
+    {
+        $admin = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $sessionId = (int) $this->getRouteParam('id');
+
+        if (!$sessionId) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Session ID required', null, 400);
+            return;
+        }
+
+        try {
+            $result = RegistrationOrchestrationService::adminReview(
+                $sessionId,
+                (int) $admin['id'],
+                'reject'
+            );
+            $this->respondWithData($result);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError(
+                ApiErrorCodes::VALIDATION_INVALID_VALUE,
+                $e->getMessage(),
+                null,
+                422
             );
         }
     }
@@ -239,6 +339,14 @@ class RegistrationPolicyApiController extends BaseApiController
      */
     public function validateInviteCode(): void
     {
+        // Rate limit: 10 invite code checks per IP per minute (anti-brute-force)
+        $ip = \Nexus\Core\ClientIp::get();
+        if (\Nexus\Services\RateLimitService::check("invite:validate:$ip", 10, 60)) {
+            header('Retry-After: 60');
+            $this->respondWithError(ApiErrorCodes::RATE_LIMIT_EXCEEDED, 'Too many attempts. Please try again later.', null, 429);
+        }
+        \Nexus\Services\RateLimitService::increment("invite:validate:$ip", 60);
+
         $input = $this->getAllInput();
         $code = $input['code'] ?? '';
 
@@ -249,5 +357,31 @@ class RegistrationPolicyApiController extends BaseApiController
         $tenantId = TenantContext::getId();
         $result = InviteCodeService::validate($tenantId, $code);
         $this->respondWithData(['valid' => $result['valid'], 'reason' => $result['reason'] ?? null]);
+    }
+
+    /**
+     * GET /api/v2/auth/registration-info
+     *
+     * Public endpoint — returns the tenant's registration mode so the
+     * registration form can conditionally show invite code fields.
+     */
+    public function getRegistrationInfo(): void
+    {
+        // Rate limit: 30 per IP per minute (lightweight but protective)
+        $ip = \Nexus\Core\ClientIp::get();
+        if (\Nexus\Services\RateLimitService::check("reg:info:$ip", 30, 60)) {
+            header('Retry-After: 60');
+            $this->respondWithError(ApiErrorCodes::RATE_LIMIT_EXCEEDED, 'Too many requests.', null, 429);
+        }
+        \Nexus\Services\RateLimitService::increment("reg:info:$ip", 60);
+
+        $tenantId = TenantContext::getId();
+        $policy = RegistrationPolicyService::getEffectivePolicy($tenantId);
+
+        $this->respondWithData([
+            'registration_mode' => $policy['registration_mode'],
+            'requires_invite_code' => $policy['registration_mode'] === 'invite_only',
+            'requires_verification' => in_array($policy['registration_mode'], ['verified_identity', 'government_id'], true),
+        ]);
     }
 }

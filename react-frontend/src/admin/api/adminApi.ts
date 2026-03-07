@@ -1182,7 +1182,10 @@ export const adminTools = {
     api.post('/v2/admin/tools/redirects', data),
   deleteRedirect: (id: number) => api.delete('/v2/admin/tools/redirects/' + id),
 
-  get404Errors: () => api.get<Array<{ id: number; url: string; referrer: string; hits: number; first_seen: string; last_seen: string }>>('/v2/admin/tools/404-errors'),
+  get404Errors: (page = 1, perPage = 50) =>
+    api.get<{ items: Array<{ id: number; url: string; referrer: string; hits: number; first_seen: string; last_seen: string }>; total: number; page: number; per_page: number }>(
+      `/v2/admin/tools/404-errors?page=${page}&per_page=${perPage}`
+    ),
   delete404Error: (id: number) => api.delete('/v2/admin/tools/404-errors/' + id),
 
   runHealthCheck: () => api.post<Array<{ name: string; status: string; duration_ms: number; error?: string }>>('/v2/admin/tools/health-check'),

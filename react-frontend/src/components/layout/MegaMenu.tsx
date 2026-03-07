@@ -139,11 +139,18 @@ export function MegaMenu({
   };
 
   return (
+    <>
+    {/* Screen reader announcement for menu state changes */}
+    <div className="sr-only" aria-live="polite" aria-atomic="true">
+      {isOpen ? t('accessibility.menu_opened', 'Navigation menu opened') : ''}
+    </div>
     <Popover placement="bottom-start" isOpen={isOpen} onOpenChange={onOpenChange} shouldBlockScroll={false} offset={8}>
       <PopoverTrigger>
         <Button
           variant="light"
           size="sm"
+          aria-expanded={isOpen}
+          aria-haspopup="true"
           className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all ${
             isActive
               ? 'bg-theme-active text-theme-primary'
@@ -170,6 +177,7 @@ export function MegaMenu({
         </nav>
       </PopoverContent>
     </Popover>
+    </>
   );
 }
 

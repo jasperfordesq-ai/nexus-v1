@@ -15,6 +15,8 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
 } from '@heroui/react';
 import { ShieldCheck, Save, Info, AlertTriangle, Key, Ticket, Plus, Trash2, Copy, Eye, EyeOff } from 'lucide-react';
+import { VerificationAuditLog } from './VerificationAuditLog';
+import { VerificationReviewQueue } from './VerificationReviewQueue';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -575,6 +577,12 @@ export function RegistrationPolicySettings() {
             Save Registration Policy
           </Button>
         </div>
+
+        {/* Pending Verification Reviews */}
+        <VerificationReviewQueue />
+
+        {/* Audit Log */}
+        <VerificationAuditLog />
       </div>
     </div>
   );

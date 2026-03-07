@@ -166,7 +166,8 @@
     "notifications_unread": "Benachrichtigungen, {{count}} ungelesen",
     "switch_to_light": "Zum hellen Modus wechseln",
     "switch_to_dark": "Zum dunklen Modus wechseln",
-    "skip_to_content": "Zum Hauptinhalt springen"
+    "skip_to_content": "Zum Hauptinhalt springen",
+    "menu_opened": "Navigationsmenü geöffnet"
   },
   "cookie_consent": {
     "banner_label": "Cookie-Zustimmung",

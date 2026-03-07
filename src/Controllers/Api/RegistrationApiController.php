@@ -257,6 +257,29 @@ class RegistrationApiController extends BaseApiController
             );
         }
 
+        // Validate invite code if tenant requires it
+        $inviteCode = trim($this->input('invite_code', ''));
+        $policy = \Nexus\Services\Identity\RegistrationPolicyService::getEffectivePolicy($tenantId);
+        if ($policy['registration_mode'] === 'invite_only') {
+            if (empty($inviteCode)) {
+                $this->respondWithError(
+                    ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                    'An invite code is required to register for this community.',
+                    'invite_code',
+                    422
+                );
+            }
+            $codeResult = \Nexus\Services\Identity\InviteCodeService::validate($tenantId, $inviteCode);
+            if (!$codeResult['valid']) {
+                $this->respondWithError(
+                    ApiErrorCodes::VALIDATION_INVALID_VALUE,
+                    $codeResult['reason'] ?? 'Invalid invite code.',
+                    'invite_code',
+                    422
+                );
+            }
+        }
+
         // Check if email already exists
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
@@ -305,6 +328,11 @@ class RegistrationApiController extends BaseApiController
                 null,
                 500
             );
+        }
+
+        // Redeem invite code if used
+        if ($policy['registration_mode'] === 'invite_only' && !empty($inviteCode)) {
+            \Nexus\Services\Identity\InviteCodeService::redeem($tenantId, $inviteCode, $userId);
         }
 
         // Post-registration actions (non-blocking)

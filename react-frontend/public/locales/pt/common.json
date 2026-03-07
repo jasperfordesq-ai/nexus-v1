@@ -166,7 +166,8 @@
     "notifications_unread": "Notificações, {{count}} não lidas",
     "switch_to_light": "Mudar para modo claro",
     "switch_to_dark": "Mudar para modo escuro",
-    "skip_to_content": "Ir para o conteúdo principal"
+    "skip_to_content": "Ir para o conteúdo principal",
+    "menu_opened": "Menu de navegação aberto"
   },
   "cookie_consent": {
     "banner_label": "Consentimento de cookies",

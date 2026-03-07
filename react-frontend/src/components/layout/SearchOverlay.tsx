@@ -9,7 +9,7 @@
  * Extracted from Navbar for better separation of concerns.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@heroui/react';
@@ -151,6 +151,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }
   }, [searchQuery, navigate, tenantPath, selectedIndex, suggestions, handleSuggestionClick, closeAndReset]);
 
+  // Respect prefers-reduced-motion
+  const prefersReducedMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
   const typeLabels: Record<string, { label: string; color: string }> = {
     listing: { label: t('search.type_listing'), color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
     user: { label: t('search.type_member'), color: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
@@ -164,22 +170,27 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         <>
           {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
             onClick={closeAndReset}
           />
 
           {/* Search Panel */}
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.15 }}
             className="fixed top-20 sm:top-28 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
           >
-            <div className="bg-[var(--surface-dropdown)] rounded-xl border border-[var(--border-default)] shadow-2xl overflow-hidden">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={t('accessibility.search', 'Search')}
+              className="bg-[var(--surface-dropdown)] rounded-xl border border-[var(--border-default)] shadow-2xl overflow-hidden"
+            >
               <form onSubmit={handleSearchSubmit} className="flex items-center px-4 py-3 gap-3">
                 <Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />
                 <input
