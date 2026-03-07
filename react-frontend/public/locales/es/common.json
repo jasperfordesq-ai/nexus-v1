@@ -44,7 +44,8 @@
     "ai_chat": "Asistente IA",
     "skills": "Habilidades",
     "nexus_score": "NexusScore",
-    "knowledge_base": "Base de conocimiento"
+    "knowledge_base": "Base de conocimiento",
+    "federation_settings": "Configuración de Federación"
   },
   "nav_desc": {
     "members": "Explorar miembros de la comunidad",
@@ -83,7 +84,8 @@
     "social_prescribing": "Derivaciones de salud y bienestar",
     "our_impact": "Resumen de impacto comunitario",
     "impact_report": "Datos de impacto detallados",
-    "strategic_plan": "Nuestra dirección estratégica"
+    "strategic_plan": "Nuestra dirección estratégica",
+    "federation_settings": "Gestiona tus preferencias de federación"
   },
   "user_menu": {
     "my_profile": "Mi Perfil",
@@ -200,7 +202,7 @@
     "pages": "Páginas",
     "cookie_settings": "Configuración de Cookies",
     "built_on_nexus": "Construido sobre Project NEXUS — Plataforma Comunitaria de Código Abierto",
-    "agpl_notice": "AGPL-3.0 — Copyright \u00a9 2024\u2013{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
     "terms": "Términos",
     "privacy": "Privacidad"
   },

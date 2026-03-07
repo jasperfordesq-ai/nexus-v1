@@ -44,7 +44,8 @@
     "ai_chat": "Assistente de IA",
     "skills": "Competências",
     "nexus_score": "NexusScore",
-    "knowledge_base": "Base de conhecimento"
+    "knowledge_base": "Base de conhecimento",
+    "federation_settings": "Configurações de Federação"
   },
   "nav_desc": {
     "members": "Explorar membros da comunidade",
@@ -83,7 +84,8 @@
     "social_prescribing": "Encaminhamentos de saúde e bem-estar",
     "our_impact": "Resumo do impacto comunitário",
     "impact_report": "Dados de impacto detalhados",
-    "strategic_plan": "A nossa direção estratégica"
+    "strategic_plan": "A nossa direção estratégica",
+    "federation_settings": "Gerencie suas preferências de federação"
   },
   "user_menu": {
     "my_profile": "O Meu Perfil",
