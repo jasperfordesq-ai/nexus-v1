@@ -67,5 +67,9 @@
   "passkey_confirm_remove_all_title": "Remove All Passkeys",
   "passkey_confirm_remove_all_body": "Are you sure you want to remove all passkeys? You'll need to set them up again on each device.",
   "passkey_confirm_remove_all_cancel": "Cancel",
-  "passkey_confirm_remove_all_confirm": "Remove All"
+  "passkey_confirm_remove_all_confirm": "Remove All",
+  "passkey_rename": "Rename passkey",
+  "passkey_rename_input": "New passkey name",
+  "passkey_renamed": "Passkey renamed.",
+  "passkey_rename_failed": "Failed to rename passkey"
 }

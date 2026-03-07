@@ -67,5 +67,9 @@
   "passkey_confirm_remove_all_title": "Eliminar todos los passkeys",
   "passkey_confirm_remove_all_body": "¿Está seguro de que desea eliminar todos los passkeys? Deberá configurarlos nuevamente en cada dispositivo.",
   "passkey_confirm_remove_all_cancel": "Cancelar",
-  "passkey_confirm_remove_all_confirm": "Eliminar todos"
+  "passkey_confirm_remove_all_confirm": "Eliminar todos",
+  "passkey_rename": "Renombrar passkey",
+  "passkey_rename_input": "Nuevo nombre del passkey",
+  "passkey_renamed": "Passkey renombrado.",
+  "passkey_rename_failed": "Error al renombrar el passkey"
 }

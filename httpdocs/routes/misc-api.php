@@ -70,6 +70,7 @@ $router->add('POST', '/api/v2/auth/register', 'Nexus\Controllers\Api\Registratio
 $router->add('GET', '/api/v2/auth/verification-status', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getVerificationStatus');
 $router->add('POST', '/api/v2/auth/start-verification', 'Nexus\Controllers\Api\RegistrationPolicyApiController@startVerification');
 $router->add('POST', '/api/v2/auth/validate-invite', 'Nexus\Controllers\Api\RegistrationPolicyApiController@validateInviteCode');
+$router->add('GET', '/api/v2/auth/registration-info', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getRegistrationInfo');
 
 // Identity Verification Webhooks (provider callbacks — no auth, signature-verified)
 $router->add('POST', '/api/v2/webhooks/identity/{provider_slug}', 'Nexus\Controllers\Api\IdentityWebhookController@handleWebhook');
@@ -114,6 +115,7 @@ $router->add('POST', '/api/webauthn/register-verify', 'Nexus\Controllers\Api\Web
 $router->add('POST', '/api/webauthn/auth-challenge', 'Nexus\Controllers\Api\WebAuthnApiController@authChallenge');
 $router->add('POST', '/api/webauthn/auth-verify', 'Nexus\Controllers\Api\WebAuthnApiController@authVerify');
 $router->add('POST', '/api/webauthn/remove', 'Nexus\Controllers\Api\WebAuthnApiController@remove');
+$router->add('POST', '/api/webauthn/rename', 'Nexus\Controllers\Api\WebAuthnApiController@rename');
 $router->add('POST', '/api/webauthn/remove-all', 'Nexus\Controllers\Api\WebAuthnApiController@removeAll'); // SECURITY: Changed to POST only
 $router->add('GET', '/api/webauthn/credentials', 'Nexus\Controllers\Api\WebAuthnApiController@credentials');
 $router->add('GET', '/api/webauthn/status', 'Nexus\Controllers\Api\WebAuthnApiController@status'); // Status endpoint
@@ -948,6 +950,10 @@ $router->add('GET', '/cron/federation-weekly-digest', 'Nexus\Controllers\CronCon
 $router->add('GET', '/cron/process-newsletters', 'Nexus\Controllers\CronController@processNewsletters');
 $router->add('GET', '/cron/process-recurring', 'Nexus\Controllers\CronController@processRecurring');
 $router->add('GET', '/cron/process-newsletter-queue', 'Nexus\Controllers\CronController@processNewsletterQueue');
+
+// Identity Verification Maintenance
+$router->add('GET', '/cron/verification-reminders', 'Nexus\Controllers\CronController@verificationReminders');
+$router->add('GET', '/cron/expire-verifications', 'Nexus\Controllers\CronController@expireVerifications');
 
 // Maintenance
 $router->add('GET', '/cron/cleanup', 'Nexus\Controllers\CronController@cleanup');

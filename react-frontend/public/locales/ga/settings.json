@@ -67,5 +67,9 @@
   "passkey_confirm_remove_all_title": "Bain gach passkey",
   "passkey_confirm_remove_all_body": "An bhfuil tú cinnte gur mian leat gach passkey a bhaint? Beidh ort iad a shocrú arís ar gach gléas.",
   "passkey_confirm_remove_all_cancel": "Cealaigh",
-  "passkey_confirm_remove_all_confirm": "Bain gach ceann"
+  "passkey_confirm_remove_all_confirm": "Bain gach ceann",
+  "passkey_rename": "Athainmnigh passkey",
+  "passkey_rename_input": "Ainm nua an passkey",
+  "passkey_renamed": "Passkey athainmnithe.",
+  "passkey_rename_failed": "Theip ar athainmniú an passkey"
 }
