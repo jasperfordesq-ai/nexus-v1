@@ -44,7 +44,8 @@
     "ai_chat": "Cúntóir AI",
     "skills": "Scileanna",
     "nexus_score": "NexusScore",
-    "knowledge_base": "Bunachar eolais"
+    "knowledge_base": "Bunachar eolais",
+    "federation_settings": "Socruithe Cónaidhme"
   },
   "nav_desc": {
     "members": "Brabhsáil baill an phobail",
@@ -83,7 +84,8 @@
     "social_prescribing": "Atreoruithe sláinte & folláine",
     "our_impact": "Achoimre ar thionchar an phobail",
     "impact_report": "Sonraí mionsonraithe tionchair",
-    "strategic_plan": "Ár dtreo straitéiseach"
+    "strategic_plan": "Ár dtreo straitéiseach",
+    "federation_settings": "Bainistigh do roghanna cónaidhme"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",
@@ -200,7 +202,7 @@
     "pages": "Leathanaigh",
     "cookie_settings": "Socruithe Fianán",
     "built_on_nexus": "Tógtha ar Project NEXUS — Ardán Pobail Foinse Oscailte",
-    "agpl_notice": "AGPL-3.0 — Cóipcheart \u00a9 2024\u2013{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — Cóipcheart © 2024–{{year}} Jasper Ford",
     "terms": "Téarmaí",
     "privacy": "Príobháideachas"
   },
