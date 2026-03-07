@@ -89,7 +89,8 @@ class RegistrationPolicyApiController extends BaseApiController
 
         $providers = IdentityProviderRegistry::listForAdmin();
 
-        // Add availability status per provider for this tenant
+        // Add availability status and credential info per provider for this tenant
+        $configured = \Nexus\Services\Identity\TenantProviderCredentialService::listConfigured($tenantId);
         foreach ($providers as &$provider) {
             try {
                 $instance = IdentityProviderRegistry::get($provider['slug']);
@@ -97,6 +98,7 @@ class RegistrationPolicyApiController extends BaseApiController
             } catch (\Throwable $e) {
                 $provider['available'] = false;
             }
+            $provider['has_credentials'] = isset($configured[$provider['slug']]);
         }
 
         $this->respondWithData($providers);
@@ -261,6 +263,92 @@ class RegistrationPolicyApiController extends BaseApiController
                 422
             );
         }
+    }
+
+    // ─── Provider Credential Endpoints ──────────────────────────────────────
+
+    /**
+     * GET /api/v2/admin/identity/provider-credentials
+     *
+     * Returns which providers have tenant-specific credentials configured.
+     */
+    public function listProviderCredentials(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $configured = \Nexus\Services\Identity\TenantProviderCredentialService::listConfigured($tenantId);
+        $allProviders = IdentityProviderRegistry::all();
+
+        $result = [];
+        foreach ($allProviders as $slug => $provider) {
+            if ($slug === 'mock') continue; // Mock never needs credentials
+            $result[] = [
+                'provider_slug' => $slug,
+                'provider_name' => $provider->getName(),
+                'has_credentials' => isset($configured[$slug]),
+                'required_fields' => \Nexus\Services\Identity\TenantProviderCredentialService::getRequiredFields($slug),
+            ];
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * PUT /api/v2/admin/identity/provider-credentials/{slug}
+     *
+     * Save API credentials for a specific provider.
+     * Body: { "api_key": "sk_live_...", "webhook_secret": "whsec_..." }
+     */
+    public function saveProviderCredentials(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $slug = $this->getRouteParam('slug');
+
+        if (!$slug || !IdentityProviderRegistry::has($slug)) {
+            $this->respondWithError(\Nexus\Core\ApiErrorCodes::NOT_FOUND, 'Unknown provider', null, 404);
+            return;
+        }
+
+        $input = $this->getAllInput();
+        $credentials = [];
+
+        // Only accept known credential fields
+        $allowedFields = ['api_key', 'webhook_secret'];
+        foreach ($allowedFields as $field) {
+            if (isset($input[$field]) && is_string($input[$field]) && $input[$field] !== '') {
+                $credentials[$field] = $input[$field];
+            }
+        }
+
+        if (empty($credentials)) {
+            $this->respondWithError(\Nexus\Core\ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'At least one credential field is required', null, 422);
+            return;
+        }
+
+        $saved = \Nexus\Services\Identity\TenantProviderCredentialService::save($tenantId, $slug, $credentials);
+        $this->respondWithData(['saved' => $saved, 'provider_slug' => $slug]);
+    }
+
+    /**
+     * DELETE /api/v2/admin/identity/provider-credentials/{slug}
+     *
+     * Remove stored credentials for a specific provider.
+     */
+    public function deleteProviderCredentials(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $slug = $this->getRouteParam('slug');
+
+        if (!$slug || !IdentityProviderRegistry::has($slug)) {
+            $this->respondWithError(\Nexus\Core\ApiErrorCodes::NOT_FOUND, 'Unknown provider', null, 404);
+            return;
+        }
+
+        $deleted = \Nexus\Services\Identity\TenantProviderCredentialService::delete($tenantId, $slug);
+        $this->respondWithData(['deleted' => $deleted, 'provider_slug' => $slug]);
     }
 
     // ─── Invite Code Endpoints ────────────────────────────────────────────

@@ -107,11 +107,16 @@ class RegistrationOrchestrationService
             throw new \RuntimeException('Identity verification provider is currently unavailable.');
         }
 
-        // Load provider config for tenant
-        $policyRow = RegistrationPolicyService::getPolicy($tenantId);
+        // Load provider config: tenant-specific credentials take priority, then legacy policy blob
         $providerConfig = [];
-        if ($policyRow && $policyRow['provider_config']) {
-            $providerConfig = RegistrationPolicyService::decryptConfig($policyRow['provider_config']);
+        $tenantCreds = TenantProviderCredentialService::get($tenantId, $policy['verification_provider']);
+        if ($tenantCreds) {
+            $providerConfig = $tenantCreds;
+        } else {
+            $policyRow = RegistrationPolicyService::getPolicy($tenantId);
+            if ($policyRow && !empty($policyRow['provider_config'])) {
+                $providerConfig = RegistrationPolicyService::decryptConfig($policyRow['provider_config']);
+            }
         }
 
         // Create session with provider
