@@ -187,7 +187,24 @@ class TenantSettingsService
             ];
         }
 
-        // Gate 2: Admin approval
+        // Gate 2: Identity verification (if tenant uses verified_identity or government_id mode)
+        $verificationStatus = $user['verification_status'] ?? 'none';
+        if ($verificationStatus === 'pending') {
+            return [
+                'code' => 'AUTH_PENDING_VERIFICATION',
+                'message' => 'Your identity verification is in progress. Please complete the verification process to continue.',
+                'extra' => ['pending_verification' => true, 'verification_status' => 'pending'],
+            ];
+        }
+        if ($verificationStatus === 'failed') {
+            return [
+                'code' => 'AUTH_VERIFICATION_FAILED',
+                'message' => 'Your identity verification did not pass. Please contact support or try again.',
+                'extra' => ['verification_failed' => true, 'verification_status' => 'failed'],
+            ];
+        }
+
+        // Gate 3: Admin approval
         if (self::requiresAdminApproval($tenantId) && empty($user['is_approved'])) {
             return [
                 'code' => 'AUTH_ACCOUNT_PENDING_APPROVAL',

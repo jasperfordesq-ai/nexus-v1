@@ -66,6 +66,13 @@ $router->add('GET', '/api/csrf-token', 'Nexus\Controllers\Api\AuthController@get
 // V2 Registration API (returns tokens immediately, field-level errors)
 $router->add('POST', '/api/v2/auth/register', 'Nexus\Controllers\Api\RegistrationApiController@register');
 
+// Identity Verification API (user-facing)
+$router->add('GET', '/api/v2/auth/verification-status', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getVerificationStatus');
+$router->add('POST', '/api/v2/auth/start-verification', 'Nexus\Controllers\Api\RegistrationPolicyApiController@startVerification');
+
+// Identity Verification Webhooks (provider callbacks — no auth, signature-verified)
+$router->add('POST', '/api/v2/webhooks/identity/{provider_slug}', 'Nexus\Controllers\Api\IdentityWebhookController@handleWebhook');
+
 // OpenAPI Documentation (accessible without auth)
 $router->add('GET', '/api/docs', 'Nexus\Controllers\Api\OpenApiController@ui');
 $router->add('GET', '/api/docs/openapi.json', 'Nexus\Controllers\Api\OpenApiController@json');

@@ -166,3 +166,4 @@ firebase-service-account.json
 *.key
 *-api-token*
 cloudflare-api-token.txt
+nexus_backup_2026-03-07.sql.gz

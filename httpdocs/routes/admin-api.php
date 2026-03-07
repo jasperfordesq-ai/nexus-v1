@@ -75,6 +75,12 @@ $router->add('POST', '/api/v2/admin/background-jobs/{id}/run', 'Nexus\Controller
 $router->add('GET', '/api/v2/admin/settings', 'Nexus\Controllers\Api\AdminConfigApiController@getSettings');
 $router->add('PUT', '/api/v2/admin/settings', 'Nexus\Controllers\Api\AdminConfigApiController@updateSettings');
 
+// Admin Config - Registration Policy & Identity Verification
+$router->add('GET', '/api/v2/admin/config/registration-policy', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getPolicy');
+$router->add('PUT', '/api/v2/admin/config/registration-policy', 'Nexus\Controllers\Api\RegistrationPolicyApiController@updatePolicy');
+$router->add('GET', '/api/v2/admin/identity/providers', 'Nexus\Controllers\Api\RegistrationPolicyApiController@listProviders');
+$router->add('GET', '/api/v2/admin/identity/sessions', 'Nexus\Controllers\Api\RegistrationPolicyApiController@listSessions');
+
 // Admin Config - AI
 $router->add('GET', '/api/v2/admin/config/ai', 'Nexus\Controllers\Api\AdminConfigApiController@getAiConfig');
 $router->add('PUT', '/api/v2/admin/config/ai', 'Nexus\Controllers\Api\AdminConfigApiController@updateAiConfig');

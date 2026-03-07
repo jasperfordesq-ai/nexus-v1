@@ -162,6 +162,7 @@ const ActivityTimeline = lazy(() => import('./modules/crm/ActivityTimeline'));
 
 // System tools
 const AdminSettings = lazy(() => import('./modules/system/AdminSettings'));
+const RegistrationPolicySettings = lazy(() => import('./modules/system/RegistrationPolicySettings'));
 const TestRunner = lazy(() => import('./modules/system/TestRunner'));
 const SeedGenerator = lazy(() => import('./modules/system/SeedGenerator'));
 const WebpConverter = lazy(() => import('./modules/system/WebpConverter'));
@@ -396,6 +397,7 @@ export function AdminRoutes() {
 
       {/* ─── SYSTEM ─── */}
       <Route path="settings" element={<Lazy><AdminSettings /></Lazy>} />
+      <Route path="settings/registration-policy" element={<Lazy><RegistrationPolicySettings /></Lazy>} />
       <Route path="tenant-features" element={<Lazy><TenantFeatures /></Lazy>} />
       <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
       <Route path="cron-jobs/logs" element={<Lazy><CronJobLogs /></Lazy>} />
