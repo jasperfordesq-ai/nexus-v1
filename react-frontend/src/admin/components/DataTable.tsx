@@ -204,9 +204,8 @@ export function DataTable<T extends Record<string, any>>({
         isLoading={isLoading}
         loadingContent={<Spinner size="lg" />}
         emptyContent={emptyContent || 'No data found'}
-        items={sortedData}
       >
-        {(item) => (
+        {sortedData.map((item) => (
           <TableRow key={String(item[keyField])}>
             {columns.map((col) => (
               <TableCell key={col.key}>
@@ -216,7 +215,7 @@ export function DataTable<T extends Record<string, any>>({
               </TableCell>
             ))}
           </TableRow>
-        )}
+        ))}
       </TableBody>
     </Table>
   );

@@ -38,7 +38,7 @@ export function Error404Tracking() {
     setLoading(true);
     try {
       const res = await adminTools.get404Errors();
-      setErrors(res.data ?? []);
+      setErrors(Array.isArray(res) ? res : (res.data ?? []));
     } catch {
       toast.error('Failed to load 404 errors');
     } finally {
