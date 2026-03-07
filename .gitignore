@@ -64,8 +64,6 @@ compose.prod.yml
 *.apk
 
 # ─── E2E Testing (Playwright) ────────────────────────────────────────────────
-/e2e/
-playwright.config.ts
 playwright-report/
 test-results/
 
