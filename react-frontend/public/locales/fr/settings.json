@@ -54,5 +54,18 @@
   "backup_codes_warning": "Conservez ces codes en lieu sûr",
   "backup_codes_desc": "Chaque code de secours ne peut être utilisé qu'une seule fois. Si vous perdez l'accès à votre application d'authentification, vous pouvez utiliser ces codes pour vous connecter.",
   "backup_codes_copy": "Copier tous les codes",
-  "backup_codes_saved": "J'ai sauvegardé mes codes"
+  "backup_codes_saved": "J'ai sauvegardé mes codes",
+  "passkey_setup_subtitle": "Configuration pour cet appareil",
+  "passkey_multi_device_note": "Vous pouvez enregistrer des passkeys sur plusieurs appareils. Chaque appareil a besoin de son propre passkey sauf si votre fournisseur les synchronise (ex. Trousseau iCloud entre appareils Apple, Google Password Manager entre Android et Chrome).",
+  "passkey_add_another": "Ajouter un autre passkey",
+  "passkey_create": "Créer un passkey",
+  "passkey_device_tip": "Enregistrez un passkey sur chaque appareil que vous utilisez. Pour ajouter votre téléphone, ouvrez cette page sur votre téléphone.",
+  "passkey_setup_guide": "Guide de configuration",
+  "passkey_registration_failed": "Échec de l'enregistrement",
+  "passkey_remove_failed": "Impossible de supprimer le passkey",
+  "passkey_remove_all_failed": "Impossible de supprimer les passkeys",
+  "passkey_confirm_remove_all_title": "Supprimer tous les passkeys",
+  "passkey_confirm_remove_all_body": "Êtes-vous sûr de vouloir supprimer tous les passkeys ? Vous devrez les reconfigurer sur chaque appareil.",
+  "passkey_confirm_remove_all_cancel": "Annuler",
+  "passkey_confirm_remove_all_confirm": "Tout supprimer"
 }

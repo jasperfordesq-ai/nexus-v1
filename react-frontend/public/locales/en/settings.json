@@ -54,5 +54,18 @@
   "backup_codes_warning": "Save these codes in a safe place",
   "backup_codes_desc": "Each backup code can only be used once. If you lose access to your authenticator app, you can use these codes to sign in.",
   "backup_codes_copy": "Copy All Codes",
-  "backup_codes_saved": "I've Saved My Codes"
+  "backup_codes_saved": "I've Saved My Codes",
+  "passkey_setup_subtitle": "Setup for this device",
+  "passkey_multi_device_note": "You can register passkeys on multiple devices. Each device needs its own passkey unless your passkey provider syncs them (e.g., iCloud Keychain syncs across Apple devices, Google Password Manager syncs across Android and Chrome).",
+  "passkey_add_another": "Add another passkey",
+  "passkey_create": "Create a passkey",
+  "passkey_device_tip": "Register a passkey on each device you use. To add your phone, open this page on your phone.",
+  "passkey_setup_guide": "Setup guide",
+  "passkey_registration_failed": "Registration failed",
+  "passkey_remove_failed": "Failed to remove credential",
+  "passkey_remove_all_failed": "Failed to remove credentials",
+  "passkey_confirm_remove_all_title": "Remove All Passkeys",
+  "passkey_confirm_remove_all_body": "Are you sure you want to remove all passkeys? You'll need to set them up again on each device.",
+  "passkey_confirm_remove_all_cancel": "Cancel",
+  "passkey_confirm_remove_all_confirm": "Remove All"
 }
