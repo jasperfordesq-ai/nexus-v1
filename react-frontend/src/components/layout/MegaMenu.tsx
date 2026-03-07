@@ -101,6 +101,12 @@ export function MegaMenu({
         const prevColStart = columnStarts[currentCol - 1];
         buttons[prevColStart]?.focus();
       }
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      buttons[0]?.focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      buttons[buttons.length - 1]?.focus();
     } else if (e.key === 'Escape') {
       onOpenChange(false);
     }

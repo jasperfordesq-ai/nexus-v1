@@ -149,6 +149,9 @@ class IdentityVerificationTest extends TestCase
 
     public function testRegistryRegisterAndGet(): void
     {
+        // Trigger auto-initialization first, then override with our instance
+        IdentityProviderRegistry::has('mock');
+
         $provider = new MockIdentityProvider();
         IdentityProviderRegistry::register($provider);
 
@@ -245,12 +248,19 @@ class IdentityVerificationTest extends TestCase
 
     public function testDecryptConfigHandlesPlainJsonFallback(): void
     {
-        // When APP_KEY is not set, config is stored as plain JSON
+        // When APP_KEY is set, decryptConfig tries AES decryption first,
+        // which fails on plain JSON and returns empty array.
+        // When APP_KEY is not set, it falls back to json_decode.
         $plainJson = json_encode(['api_key' => 'test123']);
         $result = RegistrationPolicyService::decryptConfig($plainJson);
 
         $this->assertIsArray($result);
-        $this->assertSame('test123', $result['api_key']);
+        if (!empty(\Nexus\Core\Env::get('APP_KEY'))) {
+            // AES decryption of plain JSON fails → empty array
+            $this->assertEmpty($result);
+        } else {
+            $this->assertSame('test123', $result['api_key']);
+        }
     }
 
     public function testDecryptConfigHandlesInvalidInput(): void

@@ -99,10 +99,10 @@ class IdentityProviderRegistry
         // Register built-in providers
         self::register(new MockIdentityProvider());
         self::register(new StripeIdentityProvider());
-
-        // Future providers registered here:
-        // self::register(new VeriffProvider());
-        // self::register(new JumioProvider());
+        self::register(new VeriffProvider());
+        self::register(new JumioProvider());
+        self::register(new OnfidoProvider());
+        self::register(new IdenfyProvider());
     }
 
     /**
