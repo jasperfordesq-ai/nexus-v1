@@ -143,6 +143,7 @@
     "alerts": "Benachrichtigungen"
   },
   "sections": {
+    "main": "Hauptmenü",
     "community": "Community",
     "explore": "Entdecken",
     "federation": "Federation",
@@ -164,7 +165,8 @@
     "notifications": "Benachrichtigungen",
     "notifications_unread": "Benachrichtigungen, {{count}} ungelesen",
     "switch_to_light": "Zum hellen Modus wechseln",
-    "switch_to_dark": "Zum dunklen Modus wechseln"
+    "switch_to_dark": "Zum dunklen Modus wechseln",
+    "skip_to_content": "Zum Hauptinhalt springen"
   },
   "cookie_consent": {
     "banner_label": "Cookie-Zustimmung",

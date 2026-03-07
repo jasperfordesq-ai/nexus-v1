@@ -70,9 +70,6 @@ export function Layout({
         <div className="blob blob-cyan" />
       </div>
 
-      {/* Development status banner — always visible, non-dismissible */}
-      <DevelopmentStatusBanner />
-
       {/* Offline indicator */}
       <OfflineIndicator />
 
@@ -97,7 +94,7 @@ export function Layout({
 
       {/* Main Content */}
       <main
-        className={`flex-1 relative z-10 min-w-0 ${withNavbarPadding && showNavbar ? 'pt-14 sm:pt-24' : ''}`}
+        className={`flex-1 relative z-10 min-w-0 ${withNavbarPadding && showNavbar ? 'pt-20 sm:pt-[7.5rem]' : ''}`}
       >
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 min-w-0">
           <Outlet />

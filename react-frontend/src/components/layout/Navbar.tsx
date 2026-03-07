@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Button,
@@ -251,6 +252,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       </a>
 
       <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip">
+        {/* Development status banner — inside fixed header so it's always visible */}
+        <DevelopmentStatusBanner />
+
         {/* Utility Bar — slim top strip for secondary actions */}
         <div className="hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)]">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

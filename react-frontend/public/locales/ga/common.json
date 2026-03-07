@@ -143,6 +143,7 @@
     "alerts": "Foláirimh"
   },
   "sections": {
+    "main": "Príomh",
     "community": "Pobal",
     "explore": "Taiscéalaigh",
     "federation": "Cónaidhm",
@@ -164,7 +165,8 @@
     "notifications": "Fógraí",
     "notifications_unread": "Fógraí, {{count}} gan léamh",
     "switch_to_light": "Athraigh go mód solais",
-    "switch_to_dark": "Athraigh go mód dorcha"
+    "switch_to_dark": "Athraigh go mód dorcha",
+    "skip_to_content": "Téigh go dtí an príomhábhar"
   },
   "cookie_consent": {
     "banner_label": "Toiliú fianán",
