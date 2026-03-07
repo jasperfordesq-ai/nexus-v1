@@ -201,4 +201,24 @@ class IdentityVerificationSessionService
 
         return $stmt->rowCount();
     }
+
+    /**
+     * Delete completed/expired sessions older than the retention period.
+     * Keeps audit trail in identity_verification_events but cleans session table.
+     *
+     * @param int $retentionDays  Delete sessions older than this (default 180 days)
+     * @return int Number of sessions deleted
+     */
+    public static function purgeOldSessions(int $retentionDays = 180): int
+    {
+        $stmt = Database::query(
+            "DELETE FROM identity_verification_sessions
+             WHERE status IN ('passed', 'failed', 'expired', 'cancelled')
+               AND completed_at IS NOT NULL
+               AND completed_at < DATE_SUB(NOW(), INTERVAL ? DAY)",
+            [$retentionDays]
+        );
+
+        return $stmt->rowCount();
+    }
 }

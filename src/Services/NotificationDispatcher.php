@@ -1693,6 +1693,39 @@ HTML;
         }
     }
 
+    /**
+     * Dispatch a verification reminder to a user who hasn't completed verification.
+     */
+    public static function dispatchVerificationReminder(int $userId): void
+    {
+        $content = "You haven't completed identity verification yet. Please verify your identity to activate your account.";
+        $link = "/verify-identity";
+
+        Notification::create($userId, $content, $link, 'verification_reminder');
+
+        $tenant = \Nexus\Core\TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Community';
+        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+        $frontendUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+
+        $htmlContent = <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">Verification Reminder</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">You started registering but haven't completed identity verification yet. Please verify your identity to activate your account.</p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/verify-identity" style="display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Complete Verification</a>
+        </div>
+    </div>
+</div>
+HTML;
+
+        self::queueNotification($userId, 'verification_reminder', $content, $link, 'instant', $htmlContent);
+    }
+
     private static function buildVerificationPassedEmail(): string
     {
         $tenant = \Nexus\Core\TenantContext::get();

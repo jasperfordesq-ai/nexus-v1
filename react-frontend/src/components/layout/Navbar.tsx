@@ -213,6 +213,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
     { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
     { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
+    { label: t('nav.federation_settings'), desc: t('nav_desc.federation_settings'), href: tenantPath('/federation/settings'), icon: Settings },
   ] : [], [t, tenantPath, hasFeature]);
 
   const aboutItems = useMemo(() => [

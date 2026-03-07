@@ -954,6 +954,7 @@ $router->add('GET', '/cron/process-newsletter-queue', 'Nexus\Controllers\CronCon
 // Identity Verification Maintenance
 $router->add('GET', '/cron/verification-reminders', 'Nexus\Controllers\CronController@verificationReminders');
 $router->add('GET', '/cron/expire-verifications', 'Nexus\Controllers\CronController@expireVerifications');
+$router->add('GET', '/cron/purge-verification-sessions', 'Nexus\Controllers\CronController@purgeVerificationSessions');
 
 // Maintenance
 $router->add('GET', '/cron/cleanup', 'Nexus\Controllers\CronController@cleanup');

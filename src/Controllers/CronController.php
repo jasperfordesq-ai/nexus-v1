@@ -2188,4 +2188,19 @@ class CronController
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Purge completed/expired verification sessions older than 180 days.
+     * Audit events are retained separately. Schedule: weekly.
+     */
+    public function purgeVerificationSessions()
+    {
+        $this->checkAccess();
+        try {
+            $purged = \Nexus\Services\Identity\RegistrationOrchestrationService::purgeOldSessions(180);
+            echo json_encode(['success' => true, 'sessions_purged' => $purged]);
+        } catch (\Throwable $e) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
 }

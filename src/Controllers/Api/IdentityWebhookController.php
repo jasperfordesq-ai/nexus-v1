@@ -91,6 +91,16 @@ class IdentityWebhookController extends BaseApiController
 
         // Route to orchestration service
         $status = $result['status'] ?? 'processing';
+
+        // Idempotency check: skip if this session already has this terminal status
+        $currentStatus = $session['status'] ?? '';
+        $isTerminal = in_array($currentStatus, ['passed', 'failed', 'expired', 'cancelled'], true);
+        if ($isTerminal && $currentStatus === $status) {
+            // Duplicate webhook — acknowledge but skip processing
+            $this->respondWithData(['received' => true, 'status' => $status, 'duplicate' => true]);
+            return;
+        }
+
         RegistrationOrchestrationService::handleVerificationResult(
             (int) $session['id'],
             $status,

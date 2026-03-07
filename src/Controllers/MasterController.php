@@ -10,6 +10,7 @@ use Nexus\Core\Csrf;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\Tenant;
+use Nexus\Models\User;
 
 class MasterController
 {
@@ -93,6 +94,10 @@ class MasterController
                         "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?, ?, 'admin', 1)",
                         [$tenantId, trim($firstName . ' ' . $lastName), $firstName, $lastName, $adminEmail, $hash]
                     );
+                    $adminUserId = (int)Database::lastInsertId();
+                    if ($adminUserId > 0) {
+                        User::seedFederationSettings($adminUserId);
+                    }
                 } catch (\Exception $e) {
                     error_log("MasterController: Failed to create initial admin for tenant {$tenantId}: " . $e->getMessage());
                 }
@@ -126,6 +131,10 @@ class MasterController
                     "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?, ?, 'admin', 1)",
                     [$tenantId, trim($firstName . ' ' . $lastName), $firstName, $lastName, $email, $hash]
                 );
+                $adminUserId = (int)Database::lastInsertId();
+                if ($adminUserId > 0) {
+                    User::seedFederationSettings($adminUserId);
+                }
             } catch (\Exception $e) {
                 // Ignore for now or handle dupes
             }

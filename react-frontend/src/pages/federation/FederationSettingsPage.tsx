@@ -77,7 +77,7 @@ const DEFAULT_SETTINGS: SettingsFormData = {
   transactions_enabled_federated: true,
   email_notifications: true,
   service_reach: 'local_only',
-  travel_radius_km: 25,
+  travel_radius_km: 0,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

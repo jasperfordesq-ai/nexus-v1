@@ -665,4 +665,16 @@ class RegistrationOrchestrationService
     {
         return IdentityVerificationSessionService::expireAbandoned(72);
     }
+
+    /**
+     * Purge completed/expired sessions older than retention period.
+     * Intended to run weekly via cron. Audit events are retained separately.
+     *
+     * @param int $retentionDays Default 180 days
+     * @return int Number of sessions purged
+     */
+    public static function purgeOldSessions(int $retentionDays = 180): int
+    {
+        return IdentityVerificationSessionService::purgeOldSessions($retentionDays);
+    }
 }

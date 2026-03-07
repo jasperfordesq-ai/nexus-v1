@@ -75,6 +75,8 @@ import {
   Sparkles,
   Calendar,
   Users,
+  Globe,
+  ChevronRight,
 } from 'lucide-react';
 import DOMPurify from 'dompurify';
 import { GlassCard } from '@/components/ui';
@@ -157,7 +159,7 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, logout, refreshUser } = useAuth();
-  const { tenantPath, tenant } = useTenant();
+  const { tenantPath, tenant, hasFeature } = useTenant();
   const { theme, setTheme } = useTheme();
   const { t } = useTranslation('settings');
   const toast = useToast();
@@ -1463,6 +1465,29 @@ export function SettingsPage() {
                 </Button>
               </div>
             </GlassCard>
+
+            {/* Federation Settings Link */}
+            {hasFeature('federation') && (
+              <GlassCard className="p-6">
+                <Button
+                  variant="flat"
+                  className="w-full justify-between bg-theme-elevated text-theme-primary h-auto py-4 px-4"
+                  startContent={
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-indigo-500/20">
+                        <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium">Federation Settings</p>
+                        <p className="text-sm text-theme-subtle font-normal">Manage your visibility and preferences across partner communities</p>
+                      </div>
+                    </div>
+                  }
+                  endContent={<ChevronRight className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+                  onPress={() => navigate(tenantPath('/federation/settings'))}
+                />
+              </GlassCard>
+            )}
 
             {/* GDPR Section */}
             <GlassCard className="p-6">

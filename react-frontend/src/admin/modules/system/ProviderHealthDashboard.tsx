@@ -46,6 +46,8 @@ interface ProviderHealth {
   name: string;
   available: boolean;
   supported_levels: string[];
+  latency_ms: number | null;
+  avg_completion_seconds: number | null;
   stats: ProviderHealthStats;
   recent_24h: ProviderRecent24h;
   last_webhook: ProviderLastWebhook | null;
@@ -205,6 +207,24 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
               {formatLevel(level)}
             </Chip>
           ))}
+        </div>
+
+        {/* Latency metrics */}
+        <div className="flex items-center gap-3 text-sm">
+          <Tooltip content="API health check response time">
+            <Chip size="sm" variant="flat" color={provider.latency_ms !== null && provider.latency_ms < 500 ? 'success' : provider.latency_ms !== null && provider.latency_ms < 2000 ? 'warning' : 'default'} className="text-xs">
+              {provider.latency_ms !== null ? `${provider.latency_ms}ms` : 'N/A'} latency
+            </Chip>
+          </Tooltip>
+          {provider.avg_completion_seconds !== null && (
+            <Tooltip content="Average time to complete verification (30d)">
+              <Chip size="sm" variant="flat" color="default" className="text-xs">
+                {provider.avg_completion_seconds < 60
+                  ? `${provider.avg_completion_seconds}s avg`
+                  : `${Math.round(provider.avg_completion_seconds / 60)}m avg`}
+              </Chip>
+            </Tooltip>
+          )}
         </div>
 
         {/* Success rate */}

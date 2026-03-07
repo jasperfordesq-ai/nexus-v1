@@ -350,26 +350,20 @@ class RegistrationApiController extends BaseApiController
         // Send verification email (always — even if not enforced, users should verify)
         $this->sendVerificationEmail($userId, $email, $firstName);
 
-        // Determine what gates the user must pass before they can log in
-        $requiresVerification = \Nexus\Services\TenantSettingsService::requiresEmailVerification($tenantId);
-        $requiresApproval = \Nexus\Services\TenantSettingsService::requiresAdminApproval($tenantId);
+        // Route through Registration Policy Engine to determine post-registration action
+        $orchestrationResult = \Nexus\Services\Identity\RegistrationOrchestrationService::processRegistration($userId, $tenantId);
 
-        // If no approval gate, grant welcome credits now (approval flow grants them on approve)
-        if (!$requiresApproval) {
+        $requiresVerification = $orchestrationResult['requires_verification'] ?? false;
+        $requiresApproval = $orchestrationResult['requires_approval'] ?? false;
+        $requiresWaitlist = $orchestrationResult['requires_waitlist'] ?? false;
+
+        // Grant welcome credits unless a gate blocks immediate activation
+        if (!$requiresApproval && !$requiresVerification && !$requiresWaitlist) {
             $this->grantWelcomeCredits($userId, $tenantId);
         }
 
-        // SECURITY: If verification or approval is required, do NOT issue tokens.
-        // The user must verify their email and/or be approved before they can log in.
-        if ($requiresVerification || $requiresApproval) {
-            $nextSteps = [];
-            if ($requiresVerification) {
-                $nextSteps[] = 'Please check your inbox and verify your email address.';
-            }
-            if ($requiresApproval) {
-                $nextSteps[] = 'Your account will be reviewed by a community administrator.';
-            }
-
+        // SECURITY: If any gate is active, do NOT issue tokens.
+        if ($requiresVerification || $requiresApproval || $requiresWaitlist) {
             $this->respondWithData([
                 'user' => [
                     'id' => $userId,
@@ -380,8 +374,10 @@ class RegistrationApiController extends BaseApiController
                 ],
                 'requires_verification' => $requiresVerification,
                 'requires_approval' => $requiresApproval,
-                'next_steps' => $nextSteps,
-                'message' => 'Registration successful! ' . implode(' ', $nextSteps),
+                'requires_waitlist' => $requiresWaitlist,
+                'waitlist_position' => $orchestrationResult['waitlist_position'] ?? null,
+                'next_steps' => $orchestrationResult['next_steps'] ?? [],
+                'message' => $orchestrationResult['message'] ?? 'Registration successful!',
             ], null, 201);
             return;
         }
