@@ -37,6 +37,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -60,6 +61,29 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Focus trap — keep Tab cycling within the dialog
+  useEffect(() => {
+    if (!isOpen) return;
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'input, button, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener('keydown', handleTab);
+    return () => document.removeEventListener('keydown', handleTab);
+  }, [isOpen]);
 
   // Debounced suggestions fetch
   useEffect(() => {
@@ -186,6 +210,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             className="fixed top-20 sm:top-28 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
           >
             <div
+              ref={dialogRef}
               role="dialog"
               aria-modal="true"
               aria-label={t('accessibility.search', 'Search')}

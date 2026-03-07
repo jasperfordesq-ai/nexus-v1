@@ -206,6 +206,41 @@ describe('SearchOverlay', () => {
     });
   });
 
+  describe('Focus trap', () => {
+    it('has dialog role with aria-modal', () => {
+      renderOverlay();
+      const dialog = document.querySelector('[role="dialog"]');
+      expect(dialog).toBeTruthy();
+      expect(dialog!.getAttribute('aria-modal')).toBe('true');
+    });
+
+    it('traps focus within the dialog on Tab', () => {
+      renderOverlay();
+      const dialog = document.querySelector('[role="dialog"]')!;
+      const focusable = dialog.querySelectorAll<HTMLElement>('input, button');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      // Focus last element, Tab should wrap to first
+      (last as HTMLElement).focus();
+      fireEvent.keyDown(document, { key: 'Tab' });
+      expect(document.activeElement).toBe(first);
+    });
+
+    it('traps focus within the dialog on Shift+Tab', () => {
+      renderOverlay();
+      const dialog = document.querySelector('[role="dialog"]')!;
+      const focusable = dialog.querySelectorAll<HTMLElement>('input, button');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      // Focus first element, Shift+Tab should wrap to last
+      (first as HTMLElement).focus();
+      fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+      expect(document.activeElement).toBe(last);
+    });
+  });
+
   describe('Quick link rendering', () => {
     it('renders all quick link buttons', () => {
       renderOverlay();

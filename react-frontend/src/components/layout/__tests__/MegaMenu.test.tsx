@@ -199,6 +199,24 @@ describe('MegaMenu', () => {
       expect(document.activeElement).toBe(buttons[0]);
     });
 
+    it('Home moves focus to first item', () => {
+      renderMegaMenu();
+      const buttons = getMegaButtons();
+      buttons[2]?.focus();
+      const nav = document.querySelector('nav[aria-label="More navigation"]')!;
+      fireEvent.keyDown(nav, { key: 'Home' });
+      expect(document.activeElement).toBe(buttons[0]);
+    });
+
+    it('End moves focus to last item', () => {
+      renderMegaMenu();
+      const buttons = getMegaButtons();
+      buttons[0]?.focus();
+      const nav = document.querySelector('nav[aria-label="More navigation"]')!;
+      fireEvent.keyDown(nav, { key: 'End' });
+      expect(document.activeElement).toBe(buttons[buttons.length - 1]);
+    });
+
     it('Escape calls onOpenChange(false)', () => {
       const { props } = renderMegaMenu();
       const nav = document.querySelector('nav[aria-label="More navigation"]')!;
