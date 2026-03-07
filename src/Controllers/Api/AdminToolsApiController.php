@@ -210,14 +210,16 @@ class AdminToolsApiController extends BaseApiController
                 "SELECT COUNT(*) FROM error_404_log WHERE resolved = 0"
             )->fetchColumn();
 
+            // LIMIT/OFFSET cannot use bound params with native prepared statements
+            // (PDO binds as strings; MariaDB rejects string LIMIT). Values are
+            // already validated integers from max/min above, so interpolation is safe.
             $errors = Database::query(
                 "SELECT id, url, referer, hit_count,
                         first_seen_at, last_seen_at, resolved
                  FROM error_404_log
                  WHERE resolved = 0
                  ORDER BY hit_count DESC, last_seen_at DESC
-                 LIMIT ? OFFSET ?",
-                [$perPage, $offset]
+                 LIMIT {$perPage} OFFSET {$offset}"
             )->fetchAll();
 
             $errors = array_map(function ($row) {
