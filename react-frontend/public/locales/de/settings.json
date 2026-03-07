@@ -54,5 +54,18 @@
   "backup_codes_warning": "Bewahren Sie diese Codes sicher auf",
   "backup_codes_desc": "Jeder Backup-Code kann nur einmal verwendet werden. Wenn Sie den Zugang zu Ihrer Authenticator-App verlieren, können Sie diese Codes zum Anmelden verwenden.",
   "backup_codes_copy": "Alle Codes kopieren",
-  "backup_codes_saved": "Ich habe meine Codes gespeichert"
+  "backup_codes_saved": "Ich habe meine Codes gespeichert",
+  "passkey_setup_subtitle": "Einrichtung für dieses Gerät",
+  "passkey_multi_device_note": "Sie können Passkeys auf mehreren Geräten registrieren. Jedes Gerät benötigt einen eigenen Passkey, es sei denn, Ihr Passkey-Anbieter synchronisiert sie (z. B. iCloud-Schlüsselbund synchronisiert über Apple-Geräte, Google Passwort-Manager über Android und Chrome).",
+  "passkey_add_another": "Weiteren Passkey hinzufügen",
+  "passkey_create": "Passkey erstellen",
+  "passkey_device_tip": "Registrieren Sie einen Passkey auf jedem Gerät, das Sie nutzen. Um Ihr Handy hinzuzufügen, öffnen Sie diese Seite auf Ihrem Handy.",
+  "passkey_setup_guide": "Einrichtungsanleitung",
+  "passkey_registration_failed": "Registrierung fehlgeschlagen",
+  "passkey_remove_failed": "Passkey konnte nicht entfernt werden",
+  "passkey_remove_all_failed": "Passkeys konnten nicht entfernt werden",
+  "passkey_confirm_remove_all_title": "Alle Passkeys entfernen",
+  "passkey_confirm_remove_all_body": "Möchten Sie wirklich alle Passkeys entfernen? Sie müssen sie auf jedem Gerät neu einrichten.",
+  "passkey_confirm_remove_all_cancel": "Abbrechen",
+  "passkey_confirm_remove_all_confirm": "Alle entfernen"
 }

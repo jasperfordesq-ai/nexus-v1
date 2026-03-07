@@ -172,8 +172,9 @@ class WebAuthnApiController extends BaseApiController
 
         // Transport hints for future allowCredentials
         $transports = null;
-        if (!empty($input['response']['transports']) && is_array($input['response']['transports'])) {
-            $transports = json_encode($input['response']['transports']);
+        $transportData = $input['transports'] ?? $input['response']['transports'] ?? null;
+        if (!empty($transportData) && is_array($transportData)) {
+            $transports = json_encode($transportData);
         }
 
         // Device name from client
@@ -437,6 +438,11 @@ class WebAuthnApiController extends BaseApiController
      */
     public function remove()
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->error('Method not allowed. Use POST request.', 405, ApiErrorCodes::VALIDATION_ERROR);
+        }
+
+        $this->verifyCsrf();
         $userId = $this->requireAuth();
         $input = $this->getInput();
         $credentialId = $input['credential_id'] ?? null;
@@ -559,6 +565,12 @@ class WebAuthnApiController extends BaseApiController
      */
     private function getRpId(): string
     {
+        // Environment variable takes priority — allows explicit RP ID configuration
+        $envRpId = $_ENV['WEBAUTHN_RP_ID'] ?? $_SERVER['WEBAUTHN_RP_ID'] ?? getenv('WEBAUTHN_RP_ID');
+        if ($envRpId && is_string($envRpId) && $envRpId !== '') {
+            return $envRpId;
+        }
+
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         if (!empty($_SERVER['HTTP_ORIGIN'])) {
             $parsed = parse_url($_SERVER['HTTP_ORIGIN']);
@@ -571,6 +583,8 @@ class WebAuthnApiController extends BaseApiController
         $host = preg_replace('/:\d+$/', '', $host);
 
         // For production multi-subdomain setup, extract registrable domain
+        // This handles 2-level TLDs (example.com) but NOT multi-level TLDs (.co.uk)
+        // For multi-level TLDs, set WEBAUTHN_RP_ID environment variable
         if ($host !== 'localhost' && $host !== '127.0.0.1' && substr_count($host, '.') >= 2) {
             $parts = explode('.', $host);
             if (count($parts) >= 3) {

@@ -54,5 +54,18 @@
   "backup_codes_warning": "Conserva questi codici in un luogo sicuro",
   "backup_codes_desc": "Ogni codice di backup può essere utilizzato una sola volta. Se perdi l'accesso alla tua app di autenticazione, puoi usare questi codici per accedere.",
   "backup_codes_copy": "Copia Tutti i Codici",
-  "backup_codes_saved": "Ho Salvato i Miei Codici"
+  "backup_codes_saved": "Ho Salvato i Miei Codici",
+  "passkey_setup_subtitle": "Configurazione per questo dispositivo",
+  "passkey_multi_device_note": "Puoi registrare passkey su più dispositivi. Ogni dispositivo ha bisogno del proprio passkey a meno che il tuo provider non li sincronizzi (es. Portachiavi iCloud tra dispositivi Apple, Google Password Manager tra Android e Chrome).",
+  "passkey_add_another": "Aggiungi un altro passkey",
+  "passkey_create": "Crea un passkey",
+  "passkey_device_tip": "Registra un passkey su ogni dispositivo che usi. Per aggiungere il tuo telefono, apri questa pagina sul tuo telefono.",
+  "passkey_setup_guide": "Guida alla configurazione",
+  "passkey_registration_failed": "Registrazione fallita",
+  "passkey_remove_failed": "Impossibile rimuovere il passkey",
+  "passkey_remove_all_failed": "Impossibile rimuovere i passkey",
+  "passkey_confirm_remove_all_title": "Rimuovi tutti i passkey",
+  "passkey_confirm_remove_all_body": "Sei sicuro di voler rimuovere tutti i passkey? Dovrai configurarli di nuovo su ogni dispositivo.",
+  "passkey_confirm_remove_all_cancel": "Annulla",
+  "passkey_confirm_remove_all_confirm": "Rimuovi tutti"
 }

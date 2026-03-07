@@ -54,5 +54,18 @@
   "backup_codes_warning": "Sábháil na cóid seo in áit shábháilte",
   "backup_codes_desc": "Ní féidir gach cód cúltaca a úsáid ach uair amháin. Má chailleann tú rochtain ar d'aip fíordheimhnithe, is féidir leat na cóid seo a úsáid chun logáil isteach.",
   "backup_codes_copy": "Cóipeáil Gach Cód",
-  "backup_codes_saved": "Shábháil Mé Mo Chóid"
+  "backup_codes_saved": "Shábháil Mé Mo Chóid",
+  "passkey_setup_subtitle": "Socrú don ghléas seo",
+  "passkey_multi_device_note": "Is féidir leat passkeys a chlárú ar ghléasanna éagsúla. Teastaíonn a passkey féin ó gach gléas mura sioncranaíonn do sholáthraí iad (m.sh. sioncranaíonn iCloud Keychain ar fud gléasanna Apple, sioncranaíonn Google Password Manager ar fud Android agus Chrome).",
+  "passkey_add_another": "Passkey eile a chur leis",
+  "passkey_create": "Passkey a chruthú",
+  "passkey_device_tip": "Cláraigh passkey ar gach gléas a úsáideann tú. Chun do ghuthán a chur leis, oscail an leathanach seo ar do ghuthán.",
+  "passkey_setup_guide": "Treoir socraithe",
+  "passkey_registration_failed": "Theip ar an gclárú",
+  "passkey_remove_failed": "Níorbh fhéidir an passkey a bhaint",
+  "passkey_remove_all_failed": "Níorbh fhéidir na passkeys a bhaint",
+  "passkey_confirm_remove_all_title": "Bain gach passkey",
+  "passkey_confirm_remove_all_body": "An bhfuil tú cinnte gur mian leat gach passkey a bhaint? Beidh ort iad a shocrú arís ar gach gléas.",
+  "passkey_confirm_remove_all_cancel": "Cealaigh",
+  "passkey_confirm_remove_all_confirm": "Bain gach ceann"
 }

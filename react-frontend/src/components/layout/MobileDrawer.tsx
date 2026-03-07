@@ -5,11 +5,12 @@
 
 /**
  * Mobile Navigation Drawer
- * Uses HeroUI Drawer component for accessibility and animations
- * Theme-aware styling for light and dark modes
+ * Uses HeroUI Drawer component for accessibility and animations.
+ * Sections are collapsible via HeroUI Accordion.
+ * Admin/Help/Theme/Language consolidated into a utility row at the bottom.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Button,
@@ -19,6 +20,8 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerBody,
+  Accordion,
+  AccordionItem,
 } from '@heroui/react';
 import {
   X,
@@ -60,12 +63,14 @@ import {
   GraduationCap,
   Activity,
   Library,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant, useNotifications, useCookieConsent } from '@/contexts';
+import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { tokenManager, API_BASE } from '@/lib/api';
 import type { TenantFeatures, TenantModules } from '@/types/api';
+import { navigateToLegacyAdmin } from '@/lib/nav-helpers';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useMenuContext } from '@/contexts';
 import { MobileMenuItems } from '@/components/navigation';
@@ -84,12 +89,18 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
   const { resetConsent } = useCookieConsent();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const { mobileMenus, headerMenus, hasCustomMenus } = useMenuContext();
+
+  const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
 
   // Use mobile-specific menus if available, fall back to header menus
   const apiMenus = mobileMenus.length > 0 ? mobileMenus : headerMenus;
 
-  // Nav item arrays — defined inside component so t() is available
+  // Track which accordion sections are expanded
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set(['main']));
+
+  // Nav item arrays
   const mainNavItems = [
     { label: t('nav.home'), href: '/', icon: Home },
     { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
@@ -136,25 +147,18 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.federated_events'), href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
   ];
 
-  // Universal about items — shown for all tenants
   const aboutNavItems = [
     { label: t('nav.about'), href: '/about', icon: Info },
     { label: t('nav.faq'), href: '/faq', icon: HelpCircle },
     { label: t('nav.timebanking_guide'), href: '/timebanking-guide', icon: BookOpen },
   ];
 
-  // Tenant 2 (hOUR Timebank) specific pages — contain hardcoded org content
   const hourTimebankAboutItems = [
     { label: t('nav.partner_with_us'), href: '/partner', icon: Handshake },
     { label: t('nav.social_prescribing'), href: '/social-prescribing', icon: Stethoscope },
     { label: t('nav.our_impact'), href: '/impact-summary', icon: TrendingUp },
     { label: t('nav.impact_report'), href: '/impact-report', icon: BarChart3 },
     { label: t('nav.strategic_plan'), href: '/strategic-plan', icon: Compass },
-  ];
-
-  const supportNavItems = [
-    { label: t('support.help_center'), href: '/help', icon: HelpCircle },
-    { label: t('support.contact'), href: '/contact', icon: MessageSquare },
   ];
 
   const legalNavItems = [
@@ -168,7 +172,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   // Track previous pathname to only close on actual navigation
   const prevPathRef = useRef(location.pathname);
 
-  // Close on route change (but not on initial mount)
   useEffect(() => {
     if (prevPathRef.current !== location.pathname) {
       onClose();
@@ -190,20 +193,9 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     feature?: keyof TenantFeatures;
     module?: keyof TenantModules;
   }) => {
-    // Check feature flag
-    if (item.feature && !hasFeature(item.feature)) {
-      return null;
-    }
-
-    // Check module flag
-    if (item.module && !hasModule(item.module)) {
-      return null;
-    }
-
-    // Check auth requirement
-    if (item.auth && !isAuthenticated) {
-      return null;
-    }
+    if (item.feature && !hasFeature(item.feature)) return null;
+    if (item.module && !hasModule(item.module)) return null;
+    if (item.auth && !isAuthenticated) return null;
 
     const Icon = item.icon;
     const resolvedHref = tenantPath(item.href);
@@ -213,18 +205,26 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         key={item.href}
         to={resolvedHref}
         className={({ isActive }) =>
-          `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+          `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
             isActive
               ? 'bg-theme-active text-theme-primary'
               : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
           }`
         }
       >
-        <Icon className="w-5 h-5" aria-hidden="true" />
+        <Icon className="w-4 h-4" aria-hidden="true" />
         <span>{item.label}</span>
       </NavLink>
     );
   };
+
+  // Filter nav arrays to count visible items (for hiding empty sections)
+  const visibleCommunity = communityNavItems.filter(i => !i.feature || hasFeature(i.feature));
+  const visibleExplore = exploreNavItems.filter(i => !i.feature || hasFeature(i.feature));
+  const visibleFederation = federationNavItems.filter(i => !i.feature || hasFeature(i.feature));
+
+  // Accordion section header style
+  const sectionTitleClass = 'text-xs font-semibold uppercase tracking-wider text-theme-subtle';
 
   return (
     <Drawer
@@ -234,7 +234,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       size="sm"
       hideCloseButton
       classNames={{
-        base: 'bg-[var(--surface-overlay)] border-l border-[var(--border-default)] shadow-2xl',
+        base: 'bg-[var(--surface-dropdown)] border-l border-[var(--border-default)] shadow-2xl',
         header: 'border-b border-[var(--border-default)] p-4',
         body: 'p-0',
       }}
@@ -300,7 +300,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </Link>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4">
+              <div className="grid grid-cols-3 gap-2 mt-3">
                 <Link
                   to={tenantPath('/wallet')}
                   className="text-center p-2 rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors"
@@ -338,163 +338,193 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             </div>
           )}
 
-          {/* Navigation */}
-          <nav className="p-4 space-y-6" aria-label="Mobile navigation">
+          {/* Navigation — Collapsible Sections */}
+          <nav className="flex-1 overflow-y-auto" aria-label="Mobile navigation">
             {hasCustomMenus ? (
-              /* API-driven navigation when custom menus exist */
-              <div className="space-y-1">
+              <div className="p-4 space-y-1">
                 <MobileMenuItems menus={apiMenus} />
               </div>
             ) : (
-            <>
-            {/* Main */}
-            <div className="space-y-1">
-              {mainNavItems.map(renderNavLink)}
-            </div>
-
-            {/* Community */}
-            {communityNavItems.filter(item => !item.feature || hasFeature(item.feature)).length > 0 && (
-              <div>
-                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                  {t('sections.community')}
-                </p>
-                <div className="space-y-1">
-                  {communityNavItems.map(renderNavLink)}
+            <Accordion
+              selectionMode="multiple"
+              selectedKeys={expandedKeys}
+              onSelectionChange={(keys) => setExpandedKeys(keys as Set<string>)}
+              className="px-2 py-2"
+              itemClasses={{
+                base: 'py-0',
+                title: sectionTitleClass,
+                trigger: 'py-2 px-2',
+                content: 'pb-2 pt-0',
+                indicator: 'text-theme-subtle',
+              }}
+            >
+              {/* Main Navigation */}
+              <AccordionItem key="main" title={t('sections.main', 'Main')} aria-label="Main navigation">
+                <div className="space-y-0.5">
+                  {mainNavItems.map(renderNavLink)}
                 </div>
-              </div>
-            )}
+              </AccordionItem>
 
-            {/* Explore */}
-            {(hasFeature('gamification') || hasFeature('goals') || hasFeature('ai_chat')) && (
-              <div>
-                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                  {t('sections.explore')}
-                </p>
-                <div className="space-y-1">
-                  {exploreNavItems.map(renderNavLink)}
-                </div>
-              </div>
-            )}
+              {/* Community */}
+              {visibleCommunity.length > 0 ? (
+                <AccordionItem key="community" title={t('sections.community')} aria-label="Community navigation">
+                  <div className="space-y-0.5">
+                    {communityNavItems.map(renderNavLink)}
+                  </div>
+                </AccordionItem>
+              ) : null}
 
-            {/* Federation */}
-            {hasFeature('federation') && isAuthenticated && (
-              <div>
-                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">
-                  <Globe className="w-3 h-3" aria-hidden="true" />
-                  {t('sections.federation')}
-                </p>
-                <div className="space-y-1">
-                  {federationNavItems.map(renderNavLink)}
-                </div>
-              </div>
-            )}
+              {/* Explore / Activity */}
+              {visibleExplore.length > 0 ? (
+                <AccordionItem key="explore" title={t('sections.explore')} aria-label="Explore navigation">
+                  <div className="space-y-0.5">
+                    {exploreNavItems.map(renderNavLink)}
+                  </div>
+                </AccordionItem>
+              ) : null}
 
-            {/* About */}
-            <div>
-              <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                {t('sections.about')}
-              </p>
-              <div className="space-y-1">
-                {aboutNavItems.map(renderNavLink)}
-                {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
-                {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
-                  label: p.title,
-                  href: `/page/${p.slug}`,
-                  icon: FileText,
-                }))}
-              </div>
-            </div>
-            </>
-            )}
-
-            {/* Support — always hardcoded */}
-            <div>
-              <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                {t('sections.support')}
-              </p>
-              <div className="space-y-1">
-                {supportNavItems.map(renderNavLink)}
-              </div>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                {t('sections.legal')}
-              </p>
-              <div className="space-y-1">
-                {legalNavItems.map(renderNavLink)}
-                <button
-                  onClick={() => { resetConsent(); onClose(); }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full text-left"
+              {/* Federation */}
+              {visibleFederation.length > 0 && isAuthenticated ? (
+                <AccordionItem
+                  key="federation"
+                  title={
+                    <span className="flex items-center gap-1.5">
+                      <Globe className="w-3 h-3" aria-hidden="true" />
+                      {t('sections.federation')}
+                    </span>
+                  }
+                  aria-label="Federation navigation"
                 >
-                  <Settings className="w-5 h-5" aria-hidden="true" />
-                  <span>{t('cookie_consent.manage', 'Cookie Settings')}</span>
-                </button>
+                  <div className="space-y-0.5">
+                    {federationNavItems.map(renderNavLink)}
+                  </div>
+                </AccordionItem>
+              ) : null}
+
+              {/* About */}
+              <AccordionItem key="about" title={t('sections.about')} aria-label="About navigation">
+                <div className="space-y-0.5">
+                  {aboutNavItems.map(renderNavLink)}
+                  {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
+                  {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
+                    label: p.title,
+                    href: `/page/${p.slug}`,
+                    icon: FileText,
+                  }))}
+                </div>
+              </AccordionItem>
+
+              {/* Legal */}
+              <AccordionItem key="legal" title={t('sections.legal')} aria-label="Legal navigation">
+                <div className="space-y-0.5">
+                  {legalNavItems.map(renderNavLink)}
+                  <button
+                    onClick={() => { resetConsent(); onClose(); }}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full text-left"
+                  >
+                    <Settings className="w-4 h-4" aria-hidden="true" />
+                    <span>{t('cookie_consent.manage', 'Cookie Settings')}</span>
+                  </button>
+                </div>
+              </AccordionItem>
+            </Accordion>
+            )}
+
+            {/* Utility Row — consolidated secondary actions */}
+            <div className="px-4 py-3 border-t border-[var(--border-default)]">
+              <div className="flex items-center justify-between gap-2">
+                {/* Left: Admin + Help links */}
+                <div className="flex items-center gap-1 flex-wrap">
+                  {isAuthenticated && (
+                    <Button
+                      variant="light"
+                      size="sm"
+                      className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
+                      onPress={() => { onClose(); navigate(tenantPath('/help')); }}
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                      {t('user_menu.help_center')}
+                    </Button>
+                  )}
+                  {!isAuthenticated && (
+                    <Button
+                      variant="light"
+                      size="sm"
+                      className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
+                      onPress={() => { onClose(); navigate(tenantPath('/contact')); }}
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
+                      {t('support.contact')}
+                    </Button>
+                  )}
+                  {isAuthenticated && isAdmin && (
+                    <>
+                      <Button
+                        variant="light"
+                        size="sm"
+                        className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
+                        onPress={() => { onClose(); navigate('/admin'); }}
+                      >
+                        <Shield className="w-3.5 h-3.5" aria-hidden="true" />
+                        {t('user_menu.admin_panel')}
+                      </Button>
+                      <Button
+                        variant="light"
+                        size="sm"
+                        className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
+                        onPress={navigateToLegacyAdmin}
+                      >
+                        <LayoutDashboard className="w-3.5 h-3.5" aria-hidden="true" />
+                        {t('user_menu.legacy_admin')}
+                      </Button>
+                    </>
+                  )}
+                </div>
+
+                {/* Right: Language + Theme */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <LanguageSwitcher />
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    size="sm"
+                    className="text-theme-muted hover:text-theme-primary w-8 h-8 min-w-8"
+                    onPress={toggleTheme}
+                    aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                  >
+                    {resolvedTheme === 'dark' ? (
+                      <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                    ) : (
+                      <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
 
-            {/* Admin Tools */}
-            {isAuthenticated && user && (user.role === 'admin' || user.role === 'tenant_admin' || user.role === 'super_admin' || user.is_admin || user.is_super_admin || user.is_tenant_super_admin) && (
-              <div>
-                <Divider className="bg-theme-elevated mb-4" />
-                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider flex items-center gap-2">
-                  <Shield className="w-3 h-3" aria-hidden="true" />
-                  {t('admin_tools.section')}
-                </p>
-                <div className="space-y-1">
-                  <a
-                    href="/admin"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
-                  >
-                    <LayoutDashboard className="w-5 h-5" aria-hidden="true" />
-                    <span>{t('admin_tools.admin_panel')}</span>
-                  </a>
-                  <a
-                    href={(API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin) + '/admin-legacy'}
-                    onClick={(e) => { e.preventDefault(); const token = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; if (token) { const f = document.createElement('form'); f.method = 'POST'; f.action = `${phpOrigin}/api/auth/admin-session`; f.style.display = 'none'; const ti = document.createElement('input'); ti.name = 'token'; ti.value = token; f.appendChild(ti); const ri = document.createElement('input'); ri.name = 'redirect'; ri.value = '/admin-legacy'; f.appendChild(ri); document.body.appendChild(f); f.submit(); } else { window.location.href = `${phpOrigin}/admin-legacy`; } }}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all"
-                  >
-                    <Shield className="w-5 h-5" aria-hidden="true" />
-                    <span>{t('admin_tools.legacy_admin')}</span>
-                  </a>
-                </div>
-              </div>
-            )}
-
-            {/* Account */}
+            {/* Account Actions */}
             {isAuthenticated && (
-              <div>
-                <p className="px-4 mb-2 text-xs font-semibold text-theme-subtle uppercase tracking-wider">
-                  {t('sections.account')}
-                </p>
-                <div className="space-y-1">
+              <div className="px-4 py-3 border-t border-[var(--border-default)]">
+                <div className="flex items-center gap-2">
                   <NavLink
                     to={tenantPath('/settings')}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                      `flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                         isActive
                           ? 'bg-theme-active text-theme-primary'
-                          : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                          : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)]'
                       }`
                     }
                   >
-                    <Settings className="w-5 h-5" aria-hidden="true" />
+                    <Settings className="w-4 h-4" aria-hidden="true" />
                     <span>{t('account.settings')}</span>
                   </NavLink>
-                  <div className="flex items-center gap-3 px-4 py-2">
-                    <Globe className="w-5 h-5 text-theme-muted shrink-0" aria-hidden="true" />
-                    <span className="text-base font-medium text-theme-muted">{t('sections.language')}</span>
-                    <div className="ml-auto">
-                      <LanguageSwitcher compact={false} />
-                    </div>
-                  </div>
                   <Button
                     variant="light"
                     onPress={handleLogout}
-                    className="flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition-all w-full h-auto"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-red-500 dark:text-red-400 hover:bg-red-500/10 transition-all h-auto border border-red-500/20"
                   >
-                    <LogOut className="w-5 h-5" aria-hidden="true" />
+                    <LogOut className="w-4 h-4" aria-hidden="true" />
                     <span>{t('account.log_out')}</span>
                   </Button>
                 </div>
@@ -503,8 +533,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
             {/* Auth buttons for guests */}
             {!isAuthenticated && (
-              <div className="space-y-2 pt-4">
-                <Divider className="bg-theme-elevated" />
+              <div className="px-4 py-3 border-t border-[var(--border-default)] space-y-2">
                 <Link to={tenantPath('/login')}>
                   <Button
                     variant="flat"
@@ -522,8 +551,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
             )}
 
             {/* Attribution (AGPL Section 7(b) — required on all pages) */}
-            <div className="pt-6 pb-4 px-4">
-              <Divider className="bg-theme-elevated mb-4" />
+            <div className="pt-4 pb-4 px-4">
+              <Divider className="bg-theme-elevated mb-3" />
               <a
                 href="https://github.com/jasperfordesq-ai/nexus-v1"
                 target="_blank"

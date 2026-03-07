@@ -4,7 +4,17 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Spinner, Tooltip } from '@heroui/react';
+import {
+  Button,
+  Spinner,
+  Tooltip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from '@heroui/react';
 import {
   Fingerprint,
   Trash2,
@@ -125,6 +135,7 @@ export function BiometricSettings() {
 
   const platform = detectPlatform();
   const instructions = PLATFORM_INSTRUCTIONS[platform];
+  const removeAllConfirm = useDisclosure();
 
   const loadCredentials = useCallback(async () => {
     try {
@@ -151,7 +162,7 @@ export function BiometricSettings() {
       toast.success(t('biometric_registered', { defaultValue: 'Passkey registered successfully!' }));
       loadCredentials();
     } else {
-      toast.error(result.error || 'Registration failed');
+      toast.error(result.error || t('passkey_registration_failed', { defaultValue: 'Registration failed' }));
     }
   };
 
@@ -164,7 +175,7 @@ export function BiometricSettings() {
       toast.success(t('biometric_removed', { defaultValue: 'Passkey removed.' }));
       setCredentials(prev => prev.filter(c => c.credential_id !== credentialId));
     } else {
-      toast.error('Failed to remove credential');
+      toast.error(t('passkey_remove_failed', { defaultValue: 'Failed to remove credential' }));
     }
   };
 
@@ -182,7 +193,7 @@ export function BiometricSettings() {
       );
       setCredentials([]);
     } else {
-      toast.error('Failed to remove credentials');
+      toast.error(t('passkey_remove_all_failed', { defaultValue: 'Failed to remove credentials' }));
     }
   };
 
@@ -260,14 +271,14 @@ export function BiometricSettings() {
           </div>
         </div>
 
-        <Tooltip content="How to set up passkeys">
+        <Tooltip content={t('passkey_setup_tooltip', { defaultValue: 'How to set up passkeys' })}>
           <Button
             isIconOnly
             size="sm"
             variant="light"
             className="text-theme-subtle"
             onPress={() => setShowInstructions(!showInstructions)}
-            aria-label="Show setup instructions"
+            aria-label={t('passkey_show_instructions', { defaultValue: 'Show setup instructions' })}
           >
             <Info className="w-4 h-4" />
           </Button>
@@ -278,7 +289,7 @@ export function BiometricSettings() {
       {showInstructions && (
         <div className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/20 space-y-2">
           <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-            {instructions.title} — Setup for this device
+            {t('passkey_setup_title', { defaultValue: instructions.title })} — {t('passkey_setup_subtitle', { defaultValue: 'Setup for this device' })}
           </p>
           <ol className="text-sm text-theme-subtle space-y-1 list-decimal list-inside">
             {instructions.steps.map((step, i) => (
@@ -287,7 +298,7 @@ export function BiometricSettings() {
           </ol>
           <div className="pt-2 border-t border-indigo-500/10">
             <p className="text-xs text-theme-muted">
-              You can register passkeys on multiple devices. Each device needs its own passkey unless your passkey provider syncs them (e.g., iCloud Keychain syncs across Apple devices, Google Password Manager syncs across Android and Chrome).
+              {t('passkey_multi_device_note', { defaultValue: 'You can register passkeys on multiple devices. Each device needs its own passkey unless your passkey provider syncs them (e.g., iCloud Keychain syncs across Apple devices, Google Password Manager syncs across Android and Chrome).' })}
             </p>
           </div>
         </div>
@@ -301,7 +312,7 @@ export function BiometricSettings() {
         isLoading={registering}
         startContent={!registering ? <Fingerprint className="w-4 h-4" /> : undefined}
       >
-        {hasCredentials ? 'Add another passkey' : 'Create a passkey'}
+        {hasCredentials ? t('passkey_add_another', { defaultValue: 'Add another passkey' }) : t('passkey_create', { defaultValue: 'Create a passkey' })}
       </Button>
 
       {/* Registered credentials list */}
@@ -362,7 +373,7 @@ export function BiometricSettings() {
                 size="sm"
                 variant="flat"
                 className="bg-red-500/10 text-red-500"
-                onPress={handleRemoveAll}
+                onPress={removeAllConfirm.onOpen}
                 isLoading={removingAll}
                 startContent={!removingAll ? <Trash2 className="w-3 h-3" /> : undefined}
               >
@@ -376,16 +387,51 @@ export function BiometricSettings() {
       {/* Multi-device tip */}
       {!showInstructions && (
         <p className="text-xs text-theme-muted">
-          Register a passkey on each device you use. To add your phone, open this page on your phone.{' '}
+          {t('passkey_device_tip', { defaultValue: 'Register a passkey on each device you use. To add your phone, open this page on your phone.' })}{' '}
           <button
             type="button"
             className="text-indigo-500 hover:underline"
             onClick={() => setShowInstructions(true)}
           >
-            Setup guide
+            {t('passkey_setup_guide', { defaultValue: 'Setup guide' })}
           </button>
         </p>
       )}
+
+      {/* Remove All confirmation modal */}
+      <Modal isOpen={removeAllConfirm.isOpen} onOpenChange={removeAllConfirm.onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                {t('passkey_remove_all_title', { defaultValue: 'Remove All Passkeys' })}
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-theme-subtle">
+                  {t('passkey_remove_all_warning', {
+                    defaultValue:
+                      "Are you sure you want to remove all passkeys? You'll need to set them up again on each device.",
+                  })}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  {t('cancel', { defaultValue: 'Cancel' })}
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={() => {
+                    handleRemoveAll();
+                    onClose();
+                  }}
+                >
+                  {t('passkey_remove_all_confirm', { defaultValue: 'Remove All' })}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
