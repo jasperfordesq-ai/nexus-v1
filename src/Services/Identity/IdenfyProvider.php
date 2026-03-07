@@ -169,7 +169,10 @@ class IdenfyProvider implements IdentityVerificationProviderInterface
 
     public function isAvailable(int $tenantId): bool
     {
-        return !empty($this->getGlobalApiKey()) && !empty($this->getGlobalApiSecret());
+        if (!empty($this->getGlobalApiKey()) && !empty($this->getGlobalApiSecret())) {
+            return true;
+        }
+        return TenantProviderCredentialService::hasCredentials($tenantId, $this->getSlug());
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────

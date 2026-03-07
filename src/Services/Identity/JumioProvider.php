@@ -140,7 +140,10 @@ class JumioProvider implements IdentityVerificationProviderInterface
 
     public function isAvailable(int $tenantId): bool
     {
-        return !empty($this->getGlobalApiToken()) && !empty($this->getGlobalApiSecret());
+        if (!empty($this->getGlobalApiToken()) && !empty($this->getGlobalApiSecret())) {
+            return true;
+        }
+        return TenantProviderCredentialService::hasCredentials($tenantId, $this->getSlug());
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────

@@ -38,6 +38,7 @@ interface ProviderInfo {
   name: string;
   levels: string[];
   available: boolean;
+  has_credentials: boolean;
 }
 
 interface InviteCode {
@@ -97,11 +98,10 @@ export function RegistrationPolicySettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Provider config state
-  const [providerApiKey, setProviderApiKey] = useState('');
-  const [providerWebhookSecret, setProviderWebhookSecret] = useState('');
-  const [showApiKey, setShowApiKey] = useState(false);
-  const [showWebhookSecret, setShowWebhookSecret] = useState(false);
+  // Per-provider credential state
+  const [credentialInputs, setCredentialInputs] = useState<Record<string, { api_key: string; webhook_secret: string }>>({});
+  const [credentialVisibility, setCredentialVisibility] = useState<Record<string, { api_key: boolean; webhook_secret: boolean }>>({});
+  const [savingCredentials, setSavingCredentials] = useState<Record<string, boolean>>({});
 
   // Invite codes state
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
@@ -153,11 +153,6 @@ export function RegistrationPolicySettings() {
     if (!policy) return;
     setSaving(true);
     try {
-      // Build provider config if keys were entered
-      const providerConfig: Record<string, string> = {};
-      if (providerApiKey) providerConfig.api_key = providerApiKey;
-      if (providerWebhookSecret) providerConfig.webhook_secret = providerWebhookSecret;
-
       const res = await api.put('/v2/admin/config/registration-policy', {
         registration_mode: policy.registration_mode,
         verification_provider: policy.verification_provider,
@@ -165,18 +160,44 @@ export function RegistrationPolicySettings() {
         post_verification: policy.post_verification,
         fallback_mode: policy.fallback_mode,
         require_email_verify: policy.require_email_verify,
-        ...(Object.keys(providerConfig).length > 0 ? { provider_config: providerConfig } : {}),
       });
       if (res.data) {
         toast.success('Registration policy saved');
-        setProviderApiKey('');
-        setProviderWebhookSecret('');
         fetchData();
       }
     } catch {
       toast.error('Failed to save registration policy');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveCredentials = async (slug: string) => {
+    const input = credentialInputs[slug];
+    if (!input?.api_key && !input?.webhook_secret) return;
+    setSavingCredentials(prev => ({ ...prev, [slug]: true }));
+    try {
+      const body: Record<string, string> = {};
+      if (input.api_key) body.api_key = input.api_key;
+      if (input.webhook_secret) body.webhook_secret = input.webhook_secret;
+      await api.put(`/v2/admin/identity/provider-credentials/${slug}`, body);
+      toast.success('Credentials saved and encrypted');
+      setCredentialInputs(prev => ({ ...prev, [slug]: { api_key: '', webhook_secret: '' } }));
+      fetchData();
+    } catch {
+      toast.error('Failed to save credentials');
+    } finally {
+      setSavingCredentials(prev => ({ ...prev, [slug]: false }));
+    }
+  };
+
+  const handleDeleteCredentials = async (slug: string) => {
+    try {
+      await api.delete(`/v2/admin/identity/provider-credentials/${slug}`);
+      toast.success('Credentials removed');
+      fetchData();
+    } catch {
+      toast.error('Failed to remove credentials');
     }
   };
 
@@ -354,46 +375,95 @@ export function RegistrationPolicySettings() {
           </Card>
         )}
 
-        {/* Provider API Configuration (conditional) */}
-        {showVerificationOptions && policy.verification_provider && (
+        {/* Provider API Credentials — per-provider management */}
+        {showVerificationOptions && (
           <Card shadow="sm">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Key size={20} /> Provider API Configuration
+                <Key size={20} /> Provider API Credentials
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
               <p className="text-sm text-default-500">
-                Enter the API credentials for your verification provider. These are encrypted at rest and never exposed in the API response.
+                Enter your own API credentials for each provider. Credentials are encrypted at rest (AES-256-GCM) and never exposed in API responses.
+                Providers with credentials configured will show as &quot;Available&quot;.
               </p>
-              <Input
-                label="API Secret Key"
-                placeholder="sk_live_..."
-                value={providerApiKey}
-                onChange={(e) => setProviderApiKey(e.target.value)}
-                type={showApiKey ? 'text' : 'password'}
-                variant="bordered"
-                description="Leave blank to keep the existing key"
-                endContent={
-                  <Button isIconOnly size="sm" variant="light" onPress={() => setShowApiKey(!showApiKey)}>
-                    {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </Button>
-                }
-              />
-              <Input
-                label="Webhook Signing Secret"
-                placeholder="whsec_..."
-                value={providerWebhookSecret}
-                onChange={(e) => setProviderWebhookSecret(e.target.value)}
-                type={showWebhookSecret ? 'text' : 'password'}
-                variant="bordered"
-                description="Leave blank to keep the existing secret"
-                endContent={
-                  <Button isIconOnly size="sm" variant="light" onPress={() => setShowWebhookSecret(!showWebhookSecret)}>
-                    {showWebhookSecret ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </Button>
-                }
-              />
+              {providers.filter(p => p.slug !== 'mock').map((p) => {
+                const inputs = credentialInputs[p.slug] || { api_key: '', webhook_secret: '' };
+                const visibility = credentialVisibility[p.slug] || { api_key: false, webhook_secret: false };
+                const isSaving = savingCredentials[p.slug] || false;
+
+                return (
+                  <Card key={p.slug} shadow="none" className="border border-default-200">
+                    <CardBody className="gap-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{p.name}</span>
+                          {p.has_credentials ? (
+                            <Chip size="sm" color="success" variant="flat">Credentials Saved</Chip>
+                          ) : (
+                            <Chip size="sm" color="default" variant="flat">No Credentials</Chip>
+                          )}
+                          {p.available ? (
+                            <Chip size="sm" color="success" variant="dot">Available</Chip>
+                          ) : (
+                            <Chip size="sm" color="danger" variant="dot">Unavailable</Chip>
+                          )}
+                        </div>
+                        {p.has_credentials && (
+                          <Button size="sm" variant="light" color="danger" startContent={<Trash2 size={14} />} onPress={() => handleDeleteCredentials(p.slug)}>
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <Input
+                          label="API Key / Secret Key"
+                          placeholder={p.has_credentials ? '••••••••  (saved)' : 'sk_live_... or api key'}
+                          value={inputs.api_key}
+                          onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, api_key: e.target.value } }))}
+                          type={visibility.api_key ? 'text' : 'password'}
+                          variant="bordered"
+                          size="sm"
+                          endContent={
+                            <Button isIconOnly size="sm" variant="light" onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, api_key: !visibility.api_key } }))}>
+                              {visibility.api_key ? <EyeOff size={14} /> : <Eye size={14} />}
+                            </Button>
+                          }
+                        />
+                        <Input
+                          label="Webhook Secret"
+                          placeholder={p.has_credentials ? '••••••••  (saved)' : 'whsec_... or webhook secret'}
+                          value={inputs.webhook_secret}
+                          onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, webhook_secret: e.target.value } }))}
+                          type={visibility.webhook_secret ? 'text' : 'password'}
+                          variant="bordered"
+                          size="sm"
+                          endContent={
+                            <Button isIconOnly size="sm" variant="light" onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
+                              {visibility.webhook_secret ? <EyeOff size={14} /> : <Eye size={14} />}
+                            </Button>
+                          }
+                        />
+                      </div>
+                      {(inputs.api_key || inputs.webhook_secret) && (
+                        <div className="flex justify-end">
+                          <Button
+                            size="sm"
+                            color="primary"
+                            variant="flat"
+                            startContent={!isSaving ? <Save size={14} /> : undefined}
+                            isLoading={isSaving}
+                            onPress={() => handleSaveCredentials(p.slug)}
+                          >
+                            Save {p.name} Credentials
+                          </Button>
+                        </div>
+                      )}
+                    </CardBody>
+                  </Card>
+                );
+              })}
             </CardBody>
           </Card>
         )}

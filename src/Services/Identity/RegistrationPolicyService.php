@@ -239,7 +239,7 @@ class RegistrationPolicyService
      * @param array $config
      * @return string Encrypted string
      */
-    private static function encryptConfig(array $config): string
+    public static function encryptConfig(array $config): string
     {
         $key = \Nexus\Core\Env::get('APP_KEY');
         if (!$key) {

@@ -208,8 +208,11 @@ class StripeIdentityProvider implements IdentityVerificationProviderInterface
 
     public function isAvailable(int $tenantId): bool
     {
-        // Check if we have a Stripe API key available (global or tenant-specific)
-        return !empty($this->getGlobalApiKey());
+        // Check global key first, then tenant-specific credentials
+        if (!empty($this->getGlobalApiKey())) {
+            return true;
+        }
+        return TenantProviderCredentialService::hasCredentials($tenantId, $this->getSlug());
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────
