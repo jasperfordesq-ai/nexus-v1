@@ -86,11 +86,8 @@ export default function GroupRanking() {
             <TableColumn>TOTAL SCORE</TableColumn>
             <TableColumn>FEATURED</TableColumn>
           </TableHeader>
-          <TableBody
-            emptyContent={loading ? 'Loading...' : 'No groups found'}
-            items={groups}
-          >
-            {(group) => (
+          <TableBody emptyContent={loading ? 'Loading...' : 'No groups found'}>
+            {groups.map((group) => (
               <TableRow key={group.group_id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
@@ -126,12 +123,12 @@ export default function GroupRanking() {
                 </TableCell>
                 <TableCell>
                   <Switch
-                    isSelected={group.is_featured}
+                    isSelected={!!group.is_featured}
                     onValueChange={() => handleToggleFeatured(group.group_id)}
                   />
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </Card>

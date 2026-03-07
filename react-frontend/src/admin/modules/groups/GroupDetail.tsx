@@ -229,8 +229,8 @@ export default function GroupDetail() {
                 <TableColumn>JOINED</TableColumn>
                 <TableColumn>ACTIONS</TableColumn>
               </TableHeader>
-              <TableBody items={members}>
-                {(member) => (
+              <TableBody emptyContent="No members found">
+                {members.map((member) => (
                   <TableRow key={member.user_id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export default function GroupDetail() {
                       </div>
                     </TableCell>
                   </TableRow>
-                )}
+                ))}
               </TableBody>
             </Table>
           </Card>
