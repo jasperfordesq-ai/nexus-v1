@@ -36,6 +36,8 @@ import {
   MailCheck,
   ShieldCheck,
   Ticket,
+  Clock,
+  Users,
 } from 'lucide-react';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
@@ -331,8 +333,8 @@ export function RegisterPage() {
     });
 
     if (result.success) {
-      // If verification or approval is required, show pending screen instead of redirecting
-      if (result.requiresVerification || result.requiresApproval) {
+      // If verification, approval, or waitlist is required, show pending screen
+      if (result.requiresVerification || result.requiresApproval || result.requiresWaitlist) {
         setPendingResult(result);
         return;
       }
@@ -987,7 +989,9 @@ export function RegisterPage() {
                 animate={{ scale: 1 }}
                 className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-4"
               >
-                {pendingResult.requiresVerification ? (
+                {pendingResult.requiresWaitlist ? (
+                  <Users className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                ) : pendingResult.requiresVerification ? (
                   <MailCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
                 ) : (
                   <ShieldCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
@@ -995,18 +999,36 @@ export function RegisterPage() {
               </motion.div>
 
               <h1 className="text-xl sm:text-2xl font-bold text-theme-primary mb-2">
-                Registration Successful!
+                {pendingResult.requiresWaitlist ? t('register.waitlist_title', { defaultValue: "You're on the waitlist!" }) : t('register.success_title', { defaultValue: 'Registration Successful!' })}
               </h1>
 
               <div className="space-y-3 mt-4 text-left">
+                {pendingResult.requiresWaitlist && (
+                  <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-sm">
+                    <div className="flex items-start gap-3">
+                      <Clock className="w-5 h-5 text-indigo-500 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-indigo-600 dark:text-indigo-400">
+                          {pendingResult.waitlistPosition
+                            ? t('register.waitlist_position', { defaultValue: 'Position #{{position}} on the waitlist', position: pendingResult.waitlistPosition })
+                            : t('register.waitlist_joined', { defaultValue: 'Added to the waitlist' })}
+                        </p>
+                        <p className="text-indigo-600/80 dark:text-indigo-300/80 mt-1">
+                          {t('register.waitlist_body', { defaultValue: "We'll send you an email when a spot opens up. Thank you for your patience!" })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {pendingResult.requiresVerification && (
                   <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-sm">
                     <div className="flex items-start gap-3">
                       <MailCheck className="w-5 h-5 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-blue-600 dark:text-blue-400">Verify your email</p>
+                        <p className="font-medium text-blue-600 dark:text-blue-400">{t('register.verify_email_title', { defaultValue: 'Verify your email' })}</p>
                         <p className="text-blue-600/80 dark:text-blue-300/80 mt-1">
-                          We&apos;ve sent a verification link to <strong>{email}</strong>. Please check your inbox and click the link to verify your email address.
+                          {t('register.verify_email_body', { defaultValue: "We've sent a verification link to <strong>{{email}}</strong>. Please check your inbox and click the link to verify your email address.", email })}
                         </p>
                       </div>
                     </div>
@@ -1018,9 +1040,9 @@ export function RegisterPage() {
                     <div className="flex items-start gap-3">
                       <ShieldCheck className="w-5 h-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-amber-600 dark:text-amber-400">Awaiting admin approval</p>
+                        <p className="font-medium text-amber-600 dark:text-amber-400">{t('register.approval_title', { defaultValue: 'Awaiting admin approval' })}</p>
                         <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">
-                          Your account will be reviewed by a community administrator. You&apos;ll receive an email once your account has been approved.
+                          {t('register.approval_body', { defaultValue: "Your account will be reviewed by a community administrator. You'll receive an email once your account has been approved." })}
                         </p>
                       </div>
                     </div>
@@ -1029,12 +1051,13 @@ export function RegisterPage() {
               </div>
 
               <p className="text-theme-muted text-sm mt-6">
-                Once {pendingResult.requiresVerification && pendingResult.requiresApproval
-                  ? 'your email is verified and your account is approved'
-                  : pendingResult.requiresVerification
-                    ? 'your email is verified'
-                    : 'your account is approved'
-                }, you can log in.
+                {pendingResult.requiresWaitlist
+                  ? t('register.waitlist_next', { defaultValue: "You'll receive an email when your account is activated." })
+                  : pendingResult.requiresVerification && pendingResult.requiresApproval
+                    ? t('register.next_verify_approve', { defaultValue: 'Once your email is verified and your account is approved, you can log in.' })
+                    : pendingResult.requiresVerification
+                      ? t('register.next_verify', { defaultValue: 'Once your email is verified, you can log in.' })
+                      : t('register.next_approve', { defaultValue: 'Once your account is approved, you can log in.' })}
               </p>
 
               <Button
@@ -1042,7 +1065,7 @@ export function RegisterPage() {
                 size="lg"
                 onPress={() => navigate(tenantPath('/login'))}
               >
-                Go to Login
+                {t('register.go_to_login', { defaultValue: 'Go to Login' })}
               </Button>
             </div>
           </GlassCard>

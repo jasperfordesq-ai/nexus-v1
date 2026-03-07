@@ -63,6 +63,8 @@ export interface RegisterResult {
   success: boolean;
   requiresVerification?: boolean;
   requiresApproval?: boolean;
+  requiresWaitlist?: boolean;
+  waitlistPosition?: number;
   nextSteps?: string[];
   message?: string;
   error?: string;
@@ -438,11 +440,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const responseData = response.data as Record<string, unknown>;
 
-    // Check if verification or approval is required (no tokens issued)
+    // Check if verification, approval, or waitlist is required (no tokens issued)
     const requiresVerification = responseData.requires_verification === true;
     const requiresApproval = responseData.requires_approval === true;
+    const requiresWaitlist = responseData.requires_waitlist === true;
 
-    if (requiresVerification || requiresApproval) {
+    if (requiresVerification || requiresApproval || requiresWaitlist) {
       // Registration succeeded but user cannot log in yet.
       // Reset to idle state — do NOT store any tokens.
       setState((prev) => ({
@@ -454,6 +457,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         success: true,
         requiresVerification,
         requiresApproval,
+        requiresWaitlist,
+        waitlistPosition: typeof responseData.waitlist_position === 'number' ? responseData.waitlist_position : undefined,
         nextSteps: (responseData.next_steps as string[]) ?? [],
         message: (responseData.message as string) ?? 'Registration successful!',
       };

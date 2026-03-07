@@ -17,6 +17,7 @@ import {
 import { ShieldCheck, Save, Info, AlertTriangle, Key, Ticket, Plus, Trash2, Copy, Eye, EyeOff } from 'lucide-react';
 import { VerificationAuditLog } from './VerificationAuditLog';
 import { VerificationReviewQueue } from './VerificationReviewQueue';
+import { ProviderHealthDashboard } from './ProviderHealthDashboard';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -62,6 +63,7 @@ const REGISTRATION_MODES = [
   { key: 'verified_identity', label: 'Verified Identity via Provider', description: 'Users must complete identity verification (document check, selfie, etc.) before activation.' },
   { key: 'government_id', label: 'Government / Digital ID (Future)', description: 'Users authenticate via government-issued digital identity. Coming soon.' },
   { key: 'invite_only', label: 'Invite Only / Closed', description: 'Registration is closed. Only invited users can join.' },
+  { key: 'waitlist', label: 'Waitlist', description: 'Users join a waitlist and are activated in order when capacity opens.' },
 ];
 
 const VERIFICATION_LEVELS = [
@@ -106,6 +108,8 @@ export function RegistrationPolicySettings() {
   const [inviteCodesTotal, setInviteCodesTotal] = useState(0);
   const [inviteCodesLoading, setInviteCodesLoading] = useState(false);
   const [generateCount, setGenerateCount] = useState(1);
+  const [generateMaxUses, setGenerateMaxUses] = useState(1);
+  const [generateExpiry, setGenerateExpiry] = useState('');
   const [generateNote, setGenerateNote] = useState('');
   const [generating, setGenerating] = useState(false);
   const [generatedCodes, setGeneratedCodes] = useState<string[]>([]);
@@ -181,6 +185,8 @@ export function RegistrationPolicySettings() {
     try {
       const res = await api.post<{ codes: string[] }>('/v2/admin/invite-codes', {
         count: generateCount,
+        max_uses: generateMaxUses,
+        expires_at: generateExpiry || undefined,
         note: generateNote || undefined,
       });
       if (res.data?.codes) {
@@ -403,7 +409,7 @@ export function RegistrationPolicySettings() {
                 size="sm"
                 color="primary"
                 startContent={<Plus size={14} />}
-                onPress={() => { setGeneratedCodes([]); setGenerateCount(1); setGenerateNote(''); generateModal.onOpen(); }}
+                onPress={() => { setGeneratedCodes([]); setGenerateCount(1); setGenerateMaxUses(1); setGenerateExpiry(''); setGenerateNote(''); generateModal.onOpen(); }}
               >
                 Generate Codes
               </Button>
@@ -503,6 +509,25 @@ export function RegistrationPolicySettings() {
                     value={String(generateCount)}
                     onChange={(e) => setGenerateCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
                     variant="bordered"
+                    description="Generate up to 100 codes at once"
+                  />
+                  <Input
+                    label="Max uses per code"
+                    type="number"
+                    min={1}
+                    max={1000}
+                    value={String(generateMaxUses)}
+                    onChange={(e) => setGenerateMaxUses(Math.max(1, Math.min(1000, parseInt(e.target.value) || 1)))}
+                    variant="bordered"
+                    description="How many times each code can be used (1 = single-use)"
+                  />
+                  <Input
+                    label="Expiry date (optional)"
+                    type="date"
+                    value={generateExpiry}
+                    onChange={(e) => setGenerateExpiry(e.target.value)}
+                    variant="bordered"
+                    description="Codes expire at midnight on this date (leave blank for no expiry)"
                   />
                   <Input
                     label="Note (optional)"
@@ -560,11 +585,15 @@ export function RegistrationPolicySettings() {
                   <li><strong>Verified Identity:</strong> User must pass an identity check (document scan, selfie) via a third-party provider.</li>
                   <li><strong>Government/Digital ID:</strong> Placeholder for future eID integration (EUDI wallet, UK trust framework, etc.).</li>
                   <li><strong>Invite Only:</strong> Registration is closed. Only users with an invitation can join.</li>
+                  <li><strong>Waitlist:</strong> Users join a queue and are activated in order when capacity opens.</li>
                 </ul>
               </div>
             </div>
           </CardBody>
         </Card>
+
+        {/* Provider Health Dashboard (conditional) */}
+        {showVerificationOptions && <ProviderHealthDashboard />}
 
         {/* Save */}
         <div className="flex justify-end">

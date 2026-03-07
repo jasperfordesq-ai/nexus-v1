@@ -214,7 +214,8 @@ class IdentityVerificationTest extends TestCase
         $this->assertContains('verified_identity', RegistrationPolicyService::MODES);
         $this->assertContains('government_id', RegistrationPolicyService::MODES);
         $this->assertContains('invite_only', RegistrationPolicyService::MODES);
-        $this->assertCount(5, RegistrationPolicyService::MODES);
+        $this->assertContains('waitlist', RegistrationPolicyService::MODES);
+        $this->assertCount(6, RegistrationPolicyService::MODES);
     }
 
     public function testValidVerificationLevels(): void
