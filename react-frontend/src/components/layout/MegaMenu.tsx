@@ -9,7 +9,7 @@
  * Supports keyboard navigation (arrow keys + Enter) and focus management.
  */
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Button,
@@ -112,6 +112,12 @@ export function MegaMenu({
     }
   }, [activityItems.length, federationItems.length, allItems.length, onOpenChange]);
 
+  // Respect prefers-reduced-motion for popover animation
+  const reducedMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
   const hasFederation = federationItems.length > 0;
   const columnCount = hasFederation ? 3 : 2;
 
@@ -126,7 +132,7 @@ export function MegaMenu({
               key={item.href}
               data-mega-item
               onClick={() => onNavigate(item.href)}
-              className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 ${
+              className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 ${
                 location.pathname.startsWith(item.href)
                   ? 'bg-theme-active text-theme-primary'
                   : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
@@ -150,7 +156,14 @@ export function MegaMenu({
     <div className="sr-only" aria-live="polite" aria-atomic="true">
       {isOpen ? t('accessibility.menu_opened', 'Navigation menu opened') : ''}
     </div>
-    <Popover placement="bottom-start" isOpen={isOpen} onOpenChange={onOpenChange} shouldBlockScroll={false} offset={8}>
+    <Popover
+      placement="bottom-start"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      shouldBlockScroll={false}
+      offset={8}
+      motionProps={reducedMotion ? { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } } : undefined}
+    >
       <PopoverTrigger>
         <Button
           variant="light"
