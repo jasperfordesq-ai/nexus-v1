@@ -1628,4 +1628,83 @@ COMMENT;
 </html>
 HTML;
     }
+
+    // ─── Identity Verification Notifications ────────────────────────────
+
+    /**
+     * Dispatch notification when identity verification passes.
+     */
+    public static function dispatchVerificationPassed(int $userId): void
+    {
+        $content = "Your identity has been verified successfully.";
+        $link = "/dashboard";
+
+        Notification::create($userId, $content, $link, 'verification_passed');
+        $htmlContent = self::buildVerificationPassedEmail();
+        self::queueNotification($userId, 'verification_passed', $content, $link, 'instant', $htmlContent);
+    }
+
+    /**
+     * Dispatch notification when identity verification fails.
+     */
+    public static function dispatchVerificationFailed(int $userId, string $reason = ''): void
+    {
+        $content = "Your identity verification was unsuccessful.";
+        if (!empty($reason)) {
+            $content .= " Reason: {$reason}";
+        }
+        $link = "/verify-identity";
+
+        Notification::create($userId, $content, $link, 'verification_failed');
+        $htmlContent = self::buildVerificationFailedEmail($reason);
+        self::queueNotification($userId, 'verification_failed', $content, $link, 'instant', $htmlContent);
+    }
+
+    private static function buildVerificationPassedEmail(): string
+    {
+        $tenant = \Nexus\Core\TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Community';
+        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+        $frontendUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #22c55e, #16a34a); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">Identity Verified</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">Your identity has been successfully verified. Your account is now active and ready to use.</p>
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/dashboard" style="display: inline-block; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Go to Dashboard</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
+
+    private static function buildVerificationFailedEmail(string $reason): string
+    {
+        $tenant = \Nexus\Core\TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Community';
+        $basePath = \Nexus\Core\TenantContext::getSlugPrefix();
+        $frontendUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+        $reasonHtml = !empty($reason) ? "<p style=\"color: #dc2626; font-weight: 500; margin: 16px 0;\">Reason: " . htmlspecialchars($reason) . "</p>" : '';
+
+        return <<<HTML
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 24px; border-radius: 16px 16px 0 0; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">Verification Unsuccessful</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">{$tenantName}</p>
+    </div>
+    <div style="background: #f8fafc; padding: 24px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none;">
+        <p style="color: #1e293b; font-size: 16px; line-height: 1.6;">We were unable to verify your identity. You may retry the verification process or contact support for assistance.</p>
+        {$reasonHtml}
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="{$frontendUrl}{$basePath}/verify-identity" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600;">Retry Verification</a>
+        </div>
+    </div>
+</div>
+HTML;
+    }
 }

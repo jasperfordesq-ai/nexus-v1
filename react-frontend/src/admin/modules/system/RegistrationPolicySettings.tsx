@@ -11,9 +11,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Card, CardBody, CardHeader, Select, SelectItem, Switch, Button, Spinner, Chip,
-  Divider,
+  Divider, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
+  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
 } from '@heroui/react';
-import { ShieldCheck, Save, Info, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, Save, Info, AlertTriangle, Key, Ticket, Plus, Trash2, Copy, Eye, EyeOff } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -34,6 +35,23 @@ interface ProviderInfo {
   name: string;
   levels: string[];
   available: boolean;
+}
+
+interface InviteCode {
+  id: number;
+  code: string;
+  max_uses: number;
+  uses_count: number;
+  note: string | null;
+  is_active: number;
+  expires_at: string | null;
+  created_at: string;
+  creator_name: string | null;
+}
+
+interface InviteCodesResponse {
+  items: InviteCode[];
+  total: number;
 }
 
 const REGISTRATION_MODES = [
@@ -75,6 +93,22 @@ export function RegistrationPolicySettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // Provider config state
+  const [providerApiKey, setProviderApiKey] = useState('');
+  const [providerWebhookSecret, setProviderWebhookSecret] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [showWebhookSecret, setShowWebhookSecret] = useState(false);
+
+  // Invite codes state
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
+  const [inviteCodesTotal, setInviteCodesTotal] = useState(0);
+  const [inviteCodesLoading, setInviteCodesLoading] = useState(false);
+  const [generateCount, setGenerateCount] = useState(1);
+  const [generateNote, setGenerateNote] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [generatedCodes, setGeneratedCodes] = useState<string[]>([]);
+  const generateModal = useDisclosure();
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -91,12 +125,33 @@ export function RegistrationPolicySettings() {
     }
   }, [toast]);
 
+  const fetchInviteCodes = useCallback(async () => {
+    setInviteCodesLoading(true);
+    try {
+      const res = await api.get<InviteCodesResponse>('/v2/admin/invite-codes');
+      if (res.data) {
+        setInviteCodes(res.data.items || []);
+        setInviteCodesTotal(res.data.total || 0);
+      }
+    } catch { /* ignore */ } finally {
+      setInviteCodesLoading(false);
+    }
+  }, []);
+
   useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    if (policy?.registration_mode === 'invite_only') fetchInviteCodes();
+  }, [policy?.registration_mode, fetchInviteCodes]);
 
   const handleSave = async () => {
     if (!policy) return;
     setSaving(true);
     try {
+      // Build provider config if keys were entered
+      const providerConfig: Record<string, string> = {};
+      if (providerApiKey) providerConfig.api_key = providerApiKey;
+      if (providerWebhookSecret) providerConfig.webhook_secret = providerWebhookSecret;
+
       const res = await api.put('/v2/admin/config/registration-policy', {
         registration_mode: policy.registration_mode,
         verification_provider: policy.verification_provider,
@@ -104,9 +159,12 @@ export function RegistrationPolicySettings() {
         post_verification: policy.post_verification,
         fallback_mode: policy.fallback_mode,
         require_email_verify: policy.require_email_verify,
+        ...(Object.keys(providerConfig).length > 0 ? { provider_config: providerConfig } : {}),
       });
       if (res.data) {
         toast.success('Registration policy saved');
+        setProviderApiKey('');
+        setProviderWebhookSecret('');
         fetchData();
       }
     } catch {
@@ -114,6 +172,40 @@ export function RegistrationPolicySettings() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleGenerateInviteCodes = async () => {
+    setGenerating(true);
+    try {
+      const res = await api.post<{ codes: string[] }>('/v2/admin/invite-codes', {
+        count: generateCount,
+        note: generateNote || undefined,
+      });
+      if (res.data?.codes) {
+        setGeneratedCodes(res.data.codes);
+        fetchInviteCodes();
+        toast.success(`Generated ${res.data.codes.length} invite code(s)`);
+      }
+    } catch {
+      toast.error('Failed to generate invite codes');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleDeactivateCode = async (id: number) => {
+    try {
+      await api.delete(`/v2/admin/invite-codes/${id}`);
+      toast.success('Invite code deactivated');
+      fetchInviteCodes();
+    } catch {
+      toast.error('Failed to deactivate invite code');
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard');
   };
 
   const showVerificationOptions = policy?.registration_mode === 'verified_identity' || policy?.registration_mode === 'government_id';
@@ -253,6 +345,185 @@ export function RegistrationPolicySettings() {
             </CardBody>
           </Card>
         )}
+
+        {/* Provider API Configuration (conditional) */}
+        {showVerificationOptions && policy.verification_provider && (
+          <Card shadow="sm">
+            <CardHeader>
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Key size={20} /> Provider API Configuration
+              </h3>
+            </CardHeader>
+            <CardBody className="gap-4">
+              <p className="text-sm text-default-500">
+                Enter the API credentials for your verification provider. These are encrypted at rest and never exposed in the API response.
+              </p>
+              <Input
+                label="API Secret Key"
+                placeholder="sk_live_..."
+                value={providerApiKey}
+                onChange={(e) => setProviderApiKey(e.target.value)}
+                type={showApiKey ? 'text' : 'password'}
+                variant="bordered"
+                description="Leave blank to keep the existing key"
+                endContent={
+                  <Button isIconOnly size="sm" variant="light" onPress={() => setShowApiKey(!showApiKey)}>
+                    {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </Button>
+                }
+              />
+              <Input
+                label="Webhook Signing Secret"
+                placeholder="whsec_..."
+                value={providerWebhookSecret}
+                onChange={(e) => setProviderWebhookSecret(e.target.value)}
+                type={showWebhookSecret ? 'text' : 'password'}
+                variant="bordered"
+                description="Leave blank to keep the existing secret"
+                endContent={
+                  <Button isIconOnly size="sm" variant="light" onPress={() => setShowWebhookSecret(!showWebhookSecret)}>
+                    {showWebhookSecret ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </Button>
+                }
+              />
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Invite Codes Management (conditional) */}
+        {policy.registration_mode === 'invite_only' && (
+          <Card shadow="sm">
+            <CardHeader className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Ticket size={20} /> Invite Codes
+              </h3>
+              <Button
+                size="sm"
+                color="primary"
+                startContent={<Plus size={14} />}
+                onPress={() => { setGeneratedCodes([]); setGenerateCount(1); setGenerateNote(''); generateModal.onOpen(); }}
+              >
+                Generate Codes
+              </Button>
+            </CardHeader>
+            <CardBody>
+              {inviteCodesLoading ? (
+                <div className="flex justify-center py-4"><Spinner /></div>
+              ) : inviteCodes.length === 0 ? (
+                <p className="text-sm text-default-500 text-center py-4">No invite codes generated yet.</p>
+              ) : (
+                <Table aria-label="Invite codes" removeWrapper>
+                  <TableHeader>
+                    <TableColumn>Code</TableColumn>
+                    <TableColumn>Uses</TableColumn>
+                    <TableColumn>Status</TableColumn>
+                    <TableColumn>Note</TableColumn>
+                    <TableColumn>Actions</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {inviteCodes.map((ic) => (
+                      <TableRow key={ic.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <code className="text-sm font-mono">{ic.code}</code>
+                            <Button isIconOnly size="sm" variant="light" onPress={() => copyToClipboard(ic.code)}>
+                              <Copy size={12} />
+                            </Button>
+                          </div>
+                        </TableCell>
+                        <TableCell>{ic.uses_count}/{ic.max_uses}</TableCell>
+                        <TableCell>
+                          {!ic.is_active ? (
+                            <Chip size="sm" color="default" variant="flat">Deactivated</Chip>
+                          ) : ic.uses_count >= ic.max_uses ? (
+                            <Chip size="sm" color="warning" variant="flat">Exhausted</Chip>
+                          ) : ic.expires_at && new Date(ic.expires_at) < new Date() ? (
+                            <Chip size="sm" color="warning" variant="flat">Expired</Chip>
+                          ) : (
+                            <Chip size="sm" color="success" variant="flat">Active</Chip>
+                          )}
+                        </TableCell>
+                        <TableCell><span className="text-sm text-default-500">{ic.note || '—'}</span></TableCell>
+                        <TableCell>
+                          {ic.is_active ? (
+                            <Button isIconOnly size="sm" variant="light" color="danger" onPress={() => handleDeactivateCode(ic.id)}>
+                              <Trash2 size={14} />
+                            </Button>
+                          ) : null}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+              {inviteCodesTotal > 0 && (
+                <p className="text-xs text-default-400 mt-2">{inviteCodesTotal} total code(s)</p>
+              )}
+            </CardBody>
+          </Card>
+        )}
+
+        {/* Generate Codes Modal */}
+        <Modal isOpen={generateModal.isOpen} onOpenChange={generateModal.onOpenChange} size="md">
+          <ModalContent>
+            <ModalHeader>Generate Invite Codes</ModalHeader>
+            <ModalBody>
+              {generatedCodes.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-default-500">Generated {generatedCodes.length} code(s):</p>
+                  <div className="space-y-1">
+                    {generatedCodes.map((code) => (
+                      <div key={code} className="flex items-center justify-between p-2 bg-default-100 rounded-lg">
+                        <code className="font-mono text-sm">{code}</code>
+                        <Button isIconOnly size="sm" variant="light" onPress={() => copyToClipboard(code)}>
+                          <Copy size={14} />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    onPress={() => copyToClipboard(generatedCodes.join('\n'))}
+                    startContent={<Copy size={14} />}
+                    className="mt-2"
+                  >
+                    Copy all
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <Input
+                    label="Number of codes"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={String(generateCount)}
+                    onChange={(e) => setGenerateCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+                    variant="bordered"
+                  />
+                  <Input
+                    label="Note (optional)"
+                    placeholder="e.g. March 2026 onboarding batch"
+                    value={generateNote}
+                    onChange={(e) => setGenerateNote(e.target.value)}
+                    variant="bordered"
+                  />
+                </div>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="flat" onPress={generateModal.onClose}>
+                {generatedCodes.length > 0 ? 'Done' : 'Cancel'}
+              </Button>
+              {generatedCodes.length === 0 && (
+                <Button color="primary" onPress={handleGenerateInviteCodes} isLoading={generating}>
+                  Generate
+                </Button>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
         {/* Email Verification */}
         <Card shadow="sm">

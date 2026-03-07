@@ -69,6 +69,7 @@ $router->add('POST', '/api/v2/auth/register', 'Nexus\Controllers\Api\Registratio
 // Identity Verification API (user-facing)
 $router->add('GET', '/api/v2/auth/verification-status', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getVerificationStatus');
 $router->add('POST', '/api/v2/auth/start-verification', 'Nexus\Controllers\Api\RegistrationPolicyApiController@startVerification');
+$router->add('POST', '/api/v2/auth/validate-invite', 'Nexus\Controllers\Api\RegistrationPolicyApiController@validateInviteCode');
 
 // Identity Verification Webhooks (provider callbacks — no auth, signature-verified)
 $router->add('POST', '/api/v2/webhooks/identity/{provider_slug}', 'Nexus\Controllers\Api\IdentityWebhookController@handleWebhook');

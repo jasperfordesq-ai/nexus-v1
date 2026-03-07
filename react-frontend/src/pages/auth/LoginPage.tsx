@@ -17,7 +17,7 @@ import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react'
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2, Fingerprint } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft, Loader2, Building2, Fingerprint, ShieldAlert, ShieldX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
@@ -358,6 +358,50 @@ export function LoginPage() {
                               Resend verification email
                             </Button>
                           )}
+                        </div>
+                      )}
+                      {loginErrorCode === 'AUTH_PENDING_VERIFICATION' && (
+                        <div className="mt-3 flex items-start gap-2">
+                          <ShieldAlert className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-amber-600 dark:text-amber-400 text-xs">
+                              {t('login.pending_verification', {
+                                defaultValue: 'Your identity verification is still in progress. Please complete the verification process or wait for it to finish.',
+                              })}
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="flat"
+                              as={Link}
+                              to={tenantPath('/verify-identity')}
+                              className="mt-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
+                              startContent={<ShieldAlert className="w-3 h-3" />}
+                            >
+                              {t('login.continue_verification', { defaultValue: 'Continue verification' })}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      {loginErrorCode === 'AUTH_VERIFICATION_FAILED' && (
+                        <div className="mt-3 flex items-start gap-2">
+                          <ShieldX className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-red-600 dark:text-red-400 text-xs">
+                              {t('login.verification_failed', {
+                                defaultValue: 'Your identity verification was unsuccessful. You may retry the process or contact support for assistance.',
+                              })}
+                            </p>
+                            <Button
+                              size="sm"
+                              variant="flat"
+                              as={Link}
+                              to={tenantPath('/verify-identity')}
+                              className="mt-2 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
+                              startContent={<ShieldX className="w-3 h-3" />}
+                            >
+                              {t('login.retry_verification', { defaultValue: 'Retry verification' })}
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </motion.div>
