@@ -225,6 +225,9 @@ class RegistrationOrchestrationService
         );
 
         if ($verificationStatus === 'passed') {
+            // Send verification passed email
+            \Nexus\Services\NotificationDispatcher::dispatchVerificationPassed($userId);
+
             switch ($policy['post_verification']) {
                 case 'activate':
                     // Auto-activate the user
@@ -263,7 +266,14 @@ class RegistrationOrchestrationService
                     break;
             }
         } else {
-            // Verification failed
+            // Verification failed — send email notification
+            $failureReason = '';
+            $session = IdentityVerificationSessionService::getLatestForUser($tenantId, $userId);
+            if ($session) {
+                $failureReason = $session['failure_reason'] ?? '';
+            }
+            \Nexus\Services\NotificationDispatcher::dispatchVerificationFailed($userId, $failureReason);
+
             if ($policy['post_verification'] === 'reject_on_fail') {
                 Database::query(
                     "UPDATE users SET status = 'inactive' WHERE id = ? AND tenant_id = ?",

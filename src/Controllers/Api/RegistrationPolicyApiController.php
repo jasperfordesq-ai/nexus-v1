@@ -12,6 +12,7 @@ use Nexus\Services\Identity\RegistrationPolicyService;
 use Nexus\Services\Identity\IdentityProviderRegistry;
 use Nexus\Services\Identity\IdentityVerificationSessionService;
 use Nexus\Services\Identity\RegistrationOrchestrationService;
+use Nexus\Services\Identity\InviteCodeService;
 
 /**
  * RegistrationPolicyApiController — Admin endpoints for managing registration policies
@@ -160,5 +161,93 @@ class RegistrationPolicyApiController extends BaseApiController
                 503
             );
         }
+    }
+
+    // ─── Invite Code Endpoints ────────────────────────────────────────────
+
+    /**
+     * GET /api/v2/admin/invite-codes
+     *
+     * List invite codes for the current tenant.
+     */
+    public function listInviteCodes(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $limit = min($this->inputInt('limit', 50), 100);
+        $offset = max($this->inputInt('offset', 0), 0);
+
+        $result = InviteCodeService::listForTenant($tenantId, $limit, $offset);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/admin/invite-codes
+     *
+     * Generate one or more invite codes.
+     * Body: { "count": 5, "max_uses": 1, "expires_at": "2026-04-01", "note": "March batch" }
+     */
+    public function generateInviteCodes(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $adminId = (int) $this->requireAuth()['id'];
+        $input = $this->getAllInput();
+
+        $count = max(1, min((int) ($input['count'] ?? 1), 100));
+        $maxUses = isset($input['max_uses']) ? max(1, (int) $input['max_uses']) : 1;
+        $expiresAt = $input['expires_at'] ?? null;
+        $note = isset($input['note']) ? substr(trim($input['note']), 0, 255) : null;
+
+        if ($expiresAt && !strtotime($expiresAt)) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_INVALID_FORMAT, 'Invalid expires_at date', null, 422);
+        }
+
+        $codes = InviteCodeService::generate($tenantId, $adminId, $count, $maxUses, $expiresAt, $note);
+        $this->respondWithData(['codes' => $codes, 'count' => count($codes)]);
+    }
+
+    /**
+     * DELETE /api/v2/admin/invite-codes/{id}
+     *
+     * Deactivate an invite code.
+     */
+    public function deactivateInviteCode(): void
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $codeId = (int) $this->getRouteParam('id');
+
+        if (!$codeId) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Code ID required', null, 400);
+        }
+
+        $success = InviteCodeService::deactivate($tenantId, $codeId);
+        if (!$success) {
+            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Invite code not found', null, 404);
+        }
+
+        $this->respondWithData(['deactivated' => true]);
+    }
+
+    /**
+     * POST /api/v2/auth/validate-invite
+     *
+     * Public endpoint to validate an invite code before registration.
+     * Body: { "code": "ABCD1234" }
+     */
+    public function validateInviteCode(): void
+    {
+        $input = $this->getAllInput();
+        $code = $input['code'] ?? '';
+
+        if (!$code || strlen($code) < 4) {
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Invite code required', null, 400);
+        }
+
+        $tenantId = TenantContext::getId();
+        $result = InviteCodeService::validate($tenantId, $code);
+        $this->respondWithData(['valid' => $result['valid'], 'reason' => $result['reason'] ?? null]);
     }
 }

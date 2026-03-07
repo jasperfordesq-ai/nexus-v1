@@ -80,6 +80,9 @@ $router->add('GET', '/api/v2/admin/config/registration-policy', 'Nexus\Controlle
 $router->add('PUT', '/api/v2/admin/config/registration-policy', 'Nexus\Controllers\Api\RegistrationPolicyApiController@updatePolicy');
 $router->add('GET', '/api/v2/admin/identity/providers', 'Nexus\Controllers\Api\RegistrationPolicyApiController@listProviders');
 $router->add('GET', '/api/v2/admin/identity/sessions', 'Nexus\Controllers\Api\RegistrationPolicyApiController@listSessions');
+$router->add('GET', '/api/v2/admin/invite-codes', 'Nexus\Controllers\Api\RegistrationPolicyApiController@listInviteCodes');
+$router->add('POST', '/api/v2/admin/invite-codes', 'Nexus\Controllers\Api\RegistrationPolicyApiController@generateInviteCodes');
+$router->add('DELETE', '/api/v2/admin/invite-codes/{id}', 'Nexus\Controllers\Api\RegistrationPolicyApiController@deactivateInviteCode');
 
 // Admin Config - AI
 $router->add('GET', '/api/v2/admin/config/ai', 'Nexus\Controllers\Api\AdminConfigApiController@getAiConfig');
