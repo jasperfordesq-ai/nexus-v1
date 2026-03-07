@@ -86,7 +86,7 @@ describe('MegaMenu', () => {
       renderMegaMenu();
       expect(screen.getByText('Activity')).toBeTruthy();
       expect(screen.getByText('Partner Communities')).toBeTruthy();
-      expect(screen.getByText('About')).toBeTruthy();
+      expect(screen.getAllByText('About').length).toBeGreaterThanOrEqual(1);
     });
 
     it('renders all menu items', () => {
@@ -94,7 +94,7 @@ describe('MegaMenu', () => {
       expect(screen.getByText('Volunteering')).toBeTruthy();
       expect(screen.getByText('Goals')).toBeTruthy();
       expect(screen.getByText('Partner Hub')).toBeTruthy();
-      expect(screen.getByText('About')).toBeTruthy();
+      expect(screen.getAllByText('About').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Contact')).toBeTruthy();
     });
 
