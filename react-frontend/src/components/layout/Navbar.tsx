@@ -22,6 +22,9 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownSection,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
 } from '@heroui/react';
 import {
   Hexagon,
@@ -163,6 +166,30 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     navigate(tenantPath('/login'));
   };
 
+  /** Navigate to legacy admin via form POST (creates PHP session from JWT) */
+  const navigateToLegacyAdmin = useCallback(() => {
+    const t = tokenManager.getAccessToken();
+    const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin;
+    if (t) {
+      const f = document.createElement('form');
+      f.method = 'POST';
+      f.action = `${phpOrigin}/api/auth/admin-session`;
+      f.style.display = 'none';
+      const ti = document.createElement('input');
+      ti.name = 'token';
+      ti.value = t;
+      f.appendChild(ti);
+      const ri = document.createElement('input');
+      ri.name = 'redirect';
+      ri.value = '/admin-legacy';
+      f.appendChild(ri);
+      document.body.appendChild(f);
+      f.submit();
+    } else {
+      window.location.href = `${phpOrigin}/admin-legacy`;
+    }
+  }, []);
+
   // Close all dropdowns when route changes (safety net)
   useEffect(() => {
     closeAllDropdowns();
@@ -292,33 +319,33 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   // Community dropdown items
   const communityItems = [
-    { label: t('nav.members'), href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
-    { label: t('nav.connections'), href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
-    { label: t('nav.events'), href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
-    { label: t('nav.groups'), href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
-    { label: t('nav.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' as const },
-    { label: t('nav.volunteering'), href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
-    { label: t('nav.organisations'), href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
-    { label: t('nav.resources'), href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
-    { label: t('nav.knowledge_base', 'Knowledge Base'), href: tenantPath('/kb'), icon: Library, feature: 'resources' as const },
-    { label: t('nav.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' as const },
-    { label: t('nav.jobs'), href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
-    { label: t('nav.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' as const },
+    { label: t('nav.members'), desc: t('nav_desc.members'), href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
+    { label: t('nav.connections'), desc: t('nav_desc.connections'), href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
+    { label: t('nav.events'), desc: t('nav_desc.events'), href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
+    { label: t('nav.groups'), desc: t('nav_desc.groups'), href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
+    { label: t('nav.blog'), desc: t('nav_desc.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' as const },
+    { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
+    { label: t('nav.organisations'), desc: t('nav_desc.organisations'), href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
+    { label: t('nav.resources'), desc: t('nav_desc.resources'), href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
+    { label: t('nav.knowledge_base', 'Knowledge Base'), desc: t('nav_desc.knowledge_base'), href: tenantPath('/kb'), icon: Library, feature: 'resources' as const },
+    { label: t('nav.polls'), desc: t('nav_desc.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' as const },
+    { label: t('nav.jobs'), desc: t('nav_desc.jobs'), href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
+    { label: t('nav.ideation'), desc: t('nav_desc.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' as const },
   ].filter(item => hasFeature(item.feature));
 
   // Activity dropdown items — filtered by feature flags and module flags
   const activityItems = [
-    { label: t('nav.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
-    { label: t('nav.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
-    { label: t('nav.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
-    { label: t('nav.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
-    { label: t('nav.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' as const },
-    { label: t('nav.nexus_score', 'NexusScore'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' as const },
-    { label: t('nav.matches', 'Matches'), href: tenantPath('/matches'), icon: Handshake },
-    { label: t('nav.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
-    { label: t('nav.skills', 'Skills'), href: tenantPath('/skills'), icon: GraduationCap },
-    { label: t('nav.activity', 'My Activity'), href: tenantPath('/activity'), icon: Activity },
-    { label: t('nav.ai_chat', 'AI Assistant'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' as const },
+    { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
+    { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
+    { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
+    { label: t('nav.achievements'), desc: t('nav_desc.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const },
+    { label: t('nav.leaderboard'), desc: t('nav_desc.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' as const },
+    { label: t('nav.nexus_score', 'NexusScore'), desc: t('nav_desc.nexus_score'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' as const },
+    { label: t('nav.matches', 'Matches'), desc: t('nav_desc.matches'), href: tenantPath('/matches'), icon: Handshake },
+    { label: t('nav.goals'), desc: t('nav_desc.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
+    { label: t('nav.skills', 'Skills'), desc: t('nav_desc.skills'), href: tenantPath('/skills'), icon: GraduationCap },
+    { label: t('nav.activity', 'My Activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
+    { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' as const },
   ].filter(item => {
     if (item.feature && !hasFeature(item.feature)) return false;
     if (item.module && !hasModule(item.module)) return false;
@@ -327,30 +354,31 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   // Federation dropdown items — only shown when federation feature is enabled
   const federationItems = hasFeature('federation') ? [
-    { label: t('nav.federation_hub'), href: tenantPath('/federation'), icon: Globe },
-    { label: t('nav.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
-    { label: t('nav.federated_members'), href: tenantPath('/federation/members'), icon: Users },
-    { label: t('nav.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
-    { label: t('nav.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
-    { label: t('nav.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
+    { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
+    { label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
+    { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
+    { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
+    { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
+    { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
   ] : [];
 
   // About dropdown — universal items + tenant-specific items + dynamic CMS pages
   const isHourTimebank = tenant?.slug === 'hour-timebank';
   const aboutItems = [
-    { label: t('nav.about'), href: tenantPath('/about'), icon: Info },
-    { label: t('nav.faq'), href: tenantPath('/faq'), icon: HelpCircle },
-    { label: t('nav.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
+    { label: t('nav.about'), desc: t('nav_desc.about'), href: tenantPath('/about'), icon: Info },
+    { label: t('nav.faq'), desc: t('nav_desc.faq'), href: tenantPath('/faq'), icon: HelpCircle },
+    { label: t('nav.timebanking_guide'), desc: t('nav_desc.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
     // Tenant 2 (hOUR Timebank) specific pages — these contain hardcoded org content
     ...(isHourTimebank ? [
-      { label: t('nav.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
-      { label: t('nav.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
-      { label: t('nav.our_impact'), href: tenantPath('/impact-summary'), icon: TrendingUp },
-      { label: t('nav.impact_report'), href: tenantPath('/impact-report'), icon: BarChart3 },
-      { label: t('nav.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
+      { label: t('nav.partner_with_us'), desc: t('nav_desc.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
+      { label: t('nav.social_prescribing'), desc: t('nav_desc.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
+      { label: t('nav.our_impact'), desc: t('nav_desc.our_impact'), href: tenantPath('/impact-summary'), icon: TrendingUp },
+      { label: t('nav.impact_report'), desc: t('nav_desc.impact_report'), href: tenantPath('/impact-report'), icon: BarChart3 },
+      { label: t('nav.strategic_plan'), desc: t('nav_desc.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
     ] : []),
     ...(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => ({
       label: p.title,
+      desc: undefined as string | undefined,
       href: tenantPath(`/page/${p.slug}`),
       icon: FileText,
     })),
@@ -366,6 +394,67 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   return (
     <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip">
+      {/* Utility Bar — slim top strip for secondary actions */}
+      <div className="hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)]">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-end gap-1 h-8">
+            {/* Help Center — authenticated users */}
+            {isAuthenticated && (
+              <Button
+                variant="light"
+                size="sm"
+                className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs"
+                onPress={() => navigate(tenantPath('/help'))}
+              >
+                <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                {t('user_menu.help_center')}
+              </Button>
+            )}
+            {/* Admin links — admin users only */}
+            {isAuthenticated && isAdmin && (
+              <>
+                <span className="text-[var(--border-default)] text-xs select-none">|</span>
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs"
+                  onPress={() => navigate('/admin')}
+                >
+                  <Shield className="w-3.5 h-3.5" aria-hidden="true" />
+                  {t('user_menu.admin_panel')}
+                </Button>
+                <Button
+                  variant="light"
+                  size="sm"
+                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs"
+                  onPress={navigateToLegacyAdmin}
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" aria-hidden="true" />
+                  {t('user_menu.legacy_admin')}
+                </Button>
+              </>
+            )}
+            {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none">|</span>}
+            <LanguageSwitcher />
+            <Button
+              isIconOnly
+              variant="light"
+              size="sm"
+              className="text-theme-muted hover:text-theme-primary w-7 h-7 min-w-7"
+              onPress={toggleTheme}
+              aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {resolvedTheme === 'dark' ? (
+                <Sun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+              ) : (
+                <Moon className="w-3.5 h-3.5 text-indigo-500" aria-hidden="true" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation Bar */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Left Section: Mobile Menu + Brand */}
@@ -503,9 +592,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </DropdownTrigger>
                 <DropdownMenu
                   aria-label="Community navigation"
-                  className="min-w-[180px]"
+                  className="min-w-[220px]"
                   classNames={{
-                    base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',
+                    base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
                   }}
                   onAction={(key) => {
                     dropdownNavigate(String(key));
@@ -514,6 +603,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   {communityItems.map((item) => (
                     <DropdownItem
                       key={item.href}
+                      description={item.desc}
                       startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
                       className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
                     >
@@ -524,9 +614,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               </Dropdown>
             )}
 
-            {/* More Dropdown — combines Activity, Federation, and About */}
-            <Dropdown placement="bottom-start" isOpen={moreOpen} onOpenChange={handleMoreOpenChange} shouldBlockScroll={false}>
-              <DropdownTrigger>
+            {/* More — Multi-column mega menu */}
+            <Popover placement="bottom-start" isOpen={moreOpen} onOpenChange={handleMoreOpenChange} shouldBlockScroll={false} offset={8}>
+              <PopoverTrigger>
                 <Button
                   variant="light"
                   size="sm"
@@ -540,56 +630,87 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <Menu className="w-4 h-4" aria-hidden="true" />
                   {t('nav.more')}
                 </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="More navigation"
-                className="min-w-[200px]"
-                classNames={{
-                  base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',
-                }}
-                onAction={(key) => {
-                  dropdownNavigate(String(key));
-                }}
-              >
-                {activityItems.length > 0 ? (
-                  <DropdownSection title={t('sections.activity')} showDivider={federationItems.length > 0 || aboutItems.length > 0}>
-                    {activityItems.map((item) => (
-                      <DropdownItem
-                        key={item.href}
-                        startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                        className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
-                      >
-                        {item.label}
-                      </DropdownItem>
-                    ))}
-                  </DropdownSection>
-                ) : null}
-                {federationItems.length > 0 ? (
-                  <DropdownSection title={t('sections.partner_communities')} showDivider>
-                    {federationItems.map((item) => (
-                      <DropdownItem
-                        key={item.href}
-                        startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                        className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
-                      >
-                        {item.label}
-                      </DropdownItem>
-                    ))}
-                  </DropdownSection>
-                ) : null}
-                <DropdownSection title={t('sections.about')}>
-                  {aboutItems.map((item) => (
-                    <DropdownItem
-                      key={item.href}
-                      startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                      className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
-                    >
-                      {item.label}
-                    </DropdownItem>
-                  ))}
-                </DropdownSection>
-              </DropdownMenu>
-            </Dropdown>
+              </PopoverTrigger>
+              <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl max-h-[75vh] overflow-y-auto">
+                <nav className="grid grid-cols-2 gap-0 min-w-[480px] p-2" style={federationItems.length > 0 ? { gridTemplateColumns: 'repeat(3, 1fr)', minWidth: '640px' } : undefined} aria-label="More navigation">
+                  {/* Column 1: Activity */}
+                  {activityItems.length > 0 && (
+                    <div className="p-2">
+                      <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{t('sections.activity')}</p>
+                      <div className="space-y-0.5">
+                        {activityItems.map((item) => (
+                          <button
+                            key={item.href}
+                            onClick={() => dropdownNavigate(item.href)}
+                            className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                              location.pathname.startsWith(item.href)
+                                ? 'bg-theme-active text-theme-primary'
+                                : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                            }`}
+                          >
+                            <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium leading-tight">{item.label}</p>
+                              {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Column 2: Federation (if enabled) */}
+                  {federationItems.length > 0 && (
+                    <div className="p-2 border-l border-[var(--border-default)]">
+                      <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{t('sections.partner_communities')}</p>
+                      <div className="space-y-0.5">
+                        {federationItems.map((item) => (
+                          <button
+                            key={item.href}
+                            onClick={() => dropdownNavigate(item.href)}
+                            className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                              location.pathname.startsWith(item.href)
+                                ? 'bg-theme-active text-theme-primary'
+                                : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                            }`}
+                          >
+                            <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium leading-tight">{item.label}</p>
+                              {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Column 2/3: About */}
+                  <div className={`p-2 ${activityItems.length > 0 ? 'border-l border-[var(--border-default)]' : ''}`}>
+                    <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{t('sections.about')}</p>
+                    <div className="space-y-0.5">
+                      {aboutItems.map((item) => (
+                        <button
+                          key={item.href}
+                          onClick={() => dropdownNavigate(item.href)}
+                          className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                            location.pathname.startsWith(item.href)
+                              ? 'bg-theme-active text-theme-primary'
+                              : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                          }`}
+                        >
+                          <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium leading-tight">{item.label}</p>
+                            {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </nav>
+              </PopoverContent>
+            </Popover>
             </>
             )}
           </nav>
@@ -638,7 +759,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <DropdownMenu
                     aria-label="Create actions"
                     classNames={{
-                      base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl',
+                      base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
                     }}
                     onAction={(key) => {
                       dropdownNavigate(String(key));
@@ -661,24 +782,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   </DropdownMenu>
                 </Dropdown>
 
-                {/* Theme Toggle */}
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  className="text-theme-muted hover:text-theme-primary"
-                  onPress={toggleTheme}
-                  aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-                >
-                  {resolvedTheme === 'dark' ? (
-                    <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" aria-hidden="true" />
-                  ) : (
-                    <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" aria-hidden="true" />
-                  )}
-                </Button>
-
-                {/* Language Switcher */}
-                <LanguageSwitcher />
+                {/* Language Switcher — mobile only (desktop uses utility bar) */}
+                <div className="sm:hidden">
+                  <LanguageSwitcher />
+                </div>
 
                 {/* Notifications */}
                 <Badge
@@ -715,15 +822,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   <DropdownMenu
                     aria-label="User actions"
                     classNames={{
-                      base: 'bg-[var(--surface-overlay)] border border-[var(--border-default)] shadow-xl min-w-[220px]',
+                      base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl min-w-[220px] max-h-[70vh] overflow-y-auto',
                     }}
                     onAction={(key) => {
                       const k = String(key);
                       if (k === 'theme') { toggleTheme(); closeAllDropdowns(); return; }
                       if (k === 'logout') { handleLogout(); return; }
                       if (k === 'profile-header') return;
-                      if (k === 'admin-panel') { if (isAdmin) dropdownNavigate('/admin'); return; }
-                      if (k === 'legacy-admin') { if (isAdmin) { closeAllDropdowns(); const t = tokenManager.getAccessToken(); const phpOrigin = API_BASE.startsWith('http') ? new URL(API_BASE).origin : window.location.origin; if (t) { const f = document.createElement('form'); f.method = 'POST'; f.action = `${phpOrigin}/api/auth/admin-session`; f.style.display = 'none'; const ti = document.createElement('input'); ti.name = 'token'; ti.value = t; f.appendChild(ti); const ri = document.createElement('input'); ri.name = 'redirect'; ri.value = '/admin-legacy'; f.appendChild(ri); document.body.appendChild(f); f.submit(); } else { window.location.href = `${phpOrigin}/admin-legacy`; } } return; }
                       dropdownNavigate(k);
                     }}
                   >
@@ -782,33 +887,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       >
                         {resolvedTheme === 'dark' ? t('user_menu.light_mode') : t('user_menu.dark_mode')}
                       </DropdownItem>
-                      <DropdownItem
-                        key={tenantPath('/help')}
-                        startContent={<HelpCircle className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('user_menu.help_center')}
-                      </DropdownItem>
-                    </DropdownSection>
-
-                    <DropdownSection
-                      showDivider
-                      title={t('sections.admin')}
-                      classNames={{
-                        base: isAdmin ? '' : 'hidden',
-                      }}
-                    >
-                      <DropdownItem
-                        key="admin-panel"
-                        startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('user_menu.admin_panel')}
-                      </DropdownItem>
-                      <DropdownItem
-                        key="legacy-admin"
-                        startContent={<LayoutDashboard className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('user_menu.legacy_admin')}
-                      </DropdownItem>
                     </DropdownSection>
 
                     <DropdownSection>
@@ -826,24 +904,24 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               </>
             ) : (
               <>
-                {/* Theme Toggle */}
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  className="text-theme-muted hover:text-theme-primary"
-                  onPress={toggleTheme}
-                  aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-                >
-                  {resolvedTheme === 'dark' ? (
-                    <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" aria-hidden="true" />
-                  ) : (
-                    <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" aria-hidden="true" />
-                  )}
-                </Button>
-
-                {/* Language Switcher */}
-                <LanguageSwitcher />
+                {/* Theme Toggle + Language Switcher — mobile only (desktop uses utility bar) */}
+                <div className="flex items-center gap-1 sm:hidden">
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    size="sm"
+                    className="text-theme-muted hover:text-theme-primary"
+                    onPress={toggleTheme}
+                    aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                  >
+                    {resolvedTheme === 'dark' ? (
+                      <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                    ) : (
+                      <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                    )}
+                  </Button>
+                  <LanguageSwitcher />
+                </div>
 
                 <Link to={tenantPath('/login')}>
                   <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary">
@@ -879,9 +957,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="fixed top-20 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
+              className="fixed top-20 sm:top-28 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
             >
-              <div className="bg-[var(--surface-overlay)] rounded-xl border border-[var(--border-default)] shadow-2xl overflow-hidden">
+              <div className="bg-[var(--surface-dropdown)] rounded-xl border border-[var(--border-default)] shadow-2xl overflow-hidden">
                 <form onSubmit={handleSearchSubmit} className="flex items-center px-4 py-3 gap-3">
                   <Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />
                   <input

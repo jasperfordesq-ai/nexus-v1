@@ -117,13 +117,13 @@ describe('Layout', () => {
   it('adds padding class when showNavbar and withNavbarPadding are true', () => {
     const { container } = render(<Layout showNavbar={true} withNavbarPadding={true} />);
     const main = container.querySelector('main');
-    expect(main?.className).toContain('pt-16');
+    expect(main?.className).toContain('pt-24');
   });
 
   it('does not add padding class when withNavbarPadding is false', () => {
     const { container } = render(<Layout showNavbar={true} withNavbarPadding={false} />);
     const main = container.querySelector('main');
-    expect(main?.className).not.toContain('pt-16');
+    expect(main?.className).not.toContain('pt-24');
   });
 });
 
