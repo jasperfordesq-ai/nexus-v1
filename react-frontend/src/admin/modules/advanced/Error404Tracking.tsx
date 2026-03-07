@@ -40,15 +40,16 @@ export function Error404Tracking() {
   const fetchErrors = useCallback(async (p = 1) => {
     setLoading(true);
     try {
-      const res = await adminTools.get404Errors(p) as unknown as {
-        items?: Error404Entry[];
-        total?: number;
-        page?: number;
-      };
+      const res = await adminTools.get404Errors(p);
       if (!mounted.current) return;
-      setErrors(res.items ?? []);
-      setTotalItems(res.total ?? 0);
-      setPage(res.page ?? 1);
+      // api.ts wraps in { success, data, meta } — unwrapped payload is in .data
+      const payload = (res as { data?: { items?: Error404Entry[]; total?: number; page?: number } }).data ?? res;
+      const items = (payload as { items?: Error404Entry[] }).items ?? [];
+      const total = (payload as { total?: number }).total ?? 0;
+      const pg = (payload as { page?: number }).page ?? 1;
+      setErrors(items);
+      setTotalItems(total);
+      setPage(pg);
     } catch {
       toast.error('Failed to load 404 errors');
     } finally {
