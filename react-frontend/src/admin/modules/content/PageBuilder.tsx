@@ -34,7 +34,7 @@ export function PageBuilder() {
   const isEdit = id !== undefined && id !== 'new';
   usePageTitle(`Admin - ${isEdit ? 'Edit' : 'Create'} Page`);
   const navigate = useNavigate();
-  const { tenantPath, tenant } = useTenant();
+  const { tenantPath, tenant, refreshTenant } = useTenant();
   const { user } = useAuth();
   const toast = useToast();
 
@@ -126,6 +126,7 @@ export function PageBuilder() {
         const res = await adminPages.update(Number(id), payload as unknown as Record<string, unknown>);
         if (res?.success) {
           toast.success('Page updated successfully');
+          refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
           toast.error((res as unknown as Record<string, unknown>)?.error as string || 'Failed to update page');
@@ -134,6 +135,7 @@ export function PageBuilder() {
         const res = await adminPages.create(payload);
         if (res?.success) {
           toast.success('Page created successfully');
+          refreshTenant();
           navigate(tenantPath('/admin/pages'));
         } else {
           toast.error((res as unknown as Record<string, unknown>)?.error as string || 'Failed to create page');
