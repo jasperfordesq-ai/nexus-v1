@@ -1259,10 +1259,7 @@ class VolunteerApiController extends BaseApiController
         $this->verifyCsrf();
         $this->rateLimit('volunteering_certificate', 5, 60);
 
-        $options = [
-            'start_date' => $this->input('start_date') ?: date('Y-01-01'),
-            'end_date' => $this->input('end_date') ?: date('Y-m-d'),
-        ];
+        $options = [];
 
         if ($this->inputInt('organization_id')) {
             $options['organization_id'] = $this->inputInt('organization_id');
