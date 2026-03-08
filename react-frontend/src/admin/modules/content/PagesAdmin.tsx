@@ -31,7 +31,7 @@ interface PageItem {
 
 export function PagesAdmin() {
   usePageTitle('Admin - Pages');
-  const { tenantPath } = useTenant();
+  const { tenantPath, refreshTenant } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -72,6 +72,7 @@ export function PagesAdmin() {
       if (res?.success) {
         toast.success('Page deleted successfully');
         fetchData();
+        refreshTenant();
       } else {
         toast.error('Failed to delete page');
       }
