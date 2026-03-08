@@ -4,22 +4,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * CertificatesTab - Generate and view volunteer impact certificates (V6)
+ * CertificatesTab - Generate and view volunteer impact certificates
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Chip,
-} from '@heroui/react';
+import { Button, Chip } from '@heroui/react';
 import {
   Award,
   Download,
@@ -35,6 +25,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { useToast } from '@/contexts/ToastContext';
 
 interface Certificate {
   id: number;
@@ -56,9 +47,7 @@ export function CertificatesTab() {
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [startDate, setStartDate] = useState(new Date().getFullYear() + '-01-01');
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+  const { success: toastSuccess, error: toastError } = useToast();
 
   const load = useCallback(async () => {
     try {
@@ -91,17 +80,20 @@ export function CertificatesTab() {
     try {
       setIsGenerating(true);
 
-      const response = await api.post('/v2/volunteering/certificates', {
-        start_date: startDate,
-        end_date: endDate,
-      });
+      const response = await api.post('/v2/volunteering/certificates', {});
 
       if (response.success) {
-        onClose();
+        toastSuccess('Certificate generated!');
         load();
+      } else {
+        const message =
+          (response as { error?: { message?: string } }).error?.message ??
+          'No verified volunteer hours found. Hours must be approved before generating a certificate.';
+        toastError(message);
       }
     } catch (err) {
       logError('Failed to generate certificate', err);
+      toastError('Failed to generate certificate. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -132,12 +124,17 @@ export function CertificatesTab() {
           size="sm"
           className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-          onPress={onOpen}
+          onPress={handleGenerate}
+          isLoading={isGenerating}
         >
           Generate Certificate
         </Button>
       </div>
 
+
+      <p className="text-sm text-theme-muted">
+        Certificates include all of your approved volunteer hours across every organization.
+      </p>
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
@@ -168,7 +165,7 @@ export function CertificatesTab() {
           action={
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-              onPress={onOpen}
+              onPress={handleGenerate}
             >
               Generate Certificate
             </Button>
@@ -247,51 +244,6 @@ export function CertificatesTab() {
         </motion.div>
       )}
 
-      {/* Generate Certificate Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="lg" classNames={{
-        base: 'bg-content1 border border-theme-default',
-      }}>
-        <ModalContent>
-          <ModalHeader className="text-theme-primary">Generate Impact Certificate</ModalHeader>
-          <ModalBody className="space-y-4">
-            <p className="text-sm text-theme-muted">
-              Generate a certificate showing your verified volunteer hours for a specific date range.
-              Only approved hours will be included.
-            </p>
-            <Input
-              type="date"
-              label="Start Date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default',
-              }}
-            />
-            <Input
-              type="date"
-              label="End Date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default',
-              }}
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">Cancel</Button>
-            <Button
-              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-              onPress={handleGenerate}
-              isLoading={isGenerating}
-              isDisabled={!startDate || !endDate}
-            >
-              Generate
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </div>
   );
 }

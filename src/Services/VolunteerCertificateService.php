@@ -42,39 +42,32 @@ class VolunteerCertificateService
         self::$errors = [];
         $tenantId = TenantContext::getId();
 
-        $startDate = $options['start_date'] ?? date('Y-01-01');
-        $endDate = $options['end_date'] ?? date('Y-m-d');
+        // No date filtering — certificates cover all approved hours
         $orgId = $options['organization_id'] ?? null;
-
-        // Validate date range
-        if (strtotime($endDate) < strtotime($startDate)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'End date must be after start date'];
-            return null;
-        }
 
         $db = Database::getConnection();
 
         // Get user info
         $stmt = $db->prepare("SELECT id, name, avatar_url FROM users WHERE id = ? AND tenant_id = ?");
         $stmt->execute([$userId, $tenantId]);
-        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$user) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
             return null;
         }
 
-        // Get verified hours in date range
+        // Get all verified hours grouped by organization
         $sql = "
             SELECT l.organization_id, org.name as org_name, org.logo_url as org_logo,
-                   SUM(l.hours) as total_hours, COUNT(*) as shift_count
+                   SUM(l.hours) as total_hours, COUNT(*) as shift_count,
+                   MIN(l.date_logged) as first_date, MAX(l.date_logged) as last_date
             FROM vol_logs l
             JOIN vol_organizations org ON l.organization_id = org.id
             WHERE l.user_id = ? AND l.status = 'approved'
-            AND l.date_logged >= ? AND l.date_logged <= ?
             AND l.tenant_id = ?
         ";
-        $params = [$userId, $startDate, $endDate, $tenantId];
+        $params = [$userId, $tenantId];
 
         if ($orgId) {
             $sql .= " AND l.organization_id = ?";
@@ -89,6 +82,8 @@ class VolunteerCertificateService
 
         $totalHours = 0;
         $orgsData = [];
+        $firstDate = null;
+        $lastDate = null;
         foreach ($orgHours as $oh) {
             $totalHours += (float)$oh['total_hours'];
             $orgsData[] = [
@@ -97,10 +92,16 @@ class VolunteerCertificateService
                 'hours' => (float)$oh['total_hours'],
                 'shifts' => (int)$oh['shift_count'],
             ];
+            if ($oh['first_date'] && ($firstDate === null || $oh['first_date'] < $firstDate)) {
+                $firstDate = $oh['first_date'];
+            }
+            if ($oh['last_date'] && ($lastDate === null || $oh['last_date'] > $lastDate)) {
+                $lastDate = $oh['last_date'];
+            }
         }
 
         if ($totalHours <= 0) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'No verified volunteer hours found for the selected period'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'No approved volunteer hours found. Hours must be approved by an admin before generating a certificate.'];
             return null;
         }
 
@@ -124,8 +125,8 @@ class VolunteerCertificateService
                 $userId,
                 $verificationCode,
                 $totalHours,
-                $startDate,
-                $endDate,
+                $firstDate ?? date('Y-01-01'),
+                $lastDate ?? date('Y-m-d'),
                 json_encode($orgsData),
             ]);
 
@@ -147,8 +148,8 @@ class VolunteerCertificateService
             ],
             'total_hours' => round($totalHours, 1),
             'date_range' => [
-                'start' => $startDate,
-                'end' => $endDate,
+                'start' => $firstDate ?? date('Y-01-01'),
+                'end' => $lastDate ?? date('Y-m-d'),
             ],
             'organizations' => $orgsData,
             'tenant' => [
