@@ -516,9 +516,9 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
                     <span>{member.rating.toFixed(1)}</span>
                   </span>
                 )}
-                <span className="flex items-center gap-1" aria-label={`${member.total_hours_given ?? 0} hours given`}>
+                <span className="flex items-center gap-1" aria-label={`${(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)} hours exchanged`}>
                   <Clock className="w-4 h-4" aria-hidden="true" />
-                  <span>{member.total_hours_given ?? 0}h</span>
+                  <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
                 </span>
               </div>
             </div>
@@ -551,9 +551,9 @@ const MemberCard = memo(function MemberCard({ member, viewMode }: MemberCardProp
                 <span>{member.rating.toFixed(1)}</span>
               </span>
             )}
-            <span className="flex items-center gap-1" aria-label={`${member.total_hours_given ?? 0} hours given`}>
+            <span className="flex items-center gap-1" aria-label={`${(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)} hours exchanged`}>
               <Clock className="w-3 h-3" aria-hidden="true" />
-              <span>{member.total_hours_given ?? 0}h</span>
+              <span>{(member.total_hours_given ?? 0) + (member.total_hours_received ?? 0)}h</span>
             </span>
           </div>
 

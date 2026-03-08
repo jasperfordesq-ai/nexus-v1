@@ -108,7 +108,7 @@ $router->add('GET', '/api/v2/users', function () {
                    u.created_at, u.last_login_at, u.is_verified,
                    (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
                    (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
-                   (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as hours_received,
+                   (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_received,
                    (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer' AND tenant_id = u.tenant_id) as offer_count,
                    (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request' AND tenant_id = u.tenant_id) as request_count
             FROM users u
@@ -125,7 +125,7 @@ $router->add('GET', '/api/v2/users', function () {
         $user['rating'] = $user['rating'] ? (float)$user['rating'] : null;
         $user['total_hours_given'] = (int)$user['total_hours_given'];
         $user['hours_given'] = $user['total_hours_given'];  // alias — no duplicate DB query
-        $user['hours_received'] = (int)$user['hours_received'];
+        $user['total_hours_received'] = (int)$user['total_hours_received'];
         $user['offer_count'] = (int)$user['offer_count'];
         $user['request_count'] = (int)$user['request_count'];
         $user['is_verified'] = (bool)$user['is_verified'];
@@ -142,7 +142,7 @@ $router->add('GET', '/api/v2/users', function () {
     $users = array_map(static function (array $u): array {
         unset(
             $u['_community_rank'], $u['_score_breakdown'],
-            $u['hours_given'], $u['hours_received'],
+            $u['hours_given'],
             $u['offer_count'], $u['request_count'],
             $u['last_login_at']  // privacy: last active time is not for public display
         );
