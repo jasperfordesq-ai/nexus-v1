@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 /**
  * Redirect page for /matches and /matches?type=mutual.
@@ -21,6 +22,7 @@ import { useTenant } from '@/contexts';
 export default function MatchesRedirectPage() {
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  usePageTitle('Matches');
 
   useEffect(() => {
     navigate(tenantPath('/listings'), { replace: true });

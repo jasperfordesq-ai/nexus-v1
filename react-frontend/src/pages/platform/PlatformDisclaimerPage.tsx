@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { AlertTriangle } from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
   type PlatformLegalSection,
@@ -548,6 +549,7 @@ const sections: PlatformLegalSection[] = [
 ];
 
 export function PlatformDisclaimerPage() {
+  usePageTitle('Platform Disclaimer');
   return (
     <PlatformLegalPage
       title="Platform Disclaimer"
