@@ -1,4 +1,4 @@
-// Copyright © 2024–2026 Jasper Ford
+// Copyright (c) 2024-2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -12,6 +12,14 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
+
+  /**
+   * Global setup: runs once before all tests to authenticate and save storage
+   * state to e2e/.auth/user.json. Individual specs that need auth reference
+   * that file via `test.use({ storageState: 'e2e/.auth/user.json' })`.
+   */
+  globalSetup: './e2e/global-setup.ts',
+
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
