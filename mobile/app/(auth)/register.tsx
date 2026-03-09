@@ -4,6 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   View,
   Text,
@@ -24,39 +27,49 @@ import { storage } from '@/lib/storage';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 
+const registerSchema = z
+  .object({
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().optional().default(''),
+    email: z.string().email('Please enter a valid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    passwordConfirm: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((d) => d.password === d.passwordConfirm, {
+    message: 'Passwords do not match',
+    path: ['passwordConfirm'],
+  });
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
+
 export default function RegisterScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = makeStyles(theme);
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { firstName: '', lastName: '', email: '', password: '', passwordConfirm: '' },
+  });
+
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
-  async function handleRegister() {
-    if (!firstName.trim() || !email.trim() || !password) {
-      setError('Please fill in all required fields.');
-      return;
-    }
-    if (password !== passwordConfirm) {
-      setError('Passwords do not match.');
-      return;
-    }
-
+  async function onSubmit(data: RegisterFormValues) {
     setIsLoading(true);
-    setError(null);
+    setGlobalError(null);
 
     try {
       const response = await apiRegister({
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        email: email.trim().toLowerCase(),
-        password,
-        password_confirmation: passwordConfirm,
+        first_name: data.firstName.trim(),
+        last_name: data.lastName?.trim() ?? '',
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
+        password_confirmation: data.passwordConfirm,
       });
 
       const token = extractToken(response);
@@ -69,9 +82,9 @@ export default function RegisterScreen() {
       router.replace('/(tabs)/home');
     } catch (err) {
       if (err instanceof ApiResponseError) {
-        setError(err.message);
+        setGlobalError(err.message);
       } else {
-        setError('Unable to register. Please try again.');
+        setGlobalError('Unable to register. Please try again.');
       }
     } finally {
       setIsLoading(false);
@@ -92,69 +105,118 @@ export default function RegisterScreen() {
           <Text style={styles.subtitle}>Join your local timebank community</Text>
         </View>
 
-        {error && (
+        {globalError && (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>{error}</Text>
+            <Text style={styles.errorText}>{globalError}</Text>
           </View>
         )}
 
         <View style={styles.form}>
           <Text style={styles.label}>First name</Text>
-          <TextInput
-            style={styles.input}
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholder="Jane"
-            autoCapitalize="words"
-            returnKeyType="next"
+          <Controller
+            control={control}
+            name="firstName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <>
+                <TextInput
+                  style={[styles.input, errors.firstName && styles.inputError]}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Jane"
+                  autoCapitalize="words"
+                  returnKeyType="next"
+                />
+                {errors.firstName && <Text style={styles.fieldError}>{errors.firstName.message}</Text>}
+              </>
+            )}
           />
 
           <Text style={styles.label}>Last name</Text>
-          <TextInput
-            style={styles.input}
-            value={lastName}
-            onChangeText={setLastName}
-            placeholder="Smith"
-            autoCapitalize="words"
-            returnKeyType="next"
+          <Controller
+            control={control}
+            name="lastName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Smith"
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            )}
           />
 
           <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            returnKeyType="next"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <>
+                <TextInput
+                  style={[styles.input, errors.email && styles.inputError]}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="you@example.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  returnKeyType="next"
+                />
+                {errors.email && <Text style={styles.fieldError}>{errors.email.message}</Text>}
+              </>
+            )}
           />
 
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Min. 8 characters"
-            secureTextEntry
-            returnKeyType="next"
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <>
+                <TextInput
+                  style={[styles.input, errors.password && styles.inputError]}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Min. 8 characters"
+                  secureTextEntry
+                  returnKeyType="next"
+                />
+                {errors.password && <Text style={styles.fieldError}>{errors.password.message}</Text>}
+              </>
+            )}
           />
 
           <Text style={styles.label}>Confirm password</Text>
-          <TextInput
-            style={styles.input}
-            value={passwordConfirm}
-            onChangeText={setPasswordConfirm}
-            placeholder="Re-enter password"
-            secureTextEntry
-            returnKeyType="done"
-            onSubmitEditing={handleRegister}
+          <Controller
+            control={control}
+            name="passwordConfirm"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <>
+                <TextInput
+                  style={[styles.input, errors.passwordConfirm && styles.inputError]}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Re-enter password"
+                  secureTextEntry
+                  returnKeyType="done"
+                  onSubmitEditing={handleSubmit(onSubmit)}
+                />
+                {errors.passwordConfirm && (
+                  <Text style={styles.fieldError}>{errors.passwordConfirm.message}</Text>
+                )}
+              </>
+            )}
           />
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: primary }, isLoading && styles.buttonDisabled]}
-            onPress={handleRegister}
+            onPress={handleSubmit(onSubmit)}
             disabled={isLoading}
             activeOpacity={0.8}
           >
@@ -208,6 +270,8 @@ function makeStyles(theme: Theme) {
       color: theme.text,
       backgroundColor: '#FAFAFA',
     },
+    inputError: { borderColor: theme.error },
+    fieldError: { color: theme.error, fontSize: 12, marginTop: 4, marginLeft: 4 },
     button: {
       borderRadius: 10,
       paddingVertical: 14,

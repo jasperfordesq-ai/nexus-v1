@@ -19,17 +19,26 @@ import { API_V2 } from '@/lib/constants';
 import { initRealtime, getRealtimeClient, type PusherConfig } from '@/lib/realtime';
 import { registerRefreshCallback, unregisterRefreshCallback } from '@/lib/notifications';
 import { useAuthContext } from '@/lib/context/AuthContext';
+import type { Message } from '@/lib/api/messages';
+
+type MessageHandler = (msg: Message) => void;
 
 interface RealtimeContextValue {
   /** Current unread message count (seeded from API, bumped by Pusher). */
   unreadMessages: number;
   /** Call when the user opens the Messages tab — resets the badge. */
   resetUnread: () => void;
+  /**
+   * Subscribe to incoming Pusher messages for a specific conversation.
+   * Returns an unsubscribe function — call it in a useEffect cleanup.
+   */
+  subscribeToMessages: (conversationId: number, handler: MessageHandler) => () => void;
 }
 
 const RealtimeContext = createContext<RealtimeContextValue>({
   unreadMessages: 0,
   resetUnread: () => undefined,
+  subscribeToMessages: () => () => undefined,
 });
 
 export function useRealtimeContext(): RealtimeContextValue {
@@ -41,6 +50,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const channelRef = useRef<Channel | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  /** conversation_id → set of handlers listening for new messages */
+  const messageListenersRef = useRef<Map<number, Set<MessageHandler>>>(new Map());
 
   // Seed unread count from REST API whenever auth state changes
   useEffect(() => {
@@ -76,9 +87,16 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         const ch = client.subscribe(channelName);
         channelRef.current = ch;
 
-        // Bump the unread badge for every inbound message
-        ch.bind('new-message', () => {
-          if (mounted) setUnreadMessages((prev) => prev + 1);
+        // Bump the unread badge and notify any open thread screens
+        ch.bind('new-message', (payload: { conversation_id?: number; message?: Message }) => {
+          if (!mounted) return;
+          setUnreadMessages((prev) => prev + 1);
+          // Deliver to any thread that's subscribed for this conversation
+          if (payload?.conversation_id && payload?.message) {
+            messageListenersRef.current
+              .get(payload.conversation_id)
+              ?.forEach((handler) => handler(payload.message!));
+          }
         });
       })
       .catch(() => { /* Pusher not configured — silent no-op */ });
@@ -131,8 +149,20 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
   const resetUnread = useCallback(() => setUnreadMessages(0), []);
 
+  const subscribeToMessages = useCallback(
+    (conversationId: number, handler: MessageHandler): (() => void) => {
+      const map = messageListenersRef.current;
+      if (!map.has(conversationId)) map.set(conversationId, new Set());
+      map.get(conversationId)!.add(handler);
+      return () => {
+        map.get(conversationId)?.delete(handler);
+      };
+    },
+    [],
+  );
+
   return (
-    <RealtimeContext.Provider value={{ unreadMessages, resetUnread }}>
+    <RealtimeContext.Provider value={{ unreadMessages, resetUnread, subscribeToMessages }}>
       {children}
     </RealtimeContext.Provider>
   );

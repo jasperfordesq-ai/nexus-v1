@@ -37,11 +37,71 @@ export class ApiResponseError extends Error {
   }
 }
 
-/** Called when the API returns 401 — registered by AuthContext */
+/** Called when the API returns 401 and refresh has failed — registered by AuthContext */
 let onUnauthorizedCallback: (() => void) | null = null;
 
 export function registerUnauthorizedCallback(cb: () => void): void {
   onUnauthorizedCallback = cb;
+}
+
+/**
+ * Silently refresh the access token using the stored refresh token.
+ * Concurrent refresh attempts are collapsed into a single request.
+ * Returns the new access token, or null if refresh fails.
+ */
+let _isRefreshing = false;
+let _refreshWaiters: Array<(token: string | null) => void> = [];
+
+async function attemptTokenRefresh(): Promise<string | null> {
+  // Collapse concurrent refresh calls into one
+  if (_isRefreshing) {
+    return new Promise<string | null>((resolve) => {
+      _refreshWaiters.push(resolve);
+    });
+  }
+
+  _isRefreshing = true;
+  const notify = (token: string | null) => {
+    _refreshWaiters.forEach((r) => r(token));
+    _refreshWaiters = [];
+    _isRefreshing = false;
+  };
+
+  try {
+    const [storedRefresh, tenantSlug] = await Promise.all([
+      storage.get(STORAGE_KEYS.REFRESH_TOKEN),
+      storage.get(STORAGE_KEYS.TENANT_SLUG),
+    ]);
+    if (!storedRefresh) { notify(null); return null; }
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+    if (tenantSlug) headers['X-Tenant-Slug'] = tenantSlug;
+
+    const res = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ refresh_token: storedRefresh }),
+    });
+
+    if (!res.ok) { notify(null); return null; }
+
+    const data = await res.json() as { access_token?: string; token?: string; refresh_token?: string };
+    const newToken = data.access_token ?? data.token ?? null;
+    if (!newToken) { notify(null); return null; }
+
+    const saves: Promise<void>[] = [storage.set(STORAGE_KEYS.AUTH_TOKEN, newToken)];
+    if (data.refresh_token) saves.push(storage.set(STORAGE_KEYS.REFRESH_TOKEN, data.refresh_token));
+    await Promise.all(saves);
+
+    notify(newToken);
+    return newToken;
+  } catch {
+    notify(null);
+    return null;
+  }
 }
 
 async function request<T>(
@@ -98,8 +158,46 @@ async function request<T>(
 
   clearTimeout(timeoutId);
 
-  // Handle 401: clear credentials and notify AuthContext
+  // Handle 401: try silent token refresh, then retry once
   if (response.status === 401) {
+    const newToken = await attemptTokenRefresh();
+    if (newToken) {
+      // Retry the original request with the refreshed token
+      const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
+      const retryController = new AbortController();
+      const retryTimeoutId = setTimeout(() => retryController.abort(), TIMEOUTS.API_REQUEST);
+      let retryRes: Response;
+      try {
+        retryRes = await fetch(url.toString(), {
+          method,
+          headers: retryHeaders,
+          body: body !== undefined ? JSON.stringify(body) : undefined,
+          signal: retryController.signal,
+        });
+      } catch (retryErr) {
+        clearTimeout(retryTimeoutId);
+        throw retryErr instanceof Error && retryErr.name === 'AbortError'
+          ? new ApiResponseError(0, 'Request timed out. Please check your connection.')
+          : new ApiResponseError(0, 'Network error. Please check your connection.');
+      }
+      clearTimeout(retryTimeoutId);
+
+      // If the retry succeeded (not another 401), process and return it
+      if (retryRes.status !== 401) {
+        const retryContentType = retryRes.headers.get('content-type') ?? '';
+        const retryData: unknown =
+          retryContentType.includes('application/json') && retryRes.status !== 204
+            ? await retryRes.json()
+            : null;
+        if (!retryRes.ok) {
+          const eb = retryData as { message?: string; errors?: Record<string, string[]> } | null;
+          throw new ApiResponseError(retryRes.status, eb?.message ?? `Request failed with status ${retryRes.status}`, eb?.errors);
+        }
+        return retryData as T;
+      }
+    }
+
+    // Refresh failed or retry still returned 401 — force logout
     await Promise.all([
       storage.remove(STORAGE_KEYS.AUTH_TOKEN),
       storage.remove(STORAGE_KEYS.REFRESH_TOKEN),

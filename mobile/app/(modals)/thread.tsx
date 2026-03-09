@@ -25,6 +25,7 @@ import { getThread, sendMessage, type Message } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -36,6 +37,8 @@ export default function ThreadScreen() {
   const navigation = useNavigation();
 
   const conversationId = Number(id);
+
+  const { subscribeToMessages } = useRealtimeContext();
 
   const { data, isLoading, error } = useApi(
     () => getThread(conversationId),
@@ -61,6 +64,17 @@ export default function ThreadScreen() {
       setMessages([...data.data].reverse());
     }
   }, [data]);
+
+  // Live incoming messages via Pusher
+  useEffect(() => {
+    if (!conversationId) return;
+    return subscribeToMessages(conversationId, (incoming) => {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === incoming.id)) return prev; // already present
+        return [incoming, ...prev]; // prepend (FlatList inverted = newest first)
+      });
+    });
+  }, [conversationId, subscribeToMessages]);
 
   // Derive the other user's ID from the first non-own message's sender
   const otherUserId: number | null = (() => {
@@ -94,10 +108,14 @@ export default function ThreadScreen() {
 
     try {
       const res = await sendMessage(otherUserId, body);
-      // Replace optimistic message with real one from server
-      setMessages((prev) =>
-        prev.map((m) => (m.id === optimistic.id ? res.data : m)),
-      );
+      // Replace optimistic with server-confirmed message.
+      // If Pusher already delivered it, drop the optimistic instead of duplicating.
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === res.data.id)) {
+          return prev.filter((m) => m.id !== optimistic.id);
+        }
+        return prev.map((m) => (m.id === optimistic.id ? res.data : m));
+      });
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       // Remove optimistic message on failure and restore input
