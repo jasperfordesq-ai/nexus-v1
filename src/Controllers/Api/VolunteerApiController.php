@@ -113,11 +113,12 @@ class VolunteerApiController extends BaseApiController
 
         $result = VolunteerService::getOpportunities($filters);
 
-        $this->respondWithData([
-            'items'    => $result['items'],
-            'cursor'   => $result['cursor'],
-            'has_more' => $result['has_more'],
-        ]);
+        $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
     }
 
     /**
