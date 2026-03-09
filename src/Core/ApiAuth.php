@@ -192,5 +192,6 @@ trait ApiAuth
         if (!defined('TESTING')) {
             exit;
         }
+        throw new \Nexus\Core\ApiResponseSentException(401);
     }
 }

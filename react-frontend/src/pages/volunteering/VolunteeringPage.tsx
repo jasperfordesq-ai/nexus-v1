@@ -52,6 +52,8 @@ import {
   ShieldCheck,
   ArrowLeftRight,
   Users,
+  MessageSquare,
+  ClipboardCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -68,6 +70,7 @@ import { CredentialVerificationTab } from './CredentialVerificationTab';
 import { WaitlistTab } from './WaitlistTab';
 import { ShiftSwapsTab } from './ShiftSwapsTab';
 import { GroupSignUpTab } from './GroupSignUpTab';
+import { HoursReviewTab } from './HoursReviewTab';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -112,6 +115,7 @@ interface Application {
     start_time: string;
     end_time: string;
   } | null;
+  org_note?: string | null;
   created_at: string;
 }
 
@@ -123,7 +127,7 @@ interface HoursSummary {
   by_month: { month: string; total: number }[];
 }
 
-type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups';
+type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'hours-review';
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
@@ -290,6 +294,14 @@ export function VolunteeringPage() {
             >
               {t('volunteering.tab_group_signups', 'Group Sign-ups')}
             </Button>
+            <Button
+              variant={tab === 'hours-review' ? 'solid' : 'flat'}
+              className={tab === 'hours-review' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('hours-review')}
+              startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('volunteering.tab_hours_review', 'Hours Review')}
+            </Button>
           </>
         )}
       </div>
@@ -306,6 +318,7 @@ export function VolunteeringPage() {
       {tab === 'waitlist' && <WaitlistTab />}
       {tab === 'swaps' && <ShiftSwapsTab />}
       {tab === 'group-signups' && <GroupSignUpTab />}
+      {tab === 'hours-review' && <HoursReviewTab />}
     </div>
   );
 }
@@ -815,7 +828,7 @@ function ApplicationsTab() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="font-semibold text-theme-primary">{app.opportunity.title}</h3>
+                          <Link to={tenantPath(`/volunteering/opportunities/${app.opportunity.id}`)} className="font-semibold text-theme-primary hover:text-indigo-400 transition-colors">{app.opportunity.title}</Link>
                           <Chip
                             size="sm"
                             color={statusColor(app.status)}
@@ -845,6 +858,13 @@ function ApplicationsTab() {
                           <p className="text-xs text-theme-subtle flex items-center gap-1 mb-1">
                             <Clock className="w-3 h-3" aria-hidden="true" />
                             {new Date(app.shift.start_time).toLocaleString()} - {new Date(app.shift.end_time).toLocaleTimeString()}
+                          </p>
+                        )}
+
+                        {(app.status === 'approved' || app.status === 'declined') && app.org_note && (
+                          <p className="text-xs text-theme-muted flex items-start gap-1 mt-1">
+                            <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-theme-subtle" aria-hidden="true" />
+                            <span><span className="text-theme-subtle">Organiser's note: </span>{app.org_note}</span>
                           </p>
                         )}
 

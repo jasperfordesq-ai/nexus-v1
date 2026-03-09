@@ -71,6 +71,54 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+      // Lookup table for keys used by VolunteeringPage
+      const translations: Record<string, string> = {
+        "volunteering.heading": "Volunteering",
+        "volunteering.subtitle": "Find opportunities and track your impact",
+        "volunteering.tab_opportunities": "Opportunities",
+        "volunteering.tab_applications": "My Applications",
+        "volunteering.tab_hours": "My Hours",
+        "volunteering.tab_for_you": "For You",
+        "volunteering.tab_certificates": "Certificates",
+        "volunteering.tab_alerts": "Alerts",
+        "volunteering.tab_wellbeing": "Wellbeing",
+        "volunteering.tab_credentials": "Credentials",
+        "volunteering.tab_waitlist": "Waitlist",
+        "volunteering.tab_swap_requests": "Swap Requests",
+        "volunteering.tab_group_signups": "Group Sign-ups",
+        "volunteering.browse_organisations": "Browse Organisations",
+        "volunteering.post_opportunity": "Post Opportunity",
+        "volunteering.search_placeholder": "Search opportunities...",
+        "volunteering.no_opportunities_found": "No opportunities found",
+        "volunteering.apply": "Apply",
+        "volunteering.applied": "Applied",
+        "volunteering.unable_to_load_opportunities": "Unable to load opportunities",
+        "volunteering.try_again": "Try Again",
+        "volunteering.page_title": "Volunteering",
+        "volunteering.feature_not_available": "Volunteering Not Available",
+        "volunteering.feature_not_available_desc": "The volunteering feature is not enabled for this community.",
+        "volunteering.error_load_opportunities": "Failed to load opportunities",
+        "volunteering.error_load_opportunities_retry": "Failed to load more opportunities",
+        "volunteering.applied_success": "Successfully applied!",
+        "volunteering.apply_error": "Failed to apply",
+        "volunteering.apply_to_volunteer": "Apply to Volunteer",
+        "volunteering.applied_on": "Applied",
+      };
+      if (typeof fallbackOrOpts === "string") {
+        return translations[key] ?? fallbackOrOpts;
+      }
+      return translations[key] ?? key;
+    },
+    i18n: { language: "en", changeLanguage: vi.fn() },
+  }),
+  Trans: ({ children }: { children: React.ReactNode }) => children,
+  initReactI18next: { type: "3rdParty", init: vi.fn() },
+}));
+
 import { VolunteeringPage } from './VolunteeringPage';
 import { api } from '@/lib/api';
 

@@ -90,6 +90,13 @@ abstract class BaseApiController
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         if (!defined('TESTING')) {
             if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        } else {
+            // In test mode, throw an exception for error/auth responses so controller
+            // execution stops (mirrors exit behaviour in production). Success responses
+            // (2xx) do not throw so the test can inspect the full response body.
+            if ($status >= 300) {
+                throw new \Nexus\Core\ApiResponseSentException($status);
+            }
         }
     }
 

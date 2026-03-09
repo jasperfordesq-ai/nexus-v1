@@ -1,0 +1,29 @@
+{
+  "cookies": [
+    {
+      "name": "PHPSESSID",
+      "value": "c1lve6uda3cgvn3bq7h6aou0hf",
+      "domain": "staging.timebank.local",
+      "path": "/",
+      "expires": 1769958439.115597,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://staging.timebank.local",
+      "localStorage": [
+        {
+          "name": "dev_notice_dismissed",
+          "value": "2.1"
+        },
+        {
+          "name": "nexus_platform",
+          "value": "web"
+        }
+      ]
+    }
+  ]
+}

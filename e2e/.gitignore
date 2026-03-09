@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Test results
+test-results/
+playwright-report/
+test-results.json
+
+# Environment
+.env.e2e
+
+# Playwright browsers
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db

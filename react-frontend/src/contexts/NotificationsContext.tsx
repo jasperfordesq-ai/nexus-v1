@@ -402,6 +402,15 @@ function getToastConfig(type: string): { title: string } {
     achievement: { title: 'Achievement Unlocked!' },
     broker_review: { title: 'Message for Review' },
     system: { title: 'System Notification' },
+    vol_application_received: { title: 'New Application' },
+    vol_application_approved: { title: 'Application Approved' },
+    vol_application_declined: { title: 'Application Declined' },
+    vol_application_withdrawn: { title: 'Application Withdrawn' },
+    vol_shift_signup: { title: 'Shift Sign-up' },
+    vol_shift_cancelled: { title: 'Shift Cancelled' },
+    vol_hours_approved: { title: 'Hours Approved' },
+    vol_hours_declined: { title: 'Hours Declined' },
+    vol_opportunity_closed: { title: 'Opportunity Closed' },
   };
 
   return configs[type] || { title: 'Notification' };

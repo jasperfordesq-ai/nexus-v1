@@ -129,6 +129,7 @@ $router->add('DELETE', '/api/v2/volunteering/shifts/{id}/signup', 'Nexus\Control
 $router->add('GET', '/api/v2/volunteering/hours', 'Nexus\Controllers\Api\VolunteerApiController@myHours');
 $router->add('POST', '/api/v2/volunteering/hours', 'Nexus\Controllers\Api\VolunteerApiController@logHours');
 $router->add('GET', '/api/v2/volunteering/hours/summary', 'Nexus\Controllers\Api\VolunteerApiController@hoursSummary');
+$router->add('GET', '/api/v2/volunteering/hours/pending-review', 'Nexus\Controllers\Api\VolunteerApiController@pendingHoursReview');
 $router->add('PUT', '/api/v2/volunteering/hours/{id}/verify', 'Nexus\Controllers\Api\VolunteerApiController@verifyHours');
 
 // Organisations

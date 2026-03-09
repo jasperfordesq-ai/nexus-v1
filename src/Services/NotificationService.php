@@ -49,6 +49,7 @@ class NotificationService
         'events' => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
         'groups' => ['group_invite', 'group_join', 'group_post'],
         'listings' => ['listing', 'listing_interest', 'listing_match', 'listing_expiry', 'hot_match', 'mutual_match'],
+        'jobs' => ['job_application', 'job_application_status'],
         'system' => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
     ];
 

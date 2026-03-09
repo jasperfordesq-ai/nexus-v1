@@ -426,13 +426,14 @@ class VolunteerApiController extends BaseApiController
         $this->rateLimit('volunteering_handle_app', 30, 60);
 
         $action = $this->input('action');
+        $orgNote = trim((string)($this->input('org_note') ?? ''));
 
         if (!$action) {
             $this->respondWithError('VALIDATION_ERROR', 'Action is required (approve or decline)', 'action', 400);
             return;
         }
 
-        $success = VolunteerService::handleApplication($applicationId, $userId, $action);
+        $success = VolunteerService::handleApplication($applicationId, $userId, $action, $orgNote);
 
         if (!$success) {
             $errors = VolunteerService::getErrors();
@@ -696,6 +697,28 @@ class VolunteerApiController extends BaseApiController
             'id' => $logId,
             'status' => $action === 'approve' ? 'approved' : 'declined',
         ]);
+    }
+
+    /**
+     * GET /api/v2/volunteering/hours/pending-review
+     *
+     * Get hours pending approval for organisations owned by the current user.
+     */
+    public function pendingHoursReview(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('volunteering_pending_hours', 60, 60);
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = VolunteerService::getPendingHoursForOrgOwner($userId, $filters);
+        $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
     // ========================================

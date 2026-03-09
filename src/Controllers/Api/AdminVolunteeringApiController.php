@@ -360,4 +360,16 @@ class AdminVolunteeringApiController extends BaseApiController
             $this->respondWithData([]);
         }
     }
+
+    /**
+     * POST /api/v2/admin/volunteering/send-shift-reminders
+     * Trigger shift reminder emails. Called by cron job.
+     */
+    public function sendShiftReminders(): void
+    {
+        $this->requireSuperAdmin();
+
+        $sent = \Nexus\Services\VolunteerService::sendShiftReminders();
+        $this->respondWithData(['reminders_sent' => $sent]);
+    }
 }

@@ -147,6 +147,8 @@ class Notification
             'listing_expiry' => 'reminder',
             'hot_match' => 'general',
             'mutual_match' => 'general',
+            'job_application' => 'general',
+            'job_application_status' => 'general',
         ];
 
         return $typeMap[$type] ?? 'general';
@@ -182,6 +184,8 @@ class Notification
             'listing_expiry' => 'Listing Expiring Soon',
             'hot_match' => 'Hot Match Found',
             'mutual_match' => 'Mutual Match Found',
+            'job_application' => 'New Job Application',
+            'job_application_status' => 'Application Update',
         ];
 
         return $titles[$type] ?? 'Notification';

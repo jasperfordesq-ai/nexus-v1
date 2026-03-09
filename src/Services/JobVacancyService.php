@@ -9,6 +9,8 @@ namespace Nexus\Services;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
+use Nexus\Models\Notification;
+use Nexus\Core\Mailer;
 
 /**
  * JobVacancyService - Business logic for job vacancies
@@ -707,6 +709,71 @@ class JobVacancyService
 
             Database::commit();
 
+            // Notify job owner of new application
+            try {
+                $applicant = Database::query(
+                    "SELECT first_name, last_name, email FROM users WHERE id = ?",
+                    [$userId]
+                )->fetch();
+                $applicantName = trim(($applicant['first_name'] ?? '') . ' ' . ($applicant['last_name'] ?? '')) ?: 'Someone';
+                $jobTitle = $vacancy['title'] ?? 'your job posting';
+                $ownerId = (int)$vacancy['user_id'];
+
+                // In-app notification for owner
+                Notification::create(
+                    $ownerId,
+                    "{$applicantName} applied for \"{$jobTitle}\"",
+                    "/jobs/{$vacancyId}",
+                    'job_application'
+                );
+
+                // Email notification for owner
+                $owner = Database::query(
+                    "SELECT email, first_name FROM users WHERE id = ?",
+                    [$ownerId]
+                )->fetch();
+                if ($owner && !empty($owner['email'])) {
+                    $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+                    $slugPrefix = \Nexus\Core\TenantContext::getSlugPrefix();
+                    $jobUrl = $baseUrl . $slugPrefix . "/jobs/{$vacancyId}";
+                    $tenantName = htmlspecialchars(\Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS'));
+                    $ownerName = htmlspecialchars($owner['first_name'] ?? 'there');
+                    $safeApplicant = htmlspecialchars($applicantName);
+                    $safeTitle = htmlspecialchars($jobTitle);
+                    $subject = "{$applicantName} applied for \"{$jobTitle}\" on {$tenantName}";
+                    $emailBody = <<<HTML
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f4f5;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  <tr><td style="background:linear-gradient(135deg,#6366f1,#4f46e5);padding:32px;text-align:center;">
+    <h1 style="margin:0;color:#fff;font-size:24px;">New Job Application</h1>
+  </td></tr>
+  <tr><td style="padding:32px;">
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">Hi {$ownerName},</p>
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">
+      <strong>{$safeApplicant}</strong> has applied for your job posting <strong>\"{$safeTitle}\"</strong> on {$tenantName}.
+    </p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="{$jobUrl}" style="display:inline-block;padding:14px 32px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;">Review Application</a>
+    </div>
+    <p style="margin:0;font-size:14px;color:#6b7280;">Log in to {$tenantName} to view the applicant's details and cover message.</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
+HTML;
+                    $mailer = new Mailer();
+                    $mailer->send($owner['email'], $subject, $emailBody);
+                }
+            } catch (\Throwable $e) {
+                error_log("JobVacancyService: Failed to send application notification: " . get_class($e));
+            }
+
             // Check for matching job alerts and trigger notifications
             self::checkJobAlertsForVacancy($vacancyId);
 
@@ -824,7 +891,7 @@ class JobVacancyService
 
         // Get the application with its vacancy
         $application = Database::query(
-            "SELECT a.*, jv.user_id as vacancy_owner_id, jv.tenant_id
+            "SELECT a.*, jv.user_id as vacancy_owner_id, jv.tenant_id, jv.title as vacancy_title
              FROM job_vacancy_applications a
              JOIN job_vacancies jv ON a.vacancy_id = jv.id
              WHERE a.id = ?",
@@ -865,6 +932,86 @@ class JobVacancyService
 
             // J4: Log status change in history
             self::logApplicationHistory($applicationId, $previousStatus, $status, $userId, $notes);
+
+            // Notify applicant of status change
+            try {
+                $applicantId = (int)$application['user_id'];
+                $jobTitle = $application['vacancy_title'] ?? 'a job posting';
+                $safeStatus = ucfirst($status);
+                $statusMessages = [
+                    'screening'  => 'Your application is under review',
+                    'reviewed'   => 'Your application has been reviewed',
+                    'interview'  => 'You have been invited to interview',
+                    'offer'      => 'You have received a job offer',
+                    'accepted'   => 'Congratulations — your application was accepted!',
+                    'rejected'   => 'Your application was not successful this time',
+                    'withdrawn'  => 'Your application has been withdrawn',
+                ];
+                $notificationText = ($statusMessages[$status] ?? "Your application status changed to {$safeStatus}") . " for \"{$jobTitle}\"";
+
+                Notification::create(
+                    $applicantId,
+                    $notificationText,
+                    '/jobs/my-applications',
+                    'job_application_status'
+                );
+
+                // Email notification for applicant
+                $applicant = Database::query(
+                    "SELECT email, first_name FROM users WHERE id = ?",
+                    [$applicantId]
+                )->fetch();
+                if ($applicant && !empty($applicant['email'])) {
+                    $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
+                    $slugPrefix = \Nexus\Core\TenantContext::getSlugPrefix();
+                    $appsUrl = $baseUrl . $slugPrefix . '/jobs/my-applications';
+                    $tenantName = htmlspecialchars(\Nexus\Core\TenantContext::getSetting('site_name', 'Project NEXUS'));
+                    $recipientName = htmlspecialchars($applicant['first_name'] ?? 'there');
+                    $safeTitle = htmlspecialchars($jobTitle);
+                    $safeMessage = htmlspecialchars($notificationText);
+
+                    $isPositive = in_array($status, ['interview', 'offer', 'accepted']);
+                    $headerColor = $isPositive ? 'linear-gradient(135deg,#10b981,#059669)' : 'linear-gradient(135deg,#6366f1,#4f46e5)';
+                    $buttonColor = $isPositive ? '#10b981' : '#6366f1';
+
+                    $notesHtml = '';
+                    if ($notes) {
+                        $safeNotes = htmlspecialchars(trim($notes));
+                        $notesHtml = "<p style=\"margin:12px 0 0;padding:12px;background:#f0f0f0;border-radius:8px;font-style:italic;color:#555;\">Reviewer note: \"{$safeNotes}\"</p>";
+                    }
+
+                    $emailSubject = "Application update for \"{$jobTitle}\" — {$safeStatus}";
+                    $emailBody = <<<HTML
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f4f5;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  <tr><td style="background:{$headerColor};padding:32px;text-align:center;">
+    <h1 style="margin:0;color:#fff;font-size:24px;">Application Update</h1>
+  </td></tr>
+  <tr><td style="padding:32px;">
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">Hi {$recipientName},</p>
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">{$safeMessage}.</p>
+    {$notesHtml}
+    <div style="text-align:center;margin:28px 0;">
+      <a href="{$appsUrl}" style="display:inline-block;padding:14px 32px;background:{$buttonColor};color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;">View My Applications</a>
+    </div>
+    <p style="margin:0;font-size:14px;color:#6b7280;">Log in to {$tenantName} to see all your job applications.</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
+HTML;
+                    $mailer = new Mailer();
+                    $mailer->send($applicant['email'], $emailSubject, $emailBody);
+                }
+            } catch (\Throwable $e) {
+                error_log("JobVacancyService: Failed to send status notification: " . get_class($e));
+            }
 
             return true;
         } catch (\Throwable $e) {
