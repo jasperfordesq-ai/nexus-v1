@@ -15,6 +15,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
@@ -40,7 +41,7 @@ export default function ThreadScreen() {
 
   const { subscribeToMessages } = useRealtimeContext();
 
-  const { data, isLoading, error } = useApi(
+  const { data, isLoading, error, refresh } = useApi(
     () => getThread(conversationId),
     [conversationId],
   );
@@ -196,6 +197,13 @@ export default function ThreadScreen() {
           inverted
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading && messages.length > 0}
+              onRefresh={refresh}
+              tintColor={primary}
+            />
+          }
         />
 
         <View style={styles.inputRow}>
