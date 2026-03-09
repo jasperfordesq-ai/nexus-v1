@@ -43,10 +43,7 @@ describe('Button component', () => {
             </TenantProvider>
         );
 
-        // In React Native, TouchableOpacity handles the disabled state internally
-        // and won't fire onPress, but testing-library still dispatches the event.
-        // However, if we pass disabled={true} to our Button, we can verify the styles/props.
-        const button = getByText('Click Me').parent;
-        expect(button?.props.accessibilityState?.disabled).toBe(true);
+        // toBeDisabled() traverses ancestors — catches disabled set on TouchableOpacity
+        expect(getByText('Click Me')).toBeDisabled();
     });
 });
