@@ -5,6 +5,7 @@
 
 import { useEffect } from 'react';
 import { Stack, router } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -46,6 +47,33 @@ function RootLayout() {
 export default Sentry.wrap(RootLayout);
 
 /**
+ * Maps a web-format deep-link (e.g. /messages/123) to the appropriate
+ * mobile screen. Shared by foreground notification taps and background taps.
+ */
+function navigateToLink(link: string): void {
+  const match = link.match(/^\/([^/]+)(?:\/(\d+))?/);
+  if (!match) return;
+  const [, section, id] = match;
+  switch (section) {
+    case 'exchanges':
+      if (id) router.push({ pathname: '/(modals)/exchange-detail', params: { id } });
+      break;
+    case 'events':
+      if (id) router.push({ pathname: '/(modals)/event-detail', params: { id } });
+      break;
+    case 'members':
+      if (id) router.push({ pathname: '/(modals)/member-profile', params: { id } });
+      break;
+    case 'messages':
+      if (id) router.push({ pathname: '/(modals)/thread', params: { id } });
+      else router.push('/(tabs)/messages');
+      break;
+    default:
+      break;
+  }
+}
+
+/**
  * Handles the redirect logic after auth state resolves.
  * Separated from RootLayout so it can consume AuthContext.
  */
@@ -60,6 +88,15 @@ function RootNavigator() {
       router.replace('/(auth)/login');
     }
   }, [isLoading, isAuthenticated]);
+
+  // Handle taps on push notifications received while app was backgrounded/killed
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { link?: string } | undefined;
+      if (data?.link) navigateToLink(data.link);
+    });
+    return () => subscription.remove();
+  }, []);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
