@@ -296,7 +296,7 @@ class WebAuthnChallengeStore
                 return null;
             }
 
-            if ($password && !empty($password)) {
+            if (!empty($password)) {
                 if (!$redis->auth($password)) {
                     return null;
                 }
@@ -349,7 +349,8 @@ class WebAuthnChallengeStore
             return false;
         }
 
-        return $redis->del($key) > 0;
+        $deleted = $redis->del($key);
+        return is_int($deleted) && $deleted > 0;
     }
 
     // ========================================================================

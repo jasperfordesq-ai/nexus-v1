@@ -118,7 +118,7 @@ class UserService
         // Add NexusScore summary (cached, non-blocking)
         try {
             $tenantId = TenantContext::getId();
-            $score = NexusScoreCacheService::getScore($userId, $tenantId);
+            $score = (new NexusScoreCacheService(Database::getConnection()))->getScore($userId, $tenantId);
             $profile['nexus_score'] = [
                 'total_score' => $score['total_score'] ?? 0,
                 'tier'        => $score['tier'] ?? 'newcomer',

@@ -381,7 +381,8 @@ class TwoFactorChallengeManager
         }
 
         $key = self::getKey($token);
-        return $redis->del($key) > 0;
+        $deleted = $redis->del($key);
+        return is_int($deleted) && $deleted > 0;
     }
 
     // ========================================================================
