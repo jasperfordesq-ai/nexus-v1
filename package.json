@@ -23,6 +23,7 @@
   },
   "lint-staged": {
     "react-frontend/src/**/*.{ts,tsx}": [
+      "bash -c 'cd react-frontend && npx eslint --max-warnings 1000 \"$@\" 2>&1 || exit 1' _",
       "bash -c 'cd react-frontend && npx tsc --noEmit'"
     ],
     "src/**/*.php": [

@@ -559,7 +559,7 @@ function RankBadge({ rank }: { rank: number }) {
   const colors: Record<number, string> = {
     1: 'bg-warning text-warning-foreground',
     2: 'bg-default-200 text-default-600',
-    3: 'bg-[#fdba74] text-[#9a3412]',
+    3: 'bg-orange-300 text-orange-900',
   };
   return (
     <span

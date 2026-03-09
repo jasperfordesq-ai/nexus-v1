@@ -62,12 +62,13 @@ class Group
 
     public static function findById($id)
     {
+        $tenantId = TenantContext::getId();
         $sql = "SELECT g.*, u.name as owner_name, gt.name as type_name, gt.icon as type_icon, gt.color as type_color
                 FROM `groups` g
                 JOIN users u ON g.owner_id = u.id
                 LEFT JOIN group_types gt ON g.type_id = gt.id
-                WHERE g.id = ?";
-        return Database::query($sql, [$id])->fetch();
+                WHERE g.id = ? AND g.tenant_id = ?";
+        return Database::query($sql, [$id, $tenantId])->fetch();
     }
 
     public static function all($search = null, $typeId = null)

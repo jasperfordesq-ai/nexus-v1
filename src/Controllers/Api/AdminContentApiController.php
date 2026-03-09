@@ -342,8 +342,8 @@ class AdminContentApiController extends BaseApiController
 
         // Remove any menu items referencing this page before deleting it
         Database::query(
-            "DELETE FROM menu_items WHERE page_id = ?",
-            [$id]
+            "DELETE FROM menu_items WHERE page_id = ? AND page_id IN (SELECT id FROM pages WHERE tenant_id = ?)",
+            [$id, $tenantId]
         );
 
         Database::query(
@@ -601,7 +601,7 @@ class AdminContentApiController extends BaseApiController
         }
 
         // Delete items first, then the menu
-        Database::query("DELETE FROM menu_items WHERE menu_id = ?", [$id]);
+        Database::query("DELETE FROM menu_items WHERE menu_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
         Database::query("DELETE FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         $this->respondWithData(['deleted' => true]);
@@ -815,9 +815,10 @@ class AdminContentApiController extends BaseApiController
 
         $updates[] = 'updated_at = NOW()';
         $params[] = $id;
+        $params[] = $tenantId;
 
         Database::query(
-            "UPDATE menu_items SET " . implode(', ', $updates) . " WHERE id = ?",
+            "UPDATE menu_items SET " . implode(', ', $updates) . " WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)",
             $params
         );
 
@@ -868,8 +869,8 @@ class AdminContentApiController extends BaseApiController
         }
 
         // Also delete child items
-        Database::query("DELETE FROM menu_items WHERE parent_id = ?", [$id]);
-        Database::query("DELETE FROM menu_items WHERE id = ?", [$id]);
+        Database::query("DELETE FROM menu_items WHERE parent_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
+        Database::query("DELETE FROM menu_items WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
 
         $this->respondWithData(['deleted' => true]);
     }

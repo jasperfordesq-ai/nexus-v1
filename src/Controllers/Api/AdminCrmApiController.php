@@ -6,6 +6,7 @@
 
 namespace Nexus\Controllers\Api;
 
+use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
@@ -116,7 +117,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch()['cnt'];
         $retentionRate = $approvedMembers > 0 ? round(($activeMembers / $approvedMembers) * 100, 1) : 0;
 
-        $this->jsonResponse([
+        $this->respondWithData([
             'total_members' => $totalMembers,
             'active_members' => $activeMembers,
             'new_this_month' => $newThisMonth,
@@ -211,7 +212,7 @@ class AdminCrmApiController extends BaseApiController
             [$tenantId]
         )->fetchAll();
 
-        $this->jsonResponse([
+        $this->respondWithData([
             'stages' => [
                 ['name' => 'Registered', 'count' => $registered, 'color' => '#3b82f6'],
                 ['name' => 'Email Verified', 'count' => $emailVerified, 'color' => '#6366f1'],
@@ -286,15 +287,7 @@ class AdminCrmApiController extends BaseApiController
             $params
         )->fetchAll();
 
-        $this->jsonResponse([
-            'data' => $notes,
-            'meta' => [
-                'total' => $total,
-                'page' => $page,
-                'limit' => $limit,
-                'pages' => (int) ceil($total / $limit),
-            ],
-        ]);
+        $this->respondWithPaginatedCollection($notes, $total, $page, $limit);
     }
 
     /**
@@ -312,7 +305,7 @@ class AdminCrmApiController extends BaseApiController
         $category = $input['category'] ?? 'general';
 
         if (!$userId || !$content) {
-            $this->jsonResponse(['error' => 'user_id and content are required'], 400);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'user_id and content are required', null, 400);
             return;
         }
 
@@ -323,7 +316,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch();
 
         if (!$user) {
-            $this->jsonResponse(['error' => 'User not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
 
@@ -350,7 +343,7 @@ class AdminCrmApiController extends BaseApiController
             [$noteId, $tenantId]
         )->fetch();
 
-        $this->jsonResponse($note, 201);
+        $this->respondWithData($note, null, 201);
     }
 
     /**
@@ -368,7 +361,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch();
 
         if (!$note) {
-            $this->jsonResponse(['error' => 'Note not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Note not found', null, 404);
             return;
         }
 
@@ -392,7 +385,7 @@ class AdminCrmApiController extends BaseApiController
         }
 
         if (empty($updates)) {
-            $this->jsonResponse(['error' => 'No fields to update'], 400);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'No fields to update', null, 400);
             return;
         }
 
@@ -414,7 +407,7 @@ class AdminCrmApiController extends BaseApiController
             [$id, $tenantId]
         )->fetch();
 
-        $this->jsonResponse($updated);
+        $this->respondWithData($updated);
     }
 
     /**
@@ -431,7 +424,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch();
 
         if (!$note) {
-            $this->jsonResponse(['error' => 'Note not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Note not found', null, 404);
             return;
         }
 
@@ -440,7 +433,7 @@ class AdminCrmApiController extends BaseApiController
             [$id, $tenantId]
         );
 
-        $this->jsonResponse(['success' => true]);
+        $this->respondWithData(['deleted' => true]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -517,15 +510,7 @@ class AdminCrmApiController extends BaseApiController
             $params
         )->fetchAll();
 
-        $this->jsonResponse([
-            'data' => $tasks,
-            'meta' => [
-                'total' => $total,
-                'page' => $page,
-                'limit' => $limit,
-                'pages' => (int) ceil($total / $limit),
-            ],
-        ]);
+        $this->respondWithPaginatedCollection($tasks, $total, $page, $limit);
     }
 
     /**
@@ -542,7 +527,7 @@ class AdminCrmApiController extends BaseApiController
         $assignedTo = (int) ($input['assigned_to'] ?? $adminId);
 
         if (!$title) {
-            $this->jsonResponse(['error' => 'title is required'], 400);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'title is required', null, 400);
             return;
         }
 
@@ -579,7 +564,7 @@ class AdminCrmApiController extends BaseApiController
             [$taskId, $tenantId]
         )->fetch();
 
-        $this->jsonResponse($task, 201);
+        $this->respondWithData($task, null, 201);
     }
 
     /**
@@ -597,7 +582,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch();
 
         if (!$task) {
-            $this->jsonResponse(['error' => 'Task not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Task not found', null, 404);
             return;
         }
 
@@ -647,7 +632,7 @@ class AdminCrmApiController extends BaseApiController
         }
 
         if (empty($updates)) {
-            $this->jsonResponse(['error' => 'No fields to update'], 400);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'No fields to update', null, 400);
             return;
         }
 
@@ -672,7 +657,7 @@ class AdminCrmApiController extends BaseApiController
             [$id, $tenantId]
         )->fetch();
 
-        $this->jsonResponse($updated);
+        $this->respondWithData($updated);
     }
 
     /**
@@ -689,7 +674,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch();
 
         if (!$task) {
-            $this->jsonResponse(['error' => 'Task not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Task not found', null, 404);
             return;
         }
 
@@ -698,7 +683,7 @@ class AdminCrmApiController extends BaseApiController
             [$id, $tenantId]
         );
 
-        $this->jsonResponse(['success' => true]);
+        $this->respondWithData(['deleted' => true]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -747,7 +732,7 @@ class AdminCrmApiController extends BaseApiController
             )->fetchAll();
         }
 
-        $this->jsonResponse($tags);
+        $this->respondWithCollection($tags);
     }
 
     /**
@@ -764,12 +749,12 @@ class AdminCrmApiController extends BaseApiController
         $tag = trim($input['tag'] ?? '');
 
         if (!$userId || !$tag) {
-            $this->jsonResponse(['error' => 'user_id and tag are required'], 400);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'user_id and tag are required', null, 400);
             return;
         }
 
         if (mb_strlen($tag) > 50) {
-            $this->jsonResponse(['error' => 'Tag must be 50 characters or less'], 400);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_TOO_LONG, 'Tag must be 50 characters or less', null, 400);
             return;
         }
 
@@ -780,7 +765,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch();
 
         if (!$user) {
-            $this->jsonResponse(['error' => 'User not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
             return;
         }
 
@@ -793,7 +778,7 @@ class AdminCrmApiController extends BaseApiController
         } catch (\Throwable $e) {
             // Duplicate tag — that's fine
             if (strpos($e->getMessage(), 'Duplicate') !== false) {
-                $this->jsonResponse(['error' => 'Tag already assigned'], 409);
+                $this->respondWithError(ApiErrorCodes::RESOURCE_ALREADY_EXISTS, 'Tag already assigned', null, 409);
                 return;
             }
             throw $e;
@@ -801,13 +786,13 @@ class AdminCrmApiController extends BaseApiController
 
         $tagId = Database::lastInsertId();
 
-        $this->jsonResponse([
+        $this->respondWithData([
             'id' => $tagId,
             'tenant_id' => $tenantId,
             'user_id' => $userId,
             'tag' => $tag,
             'created_by' => $adminId,
-        ], 201);
+        ], null, 201);
     }
 
     /**
@@ -821,7 +806,7 @@ class AdminCrmApiController extends BaseApiController
 
         $tag = isset($_GET['tag']) ? trim($_GET['tag']) : '';
         if (!$tag) {
-            $this->jsonResponse(['error' => 'tag parameter is required'], 400);
+            $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'tag parameter is required', null, 400);
             return;
         }
 
@@ -831,7 +816,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch()['cnt'];
 
         if ($count === 0) {
-            $this->jsonResponse(['error' => 'Tag not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tag not found', null, 404);
             return;
         }
 
@@ -840,7 +825,7 @@ class AdminCrmApiController extends BaseApiController
             [$tenantId, $tag]
         );
 
-        $this->jsonResponse(['success' => true, 'deleted' => $count]);
+        $this->respondWithData(['deleted' => $count]);
     }
 
     /**
@@ -857,7 +842,7 @@ class AdminCrmApiController extends BaseApiController
         )->fetch();
 
         if (!$tag) {
-            $this->jsonResponse(['error' => 'Tag not found'], 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tag not found', null, 404);
             return;
         }
 
@@ -866,7 +851,7 @@ class AdminCrmApiController extends BaseApiController
             [$id, $tenantId]
         );
 
-        $this->jsonResponse(['success' => true]);
+        $this->respondWithData(['deleted' => true]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -889,7 +874,7 @@ class AdminCrmApiController extends BaseApiController
             [$tenantId]
         )->fetchAll();
 
-        $this->jsonResponse($admins);
+        $this->respondWithCollection($admins);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -1056,7 +1041,7 @@ class AdminCrmApiController extends BaseApiController
         }
 
         if (empty($unions)) {
-            $this->jsonResponse(['data' => [], 'meta' => ['total' => 0, 'page' => $page, 'limit' => $limit, 'pages' => 0]]);
+            $this->respondWithPaginatedCollection([], 0, $page, $limit);
             return;
         }
 
@@ -1081,15 +1066,7 @@ class AdminCrmApiController extends BaseApiController
             $entry['id'] = ($page - 1) * $limit + $i + 1;
         }
 
-        $this->jsonResponse([
-            'data' => $entries,
-            'meta' => [
-                'total' => $total,
-                'page' => $page,
-                'limit' => $limit,
-                'pages' => (int) ceil($total / $limit),
-            ],
-        ]);
+        $this->respondWithPaginatedCollection($entries, $total, $page, $limit);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

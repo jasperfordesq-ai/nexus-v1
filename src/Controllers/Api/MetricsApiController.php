@@ -22,12 +22,9 @@ class MetricsApiController extends BaseApiController
      */
     public function store()
     {
-        header('Content-Type: application/json');
-
         // Performance monitoring must be enabled
         if (!PerformanceMonitorService::isEnabled()) {
-            http_response_code(204); // No Content
-            echo json_encode(['success' => true, 'message' => 'Performance monitoring is disabled']);
+            $this->jsonResponse(['success' => true, 'message' => 'Performance monitoring is disabled'], 204);
             if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
@@ -35,8 +32,7 @@ class MetricsApiController extends BaseApiController
         $input = json_decode(file_get_contents('php://input'), true);
 
         if (!isset($input['metrics']) || !is_array($input['metrics'])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Invalid metrics payload']);
+            $this->jsonResponse(['success' => false, 'error' => 'Invalid metrics payload'], 400);
             if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
@@ -56,12 +52,11 @@ class MetricsApiController extends BaseApiController
             PerformanceMonitorService::trackFrontendMetrics($metricData);
         }
 
-        http_response_code(201);
-        echo json_encode([
+        $this->jsonResponse([
             'success' => true,
             'message' => 'Metrics recorded',
             'count' => count($metrics)
-        ]);
+        ], 201);
         if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
@@ -72,8 +67,6 @@ class MetricsApiController extends BaseApiController
      */
     public function summary()
     {
-        header('Content-Type: application/json');
-
         // Require admin authentication
         $this->requireAdmin();
 
@@ -84,8 +77,7 @@ class MetricsApiController extends BaseApiController
 
         $summary = PerformanceMonitorService::getSummary($hours);
 
-        // nosemgrep: echoed-request — json_encode output with Content-Type: application/json prevents XSS
-        echo json_encode([
+        $this->jsonResponse([
             'success' => true,
             'data' => $summary,
             'hours' => $hours

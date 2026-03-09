@@ -69,6 +69,14 @@ function LocationMapInner({
     map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
   }, [map, markers, fitBounds, zoom]);
 
+  const handleMarkerClick = useCallback(
+    (marker: MapMarker) => {
+      setActiveMarkerId((prev) => (prev === marker.id ? null : marker.id));
+      onMarkerClick?.(marker);
+    },
+    [onMarkerClick]
+  );
+
   // Gracefully degrade if API auth fails (billing not enabled, key restricted, etc.)
   if (status === APILoadingStatus.AUTH_FAILURE || status === APILoadingStatus.FAILED) {
     return null;
@@ -77,14 +85,6 @@ function LocationMapInner({
   const mapCenter = center ?? (markers.length === 1
     ? { lat: markers[0].lat, lng: markers[0].lng }
     : DEFAULT_CENTER);
-
-  const handleMarkerClick = useCallback(
-    (marker: MapMarker) => {
-      setActiveMarkerId((prev) => (prev === marker.id ? null : marker.id));
-      onMarkerClick?.(marker);
-    },
-    [onMarkerClick]
-  );
 
   const activeMarker = markers.find((m) => m.id === activeMarkerId);
 

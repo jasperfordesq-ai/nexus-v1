@@ -153,6 +153,9 @@ jobs:
           REDIS_HOST: 127.0.0.1
           APP_ENV: testing
 
+      - name: "WARNING: PHPStan static analysis (level 3) — fix pre-existing errors to promote to BLOCKING"
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github || true
+
   # ─────────────────────────────────────────────────────────────────
   # Stage 2: React Frontend (TypeScript + Vitest + Build)
   # ─────────────────────────────────────────────────────────────────
@@ -359,6 +362,25 @@ jobs:
       - name: "BLOCKING: Check for translation key mismatches"
         run: node scripts/check-i18n-drift.mjs
 
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 6b: SPDX/AGPL License Compliance Check
+  # ─────────────────────────────────────────────────────────────────
+  spdx-compliance:
+    name: SPDX License Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: "BLOCKING: Check SPDX headers on all source files"
+        run: node scripts/check-spdx.mjs
+
   # ─────────────────────────────────────────────────────────────────
   # Stage 7: Regression Pattern Detection
   # ─────────────────────────────────────────────────────────────────
@@ -437,42 +459,10 @@ jobs:
   # ─────────────────────────────────────────────────────────────────
   # Stage 7: E2E Smoke Tests (Playwright)
   # ─────────────────────────────────────────────────────────────────
-  # STATUS: DISABLED — no E2E test files exist yet.
-  #
-  # The playwright.config.ts references e2e/tests/ and e2e/global.setup.ts,
-  # but the e2e/ directory has not been created. The previous version of this
-  # job installed Playwright browsers (~400 MB), ran against missing test
-  # files, swallowed the error with continue-on-error, and reported a
-  # misleading green check (audit finding H14).
-  #
-  # TO ENABLE (checklist):
-  #   1. Create the e2e/ directory tree:
-  #        e2e/
-  #        ├── global.setup.ts      (authenticate test users, save storage state)
-  #        ├── global.teardown.ts   (clean up test data)
-  #        ├── fixtures/
-  #        │   └── .auth/
-  #        │       ├── user.json    (authenticated user storage state)
-  #        │       └── admin.json   (authenticated admin storage state)
-  #        └── tests/
-  #            ├── smoke/
-  #            │   └── health.spec.ts   (tag tests with @smoke)
-  #            └── auth/
-  #                └── login.spec.ts
-  #   2. Write at least one @smoke test (e.g. landing page loads, login form renders)
-  #   3. Create compose.ci.yml (or use compose.yml with a CI profile) that starts:
-  #        - MariaDB with schema + seed data
-  #        - PHP API (port 8090)
-  #        - React dev-server or static build served via nginx (port 5173)
-  #   4. Update E2E_BASE_URL in the job env to match the CI compose ports
-  #   5. Remove the `if: false` line below to enable the job
-  #   6. Run the job once to verify, then remove continue-on-error
-  # ─────────────────────────────────────────────────────────────────
   e2e-smoke:
-    name: E2E Smoke Tests (DISABLED — no test files)
+    name: E2E Smoke Tests
     runs-on: ubuntu-latest
     needs: [react-build]
-    if: false  # No e2e/ directory exists yet — remove this line once E2E tests are written
 
     steps:
       - uses: actions/checkout@v4

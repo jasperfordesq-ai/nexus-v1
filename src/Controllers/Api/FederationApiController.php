@@ -908,17 +908,13 @@ class FederationApiController extends BaseApiController
         $result = FederationJwtService::handleTokenRequest();
 
         if (isset($result['error'])) {
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode($result);
+            $this->jsonResponse($result, 400);
             if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         }
 
-        http_response_code(200);
-        header('Content-Type: application/json');
         header('Cache-Control: no-store');
         header('Pragma: no-cache');
-        echo json_encode($result);
+        $this->jsonResponse($result, 200);
         if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
     }
 
