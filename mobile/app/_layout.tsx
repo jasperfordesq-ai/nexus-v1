@@ -13,12 +13,18 @@ import { AuthProvider, useAuthContext } from '@/lib/context/AuthContext';
 import { TenantProvider } from '@/lib/context/TenantContext';
 import { RealtimeProvider } from '@/lib/context/RealtimeContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://placeholder@sentry.io/1234567',
+  tracesSampleRate: 1.0,
+});
 
 /**
  * Root layout — wraps the entire app in providers and handles the
  * initial auth redirect (auth check → home or login).
  */
-export default function RootLayout() {
+function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -36,6 +42,8 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default Sentry.wrap(RootLayout);
 
 /**
  * Handles the redirect logic after auth state resolves.
