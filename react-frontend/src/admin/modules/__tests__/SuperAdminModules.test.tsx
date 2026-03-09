@@ -232,7 +232,7 @@ function WRoute({ children, path, entry }: { children: React.ReactNode; path: st
 
 // ─── SuperAuditLog ──────────────────────────────────────────────────────────
 
-import SuperAuditLog from '../super-admin/audit/SuperAuditLog';
+import SuperAuditLog from '../super-admin/SuperAuditLog';
 
 describe('SuperAuditLog', () => {
   it('renders without crashing', () => {
@@ -243,7 +243,7 @@ describe('SuperAuditLog', () => {
 
 // ─── FederationAuditLog (super-admin) ───────────────────────────────────────
 
-import SAFederationAuditLog from '../super-admin/federation/FederationAuditLog';
+import SAFederationAuditLog from '../super-admin/FederationAuditLog';
 
 describe('FederationAuditLog (super-admin)', () => {
   it('renders without crashing', () => {
@@ -254,7 +254,7 @@ describe('FederationAuditLog (super-admin)', () => {
 
 // ─── FederationControls (super-admin) ───────────────────────────────────────
 
-import SAFederationControls from '../super-admin/federation/FederationControls';
+import SAFederationControls from '../super-admin/FederationControls';
 
 describe('FederationControls (super-admin)', () => {
   it('renders without crashing', () => {
@@ -265,7 +265,7 @@ describe('FederationControls (super-admin)', () => {
 
 // ─── FederationSystemControls ───────────────────────────────────────────────
 
-import FederationSystemControls from '../super-admin/federation/FederationSystemControls';
+import FederationSystemControls from '../super-admin/FederationSystemControls';
 
 describe('FederationSystemControls', () => {
   it('renders without crashing', () => {
@@ -276,7 +276,7 @@ describe('FederationSystemControls', () => {
 
 // ─── FederationTenantFeatures (super-admin) ─────────────────────────────────
 
-import SAFederationTenantFeatures from '../super-admin/federation/FederationTenantFeatures';
+import SAFederationTenantFeatures from '../super-admin/FederationTenantFeatures';
 
 describe('FederationTenantFeatures (super-admin)', () => {
   it('renders without crashing with route param', () => {
@@ -291,7 +291,7 @@ describe('FederationTenantFeatures (super-admin)', () => {
 
 // ─── FederationWhitelist ────────────────────────────────────────────────────
 
-import FederationWhitelist from '../super-admin/federation/FederationWhitelist';
+import FederationWhitelist from '../super-admin/FederationWhitelist';
 
 describe('FederationWhitelist', () => {
   it('renders without crashing', () => {
@@ -302,7 +302,7 @@ describe('FederationWhitelist', () => {
 
 // ─── Partnerships ───────────────────────────────────────────────────────────
 
-import Partnerships from '../super-admin/federation/Partnerships';
+import Partnerships from '../super-admin/Partnerships';
 
 describe('Partnerships', () => {
   it('renders without crashing', () => {
@@ -313,7 +313,7 @@ describe('Partnerships', () => {
 
 // ─── TenantForm (super-admin) ───────────────────────────────────────────────
 
-import { TenantForm as SATenantForm } from '../super-admin/tenants/TenantForm';
+import { TenantForm as SATenantForm } from '../super-admin/TenantForm';
 
 describe('TenantForm (super-admin)', () => {
   it('renders without crashing with route param', () => {
@@ -328,7 +328,7 @@ describe('TenantForm (super-admin)', () => {
 
 // ─── TenantHierarchy (super-admin) ──────────────────────────────────────────
 
-import { TenantHierarchy as SATenantHierarchy } from '../super-admin/tenants/TenantHierarchy';
+import { TenantHierarchy as SATenantHierarchy } from '../super-admin/TenantHierarchy';
 
 describe('TenantHierarchy (super-admin)', () => {
   it('renders without crashing', () => {
@@ -339,7 +339,7 @@ describe('TenantHierarchy (super-admin)', () => {
 
 // ─── TenantListAdmin ────────────────────────────────────────────────────────
 
-import { TenantListAdmin } from '../super-admin/tenants/TenantListAdmin';
+import { TenantListAdmin } from '../super-admin/TenantListAdmin';
 
 describe('TenantListAdmin', () => {
   it('renders without crashing', () => {
@@ -350,7 +350,7 @@ describe('TenantListAdmin', () => {
 
 // ─── TenantShow (super-admin) ───────────────────────────────────────────────
 
-import { TenantShow as SATenantShow } from '../super-admin/tenants/TenantShow';
+import { TenantShow as SATenantShow } from '../super-admin/TenantShow';
 
 describe('TenantShow (super-admin)', () => {
   it('renders without crashing with route param', () => {
