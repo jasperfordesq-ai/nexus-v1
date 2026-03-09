@@ -164,6 +164,25 @@ class VolunteerService
     }
 
     /**
+     * Check if a user can manage an opportunity (org creator OR active owner/admin in org_members)
+     */
+    private static function canManageOpportunity(array $opp, int $userId): bool
+    {
+        if ((int)($opp['org_owner_id'] ?? 0) === $userId) {
+            return true;
+        }
+        $orgId = (int)($opp['organization_id'] ?? 0);
+        if ($orgId <= 0) {
+            return false;
+        }
+        $role = Database::query(
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            [TenantContext::getId(), $orgId, $userId]
+        )->fetchColumn();
+        return in_array($role, ['owner', 'admin'], true);
+    }
+
+    /**
      * Get single opportunity by ID
      *
      * @param int $id Opportunity ID
@@ -187,7 +206,7 @@ class VolunteerService
         if ($viewerId) {
             $formatted['has_applied'] = VolApplication::hasApplied($id, $viewerId);
             $formatted['application'] = self::getUserApplicationForOpportunity($id, $viewerId);
-            $formatted['is_owner'] = (int)($opp['org_owner_id'] ?? 0) === $viewerId;
+            $formatted['is_owner'] = self::canManageOpportunity($opp, $viewerId);
         }
 
         return $formatted;
@@ -215,10 +234,18 @@ class VolunteerService
             return null;
         }
 
-        // Verify user owns the organization
+        // Verify user can manage the organization (owner or org admin)
         $org = VolOrganization::find($data['organization_id']);
-        if (!$org || (int)$org['user_id'] !== $userId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not own this organization'];
+        if (!$org) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Organization not found'];
+            return null;
+        }
+        $orgAdminRole = Database::query(
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            [TenantContext::getId(), (int)$org['id'], $userId]
+        )->fetchColumn();
+        if ((int)$org['user_id'] !== $userId && !in_array($orgAdminRole, ['owner', 'admin'], true)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
             return null;
         }
 
@@ -301,8 +328,8 @@ class VolunteerService
         }
 
         // Verify ownership
-        if ((int)$opp['org_owner_id'] !== $userId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not own this opportunity'];
+        if (!self::canManageOpportunity($opp, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return false;
         }
 
@@ -344,8 +371,8 @@ class VolunteerService
         }
 
         // Verify ownership
-        if ((int)$opp['org_owner_id'] !== $userId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not own this opportunity'];
+        if (!self::canManageOpportunity($opp, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return false;
         }
 
@@ -708,8 +735,8 @@ class VolunteerService
             return null;
         }
 
-        if ((int)$opp['org_owner_id'] !== $adminUserId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not own this opportunity'];
+        if (!self::canManageOpportunity($opp, $adminUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return null;
         }
 
@@ -814,7 +841,7 @@ class VolunteerService
 
         // Get application with ownership check and tenant scoping
         $stmt = $db->prepare("
-            SELECT a.*, opp.title, org.user_id as org_owner_id
+            SELECT a.*, opp.title, opp.organization_id, org.user_id as org_owner_id
             FROM vol_applications a
             JOIN vol_opportunities opp ON a.opportunity_id = opp.id
             JOIN vol_organizations org ON opp.organization_id = org.id
@@ -828,8 +855,8 @@ class VolunteerService
             return false;
         }
 
-        if ((int)$app['org_owner_id'] !== $adminUserId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not own this opportunity'];
+        if (!self::canManageOpportunity($app, $adminUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return false;
         }
 
@@ -1398,8 +1425,12 @@ class VolunteerService
         }
 
         $org = VolOrganization::find($log['organization_id']);
-        if (!$org || (int)$org['user_id'] !== $adminUserId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not own this organization'];
+        $orgAdminRoleHours = $org ? Database::query(
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            [TenantContext::getId(), (int)$org['id'], $adminUserId]
+        )->fetchColumn() : false;
+        if (!$org || ((int)$org['user_id'] !== $adminUserId && !in_array($orgAdminRoleHours, ['owner', 'admin'], true))) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
             return false;
         }
 
