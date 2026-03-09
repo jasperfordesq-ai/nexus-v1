@@ -34,7 +34,7 @@ import type { Notification } from '@/types';
 // Configuration
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PUSHER_KEY = import.meta.env.VITE_PUSHER_KEY || 'f7af200cb94bb29afbd3';
+const PUSHER_KEY = import.meta.env.VITE_PUSHER_KEY as string | undefined;
 const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_CLUSTER || 'eu';
 const POLLING_INTERVAL = 60000; // 60 seconds fallback polling
 
@@ -233,7 +233,13 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     // Fetch initial counts
     refreshCounts();
 
-    // Initialize Pusher
+    // Initialize Pusher (skip if key not configured)
+    if (!PUSHER_KEY) {
+      if (import.meta.env.DEV) {
+        console.warn('[NotificationsContext] VITE_PUSHER_KEY is not set — real-time notifications disabled.');
+      }
+      return;
+    }
     try {
       const pusher = new Pusher(PUSHER_KEY, {
         cluster: PUSHER_CLUSTER,
