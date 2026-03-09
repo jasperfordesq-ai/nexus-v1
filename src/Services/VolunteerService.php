@@ -524,6 +524,7 @@ class VolunteerService
 
             // Notify org owner — in-app bell + email
             try {
+                $applierName = 'Someone';
                 $orgOwnerId = (int)($opp['org_owner_id'] ?? 0);
                 if ($orgOwnerId > 0) {
                     $applier = \Nexus\Models\User::findById($userId);

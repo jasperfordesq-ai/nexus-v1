@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
+docker exec nexus-php-app # PHPStan: warning-only until pre-existing 119 errors are resolved. Promote to blocking by removing "|| true"
+vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github || true
 node scripts/check-i18n-drift.mjs --summary && cd react-frontend && npx tsc --noEmit && npm run build

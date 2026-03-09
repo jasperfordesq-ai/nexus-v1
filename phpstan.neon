@@ -1,0 +1,17 @@
+parameters:
+    level: 3
+    paths:
+        - src
+    excludePaths:
+        - src/Views
+        - vendor
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#Call to an undefined method#'
+        - '#Access to an undefined property#'
+        - identifier: missingType.iterableValue
+        - message: '#should always throw an exception or terminate script execution#'
+          path: src/Controllers/Api/BaseApiController.php
+
+includes:
+    - phpstan-baseline.neon

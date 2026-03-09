@@ -91,10 +91,9 @@ abstract class BaseApiController
         if (!defined('TESTING')) {
             if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
         } else {
-            // In test mode, throw an exception for error/auth responses so controller
-            // execution stops (mirrors exit behaviour in production). Success responses
-            // (2xx) do not throw so the test can inspect the full response body.
-            if ($status >= 300) {
+            // In test mode, always throw so all code paths terminate (mirrors exit in production).
+            // Tests can inspect the echoed response body via output buffering before catching.
+            if (true) {
                 throw new \Nexus\Core\ApiResponseSentException($status);
             }
         }
@@ -202,7 +201,6 @@ abstract class BaseApiController
      * @param mixed $data Response data
      * @param array|null $meta Optional metadata (pagination, etc.)
      * @param int $status HTTP status code (default 200)
-     * @return never
      */
     protected function success($data = null, ?array $meta = null, int $status = 200): void
     {
@@ -234,7 +232,6 @@ abstract class BaseApiController
      * @param int $status HTTP status code
      * @param string|null $code Error code for programmatic handling
      * @param array|null $details Additional error details
-     * @return never
      */
     protected function error(string $message, int $status = 400, ?string $code = null, ?array $details = null): void
     {
@@ -259,7 +256,6 @@ abstract class BaseApiController
      *
      * @param mixed $data Created resource data
      * @param string|null $location URL of created resource
-     * @return never
      */
     protected function created($data = null, ?string $location = null): void
     {
@@ -279,7 +275,7 @@ abstract class BaseApiController
         $this->setApiVersionHeaders();
         $this->setRateLimitHeaders();
         http_response_code(204);
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } } else { throw new \Nexus\Core\ApiResponseSentException(204); }
     }
 
     /**
@@ -289,7 +285,6 @@ abstract class BaseApiController
      * @param int $total Total count
      * @param int $page Current page
      * @param int $perPage Items per page
-     * @return never
      */
     protected function paginated(array $items, int $total, int $page = 1, int $perPage = 20): void
     {
