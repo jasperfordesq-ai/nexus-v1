@@ -1,0 +1,227 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { useCallback, useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
+
+import { useApi } from '@/lib/hooks/useApi';
+import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { getWalletBalance, getWalletTransactions, type TransactionItem } from '@/lib/api/wallet';
+import Avatar from '@/components/ui/Avatar';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+// ─── Transaction Row ─────────────────────────────────────────────────────────
+
+function TransactionRow({
+  item,
+  primary,
+  theme,
+  styles,
+}: {
+  item: TransactionItem;
+  primary: string;
+  theme: Theme;
+  styles: ReturnType<typeof makeStyles>;
+}) {
+  const isCredit = item.type === 'credit';
+  const sign = isCredit ? '+' : '−';
+  // Green for credit, red (theme.error) for debit — both are transaction status colours
+  const amountColor = isCredit ? theme.success : theme.error;
+
+  return (
+    <View style={styles.row}>
+      <Avatar
+        uri={item.other_user.avatar_url}
+        name={item.other_user.name}
+        size={44}
+      />
+
+      <View style={styles.rowBody}>
+        <Text style={styles.rowName} numberOfLines={1}>
+          {item.other_user.name}
+        </Text>
+        {item.description ? (
+          <Text style={styles.rowDesc} numberOfLines={2}>
+            {item.description}
+          </Text>
+        ) : null}
+        <Text style={styles.rowDate}>{formatDate(item.created_at)}</Text>
+      </View>
+
+      <View style={styles.rowRight}>
+        <Text style={[styles.rowAmount, { color: amountColor }]}>
+          {sign}{item.amount.toFixed(1)} hrs
+        </Text>
+        {item.status !== 'completed' && (
+          <View style={[styles.statusBadge, { borderColor: primary }]}>
+            <Text style={[styles.statusText, { color: primary }]}>{item.status}</Text>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
+
+export default function WalletModal() {
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const {
+    data: balanceData,
+    isLoading: balanceLoading,
+    refresh: refreshBalance,
+  } = useApi(() => getWalletBalance(), []);
+
+  const {
+    data: txData,
+    isLoading: txLoading,
+    error: txError,
+    refresh: refreshTx,
+  } = useApi(() => getWalletTransactions(undefined, 50, 'all'), []);
+
+  const balance = balanceData?.data?.balance ?? null;
+  const transactions = txData?.data ?? [];
+  const isLoading = balanceLoading || txLoading;
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    refreshBalance();
+    refreshTx();
+    // Give the hooks a tick to re-start their fetch
+    await new Promise<void>((resolve) => setTimeout(resolve, 400));
+    setIsRefreshing(false);
+  }, [refreshBalance, refreshTx]);
+
+  // ── Balance header ──────────────────────────────────────────────────────────
+  const ListHeader = (
+    <View style={[styles.balanceCard, { borderColor: primary }]}>
+      {balanceLoading && balance === null ? (
+        <ActivityIndicator color={primary} />
+      ) : (
+        <>
+          <Text style={[styles.balanceValue, { color: primary }]}>
+            {balance !== null ? balance.toFixed(1) : '—'}
+          </Text>
+          <Text style={styles.balanceLabel}>Time credits</Text>
+        </>
+      )}
+    </View>
+  );
+
+  // ── Empty / error state ─────────────────────────────────────────────────────
+  const ListEmpty = txLoading ? null : (
+    <View style={styles.emptyWrap}>
+      {txError ? (
+        <Text style={styles.errorText}>{txError}</Text>
+      ) : (
+        <Text style={styles.emptyText}>No transactions yet.</Text>
+      )}
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <FlatList<TransactionItem>
+        data={transactions}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item }) => (
+          <TransactionRow item={item} primary={primary} theme={theme} styles={styles} />
+        )}
+        ListHeaderComponent={ListHeader}
+        ListEmptyComponent={ListEmpty}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing || isLoading}
+            onRefresh={() => void handleRefresh()}
+            tintColor={primary}
+            colors={[primary]}
+          />
+        }
+      />
+    </SafeAreaView>
+  );
+}
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.bg },
+    listContent: { paddingHorizontal: 16, paddingBottom: 32 },
+
+    // Balance card
+    balanceCard: {
+      borderWidth: 2,
+      borderRadius: 16,
+      paddingVertical: 28,
+      paddingHorizontal: 24,
+      alignItems: 'center',
+      backgroundColor: theme.surface,
+      marginTop: 20,
+      marginBottom: 24,
+    },
+    balanceValue: { fontSize: 48, fontWeight: '700', lineHeight: 56 },
+    balanceLabel: { fontSize: 14, color: theme.textSecondary, marginTop: 4 },
+
+    // Transaction rows
+    row: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      paddingVertical: 14,
+      paddingHorizontal: 4,
+      backgroundColor: theme.surface,
+      borderRadius: 12,
+    },
+    rowBody: { flex: 1, marginLeft: 12, marginRight: 8 },
+    rowName: { fontSize: 15, fontWeight: '600', color: theme.text },
+    rowDesc: { fontSize: 13, color: theme.textSecondary, marginTop: 2, lineHeight: 18 },
+    rowDate: { fontSize: 12, color: theme.textMuted, marginTop: 4 },
+    rowRight: { alignItems: 'flex-end', justifyContent: 'center', minWidth: 72 },
+    rowAmount: { fontSize: 16, fontWeight: '700' },
+    statusBadge: {
+      borderWidth: 1,
+      borderRadius: 4,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      marginTop: 4,
+    },
+    statusText: { fontSize: 10, fontWeight: '600', textTransform: 'capitalize' },
+
+    separator: { height: 8 },
+
+    // Empty / error
+    emptyWrap: { paddingTop: 48, alignItems: 'center' },
+    emptyText: { fontSize: 14, color: theme.textMuted },
+    errorText: { fontSize: 14, color: theme.error, textAlign: 'center' },
+  });
+}

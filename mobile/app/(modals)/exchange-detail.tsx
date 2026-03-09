@@ -1,0 +1,136 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
+
+import { getExchange } from '@/lib/api/exchanges';
+import { useApi } from '@/lib/hooks/useApi';
+import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useAuth } from '@/lib/hooks/useAuth';
+import Avatar from '@/components/ui/Avatar';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+export default function ExchangeDetailModal() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const styles = makeStyles(theme);
+  const { user: currentUser } = useAuth();
+
+  const { data, isLoading, error } = useApi(
+    () => getExchange(Number(id)),
+    [id],
+  );
+
+  const exchange = data?.data;
+
+  if (isLoading) return <LoadingSpinner />;
+
+  if (error || !exchange) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>{error ?? 'Exchange not found.'}</Text>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={[styles.backLink, { color: primary }]}>Go back</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
+        {/* Type badge */}
+        <View style={[styles.typeBadge, exchange.type === 'offer' ? styles.offerBadge : styles.requestBadge]}>
+          <Text style={styles.typeBadgeText}>
+            {exchange.type === 'offer' ? 'Offering' : 'Requesting'}
+          </Text>
+        </View>
+
+        <Text style={styles.title}>{exchange.title}</Text>
+        <Text style={styles.description}>{exchange.description}</Text>
+
+        {/* Time estimate */}
+        {(exchange.hours_estimate ?? 0) > 0 && (
+          <View style={[styles.creditsCard, { borderColor: primary }]}>
+            <Text style={styles.creditsLabel}>Time estimate</Text>
+            <Text style={[styles.creditsValue, { color: primary }]}>
+              {exchange.hours_estimate} hr{exchange.hours_estimate !== 1 ? 's' : ''}
+            </Text>
+          </View>
+        )}
+
+        {/* Posted by */}
+        <View style={styles.postedBy}>
+          <Avatar uri={exchange.user.avatar_url} name={exchange.user.name} size={40} />
+          <View style={styles.postedByText}>
+            <Text style={styles.postedByLabel}>Posted by</Text>
+            <Text style={styles.postedByName}>{exchange.user.name}</Text>
+          </View>
+        </View>
+
+        {/* Action — hidden if you are the poster */}
+        {currentUser?.id !== exchange.user.id && (
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: primary }]}
+            activeOpacity={0.8}
+            onPress={() =>
+              router.push({
+                pathname: '/(modals)/thread',
+                params: { id: String(exchange.user.id), name: exchange.user.name },
+              })
+            }
+          >
+            <Text style={styles.actionButtonText}>
+              {exchange.type === 'offer' ? 'Request this service' : 'Offer to help'}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function makeStyles(theme: Theme) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.surface },
+    content: { padding: 24 },
+    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+    typeBadge: { alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 12 },
+    offerBadge: { backgroundColor: theme.successBg },
+    requestBadge: { backgroundColor: theme.infoBg },
+    typeBadgeText: { fontSize: 12, fontWeight: '600', color: theme.textSecondary },
+    title: { fontSize: 22, fontWeight: '700', color: theme.text, marginBottom: 12 },
+    description: { fontSize: 15, color: theme.textSecondary, lineHeight: 22, marginBottom: 24 },
+    creditsCard: {
+      borderWidth: 2,
+      borderRadius: 12,
+      padding: 16,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    creditsLabel: { fontSize: 14, color: theme.textSecondary },
+    creditsValue: { fontSize: 24, fontWeight: '700' },
+    postedBy: { flexDirection: 'row', alignItems: 'center', marginBottom: 32 },
+    postedByText: { marginLeft: 12 },
+    postedByLabel: { fontSize: 12, color: theme.textMuted },
+    postedByName: { fontSize: 15, fontWeight: '600', color: theme.text },
+    actionButton: { borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+    actionButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    errorText: { color: theme.error, fontSize: 14, marginBottom: 16 },
+    backLink: { fontSize: 15, fontWeight: '600' },
+  });
+}
