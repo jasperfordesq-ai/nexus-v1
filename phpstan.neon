@@ -13,5 +13,3 @@ parameters:
         - message: '#should always throw an exception or terminate script execution#'
           path: src/Controllers/Api/BaseApiController.php
 
-includes:
-    - phpstan-baseline.neon
