@@ -484,7 +484,7 @@ export function LoginPage() {
                       isRequired
                       autoComplete="username webauthn"
                       classNames={{
-                        inputWrapper: 'glass-card',
+                        inputWrapper: 'glass-card backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle',
                       }}
@@ -516,7 +516,7 @@ export function LoginPage() {
                       isRequired
                       autoComplete="current-password"
                       classNames={{
-                        inputWrapper: 'glass-card',
+                        inputWrapper: 'glass-card backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle',
                       }}
@@ -641,7 +641,7 @@ export function LoginPage() {
                       isRequired
                       autoComplete="one-time-code"
                       classNames={{
-                        inputWrapper: 'glass-card',
+                        inputWrapper: 'glass-card backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle text-center text-xl tracking-widest',
                       }}

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import {
   Card,
   Table,
@@ -169,7 +169,7 @@ export default function GroupTypes() {
                   <div className="flex items-center gap-2">
                     <div
                       className="w-8 h-8 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: type.color }}
+                      style={{ '--group-type-color': type.color, backgroundColor: 'var(--group-type-color)' } as CSSProperties}
                     >
                       <i className={`${type.icon} text-white text-sm`}></i>
                     </div>

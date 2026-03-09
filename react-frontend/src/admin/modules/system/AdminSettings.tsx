@@ -16,6 +16,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
+import type { AdminSettingsResponse } from '../../api/types';
 
 // Field names match the backend's TENANT_DIRECT_COLUMNS and GENERAL_SETTING_KEYS exactly
 interface SettingsForm {
@@ -53,11 +54,11 @@ export function AdminSettings() {
     setLoading(true);
     try {
       const res = await adminSettings.get();
-      const data = res.data;
+      const data = res.data as AdminSettingsResponse | undefined;
       if (data) {
         // API returns nested structure: { tenant: {...}, settings: {...} }
-        const tenant = (data as any).tenant || data;
-        const settings = (data as any).settings || data;
+        const tenant = data.tenant;
+        const settings = data.settings;
 
         setForm({
           name: (tenant.name as string) ?? '',
@@ -65,9 +66,9 @@ export function AdminSettings() {
           contact_email: (tenant.contact_email as string) ?? '',
           contact_phone: (tenant.contact_phone as string) ?? '',
           registration_mode: (settings.registration_mode as string) ?? 'open',
-          email_verification: settings.email_verification === 'true' || settings.email_verification === true,
-          admin_approval: settings.admin_approval === 'true' || settings.admin_approval === true,
-          maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === true,
+          email_verification: settings.email_verification === 'true',
+          admin_approval: settings.admin_approval === 'true',
+          maintenance_mode: settings.maintenance_mode === 'true',
         });
       }
     } catch {

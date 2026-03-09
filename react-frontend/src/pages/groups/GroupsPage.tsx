@@ -24,7 +24,7 @@ import {
   Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, GroupCardSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -244,14 +244,9 @@ export function GroupsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Loading groups" aria-busy="true">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-5 bg-theme-hover rounded w-2/3 mb-3" />
-                  <div className="h-4 bg-theme-hover rounded w-full mb-2" />
-                  <div className="h-4 bg-theme-hover rounded w-3/4 mb-4" />
-                  <div className="h-3 bg-theme-hover rounded w-1/3" />
-                </GlassCard>
+                <GroupCardSkeleton key={i} />
               ))}
             </div>
           ) : groups.length === 0 ? (

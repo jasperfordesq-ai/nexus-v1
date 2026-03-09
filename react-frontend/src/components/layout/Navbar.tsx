@@ -342,6 +342,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     src={branding.logo}
                     alt={branding.name}
                     className="h-8 sm:h-9 w-auto object-contain"
+                    loading="eager"
                   />
                 ) : (
                   <Hexagon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
@@ -560,6 +561,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   </div>
 
                   {/* Notifications */}
+                  {/* Visually hidden live region announces unread count changes to screen readers */}
+                  <span className="sr-only" aria-live="polite" aria-atomic="true">
+                    {unreadCount > 0 ? t('nav.unread_notifications', '{{count}} unread notifications', { count: unreadCount }) : ''}
+                  </span>
                   <Badge
                     content={unreadCount > 99 ? '99+' : unreadCount}
                     color="danger"

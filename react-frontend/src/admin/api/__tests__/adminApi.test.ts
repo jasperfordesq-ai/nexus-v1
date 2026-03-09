@@ -35,10 +35,10 @@ import { api } from '@/lib/api';
 describe('adminApi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (api.get as any).mockResolvedValue({ success: true, data: [] });
-    (api.post as any).mockResolvedValue({ success: true });
-    (api.put as any).mockResolvedValue({ success: true });
-    (api.delete as any).mockResolvedValue({ success: true });
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [] });
+    vi.mocked(api.post).mockResolvedValue({ success: true });
+    vi.mocked(api.put).mockResolvedValue({ success: true });
+    vi.mocked(api.delete).mockResolvedValue({ success: true });
   });
 
   // ─── Dashboard ─────────────────────────────────────────────────────────────

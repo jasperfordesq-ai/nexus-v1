@@ -7,7 +7,7 @@
  * CategorySelect - Dropdown for selecting a transaction category (W8)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { Select, SelectItem } from '@heroui/react';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -73,7 +73,7 @@ export function CategorySelect({
             {cat.color && (
               <div
                 className="w-3 h-3 rounded-full flex-shrink-0"
-                style={{ backgroundColor: cat.color }}
+                style={{ '--category-color': cat.color, backgroundColor: 'var(--category-color)' } as CSSProperties}
               />
             )}
             <span>{cat.name}</span>

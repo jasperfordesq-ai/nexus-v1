@@ -36,7 +36,7 @@ const variantClasses: Record<string, string> = {
   default: '',
   primary: 'glass-button-primary',
   accent: 'glass-button-accent',
-  ghost: 'glass-button-ghost',
+  ghost: 'glass-button-ghost !backdrop-blur',
 };
 
 /**
@@ -61,6 +61,7 @@ export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
   ) => {
     const combinedClassName = [
       'glass-button',
+      'backdrop-blur-lg',
       sizeClasses[size],
       variantClasses[variant],
       fullWidth ? 'w-full' : '',

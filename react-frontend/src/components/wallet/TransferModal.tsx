@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Textarea, Avatar, Spinner } from '@heroui/react';
@@ -48,6 +49,7 @@ export function TransferModal({
   onTransferComplete,
   initialRecipientId,
 }: TransferModalProps) {
+  const { t } = useTranslation('wallet');
   // Form state
   const [formData, setFormData] = useState<TransferFormData>({
     recipient: null,
@@ -396,7 +398,7 @@ export function TransferModal({
                       {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
                         <div className="absolute top-full left-0 right-0 mt-2 bg-content1 border border-theme-default rounded-lg p-4 text-center z-50">
                           <User className="w-8 h-8 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-                          <p className="text-theme-muted text-sm">No members found</p>
+                          <p className="text-theme-muted text-sm">{t('no_members_found', 'No members found')}</p>
                         </div>
                       )}
                     </div>

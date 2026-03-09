@@ -9,8 +9,7 @@
    ───────────────────────────────────────────── */
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  /* backdrop-blur-lg (16px = var(--glass-blur)) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   transition: all var(--transition-slow);
@@ -20,8 +19,7 @@
 
 .glass-card-hover {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  /* backdrop-blur-lg (16px = var(--glass-blur)) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   transition: all var(--transition-slow);
@@ -44,8 +42,7 @@
   justify-content: center;
   gap: 8px;
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  /* backdrop-blur-lg (16px = var(--glass-blur)) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   color: var(--foreground);
@@ -100,8 +97,7 @@
 
 .glass-button-ghost {
   background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* backdrop-blur (8px) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
   color: var(--text-primary);
 }
@@ -132,8 +128,7 @@
 .glass-input {
   width: 100%;
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  /* backdrop-blur-lg (16px = var(--glass-blur)) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   color: var(--foreground);
@@ -175,15 +170,13 @@
    ───────────────────────────────────────────── */
 .glass-surface {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  /* backdrop-blur-lg (16px = var(--glass-blur)) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border);
 }
 
 .glass-surface-strong {
   background: var(--glass-bg-hover);
-  backdrop-filter: blur(20px) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(20px) saturate(var(--glass-saturate));
+  /* backdrop-blur-xl (24px ~ 20px) applied via Tailwind utility on each element */
   border: 1px solid var(--glass-border-hover);
 }
 

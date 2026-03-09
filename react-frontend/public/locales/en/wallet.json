@@ -58,5 +58,6 @@
   "error": {
     "load_balance": "Failed to load wallet balance",
     "load_wallet": "Failed to load wallet data. Please try again."
-  }
+  },
+  "no_members_found": "No members found"
 }

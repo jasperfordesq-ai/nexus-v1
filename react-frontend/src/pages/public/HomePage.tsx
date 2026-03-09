@@ -188,7 +188,7 @@ export function HomePage() {
           >
             {/* Badge */}
             <motion.div variants={fadeInUp} className="mb-6">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm text-theme-muted">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card backdrop-blur-lg text-sm text-theme-muted">
                 <span className="text-indigo-500 dark:text-indigo-400">✨</span>
                 <span>{t('home.badge')}</span>
               </span>
@@ -262,7 +262,7 @@ export function HomePage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-center gap-3 p-4 rounded-2xl glass-card"
+                  className="flex items-center gap-3 p-4 rounded-2xl glass-card backdrop-blur-lg"
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
                     <feature.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
@@ -392,7 +392,7 @@ export function HomePage() {
                 transition={{ delay: index * 0.1 }}
                 className="relative group"
               >
-                <div className="p-5 sm:p-8 rounded-2xl glass-card-hover">
+                <div className="p-5 sm:p-8 rounded-2xl glass-card-hover backdrop-blur-lg">
                   <div
                     className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-6`}
                     aria-hidden="true"

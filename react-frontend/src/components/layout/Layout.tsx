@@ -10,6 +10,7 @@
 
 import { useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
 import { MobileTabBar } from './MobileTabBar';
@@ -46,6 +47,7 @@ export function Layout({
   showNavbar = true,
   withNavbarPadding = true,
 }: LayoutProps) {
+  const { t } = useTranslation('common');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -63,6 +65,14 @@ export function Layout({
 
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">
+      {/* Skip navigation — visible on focus only */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:shadow-lg"
+      >
+        {t('accessibility.skip_to_content', 'Skip to main content')}
+      </a>
+
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="blob blob-indigo" />

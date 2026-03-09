@@ -15,7 +15,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@heroui/react';
+import { Input, Avatar, Badge, Button, Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab, Skeleton } from '@heroui/react';
 import { Search, MessageSquare, Circle, Plus, Loader2, Archive, RotateCcw, AlertTriangle, ArrowRightLeft, RefreshCw } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -524,14 +524,20 @@ export function MessagesPage() {
             </Button>
           </GlassCard>
         ) : isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-3" aria-label="Loading conversations" aria-busy="true">
             {[1, 2, 3, 4, 5].map((i) => (
-              <GlassCard key={i} className="p-4 animate-pulse">
+              <GlassCard key={i} className="p-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-theme-hover" />
-                  <div className="flex-1">
-                    <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />
-                    <div className="h-3 bg-theme-hover rounded w-2/3" />
+                  <Skeleton className="w-12 h-12 rounded-full">
+                    <div className="w-12 h-12 rounded-full bg-default-300" />
+                  </Skeleton>
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="rounded-lg w-1/3">
+                      <div className="h-4 rounded-lg bg-default-300" />
+                    </Skeleton>
+                    <Skeleton className="rounded-lg w-2/3">
+                      <div className="h-3 rounded-lg bg-default-200" />
+                    </Skeleton>
                   </div>
                 </div>
               </GlassCard>
@@ -569,14 +575,20 @@ export function MessagesPage() {
       ) : (
         // Archived view
         isLoadingArchived ? (
-          <div className="space-y-3">
+          <div className="space-y-3" aria-label="Loading archived conversations" aria-busy="true">
             {[1, 2, 3].map((i) => (
-              <GlassCard key={i} className="p-4 animate-pulse">
+              <GlassCard key={i} className="p-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-theme-hover" />
-                  <div className="flex-1">
-                    <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />
-                    <div className="h-3 bg-theme-hover rounded w-2/3" />
+                  <Skeleton className="w-12 h-12 rounded-full">
+                    <div className="w-12 h-12 rounded-full bg-default-300" />
+                  </Skeleton>
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="rounded-lg w-1/3">
+                      <div className="h-4 rounded-lg bg-default-300" />
+                    </Skeleton>
+                    <Skeleton className="rounded-lg w-2/3">
+                      <div className="h-3 rounded-lg bg-default-200" />
+                    </Skeleton>
                   </div>
                 </div>
               </GlassCard>

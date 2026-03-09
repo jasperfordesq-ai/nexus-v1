@@ -332,6 +332,7 @@ export function BlogPostPage() {
               src={imageUrl}
               alt={post.title}
               className="w-full max-h-48 sm:max-h-96 object-cover"
+              loading="lazy"
             />
           </motion.div>
         )}

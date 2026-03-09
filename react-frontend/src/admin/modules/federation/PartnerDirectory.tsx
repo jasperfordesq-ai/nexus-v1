@@ -336,6 +336,7 @@ export function PartnerDirectory() {
                         src={community.logo_url}
                         alt={community.name}
                         className="w-12 h-12 rounded-lg object-cover shrink-0"
+                        loading="lazy"
                       />
                     ) : (
                       <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">

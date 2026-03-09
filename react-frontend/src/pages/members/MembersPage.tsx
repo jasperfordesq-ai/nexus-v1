@@ -382,7 +382,7 @@ export function MembersPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'}>
+            <div className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-3'} aria-label="Loading members" aria-busy="true">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <MemberCardSkeleton key={i} />
               ))}

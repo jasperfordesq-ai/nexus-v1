@@ -27,7 +27,7 @@ import {
   AlertTriangle,
   RefreshCw,
 } from 'lucide-react';
-import { GlassCard, AlgorithmLabel } from '@/components/ui';
+import { GlassCard, AlgorithmLabel, ListingSkeleton } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
@@ -308,13 +308,13 @@ export function ListingsPage() {
 
       {/* Listings Grid/List */}
       {isLoading && listings.length === 0 ? (
-        <div className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
+        <div
+          className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
+          aria-label="Loading listings"
+          aria-busy="true"
+        >
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <GlassCard key={i} className="p-6 animate-pulse">
-              <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-full mb-2" />
-              <div className="h-3 bg-theme-hover rounded w-2/3" />
-            </GlassCard>
+            <ListingSkeleton key={i} />
           ))}
         </div>
       ) : loadError ? (

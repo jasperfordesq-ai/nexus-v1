@@ -36,6 +36,7 @@ import {
   DropdownMenu,
   DropdownItem,
   useDisclosure,
+  Skeleton,
 } from '@heroui/react';
 import {
   Target,
@@ -539,13 +540,23 @@ export function GoalsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-4" aria-label="Loading goals" aria-busy="true">
               {[1, 2, 3].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-full mb-3" />
-                  <div className="h-2 bg-theme-hover rounded w-full mb-2" />
-                  <div className="h-3 bg-theme-hover rounded w-1/4" />
+                <GlassCard key={i} className="p-5">
+                  <div className="space-y-3">
+                    <Skeleton className="rounded-lg w-1/3">
+                      <div className="h-5 rounded-lg bg-default-300" />
+                    </Skeleton>
+                    <Skeleton className="rounded-lg w-full">
+                      <div className="h-3 rounded-lg bg-default-200" />
+                    </Skeleton>
+                    <Skeleton className="rounded-lg w-full">
+                      <div className="h-2 rounded-lg bg-default-200" />
+                    </Skeleton>
+                    <Skeleton className="rounded-lg w-1/4">
+                      <div className="h-3 rounded-lg bg-default-200" />
+                    </Skeleton>
+                  </div>
                 </GlassCard>
               ))}
             </div>

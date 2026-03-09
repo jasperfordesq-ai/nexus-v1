@@ -1756,6 +1756,7 @@ function MessageBubble({
                           src={attachment.url}
                           alt={attachment.name}
                           className="max-w-[200px] max-h-[200px] rounded-lg object-cover hover:opacity-90 transition-opacity"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="flex items-center gap-2 px-3 py-2 bg-black/10 dark:bg-white/10 rounded-lg hover:bg-black/20 dark:hover:bg-white/20 transition-colors">

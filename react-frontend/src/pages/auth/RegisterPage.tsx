@@ -496,7 +496,7 @@ export function RegisterPage() {
                 isRequired
                 classNames={{
                   inputWrapper:
-                    'glass-card border-glass-border hover:border-glass-border-hover',
+                    'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
@@ -531,7 +531,7 @@ export function RegisterPage() {
                 description={inviteCodeValid !== false ? t('register.invite_code_description', { defaultValue: 'You need an invite code from a community administrator to register' }) : undefined}
                 classNames={{
                   inputWrapper:
-                    'glass-card border-glass-border hover:border-glass-border-hover',
+                    'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle uppercase tracking-widest',
                   description: 'text-theme-subtle text-xs',
@@ -556,7 +556,7 @@ export function RegisterPage() {
                 autoComplete="given-name"
                 classNames={{
                   inputWrapper:
-                    'glass-card border-glass-border hover:border-glass-border-hover',
+                    'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
@@ -575,7 +575,7 @@ export function RegisterPage() {
                 }
                 classNames={{
                   inputWrapper:
-                    'glass-card border-glass-border hover:border-glass-border-hover',
+                    'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
                   description: 'text-theme-subtle text-xs',
@@ -600,7 +600,7 @@ export function RegisterPage() {
                 setLongitude(undefined);
               }}
               classNames={{
-                inputWrapper: 'glass-card border-glass-border hover:border-glass-border-hover',
+                inputWrapper: 'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
               }}
@@ -620,7 +620,7 @@ export function RegisterPage() {
               description={phoneError ? undefined : t('register.phone_admin_note')}
               classNames={{
                 inputWrapper:
-                  'glass-card border-glass-border hover:border-glass-border-hover',
+                  'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
                 description: 'text-theme-subtle text-xs',
@@ -644,7 +644,7 @@ export function RegisterPage() {
               autoComplete="email"
               classNames={{
                 inputWrapper:
-                  'glass-card border-glass-border hover:border-glass-border-hover',
+                  'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
               }}
@@ -679,7 +679,7 @@ export function RegisterPage() {
                 autoComplete="new-password"
                 classNames={{
                   inputWrapper:
-                    'glass-card border-glass-border hover:border-glass-border-hover',
+                    'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
                 }}
@@ -742,7 +742,7 @@ export function RegisterPage() {
               }
               classNames={{
                 inputWrapper:
-                  'glass-card border-glass-border hover:border-glass-border-hover',
+                  'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
               }}

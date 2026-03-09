@@ -19,8 +19,8 @@ const mockUseAuth = vi.fn();
 const mockUseTenant = vi.fn();
 
 vi.mock('@/contexts', () => ({
-  useAuth: (...args: any[]) => mockUseAuth(...args),
-  useTenant: (...args: any[]) => mockUseTenant(...args),
+  useAuth: () => mockUseAuth(),
+  useTenant: () => mockUseTenant(),
 }));
 
 import { AdminRoute } from '../AdminRoute';

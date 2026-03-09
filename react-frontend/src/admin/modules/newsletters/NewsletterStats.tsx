@@ -10,7 +10,7 @@
  * A/B test results, timeline, top links, recent activity, and quick actions.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton,
@@ -563,7 +563,7 @@ export function NewsletterStats() {
                   const pct = deviceTotal > 0 ? Math.round((count / deviceTotal) * 100) : 0;
                   return (
                     <div key={device} className="flex items-center gap-2 text-sm">
-                      <Icon size={14} style={{ color: DEVICE_COLORS[device] }} />
+                      <Icon size={14} style={{ '--device-color': DEVICE_COLORS[device], color: 'var(--device-color)' } as CSSProperties} />
                       <span className="capitalize text-default-600">{device}</span>
                       <span className="ml-auto font-semibold">{pct}%</span>
                     </div>
