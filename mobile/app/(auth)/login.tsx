@@ -4,6 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   View,
   Text,
@@ -23,35 +26,43 @@ import { ApiResponseError } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 export default function LoginScreen() {
-  const { login } = useAuth();
+  const { login: authLogin } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = makeStyles(theme);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  });
+
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
-  async function handleLogin() {
-    if (!email.trim() || !password) {
-      setError('Please enter your email and password.');
-      return;
-    }
-
+  async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
-    setError(null);
+    setGlobalError(null);
 
     try {
-      await login({ email: email.trim().toLowerCase(), password });
+      await authLogin({ email: data.email.trim().toLowerCase(), password: data.password });
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // AuthContext.login() handles the router.replace('/(tabs)/home') redirect
     } catch (err) {
       if (err instanceof ApiResponseError) {
-        setError(err.message);
+        setGlobalError(err.message);
       } else {
-        setError('Unable to sign in. Please try again.');
+        setGlobalError('Unable to sign in. Please try again.');
       }
     } finally {
       setIsLoading(false);
@@ -77,41 +88,61 @@ export default function LoginScreen() {
         </View>
 
         {/* Error banner */}
-        {error && (
+        {globalError && (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>{error}</Text>
+            <Text style={styles.errorText}>{globalError}</Text>
           </View>
         )}
 
         {/* Form */}
         <View style={styles.form}>
           <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            returnKeyType="next"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <>
+                <TextInput
+                  style={[styles.input, errors.email && styles.inputError]}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="you@example.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  returnKeyType="next"
+                />
+                {errors.email && <Text style={styles.fieldError}>{errors.email.message}</Text>}
+              </>
+            )}
           />
 
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="••••••••"
-            secureTextEntry
-            autoComplete="password"
-            returnKeyType="done"
-            onSubmitEditing={handleLogin}
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <>
+                <TextInput
+                  style={[styles.input, errors.password && styles.inputError]}
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="••••••••"
+                  secureTextEntry
+                  autoComplete="password"
+                  returnKeyType="done"
+                  onSubmitEditing={handleSubmit(onSubmit)}
+                />
+                {errors.password && <Text style={styles.fieldError}>{errors.password.message}</Text>}
+              </>
+            )}
           />
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: primary }, isLoading && styles.buttonDisabled]}
-            onPress={handleLogin}
+            onPress={handleSubmit(onSubmit)}
             disabled={isLoading}
             activeOpacity={0.8}
           >
@@ -182,6 +213,15 @@ function makeStyles(theme: Theme) {
       fontSize: 16,
       color: theme.text,
       backgroundColor: '#FAFAFA',
+    },
+    inputError: {
+      borderColor: theme.error,
+    },
+    fieldError: {
+      color: theme.error,
+      fontSize: 12,
+      marginTop: 4,
+      marginLeft: 4,
     },
     button: {
       borderRadius: 10,
