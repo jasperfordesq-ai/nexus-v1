@@ -137,7 +137,7 @@ class GroupPermissionManager
      */
     public static function hasPermission($userId, $permission)
     {
-        $user = User::find($userId);
+        $user = User::findById($userId);
         if (!$user) {
             return false;
         }
@@ -240,7 +240,7 @@ class GroupPermissionManager
      */
     public static function isGlobalAdmin($userId)
     {
-        $user = User::find($userId);
+        $user = User::findById($userId);
         if (!$user) {
             return false;
         }
@@ -451,7 +451,7 @@ class GroupPermissionManager
      */
     public static function getUserPermissions($userId)
     {
-        $user = User::find($userId);
+        $user = User::findById($userId);
         $userRole = $user['role'] ?? 'user';
 
         $permissions = self::$rolePermissions[$userRole] ?? [];

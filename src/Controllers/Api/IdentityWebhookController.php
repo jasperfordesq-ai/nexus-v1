@@ -43,7 +43,7 @@ class IdentityWebhookController extends BaseApiController
         // Extract provider slug from URL
         $providerSlug = $this->getRouteParam('provider_slug');
         if (!$providerSlug || !IdentityProviderRegistry::has($providerSlug)) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Unknown identity provider', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Unknown identity provider', null, 404);
         }
 
         $provider = IdentityProviderRegistry::get($providerSlug);

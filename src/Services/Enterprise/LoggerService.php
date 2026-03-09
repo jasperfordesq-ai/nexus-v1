@@ -287,8 +287,8 @@ class LoggerService
         }
 
         // Try Auth class if available
-        if (class_exists('\\Nexus\\Core\\Auth') && method_exists('\\Nexus\\Core\\Auth', 'getCurrentUserId')) {
-            return \Nexus\Core\Auth::getCurrentUserId();
+        if (class_exists('\\Nexus\\Core\\Auth') && method_exists('\\Nexus\\Core\\Auth', 'id')) {
+            return \Nexus\Core\Auth::id();
         }
 
         return null;

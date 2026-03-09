@@ -253,8 +253,8 @@ class FederationCreditService
             return ['success' => false, 'errors' => self::$errors];
         }
 
+        $db = Database::getConnection();
         try {
-            $db = Database::getConnection();
             $db->beginTransaction();
 
             // Create transfer record

@@ -94,7 +94,7 @@ class MaintenanceModeMiddleware
         if (preg_match('/Bearer\s+(.+)/i', $authHeader, $matches)) {
             try {
                 $token = $matches[1];
-                $payload = TokenService::verifyAccessToken($token);
+                $payload = TokenService::validateToken($token);
 
                 if ($payload && isset($payload['user_id'])) {
                     $userId = $payload['user_id'];

@@ -582,7 +582,7 @@ class EventService
      * @param int $eventId
      * @param int $userId
      * @param string $status 'going', 'interested', 'not_going'
-     * @return array ['success' => bool, 'waitlisted' => bool]
+     * @return bool
      */
     public static function rsvp(int $eventId, int $userId, string $status): bool
     {

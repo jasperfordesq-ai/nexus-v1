@@ -194,7 +194,7 @@ class MessageController
         }
 
         $userId = $_SESSION['user_id'];
-        $tenantId = TenantContext::getTenantId();
+        $tenantId = TenantContext::getId();
 
         // 2026-01-17: Removed abandoned mobile app redirect
         // All devices now use the responsive messages page with modal

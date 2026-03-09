@@ -343,7 +343,7 @@ class AdminToolsApiController extends BaseApiController
         $start = microtime(true);
         try {
             // Verify TokenService can generate a token (basic functionality check)
-            $testToken = TokenService::generateAccessToken(0, 'test', $tenantId);
+            $testToken = TokenService::generateToken(0, (int)$tenantId);
             $tests[] = [
                 'name' => 'API Auth (Token Service)',
                 'status' => !empty($testToken) ? 'pass' : 'fail',

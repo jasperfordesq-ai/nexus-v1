@@ -117,7 +117,7 @@ class ListingExpiryService
 
         foreach ($tenants as $tenant) {
             try {
-                TenantContext::setId((int)$tenant['id']);
+                TenantContext::setById((int)$tenant['id']);
                 $result = self::processExpiredListings();
                 $totalExpired += $result['expired'];
                 $totalErrors += $result['errors'];

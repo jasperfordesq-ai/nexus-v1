@@ -356,7 +356,7 @@ class SeoController
         $this->checkAdmin();
         Csrf::verifyOrDie();
 
-        $sitemapUrl = TenantContext::getBaseUrl() . '/sitemap.xml';
+        $sitemapUrl = TenantContext::getFrontendUrl() . '/sitemap.xml';
         $results = [];
 
         // Ping Google

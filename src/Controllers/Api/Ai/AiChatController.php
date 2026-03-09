@@ -944,7 +944,7 @@ class AiChatController extends BaseAiController
                 }
 
                 if ($description) {
-                    $context .= "  _$description_\n";
+                    $context .= "  _{$description}_\n";
                 }
                 $context .= "\n";
             }

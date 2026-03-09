@@ -116,7 +116,7 @@ class LegalDocumentsController
     public function store(): void
     {
         $this->checkAdmin();
-        Csrf::validate($_POST['csrf_token'] ?? '');
+        Csrf::verifyOrDie();
 
         $data = [
             'document_type' => $_POST['document_type'] ?? '',
@@ -176,7 +176,7 @@ class LegalDocumentsController
     public function update(int $id): void
     {
         $this->checkAdmin();
-        Csrf::validate($_POST['csrf_token'] ?? '');
+        Csrf::verifyOrDie();
 
         $document = LegalDocumentService::getById($id);
         if (!$document || $document['tenant_id'] !== TenantContext::getId()) {
@@ -243,7 +243,7 @@ class LegalDocumentsController
     public function storeVersion(int $documentId): void
     {
         $this->checkAdmin();
-        Csrf::validate($_POST['csrf_token'] ?? '');
+        Csrf::verifyOrDie();
 
         $document = LegalDocumentService::getById($documentId);
         if (!$document || $document['tenant_id'] !== TenantContext::getId()) {
@@ -322,7 +322,7 @@ class LegalDocumentsController
     public function updateVersion(int $documentId, int $versionId): void
     {
         $this->checkAdmin();
-        Csrf::validate($_POST['csrf_token'] ?? '');
+        Csrf::verifyOrDie();
 
         $version = LegalDocumentService::getVersion($versionId);
         if (!$version || $version['document_id'] !== $documentId) {
@@ -387,7 +387,7 @@ class LegalDocumentsController
     public function publishVersion(int $documentId, int $versionId): void
     {
         $this->checkAdmin();
-        Csrf::validate($_POST['csrf_token'] ?? '');
+        Csrf::verifyOrDie();
 
         $version = LegalDocumentService::getVersion($versionId);
         if (!$version || $version['document_id'] !== $documentId) {
@@ -414,7 +414,7 @@ class LegalDocumentsController
     public function deleteVersion(int $documentId, int $versionId): void
     {
         $this->checkAdmin();
-        Csrf::validate($_POST['csrf_token'] ?? '');
+        Csrf::verifyOrDie();
 
         $version = LegalDocumentService::getVersion($versionId);
         if (!$version || $version['document_id'] !== $documentId) {
@@ -447,7 +447,7 @@ class LegalDocumentsController
     public function notifyUsers(int $documentId, int $versionId): void
     {
         $this->checkAdmin();
-        Csrf::validate($_POST['csrf_token'] ?? '');
+        Csrf::verifyOrDie();
 
         $document = LegalDocumentService::getById($documentId);
         $version = LegalDocumentService::getVersion($versionId);

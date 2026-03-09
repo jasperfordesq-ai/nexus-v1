@@ -157,9 +157,8 @@ class RegistrationPolicyApiController extends BaseApiController
      */
     public function getVerificationStatus(): void
     {
-        $user = $this->requireAuth();
-        $tenantId = (int) $user['tenant_id'];
-        $userId = (int) $user['id'];
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
 
         $status = RegistrationOrchestrationService::getRegistrationStatus($userId, $tenantId);
         $this->respondWithData($status);
@@ -174,9 +173,8 @@ class RegistrationPolicyApiController extends BaseApiController
     public function startVerification(): void
     {
         // Rate limit: 5 verification starts per user per hour
-        $user = $this->requireAuth();
-        $tenantId = (int) $user['tenant_id'];
-        $userId = (int) $user['id'];
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
 
         if (\Nexus\Services\RateLimitService::check("verify:start:$userId", 5, 3600)) {
             header('Retry-After: 3600');
@@ -206,7 +204,7 @@ class RegistrationPolicyApiController extends BaseApiController
      */
     public function adminApproveVerification(): void
     {
-        $admin = $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $sessionId = (int) $this->getRouteParam('id');
 
@@ -218,7 +216,7 @@ class RegistrationPolicyApiController extends BaseApiController
         try {
             $result = RegistrationOrchestrationService::adminReview(
                 $sessionId,
-                (int) $admin['id'],
+                $adminId,
                 'approve'
             );
             $this->respondWithData($result);
@@ -239,7 +237,7 @@ class RegistrationPolicyApiController extends BaseApiController
      */
     public function adminRejectVerification(): void
     {
-        $admin = $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $sessionId = (int) $this->getRouteParam('id');
 
@@ -251,7 +249,7 @@ class RegistrationPolicyApiController extends BaseApiController
         try {
             $result = RegistrationOrchestrationService::adminReview(
                 $sessionId,
-                (int) $admin['id'],
+                $adminId,
                 'reject'
             );
             $this->respondWithData($result);
@@ -307,7 +305,7 @@ class RegistrationPolicyApiController extends BaseApiController
         $slug = $this->getRouteParam('slug');
 
         if (!$slug || !IdentityProviderRegistry::has($slug)) {
-            $this->respondWithError(\Nexus\Core\ApiErrorCodes::NOT_FOUND, 'Unknown provider', null, 404);
+            $this->respondWithError(\Nexus\Core\ApiErrorCodes::RESOURCE_NOT_FOUND, 'Unknown provider', null, 404);
             return;
         }
 
@@ -343,7 +341,7 @@ class RegistrationPolicyApiController extends BaseApiController
         $slug = $this->getRouteParam('slug');
 
         if (!$slug || !IdentityProviderRegistry::has($slug)) {
-            $this->respondWithError(\Nexus\Core\ApiErrorCodes::NOT_FOUND, 'Unknown provider', null, 404);
+            $this->respondWithError(\Nexus\Core\ApiErrorCodes::RESOURCE_NOT_FOUND, 'Unknown provider', null, 404);
             return;
         }
 
@@ -380,7 +378,7 @@ class RegistrationPolicyApiController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
-        $adminId = (int) $this->requireAuth()['id'];
+        $adminId = $this->requireAuth();
         $input = $this->getAllInput();
 
         $count = max(1, min((int) ($input['count'] ?? 1), 100));
@@ -413,7 +411,7 @@ class RegistrationPolicyApiController extends BaseApiController
 
         $success = InviteCodeService::deactivate($tenantId, $codeId);
         if (!$success) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Invite code not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Invite code not found', null, 404);
         }
 
         $this->respondWithData(['deactivated' => true]);

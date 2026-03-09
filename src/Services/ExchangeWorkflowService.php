@@ -217,7 +217,7 @@ class ExchangeWorkflowService
      * @param string $notes Approval notes
      * @return bool Success
      */
-    public static function approveExchange(int $exchangeId, int $brokerId, string $notes = ''): bool
+    public static function approveExchange(int $exchangeId, int $brokerId, string $notes = '', string $conditions = ''): bool
     {
         $exchange = self::getExchange($exchangeId);
 
