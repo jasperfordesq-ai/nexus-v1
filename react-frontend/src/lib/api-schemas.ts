@@ -221,3 +221,190 @@ export const transactionSchema = z.object({
   description: z.string(),
   created_at: z.string(),
 }).passthrough();
+
+/**
+ * Validates a time-credit transfer response.
+ * Returned by POST /api/v2/wallet/transfer.
+ */
+export const transferResponseSchema = z.object({
+  transaction_id: z.number(),
+  amount: z.number(),
+  new_balance: z.number(),
+  recipient: z.object({
+    id: z.number(),
+    first_name: z.string(),
+    last_name: z.string(),
+  }).passthrough(),
+  message: z.string(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Event Schemas
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates an Event object.
+ * Covers the essential required fields returned by GET /api/v2/events and
+ * GET /api/v2/events/:id.
+ */
+export const eventSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string(),
+  start_date: z.string(),
+  is_online: z.boolean(),
+  organizer: z.object({
+    id: z.number(),
+    first_name: z.string(),
+    last_name: z.string(),
+  }).passthrough(),
+  attendees_count: z.number(),
+  created_at: z.string(),
+}).passthrough();
+
+/**
+ * Validates an RSVP response.
+ * Returned by POST /api/v2/events/:id/rsvp.
+ */
+export const rsvpResponseSchema = z.object({
+  status: z.enum(['attending', 'maybe', 'not_attending', 'waitlisted']),
+  rsvp_counts: z.object({
+    going: z.number(),
+    interested: z.number(),
+  }),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Group Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates a Group object.
+ * Covers the essential required fields returned by GET /api/v2/groups and
+ * GET /api/v2/groups/:id.
+ */
+export const groupSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  visibility: z.enum(['public', 'private', 'secret']),
+  members_count: z.number(),
+  created_at: z.string(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Feed Post Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates a FeedPost object.
+ * Returned by GET /api/v2/feed.
+ */
+export const feedPostSchema = z.object({
+  id: z.number(),
+  user_id: z.number(),
+  content: z.string(),
+  likes_count: z.number(),
+  comments_count: z.number(),
+  author: z.object({
+    id: z.number(),
+    name: z.string(),
+  }).passthrough(),
+  created_at: z.string(),
+  updated_at: z.string(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Messaging Schemas
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates a Message object.
+ * The primary field from the backend is `body`; `content` is a deprecated alias.
+ */
+export const messageSchema = z.object({
+  id: z.number(),
+  body: z.string(),
+  sender_id: z.number(),
+  created_at: z.string(),
+}).passthrough();
+
+/**
+ * Validates a Conversation object.
+ * Returned by GET /api/v2/conversations.
+ */
+export const conversationSchema = z.object({
+  id: z.number(),
+  other_user: z.object({
+    id: z.number(),
+    name: z.string(),
+  }).passthrough(),
+  unread_count: z.number(),
+}).passthrough();
+
+/**
+ * Validates the unread message count response.
+ * Returned by GET /api/v2/messages/unread-count.
+ */
+export const unreadCountSchema = z.object({
+  count: z.number(),
+  conversations_with_unread: z.number(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Exchange Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates an Exchange object.
+ * Returned by GET /api/v2/exchanges and GET /api/v2/exchanges/:id.
+ */
+export const exchangeSchema = z.object({
+  id: z.number(),
+  listing_id: z.number(),
+  requester_id: z.number(),
+  provider_id: z.number(),
+  proposed_hours: z.number(),
+  status: z.enum([
+    'pending_provider',
+    'pending_broker',
+    'accepted',
+    'in_progress',
+    'pending_confirmation',
+    'completed',
+    'disputed',
+    'cancelled',
+  ]),
+  created_at: z.string(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notification Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates a Notification object.
+ * Returned by GET /api/v2/notifications.
+ */
+export const notificationSchema = z.object({
+  id: z.number(),
+  type: z.string(),
+  title: z.string(),
+  body: z.string(),
+  created_at: z.string(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Upload Response Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates an upload response.
+ * Returned by POST /api/v2/upload.
+ */
+export const uploadResponseSchema = z.object({
+  path: z.string(),
+  url: z.string(),
+  mime_type: z.string(),
+  size_bytes: z.number(),
+}).passthrough();

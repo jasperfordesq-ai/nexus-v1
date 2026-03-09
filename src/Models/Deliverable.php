@@ -271,7 +271,7 @@ class Deliverable
      * @param int $assignedBy User making the assignment
      * @return bool Success status
      */
-    public static function assign($id, $userId = null, $groupId = null, $assignedBy)
+    public static function assign($id, $assignedBy, $userId = null, $groupId = null)
     {
         $tenantId = TenantContext::getId();
         $oldState = self::findById($id);

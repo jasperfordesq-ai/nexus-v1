@@ -1477,7 +1477,7 @@ class AdminUsersApiController extends BaseApiController
             )->fetch();
 
             if (!$user) {
-                $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+                $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
                 return;
             }
 
@@ -1541,7 +1541,7 @@ class AdminUsersApiController extends BaseApiController
             )->fetch();
 
             if (!$user) {
-                $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'User not found', null, 404);
+                $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
                 return;
             }
 

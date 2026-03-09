@@ -1087,14 +1087,14 @@ function HoursTab() {
               )}
 
               {/* By Organization */}
-              {summary.by_organization.length > 0 && (
+              {(summary.by_organization ?? []).length > 0 && (
                 <GlassCard className="p-5">
                   <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-rose-400" aria-hidden="true" />
                     {t('volunteering.hours_by_organization')}
                   </h3>
                   <div className="space-y-3">
-                    {summary.by_organization.map((org, i) => (
+                    {(summary.by_organization ?? []).map((org, i) => (
                       <div key={i} className="flex items-center justify-between">
                         <span className="text-sm text-theme-muted">{org.name}</span>
                         <span className="text-sm font-medium text-theme-primary">{org.total}h</span>
@@ -1105,14 +1105,14 @@ function HoursTab() {
               )}
 
               {/* By Month */}
-              {summary.by_month.length > 0 && (
+              {(summary.by_month ?? []).length > 0 && (
                 <GlassCard className="p-5">
                   <h3 className="font-semibold text-theme-primary mb-4 flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-rose-400" aria-hidden="true" />
                     {t('volunteering.hours_by_month')}
                   </h3>
                   <div className="space-y-3">
-                    {summary.by_month.map((month, i) => (
+                    {(summary.by_month ?? []).map((month, i) => (
                       <div key={i} className="flex items-center justify-between">
                         <span className="text-sm text-theme-muted">
                           {new Date(month.month + '-01').toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}

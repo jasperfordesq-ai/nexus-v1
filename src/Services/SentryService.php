@@ -486,7 +486,7 @@ class SentryService
         try {
             $client = \Sentry\SentrySdk::getCurrentHub()->getClient();
             if ($client) {
-                return $client->flush($timeout);
+                $client->flush($timeout); return true;
             }
         } catch (\Throwable $e) {
             error_log('Sentry flush failed: ' . $e->getMessage());

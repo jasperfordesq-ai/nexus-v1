@@ -297,7 +297,7 @@ class OrgNotificationService
     /**
      * Notify user when they are made owner of a new organization (admin-created)
      */
-    public static function notifyOrganizationCreatedForYou($userId, $organizationId, $createdById = null)
+    public static function notifyOrganizationCreatedForYou($userId, $organizationId, $orgNameOverride = null, $createdById = null)
     {
         try {
             $user = User::findById($userId);

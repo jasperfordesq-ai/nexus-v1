@@ -26,7 +26,7 @@ class Review
     /**
      * Create a review (with optional group context)
      */
-    public static function create($reviewerId, $receiverId, $transactionId = null, $rating, $comment, $groupId = null)
+    public static function create($reviewerId, $receiverId, $rating, $comment, $transactionId = null, $groupId = null)
     {
         self::ensureGroupColumn();
 

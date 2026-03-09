@@ -15,6 +15,7 @@ use Nexus\Core\EmailTemplate;
 use Nexus\Core\Validator;
 use Nexus\Services\TokenService;
 use Nexus\Services\LegalDocumentService;
+use Nexus\Services\TenantSettingsService;
 
 /**
  * RegistrationApiController - V2 user registration endpoint

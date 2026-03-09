@@ -181,7 +181,7 @@ class FederationUserService
     /**
      * Check if user has opted into federation
      */
-    public static function hasOptedIn(int $userId): bool
+    public static function hasOptedIn(int $userId, ?int $tenantId = null): bool
     {
         try {
             $result = Database::query(

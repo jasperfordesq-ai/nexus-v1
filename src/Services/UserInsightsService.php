@@ -24,7 +24,7 @@ class UserInsightsService
      * @param int $userId
      * @return array
      */
-    public static function getInsights($userId)
+    public static function getInsights($userId, $months = null)
     {
         return [
             'summary' => self::getSummary($userId),
@@ -170,7 +170,7 @@ class UserInsightsService
      * @param int $userId
      * @return array
      */
-    public static function getPartnerStats($userId)
+    public static function getPartnerStats($userId, $months = null)
     {
         $tenantId = TenantContext::getId();
 
@@ -213,7 +213,7 @@ class UserInsightsService
      * @param int $limit
      * @return array
      */
-    public static function getTopPartners($userId, $limit = 10)
+    public static function getTopPartners($userId, $type = null, $limit = 10)
     {
         $tenantId = TenantContext::getId();
         $limit = (int) $limit;
@@ -254,7 +254,7 @@ class UserInsightsService
      * @param int $userId
      * @return array
      */
-    public static function getCategoryBreakdown($userId)
+    public static function getCategoryBreakdown($userId, $months = null)
     {
         $tenantId = TenantContext::getId();
 

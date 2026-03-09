@@ -144,6 +144,8 @@ class WebAuthnApiController extends BaseApiController
         $rpId = $this->getRpId();
         $rpName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
+        $data = null;
+        $webAuthn = null;
         try {
             $webAuthn = new WebAuthn($rpName, $rpId, ['none'], true);
 
@@ -332,6 +334,7 @@ class WebAuthnApiController extends BaseApiController
         $rpId = $this->getRpId();
         $rpName = TenantContext::get()['name'] ?? 'Project NEXUS';
 
+        $webAuthn = null;
         try {
             $webAuthn = new WebAuthn($rpName, $rpId, ['none'], true);
 
@@ -495,7 +498,7 @@ class WebAuthnApiController extends BaseApiController
         );
 
         if ($stmt->rowCount() === 0) {
-            $this->error('Credential not found', 404, ApiErrorCodes::NOT_FOUND);
+            $this->error('Credential not found', 404, ApiErrorCodes::RESOURCE_NOT_FOUND);
         }
 
         $this->jsonResponse(['success' => true, 'device_name' => $newName]);

@@ -59,7 +59,7 @@ class NotificationDispatcher
                 try {
                     $pushTitle = self::getPushTitle($activityType);
                     WebPushService::sendToUser($userId, $pushTitle, $content, $link);
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     error_log('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
                 }
                 break;
@@ -312,7 +312,7 @@ class NotificationDispatcher
     {
         // Get user info for the template
         $userId = $match['recipient_user_id'] ?? 0;
-        $user = $userId ? User::find($userId) : null;
+        $user = $userId ? User::findById($userId) : null;
         $userName = $user['name'] ?? $user['first_name'] ?? 'there';
 
         // Get tenant name
@@ -357,7 +357,7 @@ HTML;
     {
         // Get user info for the template
         $userId = $match['recipient_user_id'] ?? 0;
-        $user = $userId ? User::find($userId) : null;
+        $user = $userId ? User::findById($userId) : null;
         $userName = $user['name'] ?? $user['first_name'] ?? 'there';
 
         // Get tenant name

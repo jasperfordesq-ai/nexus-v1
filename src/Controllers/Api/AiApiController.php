@@ -705,7 +705,7 @@ class AiApiController extends BaseApiController
                 }
 
                 if ($description) {
-                    $context .= "  _$description_\n";
+                    $context .= "  _{$description}_\n";
                 }
                 $context .= "\n";
             }

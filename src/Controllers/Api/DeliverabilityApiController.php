@@ -270,7 +270,7 @@ class DeliverabilityApiController extends BaseApiController
             return $this->jsonResponse(['error' => 'user_id or group_id is required'], 400);
         }
 
-        $result = Deliverable::assign($id, $assignedUserId, $assignedGroupId, $userId);
+        $result = Deliverable::assign($id, $userId, $assignedUserId, $assignedGroupId);
 
         if (!$result) {
             return $this->jsonResponse(['error' => 'Failed to assign deliverable'], 500);

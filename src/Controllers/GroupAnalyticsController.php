@@ -10,7 +10,6 @@ use Nexus\Core\View;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\Group;
-use Nexus\Models\GroupMember;
 
 /**
  * GroupAnalyticsController
@@ -39,7 +38,12 @@ class GroupAnalyticsController
         // Check if user is owner/admin of group or site admin
         $isSiteAdmin = $this->isSiteAdmin($userId);
         $isGroupOwner = ($group['owner_id'] == $userId);
-        $isGroupAdmin = GroupMember::isAdmin($groupId, $userId);
+        // Check if user is a group admin via direct DB query
+        $groupMemberRow = Database::query(
+            "SELECT role FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'active'",
+            [$groupId, $userId]
+        )->fetch();
+        $isGroupAdmin = $groupMemberRow && in_array($groupMemberRow['role'], ['admin', 'moderator']);
 
         if (!$isSiteAdmin && !$isGroupOwner && !$isGroupAdmin) {
             $this->forbidden('You must be a group owner or admin to view analytics');
@@ -584,7 +588,7 @@ class GroupAnalyticsController
             )->fetchAll();
 
             foreach ($members as $member) {
-                $total = $member['post_count'] + $member['comment_count'];
+                $total = (int)$member['post_count'] + (int)$member['comment_count'];
 
                 if ($total >= 10) {
                     $distribution['very_active']++;
@@ -628,7 +632,11 @@ class GroupAnalyticsController
         // Check access
         $isSiteAdmin = $this->isSiteAdmin($userId);
         $isGroupOwner = ($group['owner_id'] == $userId);
-        $isGroupAdmin = GroupMember::isAdmin($groupId, $userId);
+        $groupMemberRow2 = Database::query(
+            "SELECT role FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'active'",
+            [$groupId, $userId]
+        )->fetch();
+        $isGroupAdmin = $groupMemberRow2 && in_array($groupMemberRow2['role'], ['admin', 'moderator']);
 
         if (!$isSiteAdmin && !$isGroupOwner && !$isGroupAdmin) {
             http_response_code(403);

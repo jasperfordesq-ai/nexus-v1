@@ -284,6 +284,8 @@ class BrokerControlsController
         $this->requireAdmin();
 
         $tenantId = TenantContext::getId();
+        $exchange = null;
+        $history = [];
 
         try {
             $exchange = Database::query(
@@ -560,6 +562,8 @@ class BrokerControlsController
         }
 
         // GET - show form
+        $listing = null;
+        $existingTag = null;
         try {
             $listing = Database::query(
                 "SELECT l.*, u.name as owner_name, c.name as category_name

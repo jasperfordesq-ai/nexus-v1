@@ -558,12 +558,8 @@ class WalletFeaturesApiController extends BaseApiController
     {
         $userId = $this->getUserId();
 
-        try {
-            if (!TenantContext::isTokenUserSuperAdmin() && !TenantContext::isTokenUserAdmin()) {
-                $this->error('Admin access required', 403);
-            }
-        } catch (\Exception $e) {
-            // Fallback: check user role directly
+        // Check user role directly
+        {
             $stmt = \Nexus\Core\Database::query(
                 "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
                 [$userId, TenantContext::getId()]

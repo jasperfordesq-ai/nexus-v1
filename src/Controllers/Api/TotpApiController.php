@@ -87,7 +87,7 @@ class TotpApiController extends BaseApiController
             }
 
             // Validate CSRF for session-based requests
-            if (!Csrf::validate($csrfToken)) {
+            if (!Csrf::verify($csrfToken)) {
                 $this->error(
                     'Invalid CSRF token',
                     403,

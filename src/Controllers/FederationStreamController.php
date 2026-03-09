@@ -39,7 +39,7 @@ class FederationStreamController
         $tenantId = TenantContext::getId();
 
         // Check if user is opted into federation
-        if (!FederationUserService::isUserOptedIn($userId, $tenantId)) {
+        if (!FederationUserService::hasOptedIn($userId, $tenantId)) {
             http_response_code(403);
             echo "data: " . json_encode(['error' => 'Not opted into federation']) . "\n\n";
             if (!defined('TESTING')) { exit; }

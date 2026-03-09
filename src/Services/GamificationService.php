@@ -14,6 +14,18 @@ use Nexus\Core\TenantContext;
 class GamificationService
 {
     /**
+     * Constructor - accepts optional PDO for backward compatibility.
+     * All methods in this service are static; the PDO parameter is ignored.
+     *
+     * @param mixed $db Unused — kept for call-site compatibility
+     */
+    public function __construct($db = null)
+    {
+        // All methods are static; $db is accepted but not used
+        ($db); // Acknowledge parameter to avoid unused warning
+    }
+
+    /**
      * Cache for badge definitions to avoid repeated array creation
      */
     private static $badgeDefinitionsCache = null;
@@ -677,6 +689,10 @@ class GamificationService
 
         $xpInLevel = $xp - $currentThreshold;
         $xpNeeded = $nextThreshold - $currentThreshold;
+
+        if ($xpNeeded <= 0) {
+            return 100;
+        }
 
         return min(100, round(($xpInLevel / $xpNeeded) * 100));
     }

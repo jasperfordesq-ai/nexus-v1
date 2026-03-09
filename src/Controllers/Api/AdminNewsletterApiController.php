@@ -2363,7 +2363,7 @@ class AdminNewsletterApiController extends BaseApiController
                 return;
             }
 
-            $tenantName = TenantContext::get('name') ?? 'Community';
+            $tenantName = TenantContext::get()['name'] ?? 'Community';
 
             $sampleRecipient = [
                 'email' => $admin['email'],
@@ -2381,7 +2381,7 @@ class AdminNewsletterApiController extends BaseApiController
 
             $subject = '[TEST] ' . ($newsletter['subject'] ?? 'No Subject');
 
-            $sent = \Nexus\Core\Mailer::send($admin['email'], $subject, $html);
+            $sent = (new \Nexus\Core\Mailer())->send($admin['email'], $subject, $html);
 
             if ($sent) {
                 $this->respondWithData([

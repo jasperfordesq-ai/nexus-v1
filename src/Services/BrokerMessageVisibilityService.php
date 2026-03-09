@@ -607,7 +607,7 @@ class BrokerMessageVisibilityService
 
         foreach ($byTenant as $tenantId => $users) {
             try {
-                TenantContext::setId($tenantId);
+                TenantContext::setById($tenantId);
                 $adminIds = self::getTenantBrokerAdminIds();
                 foreach ($users as $row) {
                     $userId = (int) $row['user_id'];

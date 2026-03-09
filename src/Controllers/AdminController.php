@@ -1001,7 +1001,7 @@ class AdminController
         header('Content-Type: application/json');
 
         try {
-            $cssDir = ROOT_DIR . '/httpdocs/assets/css';
+            $cssDir = dirname(__DIR__, 2) . '/httpdocs/assets/css';
             $results = [];
             $errors = [];
 

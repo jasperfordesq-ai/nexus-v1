@@ -65,7 +65,7 @@ class AdminDeliverabilityApiController extends BaseApiController
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         if (preg_match('/Bearer\s+(\S+)/', $authHeader, $m)) {
             try {
-                $payload = \Nexus\Services\TokenService::validateAccessToken($m[1]);
+                $payload = \Nexus\Services\TokenService::validateToken($m[1]);
                 return (int) ($payload['user_id'] ?? $payload['sub'] ?? 0) ?: null;
             } catch (\Exception $e) {
             }
