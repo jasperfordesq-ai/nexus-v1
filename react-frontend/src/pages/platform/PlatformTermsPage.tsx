@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { FileText } from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
   type PlatformLegalSection,
@@ -593,6 +594,7 @@ const crossLinks = [
 ];
 
 export function PlatformTermsPage() {
+  usePageTitle('Platform Terms of Service');
   return (
     <PlatformLegalPage
       title="Platform Terms of Service"

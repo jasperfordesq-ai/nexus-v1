@@ -11,6 +11,7 @@
  */
 
 import { Shield } from 'lucide-react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import {
   PlatformLegalPage,
   type PlatformLegalSection,
@@ -484,6 +485,7 @@ const sections: PlatformLegalSection[] = [
 ];
 
 export function PlatformPrivacyPage() {
+  usePageTitle('Platform Privacy Policy');
   return (
     <PlatformLegalPage
       title="Platform Privacy Policy"

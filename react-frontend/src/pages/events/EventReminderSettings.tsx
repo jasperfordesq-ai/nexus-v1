@@ -18,6 +18,7 @@ import { Button, Select, SelectItem, Switch, Skeleton } from '@heroui/react';
 import { Bell, Mail, Clock, Save, Smartphone, AlertCircle } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { EventReminderPreferences } from '@/types/api';
@@ -42,6 +43,7 @@ const defaultPreferences: EventReminderPreferences = {
 export function EventReminderSettings() {
   const { t } = useTranslation('events');
   const toast = useToast();
+  usePageTitle(t('reminder_settings', 'Event Reminder Settings'));
 
   const [preferences, setPreferences] = useState<EventReminderPreferences>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(true);
