@@ -391,12 +391,11 @@ class JobVacanciesApiController extends BaseApiController
 
         $result = JobVacancyService::getMyApplications($userId, $filters);
 
-        $this->respondWithCollection(
-            $result['items'],
-            $result['cursor'],
-            $filters['limit'],
-            $result['has_more']
-        );
+        $this->respondWithData([
+            'items'    => $result['items'],
+            'cursor'   => $result['cursor'],
+            'has_more' => $result['has_more'],
+        ]);
     }
 
     // =========================================================================
