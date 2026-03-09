@@ -121,7 +121,7 @@ class UserService
             $score = (new NexusScoreCacheService(Database::getConnection()))->getScore($userId, $tenantId);
             $profile['nexus_score'] = [
                 'total_score' => $score['total_score'] ?? 0,
-                'tier'        => $score['tier'] ?? 'newcomer',
+                'tier'        => $score['tier']['name'] ?? 'newcomer',
                 'percentile'  => $score['percentile'] ?? 0,
             ];
         } catch (\Throwable $e) {
