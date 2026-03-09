@@ -365,6 +365,7 @@ export default function LegalDocVersionList() {
                       size="sm"
                       variant="bordered"
                       isIconOnly
+                      aria-label="View full content"
                       onPress={() => {
                         setViewingVersion(version);
                         setShowViewModal(true);

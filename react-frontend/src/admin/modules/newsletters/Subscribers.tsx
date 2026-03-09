@@ -557,6 +557,7 @@ export function Subscribers() {
                             variant="light"
                             color="danger"
                             size="sm"
+                            aria-label="Remove subscriber"
                             onPress={() => setRemoveTarget(sub)}
                           >
                             <Trash2 size={14} />

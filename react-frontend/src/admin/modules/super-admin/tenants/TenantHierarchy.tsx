@@ -277,6 +277,7 @@ export function TenantHierarchy() {
             type="button"
             variant="light"
             isIconOnly
+            aria-label={isExpanded ? "Collapse" : "Expand"}
             onPress={() => toggleNode(node.id)}
             className="shrink-0 min-w-0 h-auto p-0"
             isDisabled={!hasChildren}

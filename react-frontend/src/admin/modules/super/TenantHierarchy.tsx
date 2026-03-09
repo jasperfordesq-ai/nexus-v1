@@ -48,6 +48,7 @@ function TreeNode({ node, depth, onNavigate }: TreeNodeProps) {
             isIconOnly
             size="sm"
             variant="light"
+            aria-label={expanded ? "Collapse" : "Expand"}
             onPress={() => setExpanded(!expanded)}
             className="shrink-0"
           >

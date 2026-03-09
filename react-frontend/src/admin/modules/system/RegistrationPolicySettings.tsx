@@ -582,7 +582,7 @@ export function RegistrationPolicySettings() {
                             size="sm"
                             description="Your provider's API key or secret key"
                             endContent={
-                              <Button isIconOnly size="sm" variant="light" onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, api_key: !visibility.api_key } }))}>
+                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.api_key ? "Hide API key" : "Show API key"} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, api_key: !visibility.api_key } }))}>
                                 {visibility.api_key ? <EyeOff size={14} /> : <Eye size={14} />}
                               </Button>
                             }
@@ -597,7 +597,7 @@ export function RegistrationPolicySettings() {
                             size="sm"
                             description="Used to verify incoming webhook payloads from the provider"
                             endContent={
-                              <Button isIconOnly size="sm" variant="light" onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
+                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.webhook_secret ? "Hide webhook secret" : "Show webhook secret"} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
                                 {visibility.webhook_secret ? <EyeOff size={14} /> : <Eye size={14} />}
                               </Button>
                             }
@@ -703,7 +703,7 @@ export function RegistrationPolicySettings() {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <code className="text-sm font-mono">{ic.code}</code>
-                            <Button isIconOnly size="sm" variant="light" onPress={() => copyToClipboard(ic.code)}>
+                            <Button isIconOnly size="sm" variant="light" aria-label="Copy invite code" onPress={() => copyToClipboard(ic.code)}>
                               <Copy size={12} />
                             </Button>
                           </div>
@@ -732,7 +732,7 @@ export function RegistrationPolicySettings() {
                         </TableCell>
                         <TableCell>
                           {ic.is_active ? (
-                            <Button isIconOnly size="sm" variant="light" color="danger" onPress={() => handleDeactivateCode(ic.id)}>
+                            <Button isIconOnly size="sm" variant="light" color="danger" aria-label="Deactivate invite code" onPress={() => handleDeactivateCode(ic.id)}>
                               <Trash2 size={14} />
                             </Button>
                           ) : null}
@@ -761,7 +761,7 @@ export function RegistrationPolicySettings() {
                     {generatedCodes.map((code) => (
                       <div key={code} className="flex items-center justify-between p-2 bg-default-100 rounded-lg">
                         <code className="font-mono text-sm">{code}</code>
-                        <Button isIconOnly size="sm" variant="light" onPress={() => copyToClipboard(code)}>
+                        <Button isIconOnly size="sm" variant="light" aria-label="Copy code" onPress={() => copyToClipboard(code)}>
                           <Copy size={14} />
                         </Button>
                       </div>

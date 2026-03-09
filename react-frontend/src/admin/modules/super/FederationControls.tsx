@@ -361,7 +361,7 @@ export function FederationControls() {
                     </Link>
                     {' '}<span className="text-xs text-default-400">(ID: {entry.tenant_id})</span>
                   </span>
-                  <Button size="sm" variant="light" color="danger" isIconOnly onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
+                  <Button size="sm" variant="light" color="danger" isIconOnly aria-label="Remove from whitelist" onPress={() => handleRemoveWhitelist(entry.tenant_id)}>
                     <Trash2 size={14} />
                   </Button>
                 </div>

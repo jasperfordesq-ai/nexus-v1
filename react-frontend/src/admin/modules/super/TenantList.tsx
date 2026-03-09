@@ -152,7 +152,7 @@ export function TenantList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light">
+          <Button isIconOnly size="sm" variant="light" aria-label="Tenant actions">
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>

@@ -216,7 +216,7 @@ export function AttributesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light">
+          <Button isIconOnly size="sm" variant="light" aria-label="Attribute actions">
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>

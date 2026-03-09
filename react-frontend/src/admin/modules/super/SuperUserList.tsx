@@ -161,7 +161,7 @@ export function SuperUserList() {
       key: 'actions', label: 'Actions',
       render: (user) => (
         <Dropdown>
-          <DropdownTrigger><Button isIconOnly size="sm" variant="light"><MoreVertical size={16} /></Button></DropdownTrigger>
+          <DropdownTrigger><Button isIconOnly size="sm" variant="light" aria-label="User actions"><MoreVertical size={16} /></Button></DropdownTrigger>
           <DropdownMenu aria-label="User actions" onAction={(key) => {
             if (key === 'view') navigate(tenantPath(`/admin/super/users/${user.id}`));
             else if (key === 'edit') navigate(tenantPath(`/admin/super/users/${user.id}/edit`));

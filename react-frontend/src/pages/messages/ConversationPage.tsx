@@ -1533,6 +1533,7 @@ export function ConversationPage() {
                 <Button
                   type="submit"
                   isIconOnly
+                  aria-label="Send message"
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
                   isLoading={isSending}
                 >
