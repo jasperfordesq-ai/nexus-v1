@@ -58,5 +58,6 @@
   "error": {
     "load_balance": "Theip ar luchtú iarmhéid an sparáin",
     "load_wallet": "Theip ar luchtú sonraí an sparáin. Bain triail eile as le do thoil."
-  }
+  },
+  "no_members_found": "Níor aimsíodh comhaltaí"
 }
