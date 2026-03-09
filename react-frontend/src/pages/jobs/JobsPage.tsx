@@ -40,6 +40,7 @@ import {
   BookmarkCheck,
   Bell,
   Star,
+  Edit,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -127,6 +128,8 @@ export function JobsPage() {
   const [activeTab, setActiveTab] = useState<string>(searchParams.get('tab') || 'browse');
   const [savedJobs, setSavedJobs] = useState<JobVacancy[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
+  const [myPostings, setMyPostings] = useState<JobVacancy[]>([]);
+  const [isLoadingMyPostings, setIsLoadingMyPostings] = useState(false);
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -223,6 +226,27 @@ export function JobsPage() {
       loadSaved();
     }
   }, [activeTab, isAuthenticated]);
+
+  // Load my postings
+  useEffect(() => {
+    if (activeTab === 'my-postings' && isAuthenticated) {
+      const loadMyPostings = async () => {
+        setIsLoadingMyPostings(true);
+        try {
+          const response = await api.get<JobVacancy[]>('/v2/jobs/my-postings');
+          if (response.success && response.data) {
+            setMyPostings(response.data);
+          }
+        } catch (err) {
+          logError('Failed to load my postings', err);
+        } finally {
+          setIsLoadingMyPostings(false);
+        }
+      };
+      loadMyPostings();
+    }
+  }, [activeTab, isAuthenticated]);
+
 
   // Update URL params
   useEffect(() => {
@@ -337,6 +361,15 @@ export function JobsPage() {
               <span className="flex items-center gap-2">
                 <Bookmark className="w-4 h-4" aria-hidden="true" />
                 {t('saved.title')}
+              </span>
+            }
+          />
+          <Tab
+            key="my-postings"
+            title={
+              <span className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4" aria-hidden="true" />
+                {t('my_postings.title', 'My Postings')}
               </span>
             }
           />
@@ -529,6 +562,64 @@ export function JobsPage() {
           )}
         </>
       )}
+
+      {/* My Postings tab content */}
+      {activeTab === 'my-postings' && (
+        <>
+          {/* CTA header */}
+          <div className="flex justify-end">
+            <Link to={tenantPath('/jobs/create')}>
+              <Button
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('create_vacancy')}
+              </Button>
+            </Link>
+          </div>
+          {isLoadingMyPostings ? (
+            <div className="space-y-4">
+              {[1, 2].map((i) => (
+                <GlassCard key={i} className="p-5 animate-pulse">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
+                      <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
+                      <div className="h-3 bg-theme-hover rounded w-1/4" />
+                    </div>
+                  </div>
+                </GlassCard>
+              ))}
+            </div>
+          ) : myPostings.length === 0 ? (
+            <EmptyState
+              icon={<Briefcase className="w-12 h-12" aria-hidden="true" />}
+              title={t('my_postings.empty_title', 'No postings yet')}
+              description={t('my_postings.empty_description', 'Post a vacancy to start receiving applications from your community.')}
+              action={
+                <Link to={tenantPath('/jobs/create')}>
+                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+                    {t('create_vacancy')}
+                  </Button>
+                </Link>
+              }
+            />
+          ) : (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="space-y-4"
+            >
+              {myPostings.map((vacancy) => (
+                <motion.div key={vacancy.id} variants={itemVariants}>
+                  <MyPostingCard vacancy={vacancy} />
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -668,6 +759,105 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
         </GlassCard>
       </article>
     </Link>
+  );
+});
+
+const MY_POSTING_STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default' | 'primary' | 'secondary'> = {
+  open: 'success',
+  draft: 'default',
+  closed: 'danger',
+  filled: 'success',
+};
+
+interface MyPostingCardProps {
+  vacancy: JobVacancy;
+}
+
+const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProps) {
+  const { t } = useTranslation('jobs');
+  const { tenantPath } = useTenant();
+
+  return (
+    <GlassCard className="p-5">
+      <div className="flex gap-3 sm:gap-4">
+        {/* Icon */}
+        <div className="flex-shrink-0">
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
+            <Briefcase className="w-6 h-6 text-indigo-400" aria-hidden="true" />
+          </div>
+        </div>
+
+        {/* Details */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-semibold text-theme-primary text-lg">{vacancy.title}</h3>
+            {/* Status chip — prominent */}
+            <Chip
+              size="sm"
+              variant="flat"
+              color={MY_POSTING_STATUS_COLORS[vacancy.status] ?? 'default'}
+              className="font-medium"
+            >
+              {t(`status.${vacancy.status}`, vacancy.status)}
+            </Chip>
+            <Chip size="sm" variant="flat" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'} className="text-xs">
+              {t(`type.${vacancy.type}`)}
+            </Chip>
+            <Chip size="sm" variant="flat" color="default" className="text-xs">
+              {t(`commitment.${vacancy.commitment}`)}
+            </Chip>
+          </div>
+
+          {/* Stats row */}
+          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-theme-subtle">
+            <span className="flex items-center gap-1">
+              <Eye className="w-4 h-4" aria-hidden="true" />
+              {t('views', { count: vacancy.views_count })}
+            </span>
+            <span className={`flex items-center gap-1 ${vacancy.applications_count > 0 ? 'text-primary font-medium' : ''}`}>
+              <FileText className="w-4 h-4" aria-hidden="true" />
+              {t('applications', { count: vacancy.applications_count })}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-4 h-4" aria-hidden="true" />
+              {new Date(vacancy.created_at).toLocaleDateString()}
+            </span>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            <Link to={tenantPath(`/jobs/${vacancy.id}#applications`)}>
+              <Button
+                size="sm"
+                variant="flat"
+                color={vacancy.applications_count > 0 ? 'primary' : 'default'}
+                className={vacancy.applications_count > 0 ? '' : 'bg-theme-elevated text-theme-muted'}
+                startContent={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
+              >
+                {t('my_postings.view_applicants', 'View Applicants')} ({vacancy.applications_count})
+              </Button>
+            </Link>
+            <Link to={tenantPath(`/jobs/${vacancy.id}/edit`)}>
+              <Button
+                size="sm"
+                variant="flat"
+                className="bg-theme-elevated text-theme-muted"
+                startContent={<Edit className="w-3.5 h-3.5" aria-hidden="true" />}
+              >
+                {t('my_postings.edit', 'Edit')}
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Arrow */}
+        <div className="flex-shrink-0 self-center">
+          <Link to={tenantPath(`/jobs/${vacancy.id}`)}>
+            <ChevronRight className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </GlassCard>
   );
 });
 

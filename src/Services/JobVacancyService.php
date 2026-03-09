@@ -1114,6 +1114,73 @@ HTML;
     }
 
     /**
+     * Get all job vacancies posted by a specific user (any status)
+     *
+     * @param int $userId
+     * @param int $tenantId
+     * @param array $params Optional: cursor, limit (default 20, max 50)
+     * @return array ['items' => [...], 'cursor' => ?string, 'has_more' => bool]
+     */
+    public static function getMyPostings(int $userId, int $tenantId, array $params = []): array
+    {
+        $limit = min((int)($params['limit'] ?? 20), 50);
+        $cursor = $params['cursor'] ?? null;
+
+        $where = ["jv.tenant_id = ?", "jv.user_id = ?"];
+        $queryParams = [$tenantId, $userId];
+
+        if ($cursor) {
+            $cursorId = base64_decode($cursor);
+            if ($cursorId !== false) {
+                $where[] = "jv.id < ?";
+                $queryParams[] = (int)$cursorId;
+            }
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $queryParams[] = $limit + 1;
+
+        $sql = "
+            SELECT
+                jv.*,
+                u.first_name as creator_first_name,
+                u.last_name as creator_last_name,
+                u.avatar_url as creator_avatar,
+                o.name as organization_name,
+                o.logo_url as organization_logo
+            FROM job_vacancies jv
+            LEFT JOIN users u ON jv.user_id = u.id
+            LEFT JOIN organizations o ON jv.organization_id = o.id
+            WHERE {$whereClause}
+            ORDER BY jv.created_at DESC, jv.id DESC
+            LIMIT ?
+        ";
+
+        $vacancies = Database::query($sql, $queryParams)->fetchAll();
+
+        $hasMore = count($vacancies) > $limit;
+        if ($hasMore) {
+            array_pop($vacancies);
+        }
+
+        $nextCursor = null;
+        if ($hasMore && !empty($vacancies)) {
+            $lastItem = end($vacancies);
+            $nextCursor = base64_encode((string)$lastItem['id']);
+        }
+
+        foreach ($vacancies as &$vacancy) {
+            $vacancy = self::enrichVacancy($vacancy, $userId);
+        }
+
+        return [
+            'items' => $vacancies,
+            'cursor' => $nextCursor,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
      * Increment the views count for a vacancy (J8: also log to analytics table)
      *
      * @param int $id
