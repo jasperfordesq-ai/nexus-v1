@@ -234,7 +234,7 @@ export default function GroupDetail() {
                   <TableRow key={member.user_id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {member.user_avatar && <img src={member.user_avatar} className="w-8 h-8 rounded-full" alt={member.user_name || 'Member avatar'} />}
+                        {member.user_avatar && <img src={member.user_avatar} className="w-8 h-8 rounded-full" alt={member.user_name || 'Member avatar'} loading="lazy" />}
                         <div>{member.user_name}</div>
                       </div>
                     </TableCell>

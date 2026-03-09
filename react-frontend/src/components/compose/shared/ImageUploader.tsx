@@ -68,7 +68,7 @@ export function ImageUploader({
 
       {preview && (
         <div className="relative rounded-xl overflow-hidden border border-[var(--border-default)]">
-          <img src={preview} alt="Upload preview" className="w-full max-h-60 object-cover" />
+          <img src={preview} alt="Upload preview" className="w-full max-h-60 object-cover" loading="eager" />
           <Button
             isIconOnly
             variant="flat"
