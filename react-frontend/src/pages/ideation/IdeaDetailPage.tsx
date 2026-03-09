@@ -481,7 +481,7 @@ export function IdeaDetailPage() {
             {(isAdmin || isOwner) && (
               <Dropdown>
                 <DropdownTrigger>
-                  <Button isIconOnly variant="flat" size="sm">
+                  <Button isIconOnly variant="flat" size="sm" aria-label="Idea actions">
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </DropdownTrigger>

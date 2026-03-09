@@ -89,6 +89,7 @@ export function CronJobSetup() {
               size="sm"
               variant="flat"
               isIconOnly
+              aria-label={showKey ? "Hide key" : "Show key"}
               onPress={() => setShowKey(!showKey)}
             >
               {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -182,6 +183,7 @@ export function CronJobSetup() {
                       size="sm"
                       variant="flat"
                       isIconOnly
+                      aria-label="Copy cURL command"
                       onPress={() =>
                         copyToClipboard(
                           `curl -H "X-Cron-Key: ${CRON_KEY}" ${CRON_URL}`,
@@ -312,6 +314,7 @@ exports.handler = async (event) => {
                       size="sm"
                       variant="flat"
                       isIconOnly
+                      aria-label="Copy gcloud command"
                       onPress={() =>
                         copyToClipboard(
                           `gcloud scheduler jobs create http nexus-cron --schedule="*/5 * * * *" --uri="${CRON_URL}" --http-method=GET --headers="X-Cron-Key=${CRON_KEY}"`,
@@ -344,6 +347,7 @@ exports.handler = async (event) => {
                       size="sm"
                       variant="flat"
                       isIconOnly
+                      aria-label="Copy crontab entry"
                       onPress={() =>
                         copyToClipboard(
                           `*/5 * * * * curl -H "X-Cron-Key: ${CRON_KEY}" ${CRON_URL}`,

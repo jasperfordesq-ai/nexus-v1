@@ -378,7 +378,7 @@ export function MemberNotes() {
                 </div>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light">
+                    <Button isIconOnly size="sm" variant="light" aria-label="Note actions">
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>

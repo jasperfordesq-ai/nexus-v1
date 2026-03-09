@@ -171,7 +171,7 @@ export function NewsletterList() {
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light"><MoreVertical size={16} /></Button>
+            <Button isIconOnly size="sm" variant="light" aria-label="Newsletter actions"><MoreVertical size={16} /></Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Newsletter actions" onAction={(key) => {
             if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));

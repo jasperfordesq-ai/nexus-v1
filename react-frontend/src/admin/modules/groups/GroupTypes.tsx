@@ -193,6 +193,7 @@ export default function GroupTypes() {
                       size="sm"
                       variant="flat"
                       isIconOnly
+                      aria-label="Edit group type"
                       onPress={() => openEdit(type)}
                     >
                       <Edit2 className="w-4 h-4" />
@@ -202,6 +203,7 @@ export default function GroupTypes() {
                       variant="flat"
                       color="danger"
                       isIconOnly
+                      aria-label="Delete group type"
                       onPress={() => handleDelete(type.id)}
                     >
                       <Trash2 className="w-4 h-4" />

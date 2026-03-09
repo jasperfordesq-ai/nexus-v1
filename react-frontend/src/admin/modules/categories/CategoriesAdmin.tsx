@@ -232,7 +232,7 @@ export function CategoriesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light">
+          <Button isIconOnly size="sm" variant="light" aria-label="Category actions">
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
