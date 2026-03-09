@@ -164,22 +164,33 @@ class VolunteerService
     }
 
     /**
-     * Check if a user can manage an opportunity (org creator OR active owner/admin in org_members)
+     * Check if a user can manage an opportunity.
+     * True if: org creator, org owner/admin in org_members, or site admin/tenant_admin.
      */
     private static function canManageOpportunity(array $opp, int $userId): bool
     {
+        // Direct org creator
         if ((int)($opp['org_owner_id'] ?? 0) === $userId) {
             return true;
         }
+        // Site-level admin (admin, tenant_admin, super_admin) can manage any opportunity
+        $siteRole = Database::query(
+            'SELECT role FROM users WHERE id = ?',
+            [$userId]
+        )->fetchColumn();
+        if (in_array($siteRole, ['super_admin', 'admin', 'tenant_admin'], true)) {
+            return true;
+        }
+        // Org-level owner/admin in org_members
         $orgId = (int)($opp['organization_id'] ?? 0);
         if ($orgId <= 0) {
             return false;
         }
-        $role = Database::query(
+        $orgRole = Database::query(
             "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
             [TenantContext::getId(), $orgId, $userId]
         )->fetchColumn();
-        return in_array($role, ['owner', 'admin'], true);
+        return in_array($orgRole, ['owner', 'admin'], true);
     }
 
     /**
