@@ -1,0 +1,36 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Lighthouse CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'react-frontend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'react-frontend/**'
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: react-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: react-frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_API_URL: https://api.project-nexus.ie
+          VITE_PUSHER_KEY: placeholder
+          VITE_PUSHER_CLUSTER: eu
+      - run: npm run lhci
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import path from 'path'
 import { execSync } from 'child_process'
 
@@ -47,6 +48,14 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/],
       },
     }),
+    ViteImageOptimizer({
+      png: { quality: 80 },
+      jpeg: { quality: 80 },
+      jpg: { quality: 80 },
+      webp: { lossless: false, quality: 80 },
+      svg: { plugins: [{ name: 'preset-default' }] },
+      logStats: true,
+    }),
   ],
   define: {
     __BUILD_COMMIT__: JSON.stringify(commitHash),
@@ -88,5 +97,18 @@ export default defineConfig({
       },
     },
   },
-  build: { outDir: 'dist' },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-heroui': ['@heroui/react'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-i18n': ['i18next', 'react-i18next'],
+          'vendor-charts': ['recharts'],
+        },
+      },
+    },
+  },
 })
