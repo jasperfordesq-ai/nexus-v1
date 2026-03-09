@@ -17,6 +17,7 @@ use Nexus\Models\VolReview;
 use Nexus\Models\OrgMember;
 use Nexus\Models\ActivityLog;
 use Nexus\Models\Transaction;
+use Nexus\Services\EmailTemplateService;
 use Nexus\Services\NotificationDispatcher;
 
 /**
@@ -186,6 +187,7 @@ class VolunteerService
         if ($viewerId) {
             $formatted['has_applied'] = VolApplication::hasApplied($id, $viewerId);
             $formatted['application'] = self::getUserApplicationForOpportunity($id, $viewerId);
+            $formatted['is_owner'] = (int)($opp['org_owner_id'] ?? 0) === $viewerId;
         }
 
         return $formatted;
@@ -504,8 +506,11 @@ class VolunteerService
                 if (!empty($opp['org_email'])) {
                     $mailer = new \Nexus\Core\Mailer();
                     $subject = "New Volunteer Application: " . $opp['title'];
-                    $body = "<h2>New Applicant!</h2><p>You have received a new application for <strong>{$opp['title']}</strong>.</p><p>Check your dashboard to review it.</p>";
-                    $mailer->send($opp['org_email'], $subject, $body);
+                    $body = "<h2>New Volunteer Application</h2>" .
+                        "<p><strong>{$applierName}</strong> has applied for your opportunity: <strong>" . htmlspecialchars($opp['title']) . "</strong></p>" .
+                        (!empty($data['message']) ? "<p><em>Their message:</em> " . htmlspecialchars($data['message']) . "</p>" : "") .
+                        "<p>Log in to review and respond to their application.</p>";
+                    $mailer->send($opp['org_email'], (TenantContext::get()['name'] ?? 'NEXUS') . ': ' . $subject, EmailTemplateService::wrap($body));
                 }
             } catch (\Throwable $e) {
                 // Silent fail
@@ -616,7 +621,7 @@ class VolunteerService
         $tenantId = TenantContext::getId();
 
         $sql = "
-            SELECT a.*, o.title as opp_title, o.location, org.id as org_id, org.name as org_name, org.logo_url as org_logo,
+            SELECT a.*, a.org_note, o.title as opp_title, o.location, org.id as org_id, org.name as org_name, org.logo_url as org_logo,
                    s.start_time as shift_start, s.end_time as shift_end
             FROM vol_applications a
             JOIN vol_opportunities o ON a.opportunity_id = o.id
@@ -657,6 +662,7 @@ class VolunteerService
                 'id' => (int)$app['id'],
                 'status' => $app['status'],
                 'message' => $app['message'],
+                'org_note' => $app['org_note'] ?? null,
                 'opportunity' => [
                     'id' => (int)$app['opportunity_id'],
                     'title' => $app['opp_title'],
@@ -721,7 +727,7 @@ class VolunteerService
         }
 
         $sql = "
-            SELECT a.*, u.name as user_name, u.email as user_email, u.avatar_url as user_avatar,
+            SELECT a.*, a.org_note, u.name as user_name, u.email as user_email, u.avatar_url as user_avatar,
                    s.start_time as shift_start, s.end_time as shift_end
             FROM vol_applications a
             JOIN users u ON a.user_id = u.id
@@ -761,6 +767,7 @@ class VolunteerService
                 'id' => (int)$app['id'],
                 'status' => $app['status'],
                 'message' => $app['message'],
+                'org_note' => $app['org_note'] ?? null,
                 'user' => [
                     'id' => (int)$app['user_id'],
                     'name' => $app['user_name'],
@@ -789,9 +796,10 @@ class VolunteerService
      * @param int $applicationId Application ID
      * @param int $adminUserId Admin user ID
      * @param string $action 'approve' or 'decline'
+     * @param string $orgNote Optional note from the organiser to the applicant
      * @return bool Success
      */
-    public static function handleApplication(int $applicationId, int $adminUserId, string $action): bool
+    public static function handleApplication(int $applicationId, int $adminUserId, string $action, string $orgNote = ''): bool
     {
         self::$errors = [];
 
@@ -828,8 +836,8 @@ class VolunteerService
         $status = $action === 'approve' ? 'approved' : 'declined';
 
         try {
-            $stmt = $db->prepare("UPDATE vol_applications SET status = ? WHERE id = ? AND tenant_id = ?");
-            $stmt->execute([$status, $applicationId, $tenantId]);
+            $stmt = $db->prepare("UPDATE vol_applications SET status = ?, org_note = ? WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$status, $orgNote !== '' ? $orgNote : null, $applicationId, $tenantId]);
 
             // Notify applicant — in-app bell + email
             try {
@@ -851,8 +859,13 @@ class VolunteerService
                 if ($applicant && !empty($applicant['email'])) {
                     $mailer = new \Nexus\Core\Mailer();
                     $subject = "Update on your Volunteer Application";
-                    $body = "<h2>Application Update</h2><p>Your application has been <strong>" . strtoupper($status) . "</strong>.</p>";
-                    $mailer->send($applicant['email'], $subject, $body);
+                    $body = "<h2>Your Volunteer Application</h2>" .
+                        "<p>Your application for <strong>" . htmlspecialchars($oppTitle) . "</strong> has been <strong>" . strtoupper($status) . "</strong>.</p>" .
+                        ($status === 'approved'
+                            ? "<p>Congratulations! The organiser will be in touch with next steps.</p>"
+                            : "<p>Thank you for your interest. We encourage you to explore other volunteering opportunities.</p>") .
+                        (!empty($orgNote) ? "<p><em>Note from the organiser:</em> " . htmlspecialchars($orgNote) . "</p>" : "");
+                    $mailer->send($applicant['email'], (TenantContext::get()['name'] ?? 'NEXUS') . ': ' . $subject, EmailTemplateService::wrap($body));
                 }
             } catch (\Throwable $e) {
                 // Silent fail
@@ -1447,6 +1460,86 @@ class VolunteerService
     }
 
     /**
+     * Get pending hours waiting for approval by this org owner.
+     * Returns all vol_logs with status=pending for organisations owned by $userId.
+     */
+    public static function getPendingHoursForOrgOwner(int $userId, array $filters = []): array
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        $limit = min($filters['limit'] ?? 20, 50);
+        $cursorId = null;
+        if (!empty($filters['cursor'])) {
+            $decoded = base64_decode($filters['cursor'], true);
+            if ($decoded && is_numeric($decoded)) {
+                $cursorId = (int)$decoded;
+            }
+        }
+
+        $sql = "
+            SELECT l.id, l.hours, l.date, l.description, l.status, l.created_at,
+                   u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                   org.id as org_id, org.name as org_name, org.logo_url as org_logo,
+                   opp.id as opp_id, opp.title as opp_title
+            FROM vol_logs l
+            JOIN vol_organizations org ON l.organization_id = org.id
+            JOIN users u ON l.user_id = u.id
+            LEFT JOIN vol_opportunities opp ON l.opportunity_id = opp.id
+            WHERE org.user_id = ? AND l.tenant_id = ? AND l.status = 'pending'
+        ";
+        $params = [$userId, $tenantId];
+
+        if ($cursorId) {
+            $sql .= " AND l.id < ?";
+            $params[] = $cursorId;
+        }
+
+        $sql .= " ORDER BY l.created_at DESC, l.id DESC LIMIT " . ($limit + 1);
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $hasMore = count($rows) > $limit;
+        if ($hasMore) array_pop($rows);
+
+        $items = [];
+        $lastId = null;
+        foreach ($rows as $row) {
+            $lastId = $row['id'];
+            $items[] = [
+                'id'          => (int)$row['id'],
+                'hours'       => (float)$row['hours'],
+                'date'        => $row['date'],
+                'description' => $row['description'],
+                'status'      => $row['status'],
+                'created_at'  => $row['created_at'],
+                'user'        => [
+                    'id'         => (int)$row['user_id'],
+                    'name'       => $row['user_name'],
+                    'avatar_url' => $row['user_avatar'],
+                ],
+                'organization' => [
+                    'id'      => (int)$row['org_id'],
+                    'name'    => $row['org_name'],
+                    'logo_url'=> $row['org_logo'],
+                ],
+                'opportunity'  => $row['opp_id'] ? [
+                    'id'    => (int)$row['opp_id'],
+                    'title' => $row['opp_title'],
+                ] : null,
+            ];
+        }
+
+        return [
+            'items'    => $items,
+            'cursor'   => ($hasMore && $lastId) ? base64_encode((string)$lastId) : null,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
      * Get hours summary for a user
      *
      * @param int $userId User ID
@@ -2035,5 +2128,76 @@ class VolunteerService
         }
 
         return $slug;
+    }
+
+    /**
+     * Send reminder emails to volunteers for shifts starting within the next 24 hours.
+     * Designed to be called by a cron job once per day.
+     *
+     * @return int Number of reminders sent
+     */
+    public static function sendShiftReminders(): int
+    {
+        $db = Database::getConnection();
+        $tenantId = TenantContext::getId();
+
+        // Get shifts starting in next 24 hours for this tenant
+        $stmt = $db->prepare("
+            SELECT s.id as shift_id, s.start_time, s.end_time,
+                   opp.id as opp_id, opp.title as opp_title, opp.location,
+                   u.id as user_id, u.email as user_email, u.name as user_name
+            FROM vol_shifts s
+            JOIN vol_opportunities opp ON s.opportunity_id = opp.id
+            JOIN vol_shift_signups ss ON ss.shift_id = s.id
+            JOIN users u ON ss.user_id = u.id
+            WHERE opp.tenant_id = ?
+              AND s.start_time > NOW()
+              AND s.start_time <= DATE_ADD(NOW(), INTERVAL 24 HOUR)
+              AND opp.is_active = 1
+        ");
+        $stmt->execute([$tenantId]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $sent = 0;
+        foreach ($rows as $row) {
+            try {
+                if (empty($row['user_email'])) continue;
+                $startFormatted = (new \DateTime($row['start_time']))->format('l, j F Y \a\t g:ia');
+                $endTime = (new \DateTime($row['end_time']))->format('g:ia');
+                $location = !empty($row['location']) ? htmlspecialchars($row['location']) : 'See opportunity for details';
+                $title = htmlspecialchars($row['opp_title']);
+                $name = htmlspecialchars($row['user_name']);
+                $frontendUrl = rtrim(\Nexus\Core\TenantContext::getFrontendUrl(), '/');
+                $slugPrefix = \Nexus\Core\TenantContext::getSlugPrefix();
+                $oppUrl = $frontendUrl . $slugPrefix . '/volunteering/opportunities/' . $row['opp_id'];
+
+                $body = "<h2>Shift Reminder</h2>"
+                    . "<p>Hi {$name},</p>"
+                    . "<p>This is a reminder that you have a volunteer shift coming up tomorrow:</p>"
+                    . "<table style=\"border-collapse:collapse;width:100%;margin:16px 0;\">"
+                    . "<tr><td style=\"padding:8px 0;color:#6b7280;font-size:13px;\">Opportunity</td>"
+                    . "<td style=\"padding:8px 0;font-weight:600;\">{$title}</td></tr>"
+                    . "<tr><td style=\"padding:8px 0;color:#6b7280;font-size:13px;\">When</td>"
+                    . "<td style=\"padding:8px 0;\">{$startFormatted} &ndash; {$endTime}</td></tr>"
+                    . "<tr><td style=\"padding:8px 0;color:#6b7280;font-size:13px;\">Where</td>"
+                    . "<td style=\"padding:8px 0;\">{$location}</td></tr>"
+                    . "</table>"
+                    . "<p style=\"margin:24px 0 8px;\"><a href=\"{$oppUrl}\" style=\"display:inline-block;background-color:#6366f1;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:600;\">View Opportunity</a></p>"
+                    . "<p>Thank you for volunteering!</p>";
+
+                $mailer = new \Nexus\Core\Mailer();
+                $tenantName = TenantContext::get()['name'] ?? 'NEXUS';
+                $mailer->send(
+                    $row['user_email'],
+                    $tenantName . ': Reminder — ' . $row['opp_title'],
+                    EmailTemplateService::wrap($body)
+                );
+                $sent++;
+            } catch (\Throwable $e) {
+                error_log('VolunteerService::sendShiftReminders error for user ' . $row['user_id'] . ': ' . $e->getMessage());
+            }
+        }
+
+        return $sent;
     }
 }

@@ -55,6 +55,13 @@ class NotificationDispatcher
             case 'instant':
                 // Queue as 'instant' with full HTML body for rapid processing
                 self::queueNotification($userId, $activityType, $content, $link, 'instant', $htmlContent);
+                // Also dispatch a real-time web push notification
+                try {
+                    $pushTitle = self::getPushTitle($activityType);
+                    WebPushService::sendToUser($userId, $pushTitle, $content, $link);
+                } catch (Throwable $e) {
+                    error_log('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
+                }
                 break;
 
             case 'daily':
@@ -148,6 +155,33 @@ class NotificationDispatcher
         }
 
         return null;
+    }
+
+    /**
+     * Map activity types to short push notification titles
+     */
+    private static function getPushTitle(string $activityType): string
+    {
+        $titles = [
+            'vol_application_received'  => 'New Application',
+            'vol_application_approved'  => 'Application Approved',
+            'vol_application_declined'  => 'Application Declined',
+            'vol_hours_approved'        => 'Hours Approved',
+            'vol_hours_declined'        => 'Hours Declined',
+            'vol_hours_pending_review'  => 'Hours Pending Review',
+            'vol_shift_reminder'        => 'Shift Reminder',
+            'vol_shift_cancelled'       => 'Shift Cancelled',
+            'vol_waitlist_promoted'     => 'Waitlist Update',
+            'vol_swap_requested'        => 'Shift Swap Request',
+            'vol_swap_approved'         => 'Shift Swap Approved',
+            'vol_swap_declined'         => 'Shift Swap Declined',
+            'new_topic'                 => 'New Post',
+            'new_reply'                 => 'New Reply',
+            'mention'                   => 'You Were Mentioned',
+            'hot_match'                 => 'Hot Match Found',
+            'mutual_match'              => 'Mutual Match Found',
+        ];
+        return $titles[$activityType] ?? 'New Notification';
     }
 
     private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null)

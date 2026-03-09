@@ -280,6 +280,15 @@ export function JobsPage() {
         <div className="flex gap-2">
           {isAuthenticated && (
             <>
+              <Link to={tenantPath('/jobs/my-applications')}>
+                <Button
+                  variant="flat"
+                  className="bg-theme-elevated text-theme-muted"
+                  startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('my_applications.title')}
+                </Button>
+              </Link>
               <Link to={tenantPath('/jobs/alerts')}>
                 <Button
                   variant="flat"

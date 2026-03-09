@@ -410,6 +410,7 @@ $router->add('GET', '/api/v2/admin/volunteering/approvals', 'Nexus\Controllers\A
 $router->add('GET', '/api/v2/admin/volunteering/organizations', 'Nexus\Controllers\Api\AdminVolunteeringApiController@organizations');
 $router->add('POST', '/api/v2/admin/volunteering/approvals/{id}/approve', 'Nexus\Controllers\Api\AdminVolunteeringApiController@approveApplication');
 $router->add('POST', '/api/v2/admin/volunteering/approvals/{id}/decline', 'Nexus\Controllers\Api\AdminVolunteeringApiController@declineApplication');
+$router->add('POST', '/api/v2/admin/volunteering/send-shift-reminders', 'Nexus\Controllers\Api\AdminVolunteeringApiController@sendShiftReminders');
 
 // Admin Events
 $router->add('GET', '/api/v2/admin/events', 'Nexus\Controllers\Api\AdminEventsApiController@index');
@@ -438,6 +439,8 @@ $router->add('GET', '/api/v2/admin/jobs/{id}', 'Nexus\Controllers\Api\AdminJobsA
 $router->add('DELETE', '/api/v2/admin/jobs/{id}', 'Nexus\Controllers\Api\AdminJobsApiController@destroy');
 $router->add('POST', '/api/v2/admin/jobs/{id}/feature', 'Nexus\Controllers\Api\AdminJobsApiController@feature');
 $router->add('POST', '/api/v2/admin/jobs/{id}/unfeature', 'Nexus\Controllers\Api\AdminJobsApiController@unfeature');
+$router->add('GET', '/api/v2/admin/jobs/{id}/applications', 'Nexus\Controllers\Api\AdminJobsApiController@getApplications');
+$router->add('PUT', '/api/v2/admin/jobs/applications/{id}', 'Nexus\Controllers\Api\AdminJobsApiController@updateApplicationStatus');
 
 // Admin Ideation / Challenges
 $router->add('GET', '/api/v2/admin/ideation', 'Nexus\Controllers\Api\AdminIdeationApiController@index');

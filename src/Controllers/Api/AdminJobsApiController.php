@@ -26,27 +26,28 @@ class AdminJobsApiController extends BaseApiController
     {
         $this->requireAdmin();
 
+        $page = max(1, $this->queryInt('page', 1));
+        $limit = min(200, max(1, $this->queryInt('limit', 50)));
+
+        // Fetch all matching items with a large internal limit for accurate pagination
         $filters = [
-            'status' => $this->query('status'),
-            'search' => $this->query('search'),
-            'page' => max(1, $this->queryInt('page', 1)),
-            'limit' => min(200, max(1, $this->queryInt('limit', 50))),
+            'limit' => 10000, // Internal max to get full dataset for pagination
         ];
+        if ($this->query('status')) {
+            $filters['status'] = $this->query('status');
+        }
+        if ($this->query('search')) {
+            $filters['search'] = $this->query('search');
+        }
 
         $result = JobVacancyService::getAll($filters);
+        $allItems = $result['items'] ?? [];
 
-        $items = $result['data'] ?? $result['items'] ?? $result;
-        $total = $result['total'] ?? (is_array($items) ? count($items) : 0);
-        $page = $filters['page'];
-        $limit = $filters['limit'];
+        $total = count($allItems);
+        $offset = ($page - 1) * $limit;
+        $paged = array_slice($allItems, $offset, $limit);
 
-        if (is_array($items) && !isset($result['total'])) {
-            $offset = ($page - 1) * $limit;
-            $paged = array_slice($items, $offset, $limit);
-            $this->respondWithPaginatedCollection($paged, count($items), $page, $limit);
-        } else {
-            $this->respondWithPaginatedCollection($items, $total, $page, $limit);
-        }
+        $this->respondWithPaginatedCollection($paged, $total, $page, $limit);
     }
 
     public function show(int $id): void
@@ -106,6 +107,50 @@ class AdminJobsApiController extends BaseApiController
             $this->respondWithData(['featured' => false, 'id' => $id]);
         } else {
             $this->respondWithError('UNFEATURE_FAILED', 'Failed to unfeature job', null, 400);
+        }
+    }
+
+    public function getApplications(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+
+        $job = JobVacancyService::getById($id);
+        if (!$job) {
+            $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
+            return;
+        }
+
+        $applications = JobVacancyService::getApplications($id, $adminId);
+
+        if ($applications === null) {
+            $this->respondWithError('FETCH_FAILED', 'Failed to load applications', null, 400);
+            return;
+        }
+
+        $this->respondWithData($applications);
+    }
+
+    public function updateApplicationStatus(int $id): void
+    {
+        $adminId = $this->requireAdmin();
+
+        $input = $this->getJsonInput();
+        $status = $input['status'] ?? null;
+        $notes = $input['notes'] ?? null;
+
+        if (!$status) {
+            $this->respondWithError('VALIDATION_REQUIRED', 'Status is required', 'status', 422);
+            return;
+        }
+
+        $updated = JobVacancyService::updateApplicationStatus($id, $adminId, $status, $notes);
+
+        if ($updated) {
+            $this->respondWithData(['updated' => true, 'id' => $id, 'status' => $status]);
+        } else {
+            $errors = JobVacancyService::getErrors();
+            $first = $errors[0] ?? [];
+            $this->respondWithError($first['code'] ?? 'UPDATE_FAILED', $first['message'] ?? 'Failed to update', null, 400);
         }
     }
 }

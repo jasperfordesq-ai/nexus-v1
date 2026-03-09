@@ -1,0 +1,1 @@
+﻿<?php \ = new PDO("mysql:host=nexus-php-db;dbname=nexus","nexus","HpW4H99dd2BNXjtl5FhHlIEitzAkjmm"); foreach(\->query("DESCRIBE vol_organizations")->fetchAll(PDO::FETCH_ASSOC) as \) echo \["Field"]." Null=".\["Null"]." Default=".(\["Default"]??"NULL").PHP_EOL;

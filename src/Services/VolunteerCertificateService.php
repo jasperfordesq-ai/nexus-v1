@@ -50,7 +50,7 @@ class VolunteerCertificateService
         // Get user info
         $stmt = $db->prepare("SELECT id, name, avatar_url FROM users WHERE id = ? AND tenant_id = ?");
         $stmt->execute([$userId, $tenantId]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$user) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
