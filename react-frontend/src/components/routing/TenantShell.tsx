@@ -32,6 +32,7 @@ import { AuthProvider, NotificationsProvider, PusherProvider, MenuProvider } fro
 import { RESERVED_PATHS } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback';
 import { lazy, Suspense } from 'react';
+import { Spinner } from '@heroui/react';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
 
@@ -97,18 +98,16 @@ function TenantGuard({
   const { user } = useAuth();
   const location = useLocation();
 
-  // While loading, let the Suspense fallback handle it
+  // While tenant is loading, block page rendering to prevent API calls before
+  // X-Tenant-ID is set in localStorage. Bootstrap is fast (50-200ms, Redis-cached).
+  // Without this, pages on custom domains (hour-timebank.ie) fire API calls before
+  // the tenant ID is known, causing the API to return master tenant (ID 1) results.
   if (isLoading) {
-    // If slug-prefixed and we have appRoutes, still need nested Routes for correct path matching
-    if (slugPrefix && appRoutes) {
-      const strippedPath = location.pathname.replace(new RegExp(`^/${slugPrefix}`, 'i'), '') || '/';
-      return (
-        <Routes location={{ ...location, pathname: strippedPath }}>
-          {appRoutes()}
-        </Routes>
-      );
-    }
-    return <>{children}</>;
+    return (
+      <div className="min-h-screen flex items-center justify-center" aria-label="Loading community">
+        <Spinner size="lg" color="primary" />
+      </div>
+    );
   }
 
   // If the slug was not found, show "Community Not Found" page
