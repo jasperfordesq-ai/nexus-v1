@@ -32,7 +32,7 @@ export interface AppUpdateInfo {
 
 function isNativeApp(): boolean {
   try {
-    return !!(window as any).Capacitor?.isNativePlatform?.();
+    return !!window.Capacitor?.isNativePlatform?.();
   } catch {
     return false;
   }

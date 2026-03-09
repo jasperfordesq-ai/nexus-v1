@@ -30,8 +30,8 @@ import { HeroUIProvider } from '@heroui/react';
  * SAFETY: Never reloads while the user has focus in a text input, textarea, or
  * contenteditable field — this prevents losing typed message drafts.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function lazyWithRetry(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   importFn: () => Promise<{ default: ComponentType<any> }>
 ) {
   return lazy(() =>

@@ -2121,6 +2121,7 @@ export function SettingsPage() {
                       src={twoFactorSetupData.qr_code_url}
                       alt="2FA QR Code"
                       className="w-48 h-48"
+                      loading="lazy"
                     />
                   </div>
                 </div>

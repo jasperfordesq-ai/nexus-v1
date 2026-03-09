@@ -145,6 +145,7 @@ function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
       role="region"
       aria-label="Notifications"
       aria-live="polite"
+      aria-atomic="false"
     >
       <AnimatePresence mode="popLayout">
         {toasts.map((toast) => (
@@ -205,8 +206,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
         backdrop-blur-xl border rounded-lg
         p-4 shadow-lg
       `}
-      role="alert"
-      aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
+      role={toast.type === "error" || toast.type === "warning" ? "alert" : "status"}
     >
       <div className="flex items-start gap-3">
         <Icon className={`w-5 h-5 ${iconColor} flex-shrink-0 mt-0.5`} aria-hidden="true" />

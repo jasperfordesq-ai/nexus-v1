@@ -23,7 +23,7 @@ export const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(
   ({ label, error, helperText, className = '', id, disabled, ...props }, ref) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
     const errorClass = error ? 'glass-input-error' : '';
-    const combinedClassName = ['glass-input', errorClass, className].filter(Boolean).join(' ');
+    const combinedClassName = ['glass-input', 'backdrop-blur-lg', errorClass, className].filter(Boolean).join(' ');
 
     return (
       <div className="w-full">

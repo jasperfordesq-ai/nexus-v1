@@ -455,6 +455,7 @@ export function EventDetailPage() {
             src={resolveAssetUrl(event.cover_image)}
             alt={t('detail.cover_alt', { title: event.title })}
             className="w-full h-48 sm:h-64 object-cover"
+            loading="lazy"
           />
         </div>
       )}

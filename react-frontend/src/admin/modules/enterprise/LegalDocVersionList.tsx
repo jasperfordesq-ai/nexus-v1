@@ -40,6 +40,7 @@ import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { LegalDocumentVersion } from '@/admin/api/types';
 import LegalDocVersionForm from './LegalDocVersionForm';
 import LegalDocVersionComparison from './LegalDocVersionComparison';
+import DOMPurify from 'dompurify';
 
 export default function LegalDocVersionList() {
   usePageTitle('Legal Document Versions');
@@ -532,7 +533,7 @@ export default function LegalDocVersionList() {
                 )}
                 <div
                   className="prose prose-sm max-w-none dark:prose-invert border rounded-lg p-4 overflow-auto"
-                  dangerouslySetInnerHTML={{ __html: viewingVersion?.content ?? '' }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(viewingVersion?.content ?? '') }}
                 />
               </ModalBody>
               <ModalFooter>

@@ -809,6 +809,7 @@ export function ChallengeDetailPage() {
             src={resolveAssetUrl(challenge.cover_image)}
             alt={challenge.title}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         </div>
       )}
@@ -1177,6 +1178,7 @@ export function ChallengeDetailPage() {
                             src={resolveAssetUrl(idea.image_url)}
                             alt={t('idea_image')}
                             className="w-24 h-24 object-cover rounded-lg"
+                            loading="lazy"
                           />
                         </div>
                       )}
@@ -1192,6 +1194,7 @@ export function ChallengeDetailPage() {
                                 src={resolveAssetUrl(m.url)}
                                 alt={m.caption ?? ''}
                                 className="w-16 h-16 object-cover rounded-lg border border-[var(--color-border)]"
+                                loading="lazy"
                               />
                             ) : (
                               <div

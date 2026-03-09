@@ -14,7 +14,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
 // ─── Common mocks ────────────────────────────────────────────────────────────
@@ -55,16 +55,7 @@ vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: vi.fn((url) => url || ''),
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
-    get: (_, tag) => ({ children, ...props }: any) => {
-      const { variants, initial, animate, exit, layout, whileHover, whileTap, transition, ...rest } = props;
-      const Tag = typeof tag === 'string' ? tag : 'div';
-      return <Tag {...rest}>{children}</Tag>;
-    },
-  }),
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+vi.mock('framer-motion');
 
 vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: any) => <div>{children}</div>,

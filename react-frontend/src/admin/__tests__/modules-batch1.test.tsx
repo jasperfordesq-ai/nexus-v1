@@ -68,18 +68,7 @@ vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: new Proxy({}, {
-    get: (_, tag) => {
-      return ({ children, ...props }: any) => {
-        const { variants, initial, animate, exit, layout, whileHover, whileTap, transition, ...rest } = props;
-        const Tag = typeof tag === 'string' ? tag : 'div';
-        return <Tag {...rest}>{children}</Tag>;
-      };
-    },
-  }),
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+vi.mock('framer-motion');
 
 vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: any) => <div>{children}</div>,

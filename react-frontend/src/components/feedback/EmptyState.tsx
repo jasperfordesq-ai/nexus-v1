@@ -5,7 +5,15 @@
 
 /**
  * Empty State Component
- * Displays when there's no data to show
+ * Displays when there's no data to show — centered, vertically stacked layout
+ * with an icon in a soft-coloured circle, title, optional description, and
+ * an optional call-to-action.
+ *
+ * The `action` prop accepts either:
+ *  - A ReactNode (e.g. a pre-built <Button> or <Link>) — most flexible
+ *  - An action config object `{ label, onClick, variant? }` — quick inline CTA
+ *
+ * Legacy props `actionLabel`/`onAction` are retained for backward compatibility.
  */
 
 import type { ReactNode } from 'react';
@@ -13,42 +21,67 @@ import { motion } from 'framer-motion';
 import { Inbox } from 'lucide-react';
 import { Button } from '@heroui/react';
 
+/** Inline action config — alternative to passing a full ReactNode */
+export interface EmptyStateActionConfig {
+  label: string;
+  onClick: () => void;
+  variant?: 'solid' | 'bordered' | 'light';
+}
+
 export interface EmptyStateProps {
   /**
-   * Icon to display (defaults to Inbox)
+   * Icon element to display inside the icon circle (e.g. a Lucide icon).
+   * Defaults to the Inbox icon.
    */
   icon?: ReactNode;
 
   /**
-   * Main title
+   * Main heading text shown below the icon.
    */
   title: string;
 
   /**
-   * Description text (alias: message)
+   * Supporting description text (also accepted as `message` for back-compat).
    */
   description?: string;
+  /** @deprecated Use `description` */
   message?: string;
 
   /**
-   * Call-to-action element (flexible)
+   * Call-to-action. Accepts either:
+   *  - A ReactNode (rendered as-is after the description)
+   *  - An EmptyStateActionConfig object `{ label, onClick, variant? }`
    */
-  action?: ReactNode;
+  action?: ReactNode | EmptyStateActionConfig;
 
   /**
-   * Call-to-action button text (legacy)
+   * Call-to-action button text (legacy — prefer `action`).
+   * @deprecated Use `action`
    */
   actionLabel?: string;
 
   /**
-   * Call-to-action handler (legacy)
+   * Call-to-action handler (legacy — prefer `action`).
+   * @deprecated Use `action`
    */
   onAction?: () => void;
 
   /**
-   * Additional class names
+   * Additional Tailwind classes for the root element.
    */
   className?: string;
+}
+
+/** Type-guard: returns true when `action` is an EmptyStateActionConfig object */
+function isActionConfig(v: unknown): v is EmptyStateActionConfig {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'label' in v &&
+    'onClick' in v &&
+    typeof (v as EmptyStateActionConfig).label === 'string' &&
+    typeof (v as EmptyStateActionConfig).onClick === 'function'
+  );
 }
 
 export function EmptyState({
@@ -71,19 +104,41 @@ export function EmptyState({
       role="status"
       aria-label={title}
     >
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-theme-elevated border border-theme-default mb-6" aria-hidden="true">
-        {icon || <Inbox className="w-10 h-10 text-theme-subtle" />}
+      {/* Icon circle */}
+      <div
+        className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-default-100 border border-default-200 mb-6"
+        aria-hidden="true"
+      >
+        {icon || <Inbox className="w-10 h-10 text-default-400" />}
       </div>
 
-      <h3 className="text-xl font-semibold text-theme-primary mb-2">{title}</h3>
+      <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>
 
       {displayMessage && (
-        <p className="text-theme-subtle max-w-sm mb-6">{displayMessage}</p>
+        <p className="text-default-500 text-sm max-w-sm mb-6">{displayMessage}</p>
       )}
 
-      {action}
+      {/* action: ReactNode or config object */}
+      {action != null && (
+        isActionConfig(action) ? (
+          <Button
+            variant={action.variant ?? 'solid'}
+            onPress={action.onClick}
+            className={
+              action.variant && action.variant !== 'solid'
+                ? undefined
+                : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium'
+            }
+          >
+            {action.label}
+          </Button>
+        ) : (
+          action as ReactNode
+        )
+      )}
 
-      {actionLabel && onAction && (
+      {/* Legacy actionLabel / onAction */}
+      {!action && actionLabel && onAction && (
         <Button
           onPress={onAction}
           className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"

@@ -305,6 +305,7 @@ export function ListingDetailPage() {
               src={resolveAssetUrl(listing.image_url)}
               alt={listing.title}
               className="w-full h-48 sm:h-64 object-cover"
+              loading="lazy"
             />
           </div>
         )}

@@ -518,6 +518,7 @@ export function IdeationPage() {
                         src={resolveAssetUrl(challenge.cover_image)}
                         alt={challenge.title}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     </div>
                   )}

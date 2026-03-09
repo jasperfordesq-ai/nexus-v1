@@ -223,6 +223,7 @@ export function CampaignsPage() {
                       src={resolveAssetUrl(campaign.cover_image)}
                       alt={campaign.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
                 )}

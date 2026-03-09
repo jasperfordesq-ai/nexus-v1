@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Select, SelectItem, Chip } from '@heroui/react';
+import { Button, Input, Select, SelectItem, Chip, Skeleton } from '@heroui/react';
 import {
   Search,
   Calendar,
@@ -326,15 +326,23 @@ export function EventsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-6">
+            <div className="space-y-6" aria-label="Loading events" aria-busy="true">
               {[1, 2, 3].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
+                <GlassCard key={i} className="p-5">
                   <div className="flex gap-4">
-                    <div className="w-16 h-20 rounded-lg bg-theme-hover" />
-                    <div className="flex-1">
-                      <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
-                      <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
-                      <div className="h-3 bg-theme-hover rounded w-1/4" />
+                    <Skeleton className="w-16 h-20 rounded-lg flex-shrink-0">
+                      <div className="w-16 h-20 rounded-lg bg-default-300" />
+                    </Skeleton>
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="rounded-lg w-1/2">
+                        <div className="h-5 rounded-lg bg-default-300" />
+                      </Skeleton>
+                      <Skeleton className="rounded-lg w-3/4">
+                        <div className="h-4 rounded-lg bg-default-200" />
+                      </Skeleton>
+                      <Skeleton className="rounded-lg w-1/4">
+                        <div className="h-3 rounded-lg bg-default-200" />
+                      </Skeleton>
                     </div>
                   </div>
                 </GlassCard>

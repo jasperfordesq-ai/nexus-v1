@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export { LoadingScreen } from './LoadingScreen';
-export { EmptyState } from './EmptyState';
+export { EmptyState, type EmptyStateActionConfig } from './EmptyState';
 export { ErrorBoundary } from './ErrorBoundary';
 export { FeatureErrorBoundary } from './FeatureErrorBoundary';
 export { SessionExpiredModal } from './SessionExpiredModal';

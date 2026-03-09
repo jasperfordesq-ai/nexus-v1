@@ -47,7 +47,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
   ) => {
     const baseClass = hoverable ? 'glass-card-hover' : 'glass-card';
     const glowClass = glow !== 'none' ? `glow-${glow}` : '';
-    const combinedClassName = [baseClass, glowClass, className].filter(Boolean).join(' ');
+    const combinedClassName = ['backdrop-blur-lg', baseClass, glowClass, className].filter(Boolean).join(' ');
 
     if (animated) {
       return (

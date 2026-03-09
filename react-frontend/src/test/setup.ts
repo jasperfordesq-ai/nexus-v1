@@ -12,6 +12,9 @@
 /// <reference types="@testing-library/jest-dom" />
 
 import '@testing-library/jest-dom';
+import * as axeMatchers from 'vitest-axe/matchers';
+import { expect } from 'vitest';
+expect.extend(axeMatchers);
 
 // Mock window.matchMedia for components that use media queries
 Object.defineProperty(window, 'matchMedia', {

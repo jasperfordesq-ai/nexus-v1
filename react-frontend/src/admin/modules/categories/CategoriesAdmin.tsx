@@ -9,7 +9,7 @@
  * Parity: PHP Admin\CategoryController
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, type CSSProperties, useCallback, useEffect } from 'react';
 import {
   Button,
   Chip,
@@ -259,7 +259,7 @@ export function CategoriesAdmin() {
         <div className="flex items-center gap-3">
           <div
             className="h-3 w-3 rounded-full shrink-0"
-            style={{ backgroundColor: cat.color || 'var(--color-primary)' }}
+            style={{ '--category-color': cat.color || 'var(--color-primary)', backgroundColor: 'var(--category-color)' } as CSSProperties}
           />
           <span className="font-medium text-foreground">{cat.name}</span>
         </div>
@@ -411,7 +411,7 @@ export function CategoriesAdmin() {
                   <div key={item.key} className="flex items-center gap-2">
                     <div
                       className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: String(item.key) }}
+                      style={{ '--swatch-color': String(item.key), backgroundColor: 'var(--swatch-color)' } as CSSProperties}
                     />
                     <span className="capitalize">{String(item.key)}</span>
                   </div>
@@ -423,7 +423,7 @@ export function CategoriesAdmin() {
                   <div className="flex items-center gap-2">
                     <div
                       className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: color }}
+                      style={{ '--swatch-color': color, backgroundColor: 'var(--swatch-color)' } as CSSProperties}
                     />
                     <span className="capitalize">{color}</span>
                   </div>

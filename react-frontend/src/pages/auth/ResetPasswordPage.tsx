@@ -32,6 +32,9 @@ export function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
+  // Track whether the confirm-password field has been blurred so we only
+  // show the mismatch error after the user has left the field (onBlur pattern).
+  const [confirmTouched, setConfirmTouched] = useState(false);
 
   // Validate token exists
   if (!token) {
@@ -207,9 +210,10 @@ export function ResetPasswordPage() {
               placeholder={t('reset_password.confirm_placeholder')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              onBlur={() => setConfirmTouched(true)}
               startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
-              isInvalid={confirmPassword.length > 0 && password !== confirmPassword}
-              errorMessage={confirmPassword.length > 0 && password !== confirmPassword ? t('reset_password.passwords_no_match') : ''}
+              isInvalid={confirmTouched && confirmPassword.length > 0 && password !== confirmPassword}
+              errorMessage={confirmTouched && confirmPassword.length > 0 && password !== confirmPassword ? t('reset_password.passwords_no_match') : ''}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',

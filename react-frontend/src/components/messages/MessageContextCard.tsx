@@ -124,6 +124,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
               src={resolveAssetUrl(context.image_url)}
               alt={context.title}
               className="w-10 h-10 rounded-lg object-cover"
+              loading="lazy"
             />
           ) : (
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${config.color}/10`}>

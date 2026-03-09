@@ -40,7 +40,7 @@ type ActionPerformed = {
 function isNativeApp(): boolean {
   try {
     // Capacitor injects window.Capacitor when running in a native WebView
-    return !!(window as any).Capacitor?.isNativePlatform?.();
+    return !!window.Capacitor?.isNativePlatform?.();
   } catch {
     return false;
   }
@@ -143,7 +143,7 @@ export function usePushNotifications(userId: number | null) {
         // 5. Listen for registration errors
         const errListener = await PushNotifications.addListener(
           'registrationError',
-          (error: any) => {
+          (error: unknown) => {
             console.error('[Push] Registration error:', error);
           }
         );

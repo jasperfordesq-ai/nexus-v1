@@ -45,7 +45,8 @@
     "ai_chat": "AI Assistant",
     "skills": "Skills",
     "nexus_score": "NexusScore",
-    "knowledge_base": "Knowledge Base"
+    "knowledge_base": "Knowledge Base",
+    "unread_notifications": "{{count}} unread notifications"
   },
   "nav_desc": {
     "members": "Browse community members",
@@ -202,7 +203,7 @@
     "pages": "Pages",
     "cookie_settings": "Cookie Settings",
     "built_on_nexus": "Built on Project NEXUS — Open Source Community Platform",
-    "agpl_notice": "AGPL-3.0 — Copyright \u00a9 2024\u2013{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
     "terms": "Terms",
     "privacy": "Privacy"
   },
