@@ -245,7 +245,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         <DrawerHeader className="flex items-center justify-between">
           <Link to={tenantPath('/')} className="flex items-center gap-2">
             {branding.logo ? (
-              <img src={branding.logo} alt={branding.name} className="h-9 w-auto object-contain" />
+              <img src={branding.logo} alt={branding.name} className="h-9 w-auto object-contain" loading="lazy" />
             ) : (
               <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
             )}

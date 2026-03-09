@@ -49,7 +49,7 @@ export function Footer({ children, copyright }: FooterProps) {
               <div className="col-span-2 sm:col-span-1 space-y-3">
                 <Link to={tenantPath('/')} className="flex items-center gap-2">
                   {branding.logo ? (
-                    <img src={branding.logo} alt={branding.name} className="h-7 w-auto object-contain" />
+                    <img src={branding.logo} alt={branding.name} className="h-7 w-auto object-contain" loading="lazy" />
                   ) : (
                     <Hexagon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                   )}

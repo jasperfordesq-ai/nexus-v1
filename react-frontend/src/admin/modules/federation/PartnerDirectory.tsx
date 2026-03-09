@@ -467,7 +467,7 @@ export function PartnerDirectory() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100">
                   {requestTarget.logo_url ? (
-                    <img src={requestTarget.logo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    <img src={requestTarget.logo_url} alt="" className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
                   ) : (
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       <Globe size={18} className="text-primary" />
