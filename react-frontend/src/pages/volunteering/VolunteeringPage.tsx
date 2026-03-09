@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -136,8 +136,24 @@ export function VolunteeringPage() {
   usePageTitle(t('volunteering.page_title'));
   const { isAuthenticated } = useAuth();
   const { tenantPath, hasFeature } = useTenant();
-  const [tab, setTab] = useState<VolunteerTab>('opportunities');
+  const [searchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') as VolunteerTab) ?? 'opportunities';
+  const [tab, setTab] = useState<VolunteerTab>(initialTab);
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      api.get<Array<{ status: string; member_role: string }>>('/v2/volunteering/my-organisations')
+        .then((res) => {
+          if (res.success && Array.isArray(res.data)) {
+            setHasApprovedOrg(
+              res.data.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
+            );
+          }
+        })
+        .catch(() => { /* silent — button just won't show */ });
+    }
+  }, [isAuthenticated]);
 
   // Feature gate
   if (!hasFeature('volunteering')) {
@@ -154,19 +170,6 @@ export function VolunteeringPage() {
     );
   }
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      api.get<Array<{ status: string; member_role: string }>>('/v2/volunteering/my-organisations')
-        .then((res) => {
-          if (res.success && Array.isArray(res.data)) {
-            setHasApprovedOrg(
-              res.data.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
-            );
-          }
-        })
-        .catch(() => { /* silent — button just won't show */ });
-    }
-  }, [isAuthenticated]);
 
   return (
     <div className="space-y-6">

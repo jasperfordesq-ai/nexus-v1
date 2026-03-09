@@ -172,9 +172,8 @@ export default function NexusScorePage() {
     setError(null);
 
     try {
-      const res = await api.get<{ data: NexusScoreData } | NexusScoreData>('/v2/gamification/nexus-score');
-      const payload = res.data && 'data' in res.data ? res.data.data : res.data;
-      setData(payload as NexusScoreData);
+      const res = await api.get<{ data: NexusScoreData }>('/v2/gamification/nexus-score');
+      setData(res.data?.data ?? null);
     } catch (err) {
       logError('NexusScorePage.load', err);
       setError(t('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));

@@ -687,6 +687,7 @@ function AppRoutes() {
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
+          <Route path="volunteering/my-applications" element={<Navigate to="../volunteering?tab=applications" replace />} />
           <Route path="organisations/register" element={
             <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
               <FeatureErrorBoundary featureName="Organisations">
