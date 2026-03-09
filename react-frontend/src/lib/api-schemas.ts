@@ -32,10 +32,21 @@ export const apiResponseSchema = z.object({
   message: z.string().optional(),
   code: z.string().optional(),
   meta: z.object({
-    per_page: z.number(),
+    per_page: z.number().optional(),
     has_more: z.boolean().optional(),
-    cursor: z.string().optional(),
-    next_cursor: z.string().optional(),
+    cursor: z.string().nullable().optional(),
+    next_cursor: z.string().nullable().optional(),
+    previous_cursor: z.string().nullable().optional(),
+    current_page: z.number().optional(),
+    total_items: z.number().optional(),
+    total_pages: z.number().optional(),
+    total: z.number().optional(),
+    from: z.number().optional(),
+    to: z.number().optional(),
+    last_page: z.number().optional(),
+    has_next_page: z.boolean().optional(),
+    has_previous_page: z.boolean().optional(),
+    path: z.string().optional(),
   }).passthrough().optional(),
 }).passthrough();
 
@@ -112,15 +123,22 @@ export const loginResponseSchema = z.union([
  * Validates the pagination meta object.
  */
 export const paginationMetaSchema = z.object({
-  per_page: z.number(),
+  per_page: z.number().optional(),
   has_more: z.boolean().optional(),
   cursor: z.string().nullable().optional(),
   next_cursor: z.string().nullable().optional(),
+  previous_cursor: z.string().nullable().optional(),
   current_page: z.number().optional(),
   total_items: z.number().optional(),
   total_pages: z.number().optional(),
   total: z.number().optional(),
-}).passthrough();
+  from: z.number().optional(),
+  to: z.number().optional(),
+  last_page: z.number().optional(),
+  has_next_page: z.boolean().optional(),
+  has_previous_page: z.boolean().optional(),
+  path: z.string().optional(),
+});
 
 /**
  * Creates a paginated response schema for a given item schema.
@@ -407,4 +425,126 @@ export const uploadResponseSchema = z.object({
   url: z.string(),
   mime_type: z.string(),
   size_bytes: z.number(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin — Dashboard Stats Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates the admin dashboard stats response.
+ * Returned by GET /api/v2/admin/dashboard/stats.
+ */
+export const adminDashboardStatsSchema = z.object({
+  total_users: z.number(),
+  active_users: z.number(),
+  pending_users: z.number(),
+  total_listings: z.number(),
+  active_listings: z.number(),
+  pending_listings: z.number().optional(),
+  total_transactions: z.number(),
+  total_hours_exchanged: z.number(),
+  new_users_this_month: z.number(),
+  new_listings_this_month: z.number(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin — User Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates an AdminUser object.
+ * Returned by GET /api/v2/admin/users and GET /api/v2/admin/users/:id.
+ */
+export const adminUserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  first_name: z.string(),
+  last_name: z.string(),
+  email: z.string(),
+  username: z.string().optional(),
+  avatar: z.string().nullable().optional(),
+  avatar_url: z.string().nullable().optional(),
+  role: z.enum(['member', 'admin', 'moderator', 'tenant_admin', 'super_admin']),
+  status: z.enum(['active', 'inactive', 'suspended', 'pending', 'banned']),
+  tenant_id: z.number().optional(),
+  balance: z.number(),
+  has_2fa_enabled: z.boolean(),
+  is_super_admin: z.boolean(),
+  created_at: z.string(),
+  last_active_at: z.string().nullable().optional(),
+}).passthrough();
+
+/**
+ * Validates a paginated users list response.
+ * Returned by GET /api/v2/admin/users.
+ */
+export const adminUsersResponseSchema = z.object({
+  data: z.array(adminUserSchema),
+  meta: paginationMetaSchema,
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin — Settings Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates the admin settings response.
+ * Returned by GET /api/v2/admin/settings.
+ */
+export const adminSettingsResponseSchema = z.object({
+  tenant_id: z.number(),
+  tenant: z.object({
+    name: z.string(),
+    description: z.string(),
+    contact_email: z.string(),
+    contact_phone: z.string(),
+  }).passthrough(),
+  settings: z.object({
+    registration_mode: z.string().nullable(),
+    email_verification: z.string().nullable(),
+    admin_approval: z.string().nullable(),
+    maintenance_mode: z.string().nullable(),
+  }).passthrough(),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin — Tenant Config Schema (Features & Modules)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates the tenant feature/module config response.
+ * Returned by GET /api/v2/admin/config.
+ */
+export const tenantConfigSchema = z.object({
+  tenant_id: z.number(),
+  features: z.record(z.string(), z.boolean()),
+  modules: z.record(z.string(), z.boolean()),
+}).passthrough();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin — Listings Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Validates an AdminListing object.
+ * Returned by GET /api/v2/admin/listings.
+ */
+export const adminListingSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  type: z.string(),
+  status: z.enum(['active', 'pending', 'inactive', 'archived']),
+  user_id: z.number(),
+  user_name: z.string(),
+  created_at: z.string(),
+}).passthrough();
+
+/**
+ * Validates a paginated listings list response.
+ * Returned by GET /api/v2/admin/listings.
+ */
+export const adminListingsResponseSchema = z.object({
+  data: z.array(adminListingSchema),
+  meta: paginationMetaSchema,
 }).passthrough();

@@ -1738,7 +1738,7 @@ export interface FederationAuditEntry {
   tenant_to_id: number | null;
   ip_address: string | null;
   user_agent: string | null;
-  data: Record<string, any> | null;
+  data: Record<string, unknown> | null;
   created_at: string;
 }
 

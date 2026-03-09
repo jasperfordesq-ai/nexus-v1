@@ -71,15 +71,21 @@ export interface ApiError {
 export interface PaginationMeta {
   per_page: number;
   has_more: boolean;
-  cursor?: string;
-  next_cursor?: string;
-  previous_cursor?: string;
+  cursor?: string | null;
+  next_cursor?: string | null;
+  previous_cursor?: string | null;
   current_page?: number;
   total_items?: number;
   total_pages?: number;
   total?: number;
+  from?: number;
+  to?: number;
+  last_page?: number;
   has_next_page?: boolean;
   has_previous_page?: boolean;
+  path?: string;
+  // Gamification API returns available badge types in meta
+  available_types?: string[];
   // Messages API returns conversation details in meta
   conversation?: {
     id: number;
@@ -94,8 +100,6 @@ export interface PaginationMeta {
     unread_count?: number;
     message_count?: number;
   };
-  // Allow additional meta fields from various endpoints
-  [key: string]: unknown;
 }
 
 export interface RequestOptions extends Omit<RequestInit, 'body'> {
