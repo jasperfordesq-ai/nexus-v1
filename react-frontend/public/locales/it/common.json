@@ -45,7 +45,8 @@
     "skills": "Competenze",
     "nexus_score": "NexusScore",
     "knowledge_base": "Base di conoscenza",
-    "federation_settings": "Impostazioni Federazione"
+    "federation_settings": "Impostazioni Federazione",
+    "unread_notifications": "{{count}} notifiche non lette"
   },
   "nav_desc": {
     "members": "Esplora i membri della comunità",
