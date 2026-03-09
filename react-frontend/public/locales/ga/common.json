@@ -45,7 +45,8 @@
     "skills": "Scileanna",
     "nexus_score": "NexusScore",
     "knowledge_base": "Bunachar eolais",
-    "federation_settings": "Socruithe Cónaidhme"
+    "federation_settings": "Socruithe Cónaidhme",
+    "unread_notifications": "{{count}} fógra gan léamh"
   },
   "nav_desc": {
     "members": "Brabhsáil baill an phobail",
