@@ -12,7 +12,7 @@ use Nexus\Models\NewsletterSubscriber;
  * Public newsletter API endpoints (no auth required).
  * Handles unsubscribe actions initiated from email links.
  */
-class NewsletterApiController
+class NewsletterApiController extends BaseApiController
 {
     /**
      * POST /api/v2/newsletter/unsubscribe
@@ -29,16 +29,14 @@ class NewsletterApiController
         $token = trim($input['token'] ?? $_GET['token'] ?? '');
 
         if (empty($token)) {
-            http_response_code(400);
-            $this->json(['success' => false, 'message' => 'Unsubscribe token is required.']);
+            $this->json(['success' => false, 'message' => 'Unsubscribe token is required.'], 400);
             return;
         }
 
         $subscriber = NewsletterSubscriber::findByUnsubscribeToken($token);
 
         if (!$subscriber) {
-            http_response_code(404);
-            $this->json(['success' => false, 'message' => 'This unsubscribe link is invalid or has already been used.']);
+            $this->json(['success' => false, 'message' => 'This unsubscribe link is invalid or has already been used.'], 404);
             return;
         }
 
@@ -52,14 +50,12 @@ class NewsletterApiController
         if ($result) {
             $this->json(['success' => true]);
         } else {
-            http_response_code(500);
-            $this->json(['success' => false, 'message' => 'Unable to process your request. Please try again.']);
+            $this->json(['success' => false, 'message' => 'Unable to process your request. Please try again.'], 500);
         }
     }
 
-    private function json(array $data): void
+    private function json(array $data, int $status = 200): void
     {
-        header('Content-Type: application/json');
-        echo json_encode($data);
+        $this->jsonResponse($data, $status);
     }
 }

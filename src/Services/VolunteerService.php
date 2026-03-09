@@ -1521,7 +1521,7 @@ class VolunteerService
         }
 
         $sql = "
-            SELECT l.id, l.hours, l.date, l.description, l.status, l.created_at,
+            SELECT l.id, l.hours, l.date_logged, l.description, l.status, l.created_at,
                    u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
                    org.id as org_id, org.name as org_name, org.logo_url as org_logo,
                    opp.id as opp_id, opp.title as opp_title
@@ -1554,7 +1554,7 @@ class VolunteerService
             $items[] = [
                 'id'          => (int)$row['id'],
                 'hours'       => (float)$row['hours'],
-                'date'        => $row['date'],
+                'date'        => $row['date_logged'],
                 'description' => $row['description'],
                 'status'      => $row['status'],
                 'created_at'  => $row['created_at'],

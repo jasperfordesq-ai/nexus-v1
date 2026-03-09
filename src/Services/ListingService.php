@@ -661,7 +661,7 @@ class ListingService
 
         // Handle attributes if provided
         if (isset($data['attributes'])) {
-            Database::query("DELETE FROM listing_attributes WHERE listing_id = ?", [$id]);
+            Database::query("DELETE FROM listing_attributes WHERE listing_id = ? AND listing_id IN (SELECT id FROM listings WHERE tenant_id = ?)", [$id, $tenantId]);
             if (is_array($data['attributes'])) {
                 self::saveAttributes($id, $data['attributes']);
             }

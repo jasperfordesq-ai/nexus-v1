@@ -187,7 +187,7 @@ validate_environment() {
     fi
 
     # Check database connectivity (read password from .env)
-    DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_secret")
+    DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
     if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -p"$DB_PASS" > /dev/null 2>&1; then
         log_ok "Database connection OK"
     else
@@ -324,7 +324,7 @@ run_smoke_tests() {
     fi
 
     # Check database connectivity (read password from .env)
-    DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_secret")
+    DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
     if docker exec nexus-php-db mysqladmin ping -h localhost -unexus -p"$DB_PASS" > /dev/null 2>&1; then
         log_ok "Database still accessible"
     else
@@ -381,7 +381,7 @@ run_pending_migrations() {
     # Read DB credentials from .env
     local DB_USER DB_PASS DB_NAME
     DB_USER=$(grep "^DB_USER=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
-    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_secret")
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
     DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
 
     # Ensure the migrations tracking table exists
@@ -644,7 +644,7 @@ show_status() {
     if [ -d "$MIGRATION_DIR" ]; then
         local DB_USER DB_PASS DB_NAME
         DB_USER=$(grep "^DB_USER=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
-        DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_secret")
+        DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
         DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
         local APPLIED
         APPLIED=$(docker exec nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" \

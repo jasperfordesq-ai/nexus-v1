@@ -460,10 +460,10 @@ export function TenantForm() {
                 <p className="text-xs font-medium uppercase text-default-400 mb-2 flex items-center gap-1">
                   <Eye size={12} /> Google Search Preview
                 </p>
-                <p className="text-lg text-[#1a0dab] dark:text-primary truncate">
+                <p className="text-lg text-blue-700 dark:text-primary truncate">
                   {form.meta_title || form.name || 'Page Title'}
                 </p>
-                <p className="text-sm text-[#006621] dark:text-success truncate">
+                <p className="text-sm text-green-700 dark:text-success truncate">
                   {form.domain ? `https://${form.domain}` : `https://${form.slug || 'tenant'}.project-nexus.ie`}
                 </p>
                 <p className="text-sm text-default-600 line-clamp-2">
