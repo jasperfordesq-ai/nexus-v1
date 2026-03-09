@@ -58,5 +58,6 @@
   "error": {
     "load_balance": "Falha ao carregar saldo da carteira",
     "load_wallet": "Falha ao carregar dados da carteira. Tente novamente."
-  }
+  },
+  "no_members_found": "Nenhum membro encontrado"
 }

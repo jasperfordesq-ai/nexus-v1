@@ -58,5 +58,6 @@
   "error": {
     "load_balance": "Impossible de charger le solde du portefeuille",
     "load_wallet": "Impossible de charger les données du portefeuille. Veuillez réessayer."
-  }
+  },
+  "no_members_found": "Aucun membre trouvé"
 }

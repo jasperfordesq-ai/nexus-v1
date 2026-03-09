@@ -58,5 +58,6 @@
   "error": {
     "load_balance": "Kontostand konnte nicht geladen werden",
     "load_wallet": "Zeitkonto-Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
-  }
+  },
+  "no_members_found": "Keine Mitglieder gefunden"
 }

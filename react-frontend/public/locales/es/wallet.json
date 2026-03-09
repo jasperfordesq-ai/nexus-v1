@@ -58,5 +58,6 @@
   "error": {
     "load_balance": "Error al cargar el saldo de la billetera",
     "load_wallet": "Error al cargar los datos de la billetera. Por favor intenta de nuevo."
-  }
+  },
+  "no_members_found": "No se encontraron miembros"
 }

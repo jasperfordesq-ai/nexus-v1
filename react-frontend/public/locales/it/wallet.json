@@ -58,5 +58,6 @@
   "error": {
     "load_balance": "Impossibile caricare il saldo del portafoglio",
     "load_wallet": "Impossibile caricare i dati del portafoglio. La preghiamo di riprovare."
-  }
+  },
+  "no_members_found": "Nessun membro trovato"
 }
