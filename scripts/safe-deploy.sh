@@ -351,6 +351,14 @@ run_smoke_tests() {
     return 0
 }
 
+# --- Docker image prune ---
+prune_docker_images() {
+    log_step "=== Docker Image Cleanup ==="
+    local RECLAIMED
+    RECLAIMED=$(docker image prune -f 2>&1 | grep 'Total reclaimed' || echo 'Total reclaimed space: 0B')
+    log_ok "Dangling images removed -- $RECLAIMED"
+}
+
 # --- Cloudflare cache purge ---
 purge_cloudflare_cache() {
     log_step "=== Cloudflare Cache Purge (All Domains) ==="
@@ -762,6 +770,9 @@ VEOF
 
     # Purge Cloudflare cache (all 8 domains)
     purge_cloudflare_cache
+
+    # Remove dangling Docker images (prevents disk bloat over time)
+    prune_docker_images
 
     echo "" | tee -a "$LOG_FILE"
     echo "============================================" | tee -a "$LOG_FILE"
