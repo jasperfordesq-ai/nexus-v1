@@ -1,0 +1,107 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { useEffect } from 'react';
+import { Stack, router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { AuthProvider, useAuthContext } from '@/lib/context/AuthContext';
+import { TenantProvider } from '@/lib/context/TenantContext';
+import { RealtimeProvider } from '@/lib/context/RealtimeContext';
+import ErrorBoundary from '@/components/ErrorBoundary';
+
+/**
+ * Root layout — wraps the entire app in providers and handles the
+ * initial auth redirect (auth check → home or login).
+ */
+export default function RootLayout() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ErrorBoundary>
+          <TenantProvider>
+            <AuthProvider>
+              <RealtimeProvider>
+                <StatusBar style="auto" />
+                <RootNavigator />
+              </RealtimeProvider>
+            </AuthProvider>
+          </TenantProvider>
+        </ErrorBoundary>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+/**
+ * Handles the redirect logic after auth state resolves.
+ * Separated from RootLayout so it can consume AuthContext.
+ */
+function RootNavigator() {
+  const { isLoading, isAuthenticated } = useAuthContext();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (isAuthenticated) {
+      router.replace('/(tabs)/home');
+    } else {
+      router.replace('/(auth)/login');
+    }
+  }, [isLoading, isAuthenticated]);
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="(modals)/new-exchange"
+        options={{ presentation: 'modal', headerShown: true, title: 'New Exchange' }}
+      />
+      <Stack.Screen
+        name="(modals)/exchange-detail"
+        options={{ presentation: 'modal', headerShown: true, title: 'Exchange' }}
+      />
+      <Stack.Screen
+        name="(modals)/thread"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/member-profile"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/notifications"
+        options={{ presentation: 'modal', headerShown: true, title: 'Notifications' }}
+      />
+      <Stack.Screen
+        name="(modals)/wallet"
+        options={{ presentation: 'modal', headerShown: true, title: 'Wallet' }}
+      />
+      <Stack.Screen
+        name="(modals)/settings"
+        options={{ presentation: 'modal', headerShown: true, title: 'Settings' }}
+      />
+      <Stack.Screen
+        name="(modals)/edit-profile"
+        options={{ presentation: 'modal', headerShown: true, title: 'Edit Profile' }}
+      />
+      <Stack.Screen
+        name="(modals)/event-detail"
+        options={{ presentation: 'modal', headerShown: true, title: 'Event' }}
+      />
+      <Stack.Screen
+        name="(modals)/members"
+        options={{ presentation: 'modal', headerShown: true, title: 'Members' }}
+      />
+      <Stack.Screen
+        name="(modals)/change-password"
+        options={{ presentation: 'modal', headerShown: true, title: 'Change Password' }}
+      />
+    </Stack>
+  );
+}
