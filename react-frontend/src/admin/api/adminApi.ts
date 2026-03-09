@@ -129,8 +129,7 @@ import type {
 // Helper
 // ─────────────────────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildQuery(params: Record<string, any>): string {
+function buildQuery<T extends object>(params: T): string {
   const parts: string[] = [];
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined && value !== null && value !== '') {
