@@ -169,6 +169,14 @@ export function CreateJobPage() {
     if (!form.description.trim()) {
       newErrors.description = t('form.validation.description_required');
     }
+    if (form.deadline) {
+      const deadlineDate = new Date(form.deadline);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (deadlineDate < today) {
+        newErrors.deadline = t('form.validation.deadline_past', 'Deadline must be a future date');
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -214,9 +222,13 @@ export function CreateJobPage() {
       if (response.success) {
         toast.success(isEditing ? t('form.update_success') : t('form.create_success'));
         const newId = isEditing ? id : (response.data as Record<string, unknown>)?.id;
-        navigate(tenantPath(`/jobs/${newId}`));
+        if (newId) {
+          navigate(tenantPath(`/jobs/${newId}`));
+        } else {
+          navigate(tenantPath('/jobs'));
+        }
       } else {
-        toast.error(isEditing ? t('form.update_error') : t('form.create_error'));
+        toast.error(response.error || (isEditing ? t('form.update_error') : t('form.create_error')));
       }
     } catch (err) {
       logError('Failed to save vacancy', err);
@@ -449,6 +461,8 @@ export function CreateJobPage() {
             label={t('form.deadline_label')}
             value={form.deadline}
             onChange={(e) => updateField('deadline', e.target.value)}
+            isInvalid={!!errors.deadline}
+            errorMessage={errors.deadline}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -529,6 +543,60 @@ export function CreateJobPage() {
             >
               {t('form.cancel')}
             </Button>
+            {!isEditing && (
+              <Button
+                variant="flat"
+                className="bg-theme-elevated text-theme-muted"
+                onPress={async () => {
+                  if (!validate()) return;
+                  setIsSubmitting(true);
+                  try {
+                    const payload: Record<string, unknown> = {
+                      title: form.title.trim(),
+                      description: form.description.trim(),
+                      type: form.type,
+                      commitment: form.commitment,
+                      is_remote: form.is_remote,
+                      status: 'draft',
+                    };
+                    if (form.category.trim()) payload.category = form.category.trim();
+                    if (form.location.trim()) payload.location = form.location.trim();
+                    if (form.skills_required.trim()) payload.skills_required = form.skills_required.trim();
+                    if (form.hours_per_week) payload.hours_per_week = parseFloat(form.hours_per_week);
+                    if (form.time_credits) payload.time_credits = parseFloat(form.time_credits);
+                    if (form.contact_email.trim()) payload.contact_email = form.contact_email.trim();
+                    if (form.contact_phone.trim()) payload.contact_phone = form.contact_phone.trim();
+                    if (form.deadline) payload.deadline = form.deadline;
+                    if (form.salary_min) payload.salary_min = parseFloat(form.salary_min);
+                    if (form.salary_max) payload.salary_max = parseFloat(form.salary_max);
+                    if (form.salary_type) payload.salary_type = form.salary_type;
+                    if (form.salary_currency.trim()) payload.salary_currency = form.salary_currency.trim();
+                    payload.salary_negotiable = form.salary_negotiable;
+                    const response = await api.post('/v2/jobs', payload);
+                    if (response.success) {
+                      toast.success(t('form.draft_saved', 'Draft saved'));
+                      const newId = (response.data as Record<string, unknown>)?.id;
+                      if (newId) {
+                        navigate(tenantPath(`/jobs/${newId}`));
+                      } else {
+                        navigate(tenantPath('/jobs'));
+                      }
+                    } else {
+                      toast.error(response.error || t('form.create_error'));
+                    }
+                  } catch (err) {
+                    logError('Failed to save draft', err);
+                    toast.error(t('form.create_error'));
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+                isLoading={isSubmitting}
+                isDisabled={!form.title.trim() || !form.description.trim()}
+              >
+                {t('form.save_draft', 'Save as Draft')}
+              </Button>
+            )}
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={handleSubmit}

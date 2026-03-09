@@ -792,4 +792,39 @@ class JobVacanciesApiController extends BaseApiController
 
         $this->respondWithData($vacancy);
     }
+
+    /**
+     * GET /api/v2/jobs/my-postings
+     *
+     * List all job vacancies posted by the current user (any status).
+     *
+     * Query Parameters:
+     * - cursor: string (pagination cursor)
+     * - per_page: int (default 20, max 50)
+     */
+    public function myPostings(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_my_postings', 30, 60);
+
+        $tenantId = TenantContext::getId();
+
+        $params = [
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        if ($this->query('cursor')) {
+            $params['cursor'] = $this->query('cursor');
+        }
+
+        $result = JobVacancyService::getMyPostings($userId, $tenantId, $params);
+
+        $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $params['limit'],
+            $result['has_more']
+        );
+    }
 }

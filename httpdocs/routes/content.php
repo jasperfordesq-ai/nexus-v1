@@ -10,6 +10,7 @@ $router->add('GET', '/api/v2/jobs', 'Nexus\Controllers\Api\JobVacanciesApiContro
 $router->add('POST', '/api/v2/jobs', 'Nexus\Controllers\Api\JobVacanciesApiController@store');
 $router->add('GET', '/api/v2/jobs/saved', 'Nexus\Controllers\Api\JobVacanciesApiController@savedJobs');
 $router->add('GET', '/api/v2/jobs/my-applications', 'Nexus\Controllers\Api\JobVacanciesApiController@myApplications');
+$router->add('GET', '/api/v2/jobs/my-postings', 'Nexus\Controllers\Api\JobVacanciesApiController@myPostings');
 $router->add('GET', '/api/v2/jobs/alerts', 'Nexus\Controllers\Api\JobVacanciesApiController@listAlerts');
 $router->add('POST', '/api/v2/jobs/alerts', 'Nexus\Controllers\Api\JobVacanciesApiController@createAlert');
 $router->add('DELETE', '/api/v2/jobs/alerts/{id}', 'Nexus\Controllers\Api\JobVacanciesApiController@deleteAlert');

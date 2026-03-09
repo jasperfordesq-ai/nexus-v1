@@ -213,7 +213,7 @@ export function JobDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [applyMessage, setApplyMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showApplications, setShowApplications] = useState(false);
+  const [showApplications, setShowApplications] = useState(true);
   const [isLoadingApps, setIsLoadingApps] = useState(false);
 
   // J1: Saved state
@@ -652,6 +652,59 @@ export function JobDetailPage() {
         )}
       </GlassCard>
 
+      {/* Owner management banner */}
+      {isOwner && (
+        <GlassCard className="p-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="font-semibold text-theme-primary">You posted this vacancy</p>
+                <p className="text-sm text-theme-muted">
+                  {vacancy.applications_count > 0
+                    ? `${vacancy.applications_count} applicant${vacancy.applications_count !== 1 ? 's' : ''} — scroll down to review`
+                    : 'No applicants yet — share this listing to get more visibility'}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <Link to={tenantPath(`/jobs/${vacancy.id}/edit`)}>
+                <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<Edit3 className="w-4 h-4" aria-hidden="true" />}>
+                  Edit
+                </Button>
+              </Link>
+              <Link to={tenantPath(`/jobs/${vacancy.id}/analytics`)}>
+                <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}>
+                  Analytics
+                </Button>
+              </Link>
+              {vacancy.status === 'open' && (
+                <Button size="sm" color="warning" variant="flat" onPress={async () => {
+                  try {
+                    const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'closed' });
+                    if (res.success) { toast.success('Vacancy closed'); loadVacancy(); }
+                  } catch {}
+                }}>
+                  Close Vacancy
+                </Button>
+              )}
+              {vacancy.status !== 'open' && (
+                <Button size="sm" color="success" variant="flat" onPress={async () => {
+                  try {
+                    const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'open' });
+                    if (res.success) { toast.success('Vacancy reopened'); loadVacancy(); }
+                  } catch {}
+                }}>
+                  Reopen
+                </Button>
+              )}
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
@@ -707,6 +760,7 @@ export function JobDetailPage() {
 
           {/* J3: Applications pipeline (owner view) */}
           {isOwner && (
+            <div id="applications">
             <GlassCard className="p-6">
               <button
                 onClick={() => setShowApplications(!showApplications)}
@@ -731,10 +785,23 @@ export function JobDetailPage() {
                       ))}
                     </div>
                   ) : applications.length === 0 ? (
-                    <div className="text-center py-8">
-                      <FileText className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-                      <p className="text-theme-muted">{t('detail.no_applications')}</p>
-                      <p className="text-sm text-theme-subtle mt-1">{t('detail.no_applications_desc')}</p>
+                    <div className="text-center py-8 space-y-3">
+                      <div className="w-14 h-14 rounded-full bg-theme-elevated flex items-center justify-center mx-auto">
+                        <Users className="w-7 h-7 text-theme-subtle" aria-hidden="true" />
+                      </div>
+                      <p className="font-medium text-theme-primary">{t('detail.no_applications', 'No applications yet')}</p>
+                      <p className="text-sm text-theme-muted">{t('detail.no_applications_desc', "Share your vacancy to attract candidates. When someone applies, they'll appear here.")}</p>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          size="sm"
+                          variant="flat"
+                          className="bg-theme-elevated text-theme-muted"
+                          startContent={<RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
+                          onPress={loadApplications}
+                        >
+                          {t('detail.refresh', 'Refresh')}
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     applications.map((app) => (
@@ -748,6 +815,7 @@ export function JobDetailPage() {
                 </div>
               )}
             </GlassCard>
+            </div>
           )}
         </div>
 
