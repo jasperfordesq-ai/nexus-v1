@@ -47,8 +47,7 @@ import {
   PoundSterling,
   Sparkles,
 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { StatCard, PageHeader } from '../../components';
@@ -211,8 +210,13 @@ export function ImpactReport() {
   // PDF export
   // -------------------------------------------------------------------------
 
-  const exportPdf = () => {
+  const exportPdf = async () => {
     if (!data) return;
+
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable'),
+    ]);
 
     const doc = new jsPDF();
 
