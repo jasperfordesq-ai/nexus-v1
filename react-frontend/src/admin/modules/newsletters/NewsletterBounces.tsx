@@ -306,6 +306,7 @@ export function NewsletterBounces() {
           <div className="flex gap-2 w-full">
             <Input
               placeholder="Search by email..."
+              aria-label="Search bounced emails"
               value={searchQuery}
               onValueChange={setSearchQuery}
               startContent={<Search size={16} />}

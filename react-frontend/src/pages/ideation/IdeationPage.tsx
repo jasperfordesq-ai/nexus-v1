@@ -404,6 +404,7 @@ export function IdeationPage() {
           placeholder={t('search.placeholder')}
           value={searchQuery}
           onValueChange={setSearchQuery}
+          aria-label={t('search.placeholder')}
           startContent={<Search className="w-4 h-4 text-[var(--color-text-tertiary)]" />}
           endContent={searchQuery ? (
             <Button
@@ -420,7 +421,6 @@ export function IdeationPage() {
           variant="bordered"
           size="sm"
           className="max-w-md"
-          aria-label={t('search.label')}
         />
 
         {/* Tag Filter Chips */}

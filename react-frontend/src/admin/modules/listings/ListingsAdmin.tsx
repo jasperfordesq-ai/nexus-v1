@@ -211,6 +211,7 @@ function FeaturedListingsPanel() {
           </h3>
           <Input
             placeholder="Search active listings to feature..."
+            aria-label="Search listings"
             startContent={<Search size={16} className="text-default-400" />}
             value={searchQuery}
             onValueChange={handleSearch}

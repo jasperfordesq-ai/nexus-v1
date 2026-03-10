@@ -145,12 +145,12 @@ export function HashtagsDiscoveryPage() {
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+          aria-label={t('hashtags.search_placeholder')}
           endContent={isSearching ? <Spinner size="sm" /> : undefined}
           classNames={{
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
             inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
           }}
-          aria-label={t('hashtags.search_placeholder')}
         />
       </GlassCard>
 

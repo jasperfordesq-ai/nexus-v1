@@ -335,6 +335,7 @@ export default function ReportsManagement() {
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
           placeholder="Search reports..."
+          aria-label="Search reports"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

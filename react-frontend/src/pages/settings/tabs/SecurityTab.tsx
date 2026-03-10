@@ -458,6 +458,7 @@ export function SecurityTab({
                   value={deleteConfirmation}
                   onChange={(e) => onDeleteConfirmationChange(e.target.value)}
                   placeholder="DELETE"
+                  aria-label="Type DELETE to confirm account deletion"
                   classNames={{
                     input: 'bg-transparent text-theme-primary font-mono',
                     inputWrapper: 'bg-theme-elevated border-theme-default',

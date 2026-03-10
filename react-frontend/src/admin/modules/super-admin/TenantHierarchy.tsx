@@ -406,6 +406,7 @@ export function TenantHierarchy() {
             {/* Search */}
             <Input
               placeholder="Search by name or slug..."
+              aria-label="Search tenants"
               value={search}
               onValueChange={setSearch}
               startContent={<Search size={16} className="text-default-400" />}

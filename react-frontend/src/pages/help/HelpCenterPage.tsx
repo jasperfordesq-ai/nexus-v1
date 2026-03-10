@@ -118,6 +118,7 @@ export function HelpCenterPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+            aria-label={t('help.search_placeholder')}
             size="lg"
             classNames={{
               input: 'bg-transparent text-theme-primary',

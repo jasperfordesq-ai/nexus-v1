@@ -114,6 +114,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
           <Input
             size="sm"
             placeholder="Type a skill and press Enter..."
+            aria-label="Add skill tag"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}

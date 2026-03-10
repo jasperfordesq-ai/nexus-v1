@@ -170,6 +170,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="Copy threshold hours"
               value={String(config.broker_copy_threshold_hours)}
               onValueChange={v => updateConfig('broker_copy_threshold_hours', parseInt(v) || 0)}
               className="w-24"
@@ -186,6 +187,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="New member monitoring days"
               value={String(config.new_member_monitoring_days)}
               onValueChange={v => updateConfig('new_member_monitoring_days', parseInt(v) || 0)}
               className="w-24"
@@ -297,6 +299,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="Exchange timeout days"
               value={String(config.exchange_timeout_days)}
               onValueChange={v => updateConfig('exchange_timeout_days', parseInt(v) || 7)}
               className="w-24"
@@ -313,6 +316,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="Max hours without approval"
               value={String(config.max_hours_without_approval)}
               onValueChange={v => updateConfig('max_hours_without_approval', v === '' ? 0 : parseFloat(v))}
               className="w-24"
@@ -330,6 +334,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="Confirmation deadline hours"
               value={String(config.confirmation_deadline_hours)}
               onValueChange={v => updateConfig('confirmation_deadline_hours', parseInt(v) || 48)}
               className="w-24"
@@ -346,6 +351,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="Expiry hours"
               value={String(config.expiry_hours)}
               onValueChange={v => updateConfig('expiry_hours', parseInt(v) || 168)}
               className="w-24"
@@ -375,6 +381,7 @@ export default function BrokerConfiguration() {
                 </div>
                 <Input
                   type="number"
+                  aria-label="Max hour variance percent"
                   value={String(config.max_hour_variance_percent)}
                   onValueChange={v => updateConfig('max_hour_variance_percent', parseInt(v) || 0)}
                   className="w-24"
@@ -424,6 +431,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="email"
+              aria-label="Broker contact email"
               value={config.broker_contact_email}
               onValueChange={v => updateConfig('broker_contact_email', v)}
               placeholder="broker@example.com"
@@ -481,6 +489,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="Random sample percentage"
               value={String(config.random_sample_percentage)}
               onValueChange={v => updateConfig('random_sample_percentage', parseInt(v) || 0)}
               className="w-24"
@@ -497,6 +506,7 @@ export default function BrokerConfiguration() {
             </div>
             <Input
               type="number"
+              aria-label="Retention days"
               value={String(config.retention_days)}
               onValueChange={v => updateConfig('retention_days', parseInt(v) || 90)}
               className="w-24"
@@ -568,6 +578,7 @@ export default function BrokerConfiguration() {
             <Input
               type="number"
               variant="bordered"
+              aria-label="Vetting expiry warning days"
               value={String(config.vetting_expiry_warning_days)}
               onValueChange={v => updateConfig('vetting_expiry_warning_days', parseInt(v) || 30)}
               className="w-24"
@@ -582,6 +593,7 @@ export default function BrokerConfiguration() {
             <Input
               type="number"
               variant="bordered"
+              aria-label="Insurance expiry warning days"
               value={String(config.insurance_expiry_warning_days)}
               onValueChange={v => updateConfig('insurance_expiry_warning_days', parseInt(v) || 30)}
               className="w-24"

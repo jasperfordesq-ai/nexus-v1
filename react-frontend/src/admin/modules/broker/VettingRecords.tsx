@@ -691,6 +691,7 @@ export function VettingRecords() {
       <div className="mb-4">
         <Input
           placeholder="Search by name, email, or reference number..."
+          aria-label="Search vetting records"
           value={searchQuery}
           onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
           startContent={<Search size={16} className="text-default-400" />}

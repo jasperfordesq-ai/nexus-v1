@@ -221,6 +221,7 @@ export function PartnerDirectory() {
             <Input
               className="flex-1"
               placeholder="Search communities by name, description, or region..."
+              aria-label="Search partner communities"
               startContent={<Search size={16} className="text-default-400" />}
               value={search}
               onValueChange={setSearch}

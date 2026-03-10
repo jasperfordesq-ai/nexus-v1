@@ -159,6 +159,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         <div className="flex-1">
           <Input
             placeholder={t('compose.poll_question_placeholder')}
+            aria-label={t('compose.poll_question_placeholder')}
             value={draft.question}
             onChange={(e) => setQuestion(e.target.value)}
             classNames={{
@@ -178,6 +179,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
             </div>
             <Input
               placeholder={t('compose.poll_option_placeholder', { number: index + 1 })}
+              aria-label={`Poll option ${index + 1}`}
               value={opt}
               onChange={(e) => updateOption(index, e.target.value)}
               size="sm"

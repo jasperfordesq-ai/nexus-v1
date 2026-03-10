@@ -369,6 +369,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
               <div className="flex gap-2">
                 <Input
                   placeholder={t('chatrooms.message_placeholder')}
+                  aria-label={t('chatrooms.message_placeholder')}
                   value={newMessage}
                   onValueChange={setNewMessage}
                   onKeyDown={handleKeyDown}

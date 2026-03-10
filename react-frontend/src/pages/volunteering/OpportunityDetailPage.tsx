@@ -297,6 +297,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           value={nameSearch}
           onValueChange={setNameSearch}
           startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" />}
+          aria-label="Search volunteers by name"
           classNames={{ base: 'max-w-xs', inputWrapper: 'bg-theme-elevated' }}
         />
 

@@ -188,6 +188,7 @@ export function BlogPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+            aria-label={t('search_placeholder')}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',

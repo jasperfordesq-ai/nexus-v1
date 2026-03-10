@@ -422,6 +422,7 @@ export function MessagesPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-subtle" />}
+          aria-label={t('search_placeholder')}
           classNames={{
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
             inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -451,6 +452,7 @@ export function MessagesPage() {
               value={userSearchQuery}
               onChange={(e) => setUserSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
+              aria-label={t('member_search_placeholder')}
               endContent={isSearchingUsers && <Loader2 className="w-4 h-4 text-theme-subtle animate-spin" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',

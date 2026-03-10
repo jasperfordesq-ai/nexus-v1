@@ -313,6 +313,7 @@ export function SkillsBrowsePage() {
             setSelectedSkill(null);
           }}
           startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+          aria-label={t('skills.search_placeholder')}
           endContent={
             searchQuery ? (
               <Button
@@ -331,7 +332,6 @@ export function SkillsBrowsePage() {
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
             inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
           }}
-          aria-label={t('skills.search_placeholder', 'Search skill categories')}
         />
       </GlassCard>
 

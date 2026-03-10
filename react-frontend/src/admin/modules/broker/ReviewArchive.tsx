@@ -178,6 +178,7 @@ export function ReviewArchive() {
         <Input
           className="w-full sm:max-w-xs"
           placeholder="Search sender or receiver..."
+          aria-label="Search review archive"
           startContent={<Search size={16} className="text-default-400" />}
           value={search}
           onValueChange={handleSearchChange}

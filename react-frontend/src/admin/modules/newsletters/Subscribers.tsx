@@ -491,6 +491,7 @@ export function Subscribers() {
           <Input
             size="sm"
             placeholder="Search by name or email..."
+            aria-label="Search subscribers"
             startContent={<Search size={14} className="text-default-400" />}
             value={searchInput}
             onValueChange={handleSearchChange}

@@ -83,6 +83,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
             <span>Choose Icon</span>
             <Input
               placeholder="Search icons..."
+              aria-label="Search icons"
               value={search}
               onValueChange={setSearch}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}

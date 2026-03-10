@@ -298,6 +298,7 @@ export function SkillSelector({
             {/* Search */}
             <Input
               placeholder="Search for a skill..."
+              aria-label="Search skills"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
