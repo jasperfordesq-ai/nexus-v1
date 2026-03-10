@@ -90,7 +90,10 @@ class BlogPublicApiController extends BaseApiController
             array_pop($items);
         }
 
-        $baseUrl = UrlHelper::getBaseUrl();
+        // Uploads are served from the PHP API server, not the tenant frontend domain.
+        // UrlHelper::getBaseUrl() returns the tenant frontend URL (e.g. hour-timebank.ie)
+        // which has no /uploads/ directory. Always use APP_URL.
+        $baseUrl = rtrim(getenv("APP_URL") ?: ($_ENV["APP_URL"] ?? "https://api.project-nexus.ie"), "/");
         $cursor = null;
         if ($hasMore && !empty($items)) {
             $lastItem = end($items);
@@ -186,7 +189,10 @@ class BlogPublicApiController extends BaseApiController
             return;
         }
 
-        $baseUrl = UrlHelper::getBaseUrl();
+        // Uploads are served from the PHP API server, not the tenant frontend domain.
+        // UrlHelper::getBaseUrl() returns the tenant frontend URL (e.g. hour-timebank.ie)
+        // which has no /uploads/ directory. Always use APP_URL.
+        $baseUrl = rtrim(getenv("APP_URL") ?: ($_ENV["APP_URL"] ?? "https://api.project-nexus.ie"), "/");
         $content = $post['html_render'] ?? $post['content'] ?? '';
         $wordCount = str_word_count(strip_tags($content));
         $readingTime = max(1, (int) ceil($wordCount / 200));
