@@ -540,8 +540,8 @@ export function NewsletterStats() {
                       paddingAngle={3}
                       dataKey="value"
                     >
-                      {deviceChartData.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
+                      {deviceChartData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip
@@ -681,8 +681,8 @@ export function NewsletterStats() {
                 <TableColumn align="end">Unique</TableColumn>
               </TableHeader>
               <TableBody>
-                {top_links.map((link, i) => (
-                  <TableRow key={i}>
+                {top_links.map((link) => (
+                  <TableRow key={link.url}>
                     <TableCell>
                       <a
                         href={link.url}
@@ -738,8 +738,8 @@ export function NewsletterStats() {
                   <TableColumn>Time</TableColumn>
                 </TableHeader>
                 <TableBody>
-                  {recent_activity.map((item, i) => (
-                    <TableRow key={i}>
+                  {recent_activity.map((item) => (
+                    <TableRow key={`${item.email}-${item.action_at}`}>
                       <TableCell>
                         <Chip
                           size="sm"

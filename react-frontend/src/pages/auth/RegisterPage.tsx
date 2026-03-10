@@ -15,7 +15,7 @@
  * Desktop shows all fields, mobile shows one step at a time
  */
 
-import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Input, Checkbox, Divider, Select, SelectItem, Progress } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -187,24 +187,24 @@ export function RegisterPage() {
   }, [selectedTenantId, tenant?.id]);
 
   // Handle tenant selection
-  const handleTenantChange = (keys: unknown) => {
+  const handleTenantChange = useCallback((keys: unknown) => {
     const selectedKeys = keys as Set<string>;
     const tenantId = Array.from(selectedKeys)[0] || '';
     setSelectedTenantId(tenantId);
     if (tenantId) {
       tokenManager.setTenantId(tenantId);
     }
-  };
+  }, []);
 
   // Handle profile type selection
-  const handleProfileTypeChange = (keys: unknown) => {
+  const handleProfileTypeChange = useCallback((keys: unknown) => {
     const selectedKeys = keys as Set<string>;
     const type = (Array.from(selectedKeys)[0] as ProfileType) || 'individual';
     setProfileType(type);
     if (type === 'individual') {
       setOrganizationName('');
     }
-  };
+  }, []);
 
   // Redirect after successful registration
   useEffect(() => {
@@ -221,7 +221,7 @@ export function RegisterPage() {
   }, [firstName, lastName, email, password, passwordConfirm, location, phone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Validate invite code (debounced on blur)
-  const validateInviteCode = async () => {
+  const validateInviteCode = useCallback(async () => {
     if (!inviteCode.trim() || inviteCode.trim().length < 4) {
       setInviteCodeValid(null);
       return;
@@ -237,7 +237,7 @@ export function RegisterPage() {
     } finally {
       setInviteCodeChecking(false);
     }
-  };
+  }, [inviteCode]);
 
   // Validation for each step
   // tenant?.id means TenantContext already resolved the tenant (custom domain or slug route)
@@ -256,7 +256,7 @@ export function RegisterPage() {
     password === passwordConfirm;
   const isStep4Valid = termsAccepted;
 
-  const canProceed = () => {
+  const canProceed = useCallback(() => {
     switch (currentStep) {
       case 1:
         return isStep1Valid;
@@ -269,21 +269,21 @@ export function RegisterPage() {
       default:
         return false;
     }
-  };
+  }, [currentStep, isStep1Valid, isStep2Valid, isStep3Valid, isStep4Valid]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentStep < 4 && canProceed()) {
       setCurrentStep(currentStep + 1);
     }
-  };
+  }, [currentStep, canProceed]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
-  };
+  }, [currentStep]);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
 
     // Bot protection checks
@@ -341,7 +341,12 @@ export function RegisterPage() {
       // No gates — redirect to dashboard (fully authenticated)
       navigate(tenantPath('/dashboard'), { replace: true });
     }
-  };
+  }, [
+    formStartTime, clearError, password, passwordConfirm, tenants, selectedTenantId,
+    tenant?.id, register, firstName, lastName, email, profileType, organizationName,
+    location, latitude, longitude, phone, termsAccepted, newsletterOptIn,
+    requiresInviteCode, inviteCode, navigate, tenantPath,
+  ]);
 
   const passwordValid = isPasswordValid(password);
   const passwordsMatch = password === passwordConfirm;

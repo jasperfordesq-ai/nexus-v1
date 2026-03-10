@@ -27,6 +27,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
+import { CHART_COLORS } from '@/lib/chartColors';
 import {
   TrendingUp,
   Users,
@@ -100,18 +101,7 @@ interface GeographyData {
 // Chart color palette (works well in both light and dark modes)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PIE_COLORS = [
-  '#6366f1', // indigo
-  '#10b981', // emerald
-  '#f59e0b', // amber
-  '#ef4444', // red
-  '#8b5cf6', // violet
-  '#06b6d4', // cyan
-  '#f97316', // orange
-  '#ec4899', // pink
-  '#14b8a6', // teal
-  '#a855f7', // purple
-];
+const PIE_COLORS = CHART_COLORS;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -657,7 +647,7 @@ export function CommunityAnalytics() {
                     <h4 className="text-sm font-semibold text-foreground mb-3">Top Areas</h4>
                     <div className="space-y-2">
                       {geoData.top_areas.map((area, i) => (
-                        <div key={i} className="flex items-center gap-3">
+                        <div key={area.area} className="flex items-center gap-3">
                           <span className="text-xs text-default-400 w-6">{i + 1}.</span>
                           <span className="text-sm text-foreground flex-1">{area.area}</span>
                           <span className="text-xs text-default-500">

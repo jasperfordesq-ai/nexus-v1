@@ -133,8 +133,8 @@ export function GamificationAnalytics() {
               </div>
             ) : stats?.badge_distribution && stats.badge_distribution.length > 0 ? (
               <div className="space-y-3">
-                {stats.badge_distribution.map((badge, index) => (
-                  <div key={index} className="flex items-center gap-3">
+                {stats.badge_distribution.map((badge) => (
+                  <div key={badge.badge_name} className="flex items-center gap-3">
                     <span className="w-32 truncate text-sm text-foreground font-medium" title={badge.badge_name}>
                       {badge.badge_name}
                     </span>
