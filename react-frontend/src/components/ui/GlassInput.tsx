@@ -3,11 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { forwardRef, type InputHTMLAttributes } from 'react';
+import { Input } from '@heroui/react';
+import type { InputProps } from '@heroui/react';
 
-export interface GlassInputProps extends InputHTMLAttributes<HTMLInputElement> {
-  /** Label text displayed above input */
-  label?: string;
+export interface GlassInputProps extends Omit<InputProps, 'errorMessage'> {
   /** Error message to display */
   error?: string;
   /** Helper text displayed below input */
@@ -17,55 +16,42 @@ export interface GlassInputProps extends InputHTMLAttributes<HTMLInputElement> {
 /**
  * GlassInput - Glassmorphism input component
  *
- * Uses centralized CSS utilities from styles/glass.css
+ * Wraps HeroUI Input with glassmorphism styling.
  */
-export const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(
-  ({ label, error, helperText, className = '', id, disabled, ...props }, ref) => {
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
-    const errorClass = error ? 'glass-input-error' : '';
-    const combinedClassName = ['glass-input', 'backdrop-blur-lg', errorClass, className].filter(Boolean).join(' ');
+export function GlassInput({
+  label,
+  error,
+  helperText,
+  isDisabled,
+  classNames,
+  ...props
+}: GlassInputProps) {
+  return (
+    <Input
+      label={label}
+      isDisabled={isDisabled}
+      isInvalid={!!error}
+      errorMessage={error}
+      description={!error ? helperText : undefined}
+      variant="bordered"
+      classNames={{
+        inputWrapper: [
+          'bg-white/10',
+          'backdrop-blur-lg',
+          'border-white/20',
+          'hover:bg-white/15',
+          'focus-within:bg-white/15',
+          classNames?.inputWrapper ?? '',
+        ].filter(Boolean).join(' '),
+        input: ['bg-transparent', classNames?.input ?? ''].filter(Boolean).join(' '),
+        ...classNames,
+      }}
+      {...props}
+    />
+  );
+}
 
-    return (
-      <div className="w-full">
-        {label && (
-          <label
-            htmlFor={inputId}
-            className="block text-sm font-medium mb-2 text-theme-muted"
-          >
-            {label}
-          </label>
-        )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={combinedClassName}
-          disabled={disabled}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
-          {...props}
-        />
-        {error && (
-          <p
-            id={`${inputId}-error`}
-            className="mt-2 text-sm text-red-500 dark:text-red-400"
-            role="alert"
-          >
-            {error}
-          </p>
-        )}
-        {helperText && !error && (
-          <p
-            id={`${inputId}-helper`}
-            className="mt-2 text-sm text-theme-subtle"
-          >
-            {helperText}
-          </p>
-        )}
-      </div>
-    );
-  }
-);
-
-GlassInput.displayName = 'GlassInput';
+// Named export alias kept for backwards compatibility
+export const GlassInputComponent = GlassInput;
 
 export default GlassInput;

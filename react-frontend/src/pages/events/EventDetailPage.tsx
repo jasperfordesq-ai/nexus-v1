@@ -26,6 +26,7 @@ import {
   Card,
   CardBody,
   Skeleton,
+  Textarea,
 } from '@heroui/react';
 import {
   Calendar,
@@ -1180,12 +1181,16 @@ export function EventDetailPage() {
             <p className="text-theme-muted mb-4">
               {t('detail.cancel_confirm', { title: event.title })}
             </p>
-            <textarea
-              className="w-full p-3 rounded-lg bg-theme-elevated border border-theme-default text-theme-primary placeholder:text-theme-subtle resize-none"
-              rows={3}
+            <Textarea
               placeholder={t('detail.cancel_reason_placeholder')}
               value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
+              onValueChange={setCancelReason}
+              minRows={3}
+              maxRows={6}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
             />
           </ModalBody>
           <ModalFooter>
