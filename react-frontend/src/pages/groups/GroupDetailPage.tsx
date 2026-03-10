@@ -8,9 +8,9 @@
  * Full discussions UI, admin features, events tab, member management
  */
 
-import { useState, useEffect, useCallback, useRef, Fragment } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Button,
   Avatar,
@@ -25,13 +25,7 @@ import {
   Textarea,
   Switch,
   Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Spinner,
-  Skeleton,
-  Divider,
   useDisclosure,
 } from '@heroui/react';
 import {
@@ -45,28 +39,18 @@ import {
   Calendar,
   AlertCircle,
   FolderTree,
-  ChevronRight,
   RefreshCw,
   ArrowLeft,
   Plus,
-  Send,
   Trash2,
-  Clock,
   MapPin,
-  MoreVertical,
-  Shield,
-  ShieldCheck,
-  UserX,
   CheckCircle,
   XCircle,
   FileText,
-  ChevronDown,
-  ChevronUp,
   Upload,
   Image,
   Newspaper,
   Flag,
-  TrendingUp,
   FolderOpen,
   Megaphone,
 } from 'lucide-react';
@@ -81,13 +65,22 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
-import { FeedCard } from '@/components/feed/FeedCard';
-import { TeamChatrooms, TeamTasks } from '@/components/ideation';
 import type { FeedItem } from '@/components/feed/types';
-import { getAuthor } from '@/components/feed/types';
 import type { Group, User, FeedPost, Event } from '@/types/api';
+
+// Tab components
+import { GroupFeedTab } from './tabs/GroupFeedTab';
+import { GroupDiscussionTab } from './tabs/GroupDiscussionTab';
+import type { Discussion, DiscussionDetail, DiscussionMessage } from './tabs/GroupDiscussionTab';
+import { GroupMembersTab } from './tabs/GroupMembersTab';
+import type { GroupMember } from './tabs/GroupMembersTab';
+import { GroupEventsTab } from './tabs/GroupEventsTab';
 import { GroupFilesTab } from './tabs/GroupFilesTab';
 import { GroupAnnouncementsTab } from './tabs/GroupAnnouncementsTab';
+import { GroupChatroomsTab } from './tabs/GroupChatroomsTab';
+import { GroupTasksTab } from './tabs/GroupTasksTab';
+import { GroupSubgroupsTab } from './tabs/GroupSubgroupsTab';
+import { PinnedAnnouncementsBanner } from './components/PinnedAnnouncementsBanner';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -96,37 +89,6 @@ import { GroupAnnouncementsTab } from './tabs/GroupAnnouncementsTab';
 interface GroupDetails extends Group {
   members?: User[];
   recent_posts?: FeedPost[];
-}
-
-interface Discussion {
-  id: number;
-  title: string;
-  content?: string;
-  author: {
-    id: number;
-    name: string;
-    avatar_url?: string | null;
-  };
-  reply_count: number;
-  is_pinned?: boolean;
-  last_reply_at?: string | null;
-  created_at: string;
-}
-
-interface DiscussionMessage {
-  id: number;
-  content: string;
-  author: {
-    id: number;
-    name: string;
-    avatar_url?: string | null;
-  };
-  is_own?: boolean;
-  created_at: string;
-}
-
-interface DiscussionDetail extends Discussion {
-  messages: DiscussionMessage[];
 }
 
 interface JoinRequest {
@@ -138,11 +100,6 @@ interface JoinRequest {
   };
   created_at: string;
   message?: string;
-}
-
-interface GroupMember extends User {
-  role?: 'member' | 'admin' | 'moderator';
-  joined_at?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -376,7 +333,10 @@ export function GroupDetailPage() {
   const handleFeedMuteUser = async (userId: number) => {
     try {
       await api.post(`/v2/feed/users/${userId}/mute`);
-      setFeedItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
+      setFeedItems((prev) => prev.filter((fi) => {
+        const author = fi.author ?? fi.user;
+        return !author || author.id !== userId;
+      }));
       toast.success(t('toast.user_muted', 'User muted'));
     } catch (err) {
       logError('Failed to mute user', err);
@@ -676,7 +636,6 @@ export function GroupDetailPage() {
         `/v2/groups/${id}/discussions/${discussionId}`
       );
       if (response.success && response.data) {
-        // Flatten the nested API response into a DiscussionDetail
         const { discussion: disc, messages } = response.data;
         setExpandedDiscussion({ ...disc, messages });
       } else {
@@ -711,7 +670,6 @@ export function GroupDetailPage() {
         setExpandedDiscussion((prev) =>
           prev ? { ...prev, messages: [...prev.messages, newMessage] } : null
         );
-        // Update reply count and timestamp in the discussions list
         setDiscussions((prev) =>
           prev.map((d) =>
             d.id === expandedDiscussionId
@@ -817,7 +775,6 @@ export function GroupDetailPage() {
       const response = await api.delete(`/v2/groups/${id}`);
       if (response.success) {
         toast.success(t('toast.deleted'));
-        // Navigate away after deletion
         navigate(tenantPath('/groups'));
       } else {
         toast.error(response.error || t('toast.delete_failed'));
@@ -850,7 +807,6 @@ export function GroupDetailPage() {
             member_count: (prev.member_count ?? prev.members_count ?? 0) + 1,
             members_count: (prev.member_count ?? prev.members_count ?? 0) + 1,
           } : null);
-          // Reload members if already loaded
           if (membersLoaded) {
             setMembersLoaded(false);
           }
@@ -1266,527 +1222,70 @@ export function GroupDetailPage() {
 
       {/* Tab Content */}
       <div>
-        {/* ─── Feed Tab ─── */}
         {activeTab === 'feed' && (
-          <div className="space-y-4">
-            {userIsMember ? (
-              <>
-                {/* Create Post Button */}
-                {isAuthenticated && (
-                  <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={onComposeOpen}>
-                    <div className="flex items-center gap-3">
-                      <Avatar
-                        name={currentUser?.first_name || 'You'}
-                        src={resolveAvatarUrl(currentUser?.avatar)}
-                        size="sm"
-                        isBordered
-                        className="ring-2 ring-[var(--border-default)]"
-                      />
-                      <div className="flex-1 bg-[var(--surface-elevated)] rounded-full px-4 py-2.5 text-[var(--text-subtle)] text-sm border border-[var(--border-default)] hover:border-[var(--color-primary)]/30 transition-colors">
-                        {t('detail.feed_whats_on_your_mind', "What's on your mind?")}
-                      </div>
-                    </div>
-                  </GlassCard>
-                )}
-
-                {/* Feed Items */}
-                {feedLoading && feedItems.length === 0 ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <GlassCard key={i} className="p-5">
-                        <div className="flex items-center gap-3 mb-4">
-                          <Skeleton className="w-10 h-10 rounded-full" />
-                          <div className="flex-1">
-                            <Skeleton className="h-4 w-28 rounded mb-2" />
-                            <Skeleton className="h-3 w-20 rounded" />
-                          </div>
-                        </div>
-                        <Skeleton className="h-4 w-full rounded mb-2" />
-                        <Skeleton className="h-4 w-4/5 rounded mb-4" />
-                        <Divider />
-                        <div className="flex gap-4 pt-3">
-                          <Skeleton className="h-8 w-20 rounded-lg" />
-                          <Skeleton className="h-8 w-24 rounded-lg" />
-                        </div>
-                      </GlassCard>
-                    ))}
-                  </div>
-                ) : feedItems.length === 0 ? (
-                  <EmptyState
-                    icon={<Newspaper className="w-12 h-12" aria-hidden="true" />}
-                    title={t('detail.feed_empty_title', 'No posts yet')}
-                    description={t('detail.feed_empty_desc', 'Be the first to share something with this group!')}
-                    action={
-                      isAuthenticated && (
-                        <Button
-                          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                          startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                          onPress={onComposeOpen}
-                        >
-                          {t('detail.feed_create_post', 'Create Post')}
-                        </Button>
-                      )
-                    }
-                  />
-                ) : (
-                  <div className="space-y-4">
-                    <AnimatePresence mode="popLayout">
-                      {feedItems.map((item) => (
-                        <motion.div key={`${item.type}-${item.id}`} layout>
-                          <FeedCard
-                            item={item}
-                            onToggleLike={() => handleFeedToggleLike(item)}
-                            onHidePost={() => handleFeedHidePost(item.id)}
-                            onMuteUser={() => handleFeedMuteUser(getAuthor(item).id)}
-                            onReportPost={() => openFeedReportModal(item.id)}
-                            onDeletePost={() => handleFeedDeletePost(item)}
-                            onVotePoll={handleFeedVotePoll}
-                            isAuthenticated={isAuthenticated}
-                            currentUserId={currentUser?.id}
-                          />
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-
-                    {feedHasMore && (
-                      <div className="pt-4 text-center">
-                        <Button
-                          variant="bordered"
-                          className="border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
-                          onPress={() => loadGroupFeed(true)}
-                          isLoading={feedLoadingMore}
-                          startContent={!feedLoadingMore ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : undefined}
-                        >
-                          {t('detail.feed_load_more', 'Load More')}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              <GlassCard className="p-6">
-                <EmptyState
-                  icon={<Lock className="w-12 h-12" aria-hidden="true" />}
-                  title={t('detail.join_to_see_feed_title', 'Join to see the feed')}
-                  description={t('detail.join_to_see_feed_desc', 'Join this group to view posts and participate in conversations.')}
-                  action={
-                    isAuthenticated && (
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        onPress={handleJoinLeave}
-                        isLoading={isJoining}
-                      >
-                        {t('detail.join_group')}
-                      </Button>
-                    )
-                  }
-                />
-              </GlassCard>
-            )}
-          </div>
+          <GroupFeedTab
+            isMember={userIsMember}
+            isJoining={isJoining}
+            feedItems={feedItems}
+            feedLoading={feedLoading}
+            feedHasMore={feedHasMore}
+            feedLoadingMore={feedLoadingMore}
+            onJoinLeave={handleJoinLeave}
+            onComposeOpen={onComposeOpen}
+            onLoadMore={() => loadGroupFeed(true)}
+            onToggleLike={handleFeedToggleLike}
+            onHidePost={handleFeedHidePost}
+            onMuteUser={handleFeedMuteUser}
+            onReportPost={openFeedReportModal}
+            onDeletePost={handleFeedDeletePost}
+            onVotePoll={handleFeedVotePoll}
+          />
         )}
 
-        {/* ─── Discussion Tab ─── */}
         {activeTab === 'discussion' && (
-          <GlassCard className="p-6">
-            {userIsMember ? (
-              <div className="space-y-4">
-                {/* New Discussion Button */}
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-theme-primary">{t('detail.discussions_heading')}</h2>
-                  <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    size="sm"
-                    startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => setShowNewDiscussion(true)}
-                  >
-                    {t('detail.new_discussion')}
-                  </Button>
-                </div>
-
-                {/* Discussions List */}
-                {discussionsLoading && discussions.length === 0 ? (
-                  <div className="flex justify-center py-8">
-                    <Spinner size="lg" />
-                  </div>
-                ) : discussions.length === 0 ? (
-                  <EmptyState
-                    icon={<MessageSquare className="w-12 h-12" aria-hidden="true" />}
-                    title={t('detail.no_discussions_title')}
-                    description={t('detail.no_discussions_desc')}
-                    action={
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        onPress={() => setShowNewDiscussion(true)}
-                        startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('detail.start_discussion')}
-                      </Button>
-                    }
-                  />
-                ) : (
-                  <div className="space-y-3">
-                    {discussions.map((discussion) => (
-                      <Fragment key={discussion.id}>
-                        <motion.div
-                          layout
-                          className="rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors cursor-pointer overflow-hidden"
-                          onClick={() => handleExpandDiscussion(discussion.id)}
-                          role="button"
-                          tabIndex={0}
-                          aria-expanded={expandedDiscussionId === discussion.id}
-                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleExpandDiscussion(discussion.id); } }}
-                        >
-                          <div className="p-4">
-                            <div className="flex items-start gap-3">
-                              <Avatar
-                                src={resolveAvatarUrl(discussion.author.avatar_url)}
-                                name={discussion.author.name}
-                                size="sm"
-                                className="flex-shrink-0 mt-0.5"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2">
-                                  <h3 className="font-medium text-theme-primary truncate">{discussion.title}</h3>
-                                  {expandedDiscussionId === discussion.id ? (
-                                    <ChevronUp className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-                                  ) : (
-                                    <ChevronDown className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-3 mt-1 text-xs text-theme-subtle">
-                                  <span>{discussion.author.name}</span>
-                                  <span className="flex items-center gap-1">
-                                    <MessageSquare className="w-3 h-3" aria-hidden="true" />
-                                    {t('detail.reply_count', { count: discussion.reply_count })}
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="w-3 h-3" aria-hidden="true" />
-                                    {formatRelativeTime(discussion.last_reply_at || discussion.created_at)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-
-                        {/* Expanded Discussion */}
-                        <AnimatePresence>
-                          {expandedDiscussionId === discussion.id && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="ml-3 sm:ml-6 pl-3 sm:pl-6 border-l-2 border-theme-default space-y-4 pb-2">
-                                {expandedLoading ? (
-                                  <div className="flex justify-center py-4">
-                                    <Spinner size="sm" />
-                                  </div>
-                                ) : expandedDiscussion ? (
-                                  <>
-                                    {/* Original discussion content */}
-                                    <div className="p-3 rounded-lg bg-theme-elevated/50">
-                                      <p className="text-sm text-theme-muted whitespace-pre-wrap">{expandedDiscussion.content}</p>
-                                    </div>
-
-                                    {/* Messages */}
-                                    {expandedDiscussion.messages && expandedDiscussion.messages.length > 0 && (
-                                      <div className="space-y-3">
-                                        {expandedDiscussion.messages.map((msg) => (
-                                          <div key={msg.id} className="flex gap-3 p-3 rounded-lg bg-theme-elevated/30">
-                                            <Avatar
-                                              src={resolveAvatarUrl(msg.author.avatar_url)}
-                                              name={msg.author.name}
-                                              size="sm"
-                                              className="flex-shrink-0"
-                                            />
-                                            <div className="flex-1 min-w-0">
-                                              <div className="flex items-center gap-2">
-                                                <span className="text-sm font-medium text-theme-primary">{msg.author.name}</span>
-                                                <time className="text-xs text-theme-subtle" dateTime={msg.created_at}>
-                                                  {formatRelativeTime(msg.created_at)}
-                                                </time>
-                                              </div>
-                                              <p className="text-sm text-theme-muted mt-1 whitespace-pre-wrap">{msg.content}</p>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-
-                                    {/* Reply Form */}
-                                    <div className="flex flex-col sm:flex-row gap-2 items-end">
-                                      <Textarea
-                                        placeholder={t('detail.reply_placeholder')}
-                                        aria-label={t('detail.reply_aria')}
-                                        value={replyContent}
-                                        onChange={(e) => setReplyContent(e.target.value)}
-                                        minRows={1}
-                                        maxRows={4}
-                                        classNames={{
-                                          input: 'bg-transparent text-theme-primary',
-                                          inputWrapper: 'bg-theme-elevated border-theme-default',
-                                        }}
-                                      />
-                                      <Button
-                                        isIconOnly
-                                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex-shrink-0"
-                                        aria-label={t('detail.send_reply_aria')}
-                                        isLoading={sendingReply}
-                                        isDisabled={!replyContent.trim()}
-                                        onPress={handleReply}
-                                      >
-                                        <Send className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </>
-                                ) : null}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </Fragment>
-                    ))}
-
-                    {/* Load More Discussions */}
-                    {discussionsHasMore && (
-                      <div className="pt-2 text-center">
-                        <Button
-                          variant="flat"
-                          size="sm"
-                          className="bg-theme-elevated text-theme-muted"
-                          isLoading={discussionsLoading}
-                          onPress={() => loadDiscussions(true)}
-                        >
-                          {t('detail.load_more_discussions')}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <EmptyState
-                icon={<Lock className="w-12 h-12" aria-hidden="true" />}
-                title={t('detail.join_to_discuss_title')}
-                description={t('detail.join_to_discuss_desc')}
-                action={
-                  isAuthenticated && (
-                    <Button
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                      onPress={handleJoinLeave}
-                      isLoading={isJoining}
-                    >
-                      {t('detail.join_group')}
-                    </Button>
-                  )
-                }
-              />
-            )}
-          </GlassCard>
+          <GroupDiscussionTab
+            isMember={userIsMember}
+            isJoining={isJoining}
+            discussions={discussions}
+            discussionsLoading={discussionsLoading}
+            discussionsHasMore={discussionsHasMore}
+            expandedDiscussionId={expandedDiscussionId}
+            expandedDiscussion={expandedDiscussion}
+            expandedLoading={expandedLoading}
+            replyContent={replyContent}
+            sendingReply={sendingReply}
+            onJoinLeave={handleJoinLeave}
+            onShowNewDiscussion={() => setShowNewDiscussion(true)}
+            onExpandDiscussion={handleExpandDiscussion}
+            onLoadMoreDiscussions={() => loadDiscussions(true)}
+            onReplyContentChange={setReplyContent}
+            onSendReply={handleReply}
+          />
         )}
 
-        {/* ─── Members Tab ─── */}
         {activeTab === 'members' && (
-          <GlassCard className="p-6">
-            {membersLoading ? (
-              <div className="flex justify-center py-8">
-                <Spinner size="lg" />
-              </div>
-            ) : members.length > 0 ? (
-              <div className="grid sm:grid-cols-2 gap-4">
-                {members.map((member) => {
-                  const memberIsOwner = member.id === group.owner?.id;
-                  const memberIsAdmin = member.role === 'admin' || member.id === group.admins?.[0]?.id || memberIsOwner;
-                  const canManage = userIsAdmin && !memberIsOwner && member.id !== currentUser?.id;
-
-                  return (
-                    <div key={member.id} className="flex items-center gap-2 sm:gap-4 p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
-                      <Link to={tenantPath(`/profile/${member.id}`)} className="flex items-center gap-4 flex-1 min-w-0">
-                        <Avatar
-                          src={resolveAvatarUrl(member.avatar_url || member.avatar)}
-                          name={member.name}
-                          size="md"
-                          className="ring-2 ring-white/20 flex-shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <p className="font-medium text-theme-primary truncate">{member.name}</p>
-                          {member.tagline && (
-                            <p className="text-sm text-theme-subtle truncate">{member.tagline}</p>
-                          )}
-                          <div className="flex items-center gap-2 mt-1">
-                            {memberIsOwner && (
-                              <Chip size="sm" variant="flat" className="bg-amber-500/20 text-amber-600 dark:text-amber-400" startContent={<ShieldCheck className="w-3 h-3" />}>
-                                {t('detail.member_owner')}
-                              </Chip>
-                            )}
-                            {memberIsAdmin && !memberIsOwner && (
-                              <Chip size="sm" variant="flat" className="bg-purple-500/20 text-purple-600 dark:text-purple-400" startContent={<Shield className="w-3 h-3" />}>
-                                {t('detail.member_admin')}
-                              </Chip>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
-
-                      {/* Admin: Role Management */}
-                      {canManage && (
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button
-                              isIconOnly
-                              variant="light"
-                              size="sm"
-                              aria-label={t('detail.manage_member_aria', { name: member.name })}
-                              isLoading={updatingMember === member.id}
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu aria-label="Member actions">
-                            {memberIsAdmin ? (
-                              <DropdownItem
-                                key="demote"
-                                startContent={<Users className="w-4 h-4" />}
-                                onPress={() => handleUpdateMemberRole(member.id, 'member')}
-                              >
-                                {t('detail.demote_to_member')}
-                              </DropdownItem>
-                            ) : (
-                              <DropdownItem
-                                key="promote"
-                                startContent={<Shield className="w-4 h-4" />}
-                                onPress={() => handleUpdateMemberRole(member.id, 'admin')}
-                              >
-                                {t('detail.promote_to_admin')}
-                              </DropdownItem>
-                            )}
-                            <DropdownItem
-                              key="remove"
-                              className="text-danger"
-                              color="danger"
-                              startContent={<UserX className="w-4 h-4" />}
-                              onPress={() => handleRemoveMember(member.id)}
-                            >
-                              {t('detail.remove_from_group')}
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <EmptyState
-                icon={<Users className="w-12 h-12" aria-hidden="true" />}
-                title={t('detail.no_members_title')}
-                description={t('detail.no_members_desc')}
-              />
-            )}
-          </GlassCard>
+          <GroupMembersTab
+            members={members}
+            membersLoading={membersLoading}
+            userIsAdmin={userIsAdmin}
+            currentUserId={currentUser?.id}
+            groupOwnerId={group.owner?.id}
+            groupAdminIds={group.admins?.map((a) => a.id)}
+            updatingMember={updatingMember}
+            onUpdateMemberRole={handleUpdateMemberRole}
+            onRemoveMember={handleRemoveMember}
+          />
         )}
 
-        {/* ─── Events Tab ─── */}
         {activeTab === 'events' && (
-          <GlassCard className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-theme-primary">{t('detail.group_events_heading')}</h2>
-              {userIsMember && isAuthenticated && (
-                <Link to={tenantPath(`/events/create?group_id=${group.id}`)}>
-                  <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    size="sm"
-                    startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                  >
-                    {t('detail.create_event')}
-                  </Button>
-                </Link>
-              )}
-            </div>
-
-            {eventsLoading ? (
-              <div className="flex justify-center py-8">
-                <Spinner size="lg" />
-              </div>
-            ) : events.length === 0 ? (
-              <EmptyState
-                icon={<Calendar className="w-12 h-12" aria-hidden="true" />}
-                title={t('detail.no_events_title')}
-                description={t('detail.no_events_desc')}
-                action={
-                  userIsMember && isAuthenticated && (
-                    <Link to={tenantPath(`/events/create?group_id=${group.id}`)}>
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('detail.create_event')}
-                      </Button>
-                    </Link>
-                  )
-                }
-              />
-            ) : (
-              <div className="space-y-3">
-                {events.map((event) => {
-                  const eventDate = new Date(event.start_date);
-                  const isPast = eventDate < new Date();
-
-                  return (
-                    <Link key={event.id} to={tenantPath(`/events/${event.id}`)}>
-                      <div className={`flex items-center gap-4 p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors ${isPast ? 'opacity-60' : ''}`}>
-                        {/* Date Badge */}
-                        <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex flex-col items-center justify-center text-center">
-                          <span className="text-xs font-medium text-indigo-400 uppercase">
-                            {eventDate.toLocaleDateString(undefined, { month: 'short' })}
-                          </span>
-                          <span className="text-lg font-bold text-theme-primary leading-none">
-                            {eventDate.getDate()}
-                          </span>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-theme-primary truncate">{event.title}</h3>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-theme-subtle">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" aria-hidden="true" />
-                              {eventDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            {event.location && (
-                              <span className="flex items-center gap-1 truncate">
-                                <MapPin className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-                                {event.location}
-                              </span>
-                            )}
-                            <span className="flex items-center gap-1">
-                              <Users className="w-3 h-3" aria-hidden="true" />
-                              {event.attendees_count} {t('detail.attending')}
-                            </span>
-                          </div>
-                        </div>
-
-                        {isPast && (
-                          <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-subtle">
-                            {t('detail.past_chip')}
-                          </Chip>
-                        )}
-
-                        <ChevronRight className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </GlassCard>
+          <GroupEventsTab
+            groupId={group.id}
+            events={events}
+            eventsLoading={eventsLoading}
+            isMember={userIsMember}
+          />
         )}
 
-        {/* ─── Files Tab (GR1) ─── */}
         {activeTab === 'files' && (
           <GroupFilesTab
             groupId={group.id}
@@ -1795,7 +1294,6 @@ export function GroupDetailPage() {
           />
         )}
 
-        {/* ─── Announcements Tab (GR3) ─── */}
         {activeTab === 'announcements' && (
           <GroupAnnouncementsTab
             groupId={group.id}
@@ -1804,52 +1302,23 @@ export function GroupDetailPage() {
           />
         )}
 
-        {/* ─── Chatrooms Tab (I4) ─── */}
         {activeTab === 'chatrooms' && userIsMember && (
-          <GlassCard className="p-6">
-            <TeamChatrooms groupId={group.id} isGroupAdmin={userIsAdmin} />
-          </GlassCard>
+          <GroupChatroomsTab
+            groupId={group.id}
+            isGroupAdmin={userIsAdmin}
+          />
         )}
 
-        {/* ─── Tasks Tab (I5) ─── */}
         {activeTab === 'tasks' && userIsMember && (
-          <GlassCard className="p-6">
-            <TeamTasks
-              groupId={group.id}
-              isGroupAdmin={userIsAdmin}
-              members={(members || []).map(m => ({
-                id: m.id,
-                name: m.first_name && m.last_name ? `${m.first_name} ${m.last_name}` : m.name ?? 'User',
-                avatar_url: m.avatar_url ?? m.avatar ?? null,
-              }))}
-            />
-          </GlassCard>
+          <GroupTasksTab
+            groupId={group.id}
+            isGroupAdmin={userIsAdmin}
+            members={members}
+          />
         )}
 
-        {/* ─── Subgroups Tab ─── */}
         {activeTab === 'subgroups' && hasSubGroups && (
-          <GlassCard className="p-6">
-            <div className="space-y-3">
-              {group.sub_groups?.map((subGroup) => (
-                <Link key={subGroup.id} to={tenantPath(`/groups/${subGroup.id}`)}>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-                        <Users className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-theme-primary">{subGroup.name}</p>
-                        <p className="text-sm text-theme-subtle">
-                          {t('detail.members_count', { count: subGroup.member_count })}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </GlassCard>
+          <GroupSubgroupsTab subGroups={group.sub_groups!} />
         )}
       </div>
 
@@ -2212,54 +1681,6 @@ export function GroupDetailPage() {
         </ModalContent>
       </Modal>
     </motion.div>
-  );
-}
-
-/**
- * Pinned Announcements Banner
- * Shows pinned announcements at top of group page (above tabs).
- */
-function PinnedAnnouncementsBanner({ groupId }: { groupId: number }) {
-  const [pinned, setPinned] = useState<Array<{ id: number; title: string; content: string; author: { name: string }; created_at: string }>>([]);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await api.get(`/v2/groups/${groupId}/announcements?pinned=1`);
-        if (res.success) {
-          const payload = res.data;
-          const items = Array.isArray(payload)
-            ? payload
-            : (payload as { announcements?: typeof pinned })?.announcements ?? [];
-          setPinned(items.filter((a: { is_pinned?: boolean }) => a.is_pinned !== false));
-        }
-      } catch {
-        // Silently fail — banner is non-critical
-      }
-      setLoaded(true);
-    }
-    load();
-  }, [groupId]);
-
-  if (!loaded || pinned.length === 0) return null;
-
-  return (
-    <div className="space-y-2">
-      {pinned.map((announcement) => (
-        <div
-          key={announcement.id}
-          className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20"
-        >
-          <Megaphone className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-theme-primary">{announcement.title}</p>
-            <p className="text-xs text-theme-subtle mt-0.5 line-clamp-2">{announcement.content}</p>
-          </div>
-          <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">Pinned</Chip>
-        </div>
-      ))}
-    </div>
   );
 }
 
