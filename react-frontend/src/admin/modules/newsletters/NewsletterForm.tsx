@@ -9,11 +9,11 @@
  * Includes: send, test send, recipient preview, A/B testing, recurring, geo/group targeting
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import {
   Card, CardBody, CardHeader, Input, Button, Select, SelectItem,
   Divider, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Tooltip,
+  Tooltip, Spinner,
 } from '@heroui/react';
 import {
   Save, ArrowLeft, Send, TestTube, Users, Calendar, Repeat, Target,
@@ -23,7 +23,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import { RichTextEditor, PageHeader } from '../../components';
+import { PageHeader } from '../../components';
+
+const RichTextEditor = lazy(() =>
+  import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
+);
 
 interface SegmentOption {
   id: number;
@@ -464,13 +468,15 @@ export function NewsletterForm() {
               )}
 
               <Divider />
-              <RichTextEditor
-                label="Content"
-                placeholder="Write your newsletter content..."
-                value={content}
-                onChange={setContent}
-                isDisabled={saving || isSent}
-              />
+              <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+                <RichTextEditor
+                  label="Content"
+                  placeholder="Write your newsletter content..."
+                  value={content}
+                  onChange={setContent}
+                  isDisabled={saving || isSent}
+                />
+              </Suspense>
             </CardBody>
           </Card>
         </div>

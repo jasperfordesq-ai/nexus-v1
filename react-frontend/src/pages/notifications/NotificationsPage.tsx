@@ -10,7 +10,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
+import { Button, Skeleton } from '@heroui/react';
 import {
   Bell,
   MessageSquare,
@@ -183,14 +183,14 @@ export function NotificationsPage() {
 
       {/* Notifications List */}
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <GlassCard key={i} className="p-4 animate-pulse">
+        <div aria-label="Loading notifications" aria-busy="true" className="space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <GlassCard key={i} className="p-4">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-theme-hover" />
-                <div className="flex-1">
-                  <div className="h-4 bg-theme-hover rounded w-2/3 mb-2" />
-                  <div className="h-3 bg-theme-hover rounded w-1/3" />
+                <Skeleton className="rounded-full flex-shrink-0"><div className="w-10 h-10 rounded-full bg-default-300" /></Skeleton>
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton>
+                  <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/3" /></Skeleton>
                 </div>
               </div>
             </GlassCard>

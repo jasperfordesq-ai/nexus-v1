@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Tabs, Tab, Avatar } from '@heroui/react';
+import { Button, Input, Tabs, Tab, Avatar, Skeleton } from '@heroui/react';
 import {
   Search,
   ListTodo,
@@ -296,11 +296,22 @@ export function SearchPage() {
               </Button>
             </GlassCard>
           ) : isLoading ? (
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-                  <div className="h-4 bg-theme-hover rounded w-2/3" />
+            <div aria-label="Loading search results" aria-busy="true" className="space-y-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <GlassCard key={i} className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="rounded-full flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-default-300" />
+                    </Skeleton>
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="rounded-lg">
+                        <div className="h-4 rounded-lg bg-default-300 w-2/3" />
+                      </Skeleton>
+                      <Skeleton className="rounded-lg">
+                        <div className="h-3 rounded-lg bg-default-200 w-1/2" />
+                      </Skeleton>
+                    </div>
+                  </div>
                 </GlassCard>
               ))}
             </div>

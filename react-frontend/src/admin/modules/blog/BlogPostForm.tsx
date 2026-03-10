@@ -10,7 +10,7 @@
  * Parity: PHP Admin\BlogController::create() / edit()
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Card,
@@ -24,7 +24,9 @@ import {
   Divider,
   Spinner,
 } from '@heroui/react';
-import { RichTextEditor } from '../../components';
+const RichTextEditor = lazy(() =>
+  import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
+);
 import { ArrowLeft, Save, Search } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
@@ -271,13 +273,15 @@ export function BlogPostForm() {
             />
 
             {/* Content */}
-            <RichTextEditor
-              label="Content"
-              placeholder="Write the blog post content..."
-              value={content}
-              onChange={setContent}
-              isDisabled={submitting}
-            />
+            <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+              <RichTextEditor
+                label="Content"
+                placeholder="Write the blog post content..."
+                value={content}
+                onChange={setContent}
+                isDisabled={submitting}
+              />
+            </Suspense>
 
             {/* Excerpt */}
             <Textarea

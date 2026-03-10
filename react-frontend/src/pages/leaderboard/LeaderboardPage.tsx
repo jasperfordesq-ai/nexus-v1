@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Select, SelectItem, Chip, Progress } from '@heroui/react';
+import { Button, Avatar, Select, SelectItem, Chip, Progress, Skeleton } from '@heroui/react';
 import {
   Trophy,
   Medal,
@@ -140,11 +140,21 @@ function SeasonCard() {
 
   if (isLoading) {
     return (
-      <GlassCard className="p-5 animate-pulse">
-        <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-        <div className="h-3 bg-theme-hover rounded w-2/3 mb-4" />
-        <div className="h-2 bg-theme-hover rounded w-full mb-2" />
-        <div className="h-3 bg-theme-hover rounded w-1/4" />
+      <GlassCard className="p-5" aria-label="Loading season" aria-busy="true">
+        <div className="space-y-3">
+          <Skeleton className="rounded-lg">
+            <div className="h-5 rounded-lg bg-default-300 w-1/3" />
+          </Skeleton>
+          <Skeleton className="rounded-lg">
+            <div className="h-3 rounded-lg bg-default-200 w-2/3" />
+          </Skeleton>
+          <Skeleton className="rounded-lg">
+            <div className="h-2 rounded-lg bg-default-200 w-full" />
+          </Skeleton>
+          <Skeleton className="rounded-lg">
+            <div className="h-3 rounded-lg bg-default-200 w-1/4" />
+          </Skeleton>
+        </div>
       </GlassCard>
     );
   }
@@ -509,16 +519,26 @@ export function LeaderboardPage() {
       {!error && (
         <>
           {isLoading ? (
-            <GlassCard className="divide-y divide-white/5">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div key={i} className="flex items-center gap-4 p-4 animate-pulse">
-                  <div className="w-8 h-8 rounded-full bg-theme-hover" />
-                  <div className="w-10 h-10 rounded-full bg-theme-hover" />
-                  <div className="flex-1">
-                    <div className="h-4 bg-theme-hover rounded w-1/3 mb-1" />
-                    <div className="h-3 bg-theme-hover rounded w-1/5" />
+            <GlassCard className="divide-y divide-white/5" aria-label="Loading leaderboard" aria-busy="true">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-4">
+                  <Skeleton className="rounded-full flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-default-300" />
+                  </Skeleton>
+                  <Skeleton className="rounded-full flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-default-300" />
+                  </Skeleton>
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="rounded-lg">
+                      <div className="h-4 rounded-lg bg-default-300 w-1/3" />
+                    </Skeleton>
+                    <Skeleton className="rounded-lg">
+                      <div className="h-3 rounded-lg bg-default-200 w-1/5" />
+                    </Skeleton>
                   </div>
-                  <div className="h-5 bg-theme-hover rounded w-16" />
+                  <Skeleton className="rounded-lg">
+                    <div className="h-5 rounded-lg bg-default-300 w-16" />
+                  </Skeleton>
                 </div>
               ))}
             </GlassCard>
