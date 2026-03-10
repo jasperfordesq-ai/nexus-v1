@@ -1,0 +1,25 @@
+{
+  "tabs": {
+    "feed": "Fil",
+    "listings": "Annonces",
+    "messages": "Messages",
+    "members": "Membres",
+    "profile": "Profil"
+  },
+  "feed": {
+    "title": "Fil de la communauté",
+    "welcome": "Bienvenue dans votre banque de temps",
+    "empty": "Rien dans votre fil pour l'instant. Revenez bientôt !",
+    "loading": "Chargement du fil…"
+  },
+  "listings": {
+    "title": "Annonces",
+    "offer": "Offres",
+    "request": "Demandes",
+    "empty": "Aucune annonce pour l'instant."
+  },
+  "notifications": {
+    "newMessage": "Nouveau message de {{name}}",
+    "newMatch": "Vous avez un nouveau match !"
+  }
+}

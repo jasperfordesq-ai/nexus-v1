@@ -1,0 +1,26 @@
+{
+  "title": "Mensajes",
+  "thread": {
+    "inputPlaceholder": "Escribe un mensaje…",
+    "send": "Enviar",
+    "loadingHistory": "Cargando mensajes…",
+    "noMessages": "Sin mensajes todavía. ¡Di hola!",
+    "today": "Hoy",
+    "yesterday": "Ayer"
+  },
+  "voice": {
+    "label": "Mensaje de voz",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "recording": "Grabando…",
+    "tapToRecord": "Mantén pulsado para grabar"
+  },
+  "empty": {
+    "title": "Sin conversaciones todavía",
+    "subtitle": "Conéctate con miembros para empezar a enviar mensajes"
+  },
+  "errors": {
+    "sendFailed": "Error al enviar. Toca para reintentar.",
+    "loadFailed": "No se pudieron cargar los mensajes."
+  }
+}

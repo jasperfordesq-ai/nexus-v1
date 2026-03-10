@@ -46,6 +46,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 
 jest.mock('@/lib/api/client', () => ({
   ApiResponseError: class ApiResponseError extends Error {
+    status!: number;
     constructor(status: number, message: string) {
       super(message);
       this.status = status;

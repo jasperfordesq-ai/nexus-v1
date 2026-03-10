@@ -21,6 +21,7 @@ import {
 import { Link } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ApiResponseError } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -34,6 +35,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
+  const { t } = useTranslation('auth');
   const { login: authLogin } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -84,7 +86,7 @@ export default function LoginScreen() {
             <Text style={styles.logoText}>N</Text>
           </View>
           <Text style={styles.title}>Project NEXUS</Text>
-          <Text style={styles.subtitle}>Sign in to your timebank</Text>
+          <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
         </View>
 
         {/* Error banner */}
@@ -96,7 +98,7 @@ export default function LoginScreen() {
 
         {/* Form */}
         <View style={styles.form}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>{t('login.email')}</Text>
           <Controller
             control={control}
             name="email"
@@ -107,7 +109,7 @@ export default function LoginScreen() {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  placeholder="you@example.com"
+                  placeholder={t('login.emailPlaceholder')}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
@@ -118,7 +120,7 @@ export default function LoginScreen() {
             )}
           />
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={styles.label}>{t('login.password')}</Text>
           <Controller
             control={control}
             name="password"
@@ -149,7 +151,7 @@ export default function LoginScreen() {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Sign in</Text>
+              <Text style={styles.buttonText}>{t('login.submit')}</Text>
             )}
           </TouchableOpacity>
         </View>

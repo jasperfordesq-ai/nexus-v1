@@ -1,0 +1,25 @@
+{
+  "tabs": {
+    "feed": "Feed",
+    "listings": "Anúncios",
+    "messages": "Mensagens",
+    "members": "Membros",
+    "profile": "Perfil"
+  },
+  "feed": {
+    "title": "Feed da Comunidade",
+    "welcome": "Bem-vindo ao seu banco de tempo",
+    "empty": "Nada no seu feed ainda. Volte em breve!",
+    "loading": "A carregar feed…"
+  },
+  "listings": {
+    "title": "Anúncios",
+    "offer": "Ofertas",
+    "request": "Pedidos",
+    "empty": "Sem anúncios ainda."
+  },
+  "notifications": {
+    "newMessage": "Nova mensagem de {{name}}",
+    "newMatch": "Tem um novo match!"
+  }
+}

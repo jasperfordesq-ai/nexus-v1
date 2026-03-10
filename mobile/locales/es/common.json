@@ -1,0 +1,27 @@
+{
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "back": "Volver",
+    "send": "Enviar",
+    "retry": "Reintentar",
+    "done": "Hecho",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "loadMore": "Cargar más"
+  },
+  "errors": {
+    "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+    "network": "Error de red. Comprueba tu conexión.",
+    "unauthorized": "Tu sesión ha caducado. Inicia sesión de nuevo.",
+    "notFound": "No encontrado."
+  },
+  "loading": "Cargando…",
+  "noResults": "Sin resultados.",
+  "yes": "Sí",
+  "no": "No",
+  "search": "Buscar",
+  "filter": "Filtrar",
+  "clear": "Borrar"
+}

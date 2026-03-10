@@ -10,6 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import '@/lib/i18n'; // initialise i18next before any screen renders
 import { AuthProvider, useAuthContext } from '@/lib/context/AuthContext';
 import { TenantProvider } from '@/lib/context/TenantContext';
 import { RealtimeProvider } from '@/lib/context/RealtimeContext';
@@ -17,8 +18,9 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import * as Sentry from '@sentry/react-native';
 
 Sentry.init({
-  dsn: 'https://placeholder@sentry.io/1234567',
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? '',
   tracesSampleRate: 1.0,
+  enabled: !!process.env.EXPO_PUBLIC_SENTRY_DSN,
 });
 
 /**
@@ -91,7 +93,8 @@ function RootNavigator() {
 
   // Handle taps on push notifications received while app was backgrounded/killed
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const subscription = (Notifications as any).addNotificationResponseReceivedListener((response: any) => {
       const data = response.notification.request.content.data as { link?: string } | undefined;
       if (data?.link) navigateToLink(data.link);
     });

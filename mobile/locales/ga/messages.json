@@ -1,0 +1,26 @@
+{
+  "title": "Teachtaireachtaí",
+  "thread": {
+    "inputPlaceholder": "Clóscríobh teachtaireacht…",
+    "send": "Seol",
+    "loadingHistory": "Ag luchtú teachtaireachtaí…",
+    "noMessages": "Gan teachtaireachtaí fós. Abair haló!",
+    "today": "Inniu",
+    "yesterday": "Inné"
+  },
+  "voice": {
+    "label": "Teachtaireacht gutha",
+    "play": "Seinn",
+    "pause": "Cuir ar sos",
+    "recording": "Ag taifeadadh…",
+    "tapToRecord": "Coinnigh síos le taifeadadh"
+  },
+  "empty": {
+    "title": "Gan comhráití fós",
+    "subtitle": "Ceangail le baill le teachtaireachtaí a sheoladh"
+  },
+  "errors": {
+    "sendFailed": "Theip ar an teachtaireacht a sheoladh. Tapáil le triail arís.",
+    "loadFailed": "Níorbh fhéidir teachtaireachtaí a luchtú."
+  }
+}

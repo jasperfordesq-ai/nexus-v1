@@ -1,0 +1,28 @@
+{
+  "title": "Baill",
+  "search": {
+    "placeholder": "Cuardaigh baill…"
+  },
+  "filters": {
+    "all": "Gach ceann",
+    "nearby": "In aice láimhe",
+    "online": "Ar líne",
+    "newMembers": "Nua"
+  },
+  "profile": {
+    "timeCredits": "{{count}} creidmheas ama",
+    "timeCredits_other": "{{count}} creidmheas ama",
+    "memberSince": "Ball ó {{date}}",
+    "connect": "Ceangail",
+    "message": "Teachtaireacht",
+    "skills": "Scileanna",
+    "reviews": "Léirmheasanna",
+    "noSkills": "Gan scileanna liostaithe fós.",
+    "noReviews": "Gan léirmheasanna fós."
+  },
+  "empty": {
+    "title": "Gan baill aimsithe",
+    "subtitle": "Bain triail as do chuardach nó scagairí a athrú"
+  },
+  "loading": "Ag luchtú baill…"
+}

@@ -1,0 +1,28 @@
+{
+  "title": "Membri",
+  "search": {
+    "placeholder": "Cerca membri…"
+  },
+  "filters": {
+    "all": "Tutti",
+    "nearby": "Vicino",
+    "online": "Online",
+    "newMembers": "Nuovi"
+  },
+  "profile": {
+    "timeCredits": "{{count}} credito tempo",
+    "timeCredits_other": "{{count}} crediti tempo",
+    "memberSince": "Membro dal {{date}}",
+    "connect": "Connetti",
+    "message": "Messaggio",
+    "skills": "Competenze",
+    "reviews": "Recensioni",
+    "noSkills": "Nessuna competenza elencata.",
+    "noReviews": "Nessuna recensione ancora."
+  },
+  "empty": {
+    "title": "Nessun membro trovato",
+    "subtitle": "Prova a modificare la ricerca o i filtri"
+  },
+  "loading": "Caricamento membri…"
+}
