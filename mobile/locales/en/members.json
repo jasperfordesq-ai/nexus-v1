@@ -1,0 +1,28 @@
+{
+  "title": "Members",
+  "search": {
+    "placeholder": "Search members…"
+  },
+  "filters": {
+    "all": "All",
+    "nearby": "Nearby",
+    "online": "Online",
+    "newMembers": "New"
+  },
+  "profile": {
+    "timeCredits": "{{count}} time credit",
+    "timeCredits_other": "{{count}} time credits",
+    "memberSince": "Member since {{date}}",
+    "connect": "Connect",
+    "message": "Message",
+    "skills": "Skills",
+    "reviews": "Reviews",
+    "noSkills": "No skills listed yet.",
+    "noReviews": "No reviews yet."
+  },
+  "empty": {
+    "title": "No members found",
+    "subtitle": "Try adjusting your search or filters"
+  },
+  "loading": "Loading members…"
+}

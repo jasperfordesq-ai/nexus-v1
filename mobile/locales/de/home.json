@@ -1,0 +1,25 @@
+{
+  "tabs": {
+    "feed": "Feed",
+    "listings": "Angebote",
+    "messages": "Nachrichten",
+    "members": "Mitglieder",
+    "profile": "Profil"
+  },
+  "feed": {
+    "title": "Community-Feed",
+    "welcome": "Willkommen in deiner Zeitbank",
+    "empty": "Noch nichts in deinem Feed. Schau später wieder rein!",
+    "loading": "Feed wird geladen…"
+  },
+  "listings": {
+    "title": "Angebote",
+    "offer": "Angebote",
+    "request": "Gesuche",
+    "empty": "Noch keine Einträge."
+  },
+  "notifications": {
+    "newMessage": "Neue Nachricht von {{name}}",
+    "newMatch": "Du hast ein neues Match!"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "send": "Send",
+    "retry": "Retry",
+    "done": "Done",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "loadMore": "Load more"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "Your session has expired. Please log in again.",
+    "notFound": "Not found."
+  },
+  "loading": "Loading…",
+  "noResults": "No results found.",
+  "yes": "Yes",
+  "no": "No",
+  "search": "Search",
+  "filter": "Filter",
+  "clear": "Clear"
+}

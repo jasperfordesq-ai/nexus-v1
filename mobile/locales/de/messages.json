@@ -1,0 +1,26 @@
+{
+  "title": "Nachrichten",
+  "thread": {
+    "inputPlaceholder": "Nachricht eingeben…",
+    "send": "Senden",
+    "loadingHistory": "Nachrichten werden geladen…",
+    "noMessages": "Noch keine Nachrichten. Sag Hallo!",
+    "today": "Heute",
+    "yesterday": "Gestern"
+  },
+  "voice": {
+    "label": "Sprachnachricht",
+    "play": "Abspielen",
+    "pause": "Pausieren",
+    "recording": "Aufnahme läuft…",
+    "tapToRecord": "Gedrückt halten zum Aufnehmen"
+  },
+  "empty": {
+    "title": "Noch keine Unterhaltungen",
+    "subtitle": "Verbinde dich mit Mitgliedern, um Nachrichten zu senden"
+  },
+  "errors": {
+    "sendFailed": "Nachricht konnte nicht gesendet werden. Tippe zum Wiederholen.",
+    "loadFailed": "Nachrichten konnten nicht geladen werden."
+  }
+}

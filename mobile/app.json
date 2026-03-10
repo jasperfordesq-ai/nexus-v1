@@ -16,7 +16,9 @@
     "ios": {
       "bundleIdentifier": "ie.hour.nexus",
       "supportsTablet": false,
-      "associatedDomains": ["applinks:app.project-nexus.ie"]
+      "associatedDomains": [
+        "applinks:app.project-nexus.ie"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -29,10 +31,18 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "app.project-nexus.ie" },
-            { "scheme": "nexus" }
+            {
+              "scheme": "https",
+              "host": "app.project-nexus.ie"
+            },
+            {
+              "scheme": "nexus"
+            }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -51,7 +61,8 @@
           "color": "#006FEE",
           "sounds": []
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

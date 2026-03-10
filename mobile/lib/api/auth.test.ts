@@ -7,6 +7,7 @@
 jest.mock('@/lib/api/client', () => ({
   api: { get: jest.fn(), post: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
+    status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
   },
   registerUnauthorizedCallback: jest.fn(),

@@ -1,0 +1,25 @@
+{
+  "tabs": {
+    "feed": "Feed",
+    "listings": "Annunci",
+    "messages": "Messaggi",
+    "members": "Membri",
+    "profile": "Profilo"
+  },
+  "feed": {
+    "title": "Feed della comunità",
+    "welcome": "Benvenuto nella tua banca del tempo",
+    "empty": "Niente nel feed ancora. Torna presto!",
+    "loading": "Caricamento feed…"
+  },
+  "listings": {
+    "title": "Annunci",
+    "offer": "Offerte",
+    "request": "Richieste",
+    "empty": "Nessun annuncio ancora."
+  },
+  "notifications": {
+    "newMessage": "Nuovo messaggio da {{name}}",
+    "newMatch": "Hai un nuovo match!"
+  }
+}

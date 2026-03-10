@@ -1,0 +1,25 @@
+{
+  "tabs": {
+    "feed": "Sruth",
+    "listings": "Liostaí",
+    "messages": "Teachtaireachtaí",
+    "members": "Baill",
+    "profile": "Próifíl"
+  },
+  "feed": {
+    "title": "Sruth Pobail",
+    "welcome": "Fáilte chuig do bhanc ama",
+    "empty": "Níl aon rud i do shruth fós. Féach ar ais go luath!",
+    "loading": "Ag luchtú sruth…"
+  },
+  "listings": {
+    "title": "Liostaí",
+    "offer": "Tairiscintí",
+    "request": "Iarratais",
+    "empty": "Gan liostaí fós."
+  },
+  "notifications": {
+    "newMessage": "Teachtaireacht nua ó {{name}}",
+    "newMatch": "Tá meaitseáil nua agat!"
+  }
+}

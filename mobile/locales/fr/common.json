@@ -1,0 +1,27 @@
+{
+  "buttons": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "send": "Envoyer",
+    "retry": "Réessayer",
+    "done": "Terminé",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "loadMore": "Charger plus"
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "network": "Erreur réseau. Vérifiez votre connexion.",
+    "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
+    "notFound": "Introuvable."
+  },
+  "loading": "Chargement…",
+  "noResults": "Aucun résultat trouvé.",
+  "yes": "Oui",
+  "no": "Non",
+  "search": "Rechercher",
+  "filter": "Filtrer",
+  "clear": "Effacer"
+}

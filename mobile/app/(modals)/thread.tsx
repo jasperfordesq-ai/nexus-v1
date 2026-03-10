@@ -22,15 +22,18 @@ import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
+import { useTranslation } from 'react-i18next';
 import { getThread, sendMessage, type Message } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import Avatar from '@/components/ui/Avatar';
+import VoiceMessageBubble from '@/components/VoiceMessageBubble';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function ThreadScreen() {
+  const { t } = useTranslation('messages');
   const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -142,7 +145,15 @@ export default function ThreadScreen() {
               : styles.bubbleOther,
           ]}
         >
-          {item.is_voice ? (
+          {item.is_voice && item.audio_url ? (
+            <VoiceMessageBubble
+              audioUrl={item.audio_url}
+              isOwn={isOwn}
+              primaryColor={primary}
+              textColor={theme.text}
+              textColorSecondary={theme.textSecondary}
+            />
+          ) : item.is_voice ? (
             <View style={styles.voiceRow}>
               <Ionicons
                 name="mic"
@@ -211,7 +222,7 @@ export default function ThreadScreen() {
             style={styles.input}
             value={inputText}
             onChangeText={setInputText}
-            placeholder="Write a message…"
+            placeholder={t('thread.inputPlaceholder')}
             placeholderTextColor={theme.textMuted}
             multiline
             maxLength={1000}

@@ -1,0 +1,27 @@
+{
+  "buttons": {
+    "save": "Sábháil",
+    "cancel": "Cealaigh",
+    "back": "Ar ais",
+    "send": "Seol",
+    "retry": "Triail arís",
+    "done": "Déanta",
+    "edit": "Eagar",
+    "delete": "Scrios",
+    "confirm": "Deimhnigh",
+    "loadMore": "Luchtaigh tuilleadh"
+  },
+  "errors": {
+    "generic": "Chuaigh rud éigin mícheart. Déan iarracht arís.",
+    "network": "Earráid líonra. Seiceáil do nasc.",
+    "unauthorized": "Tá do sheisiún imithe in éag. Logáil isteach arís.",
+    "notFound": "Gan aimsiú."
+  },
+  "loading": "Ag luchtú…",
+  "noResults": "Gan torthaí.",
+  "yes": "Sea",
+  "no": "Ní hea",
+  "search": "Cuardaigh",
+  "filter": "Scag",
+  "clear": "Glan"
+}

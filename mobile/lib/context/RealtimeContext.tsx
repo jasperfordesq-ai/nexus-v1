@@ -88,7 +88,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         channelRef.current = ch;
 
         // Bump the unread badge and notify any open thread screens
-        ch.bind('new-message', (payload: { conversation_id?: number; message?: Message }) => {
+        ch.bind('new-message', (rawPayload: unknown) => {
+          const payload = rawPayload as { conversation_id?: number; message?: Message };
           if (!mounted) return;
           setUnreadMessages((prev) => prev + 1);
           // Deliver to any thread that's subscribed for this conversation

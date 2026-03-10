@@ -1,0 +1,28 @@
+{
+  "title": "Mitglieder",
+  "search": {
+    "placeholder": "Mitglieder suchen…"
+  },
+  "filters": {
+    "all": "Alle",
+    "nearby": "In der Nähe",
+    "online": "Online",
+    "newMembers": "Neu"
+  },
+  "profile": {
+    "timeCredits": "{{count}} Zeitguthaben",
+    "timeCredits_other": "{{count}} Zeitguthaben",
+    "memberSince": "Mitglied seit {{date}}",
+    "connect": "Verbinden",
+    "message": "Nachricht",
+    "skills": "Fähigkeiten",
+    "reviews": "Bewertungen",
+    "noSkills": "Noch keine Fähigkeiten aufgelistet.",
+    "noReviews": "Noch keine Bewertungen."
+  },
+  "empty": {
+    "title": "Keine Mitglieder gefunden",
+    "subtitle": "Versuche, deine Suche oder Filter anzupassen"
+  },
+  "loading": "Mitglieder werden geladen…"
+}

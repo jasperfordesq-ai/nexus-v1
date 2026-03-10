@@ -1,0 +1,28 @@
+{
+  "title": "Miembros",
+  "search": {
+    "placeholder": "Buscar miembros…"
+  },
+  "filters": {
+    "all": "Todos",
+    "nearby": "Cerca",
+    "online": "En línea",
+    "newMembers": "Nuevos"
+  },
+  "profile": {
+    "timeCredits": "{{count}} crédito de tiempo",
+    "timeCredits_other": "{{count}} créditos de tiempo",
+    "memberSince": "Miembro desde {{date}}",
+    "connect": "Conectar",
+    "message": "Mensaje",
+    "skills": "Habilidades",
+    "reviews": "Reseñas",
+    "noSkills": "Sin habilidades listadas.",
+    "noReviews": "Sin reseñas todavía."
+  },
+  "empty": {
+    "title": "No se encontraron miembros",
+    "subtitle": "Intenta ajustar tu búsqueda o filtros"
+  },
+  "loading": "Cargando miembros…"
+}

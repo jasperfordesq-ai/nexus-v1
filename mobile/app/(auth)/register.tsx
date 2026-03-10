@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -18,6 +18,7 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Link, router } from 'expo-router';
 
 import { register as apiRegister, extractToken } from '@/lib/api/auth';
@@ -30,7 +31,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 const registerSchema = z
   .object({
     firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().optional().default(''),
+    lastName: z.string().default(''),
     email: z.string().email('Please enter a valid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     passwordConfirm: z.string().min(1, 'Please confirm your password'),
@@ -43,6 +44,7 @@ const registerSchema = z
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterScreen() {
+  const { t } = useTranslation('auth');
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = makeStyles(theme);
@@ -52,7 +54,7 @@ export default function RegisterScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(registerSchema) as Resolver<RegisterFormValues>,
     defaultValues: { firstName: '', lastName: '', email: '', password: '', passwordConfirm: '' },
   });
 
@@ -101,8 +103,8 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Create account</Text>
-          <Text style={styles.subtitle}>Join your local timebank community</Text>
+          <Text style={styles.title}>{t('register.title')}</Text>
+          <Text style={styles.subtitle}>{t('register.subtitle')}</Text>
         </View>
 
         {globalError && (
@@ -112,7 +114,7 @@ export default function RegisterScreen() {
         )}
 
         <View style={styles.form}>
-          <Text style={styles.label}>First name</Text>
+          <Text style={styles.label}>{t('register.firstName')}</Text>
           <Controller
             control={control}
             name="firstName"
@@ -123,7 +125,7 @@ export default function RegisterScreen() {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  placeholder="Jane"
+                  placeholder={t('register.firstNamePlaceholder')}
                   autoCapitalize="words"
                   returnKeyType="next"
                 />
@@ -132,7 +134,7 @@ export default function RegisterScreen() {
             )}
           />
 
-          <Text style={styles.label}>Last name</Text>
+          <Text style={styles.label}>{t('register.lastName')}</Text>
           <Controller
             control={control}
             name="lastName"
@@ -142,14 +144,14 @@ export default function RegisterScreen() {
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                placeholder="Smith"
+                placeholder={t('register.lastNamePlaceholder')}
                 autoCapitalize="words"
                 returnKeyType="next"
               />
             )}
           />
 
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>{t('register.email')}</Text>
           <Controller
             control={control}
             name="email"
@@ -160,7 +162,7 @@ export default function RegisterScreen() {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  placeholder="you@example.com"
+                  placeholder={t('register.emailPlaceholder')}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
@@ -171,7 +173,7 @@ export default function RegisterScreen() {
             )}
           />
 
-          <Text style={styles.label}>Password</Text>
+          <Text style={styles.label}>{t('register.password')}</Text>
           <Controller
             control={control}
             name="password"
@@ -182,7 +184,7 @@ export default function RegisterScreen() {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  placeholder="Min. 8 characters"
+                  placeholder={t('register.passwordPlaceholder')}
                   secureTextEntry
                   returnKeyType="next"
                 />
@@ -191,7 +193,7 @@ export default function RegisterScreen() {
             )}
           />
 
-          <Text style={styles.label}>Confirm password</Text>
+          <Text style={styles.label}>{t('register.confirmPassword')}</Text>
           <Controller
             control={control}
             name="passwordConfirm"
@@ -202,7 +204,7 @@ export default function RegisterScreen() {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  placeholder="Re-enter password"
+                  placeholder={t('register.confirmPasswordPlaceholder')}
                   secureTextEntry
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit(onSubmit)}
@@ -223,15 +225,15 @@ export default function RegisterScreen() {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Create account</Text>
+              <Text style={styles.buttonText}>{t('register.submit')}</Text>
             )}
           </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
+          <Text style={styles.footerText}>{t('register.hasAccount')} </Text>
           <Link href="/(auth)/login" style={[styles.link, { color: primary }]}>
-            Sign in
+            {t('register.signIn')}
           </Link>
         </View>
       </ScrollView>

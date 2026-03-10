@@ -1,0 +1,26 @@
+{
+  "title": "Messages",
+  "thread": {
+    "inputPlaceholder": "Type a message…",
+    "send": "Send",
+    "loadingHistory": "Loading messages…",
+    "noMessages": "No messages yet. Say hello!",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "voice": {
+    "label": "Voice message",
+    "play": "Play",
+    "pause": "Pause",
+    "recording": "Recording…",
+    "tapToRecord": "Hold to record"
+  },
+  "empty": {
+    "title": "No conversations yet",
+    "subtitle": "Connect with members to start messaging"
+  },
+  "errors": {
+    "sendFailed": "Message failed to send. Tap to retry.",
+    "loadFailed": "Could not load messages."
+  }
+}
