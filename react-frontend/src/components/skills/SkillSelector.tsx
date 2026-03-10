@@ -122,13 +122,16 @@ export function SkillChip({
         </span>
       )}
       {onRemove && (
-        <button
-          onClick={onRemove}
-          className="ml-1 p-0.5 rounded-full hover:bg-red-500/20 text-theme-subtle hover:text-red-500 transition-colors"
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          onPress={onRemove}
+          className="ml-1 p-0.5 rounded-full hover:bg-red-500/20 text-theme-subtle hover:text-red-500 transition-colors min-w-0 w-auto h-auto"
           aria-label={`Remove ${skill.skill_name}`}
         >
           <X className="w-3 h-3" />
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -310,19 +313,20 @@ export function SkillSelector({
             {searchResults.length > 0 && (
               <div className="space-y-1 max-h-48 overflow-y-auto">
                 {searchResults.map((result) => (
-                  <button
+                  <Button
                     key={result.id}
-                    onClick={() => {
+                    variant="light"
+                    onPress={() => {
                       setSelectedSkill(result.name);
                       setSelectedCategory(result.category_id.toString());
                       setSearchResults([]);
                       setSearchQuery(result.name);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-theme-hover transition-colors"
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-theme-hover transition-colors justify-start h-auto"
                   >
                     <span className="text-sm font-medium text-theme-primary">{result.name}</span>
                     <span className="text-xs text-theme-subtle ml-2">in {result.category_name}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

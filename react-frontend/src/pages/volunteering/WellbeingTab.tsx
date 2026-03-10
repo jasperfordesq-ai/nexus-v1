@@ -485,11 +485,11 @@ export function WellbeingTab() {
               <p className="text-sm font-medium text-theme-primary mb-3">{t('wellbeing.select_mood', 'Select your mood')}</p>
               <div className="flex justify-center gap-3">
                 {moodOptions.map((mood) => (
-                  <button
+                  <Button
                     key={mood.value}
-                    type="button"
-                    onClick={() => setSelectedMood(mood.value)}
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
+                    variant="flat"
+                    onPress={() => setSelectedMood(mood.value)}
+                    className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all h-auto min-w-0 ${
                       selectedMood === mood.value
                         ? 'bg-rose-500/20 ring-2 ring-rose-500 scale-110'
                         : 'bg-theme-elevated hover:bg-theme-hover'
@@ -499,7 +499,7 @@ export function WellbeingTab() {
                   >
                     <span className="text-3xl" role="img" aria-hidden="true">{mood.emoji}</span>
                     <span className="text-xs text-theme-muted">{mood.label}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

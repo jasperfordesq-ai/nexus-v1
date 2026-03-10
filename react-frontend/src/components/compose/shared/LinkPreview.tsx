@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Skeleton } from '@heroui/react';
+import { Button, Skeleton } from '@heroui/react';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -201,14 +201,16 @@ export function LinkPreview({ content, onPreviewData }: LinkPreviewProps) {
   return (
     <div className="relative rounded-xl border border-[var(--border-default)] overflow-hidden bg-[var(--surface-elevated)]">
       {/* Dismiss button */}
-      <button
-        type="button"
-        onClick={handleDismiss}
-        className="absolute top-2 right-2 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+      <Button
+        isIconOnly
+        size="sm"
+        variant="flat"
+        onPress={handleDismiss}
+        className="absolute top-2 right-2 z-10 w-6 h-6 min-w-0 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
         aria-label={t('compose.link_preview_remove')}
       >
         <X className="w-3.5 h-3.5" aria-hidden="true" />
-      </button>
+      </Button>
 
       {/* Image */}
       {previewData.image && (

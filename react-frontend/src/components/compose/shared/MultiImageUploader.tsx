@@ -85,15 +85,17 @@ function SortableImage({
       } transition-all`}
     >
       {/* Drag handle */}
-      <button
-        type="button"
-        className="absolute top-1.5 left-1.5 z-10 bg-black/60 text-white rounded-lg p-1.5 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity cursor-grab active:cursor-grabbing backdrop-blur-sm"
+      <Button
+        isIconOnly
+        size="sm"
+        variant="flat"
+        className="absolute top-1.5 left-1.5 z-10 bg-black/60 text-white rounded-lg p-1.5 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity cursor-grab active:cursor-grabbing backdrop-blur-sm min-w-0 w-auto h-auto"
         aria-label="Drag to reorder"
         {...attributes}
         {...listeners}
       >
         <GripVertical className="w-4 h-4" />
-      </button>
+      </Button>
 
       {/* Image preview */}
       <img

@@ -149,40 +149,43 @@ function CategoryTreeItem({
 
   return (
     <div>
-      <button
-        type="button"
+      <div
         className={`
-          w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors
+          w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors
           ${isSelected ? 'bg-amber-500/10 text-amber-500 font-semibold' : 'text-theme-muted hover:bg-theme-hover'}
         `}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
-        onClick={() => onSelect(isSelected ? null : node.id)}
       >
         {hasChildren ? (
-          <button
-            type="button"
-            className="p-0 min-w-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              setExpanded(!expanded);
-            }}
+          <Button
+            isIconOnly
+            size="sm"
+            variant="light"
+            onPress={() => setExpanded(!expanded)}
             aria-label={expanded ? 'Collapse' : 'Expand'}
+            className="p-0 min-w-0 w-auto h-auto flex-shrink-0"
           >
             {expanded ? (
               <ChevronDown className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
             ) : (
               <ChevronRight className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
             )}
-          </button>
+          </Button>
         ) : (
           <span className="w-3.5" />
         )}
-        <Folder className={`w-3.5 h-3.5 flex-shrink-0 ${isSelected ? 'text-amber-400' : 'text-theme-subtle'}`} aria-hidden="true" />
-        <span className="flex-1 truncate">{node.name}</span>
-        {node.resource_count > 0 && (
-          <span className="text-xs text-theme-subtle">{node.resource_count}</span>
-        )}
-      </button>
+        <Button
+          variant="light"
+          onPress={() => onSelect(isSelected ? null : node.id)}
+          className="flex items-center gap-2 text-left text-sm h-auto p-0 min-w-0 flex-1 justify-start"
+        >
+          <Folder className={`w-3.5 h-3.5 flex-shrink-0 ${isSelected ? 'text-amber-400' : 'text-theme-subtle'}`} aria-hidden="true" />
+          <span className="flex-1 truncate">{node.name}</span>
+          {node.resource_count > 0 && (
+            <span className="text-xs text-theme-subtle">{node.resource_count}</span>
+          )}
+        </Button>
+      </div>
       {hasChildren && expanded && (
         <div>
           {node.children.map((child) => (
@@ -564,16 +567,16 @@ export function ResourcesPage() {
               </div>
               {showCategoryTree && (
                 <div className="space-y-0.5">
-                  <button
-                    type="button"
-                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors ${
+                  <Button
+                    variant="light"
+                    onPress={() => setSelectedCategory(null)}
+                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors justify-start h-auto ${
                       !selectedCategory ? 'bg-amber-500/10 text-amber-500 font-semibold' : 'text-theme-muted hover:bg-theme-hover'
                     }`}
-                    onClick={() => setSelectedCategory(null)}
+                    startContent={<FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />}
                   >
-                    <FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />
                     All Resources
-                  </button>
+                  </Button>
                   {categoryTree.map((node) => (
                     <CategoryTreeItem
                       key={node.id}

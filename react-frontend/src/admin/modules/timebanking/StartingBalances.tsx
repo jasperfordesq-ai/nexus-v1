@@ -139,13 +139,13 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
             {searchResults.length > 0 && (
               <div className="mt-2 space-y-1 max-h-48 overflow-y-auto border border-divider rounded-lg">
                 {searchResults.map((user) => (
-                  <button
+                  <Button
                     key={user.id}
-                    type="button"
-                    className="flex items-center justify-between w-full px-3 py-2 text-left hover:bg-default-100 transition-colors"
-                    onClick={() => handleSelectUser(user)}
+                    variant="light"
+                    className="flex items-center justify-between w-full px-3 py-2 h-auto rounded-none"
+                    onPress={() => handleSelectUser(user)}
                   >
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-left">
                       <p className="text-sm font-medium text-foreground truncate">
                         {user.name}
                       </p>
@@ -159,7 +159,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                         {user.balance}h
                       </p>
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

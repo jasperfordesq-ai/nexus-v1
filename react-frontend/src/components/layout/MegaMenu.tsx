@@ -128,11 +128,12 @@ export function MegaMenu({
         <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{title}</p>
         <div className="space-y-0.5">
           {items.map((item) => (
-            <button
+            <Button
               key={item.href}
               data-mega-item
-              onClick={() => onNavigate(item.href)}
-              className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 ${
+              onPress={() => onNavigate(item.href)}
+              variant="light"
+              className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 h-auto justify-start ${
                 location.pathname.startsWith(item.href)
                   ? 'bg-theme-active text-theme-primary'
                   : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
@@ -143,7 +144,7 @@ export function MegaMenu({
                 <p className="text-sm font-medium leading-tight">{item.label}</p>
                 {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       </div>

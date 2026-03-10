@@ -51,8 +51,8 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
           <p className='text-xs text-default-400 mt-0.5'>Applied{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
         </div>
       </div>
-      {application.message && (<div><button type='button' className='flex items-center gap-1 text-xs text-default-500 hover:text-default-700 transition-colors' onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>
-        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} Cover message</button>
+      {application.message && (<div><Button variant="light" size="sm" className='flex items-center gap-1 text-xs text-default-500 hover:text-default-700 h-auto p-0' onPress={() => setExpanded((v) => !v)} aria-expanded={expanded}>
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} Cover message</Button>
         {expanded && <p className='mt-2 text-sm text-default-700 bg-default-50 rounded-lg p-3 whitespace-pre-wrap leading-relaxed'>{application.message}</p>}
       </div>)}
       <div className='flex items-end gap-2 flex-wrap'>
@@ -204,18 +204,21 @@ export function JobsAdmin() {
               {items.map((job) => {
                 const isSelected = selectedJob?.id === job.id;
                 return (
-                  <button key={job.id} type='button' onClick={() => handleSelectJob(job)}
-                    className={['text-left rounded-lg px-3 py-2.5 transition-colors w-full',
-                      isSelected ? 'bg-primary-50 border border-primary-200 dark:bg-primary-950 dark:border-primary-800' : 'hover:bg-default-100 border border-transparent',
+                  <Button key={job.id} onPress={() => handleSelectJob(job)}
+                    variant="light"
+                    className={['text-left rounded-lg px-3 py-2.5 w-full justify-start h-auto',
+                      isSelected ? 'bg-primary-50 border border-primary-200 dark:bg-primary-950 dark:border-primary-800' : 'border border-transparent',
                     ].join(' ')} aria-pressed={isSelected}>
-                    <p className={['text-sm font-medium leading-snug truncate',
-                      isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-foreground'].join(' ')}>{job.title}</p>
-                    <div className='flex items-center gap-1.5 mt-1'>
-                      <Users size={11} className='text-default-400 shrink-0' />
-                      <span className='text-xs text-default-500'>{job.applications_count}{' '}{job.applications_count === 1 ? 'application' : 'applications'}</span>
+                    <div className="text-left w-full">
+                      <p className={['text-sm font-medium leading-snug truncate',
+                        isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-foreground'].join(' ')}>{job.title}</p>
+                      <div className='flex items-center gap-1.5 mt-1'>
+                        <Users size={11} className='text-default-400 shrink-0' />
+                        <span className='text-xs text-default-500'>{job.applications_count}{' '}{job.applications_count === 1 ? 'application' : 'applications'}</span>
+                      </div>
+                      {(job.organization_name || job.poster_name) && <p className='text-xs text-default-400 truncate mt-0.5'>{job.organization_name || job.poster_name}</p>}
                     </div>
-                    {(job.organization_name || job.poster_name) && <p className='text-xs text-default-400 truncate mt-0.5'>{job.organization_name || job.poster_name}</p>}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

@@ -115,10 +115,12 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
         {/* Category tabs */}
         <div className="flex gap-0.5 mb-2 overflow-x-auto">
           {EMOJI_CATEGORIES.map((cat) => (
-            <button
+            <Button
               key={cat.key}
-              type="button"
-              onClick={() => handleCategoryClick(cat.key)}
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={() => handleCategoryClick(cat.key)}
               className={`
                 w-10 h-10 flex items-center justify-center rounded-lg text-base
                 cursor-pointer transition-colors shrink-0
@@ -132,7 +134,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
               title={t(cat.label)}
             >
               {cat.icon}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -153,15 +155,17 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
               </p>
               <div className="grid grid-cols-8 gap-1">
                 {cat.emojis.map((emoji) => (
-                  <button
+                  <Button
                     key={emoji}
-                    type="button"
-                    onClick={() => handleEmojiClick(emoji)}
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    onPress={() => handleEmojiClick(emoji)}
                     className="w-11 h-11 text-lg cursor-pointer hover:bg-[var(--surface-hover)] rounded-lg flex items-center justify-center"
                     aria-label={emoji}
                   >
                     {emoji}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

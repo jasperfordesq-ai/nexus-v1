@@ -478,18 +478,20 @@ export function RiskTagsPage() {
                     {listingResults.length > 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-content1 border border-default-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                         {listingResults.map(listing => (
-                          <button
+                          <Button
                             key={listing.id}
-                            className="w-full text-left px-3 py-2 hover:bg-default-100 transition-colors"
-                            onClick={() => selectListing(listing)}
-                            type="button"
+                            variant="light"
+                            className="w-full text-left px-3 py-2 justify-start h-auto rounded-none"
+                            onPress={() => selectListing(listing)}
                           >
-                            <p className="text-sm font-medium">{listing.title}</p>
-                            <p className="text-xs text-default-500">
-                              ID: {listing.id}
-                              {listing.owner_name && ` · ${listing.owner_name}`}
-                            </p>
-                          </button>
+                            <div className="text-left">
+                              <p className="text-sm font-medium">{listing.title}</p>
+                              <p className="text-xs text-default-500">
+                                ID: {listing.id}
+                                {listing.owner_name && ` · ${listing.owner_name}`}
+                              </p>
+                            </div>
+                          </Button>
                         ))}
                       </div>
                     )}
