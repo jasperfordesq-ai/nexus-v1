@@ -13,12 +13,12 @@
  * - Typing indicators (when Pusher is available)
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Textarea, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
-import { ArrowLeft, Send, Info, Loader2, MoreVertical, Trash2, Mic, Square, Play, Pause, SmilePlus, Check, CheckCheck, Search, Paperclip, X, FileText, Pencil, AlertTriangle } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input } from '@heroui/react';
+import { ArrowLeft, Info, Loader2, MoreVertical, Trash2, Search, X, FileText, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/contexts';
 import { GlassCard } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
@@ -27,9 +27,12 @@ import { usePageTitle } from '@/hooks';
 import type { NewMessageEvent, TypingEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import type { Message, User } from '@/types/api';
 import { MessageContextCard } from '@/components/messages/MessageContextCard';
+import { MessageBubble } from './components/MessageBubble';
+import { MessageInputArea } from './components/MessageInputArea';
+import type { AttachmentPreview } from './components/MessageInputArea';
 
 interface OtherUser {
   id: number;
@@ -125,7 +128,7 @@ export function ConversationPage() {
   const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
   // File attachment state
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [attachmentPreviews, setAttachmentPreviews] = useState<{ file: File; preview: string; type: 'image' | 'file' }[]>([]);
+  const [attachmentPreviews, setAttachmentPreviews] = useState<AttachmentPreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Edit/delete state
   const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
@@ -703,15 +706,6 @@ export function ConversationPage() {
   }
 
   /**
-   * Format recording time as mm:ss
-   */
-  function formatRecordingTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
-
-  /**
    * Handle message reaction (toggle)
    */
   async function handleReaction(messageId: number, emoji: string) {
@@ -798,7 +792,7 @@ export function ConversationPage() {
   /**
    * Handle file selection for attachments
    */
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
@@ -839,7 +833,7 @@ export function ConversationPage() {
   /**
    * Send message with attachments
    */
-  async function sendMessageWithAttachments(e: React.FormEvent) {
+  async function sendMessageWithAttachments(e: FormEvent) {
     e.preventDefault();
     if ((!newMessage.trim() && attachments.length === 0) || !targetId || isSending) return;
     if (messagingRestriction?.messaging_disabled) {
@@ -1339,210 +1333,38 @@ export function ConversationPage() {
           </div>
         )}
 
-        {/* Input */}
-        <div className="p-4 border-t border-theme-default">
-          {/* Messaging disabled notice (feature flag) */}
-          {!isDirectMessagingEnabled && (
-            <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">
-              <span className="text-amber-600 dark:text-amber-400 text-sm flex-1">
-                {t('disabled_inline')}
-              </span>
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                onPress={() => navigate(tenantPath('/exchanges'))}
-              >
-                {t('exchanges_link')}
-              </Button>
-            </div>
-          )}
-
-          {/* Messaging restricted by broker/admin */}
-          {isDirectMessagingEnabled && messagingRestriction?.messaging_disabled && (
-            <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg" role="alert">
-              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-              <div className="flex-1">
-                <p className="text-red-700 dark:text-red-300 text-sm font-medium">
-                  Your messaging has been temporarily restricted.
-                </p>
-                <p className="text-red-600/80 dark:text-red-400/80 text-xs mt-1">
-                  If you believe this is an error, please contact your timebank coordinator.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Voice recording preview */}
-          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && audioBlob && !isRecording && (
-            <div className="flex items-center gap-3 mb-3 p-3 bg-theme-elevated rounded-lg">
-              <VoiceMessagePlayer audioBlob={audioBlob} />
-              <div className="flex gap-2 ml-auto">
-                <Button
-                  size="sm"
-                  variant="flat"
-                  className="bg-theme-elevated text-theme-muted"
-                  onPress={() => setAudioBlob(null)}
-                >
-                  {t('cancel')}
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
-                  onPress={sendVoiceMessage}
-                  isLoading={isSending}
-                >
-                  {t('send')}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Recording indicator */}
-          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isRecording && (
-            <div className="flex items-center gap-3 mb-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-theme-primary font-medium">{formatRecordingTime(recordingTime)}</span>
-              <span className="text-theme-subtle text-sm">{t('recording')}</span>
-              <div className="ml-auto flex gap-2">
-                <Button
-                  size="sm"
-                  variant="flat"
-                  className="bg-theme-elevated text-theme-muted"
-                  onPress={cancelRecording}
-                >
-                  {t('cancel')}
-                </Button>
-                <Button
-                  size="sm"
-                  color="danger"
-                  onPress={stopRecording}
-                  startContent={<Square className="w-3 h-3" />}
-                >
-                  {t('stop_recording')}
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Attachment previews */}
-          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && attachmentPreviews.length > 0 && (
-            <div className="flex gap-2 mb-3 flex-wrap">
-              {attachmentPreviews.map((item, index) => (
-                <div key={index} className="relative group">
-                  {item.type === 'image' ? (
-                    <img
-                      src={item.preview}
-                      alt={item.file.name}
-                      className="w-16 h-16 object-cover rounded-lg border border-theme-default"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 flex flex-col items-center justify-center bg-theme-elevated rounded-lg border border-theme-default">
-                      <FileText className="w-6 h-6 text-theme-subtle" />
-                      <span className="text-[10px] text-theme-subtle truncate max-w-14 px-1">
-                        {item.file.name.split('.').pop()?.toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    className="absolute -top-1 -right-1 w-4 h-4 min-w-0 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    onPress={() => removeAttachment(index)}
-                    aria-label={`Remove ${item.file.name}`}
-                  >
-                    <X className="w-2.5 h-2.5 text-white" aria-hidden="true" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Text input form */}
-          {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && !isRecording && !audioBlob && (
-            <form onSubmit={sendMessageWithAttachments} className="flex gap-3">
-              {/* Hidden file input */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*,.pdf,.doc,.docx,.txt"
-                className="hidden"
-                onChange={handleFileSelect}
-              />
-              {/* Attachment button */}
-              <Button
-                type="button"
-                isIconOnly
-                variant="flat"
-                className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
-                onPress={() => fileInputRef.current?.click()}
-                aria-label={t('aria_add_attachment')}
-                isDisabled={attachments.length >= 5}
-              >
-                <Paperclip className="w-4 h-4" />
-              </Button>
-              <Textarea
-                placeholder={t('type_placeholder')}
-                value={newMessage}
-                onChange={(e) => {
-                  setNewMessage(e.target.value);
-                  // Send debounced typing indicator
-                  if (targetId) {
-                    sendTypingIndicator(parseInt(targetId, 10), e.target.value.length > 0);
-                  }
-                }}
-                onBlur={() => {
-                  // Stop typing indicator when input loses focus
-                  if (pusher && targetId) {
-                    pusher.sendTyping(parseInt(targetId, 10), false);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  // Enter sends message, Shift+Enter adds newline
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if (newMessage.trim() || attachments.length > 0) {
-                      const form = e.currentTarget.closest('form');
-                      if (form) form.requestSubmit();
-                    }
-                  }
-                }}
-                minRows={1}
-                maxRows={4}
-                classNames={{
-                  input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
-                  inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                }}
-                aria-label={t('aria_message_input')}
-              />
-              {/* Voice recording button - show when no text and no attachments */}
-              {!newMessage.trim() && attachments.length === 0 && (
-                <Button
-                  type="button"
-                  isIconOnly
-                  variant="flat"
-                  className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
-                  onPress={startRecording}
-                  aria-label={t('aria_record_voice')}
-                >
-                  <Mic className="w-4 h-4" />
-                </Button>
-              )}
-              {/* Send button - show when there's text or attachments */}
-              {(newMessage.trim() || attachments.length > 0) && (
-                <Button
-                  type="submit"
-                  isIconOnly
-                  aria-label="Send message"
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
-                  isLoading={isSending}
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              )}
-            </form>
-          )}
-        </div>
+        {/* Message Input Area */}
+        <MessageInputArea
+          isDirectMessagingEnabled={isDirectMessagingEnabled}
+          messagingRestriction={messagingRestriction}
+          newMessage={newMessage}
+          onNewMessageChange={setNewMessage}
+          onSendMessage={sendMessageWithAttachments}
+          isSending={isSending}
+          onTypingIndicator={(value) => {
+            if (targetId) {
+              sendTypingIndicator(parseInt(targetId, 10), value.length > 0);
+            }
+          }}
+          onBlurTypingStop={() => {
+            if (pusher && targetId) {
+              pusher.sendTyping(parseInt(targetId, 10), false);
+            }
+          }}
+          isRecording={isRecording}
+          recordingTime={recordingTime}
+          audioBlob={audioBlob}
+          onStartRecording={startRecording}
+          onStopRecording={stopRecording}
+          onCancelRecording={cancelRecording}
+          onSendVoiceMessage={sendVoiceMessage}
+          onClearAudioBlob={() => setAudioBlob(null)}
+          attachments={attachments}
+          attachmentPreviews={attachmentPreviews}
+          fileInputRef={fileInputRef}
+          onFileSelect={handleFileSelect}
+          onRemoveAttachment={removeAttachment}
+        />
       </GlassCard>
 
       {/* Archive Confirmation Modal */}
@@ -1586,439 +1408,6 @@ export function ConversationPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
-  );
-}
-
-interface MessageBubbleProps {
-  id?: string;
-  message: Message;
-  isOwn: boolean;
-  showAvatar: boolean;
-  otherUser: ConversationMeta['other_user'];
-  onReact?: (messageId: number, emoji: string) => void;
-  isHighlighted?: boolean;
-  highlightQuery?: string;
-  onEdit?: (message: Message) => void;
-  onDelete?: (messageId: number) => void;
-  isEditing?: boolean;
-  editingText?: string;
-  onEditingTextChange?: (text: string) => void;
-  onSaveEdit?: () => void;
-  onCancelEdit?: () => void;
-}
-
-// Available reaction emojis
-const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
-
-function MessageBubble({
-  id,
-  message,
-  isOwn,
-  showAvatar,
-  otherUser,
-  onReact,
-  isHighlighted,
-  highlightQuery,
-  onEdit,
-  onDelete,
-  isEditing,
-  editingText,
-  onEditingTextChange,
-  onSaveEdit,
-  onCancelEdit,
-}: MessageBubbleProps) {
-  const { t } = useTranslation('messages');
-  const [showReactionPicker, setShowReactionPicker] = useState(false);
-  const [showMessageMenu, setShowMessageMenu] = useState(false);
-  const reactionPickerRef = useRef<HTMLDivElement>(null);
-  const messageMenuRef = useRef<HTMLDivElement>(null);
-  const isVoiceMessage = message.is_voice || message.audio_url;
-  const isDeleted = message.is_deleted;
-
-  // Close popups when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (showReactionPicker && reactionPickerRef.current && !reactionPickerRef.current.contains(event.target as Node)) {
-        setShowReactionPicker(false);
-      }
-      if (showMessageMenu && messageMenuRef.current && !messageMenuRef.current.contains(event.target as Node)) {
-        setShowMessageMenu(false);
-      }
-    }
-
-    if (showReactionPicker || showMessageMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showReactionPicker, showMessageMenu]);
-
-  // Parse reactions from message (format: { emoji: count, ... } or array)
-  const reactions = message.reactions || {};
-  const hasReactions = Object.keys(reactions).length > 0;
-
-  // Highlight search terms in message body
-  function highlightText(text: string): React.ReactNode {
-    if (!highlightQuery || !text) return text;
-    const parts = text.split(new RegExp(`(${highlightQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
-    return parts.map((part, i) =>
-      part.toLowerCase() === highlightQuery.toLowerCase() ? (
-        <mark key={i} className="bg-yellow-400/40 text-gray-900 dark:text-white rounded px-0.5">{part}</mark>
-      ) : part
-    );
-  }
-
-  return (
-    <motion.div
-      id={id}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className={`flex gap-3 ${isOwn ? 'flex-row-reverse' : ''} group transition-all duration-300 ${isHighlighted ? 'ring-2 ring-yellow-400/30 rounded-lg' : ''}`}
-    >
-      {showAvatar && !isOwn ? (
-        <Avatar
-          src={resolveAvatarUrl(otherUser.avatar_url || otherUser.avatar)}
-          name={otherUser.name}
-          size="sm"
-          className="flex-shrink-0"
-        />
-      ) : (
-        <div className="w-8" />
-      )}
-
-      <div className={`max-w-[70%] ${isOwn ? 'text-right' : ''} relative`}>
-        <div
-          className={`
-            inline-block px-4 py-2 rounded-2xl relative
-            ${isOwn
-              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-md'
-              : 'bg-theme-elevated text-theme-primary rounded-bl-md'
-            }
-          `}
-        >
-          {isEditing ? (
-            /* Editing mode */
-            <div className="min-w-[200px]">
-              <Input
-                value={editingText}
-                onChange={(e) => onEditingTextChange?.(e.target.value)}
-                classNames={{
-                  input: 'bg-transparent text-inherit placeholder:text-inherit/40',
-                  inputWrapper: 'bg-black/10 dark:bg-white/10 border-black/20 dark:border-white/20',
-                }}
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    onSaveEdit?.();
-                  } else if (e.key === 'Escape') {
-                    onCancelEdit?.();
-                  }
-                }}
-              />
-              <div className="flex gap-2 mt-2 justify-end">
-                <Button size="sm" variant="flat" className="bg-black/10 dark:bg-white/10 text-inherit/70" onPress={onCancelEdit}>
-                  {t('cancel')}
-                </Button>
-                <Button size="sm" className="bg-black/20 dark:bg-white/20 text-inherit" onPress={onSaveEdit}>
-                  {t('save')}
-                </Button>
-              </div>
-            </div>
-          ) : isDeleted ? (
-            /* Deleted message */
-            <p className="text-sm opacity-40 italic">{t('message_deleted_placeholder')}</p>
-          ) : isVoiceMessage ? (
-            <VoiceMessagePlayer audioUrl={message.audio_url} />
-          ) : (
-            <>
-              {(message.body || message.content) && (
-                <p className="text-sm whitespace-pre-wrap">{highlightText(message.body || message.content || '')}</p>
-              )}
-              {/* Edited indicator */}
-              {message.is_edited && (
-                <span className="text-[10px] opacity-40 ml-1">{t('message_edited_indicator')}</span>
-              )}
-              {/* Attachments */}
-              {message.attachments && message.attachments.length > 0 && (
-                <div className={`flex flex-wrap gap-2 ${message.body ? 'mt-2' : ''}`}>
-                  {message.attachments.map((attachment) => (
-                    <a
-                      key={attachment.id}
-                      href={attachment.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      {attachment.type === 'image' ? (
-                        <img
-                          src={attachment.url}
-                          alt={attachment.name}
-                          className="max-w-[200px] max-h-[200px] rounded-lg object-cover hover:opacity-90 transition-opacity"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex items-center gap-2 px-3 py-2 bg-black/10 dark:bg-white/10 rounded-lg hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
-                          <FileText className="w-4 h-4 opacity-60" />
-                          <div className="flex flex-col">
-                            <span className="text-xs opacity-80 truncate max-w-[150px]">{attachment.name}</span>
-                            <span className="text-[10px] opacity-40">
-                              {(attachment.size / 1024).toFixed(1)} KB
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Action buttons - shows on hover (only when not editing) */}
-          {!isEditing && !isDeleted && (
-            <div className={`absolute -bottom-2 ${isOwn ? '-left-12' : '-right-12'} flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
-              {/* Reaction button */}
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
-                onPress={() => setShowReactionPicker(!showReactionPicker)}
-                aria-label={t('aria_add_reaction')}
-              >
-                <SmilePlus className="w-3 h-3 text-theme-muted" aria-hidden="true" />
-              </Button>
-
-              {/* Edit/Delete button (only for own messages) */}
-              {isOwn && !isVoiceMessage && (
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
-                  onPress={() => setShowMessageMenu(!showMessageMenu)}
-                  aria-label={t('aria_message_options')}
-                >
-                  <MoreVertical className="w-3 h-3 text-theme-muted" aria-hidden="true" />
-                </Button>
-              )}
-            </div>
-          )}
-
-          {/* Reaction picker */}
-          {showReactionPicker && (
-            <div
-              ref={reactionPickerRef}
-              className={`
-                absolute ${isOwn ? 'left-0' : 'right-0'} -top-10
-                flex gap-1 p-1.5 bg-theme-card rounded-full border border-theme-default
-                shadow-lg z-10
-              `}
-              role="menu"
-              aria-label={t('aria_add_reaction')}
-            >
-              {REACTION_EMOJIS.map((emoji) => (
-                <Button
-                  key={emoji}
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  className="w-7 h-7 min-w-0 rounded-full"
-                  onPress={() => {
-                    onReact?.(message.id, emoji);
-                    setShowReactionPicker(false);
-                  }}
-                  aria-label={t('aria_react_with', { emoji })}
-                >
-                  {emoji}
-                </Button>
-              ))}
-            </div>
-          )}
-
-          {/* Message menu (edit/delete) */}
-          {showMessageMenu && isOwn && (
-            <div
-              ref={messageMenuRef}
-              className={`
-                absolute ${isOwn ? 'left-0' : 'right-0'} -top-16
-                flex flex-col p-1 bg-theme-card rounded-lg border border-theme-default
-                shadow-lg z-10 min-w-[100px]
-              `}
-              role="menu"
-              aria-label={t('aria_message_options')}
-            >
-              <Button
-                variant="light"
-                size="sm"
-                className="justify-start text-sm text-theme-muted"
-                startContent={<Pencil className="w-3 h-3" aria-hidden="true" />}
-                onPress={() => {
-                  onEdit?.(message);
-                  setShowMessageMenu(false);
-                }}
-                role="menuitem"
-              >
-                {t('message_edit')}
-              </Button>
-              <Button
-                variant="light"
-                size="sm"
-                className="justify-start text-sm text-red-600 dark:text-red-400"
-                startContent={<Trash2 className="w-3 h-3" aria-hidden="true" />}
-                onPress={() => {
-                  onDelete?.(message.id);
-                  setShowMessageMenu(false);
-                }}
-                role="menuitem"
-              >
-                {t('message_delete')}
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Display existing reactions */}
-        {hasReactions && (
-          <div className={`flex gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'} px-2`}>
-            {Object.entries(reactions).map(([emoji, count]) => (
-              <Button
-                key={emoji}
-                size="sm"
-                variant="light"
-                className="min-w-0 h-auto px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
-                onPress={() => onReact?.(message.id, emoji)}
-                aria-label={t('aria_toggle_reaction', { emoji })}
-              >
-                <span>{emoji}</span>
-                {typeof count === 'number' && count > 1 && (
-                  <span className="text-theme-subtle">{count}</span>
-                )}
-              </Button>
-            ))}
-          </div>
-        )}
-
-        <div className={`flex items-center gap-1 mt-1 px-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-          <span className="text-xs text-gray-400 dark:text-white/30">
-            {new Date(message.created_at || message.sent_at || Date.now()).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-          {/* Read receipts - only show for own messages */}
-          {isOwn && (
-            <span className="text-gray-400 dark:text-white/40">
-              {message.is_read || message.read_at ? (
-                <CheckCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              ) : (
-                <Check className="w-3.5 h-3.5" />
-              )}
-            </span>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/**
- * Voice message player component
- */
-interface VoiceMessagePlayerProps {
-  audioUrl?: string;
-  audioBlob?: Blob;
-}
-
-function VoiceMessagePlayer({ audioUrl, audioBlob }: VoiceMessagePlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    // Create audio element
-    const audio = new Audio();
-    audioRef.current = audio;
-
-    if (audioBlob) {
-      audio.src = URL.createObjectURL(audioBlob);
-    } else if (audioUrl) {
-      audio.src = resolveAssetUrl(audioUrl);
-    }
-
-    audio.onloadedmetadata = () => {
-      setDuration(audio.duration);
-    };
-
-    audio.ontimeupdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
-
-    audio.onended = () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    };
-
-    return () => {
-      if (audioBlob) {
-        URL.revokeObjectURL(audio.src);
-      }
-      audio.pause();
-    };
-  }, [audioUrl, audioBlob]);
-
-  function togglePlay() {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-    } else {
-      audio.play();
-      setIsPlaying(true);
-    }
-  }
-
-  function formatTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
-
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  return (
-    <div className="flex items-center gap-3 min-w-[150px]">
-      <Button
-        isIconOnly
-        size="sm"
-        variant="light"
-        className="w-8 h-8 min-w-0 bg-black/20 dark:bg-white/20 rounded-full"
-        onPress={togglePlay}
-        aria-label={isPlaying ? 'Pause' : 'Play'}
-      >
-        {isPlaying ? (
-          <Pause className="w-4 h-4" aria-hidden="true" />
-        ) : (
-          <Play className="w-4 h-4 ml-0.5" aria-hidden="true" />
-        )}
-      </Button>
-      <div className="flex-1">
-        <div className="h-1 bg-black/20 dark:bg-white/20 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-black/60 dark:bg-white/60 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="flex justify-between text-xs opacity-50 mt-1">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-      </div>
     </div>
   );
 }
