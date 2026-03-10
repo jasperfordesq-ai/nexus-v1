@@ -8,10 +8,13 @@ import { API_V2 } from '@/lib/constants';
 
 export interface Member {
   id: number;
+  /** May be empty string — use first_name + last_name as fallback */
   name: string;
   first_name: string;
   last_name: string;
-  avatar_url: string | null;
+  /** List endpoint returns `avatar`; single-user endpoint returns `avatar_url` */
+  avatar?: string | null;
+  avatar_url?: string | null;
   tagline: string | null;
   location: string | null;
   latitude: number | null;
@@ -21,8 +24,6 @@ export interface Member {
   rating: number | null;
   total_hours_given: number;
   total_hours_received: number;
-  offer_count: number;
-  request_count: number;
 }
 
 export interface MemberListResponse {
