@@ -21,6 +21,10 @@ export default function MemberCard({ member }: MemberCardProps) {
   const theme = useTheme();
   const styles = makeStyles(theme);
 
+  const displayName = member.name?.trim() ||
+    [member.first_name, member.last_name].filter(Boolean).join(' ') ||
+    'Member';
+
   return (
     <TouchableOpacity
       style={styles.wrapper}
@@ -29,9 +33,9 @@ export default function MemberCard({ member }: MemberCardProps) {
     >
       <Card style={styles.card}>
         <View style={styles.row}>
-          <Avatar uri={member.avatar_url} name={member.name} size={52} />
+          <Avatar uri={member.avatar ?? member.avatar_url ?? null} name={displayName} size={52} />
           <View style={styles.info}>
-            <Text style={styles.name}>{member.name}</Text>
+            <Text style={styles.name}>{displayName}</Text>
             {member.tagline && (
               <Text style={styles.tagline} numberOfLines={2}>{member.tagline}</Text>
             )}
