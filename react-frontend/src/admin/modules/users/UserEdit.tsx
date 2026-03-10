@@ -563,7 +563,7 @@ export function UserEdit() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Input label="Tagline" placeholder="e.g. Community volunteer" value={tagline}
                   onValueChange={setTagline} isDisabled={submitting} />
-                <Input label="Location" placeholder="e.g. Dublin, Ireland" value={location}
+                <Input label="Location" placeholder="e.g. New York, USA" value={location}
                   onValueChange={setLocation} isDisabled={submitting} />
               </div>
 
