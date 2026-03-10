@@ -343,8 +343,8 @@ export function MemberReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {cohorts.map((c, i) => (
-                  <tr key={i} className="border-b border-divider last:border-0">
+                {cohorts.map((c) => (
+                  <tr key={c.cohort} className="border-b border-divider last:border-0">
                     <td className="py-2.5 pr-4 font-medium text-foreground">{c.cohort}</td>
                     <td className="py-2.5 pr-4 text-center">{c.initial}</td>
                     {[c.month_1, c.month_2, c.month_3, c.month_6, c.month_12].map((val, j) => {

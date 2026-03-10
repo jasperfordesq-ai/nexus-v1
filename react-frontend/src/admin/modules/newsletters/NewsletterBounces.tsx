@@ -274,8 +274,8 @@ export function NewsletterBounces() {
                 <p className="text-sm text-default-400">No data</p>
               ) : (
                 <div className="space-y-2">
-                  {reasonSummary.map((r, i) => (
-                    <div key={i} className="flex items-center justify-between gap-2">
+                  {reasonSummary.map((r) => (
+                    <div key={`${r.bounce_type}-${r.reason}`} className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         <Chip size="sm" color={getBadgeColor(r.bounce_type)} variant="flat">
                           {r.bounce_type}

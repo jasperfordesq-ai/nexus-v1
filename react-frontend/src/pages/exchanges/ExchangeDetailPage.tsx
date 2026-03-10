@@ -665,9 +665,9 @@ export function ExchangeDetailPage() {
               }}
               className="space-y-0"
             >
-              {timeline.map((entry, index) => (
+              {timeline.map((entry) => (
                 <motion.div
-                  key={index}
+                  key={`${entry.timestamp}-${entry.label}`}
                   variants={{
                     hidden: { opacity: 0, x: -20 },
                     visible: { opacity: 1, x: 0 },

@@ -42,14 +42,16 @@ export function CronJobSetup() {
   const [showKey, setShowKey] = useState(false);
   const [testing, setTesting] = useState(false);
 
-  // In a real scenario, this would come from environment/config
-  const CRON_KEY = import.meta.env.VITE_CRON_KEY || 'your-secure-cron-key-here';
+  // VITE_CRON_KEY must be set in .env — shown here for admin reference only
+  const CRON_KEY = import.meta.env.VITE_CRON_KEY || '';
   const API_URL = import.meta.env.VITE_API_BASE?.replace('/api', '') || 'https://api.project-nexus.ie';
   const CRON_URL = `${API_URL}/cron.php`;
 
-  const obfuscatedKey = showKey
-    ? CRON_KEY
-    : `${CRON_KEY.slice(0, 4)}${'*'.repeat(20)}${CRON_KEY.slice(-4)}`;
+  const obfuscatedKey = !CRON_KEY
+    ? '(VITE_CRON_KEY not configured)'
+    : showKey
+      ? CRON_KEY
+      : `${CRON_KEY.slice(0, 4)}${'*'.repeat(20)}${CRON_KEY.slice(-4)}`;
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);

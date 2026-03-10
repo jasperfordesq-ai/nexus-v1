@@ -111,7 +111,7 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
     <nav aria-label="Breadcrumbs" className="mb-4">
       <ol className="flex items-center gap-1.5 text-sm text-default-500">
         {breadcrumbs.map((crumb, index) => (
-          <li key={index} className="flex items-center gap-1.5">
+          <li key={crumb.label} className="flex items-center gap-1.5">
             {index > 0 && <ChevronRight size={14} className="text-default-300" />}
             {index === 0 && <LayoutDashboard size={14} className="mr-1" />}
             {crumb.href ? (
