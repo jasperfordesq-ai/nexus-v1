@@ -30,6 +30,7 @@
     "expo-secure-store": "~14.2.0",
     "expo-status-bar": "~2.2.0",
     "i18next": "^25.8.17",
+    "promise": "^8.3.0",
     "pusher-js": "^8.4.0",
     "react": "19.0.0",
     "react-hook-form": "^7.71.2",
