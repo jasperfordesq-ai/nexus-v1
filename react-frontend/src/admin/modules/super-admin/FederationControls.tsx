@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   Shield,
   Lock,
@@ -297,32 +297,24 @@ export default function FederationControls() {
           </Button>
         </CardHeader>
         <CardBody>
-          {stats?.whitelisted_tenants && stats.whitelisted_tenants.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-default-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Tenant</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Domain</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Approved</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.whitelisted_tenants.slice(0, 5).map(tenant => (
-                    <tr key={tenant.id} className="border-b border-default-100">
-                      <td className="py-3 px-4">{tenant.name}</td>
-                      <td className="py-3 px-4 text-sm text-default-600">{tenant.domain}</td>
-                      <td className="py-3 px-4 text-sm text-default-600">
-                        {new Date(tenant.approved_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-sm text-default-500 text-center py-8">No whitelisted tenants</p>
-          )}
+          <Table aria-label="Whitelisted tenants" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Tenant</TableColumn>
+              <TableColumn>Domain</TableColumn>
+              <TableColumn>Approved</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No whitelisted tenants">
+              {(stats?.whitelisted_tenants ?? []).slice(0, 5).map(tenant => (
+                <TableRow key={tenant.id}>
+                  <TableCell>{tenant.name}</TableCell>
+                  <TableCell className="text-sm text-default-600">{tenant.domain}</TableCell>
+                  <TableCell className="text-sm text-default-600">
+                    {new Date(tenant.approved_at).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
 
@@ -341,48 +333,40 @@ export default function FederationControls() {
           </Button>
         </CardHeader>
         <CardBody>
-          {stats?.recent_partnerships && stats.recent_partnerships.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-default-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Partnership</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Level</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Status</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Created</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.recent_partnerships.slice(0, 5).map(partnership => (
-                    <tr key={partnership.id} className="border-b border-default-100">
-                      <td className="py-3 px-4">
-                        {partnership.tenant_a_name} ↔ {partnership.tenant_b_name}
-                      </td>
-                      <td className="py-3 px-4">
-                        <Chip size="sm" color="primary" variant="flat">
-                          L{partnership.level}
-                        </Chip>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Chip
-                          size="sm"
-                          color={partnership.status === 'active' ? 'success' : 'warning'}
-                          variant="flat"
-                        >
-                          {partnership.status}
-                        </Chip>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-default-600">
-                        {new Date(partnership.created_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-sm text-default-500 text-center py-8">No recent partnerships</p>
-          )}
+          <Table aria-label="Recent partnerships" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Partnership</TableColumn>
+              <TableColumn>Level</TableColumn>
+              <TableColumn>Status</TableColumn>
+              <TableColumn>Created</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No recent partnerships">
+              {(stats?.recent_partnerships ?? []).slice(0, 5).map(partnership => (
+                <TableRow key={partnership.id}>
+                  <TableCell>
+                    {partnership.tenant_a_name} ↔ {partnership.tenant_b_name}
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color="primary" variant="flat">
+                      L{partnership.level}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      color={partnership.status === 'active' ? 'success' : 'warning'}
+                      variant="flat"
+                    >
+                      {partnership.status}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="text-sm text-default-600">
+                    {new Date(partnership.created_at).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
 
