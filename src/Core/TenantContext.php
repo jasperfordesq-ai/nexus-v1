@@ -95,6 +95,41 @@ class TenantContext
             return;
         }
 
+        // 2.3. X-Tenant-Slug Header Resolution (for mobile/SPA API requests)
+        // Allows clients to specify tenant by slug rather than numeric ID.
+        // Same security model as X-Tenant-ID: token tenant must match unless superadmin.
+        $headerSlug = $_SERVER['HTTP_X_TENANT_SLUG'] ?? null;
+        if ($headerSlug !== null && $headerSlug !== '') {
+            $db = Database::getConnection();
+            $stmt = $db->prepare("SELECT * FROM tenants WHERE slug = ?");
+            $stmt->execute([trim($headerSlug)]);
+            $slugTenant = $stmt->fetch();
+
+            if ($slugTenant) {
+                $slugTenantId = (int)$slugTenant['id'];
+
+                // Check for token mismatch — same logic as X-Tenant-ID step
+                $tokenTenantId = self::extractTenantIdFromBearerToken();
+                if ($tokenTenantId !== null) {
+                    self::$tokenTenantId = $tokenTenantId;
+                    if ($tokenTenantId !== $slugTenantId && !self::isTokenUserSuperAdmin()) {
+                        self::respondWithTenantMismatchError();
+                        return;
+                    }
+                }
+
+                if (empty($slugTenant['is_active'])) {
+                    self::showInactiveTenantError($slugTenant['name'] ?? 'This community');
+                    return;
+                }
+
+                self::$tenant = $slugTenant;
+                self::$basePath = '';
+                return;
+            }
+            // Unknown slug — fall through to other resolution methods
+        }
+
         // 2.5. Bearer Token Tenant Resolution (fallback if no header)
         // For stateless requests where tenant is embedded in the token
         $tokenTenantId = self::extractTenantIdFromBearerToken();
