@@ -21,6 +21,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { useTenant } from '@/contexts/TenantContext';
+import { logDebug, logError } from '@/lib/logger';
 
 // Capacitor types — we import dynamically to avoid build errors on web
 type PermissionStatus = { receive: 'prompt' | 'prompt-with-rationale' | 'granted' | 'denied' };
@@ -59,7 +60,7 @@ async function getPushPlugin() {
     const mod = await import(/* @vite-ignore */ modulePath);
     return mod.PushNotifications;
   } catch (e) {
-    console.warn('[Push] Failed to load PushNotifications plugin:', e);
+    logError('[Push] Failed to load PushNotifications plugin', e);
     return null;
   }
 }
@@ -82,9 +83,9 @@ export function usePushNotifications(userId: number | null) {
         token,
         platform: 'android',
       });
-      console.log('[Push] Device token registered with server');
+      logDebug('[Push] Device token registered with server');
     } catch (err) {
-      console.error('[Push] Failed to register device token:', err);
+      logError('[Push] Failed to register device token', err);
     }
   }, []);
 
@@ -115,7 +116,7 @@ export function usePushNotifications(userId: number | null) {
         const permStatus: PermissionStatus = await PushNotifications.checkPermissions();
 
         if (permStatus.receive === 'denied') {
-          console.log('[Push] Notifications denied by user');
+          logDebug('[Push] Notifications denied by user');
           return;
         }
 
@@ -123,7 +124,7 @@ export function usePushNotifications(userId: number | null) {
         if (permStatus.receive !== 'granted') {
           const requestResult: PermissionStatus = await PushNotifications.requestPermissions();
           if (requestResult.receive !== 'granted') {
-            console.log('[Push] User declined notification permission');
+            logDebug('[Push] User declined notification permission');
             return;
           }
         }
@@ -135,7 +136,7 @@ export function usePushNotifications(userId: number | null) {
         const regListener = await PushNotifications.addListener(
           'registration',
           (token: PushToken) => {
-            console.log('[Push] FCM token received:', token.value.substring(0, 20) + '...');
+            logDebug('[Push] FCM token received', token.value.substring(0, 20) + '...');
             registerToken(token.value);
           }
         );
@@ -144,7 +145,7 @@ export function usePushNotifications(userId: number | null) {
         const errListener = await PushNotifications.addListener(
           'registrationError',
           (error: unknown) => {
-            console.error('[Push] Registration error:', error);
+            logError('[Push] Registration error', error);
           }
         );
 
@@ -152,7 +153,7 @@ export function usePushNotifications(userId: number | null) {
         const recvListener = await PushNotifications.addListener(
           'pushNotificationReceived',
           (notification: PushNotificationSchema) => {
-            console.log('[Push] Notification received in foreground:', notification.title);
+            logDebug('[Push] Notification received in foreground', notification.title);
             // Don't navigate — the user sees it as a system notification
             // The in-app notification bell also updates via Pusher
           }
@@ -162,7 +163,7 @@ export function usePushNotifications(userId: number | null) {
         const tapListener = await PushNotifications.addListener(
           'pushNotificationActionPerformed',
           (action: ActionPerformed) => {
-            console.log('[Push] Notification tapped:', action.notification.title);
+            logDebug('[Push] Notification tapped', action.notification.title);
             handleNotificationTap(action.notification);
           }
         );
@@ -176,7 +177,7 @@ export function usePushNotifications(userId: number | null) {
           tapListener.remove();
         };
       } catch (err) {
-        console.error('[Push] Init error:', err);
+        logError('[Push] Init error', err);
       }
     };
 
