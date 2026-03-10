@@ -393,14 +393,16 @@ export function CreateListingPage() {
                   alt="Listing preview"
                   className="w-full max-w-sm h-48 object-cover rounded-xl border border-theme-default"
                 />
-                <button
-                  type="button"
-                  onClick={() => { setImageFile(null); setImagePreview(null); if (existingImageUrl) setRemoveExistingImage(true); setExistingImageUrl(null); }}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="flat"
+                  onPress={() => { setImageFile(null); setImagePreview(null); if (existingImageUrl) setRemoveExistingImage(true); setExistingImageUrl(null); }}
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors min-w-0 w-auto h-auto"
                   aria-label="Remove image"
                 >
                   <X className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             ) : (
               <label className="flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-theme-default hover:border-indigo-500/50 bg-theme-elevated hover:bg-theme-hover transition-colors cursor-pointer">

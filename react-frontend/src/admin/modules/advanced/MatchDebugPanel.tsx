@@ -20,6 +20,7 @@ import {
   Avatar,
   Input,
   Spinner,
+  Button,
 } from '@heroui/react';
 import {
   Target,
@@ -208,15 +209,16 @@ export function MatchDebugPanel() {
         description="Inspect match score breakdown for any user. Shows top 10 matches with per-component scores."
         actions={
           selectedUser ? (
-            <button
-              onClick={handleReload}
-              disabled={matchesLoading}
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium bg-default-100 hover:bg-default-200 text-foreground transition-colors disabled:opacity-50"
+            <Button
+              onPress={handleReload}
+              isDisabled={matchesLoading}
+              variant="flat"
+              className="flex items-center gap-2"
               aria-label="Reload matches"
+              startContent={<RefreshCw className={`w-4 h-4 ${matchesLoading ? 'animate-spin' : ''}`} />}
             >
-              <RefreshCw className={`w-4 h-4 ${matchesLoading ? 'animate-spin' : ''}`} />
               Reload
-            </button>
+            </Button>
           ) : undefined
         }
       />
@@ -259,22 +261,23 @@ export function MatchDebugPanel() {
             {showDropdown && userResults.length > 0 && (
               <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-content1 border border-divider rounded-xl shadow-lg overflow-hidden">
                 {userResults.map((user) => (
-                  <button
+                  <Button
                     key={user.id}
-                    onClick={() => selectUser(user)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-default-100 transition-colors"
+                    onPress={() => selectUser(user)}
+                    variant="light"
+                    className="w-full flex items-center gap-3 px-4 py-3 justify-start h-auto rounded-none"
                   >
                     <Avatar
                       src={resolveAvatarUrl(user.avatar_url)}
                       name={user.name}
                       size="sm"
                     />
-                    <div className="min-w-0">
+                    <div className="min-w-0 text-left">
                       <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
                       <p className="text-xs text-default-500 truncate">{user.email}</p>
                     </div>
                     <span className="ml-auto text-xs text-default-400 shrink-0">#{user.id}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

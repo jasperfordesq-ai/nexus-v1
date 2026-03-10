@@ -732,11 +732,11 @@ export function InsuranceCertificates() {
                 {userSearchResults.length > 0 && (
                   <div className="mt-1 border border-default-200 rounded-lg overflow-hidden max-h-48 overflow-y-auto">
                     {userSearchResults.map((u) => (
-                      <button
+                      <Button
                         key={u.id}
-                        type="button"
-                        className="w-full flex items-center gap-2 p-2 hover:bg-default-100 transition-colors text-left"
-                        onClick={() => {
+                        variant="light"
+                        className="w-full flex items-center gap-2 p-2 justify-start h-auto rounded-none"
+                        onPress={() => {
                           setSelectedUser(u);
                           setCreateForm(prev => ({ ...prev, user_id: String(u.id) }));
                           setUserSearchQuery('');
@@ -744,11 +744,11 @@ export function InsuranceCertificates() {
                         }}
                       >
                         <Avatar name={`${u.first_name} ${u.last_name}`} size="sm" className="shrink-0" />
-                        <div className="min-w-0">
+                        <div className="min-w-0 text-left">
                           <p className="text-sm font-medium truncate">{u.first_name} {u.last_name}</p>
                           <p className="text-xs text-default-400 truncate">{u.email}</p>
                         </div>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}

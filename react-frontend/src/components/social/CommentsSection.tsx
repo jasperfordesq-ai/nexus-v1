@@ -185,42 +185,46 @@ function CommentItemInner({
           {isAuthenticated && !isEditing && (
             <>
               {depth < 2 && (
-                <button
-                  type="button"
-                  onClick={() => onReply(comment.id)}
-                  className="text-[10px] text-[var(--color-primary)] hover:underline cursor-pointer flex items-center gap-0.5"
+                <Button
+                  variant="light"
+                  size="sm"
+                  onPress={() => onReply(comment.id)}
+                  className="text-[10px] text-[var(--color-primary)] hover:underline flex items-center gap-0.5 h-auto p-0 min-w-0"
+                  startContent={<CornerDownRight className="w-2.5 h-2.5" aria-hidden="true" />}
                 >
-                  <CornerDownRight className="w-2.5 h-2.5" aria-hidden="true" />
                   {t('reply', 'Reply')}
-                </button>
+                </Button>
               )}
 
-              <button
-                type="button"
-                onClick={() => setShowReactions(!showReactions)}
-                className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] cursor-pointer"
+              <Button
+                variant="light"
+                size="sm"
+                onPress={() => setShowReactions(!showReactions)}
+                className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] h-auto p-0 min-w-0"
               >
                 {t('react', 'React')}
-              </button>
+              </Button>
 
               {isOwn && (
                 <>
-                  <button
-                    type="button"
-                    onClick={() => { setIsEditing(true); setEditContent(comment.content); }}
-                    className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] cursor-pointer flex items-center gap-0.5"
+                  <Button
+                    variant="light"
+                    size="sm"
+                    onPress={() => { setIsEditing(true); setEditContent(comment.content); }}
+                    className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] flex items-center gap-0.5 h-auto p-0 min-w-0"
+                    startContent={<Pencil className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
-                    <Pencil className="w-2.5 h-2.5" aria-hidden="true" />
                     {t('edit', 'Edit')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleDelete}
-                    className="text-[10px] text-red-400 hover:text-red-500 cursor-pointer flex items-center gap-0.5"
+                  </Button>
+                  <Button
+                    variant="light"
+                    size="sm"
+                    onPress={handleDelete}
+                    className="text-[10px] text-red-400 hover:text-red-500 flex items-center gap-0.5 h-auto p-0 min-w-0"
+                    startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
-                    <Trash2 className="w-2.5 h-2.5" aria-hidden="true" />
                     {t('delete', 'Delete')}
-                  </button>
+                  </Button>
                 </>
               )}
             </>
@@ -232,10 +236,11 @@ function CommentItemInner({
           <div className="flex flex-wrap gap-1 mt-1 px-1">
             {Object.entries(reactions).map(([emoji, count]) => (
               <Tooltip key={emoji} content={`${emoji} (${count})`} size="sm" delay={300} closeDelay={0}>
-                <button
-                  type="button"
-                  onClick={() => isAuthenticated && onToggleReaction(comment.id, emoji)}
-                  className={`inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full border transition-colors cursor-pointer ${
+                <Button
+                  variant="flat"
+                  size="sm"
+                  onPress={() => isAuthenticated && onToggleReaction(comment.id, emoji)}
+                  className={`inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full border transition-colors h-auto min-w-0 ${
                     userReactions.includes(emoji)
                       ? 'border-[var(--color-primary)]/50 bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                       : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text-subtle)]'
@@ -243,7 +248,7 @@ function CommentItemInner({
                 >
                   <span>{emoji}</span>
                   <span>{count as number}</span>
-                </button>
+                </Button>
               </Tooltip>
             ))}
           </div>
@@ -259,17 +264,19 @@ function CommentItemInner({
               className="flex gap-1 mt-1 px-1"
             >
               {AVAILABLE_REACTIONS.map((emoji) => (
-                <button
+                <Button
                   key={emoji}
-                  type="button"
-                  onClick={() => { onToggleReaction(comment.id, emoji); setShowReactions(false); }}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm hover:scale-125 transition-transform cursor-pointer ${
+                  isIconOnly
+                  size="sm"
+                  variant="flat"
+                  onPress={() => { onToggleReaction(comment.id, emoji); setShowReactions(false); }}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm hover:scale-125 transition-transform min-w-0 ${
                     userReactions.includes(emoji) ? 'bg-[var(--color-primary)]/20 ring-1 ring-[var(--color-primary)]' : 'hover:bg-[var(--surface-hover)]'
                   }`}
                   aria-label={emoji}
                 >
                   {emoji}
-                </button>
+                </Button>
               ))}
             </motion.div>
           )}
@@ -415,16 +422,17 @@ function MentionInput({
       {showMentions && mentionResults.length > 0 && (
         <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-[var(--surface-elevated)] border border-[var(--border-default)] rounded-lg shadow-lg overflow-hidden">
           {mentionResults.map((user, idx) => (
-            <button
+            <Button
               key={user.id}
-              type="button"
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors cursor-pointer ${
+              variant="light"
+              onPress={() => selectMention(user)}
+              onMouseDown={(e) => { e.preventDefault(); }}
+              onMouseEnter={() => setSelectedIndex(idx)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors justify-start h-auto rounded-none ${
                 idx === selectedIndex
                   ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                   : 'text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
               }`}
-              onMouseDown={(e) => { e.preventDefault(); selectMention(user); }}
-              onMouseEnter={() => setSelectedIndex(idx)}
             >
               <Avatar
                 name={user.name}
@@ -433,7 +441,7 @@ function MentionInput({
                 className="w-6 h-6 flex-shrink-0"
               />
               <span className="text-xs font-medium truncate">{user.name}</span>
-            </button>
+            </Button>
           ))}
         </div>
       )}

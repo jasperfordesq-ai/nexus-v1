@@ -570,13 +570,13 @@ export function SegmentForm() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {suggestions.map((suggestion, idx) => (
-                  <button
+                  <Button
                     key={idx}
-                    type="button"
-                    onClick={() => applySuggestion(suggestion)}
-                    className="text-left p-4 rounded-lg border border-default-200 hover:border-primary hover:bg-primary-50/50 transition-colors cursor-pointer"
+                    onPress={() => applySuggestion(suggestion)}
+                    variant="bordered"
+                    className="text-left p-4 rounded-lg border-default-200 hover:border-primary hover:bg-primary-50/50 h-auto justify-start"
                   >
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 text-left w-full">
                       <Lightbulb size={16} className="text-warning mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium text-foreground text-sm">{suggestion.name}</p>
@@ -586,7 +586,7 @@ export function SegmentForm() {
                         </Chip>
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

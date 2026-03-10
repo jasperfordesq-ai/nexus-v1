@@ -315,13 +315,16 @@ export function SkillsBrowsePage() {
           startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           endContent={
             searchQuery ? (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="p-0.5 rounded-full hover:bg-theme-hover transition-colors"
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={() => setSearchQuery('')}
+                className="p-0.5 rounded-full hover:bg-theme-hover transition-colors min-w-0 w-auto h-auto"
                 aria-label="Clear search"
               >
                 <X className="w-3.5 h-3.5 text-theme-subtle" />
-              </button>
+              </Button>
             ) : undefined
           }
           classNames={{
@@ -396,9 +399,10 @@ export function SkillsBrowsePage() {
                   <motion.div key={category.id} variants={itemVariants}>
                     <GlassCard className="overflow-hidden">
                       {/* Category Header */}
-                      <button
-                        onClick={() => toggleCategory(category.id)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-theme-hover transition-colors cursor-pointer"
+                      <Button
+                        variant="light"
+                        onPress={() => toggleCategory(category.id)}
+                        className="w-full flex items-center justify-between p-4 hover:bg-theme-hover transition-colors justify-between h-auto"
                         aria-expanded={isExpanded}
                       >
                         <div className="flex items-center gap-3">
@@ -431,7 +435,7 @@ export function SkillsBrowsePage() {
                             <ChevronRight className="w-5 h-5 text-theme-subtle transition-transform" aria-hidden="true" />
                           )}
                         </div>
-                      </button>
+                      </Button>
 
                       {/* Expanded: Sub-categories + Skills */}
                       <AnimatePresence>
@@ -488,10 +492,11 @@ export function SkillsBrowsePage() {
                                         selectedSkill?.categoryId === category.id &&
                                         selectedSkill?.skillName === skill.skill_name;
                                       return (
-                                        <button
+                                        <Button
                                           key={skill.skill_name}
-                                          onClick={() => selectSkill(category.id, skill.skill_name)}
-                                          className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
+                                          variant="flat"
+                                          onPress={() => selectSkill(category.id, skill.skill_name)}
+                                          className={`text-left p-3 rounded-xl border transition-all justify-start h-auto ${
                                             isSelected
                                               ? 'bg-indigo-500/10 border-indigo-500/40 shadow-sm shadow-indigo-500/10'
                                               : 'bg-theme-elevated border-theme-default hover:border-indigo-500/30 hover:bg-theme-hover'
@@ -524,7 +529,7 @@ export function SkillsBrowsePage() {
                                               </span>
                                             )}
                                           </div>
-                                        </button>
+                                        </Button>
                                       );
                                     })}
                                   </div>
@@ -555,16 +560,19 @@ export function SkillsBrowsePage() {
                                             skill: selectedSkill.skillName,
                                           })}
                                         </h4>
-                                        <button
-                                          onClick={() => {
+                                        <Button
+                                          isIconOnly
+                                          size="sm"
+                                          variant="light"
+                                          onPress={() => {
                                             setSelectedSkill(null);
                                             setSkillMembers([]);
                                           }}
-                                          className="p-1 rounded-lg hover:bg-theme-hover transition-colors"
+                                          className="p-1 rounded-lg hover:bg-theme-hover transition-colors min-w-0 w-auto h-auto"
                                           aria-label="Close members list"
                                         >
                                           <X className="w-4 h-4 text-theme-subtle" />
-                                        </button>
+                                        </Button>
                                       </div>
 
                                       {loadingMembers ? (

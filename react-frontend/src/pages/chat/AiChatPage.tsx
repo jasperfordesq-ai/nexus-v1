@@ -239,12 +239,13 @@ function EmptyState({ onQuestionClick }: EmptyStateProps) {
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.25 + i * 0.06, duration: 0.25 }}
             >
-              <button
-                onClick={() => onQuestionClick(q)}
-                className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--border-default)] text-sm text-[var(--color-text)] hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all"
+              <Button
+                variant="flat"
+                onPress={() => onQuestionClick(q)}
+                className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--border-default)] text-sm text-[var(--color-text)] hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all justify-start h-auto"
               >
                 {q}
-              </button>
+              </Button>
             </motion.div>
           ))}
         </div>

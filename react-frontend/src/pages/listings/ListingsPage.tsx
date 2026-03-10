@@ -491,18 +491,20 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 </span>
               )}
               {onToggleSave && (
-                <button
-                  type="button"
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="flat"
                   onClick={handleSaveClick}
-                  disabled={isSaving}
+                  isDisabled={isSaving}
                   aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
-                  className="p-1 rounded transition-colors hover:bg-theme-hover disabled:opacity-50"
+                  className="p-1 rounded transition-colors hover:bg-theme-hover min-w-0 w-auto h-auto"
                 >
                   <Heart
                     className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
                     aria-hidden="true"
                   />
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -540,18 +542,20 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             </span>
           )}
           {onToggleSave && (
-            <button
-              type="button"
+            <Button
+              isIconOnly
+              size="sm"
+              variant="flat"
               onClick={handleSaveClick}
-              disabled={isSaving}
+              isDisabled={isSaving}
               aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
-              className="ml-auto p-1 rounded transition-colors hover:bg-theme-hover disabled:opacity-50"
+              className="ml-auto p-1 rounded transition-colors hover:bg-theme-hover min-w-0 w-auto h-auto"
             >
               <Heart
                 className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
                 aria-hidden="true"
               />
-            </button>
+            </Button>
           )}
         </div>
 

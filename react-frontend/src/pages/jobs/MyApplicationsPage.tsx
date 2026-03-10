@@ -252,12 +252,15 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
         {/* Cover message */}
         {application.message && (
           <div className='mb-3'>
-            <button
-              className='flex items-center gap-1 text-xs text-theme-muted hover:text-theme-primary transition-colors mb-1'
-              onClick={() => setMessageExpanded((v) => !v)}>
-              {messageExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            <Button
+              variant="light"
+              size="sm"
+              onPress={() => setMessageExpanded((v) => !v)}
+              className="flex items-center gap-1 text-xs text-theme-muted hover:text-theme-primary transition-colors mb-1 h-auto p-0 min-w-0"
+              startContent={messageExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            >
               {messageExpanded ? 'Hide cover message' : 'Show cover message'}
-            </button>
+            </Button>
             <AnimatePresence initial={false}>
               {messageExpanded && (
                 <motion.div

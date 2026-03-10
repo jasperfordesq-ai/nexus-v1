@@ -157,15 +157,16 @@ export function PlatformLegalPage({
               <ol className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {sections.map((section, idx) => (
                   <li key={section.id}>
-                    <button
-                      onClick={() =>
+                    <Button
+                      variant="light"
+                      onPress={() =>
                         document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                       }
-                      className="text-left text-sm text-theme-muted hover:text-theme-primary transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-slate-500/10"
+                      className="text-left text-sm text-theme-muted hover:text-theme-primary transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-slate-500/10 justify-start h-auto"
                     >
                       <span className="font-medium text-theme-subtle mr-2">{idx + 1}.</span>
                       {section.title}
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ol>
