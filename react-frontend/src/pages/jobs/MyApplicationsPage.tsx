@@ -300,7 +300,9 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
                   .then((res) => {
                     if (res.success && Array.isArray(res.data)) setHistory(res.data);
                   })
-                  .catch(() => {})
+                  .catch((err: unknown) => {
+                    logError('MyApplicationsPage: failed to load application history', err);
+                  })
                   .finally(() => setHistoryLoading(false));
               }
             }}>

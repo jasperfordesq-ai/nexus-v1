@@ -189,8 +189,11 @@ export function UserList() {
           const tokenData = res.data as { token?: string; impersonation_token?: string };
           const token = tokenData.token || tokenData.impersonation_token;
           if (token) {
+            // Store token in sessionStorage instead of URL query params
+            // to avoid leaking it in browser history, Referer headers, and server logs
+            sessionStorage.setItem('impersonate_token', token);
             toast.success(`Impersonating ${user.name}. Opening in new tab...`);
-            window.open(`${window.location.origin}${tenantPath('/dashboard')}?impersonate_token=${token}`, '_blank');
+            window.open(`${window.location.origin}${tenantPath('/dashboard')}`, '_blank');
           } else {
             toast.success('Impersonation started');
           }

@@ -605,12 +605,6 @@ export function GroupExchangeDetailPage() {
           aria-label="Exchange participants"
           shadow="sm"
           isStriped
-          emptyContent={
-            <div className="text-center py-6">
-              <Users className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-              <p className="text-theme-muted text-sm">{t('detail.no_participants')}</p>
-            </div>
-          }
         >
           <TableHeader>
             <TableColumn>{t('detail.col_name')}</TableColumn>
@@ -629,7 +623,7 @@ export function GroupExchangeDetailPage() {
               <TableColumn>{' '}</TableColumn>
             )}
           </TableHeader>
-          <TableBody>
+          <TableBody emptyContent={<div className="text-center py-6"><Users className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" /><p className="text-theme-muted text-sm">{t('detail.no_participants')}</p></div>}>
             {exchange.participants.map((p) => (
               <TableRow key={p.id}>
                 <TableCell>

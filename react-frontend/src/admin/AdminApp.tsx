@@ -16,15 +16,18 @@ import { Routes, Route } from 'react-router-dom';
 import { AdminRoute } from './AdminRoute';
 import { AdminLayout } from './AdminLayout';
 import { AdminRoutes } from './routes';
+import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 
 export default function AdminApp() {
   return (
-    <Routes>
-      <Route element={<AdminRoute />}>
-        <Route element={<AdminLayout />}>
-          {AdminRoutes()}
+    <ErrorBoundary>
+      <Routes>
+        <Route element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            {AdminRoutes()}
+          </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </ErrorBoundary>
   );
 }

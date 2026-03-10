@@ -43,6 +43,7 @@ import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 import type {
   LegalDocumentType,
   LegalVersionSummary,
@@ -134,7 +135,9 @@ export function LegalVersionHistoryPage() {
           setVersions(res.data.versions ?? []);
         }
       })
-      .catch(() => {})
+      .catch((err: unknown) => {
+        logError('LegalVersionHistoryPage: failed to load version list', err);
+      })
       .finally(() => setLoading(false));
   }, [docType, tenantLoading, tenant]);
 

@@ -984,6 +984,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
                     }}
                     aria-pressed={isSelected}
                     aria-disabled={isDisabled}
+                    aria-label={t('achievements.showcase.showcase_badge', { name: badge.name })}
                   >
                     <Checkbox
                       isSelected={isSelected}

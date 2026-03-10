@@ -852,7 +852,7 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
 
         {/* Arrow */}
         <div className="flex-shrink-0 self-center">
-          <Link to={tenantPath(`/jobs/${vacancy.id}`)}>
+          <Link to={tenantPath(`/jobs/${vacancy.id}`)} aria-label={t('jobs.view_details', 'View job details')}>
             <ChevronRight className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
           </Link>
         </div>

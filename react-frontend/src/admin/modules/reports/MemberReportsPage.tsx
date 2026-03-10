@@ -342,23 +342,29 @@ export function MemberReportsPage() {
               isLoading={loading}
               loadingContent={<Spinner />}
             >
-              {cohorts.map((c, i) => (
-                <TableRow key={c.cohort}>
-                  <TableCell className="font-medium text-foreground">{c.cohort}</TableCell>
-                  <TableCell className="text-center">{c.initial}</TableCell>
-                  {[c.month_1, c.month_2, c.month_3, c.month_6, c.month_12].map((val, j) => {
-                    const pct = c.initial > 0 ? (val / c.initial) * 100 : 0;
-                    const color =
-                      pct >= 60 ? 'text-success' : pct >= 30 ? 'text-warning' : 'text-danger';
-                    return (
-                      <TableCell key={j} className={`text-center font-medium ${color}`}>
-                        {pct.toFixed(0)}%
-                        <span className="text-xs text-default-400 ml-1">({val})</span>
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
+              {cohorts.map((c) => {
+                const pctCell = (val: number, key: string) => {
+                  const pct = c.initial > 0 ? (val / c.initial) * 100 : 0;
+                  const color = pct >= 60 ? 'text-success' : pct >= 30 ? 'text-warning' : 'text-danger';
+                  return (
+                    <TableCell key={key} className={`text-center font-medium ${color}`}>
+                      {pct.toFixed(0)}%
+                      <span className="text-xs text-default-400 ml-1">({val})</span>
+                    </TableCell>
+                  );
+                };
+                return (
+                  <TableRow key={c.cohort}>
+                    <TableCell className="font-medium text-foreground">{c.cohort}</TableCell>
+                    <TableCell className="text-center">{c.initial}</TableCell>
+                    {pctCell(c.month_1, 'm1')}
+                    {pctCell(c.month_2, 'm2')}
+                    {pctCell(c.month_3, 'm3')}
+                    {pctCell(c.month_6, 'm6')}
+                    {pctCell(c.month_12, 'm12')}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardBody>

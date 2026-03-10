@@ -62,11 +62,16 @@ import { FeedContentRenderer } from './FeedContentRenderer';
 
 export interface FeedCardProps {
   item: FeedItem;
-  onToggleLike: () => void;
-  onHidePost: () => void;
-  onMuteUser: () => void;
-  onReportPost: () => void;
-  onDeletePost: () => void;
+  /** Called with the feed item when the user toggles the like button. */
+  onToggleLike: (item: FeedItem) => void;
+  /** Called with the feed item when the user hides a post. */
+  onHidePost: (item: FeedItem) => void;
+  /** Called with the feed item when the user mutes the post author. */
+  onMuteUser: (item: FeedItem) => void;
+  /** Called with the feed item when the user reports a post. */
+  onReportPost: (item: FeedItem) => void;
+  /** Called with the feed item when the user deletes their own post. */
+  onDeletePost: (item: FeedItem) => void;
   onVotePoll: (pollId: number, optionId: number) => void;
   isAuthenticated: boolean;
   currentUserId?: number;
@@ -418,7 +423,7 @@ const FeedCard = React.memo(function FeedCard({
                     startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                     className="text-danger"
                     color="danger"
-                    onPress={onDeletePost}
+                    onPress={() => onDeletePost(item)}
                   >
                     {t('card.delete_post')}
                   </DropdownItem>
@@ -427,14 +432,14 @@ const FeedCard = React.memo(function FeedCard({
                     <DropdownItem
                       key="hide"
                       startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
-                      onPress={onHidePost}
+                      onPress={() => onHidePost(item)}
                     >
                       {t('card.hide_post')}
                     </DropdownItem>
                     <DropdownItem
                       key="mute"
                       startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
-                      onPress={onMuteUser}
+                      onPress={() => onMuteUser(item)}
                     >
                       {t('card.mute_user', { name: author.name })}
                     </DropdownItem>
@@ -443,7 +448,7 @@ const FeedCard = React.memo(function FeedCard({
                       startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
                       className="text-danger"
                       color="danger"
-                      onPress={onReportPost}
+                      onPress={() => onReportPost(item)}
                     >
                       {t('card.report_post')}
                     </DropdownItem>
@@ -674,7 +679,7 @@ const FeedCard = React.memo(function FeedCard({
                   aria-hidden="true"
                 />
               }
-              onPress={isAuthenticated ? onToggleLike : undefined}
+              onPress={isAuthenticated ? () => onToggleLike(item) : undefined}
               isDisabled={!isAuthenticated}
             >
               {t('card.like_action')}
