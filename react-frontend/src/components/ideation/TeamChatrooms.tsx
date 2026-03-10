@@ -255,10 +255,11 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
         <div className="space-y-1">
           {chatrooms.map((room) => (
-            <button
+            <Button
               key={room.id}
-              onClick={() => setActiveChatroomId(room.id)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+              onPress={() => setActiveChatroomId(room.id)}
+              variant="light"
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start h-auto ${
                 activeChatroomId === room.id
                   ? 'bg-primary/10 text-primary font-medium'
                   : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
@@ -266,7 +267,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
             >
               <Hash className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{room.name}</span>
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -342,13 +343,16 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                         {formatRelativeTime(msg.created_at)}
                       </span>
                       {(user?.id === msg.user_id || isAdmin) && (
-                        <button
-                          onClick={() => handleDeleteMessage(msg.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          variant="light"
+                          onPress={() => handleDeleteMessage(msg.id)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto h-auto"
                           aria-label={t('comments.delete')}
                         >
                           <Trash2 className="w-3 h-3 text-[var(--color-text-tertiary)] hover:text-danger" />
-                        </button>
+                        </Button>
                       )}
                     </div>
                     <p className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap">

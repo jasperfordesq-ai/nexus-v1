@@ -74,13 +74,16 @@ export function UpdateAvailableBanner() {
             >
               {t('update_banner.update_now')}
             </Button>
-            <button
-              onClick={handleDismiss}
-              className="ml-1 p-1 rounded hover:bg-indigo-500 transition-colors"
+            <Button
+              isIconOnly
+              size="sm"
+              variant="flat"
+              onPress={handleDismiss}
+              className="ml-1 p-1 rounded hover:bg-indigo-500 transition-colors min-w-0 w-auto h-auto text-white"
               aria-label={t('update_banner.dismiss')}
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
         </motion.div>
       )}

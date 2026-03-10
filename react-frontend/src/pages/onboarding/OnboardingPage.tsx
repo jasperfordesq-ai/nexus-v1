@@ -714,13 +714,14 @@ export function OnboardingPage() {
                         <CheckCircle className="w-4 h-4" aria-hidden="true" />
                         {t('photo_uploaded')}
                       </p>
-                      <button
-                        className="text-xs text-theme-subtle hover:text-theme-muted underline mt-1"
-                        onClick={() => fileInputRef.current?.click()}
-                        type="button"
+                      <Button
+                        variant="light"
+                        size="sm"
+                        onPress={() => fileInputRef.current?.click()}
+                        className="text-xs text-theme-subtle hover:text-theme-muted underline mt-1 h-auto p-0 min-w-0"
                       >
                         {t('change_photo')}
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     <div className="text-center">
@@ -1068,13 +1069,14 @@ export function OnboardingPage() {
                     <p className="text-sm text-theme-muted line-clamp-2 mt-0.5">
                       {bio || user?.bio || t('no_bio_yet')}
                     </p>
-                    <button
-                      type="button"
-                      className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-1"
-                      onClick={() => goToStep(2)}
+                    <Button
+                      variant="light"
+                      size="sm"
+                      onPress={() => goToStep(2)}
+                      className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-1 h-auto p-0 min-w-0"
                     >
                       {t('edit_profile')}
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -1240,15 +1242,16 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
         return (
           <div key={step} className="flex items-center flex-1 last:flex-initial">
             {/* Step dot + label */}
-            <button
-              type="button"
-              className={`
-                flex flex-col items-center gap-1 transition-all
-                ${isClickable ? 'cursor-pointer' : 'cursor-default'}
-              `}
-              onClick={() => isClickable && onStepClick(step)}
+            <Button
+              variant="light"
+              onPress={() => isClickable && onStepClick(step)}
               aria-label={t('aria_step', { step, label: t(STEP_LABEL_KEYS[i]), status: isCompleted ? t('aria_completed') : isCurrent ? t('aria_current') : '' })}
               aria-current={isCurrent ? 'step' : undefined}
+              isDisabled={!isClickable}
+              className={`
+                flex flex-col items-center gap-1 transition-all h-auto min-w-0 p-0
+                ${isClickable ? 'cursor-pointer' : 'cursor-default'}
+              `}
             >
               <div
                 className={`
@@ -1275,7 +1278,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
               >
                 {t(STEP_LABEL_KEYS[i])}
               </span>
-            </button>
+            </Button>
 
             {/* Connector line */}
             {step < totalSteps && (
@@ -1355,13 +1358,14 @@ function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyT
           {icon}
           {title}
         </h3>
-        <button
-          type="button"
-          className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
-          onClick={onEdit}
+        <Button
+          variant="light"
+          size="sm"
+          onPress={onEdit}
+          className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline h-auto p-0 min-w-0"
         >
           {t('edit')}
-        </button>
+        </Button>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {items.length > 0 ? (

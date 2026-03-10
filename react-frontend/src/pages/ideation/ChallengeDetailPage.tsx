@@ -1034,28 +1034,30 @@ export function ChallengeDetailPage() {
         <div className="flex items-center gap-2">
           {/* Sort Toggle */}
           <div className="flex rounded-lg overflow-hidden border border-[var(--color-border)]" role="group" aria-label={t('ideas.sort_label', { defaultValue: 'Sort ideas' })}>
-            <button
-              className={`px-3 py-1.5 text-sm transition-colors ${
-                sortMode === 'votes'
-                  ? 'bg-primary text-white'
-                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
-              }`}
-              onClick={() => setSortMode('votes')}
+            <Button
+              variant={sortMode === 'votes' ? 'solid' : 'flat'}
+              color={sortMode === 'votes' ? 'primary' : 'default'}
+              size="sm"
+              onPress={() => setSortMode('votes')}
               aria-pressed={sortMode === 'votes'}
+              className={`px-3 py-1.5 text-sm transition-colors rounded-none h-auto ${
+                sortMode !== 'votes' ? 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]' : ''
+              }`}
             >
               {t('ideas.sort_votes')}
-            </button>
-            <button
-              className={`px-3 py-1.5 text-sm transition-colors ${
-                sortMode === 'newest'
-                  ? 'bg-primary text-white'
-                  : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
-              }`}
-              onClick={() => setSortMode('newest')}
+            </Button>
+            <Button
+              variant={sortMode === 'newest' ? 'solid' : 'flat'}
+              color={sortMode === 'newest' ? 'primary' : 'default'}
+              size="sm"
+              onPress={() => setSortMode('newest')}
               aria-pressed={sortMode === 'newest'}
+              className={`px-3 py-1.5 text-sm transition-colors rounded-none h-auto ${
+                sortMode !== 'newest' ? 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]' : ''
+              }`}
             >
               {t('ideas.sort_newest')}
-            </button>
+            </Button>
           </div>
 
           {/* Submit Idea Button */}
@@ -1122,23 +1124,23 @@ export function ChallengeDetailPage() {
                 <div className="flex items-start gap-4">
                   {/* Vote Button */}
                   <div className="flex flex-col items-center gap-0.5 min-w-[48px]">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleVote(idea.id);
-                      }}
-                      disabled={!isAuthenticated || votingIds.has(idea.id)}
-                      className={`p-1.5 rounded-lg transition-colors ${
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="flat"
+                      onPress={() => handleVote(idea.id)}
+                      isDisabled={!isAuthenticated || votingIds.has(idea.id)}
+                      className={`p-1.5 rounded-lg transition-colors min-w-0 w-auto h-auto ${
                         idea.has_voted
                           ? 'bg-primary/10 text-primary'
                           : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      }`}
                       aria-label={idea.has_voted ? t('ideas.unvote') : t('ideas.vote')}
                     >
                       <ArrowBigUp
                         className={`w-6 h-6 ${idea.has_voted ? 'fill-current' : ''}`}
                       />
-                    </button>
+                    </Button>
                     <span className={`text-sm font-semibold ${
                       idea.has_voted ? 'text-primary' : 'text-[var(--color-text-secondary)]'
                     }`}>

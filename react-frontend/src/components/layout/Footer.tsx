@@ -6,6 +6,7 @@
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@heroui/react';
 import { useTenant, useFeature, useCookieConsent } from '@/contexts';
 import { Hexagon, Mail, Phone, MapPin, Cookie, Bug } from 'lucide-react';
 
@@ -152,14 +153,16 @@ export function Footer({ children, copyright }: FooterProps) {
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-theme-subtle">{footerText}</p>
               <div className="flex items-center gap-3">
-                <button
-                  onClick={resetConsent}
-                  className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors cursor-pointer"
+                <Button
+                  variant="light"
+                  size="sm"
+                  onPress={resetConsent}
+                  className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
                   aria-label="Cookie settings"
+                  startContent={<Cookie className="w-3 h-3" aria-hidden="true" />}
                 >
-                  <Cookie className="w-3 h-3" aria-hidden="true" />
                   {t('footer.cookie_settings')}
-                </button>
+                </Button>
                 <span className="text-theme-subtle/30">|</span>
                 <a
                   href="https://github.com/jasperfordesq-ai/nexus-v1"

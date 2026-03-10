@@ -278,15 +278,15 @@ export function AdvancedSearchFilters({
                   .filter((t) => !skillsList.includes(t))
                   .slice(0, 8)
                   .map((tag) => (
-                    <button
+                    <Button
                       key={tag}
-                      type="button"
-                      onClick={() => handleAddSkill(tag)}
-                      className="text-xs px-2 py-0.5 rounded-full bg-theme-hover text-theme-muted
-                                 hover:bg-primary/20 hover:text-primary transition-colors"
+                      size="sm"
+                      variant="flat"
+                      onPress={() => handleAddSkill(tag)}
+                      className="text-xs px-2 py-0.5 rounded-full bg-theme-hover text-theme-muted hover:bg-primary/20 hover:text-primary transition-colors h-auto min-w-0"
                     >
                       {tag}
-                    </button>
+                    </Button>
                   ))}
               </div>
             )}

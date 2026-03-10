@@ -398,25 +398,27 @@ export function ListingDetailPage() {
         {(social.likesCount > 0 || social.commentsCount > 0) && (
           <div className="flex gap-4 text-sm text-theme-subtle mb-4">
             {social.likesCount > 0 && (
-              <button
-                type="button"
-                onClick={onLikersOpen}
-                className="flex items-center gap-1.5 hover:text-theme-primary transition-colors cursor-pointer"
+              <Button
+                variant="light"
+                size="sm"
+                onPress={onLikersOpen}
+                className="flex items-center gap-1.5 hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
               >
                 <span className="w-4 h-4 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
                   <Heart className="w-2.5 h-2.5 text-white fill-white" aria-hidden="true" />
                 </span>
                 {social.likesCount} {social.likesCount === 1 ? t('like', 'like') : t('likes', 'likes')}
-              </button>
+              </Button>
             )}
             {social.commentsCount > 0 && (
-              <button
-                type="button"
-                onClick={toggleComments}
-                className="hover:text-theme-primary transition-colors cursor-pointer"
+              <Button
+                variant="light"
+                size="sm"
+                onPress={toggleComments}
+                className="hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
               >
                 {social.commentsCount} {social.commentsCount === 1 ? t('comment', 'comment') : t('comments', 'comments')}
-              </button>
+              </Button>
             )}
           </div>
         )}

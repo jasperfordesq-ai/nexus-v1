@@ -443,13 +443,14 @@ export function BiometricSettings() {
       {!showInstructions && (
         <p className="text-xs text-theme-muted">
           {t('passkey_device_tip', { defaultValue: 'Register a passkey on each device you use. To add your phone, open this page on your phone.' })}{' '}
-          <button
-            type="button"
-            className="text-indigo-500 hover:underline"
-            onClick={() => setShowInstructions(true)}
+          <Button
+            variant="light"
+            size="sm"
+            className="text-indigo-500 hover:underline h-auto p-0 min-w-0"
+            onPress={() => setShowInstructions(true)}
           >
             {t('passkey_setup_guide', { defaultValue: 'Setup guide' })}
-          </button>
+          </Button>
         </p>
       )}
 

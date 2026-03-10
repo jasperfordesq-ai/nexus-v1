@@ -277,13 +277,14 @@ export function GroupFilesTab({ groupId, isAdmin, isMember }: GroupFilesTabProps
           <CloudUpload className={`w-10 h-10 mx-auto mb-2 ${isDragging ? 'text-primary' : 'text-theme-subtle'}`} />
           <p className="text-sm text-theme-subtle">
             {t('files.drag_and_drop', 'Drag and drop files here, or')}{' '}
-            <button
-              type="button"
-              className="text-primary hover:underline"
-              onClick={() => fileInputRef.current?.click()}
+            <Button
+              variant="light"
+              size="sm"
+              onPress={() => fileInputRef.current?.click()}
+              className="text-primary hover:underline h-auto p-0 min-w-0 inline"
             >
               {t('files.browse', 'browse')}
-            </button>
+            </Button>
           </p>
         </div>
       )}

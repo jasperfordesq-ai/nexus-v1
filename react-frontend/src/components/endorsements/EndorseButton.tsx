@@ -91,10 +91,12 @@ export function EndorseButton({
         closeDelay={0}
         size="sm"
       >
-        <button
-          onClick={handleToggle}
-          disabled={isLoading}
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all ${
+        <Button
+          size="sm"
+          variant="flat"
+          onPress={handleToggle}
+          isDisabled={isLoading}
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all h-auto min-w-0 ${
             localIsEndorsed
               ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
               : 'bg-theme-elevated text-theme-subtle hover:bg-indigo-500/10 hover:text-indigo-500'
@@ -103,7 +105,7 @@ export function EndorseButton({
         >
           <ThumbsUp className={`w-3 h-3 ${localIsEndorsed ? 'fill-current' : ''}`} aria-hidden="true" />
           {localCount > 0 && <span>{localCount}</span>}
-        </button>
+        </Button>
       </Tooltip>
     );
   }
