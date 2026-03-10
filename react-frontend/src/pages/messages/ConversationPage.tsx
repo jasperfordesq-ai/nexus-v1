@@ -1072,6 +1072,7 @@ export function ConversationPage() {
             </Button>
 
             <Link to={tenantPath(`/profile/${other_user.id}`)} className="flex items-center gap-3">
+              <h1 className="sr-only">{t('conversation_with', { name: other_user.name })}</h1>
               <Avatar
                 src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
                 name={other_user.name}

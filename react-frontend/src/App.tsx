@@ -294,12 +294,16 @@ function AppRoutes() {
         {/* Public but can show auth-specific content (module-gated) */}
         <Route path="listings" element={
           <FeatureGate module="listings" redirect="/">
-            <ListingsPage />
+            <FeatureErrorBoundary featureName="Listings">
+              <ListingsPage />
+            </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="listings/:id" element={
           <FeatureGate module="listings" redirect="/">
-            <ListingDetailPage />
+            <FeatureErrorBoundary featureName="Listings">
+              <ListingDetailPage />
+            </FeatureErrorBoundary>
           </FeatureGate>
         } />
 
@@ -308,62 +312,86 @@ function AppRoutes() {
           {/* Core Features (module-gated) */}
           <Route path="dashboard" element={
             <FeatureGate module="dashboard" redirect="/">
-              <DashboardPage />
+              <FeatureErrorBoundary featureName="Dashboard">
+                <DashboardPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="listings/create" element={
             <FeatureGate module="listings" redirect="/">
-              <CreateListingPage />
+              <FeatureErrorBoundary featureName="Listings">
+                <CreateListingPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="listings/edit/:id" element={
             <FeatureGate module="listings" redirect="/">
-              <CreateListingPage />
+              <FeatureErrorBoundary featureName="Listings">
+                <CreateListingPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="messages" element={
             <FeatureGate module="messages" redirect="/dashboard">
-              <MessagesPage />
+              <FeatureErrorBoundary featureName="Messages">
+                <MessagesPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="messages/new/:userId" element={
             <FeatureGate module="messages" redirect="/dashboard">
-              <ConversationPage />
+              <FeatureErrorBoundary featureName="Messages">
+                <ConversationPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="messages/:id" element={
             <FeatureGate module="messages" redirect="/dashboard">
-              <ConversationPage />
+              <FeatureErrorBoundary featureName="Messages">
+                <ConversationPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="wallet" element={
             <FeatureGate module="wallet" redirect="/dashboard">
-              <WalletPage />
+              <FeatureErrorBoundary featureName="Wallet">
+                <WalletPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="profile" element={
             <FeatureGate module="profile" redirect="/dashboard">
-              <ProfilePage />
+              <FeatureErrorBoundary featureName="Profile">
+                <ProfilePage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="profile/:id" element={
             <FeatureGate module="profile" redirect="/dashboard">
-              <ProfilePage />
+              <FeatureErrorBoundary featureName="Profile">
+                <ProfilePage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="settings" element={
             <FeatureGate module="settings" redirect="/dashboard">
-              <SettingsPage />
+              <FeatureErrorBoundary featureName="Settings">
+                <SettingsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="search" element={
             <FeatureGate feature="search" redirect="/dashboard">
-              <SearchPage />
+              <FeatureErrorBoundary featureName="Search">
+                <SearchPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="notifications" element={
             <FeatureGate module="notifications" redirect="/dashboard">
-              <NotificationsPage />
+              <FeatureErrorBoundary featureName="Notifications">
+                <NotificationsPage />
+              </FeatureErrorBoundary>
             </FeatureGate>
           } />
 
