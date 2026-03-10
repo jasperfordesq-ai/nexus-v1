@@ -240,6 +240,7 @@ export function MatchDebugPanel() {
               value={searchQuery}
               onValueChange={handleSearchChange}
               placeholder="Search users by name or email..."
+              aria-label="Search users"
               startContent={
                 searchLoading
                   ? <Spinner size="sm" />
@@ -254,7 +255,6 @@ export function MatchDebugPanel() {
                 setMatches([]);
                 setTotal(0);
               }}
-              aria-label="Search users"
             />
 
             {/* Dropdown results */}

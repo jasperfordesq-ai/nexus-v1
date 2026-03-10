@@ -229,6 +229,7 @@ export function SearchPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             startContent={<Search className="w-5 h-5 text-theme-subtle" />}
+            aria-label={t('search_placeholder')}
             size="lg"
             classNames={{
               input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',

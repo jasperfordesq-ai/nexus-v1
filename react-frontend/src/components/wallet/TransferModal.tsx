@@ -311,6 +311,7 @@ export function TransferModal({
                       ref={searchInputRef}
                       type="text"
                       placeholder="Search by name or username..."
+                      aria-label="Search recipient"
                       value={searchQuery}
                       onValueChange={handleSearchChange}
                       onFocus={() => searchResults.length > 0 && setShowResults(true)}
@@ -395,6 +396,7 @@ export function TransferModal({
                 <Input
                   type="number"
                   placeholder="0"
+                  aria-label="Amount in hours"
                   min="0.25"
                   step="0.25"
                   value={formData.amount}

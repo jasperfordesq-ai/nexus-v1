@@ -839,6 +839,7 @@ export function PollsPage() {
                           value={opt}
                           onChange={(e) => updateOption(index, e.target.value)}
                           size="sm"
+                          aria-label={t('option_placeholder', { number: index + 1 })}
                           classNames={{
                             input: 'bg-transparent text-[var(--text-primary)]',
                             inputWrapper: 'bg-[var(--surface-elevated)] border-[var(--border-default)] hover:border-[var(--color-primary)]/40',

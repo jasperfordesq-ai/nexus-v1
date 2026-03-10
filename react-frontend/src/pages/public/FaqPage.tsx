@@ -369,6 +369,7 @@ export function FaqPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+              aria-label={t('faq.search_placeholder')}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-subtle/10 border-theme-default',

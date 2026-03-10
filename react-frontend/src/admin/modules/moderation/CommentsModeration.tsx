@@ -246,6 +246,7 @@ export default function CommentsModeration() {
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
           placeholder="Search comments or users..."
+          aria-label="Search comments"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

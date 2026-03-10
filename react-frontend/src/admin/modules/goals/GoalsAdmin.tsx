@@ -185,6 +185,7 @@ export function GoalsAdmin() {
       <div className="mb-4 flex items-center gap-2">
         <Input
           placeholder="Search goals by title or member..."
+          aria-label="Search goals"
           value={searchInput}
           onValueChange={setSearchInput}
           onKeyDown={handleSearchKeyDown}

@@ -351,6 +351,7 @@ export function SafeguardingDashboard() {
             <h3 className="text-lg font-semibold">Flagged Messages</h3>
             <Input
               placeholder="Search messages..."
+              aria-label="Search safeguarding messages"
               size="sm"
               variant="bordered"
               className="max-w-xs"

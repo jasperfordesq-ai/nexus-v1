@@ -118,6 +118,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
               <Input
                 size="sm"
                 placeholder="Name this search..."
+                aria-label="Saved search name"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
                 onKeyDown={(e) => {

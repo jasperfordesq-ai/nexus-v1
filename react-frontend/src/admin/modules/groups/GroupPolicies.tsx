@@ -136,6 +136,7 @@ export default function GroupPolicies({ isOpen, onClose, typeId, typeName }: Gro
             type="number"
             size="sm"
             className="w-32"
+            aria-label={policy.label || policy.key}
             value={String(policy.value)}
             onValueChange={(value) => handlePolicyChange(policy, Number(value))}
           />
@@ -147,6 +148,7 @@ export default function GroupPolicies({ isOpen, onClose, typeId, typeName }: Gro
             type="text"
             size="sm"
             className="w-48"
+            aria-label={policy.label || policy.key}
             value={String(policy.value)}
             onValueChange={(value) => handlePolicyChange(policy, value)}
           />

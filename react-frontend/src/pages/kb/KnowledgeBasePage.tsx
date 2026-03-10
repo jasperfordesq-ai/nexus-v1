@@ -161,6 +161,7 @@ export function KnowledgeBasePage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+          aria-label="Search the knowledge base"
           endContent={isSearching ? <Spinner size="sm" /> : undefined}
           classNames={{
             input: 'bg-transparent text-theme-primary',

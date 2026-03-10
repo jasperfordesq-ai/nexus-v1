@@ -740,6 +740,7 @@ const FeedCard = React.memo(function FeedCard({
                 <div className="flex items-start gap-2.5">
                   <Input
                     placeholder={t('card.write_comment')}
+                    aria-label={t('card.write_comment')}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitComment()}

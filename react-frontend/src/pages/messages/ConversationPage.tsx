@@ -1144,6 +1144,7 @@ export function ConversationPage() {
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 startContent={<Search className="w-4 h-4 text-theme-subtle" />}
+                aria-label={t('conversation_search_placeholder')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

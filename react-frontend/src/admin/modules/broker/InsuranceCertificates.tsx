@@ -633,6 +633,7 @@ export function InsuranceCertificates() {
       <div className="mb-4">
         <Input
           placeholder="Search by name, email, provider, or policy number..."
+          aria-label="Search insurance certificates"
           value={searchQuery}
           onValueChange={setSearchQuery}
           startContent={<Search size={16} className="text-default-400" />}

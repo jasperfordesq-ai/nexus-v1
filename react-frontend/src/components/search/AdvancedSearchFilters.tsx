@@ -239,6 +239,7 @@ export function AdvancedSearchFilters({
               <Input
                 size="sm"
                 placeholder="Add a skill tag..."
+                aria-label="Add a skill tag"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={(e) => {

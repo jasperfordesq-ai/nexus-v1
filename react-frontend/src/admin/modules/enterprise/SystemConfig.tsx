@@ -138,6 +138,7 @@ export function SystemConfig() {
                 <Input
                   value={editedConfig[key] ?? ''}
                   onValueChange={(v) => handleChange(key, v)}
+                  aria-label={key}
                   variant="bordered"
                   size="sm"
                   className="flex-1"

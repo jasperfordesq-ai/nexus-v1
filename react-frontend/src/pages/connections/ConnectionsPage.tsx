@@ -567,11 +567,11 @@ export default function ConnectionsPage() {
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-[var(--color-text-muted)]" aria-hidden="true" />}
+            aria-label="Search connections"
             variant="bordered"
             classNames={{
               inputWrapper: 'bg-[var(--color-surface)] border-[var(--border-default)] hover:border-indigo-400',
             }}
-            aria-label="Search connections"
             isClearable
             onClear={() => setSearchQuery('')}
           />

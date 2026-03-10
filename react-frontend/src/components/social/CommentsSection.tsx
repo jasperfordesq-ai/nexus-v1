@@ -407,6 +407,7 @@ function MentionInput({
       <Input
         ref={inputRef}
         placeholder={placeholder}
+        aria-label={placeholder || "Write a comment"}
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}

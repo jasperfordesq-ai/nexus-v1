@@ -2042,6 +2042,7 @@ export function SettingsPage() {
                   value={deleteConfirmation}
                   onChange={(e) => setDeleteConfirmation(e.target.value)}
                   placeholder="DELETE"
+                  aria-label="Type DELETE to confirm account deletion"
                   classNames={{
                     input: 'bg-transparent text-theme-primary font-mono',
                     inputWrapper: 'bg-theme-elevated border-theme-default',

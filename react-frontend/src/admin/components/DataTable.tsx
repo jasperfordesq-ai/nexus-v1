@@ -130,6 +130,7 @@ export function DataTable<T extends Record<string, any>>({
             <Input
               className="w-full sm:max-w-xs"
               placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder || "Search"}
               startContent={<Search size={16} className="text-default-400" />}
               value={searchValue}
               onValueChange={handleSearchChange}

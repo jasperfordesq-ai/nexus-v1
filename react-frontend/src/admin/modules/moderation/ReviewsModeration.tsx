@@ -295,6 +295,7 @@ export default function ReviewsModeration() {
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
           placeholder="Search reviews or users..."
+          aria-label="Search reviews"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

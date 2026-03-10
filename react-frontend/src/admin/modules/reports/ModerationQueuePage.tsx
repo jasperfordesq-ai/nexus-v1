@@ -459,6 +459,7 @@ export function ModerationQueuePage() {
         <Input
           size="sm"
           placeholder="Search content..."
+          aria-label="Search moderation queue"
           value={search}
           onValueChange={setSearch}
           className="w-48"

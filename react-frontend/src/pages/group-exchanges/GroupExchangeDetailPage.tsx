@@ -793,12 +793,12 @@ export function GroupExchangeDetailPage() {
               value={searchQuery}
               onChange={(e) => handleSearchMembers(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+              aria-label={t('detail.search_members_placeholder')}
               endContent={isSearching ? <Spinner size="sm" /> : null}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
               }}
-              aria-label={t('detail.search_members_aria')}
             />
 
             {searchResults.length > 0 && (

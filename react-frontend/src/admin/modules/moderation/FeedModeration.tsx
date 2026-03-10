@@ -255,6 +255,7 @@ export default function FeedModeration() {
       <div className="flex flex-col sm:flex-row gap-4">
         <Input
           placeholder="Search posts or users..."
+          aria-label="Search posts"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
