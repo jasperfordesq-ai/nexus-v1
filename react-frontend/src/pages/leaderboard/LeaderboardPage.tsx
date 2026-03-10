@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts/ToastContext';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -313,6 +313,7 @@ function SeasonCard() {
 export function LeaderboardPage() {
   const { t } = useTranslation('gamification');
   usePageTitle(t('leaderboard.page_title'));
+  const { tenantPath } = useTenant();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [meta, setMeta] = useState<LeaderboardMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -559,7 +560,7 @@ export function LeaderboardPage() {
                 {entries.map((entry) => (
                   <motion.div key={entry.position} variants={itemVariants}>
                     <Link
-                      to={`/profile/${entry.user.id}`}
+                      to={tenantPath(`/profile/${entry.user.id}`)}
                       className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-theme-hover transition-colors ${
                         entry.is_current_user ? 'bg-indigo-500/10 border-l-2 border-indigo-500' : ''
                       } ${entry.position <= 3 ? 'bg-gradient-to-r from-amber-500/5 to-transparent' : ''}`}

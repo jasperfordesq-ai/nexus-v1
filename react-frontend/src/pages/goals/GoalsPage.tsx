@@ -66,7 +66,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -992,6 +992,7 @@ function GoalCard({
   onCheckin,
 }: GoalCardProps) {
   const { t } = useTranslation('gamification');
+  const { tenantPath } = useTenant();
   const isCompleted = goal.status === 'completed' || goal.progress_percentage >= 100;
   const deadlineDate = goal.deadline ? new Date(goal.deadline) : null;
   const isOverdue = deadlineDate && deadlineDate < new Date() && !isCompleted;
@@ -1074,7 +1075,7 @@ function GoalCard({
             )}
             {(!isOwner || isBuddyingTab) && goal.user_name && (
               <Link
-                to={`/profile/${goal.user_id}`}
+                to={tenantPath(`/profile/${goal.user_id}`)}
                 className="flex items-center gap-1.5 hover:text-theme-primary transition-colors"
               >
                 <Avatar
