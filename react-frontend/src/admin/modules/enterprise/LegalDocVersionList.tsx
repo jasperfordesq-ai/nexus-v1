@@ -18,6 +18,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  RadioGroup,
+  Radio,
 } from '@heroui/react';
 import {
   Clock,
@@ -558,41 +560,34 @@ export default function LegalDocVersionList() {
                     Choose who should receive email notifications about version {selectedVersion?.version_number}:
                   </p>
 
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-[var(--color-surface)]">
-                      <input
-                        type="radio"
-                        name="notify-target"
-                        value="non_accepted"
-                        checked={notifyTarget === 'non_accepted'}
-                        onChange={(e) => setNotifyTarget(e.target.value as 'all' | 'non_accepted')}
-                        className="w-4 h-4"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium">Non-accepted users only</p>
-                        <p className="text-sm text-[var(--color-text-secondary)]">
-                          {pendingCount > 0 ? `${pendingCount} users` : 'Loading...'}
-                        </p>
-                      </div>
-                    </label>
+                  <RadioGroup
+                    value={notifyTarget}
+                    onValueChange={(val) => setNotifyTarget(val as 'all' | 'non_accepted')}
+                    aria-label="Notification target"
+                    classNames={{ wrapper: 'gap-3' }}
+                  >
+                    <Radio
+                      value="non_accepted"
+                      classNames={{
+                        base: 'flex items-start gap-3 p-3 border border-[var(--color-border)] rounded-lg cursor-pointer hover:bg-[var(--color-surface)] max-w-full',
+                        label: 'flex-1',
+                      }}
+                      description={pendingCount > 0 ? `${pendingCount} users` : 'Loading...'}
+                    >
+                      <span className="font-medium">Non-accepted users only</span>
+                    </Radio>
 
-                    <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-[var(--color-surface)]">
-                      <input
-                        type="radio"
-                        name="notify-target"
-                        value="all"
-                        checked={notifyTarget === 'all'}
-                        onChange={(e) => setNotifyTarget(e.target.value as 'all' | 'non_accepted')}
-                        className="w-4 h-4"
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium">All active users</p>
-                        <p className="text-sm text-[var(--color-text-secondary)]">
-                          Send to everyone (may be redundant)
-                        </p>
-                      </div>
-                    </label>
-                  </div>
+                    <Radio
+                      value="all"
+                      classNames={{
+                        base: 'flex items-start gap-3 p-3 border border-[var(--color-border)] rounded-lg cursor-pointer hover:bg-[var(--color-surface)] max-w-full',
+                        label: 'flex-1',
+                      }}
+                      description="Send to everyone (may be redundant)"
+                    >
+                      <span className="font-medium">All active users</span>
+                    </Radio>
+                  </RadioGroup>
                 </div>
               </ModalBody>
               <ModalFooter>

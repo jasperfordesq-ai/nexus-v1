@@ -12,7 +12,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import { Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -217,34 +217,42 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               className="bg-[var(--surface-dropdown)] rounded-xl border border-[var(--border-default)] shadow-2xl overflow-hidden"
             >
               <form onSubmit={handleSearchSubmit} className="flex items-center px-4 py-3 gap-3">
-                <Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-                <input
+                <Input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onValueChange={setSearchQuery}
                   onKeyDown={handleSearchKeyDown}
                   placeholder={t('search.placeholder')}
-                  className="flex-1 bg-transparent text-theme-primary placeholder:text-theme-subtle outline-none text-base"
                   aria-label="Search"
                   aria-autocomplete="list"
                   aria-activedescendant={selectedIndex >= 0 ? `suggestion-${selectedIndex}` : undefined}
+                  startContent={<Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />}
+                  endContent={
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {searchQuery && (
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          size="sm"
+                          onPress={() => setSearchQuery('')}
+                          className="text-theme-subtle hover:text-theme-primary min-w-6 w-6 h-6"
+                          aria-label="Clear search"
+                        >
+                          <X className="w-4 h-4" aria-hidden="true" />
+                        </Button>
+                      )}
+                      <kbd className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)]">
+                        ESC
+                      </kbd>
+                    </div>
+                  }
+                  classNames={{
+                    base: 'flex-1',
+                    input: 'bg-transparent text-theme-primary text-base',
+                    inputWrapper: 'bg-transparent shadow-none border-0 px-0 h-auto hover:bg-transparent focus-within:bg-transparent',
+                  }}
                 />
-                {searchQuery && (
-                  <Button
-                    isIconOnly
-                    variant="light"
-                    size="sm"
-                    onPress={() => setSearchQuery('')}
-                    className="text-theme-subtle hover:text-theme-primary min-w-6 w-6 h-6"
-                    aria-label="Clear search"
-                  >
-                    <X className="w-4 h-4" aria-hidden="true" />
-                  </Button>
-                )}
-                <kbd className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)]">
-                  ESC
-                </kbd>
               </form>
 
               {/* Suggestions or Quick Links */}
