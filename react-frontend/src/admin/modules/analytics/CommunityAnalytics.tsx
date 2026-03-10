@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Spinner, Button } from '@heroui/react';
+import { Card, CardBody, CardHeader, Spinner, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   BarChart,
   PieChart,
@@ -487,51 +487,26 @@ export function CommunityAnalytics() {
             <h3 className="font-semibold">Top Earners (30 days)</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            {loading ? (
-              <div className="flex h-48 items-center justify-center">
-                <Spinner />
-              </div>
-            ) : data && data.top_earners.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-divider text-left">
-                      <th className="pb-2 pr-4 font-medium text-default-500">
-                        Rank
-                      </th>
-                      <th className="pb-2 pr-4 font-medium text-default-500">
-                        Name
-                      </th>
-                      <th className="pb-2 text-right font-medium text-default-500">
-                        Hours Earned
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.top_earners.map((earner, index) => (
-                      <tr
-                        key={earner.id}
-                        className="border-b border-divider last:border-0"
-                      >
-                        <td className="py-2.5 pr-4 font-medium text-default-600">
-                          {index + 1}
-                        </td>
-                        <td className="py-2.5 pr-4 text-foreground">
-                          {earner.name}
-                        </td>
-                        <td className="py-2.5 text-right font-semibold text-success">
-                          {earner.total.toFixed(1)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="py-8 text-center text-sm text-default-400">
-                No earner data available yet
-              </p>
-            )}
+            <Table aria-label="Top earners" shadow="sm" isStriped>
+              <TableHeader>
+                <TableColumn>Rank</TableColumn>
+                <TableColumn>Name</TableColumn>
+                <TableColumn className="text-right">Hours Earned</TableColumn>
+              </TableHeader>
+              <TableBody
+                emptyContent="No earner data available yet"
+                isLoading={loading}
+                loadingContent={<Spinner />}
+              >
+                {(data?.top_earners ?? []).map((earner, index) => (
+                  <TableRow key={earner.id}>
+                    <TableCell className="font-medium text-default-600">{index + 1}</TableCell>
+                    <TableCell className="text-foreground">{earner.name}</TableCell>
+                    <TableCell className="text-right font-semibold text-success">{earner.total.toFixed(1)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardBody>
         </Card>
 
@@ -542,51 +517,26 @@ export function CommunityAnalytics() {
             <h3 className="font-semibold">Top Spenders (30 days)</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            {loading ? (
-              <div className="flex h-48 items-center justify-center">
-                <Spinner />
-              </div>
-            ) : data && data.top_spenders.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-divider text-left">
-                      <th className="pb-2 pr-4 font-medium text-default-500">
-                        Rank
-                      </th>
-                      <th className="pb-2 pr-4 font-medium text-default-500">
-                        Name
-                      </th>
-                      <th className="pb-2 text-right font-medium text-default-500">
-                        Hours Spent
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.top_spenders.map((spender, index) => (
-                      <tr
-                        key={spender.id}
-                        className="border-b border-divider last:border-0"
-                      >
-                        <td className="py-2.5 pr-4 font-medium text-default-600">
-                          {index + 1}
-                        </td>
-                        <td className="py-2.5 pr-4 text-foreground">
-                          {spender.name}
-                        </td>
-                        <td className="py-2.5 text-right font-semibold text-warning">
-                          {spender.total.toFixed(1)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="py-8 text-center text-sm text-default-400">
-                No spender data available yet
-              </p>
-            )}
+            <Table aria-label="Top spenders" shadow="sm" isStriped>
+              <TableHeader>
+                <TableColumn>Rank</TableColumn>
+                <TableColumn>Name</TableColumn>
+                <TableColumn className="text-right">Hours Spent</TableColumn>
+              </TableHeader>
+              <TableBody
+                emptyContent="No spender data available yet"
+                isLoading={loading}
+                loadingContent={<Spinner />}
+              >
+                {(data?.top_spenders ?? []).map((spender, index) => (
+                  <TableRow key={spender.id}>
+                    <TableCell className="font-medium text-default-600">{index + 1}</TableCell>
+                    <TableCell className="text-foreground">{spender.name}</TableCell>
+                    <TableCell className="text-right font-semibold text-warning">{spender.total.toFixed(1)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardBody>
         </Card>
       </div>

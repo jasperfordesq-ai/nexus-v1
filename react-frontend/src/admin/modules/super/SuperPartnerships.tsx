@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Button, Chip, Tabs, Tab } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { TrendingUp, Users, MessageSquare, DollarSign, FileText, Calendar, UsersRound, Pause, XCircle } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import ConfirmModal from '../../components/ConfirmModal';
@@ -242,97 +242,79 @@ export default function Partnerships() {
           </Tabs>
         </CardHeader>
         <CardBody>
-          {filteredPartnerships.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-default-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Partnership</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Level</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Features</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Status</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Created</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPartnerships.map(partnership => (
-                    <tr key={partnership.id} className="border-b border-default-100">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{partnership.tenant_a_name}</span>
-                          <span className="text-default-500">↔</span>
-                          <span className="font-medium">{partnership.tenant_b_name}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Chip
+          <Table aria-label="Federation partnerships" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Partnership</TableColumn>
+              <TableColumn>Level</TableColumn>
+              <TableColumn>Features</TableColumn>
+              <TableColumn>Status</TableColumn>
+              <TableColumn>Created</TableColumn>
+              <TableColumn>Actions</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={`No ${filter !== 'all' ? filter : ''} partnerships found`}>
+              {filteredPartnerships.map(partnership => (
+                <TableRow key={partnership.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{partnership.tenant_a_name}</span>
+                      <span className="text-default-500">↔</span>
+                      <span className="font-medium">{partnership.tenant_b_name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color={getLevelColor(partnership.level)} variant="flat">
+                      L{partnership.level}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {Object.entries(partnership.features).map(([key, enabled]) =>
+                        enabled ? (
+                          <span key={key} title={key}>
+                            {getFeatureIcon(key)}
+                          </span>
+                        ) : null
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color={getStatusColor(partnership.status)} variant="flat">
+                      {partnership.status}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="text-sm text-default-600">
+                    {new Date(partnership.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {partnership.status === 'active' && (
+                        <Button
                           size="sm"
-                          color={getLevelColor(partnership.level)}
                           variant="flat"
+                          color="warning"
+                          onPress={() => setActionPartnership({ id: partnership.id, action: 'suspend' })}
+                          startContent={<Pause className="w-4 h-4" />}
                         >
-                          L{partnership.level}
-                        </Chip>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          {Object.entries(partnership.features).map(([key, enabled]) =>
-                            enabled ? (
-                              <span key={key} title={key}>
-                                {getFeatureIcon(key)}
-                              </span>
-                            ) : null
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Chip
+                          Suspend
+                        </Button>
+                      )}
+                      {(partnership.status === 'active' || partnership.status === 'suspended') && (
+                        <Button
                           size="sm"
-                          color={getStatusColor(partnership.status)}
                           variant="flat"
+                          color="danger"
+                          onPress={() => setActionPartnership({ id: partnership.id, action: 'terminate' })}
+                          startContent={<XCircle className="w-4 h-4" />}
                         >
-                          {partnership.status}
-                        </Chip>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-default-600">
-                        {new Date(partnership.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          {partnership.status === 'active' && (
-                            <Button
-                              size="sm"
-                              variant="flat"
-                              color="warning"
-                              onPress={() => setActionPartnership({ id: partnership.id, action: 'suspend' })}
-                              startContent={<Pause className="w-4 h-4" />}
-                            >
-                              Suspend
-                            </Button>
-                          )}
-                          {(partnership.status === 'active' || partnership.status === 'suspended') && (
-                            <Button
-                              size="sm"
-                              variant="flat"
-                              color="danger"
-                              onPress={() => setActionPartnership({ id: partnership.id, action: 'terminate' })}
-                              startContent={<XCircle className="w-4 h-4" />}
-                            >
-                              Terminate
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-sm text-default-500 text-center py-8">
-              No {filter !== 'all' ? filter : ''} partnerships found
-            </p>
-          )}
+                          Terminate
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
 

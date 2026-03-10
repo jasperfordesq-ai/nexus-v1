@@ -12,7 +12,13 @@ import {
   Button,
   Select,
   SelectItem,
-  Textarea
+  Textarea,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@heroui/react';
 import { Plus, Trash2 } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
@@ -175,68 +181,60 @@ export default function FederationWhitelist() {
           <h3 className="text-lg font-semibold">Whitelisted Tenants ({entries.length})</h3>
         </CardHeader>
         <CardBody>
-          {entries.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-default-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Tenant</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Domain</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Approved By</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Date</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Notes</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map(entry => (
-                    <tr key={entry.id} className="border-b border-default-100">
-                      <td className="py-3 px-4">
-                        <Link
-                          to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
-                          className="text-primary hover:underline"
-                        >
-                          {entry.tenant_name}
-                        </Link>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-default-600">{entry.domain}</td>
-                      <td className="py-3 px-4 text-sm text-default-600">{entry.approved_by_name}</td>
-                      <td className="py-3 px-4 text-sm text-default-600">
-                        {new Date(entry.approved_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-default-600 max-w-xs truncate">
-                        {entry.notes || '-'}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            as={Link}
-                            to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
-                            size="sm"
-                            variant="flat"
-                            color="primary"
-                          >
-                            View
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="flat"
-                            color="danger"
-                            onPress={() => setRemoving(entry.tenant_id)}
-                            startContent={<Trash2 className="w-4 h-4" />}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-sm text-default-500 text-center py-8">No tenants whitelisted yet</p>
-          )}
+          <Table aria-label="Whitelisted tenants" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Tenant</TableColumn>
+              <TableColumn>Domain</TableColumn>
+              <TableColumn>Approved By</TableColumn>
+              <TableColumn>Date</TableColumn>
+              <TableColumn>Notes</TableColumn>
+              <TableColumn>Actions</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No tenants whitelisted yet">
+              {entries.map(entry => (
+                <TableRow key={entry.id}>
+                  <TableCell>
+                    <Link
+                      to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
+                      className="text-primary hover:underline"
+                    >
+                      {entry.tenant_name}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-sm text-default-600">{entry.domain}</TableCell>
+                  <TableCell className="text-sm text-default-600">{entry.approved_by_name}</TableCell>
+                  <TableCell className="text-sm text-default-600">
+                    {new Date(entry.approved_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-sm text-default-600 max-w-xs truncate">
+                    {entry.notes || '-'}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        as={Link}
+                        to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
+                        size="sm"
+                        variant="flat"
+                        color="primary"
+                      >
+                        View
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        color="danger"
+                        onPress={() => setRemoving(entry.tenant_id)}
+                        startContent={<Trash2 className="w-4 h-4" />}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
 

@@ -12,7 +12,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
+import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   Compass,
   Download,
@@ -345,30 +345,26 @@ export function StrategicPlanPage() {
                     </div>
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-emerald-500/5">
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_initiative_header')}</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_priority_header')}</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_kpi_header')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-theme-default">
-                      {[0, 1, 2, 3, 4, 5].map((idx) => (
-                        <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_1_row_${idx}_initiative`)}</td>
-                          <td className="px-5 py-3">
-                            <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                              {t(`strategic_plan.pillar_1_row_${idx}_priority`)}
-                            </span>
-                          </td>
-                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_1_row_${idx}_kpi`)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="Strategic pillar 1 initiatives" shadow="none" isStriped>
+                  <TableHeader>
+                    <TableColumn>{t('strategic_plan.pillar_initiative_header')}</TableColumn>
+                    <TableColumn>{t('strategic_plan.pillar_priority_header')}</TableColumn>
+                    <TableColumn>{t('strategic_plan.pillar_kpi_header')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {[0, 1, 2, 3, 4, 5].map((idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="text-theme-muted">{t(`strategic_plan.pillar_1_row_${idx}_initiative`)}</TableCell>
+                        <TableCell>
+                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                            {t(`strategic_plan.pillar_1_row_${idx}_priority`)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-theme-muted">{t(`strategic_plan.pillar_1_row_${idx}_kpi`)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </GlassCard>
 
               {/* Pillar 2 */}
@@ -384,30 +380,26 @@ export function StrategicPlanPage() {
                     </div>
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-indigo-500/5">
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_initiative_header')}</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_priority_header')}</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.pillar_kpi_header')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-theme-default">
-                      {[0, 1, 2, 3, 4, 5].map((idx) => (
-                        <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_2_row_${idx}_initiative`)}</td>
-                          <td className="px-5 py-3">
-                            <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
-                              {t(`strategic_plan.pillar_2_row_${idx}_priority`)}
-                            </span>
-                          </td>
-                          <td className="px-5 py-3 text-theme-muted">{t(`strategic_plan.pillar_2_row_${idx}_kpi`)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="Strategic pillar 2 initiatives" shadow="none" isStriped>
+                  <TableHeader>
+                    <TableColumn>{t('strategic_plan.pillar_initiative_header')}</TableColumn>
+                    <TableColumn>{t('strategic_plan.pillar_priority_header')}</TableColumn>
+                    <TableColumn>{t('strategic_plan.pillar_kpi_header')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {[0, 1, 2, 3, 4, 5].map((idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="text-theme-muted">{t(`strategic_plan.pillar_2_row_${idx}_initiative`)}</TableCell>
+                        <TableCell>
+                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
+                            {t(`strategic_plan.pillar_2_row_${idx}_priority`)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-theme-muted">{t(`strategic_plan.pillar_2_row_${idx}_kpi`)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </GlassCard>
             </div>
           </motion.div>
@@ -426,82 +418,78 @@ export function StrategicPlanPage() {
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
-                        <th className="px-4 py-3 text-left font-semibold text-theme-primary min-w-[160px]">{t('strategic_plan.roadmap_activity_header')}</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q1')}</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q2')}</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q3')}</th>
-                        <th className="px-4 py-3 text-center font-semibold text-theme-primary min-w-[90px]">{t('strategic_plan.roadmap_q4')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-theme-default">
-                      {[
-                        {
-                          q1: 'submit' as const,
-                          q2: 'secure' as const,
-                          q3: null,
-                          q4: null,
-                        },
-                        {
-                          q1: 'pitch' as const,
-                          q2: 'launch' as const,
-                          q3: 'launch' as const,
-                          q4: 'launch' as const,
-                        },
-                        {
-                          q1: null,
-                          q2: 'pitch' as const,
-                          q3: 'ongoing' as const,
-                          q4: 'ongoing' as const,
-                        },
-                        {
-                          q1: null,
-                          q2: 'launch' as const,
-                          q3: 'ongoing' as const,
-                          q4: 'ongoing' as const,
-                        },
-                        {
-                          q1: 'pitch' as const,
-                          q2: 'pitch' as const,
-                          q3: 'secure' as const,
-                          q4: null,
-                        },
-                        {
-                          q1: 'ongoing' as const,
-                          q2: 'ongoing' as const,
-                          q3: 'ongoing' as const,
-                          q4: 'ongoing' as const,
-                        },
-                        {
-                          q1: 'submit' as const,
-                          q2: 'secure' as const,
-                          q3: null,
-                          q4: null,
-                        },
-                        {
-                          q1: null,
-                          q2: null,
-                          q3: null,
-                          q4: 'launch' as const,
-                        },
-                      ].map((row, idx) => (
-                        <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-4 py-3 text-theme-muted font-medium">{t(`strategic_plan.roadmap_activity_${idx}`)}</td>
-                          {([row.q1, row.q2, row.q3, row.q4] as (typeof row.q1)[]).map((cell, cellIdx) => (
-                            <td key={cellIdx} className="px-4 py-3 text-center">
-                              {cell ? <RoadmapBadge label={t(`strategic_plan.badge_${cell}`)} type={cell} /> : (
-                                <span className="text-theme-subtle">&mdash;</span>
-                              )}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="Year 1 roadmap" shadow="none" isStriped>
+                  <TableHeader>
+                    <TableColumn className="min-w-[160px]">{t('strategic_plan.roadmap_activity_header')}</TableColumn>
+                    <TableColumn className="text-center min-w-[90px]">{t('strategic_plan.roadmap_q1')}</TableColumn>
+                    <TableColumn className="text-center min-w-[90px]">{t('strategic_plan.roadmap_q2')}</TableColumn>
+                    <TableColumn className="text-center min-w-[90px]">{t('strategic_plan.roadmap_q3')}</TableColumn>
+                    <TableColumn className="text-center min-w-[90px]">{t('strategic_plan.roadmap_q4')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      {
+                        q1: 'submit' as const,
+                        q2: 'secure' as const,
+                        q3: null,
+                        q4: null,
+                      },
+                      {
+                        q1: 'pitch' as const,
+                        q2: 'launch' as const,
+                        q3: 'launch' as const,
+                        q4: 'launch' as const,
+                      },
+                      {
+                        q1: null,
+                        q2: 'pitch' as const,
+                        q3: 'ongoing' as const,
+                        q4: 'ongoing' as const,
+                      },
+                      {
+                        q1: null,
+                        q2: 'launch' as const,
+                        q3: 'ongoing' as const,
+                        q4: 'ongoing' as const,
+                      },
+                      {
+                        q1: 'pitch' as const,
+                        q2: 'pitch' as const,
+                        q3: 'secure' as const,
+                        q4: null,
+                      },
+                      {
+                        q1: 'ongoing' as const,
+                        q2: 'ongoing' as const,
+                        q3: 'ongoing' as const,
+                        q4: 'ongoing' as const,
+                      },
+                      {
+                        q1: 'submit' as const,
+                        q2: 'secure' as const,
+                        q3: null,
+                        q4: null,
+                      },
+                      {
+                        q1: null,
+                        q2: null,
+                        q3: null,
+                        q4: 'launch' as const,
+                      },
+                    ].map((row, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="text-theme-muted font-medium">{t(`strategic_plan.roadmap_activity_${idx}`)}</TableCell>
+                        {([row.q1, row.q2, row.q3, row.q4] as (typeof row.q1)[]).map((cell, cellIdx) => (
+                          <TableCell key={cellIdx} className="text-center">
+                            {cell ? <RoadmapBadge label={t(`strategic_plan.badge_${cell}`)} type={cell} /> : (
+                              <span className="text-theme-subtle">&mdash;</span>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </GlassCard>
 
               {/* Badge Legend */}
@@ -530,54 +518,50 @@ export function StrategicPlanPage() {
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gradient-to-r from-rose-500/10 to-amber-500/10">
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.risk_header')}</th>
-                        <th className="px-5 py-3 text-center font-semibold text-theme-primary w-24">{t('strategic_plan.likelihood_header')}</th>
-                        <th className="px-5 py-3 text-center font-semibold text-theme-primary w-24">{t('strategic_plan.impact_header')}</th>
-                        <th className="px-5 py-3 text-left font-semibold text-theme-primary">{t('strategic_plan.mitigation_header')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-theme-default">
-                      {[
-                        { likelihood: 'High' as const, impact: 'Critical' as const },
-                        { likelihood: 'Medium' as const, impact: 'High' as const },
-                        { likelihood: 'Medium' as const, impact: 'Medium' as const },
-                        { likelihood: 'Low' as const, impact: 'Medium' as const },
-                        { likelihood: 'Medium' as const, impact: 'High' as const },
-                      ].map((row, idx) => (
-                        <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-5 py-3 text-theme-muted font-medium">{t(`strategic_plan.risk_${idx}_name`)}</td>
-                          <td className="px-5 py-3 text-center">
-                            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                              row.likelihood === 'High'
-                                ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
-                                : row.likelihood === 'Medium'
-                                ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                                : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                            }`}>
-                              {t(`strategic_plan.risk_${idx}_likelihood`)}
-                            </span>
-                          </td>
-                          <td className="px-5 py-3 text-center">
-                            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                              row.impact === 'Critical'
-                                ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
-                                : row.impact === 'High'
-                                ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                                : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
-                            }`}>
-                              {t(`strategic_plan.risk_${idx}_impact`)}
-                            </span>
-                          </td>
-                          <td className="px-5 py-3 text-theme-muted text-xs leading-relaxed">{t(`strategic_plan.risk_${idx}_mitigation`)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="Risk and mitigation" shadow="none" isStriped>
+                  <TableHeader>
+                    <TableColumn>{t('strategic_plan.risk_header')}</TableColumn>
+                    <TableColumn className="text-center w-24">{t('strategic_plan.likelihood_header')}</TableColumn>
+                    <TableColumn className="text-center w-24">{t('strategic_plan.impact_header')}</TableColumn>
+                    <TableColumn>{t('strategic_plan.mitigation_header')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      { likelihood: 'High' as const, impact: 'Critical' as const },
+                      { likelihood: 'Medium' as const, impact: 'High' as const },
+                      { likelihood: 'Medium' as const, impact: 'Medium' as const },
+                      { likelihood: 'Low' as const, impact: 'Medium' as const },
+                      { likelihood: 'Medium' as const, impact: 'High' as const },
+                    ].map((row, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="text-theme-muted font-medium">{t(`strategic_plan.risk_${idx}_name`)}</TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                            row.likelihood === 'High'
+                              ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
+                              : row.likelihood === 'Medium'
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                              : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                          }`}>
+                            {t(`strategic_plan.risk_${idx}_likelihood`)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                            row.impact === 'Critical'
+                              ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
+                              : row.impact === 'High'
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                              : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
+                          }`}>
+                            {t(`strategic_plan.risk_${idx}_impact`)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-theme-muted text-xs leading-relaxed">{t(`strategic_plan.risk_${idx}_mitigation`)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </GlassCard>
             </div>
           </motion.div>

@@ -26,6 +26,12 @@ import {
   Chip,
   Avatar,
   Spinner,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@heroui/react';
 import {
   ArrowRight,
@@ -701,36 +707,31 @@ export function CreateGroupExchangePage() {
                 </div>
 
                 {/* Split Table */}
-                {splitPreview.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-theme-default">
-                          <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_provider')}</th>
-                          <th className="text-center py-2 px-3 text-theme-muted font-medium" aria-hidden="true" />
-                          <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_receiver')}</th>
-                          <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_hours')}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {splitPreview.map((split, idx) => (
-                          <tr key={idx} className="border-b border-theme-default/50">
-                            <td className="py-2 px-3 text-emerald-400">{split.providerName}</td>
-                            <td className="py-2 px-3 text-center text-theme-subtle">
-                              <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
-                            </td>
-                            <td className="py-2 px-3 text-amber-400">{split.receiverName}</td>
-                            <td className="py-2 px-3 text-right font-medium text-theme-primary">{split.amount}h</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-center py-6 text-theme-muted">
-                    {t('create.unable_to_calculate')}
-                  </div>
-                )}
+                <Table
+                  aria-label="Hour split preview"
+                  shadow="sm"
+                  isStriped
+                  emptyContent={<div className="text-center py-6 text-theme-muted">{t('create.unable_to_calculate')}</div>}
+                >
+                  <TableHeader>
+                    <TableColumn>{t('detail.col_provider')}</TableColumn>
+                    <TableColumn className="text-center" aria-hidden="true">{' '}</TableColumn>
+                    <TableColumn>{t('detail.col_receiver')}</TableColumn>
+                    <TableColumn className="text-right">{t('detail.col_hours')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {splitPreview.map((split, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="text-emerald-400">{split.providerName}</TableCell>
+                        <TableCell className="text-center text-theme-subtle">
+                          <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
+                        </TableCell>
+                        <TableCell className="text-amber-400">{split.receiverName}</TableCell>
+                        <TableCell className="text-right font-medium text-theme-primary">{split.amount}h</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </GlassCard>
 
               {/* Participant Details */}
