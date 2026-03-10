@@ -780,8 +780,8 @@ export function ProfilePage() {
                 <div className="mt-6">
                   <h3 className="text-sm font-medium text-theme-muted mb-3">{t('about.skills')}</h3>
                   <div className="flex flex-wrap gap-2">
-                    {profile.skills.map((skill, index) => (
-                      <div key={index} className="inline-flex items-center gap-1.5">
+                    {profile.skills.map((skill) => (
+                      <div key={skill} className="inline-flex items-center gap-1.5">
                         <Chip
                           variant="flat"
                           size="sm"

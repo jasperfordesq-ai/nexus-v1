@@ -65,6 +65,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { CHART_COLORS } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
@@ -118,10 +119,7 @@ const tooltipStyle = {
   color: 'hsl(var(--heroui-foreground))',
 };
 
-const PIE_COLORS = [
-  '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
-  '#06b6d4', '#f97316', '#ec4899', '#14b8a6', '#a855f7',
-];
+const PIE_COLORS = CHART_COLORS;
 
 const SORT_OPTIONS = [
   { key: 'total', label: 'Total Hours' },

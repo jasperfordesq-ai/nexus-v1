@@ -150,8 +150,8 @@ export default function PerformanceDashboard() {
 
     return (
       <div className="space-y-3">
-        {summary.slowest_requests.map((request, index) => (
-          <Card key={index} className="p-4">
+        {summary.slowest_requests.map((request) => (
+          <Card key={`${request.timestamp}-${request.endpoint}`} className="p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
@@ -198,8 +198,8 @@ export default function PerformanceDashboard() {
 
     return (
       <div className="space-y-3">
-        {summary.slowest_queries.map((query, index) => (
-          <Card key={index} className="p-4">
+        {summary.slowest_queries.map((query) => (
+          <Card key={`${query.timestamp}-${query.duration_ms}`} className="p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
@@ -240,8 +240,8 @@ export default function PerformanceDashboard() {
 
     return (
       <div className="space-y-3">
-        {summary.memory_spikes.map((spike, index) => (
-          <Card key={index} className="p-4">
+        {summary.memory_spikes.map((spike) => (
+          <Card key={`${spike.timestamp}-${spike.endpoint}`} className="p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
