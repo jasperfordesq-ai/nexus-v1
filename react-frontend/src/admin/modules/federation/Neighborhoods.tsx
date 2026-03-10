@@ -380,7 +380,7 @@ export function Neighborhoods() {
               <ModalBody className="gap-4">
                 <Input
                   label="Name"
-                  placeholder="e.g., Greater Dublin Area"
+                  placeholder="e.g., Greater London Area"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                 />
