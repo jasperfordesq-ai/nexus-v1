@@ -284,8 +284,10 @@ export function UserEdit() {
         const token = (res.data as Record<string, unknown>).access_token as string
           || (res.data as Record<string, unknown>).token as string;
         if (token) {
-          const url = `${window.location.origin}?impersonate_token=${token}`;
-          window.open(url, '_blank');
+          // Store token in sessionStorage instead of URL query params
+          // to avoid leaking it in browser history, Referer headers, and server logs
+          sessionStorage.setItem('impersonate_token', token);
+          window.open(`${window.location.origin}/`, '_blank');
           toast.success(`Logged in as ${user?.name}`);
         }
       } else {

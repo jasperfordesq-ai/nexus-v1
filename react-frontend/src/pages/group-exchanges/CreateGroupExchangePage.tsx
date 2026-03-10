@@ -711,7 +711,6 @@ export function CreateGroupExchangePage() {
                   aria-label="Hour split preview"
                   shadow="sm"
                   isStriped
-                  emptyContent={<div className="text-center py-6 text-theme-muted">{t('create.unable_to_calculate')}</div>}
                 >
                   <TableHeader>
                     <TableColumn>{t('detail.col_provider')}</TableColumn>
@@ -719,7 +718,7 @@ export function CreateGroupExchangePage() {
                     <TableColumn>{t('detail.col_receiver')}</TableColumn>
                     <TableColumn className="text-right">{t('detail.col_hours')}</TableColumn>
                   </TableHeader>
-                  <TableBody>
+                  <TableBody emptyContent={<div className="text-center py-6 text-theme-muted">{t('create.unable_to_calculate')}</div>}>
                     {splitPreview.map((split, idx) => (
                       <TableRow key={idx}>
                         <TableCell className="text-emerald-400">{split.providerName}</TableCell>

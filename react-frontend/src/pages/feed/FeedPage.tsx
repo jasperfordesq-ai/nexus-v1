@@ -198,7 +198,7 @@ export function FeedPage() {
 
   /* ───────── Like Toggle ───────── */
 
-  const handleToggleLike = async (item: FeedItem) => {
+  const handleToggleLike = useCallback(async (item: FeedItem) => {
     // Optimistic update
     setItems((prev) =>
       prev.map((fi) =>
@@ -232,22 +232,23 @@ export function FeedPage() {
         )
       );
     }
-  };
+  }, []);
 
   /* ───────── Moderation ───────── */
 
-  const handleHidePost = async (postId: number, itemType?: string) => {
+  const handleHidePost = useCallback(async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${postId}/hide`);
-      setItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === (itemType ?? fi.type))));
+      await api.post(`/v2/feed/posts/${item.id}/hide`);
+      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
       toast.success(t('toast.post_hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
       toast.error(t('toast.hide_failed'));
     }
-  };
+  }, [toast, t]);
 
-  const handleMuteUser = async (userId: number) => {
+  const handleMuteUser = useCallback(async (item: FeedItem) => {
+    const userId = getAuthor(item).id;
     try {
       await api.post(`/v2/feed/users/${userId}/mute`);
       setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
@@ -256,13 +257,13 @@ export function FeedPage() {
       logError('Failed to mute user', err);
       toast.error(t('toast.mute_failed'));
     }
-  };
+  }, [toast, t]);
 
-  const openReportModal = (postId: number) => {
-    setReportPostId(postId);
+  const openReportModal = useCallback((item: FeedItem) => {
+    setReportPostId(item.id);
     setReportReason('');
     onReportOpen();
-  };
+  }, [onReportOpen]);
 
   const handleReport = async () => {
     if (!reportPostId || !reportReason.trim()) {
@@ -287,7 +288,7 @@ export function FeedPage() {
     }
   };
 
-  const handleDeletePost = async (item: FeedItem) => {
+  const handleDeletePost = useCallback(async (item: FeedItem) => {
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
@@ -296,11 +297,11 @@ export function FeedPage() {
       logError('Failed to delete post', err);
       toast.error(t('toast.delete_failed'));
     }
-  };
+  }, [toast, t]);
 
   /* ───────── Poll Voting ───────── */
 
-  const handleVotePoll = async (pollId: number, optionId: number) => {
+  const handleVotePoll = useCallback(async (pollId: number, optionId: number) => {
     try {
       const response = await api.post<PollData>(`/v2/feed/polls/${pollId}/vote`, {
         option_id: optionId,
@@ -319,7 +320,7 @@ export function FeedPage() {
       logError('Failed to vote', err);
       toast.error(t('toast.vote_failed'));
     }
-  };
+  }, [toast, t]);
 
   /* ───────── New-posts banner dismiss ───────── */
 
@@ -519,11 +520,11 @@ export function FeedPage() {
                   <motion.div key={`${item.type}-${item.id}`} variants={itemVariants} layout>
                     <FeedCard
                       item={item}
-                      onToggleLike={() => handleToggleLike(item)}
-                      onHidePost={() => handleHidePost(item.id, item.type)}
-                      onMuteUser={() => handleMuteUser(getAuthor(item).id)}
-                      onReportPost={() => openReportModal(item.id)}
-                      onDeletePost={() => handleDeletePost(item)}
+                      onToggleLike={handleToggleLike}
+                      onHidePost={handleHidePost}
+                      onMuteUser={handleMuteUser}
+                      onReportPost={openReportModal}
+                      onDeletePost={handleDeletePost}
                       onVotePoll={handleVotePoll}
                       isAuthenticated={isAuthenticated}
                       currentUserId={user?.id}

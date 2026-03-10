@@ -24,7 +24,6 @@ import {
   Input,
   Textarea,
   Switch,
-  Chip,
   Spinner,
   useDisclosure,
 } from '@heroui/react';
@@ -41,7 +40,6 @@ import {
   FolderTree,
   RefreshCw,
   ArrowLeft,
-  Plus,
   Trash2,
   MapPin,
   CheckCircle,
@@ -57,7 +55,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { ComposeHub } from '@/components/compose';
-import { LoadingScreen, EmptyState } from '@/components/feedback';
+import { LoadingScreen } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -334,7 +332,7 @@ export function GroupDetailPage() {
     try {
       await api.post(`/v2/feed/users/${userId}/mute`);
       setFeedItems((prev) => prev.filter((fi) => {
-        const author = fi.author ?? fi.user;
+        const author = fi.author ?? (fi as unknown as Record<string, unknown>).user as FeedItem['author'];
         return !author || author.id !== userId;
       }));
       toast.success(t('toast.user_muted', 'User muted'));

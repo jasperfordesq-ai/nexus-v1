@@ -446,10 +446,19 @@ class ApiClient {
 
       // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
       const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
+      const errorMessage = data.error ?? firstError?.message ?? data.message ?? 'Request failed';
+      const errorCode = data.code ?? firstError?.code ?? `HTTP_${response.status}`;
+
+      // Dispatch global error for server errors (5xx) so useApiErrorHandler can show toasts.
+      // Client errors (4xx) are typically handled by the calling component.
+      if (response.status >= 500) {
+        this.dispatchApiError(errorMessage, errorCode, endpoint);
+      }
+
       return {
         success: false,
-        error: data.error ?? firstError?.message ?? data.message ?? 'Request failed',
-        code: data.code ?? firstError?.code ?? `HTTP_${response.status}`,
+        error: errorMessage,
+        code: errorCode,
       };
     } catch (error) {
       clearTimeout(timeoutId);

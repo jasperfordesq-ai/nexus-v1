@@ -476,18 +476,24 @@ export function StrategicPlanPage() {
                         q3: null,
                         q4: 'launch' as const,
                       },
-                    ].map((row, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell className="text-theme-muted font-medium">{t(`strategic_plan.roadmap_activity_${idx}`)}</TableCell>
-                        {([row.q1, row.q2, row.q3, row.q4] as (typeof row.q1)[]).map((cell, cellIdx) => (
-                          <TableCell key={cellIdx} className="text-center">
-                            {cell ? <RoadmapBadge label={t(`strategic_plan.badge_${cell}`)} type={cell} /> : (
-                              <span className="text-theme-subtle">&mdash;</span>
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
+                    ].map((row, idx) => {
+                      const qCell = (cell: RoadmapBadgeProps['type'] | null, key: string) => (
+                        <TableCell key={key} className="text-center">
+                          {cell ? <RoadmapBadge label={t(`strategic_plan.badge_${cell}`)} type={cell} /> : (
+                            <span className="text-theme-subtle">&mdash;</span>
+                          )}
+                        </TableCell>
+                      );
+                      return (
+                        <TableRow key={idx}>
+                          <TableCell className="text-theme-muted font-medium">{t(`strategic_plan.roadmap_activity_${idx}`)}</TableCell>
+                          {qCell(row.q1, 'q1')}
+                          {qCell(row.q2, 'q2')}
+                          {qCell(row.q3, 'q3')}
+                          {qCell(row.q4, 'q4')}
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </GlassCard>

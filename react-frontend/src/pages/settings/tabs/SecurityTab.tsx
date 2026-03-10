@@ -28,7 +28,6 @@ import {
   ShieldOff,
   Copy,
   CheckCircle,
-  Info,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { BiometricSettings } from '@/components/security/BiometricSettings';

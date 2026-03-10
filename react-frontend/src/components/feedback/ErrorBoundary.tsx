@@ -54,7 +54,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   handleGoHome = () => {
-    window.location.href = '/';
+    // Preserve tenant slug from current URL (e.g., /hour-timebank/dashboard → /hour-timebank/)
+    const match = window.location.pathname.match(/^\/([^/]+)\//);
+    window.location.href = match ? `/${match[1]}/` : '/';
   };
 
   handleTryAgain = () => {

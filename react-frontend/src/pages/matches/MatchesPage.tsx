@@ -367,7 +367,7 @@ export function MatchesPage() {
 
                       {/* Actions */}
                       <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                        <Link to={tenantPath(detailPath)}>
+                        <Link to={tenantPath(detailPath)} aria-label="View match details">
                           <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-primary transition-colors mt-2" />
                         </Link>
                         {match.source_type === 'listing' && (

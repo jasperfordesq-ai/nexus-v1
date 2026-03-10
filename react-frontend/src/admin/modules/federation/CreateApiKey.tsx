@@ -13,7 +13,8 @@ import { Card, CardBody, CardHeader, Input, Button, Checkbox } from '@heroui/rea
 import { Key, ArrowLeft, Copy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
+import { logError } from '@/lib/logger';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -23,6 +24,7 @@ export function CreateApiKey() {
   usePageTitle('Admin - Create API Key');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  const toast = useToast();
   const [name, setName] = useState('');
   const [scopes, setScopes] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -52,7 +54,10 @@ export function CreateApiKey() {
           navigate(tenantPath('/admin/federation/api-keys'));
         }
       }
-    } catch { /* empty */ }
+    } catch (err) {
+      logError('CreateApiKey: failed to create API key', err);
+      toast.error('Failed to create API key. Please try again.');
+    }
     setSaving(false);
   };
 

@@ -412,6 +412,7 @@ export function IdeationPage() {
               variant="light"
               onPress={() => setSearchQuery('')}
               className="p-0.5 rounded hover:bg-[var(--color-surface-hover)] min-w-0 w-auto h-auto"
+              aria-label={t('search.clear', 'Clear search')}
             >
               <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
             </Button>

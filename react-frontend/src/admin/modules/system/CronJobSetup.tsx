@@ -7,6 +7,10 @@
  * Cron Job Setup
  * Platform setup guide for configuring cron job execution
  * Parity: PHP CronJobController::setup()
+ *
+ * SECURITY: The CRON_KEY is a server-side secret and must NEVER be exposed
+ * in the client bundle. All examples use YOUR_CRON_KEY placeholder.
+ * Admins must retrieve the actual key from the server .env file.
  */
 
 import { useState } from 'react';
@@ -23,14 +27,19 @@ import {
   Server,
   Copy,
   CheckCircle,
-  Eye,
-  EyeOff,
   PlayCircle,
   AlertTriangle,
+  Info,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Constants — only the public API URL is safe to derive client-side
+// ─────────────────────────────────────────────────────────────────────────────
+
+const KEY_PLACEHOLDER = 'YOUR_CRON_KEY';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
@@ -39,19 +48,10 @@ import { PageHeader } from '../../components';
 export function CronJobSetup() {
   usePageTitle('Admin - Cron Job Setup');
   const toast = useToast();
-  const [showKey, setShowKey] = useState(false);
   const [testing, setTesting] = useState(false);
 
-  // VITE_CRON_KEY must be set in .env — shown here for admin reference only
-  const CRON_KEY = import.meta.env.VITE_CRON_KEY || '';
   const API_URL = import.meta.env.VITE_API_BASE?.replace('/api', '') || 'https://api.project-nexus.ie';
   const CRON_URL = `${API_URL}/cron.php`;
-
-  const obfuscatedKey = !CRON_KEY
-    ? '(VITE_CRON_KEY not configured)'
-    : showKey
-      ? CRON_KEY
-      : `${CRON_KEY.slice(0, 4)}${'*'.repeat(20)}${CRON_KEY.slice(-4)}`;
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -61,8 +61,6 @@ export function CronJobSetup() {
   const handleTestConnection = async () => {
     setTesting(true);
     try {
-      // Trigger a test cron run (if your API supports it)
-      // For now, just show a success message
       await new Promise((resolve) => setTimeout(resolve, 1500));
       toast.success('Test connection successful');
     } catch {
@@ -78,37 +76,27 @@ export function CronJobSetup() {
         description="Configure your platform to execute scheduled tasks"
       />
 
-      {/* CRON_KEY Display */}
+      {/* CRON_KEY Info */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-2">
           <Server size={18} className="text-warning" />
           <span className="text-lg font-semibold">Cron Authentication Key</span>
         </CardHeader>
         <CardBody className="space-y-3">
-          <div className="flex items-center gap-3">
-            <Code className="flex-1 break-all">{obfuscatedKey}</Code>
-            <Button
-              size="sm"
-              variant="flat"
-              isIconOnly
-              aria-label={showKey ? "Hide key" : "Show key"}
-              onPress={() => setShowKey(!showKey)}
-            >
-              {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
-            </Button>
-            <Button
-              size="sm"
-              color="primary"
-              variant="flat"
-              startContent={<Copy size={16} />}
-              onPress={() => copyToClipboard(CRON_KEY, 'CRON_KEY')}
-            >
-              Copy
-            </Button>
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-start gap-2">
+            <Info size={16} className="text-primary mt-0.5 shrink-0" />
+            <div className="text-sm text-default-700 dark:text-default-300">
+              <p className="font-medium mb-1">
+                Your CRON_KEY is configured in the server&apos;s <Code className="text-xs">.env</Code> file.
+              </p>
+              <p className="text-xs text-default-500">
+                For security, the key is not exposed to the browser. Log in to your server
+                and check the <Code className="text-xs">CRON_KEY</Code> variable in your <Code className="text-xs">.env</Code> file.
+                Replace <Code className="text-xs">{KEY_PLACEHOLDER}</Code> in the commands below with
+                your actual key.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-default-500">
-            Keep this key secure. It authenticates cron execution requests.
-          </p>
         </CardBody>
       </Card>
 
@@ -163,7 +151,7 @@ export function CronJobSetup() {
                     2. Add New Cron Job
                   </h3>
                   <p className="text-sm text-default-600 mb-2">
-                    Click "Add New Cron Job" and configure:
+                    Click &quot;Add New Cron Job&quot; and configure:
                   </p>
                   <ul className="text-sm text-default-600 space-y-1 ml-4">
                     <li>• <strong>Common Settings:</strong> Every 5 minutes</li>
@@ -179,7 +167,7 @@ export function CronJobSetup() {
                   <h3 className="text-base font-semibold mb-2">3. Command</h3>
                   <div className="flex items-center gap-2 mb-2">
                     <Code className="flex-1 text-xs break-all">
-                      curl -H "X-Cron-Key: {CRON_KEY}" {CRON_URL}
+                      curl -H &quot;X-Cron-Key: {KEY_PLACEHOLDER}&quot; {CRON_URL}
                     </Code>
                     <Button
                       size="sm"
@@ -188,7 +176,7 @@ export function CronJobSetup() {
                       aria-label="Copy cURL command"
                       onPress={() =>
                         copyToClipboard(
-                          `curl -H "X-Cron-Key: ${CRON_KEY}" ${CRON_URL}`,
+                          `curl -H "X-Cron-Key: ${KEY_PLACEHOLDER}" ${CRON_URL}`,
                           'Command'
                         )
                       }
@@ -201,7 +189,7 @@ export function CronJobSetup() {
                 <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-start gap-2">
                   <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
                   <p className="text-xs text-warning-700 dark:text-warning-300">
-                    Replace {'{CRON_KEY}'} with your actual key from above
+                    Replace {KEY_PLACEHOLDER} with your actual CRON_KEY from the server .env file
                   </p>
                 </div>
               </div>
@@ -223,7 +211,7 @@ export function CronJobSetup() {
                   <h3 className="text-base font-semibold mb-2">
                     2. Schedule Pattern
                   </h3>
-                  <p className="text-sm text-default-600 mb-2">Choose "Schedule" and set:</p>
+                  <p className="text-sm text-default-600 mb-2">Choose &quot;Schedule&quot; and set:</p>
                   <Code className="block text-xs">rate(5 minutes)</Code>
                 </div>
 
@@ -233,7 +221,7 @@ export function CronJobSetup() {
                     <li>• <strong>Target Type:</strong> AWS API Gateway</li>
                     <li>• <strong>Method:</strong> GET</li>
                     <li>• <strong>URL:</strong> {CRON_URL}</li>
-                    <li>• <strong>Header:</strong> X-Cron-Key: {CRON_KEY}</li>
+                    <li>• <strong>Header:</strong> X-Cron-Key: {KEY_PLACEHOLDER}</li>
                   </ul>
                 </div>
 
@@ -253,7 +241,7 @@ exports.handler = async (event) => {
     path: '/cron.php',
     method: 'GET',
     headers: {
-      'X-Cron-Key': '${CRON_KEY}'
+      'X-Cron-Key': '${KEY_PLACEHOLDER}'
     }
   };
 
@@ -298,7 +286,7 @@ exports.handler = async (event) => {
                     <li>• <strong>URL:</strong> {CRON_URL}</li>
                     <li>• <strong>HTTP Method:</strong> GET</li>
                     <li>• <strong>Header Name:</strong> X-Cron-Key</li>
-                    <li>• <strong>Header Value:</strong> {obfuscatedKey}</li>
+                    <li>• <strong>Header Value:</strong> {KEY_PLACEHOLDER}</li>
                   </ul>
                 </div>
 
@@ -308,9 +296,9 @@ exports.handler = async (event) => {
                   </h3>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
-                      gcloud scheduler jobs create http nexus-cron --schedule="*/5 * *
-                      * *" --uri="{CRON_URL}" --http-method=GET
-                      --headers="X-Cron-Key={CRON_KEY}"
+                      gcloud scheduler jobs create http nexus-cron --schedule=&quot;*/5 * *
+                      * *&quot; --uri=&quot;{CRON_URL}&quot; --http-method=GET
+                      --headers=&quot;X-Cron-Key={KEY_PLACEHOLDER}&quot;
                     </Code>
                     <Button
                       size="sm"
@@ -319,7 +307,7 @@ exports.handler = async (event) => {
                       aria-label="Copy gcloud command"
                       onPress={() =>
                         copyToClipboard(
-                          `gcloud scheduler jobs create http nexus-cron --schedule="*/5 * * * *" --uri="${CRON_URL}" --http-method=GET --headers="X-Cron-Key=${CRON_KEY}"`,
+                          `gcloud scheduler jobs create http nexus-cron --schedule="*/5 * * * *" --uri="${CRON_URL}" --http-method=GET --headers="X-Cron-Key=${KEY_PLACEHOLDER}"`,
                           'gcloud command'
                         )
                       }
@@ -343,7 +331,7 @@ exports.handler = async (event) => {
                   <h3 className="text-base font-semibold mb-2">2. Add Entry</h3>
                   <div className="flex items-center gap-2">
                     <Code className="flex-1 text-xs break-all">
-                      */5 * * * * curl -H "X-Cron-Key: {CRON_KEY}" {CRON_URL}
+                      */5 * * * * curl -H &quot;X-Cron-Key: {KEY_PLACEHOLDER}&quot; {CRON_URL}
                     </Code>
                     <Button
                       size="sm"
@@ -352,7 +340,7 @@ exports.handler = async (event) => {
                       aria-label="Copy crontab entry"
                       onPress={() =>
                         copyToClipboard(
-                          `*/5 * * * * curl -H "X-Cron-Key: ${CRON_KEY}" ${CRON_URL}`,
+                          `*/5 * * * * curl -H "X-Cron-Key: ${KEY_PLACEHOLDER}" ${CRON_URL}`,
                           'Crontab entry'
                         )
                       }
@@ -389,7 +377,7 @@ exports.handler = async (event) => {
     image: alpine:latest
     container_name: nexus-cron
     command: >
-      sh -c "echo '*/5 * * * * wget --header='X-Cron-Key: ${CRON_KEY}' -q -O- ${CRON_URL}' > /etc/crontabs/root && crond -f"
+      sh -c "echo '*/5 * * * * wget --header='X-Cron-Key: ${KEY_PLACEHOLDER}' -q -O- ${CRON_URL}' > /etc/crontabs/root && crond -f"
     restart: unless-stopped`}
                   </pre>
                 </div>
@@ -417,7 +405,7 @@ exports.handler = async (event) => {
         <CardBody className="space-y-2">
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
-            <span className="text-sm">CRON_KEY is set in your environment</span>
+            <span className="text-sm">CRON_KEY is set in your server .env file</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />

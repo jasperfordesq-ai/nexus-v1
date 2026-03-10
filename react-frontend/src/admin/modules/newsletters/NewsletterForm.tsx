@@ -22,6 +22,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { logError } from '@/lib/logger';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
@@ -185,7 +186,10 @@ export function NewsletterForm() {
               } catch { /* ignore */ }
             }
           }
-        } catch { /* empty */ }
+        } catch (err) {
+          logError('NewsletterForm: failed to load newsletter data', err);
+          toast.error('Failed to load newsletter. Please try again.');
+        }
         setLoading(false);
       })();
     }

@@ -977,7 +977,7 @@ export function ChallengeDetailPage() {
               {t('outcomes.title')}
             </h2>
             {isAdmin && (
-              <Button variant="flat" size="sm" onPress={onOutcomeOpen}>
+              <Button variant="flat" size="sm" onPress={onOutcomeOpen} aria-label={t('outcomes.edit', 'Edit outcomes')}>
                 <Edit3 className="w-4 h-4" />
               </Button>
             )}
@@ -1301,6 +1301,7 @@ export function ChallengeDetailPage() {
                       key={draft.id}
                       role="button"
                       tabIndex={0}
+                      aria-label={draft.title || t('ideas.untitled_draft')}
                       className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
                         editingDraftId === draft.id
                           ? 'bg-primary/10 border border-primary/30'
