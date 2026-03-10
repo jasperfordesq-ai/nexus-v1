@@ -9,14 +9,18 @@
  * Wired to adminPages.get/create/update.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Spinner, Switch } from '@heroui/react';
 import { FileText, ArrowLeft, Save, Menu, ExternalLink } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
-import { PageHeader, RichTextEditor } from '../../components';
+import { PageHeader } from '../../components';
+
+const RichTextEditor = lazy(() =>
+  import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
+);
 
 interface PageFormData {
   title: string;
@@ -216,13 +220,15 @@ export function PageBuilder() {
                 handleChange('slug', toSlug(v));
               }}
             />
-            <RichTextEditor
-              label="Page Content"
-              placeholder="Write your page content here..."
-              value={formData.content}
-              onChange={(html) => handleChange('content', html)}
-              isDisabled={saving}
-            />
+            <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+              <RichTextEditor
+                label="Page Content"
+                placeholder="Write your page content here..."
+                value={formData.content}
+                onChange={(html) => handleChange('content', html)}
+                isDisabled={saving}
+              />
+            </Suspense>
             <Input
               label="Meta Description"
               placeholder="SEO meta description..."

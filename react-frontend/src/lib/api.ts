@@ -27,6 +27,15 @@ import { captureApiCall } from '@/lib/sentry';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+// Auth tokens use localStorage (standard SPA pattern, not HttpOnly cookies).
+// Security depends on strict Content-Security-Policy headers on the server:
+//   Content-Security-Policy: default-src 'self'; script-src 'self';
+//     connect-src 'self' https://api.project-nexus.ie wss://api.project-nexus.ie;
+//     img-src 'self' data: blob: https:;
+//   X-Content-Type-Options: nosniff
+//   X-Frame-Options: DENY
+//   Referrer-Policy: strict-origin-when-cross-origin
+// See docs/DEPLOYMENT.md for the full nginx/Cloudflare CSP configuration.
 const TOKEN_KEY = 'nexus_access_token';
 const REFRESH_TOKEN_KEY = 'nexus_refresh_token';
 const TENANT_ID_KEY = 'nexus_tenant_id';

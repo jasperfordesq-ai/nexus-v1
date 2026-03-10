@@ -8,8 +8,8 @@
  * voice input, link preview, character count, and draft persistence.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button, Avatar } from '@heroui/react';
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { Button, Avatar, Spinner } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
@@ -17,8 +17,11 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { ComposeEditor } from '../shared/ComposeEditor';
 import type { ComposeEditorHandle } from '../shared/ComposeEditor';
+
+const ComposeEditor = lazy(() =>
+  import('../shared/ComposeEditor').then((m) => ({ default: m.ComposeEditor })),
+);
 import { MultiImageUploader } from '../shared/MultiImageUploader';
 import { EmojiPicker } from '../shared/EmojiPicker';
 import { VoiceInput } from '../shared/VoiceInput';
@@ -180,14 +183,16 @@ export function PostTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
           isBordered
         />
         <div className="flex-1 min-w-0">
-          <ComposeEditor
-            ref={editorRef}
-            value={draft.htmlContent}
-            onChange={handleHtmlChange}
-            onPlainTextChange={handlePlainTextChange}
-            placeholder={t('whats_on_your_mind')}
-            maxLength={MAX_CONTENT_CHARS}
-          />
+          <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+            <ComposeEditor
+              ref={editorRef}
+              value={draft.htmlContent}
+              onChange={handleHtmlChange}
+              onPlainTextChange={handlePlainTextChange}
+              placeholder={t('whats_on_your_mind')}
+              maxLength={MAX_CONTENT_CHARS}
+            />
+          </Suspense>
           <CharacterCount current={draft.plainText.length} max={MAX_CONTENT_CHARS} />
         </div>
       </div>

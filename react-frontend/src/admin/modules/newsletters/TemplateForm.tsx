@@ -10,7 +10,7 @@
  * Parity: PHP Admin newsletter template form.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Card,
@@ -36,7 +36,11 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import { PageHeader, RichTextEditor } from '../../components';
+import { PageHeader } from '../../components';
+
+const RichTextEditor = lazy(() =>
+  import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
+);
 
 const MERGE_VARIABLES = [
   '{{first_name}}',
@@ -355,13 +359,15 @@ export function TemplateForm() {
                 <h3 className="text-lg font-semibold">Content</h3>
               </CardHeader>
               <CardBody className="gap-4">
-                <RichTextEditor
-                  label="Template Content"
-                  placeholder="Design your email template content..."
-                  value={content}
-                  onChange={setContent}
-                  isDisabled={submitting}
-                />
+                <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+                  <RichTextEditor
+                    label="Template Content"
+                    placeholder="Design your email template content..."
+                    value={content}
+                    onChange={setContent}
+                    isDisabled={submitting}
+                  />
+                </Suspense>
 
                 <Divider />
 

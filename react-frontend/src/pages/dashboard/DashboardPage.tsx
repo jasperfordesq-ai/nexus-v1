@@ -17,7 +17,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Chip, Progress } from '@heroui/react';
+import { Button, Avatar, Chip, Progress, Skeleton } from '@heroui/react';
 import {
   Clock,
   ListTodo,
@@ -494,11 +494,11 @@ export function DashboardPage() {
                 </div>
 
                 {isLoading ? (
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="h-16 bg-theme-elevated rounded-lg" />
-                      </div>
+                  <div aria-label="Loading listings" aria-busy="true" className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <Skeleton key={i} className="rounded-lg">
+                        <div className="h-16 rounded-lg bg-default-300" />
+                      </Skeleton>
                     ))}
                   </div>
                 ) : stats.recentListings.length > 0 ? (
@@ -563,13 +563,13 @@ export function DashboardPage() {
                   </div>
 
                   {activityLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse flex items-center gap-3 p-3">
-                          <div className="w-10 h-10 rounded-full bg-theme-elevated shrink-0" />
+                    <div aria-label="Loading activity" aria-busy="true" className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="flex items-center gap-3 p-3">
+                          <Skeleton className="rounded-full shrink-0"><div className="w-10 h-10 rounded-full bg-default-300" /></Skeleton>
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-theme-elevated rounded w-3/4" />
-                            <div className="h-3 bg-theme-elevated rounded w-1/2" />
+                            <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-3/4" /></Skeleton>
+                            <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/2" /></Skeleton>
                           </div>
                         </div>
                       ))}
@@ -669,11 +669,11 @@ export function DashboardPage() {
                     </Link>
                   </div>
                   {isLoading ? (
-                    <div className="space-y-2">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse flex items-center justify-between p-2">
-                          <div className="h-4 bg-theme-elevated rounded w-2/3" />
-                          <div className="h-5 bg-theme-elevated rounded-full w-8" />
+                    <div aria-label="Loading endorsements" aria-busy="true" className="space-y-2">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="flex items-center justify-between p-2">
+                          <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton>
+                          <Skeleton className="rounded-full"><div className="h-5 w-8 rounded-full bg-default-300" /></Skeleton>
                         </div>
                       ))}
                     </div>
@@ -715,11 +715,11 @@ export function DashboardPage() {
                     </div>
 
                     {suggestedLoading ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                        {[1, 2, 3, 4].map((i) => (
-                          <div key={i} className="animate-pulse">
-                            <div className="h-24 bg-theme-elevated rounded-lg" />
-                          </div>
+                      <div aria-label="Loading suggestions" aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <Skeleton key={i} className="rounded-lg">
+                            <div className="h-24 rounded-lg bg-default-300" />
+                          </Skeleton>
                         ))}
                       </div>
                     ) : stats.suggestedListings.length > 0 ? (
@@ -779,13 +779,13 @@ export function DashboardPage() {
                   </div>
 
                   {groupsLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-theme-elevated shrink-0" />
+                    <div aria-label="Loading groups" aria-busy="true" className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <Skeleton className="rounded-lg shrink-0"><div className="w-10 h-10 rounded-lg bg-default-300" /></Skeleton>
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-theme-elevated rounded w-2/3" />
-                            <div className="h-3 bg-theme-elevated rounded w-1/3" />
+                            <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton>
+                            <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/3" /></Skeleton>
                           </div>
                         </div>
                       ))}
@@ -851,13 +851,13 @@ export function DashboardPage() {
                   </div>
 
                   {eventsLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="animate-pulse flex items-center gap-3">
-                          <div className="w-12 h-14 rounded-lg bg-theme-elevated shrink-0" />
+                    <div aria-label="Loading events" aria-busy="true" className="space-y-3">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <Skeleton className="rounded-lg shrink-0"><div className="w-12 h-14 rounded-lg bg-default-300" /></Skeleton>
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-theme-elevated rounded w-3/4" />
-                            <div className="h-3 bg-theme-elevated rounded w-1/2" />
+                            <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-3/4" /></Skeleton>
+                            <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/2" /></Skeleton>
                           </div>
                         </div>
                       ))}
@@ -922,10 +922,10 @@ export function DashboardPage() {
                     {t('sections.your_progress')}
                   </h2>
                   {isLoading ? (
-                    <div className="space-y-4 animate-pulse">
-                      <div className="h-4 bg-theme-elevated rounded w-1/2" />
-                      <div className="h-2 bg-theme-elevated rounded-full" />
-                      <div className="h-4 bg-theme-elevated rounded w-1/3" />
+                    <div aria-label="Loading progress" aria-busy="true" className="space-y-4">
+                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/2" /></Skeleton>
+                      <Skeleton className="rounded-full"><div className="h-2 rounded-full bg-default-200" /></Skeleton>
+                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-200 w-1/3" /></Skeleton>
                     </div>
                   ) : stats.gamification ? (
                     <div className="space-y-4">
@@ -1029,7 +1029,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
         </div>
         <div className="text-theme-muted text-sm">{label}</div>
         {isLoading ? (
-          <div className="h-8 w-16 bg-theme-elevated rounded animate-pulse mt-1" />
+          <Skeleton className="rounded-lg mt-1"><div className="h-8 w-16 rounded-lg bg-default-300" /></Skeleton>
         ) : (
           <div className="text-2xl font-bold text-theme-primary">{value}</div>
         )}
@@ -1100,9 +1100,11 @@ function PendingReviewsCard() {
           <Star className="w-5 h-5 text-amber-500" aria-hidden="true" />
           {t('sections.pending_reviews')}
         </h2>
-        <div className="animate-pulse space-y-3">
-          {[1, 2].map((i) => (
-            <div key={i} className="h-16 bg-theme-elevated rounded-lg" />
+        <div aria-label="Loading pending reviews" aria-busy="true" className="space-y-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <Skeleton key={i} className="rounded-lg">
+              <div className="h-16 rounded-lg bg-default-300" />
+            </Skeleton>
           ))}
         </div>
       </GlassCard>

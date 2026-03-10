@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Tabs, Tab } from '@heroui/react';
+import { Button, Tabs, Tab, Skeleton } from '@heroui/react';
 import {
   Wallet,
   ArrowUpRight,
@@ -280,7 +280,9 @@ export function WalletPage() {
             <p className="text-theme-muted text-sm mb-2">{t('your_balance')}</p>
 
             {isLoading ? (
-              <div className="h-12 w-32 mx-auto bg-theme-elevated rounded animate-pulse" />
+              <Skeleton className="rounded-lg mx-auto">
+                <div className="h-12 w-32 rounded-lg bg-default-300 mx-auto" />
+              </Skeleton>
             ) : (
               <h1 className="text-3xl sm:text-5xl font-bold text-theme-primary mb-2">
                 {balance?.balance ?? 0}
@@ -398,18 +400,20 @@ export function WalletPage() {
           {/* Transactions List */}
           <div className="mt-6 space-y-3">
             {isLoading ? (
-              [1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="animate-pulse p-4 rounded-lg bg-theme-elevated">
+              <div aria-label="Loading transactions" aria-busy="true" className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="p-4 rounded-lg bg-theme-elevated">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-theme-hover" />
-                    <div className="flex-1">
-                      <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />
-                      <div className="h-3 bg-theme-hover rounded w-1/4" />
+                    <Skeleton className="rounded-full flex-shrink-0"><div className="w-10 h-10 rounded-full bg-default-300" /></Skeleton>
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/3" /></Skeleton>
+                      <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/4" /></Skeleton>
                     </div>
                   </div>
                 </div>
-              ))
-            ) : filteredTransactions.length === 0 ? (
+                ))}
+              </div>
+              ) : filteredTransactions.length === 0 ? (
               <EmptyState
                 icon={<Wallet className="w-12 h-12" />}
                 title={t('no_transactions')}
@@ -482,7 +486,7 @@ function StatCard({ icon, label, value, color, isLoading }: StatCardProps) {
       </div>
       <div className="text-theme-subtle text-xs mb-1">{label}</div>
       {isLoading ? (
-        <div className="h-6 w-12 mx-auto bg-theme-hover rounded animate-pulse" />
+        <Skeleton className="rounded-lg mx-auto"><div className="h-6 w-12 rounded-lg bg-default-300 mx-auto" /></Skeleton>
       ) : (
         <div className="text-xl font-bold text-theme-primary">{value}</div>
       )}
