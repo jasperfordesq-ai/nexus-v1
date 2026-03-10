@@ -326,45 +326,41 @@ export function MemberReportsPage() {
           <UserCheck size={18} className="text-primary" />
           <h3 className="font-semibold">Retention Cohorts</h3>
         </CardHeader>
-        <CardBody className="px-4 pb-4 overflow-x-auto">
-          {loading ? (
-            <div className="flex h-[300px] items-center justify-center"><Spinner /></div>
-          ) : cohorts.length > 0 ? (
-            <table className="w-full text-sm min-w-[600px]">
-              <thead>
-                <tr className="border-b border-divider text-left">
-                  <th className="pb-2 pr-4 font-medium text-default-500">Cohort</th>
-                  <th className="pb-2 pr-4 font-medium text-default-500 text-center">Initial</th>
-                  <th className="pb-2 pr-4 font-medium text-default-500 text-center">Month 1</th>
-                  <th className="pb-2 pr-4 font-medium text-default-500 text-center">Month 2</th>
-                  <th className="pb-2 pr-4 font-medium text-default-500 text-center">Month 3</th>
-                  <th className="pb-2 pr-4 font-medium text-default-500 text-center">Month 6</th>
-                  <th className="pb-2 font-medium text-default-500 text-center">Month 12</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cohorts.map((c) => (
-                  <tr key={c.cohort} className="border-b border-divider last:border-0">
-                    <td className="py-2.5 pr-4 font-medium text-foreground">{c.cohort}</td>
-                    <td className="py-2.5 pr-4 text-center">{c.initial}</td>
-                    {[c.month_1, c.month_2, c.month_3, c.month_6, c.month_12].map((val, j) => {
-                      const pct = c.initial > 0 ? (val / c.initial) * 100 : 0;
-                      const color =
-                        pct >= 60 ? 'text-success' : pct >= 30 ? 'text-warning' : 'text-danger';
-                      return (
-                        <td key={j} className={`py-2.5 pr-4 text-center font-medium ${color}`}>
-                          {pct.toFixed(0)}%
-                          <span className="text-xs text-default-400 ml-1">({val})</span>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="py-8 text-center text-sm text-default-400">No retention data available</p>
-          )}
+        <CardBody className="px-4 pb-4">
+          <Table aria-label="Retention cohorts" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Cohort</TableColumn>
+              <TableColumn className="text-center">Initial</TableColumn>
+              <TableColumn className="text-center">Month 1</TableColumn>
+              <TableColumn className="text-center">Month 2</TableColumn>
+              <TableColumn className="text-center">Month 3</TableColumn>
+              <TableColumn className="text-center">Month 6</TableColumn>
+              <TableColumn className="text-center">Month 12</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent="No retention data available"
+              isLoading={loading}
+              loadingContent={<Spinner />}
+            >
+              {cohorts.map((c, i) => (
+                <TableRow key={c.cohort}>
+                  <TableCell className="font-medium text-foreground">{c.cohort}</TableCell>
+                  <TableCell className="text-center">{c.initial}</TableCell>
+                  {[c.month_1, c.month_2, c.month_3, c.month_6, c.month_12].map((val, j) => {
+                    const pct = c.initial > 0 ? (val / c.initial) * 100 : 0;
+                    const color =
+                      pct >= 60 ? 'text-success' : pct >= 30 ? 'text-warning' : 'text-danger';
+                    return (
+                      <TableCell key={j} className={`text-center font-medium ${color}`}>
+                        {pct.toFixed(0)}%
+                        <span className="text-xs text-default-400 ml-1">({val})</span>
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
     );
@@ -458,47 +454,41 @@ export function MemberReportsPage() {
           <h3 className="font-semibold">Top Contributors</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          {loading ? (
-            <div className="flex h-48 items-center justify-center"><Spinner /></div>
-          ) : contributors.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-divider text-left">
-                    <th className="pb-2 pr-4 font-medium text-default-500">Rank</th>
-                    <th className="pb-2 pr-4 font-medium text-default-500">Member</th>
-                    <th className="pb-2 pr-4 font-medium text-default-500 text-right">Given</th>
-                    <th className="pb-2 pr-4 font-medium text-default-500 text-right">Received</th>
-                    <th className="pb-2 pr-4 font-medium text-default-500 text-right">Transactions</th>
-                    <th className="pb-2 font-medium text-default-500 text-right">Listings</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {contributors.map((c, i) => (
-                    <tr key={c.id} className="border-b border-divider last:border-0">
-                      <td className="py-2.5 pr-4">
-                        <span className={`font-bold ${i < 3 ? 'text-warning' : 'text-default-400'}`}>
-                          {i + 1}
-                        </span>
-                      </td>
-                      <td className="py-2.5 pr-4">
-                        <div className="flex items-center gap-2">
-                          <Avatar size="sm" src={c.avatar_url ?? undefined} name={c.name} />
-                          <span className="font-medium text-foreground">{c.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-2.5 pr-4 text-right text-success font-medium">{c.hours_given?.toFixed(1)}</td>
-                      <td className="py-2.5 pr-4 text-right text-warning font-medium">{c.hours_received?.toFixed(1)}</td>
-                      <td className="py-2.5 pr-4 text-right text-primary">{c.transaction_count}</td>
-                      <td className="py-2.5 text-right text-default-600">{c.listings_count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="py-8 text-center text-sm text-default-400">No contributor data available</p>
-          )}
+          <Table aria-label="Top contributors" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Rank</TableColumn>
+              <TableColumn>Member</TableColumn>
+              <TableColumn className="text-right">Given</TableColumn>
+              <TableColumn className="text-right">Received</TableColumn>
+              <TableColumn className="text-right">Transactions</TableColumn>
+              <TableColumn className="text-right">Listings</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent="No contributor data available"
+              isLoading={loading}
+              loadingContent={<Spinner />}
+            >
+              {contributors.map((c, i) => (
+                <TableRow key={c.id}>
+                  <TableCell>
+                    <span className={`font-bold ${i < 3 ? 'text-warning' : 'text-default-400'}`}>
+                      {i + 1}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar size="sm" src={c.avatar_url ?? undefined} name={c.name} />
+                      <span className="font-medium text-foreground">{c.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right text-success font-medium">{c.hours_given?.toFixed(1)}</TableCell>
+                  <TableCell className="text-right text-warning font-medium">{c.hours_received?.toFixed(1)}</TableCell>
+                  <TableCell className="text-right text-primary">{c.transaction_count}</TableCell>
+                  <TableCell className="text-right text-default-600">{c.listings_count}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
     );

@@ -34,6 +34,12 @@ import {
   ModalFooter,
   Input,
   Spinner,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@heroui/react';
 import {
   ArrowLeftRight,
@@ -595,93 +601,96 @@ export function GroupExchangeDetailPage() {
           {t('detail.participants_heading', { count: exchange.participants.length })}
         </h2>
 
-        {exchange.participants.length === 0 ? (
-          <div className="text-center py-6">
-            <Users className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
-            <p className="text-theme-muted text-sm">{t('detail.no_participants')}</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-theme-default">
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_name')}</th>
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_role')}</th>
-                  {exchange.split_type === 'custom' && (
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_hours')}</th>
-                  )}
-                  {exchange.split_type === 'weighted' && (
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_weight')}</th>
-                  )}
-                  <th className="text-center py-2 px-3 text-theme-muted font-medium">{t('detail.col_confirmed')}</th>
-                  {canAddParticipants && (
-                    <th className="text-right py-2 px-3 text-theme-muted font-medium" />
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {exchange.participants.map((p) => (
-                  <tr key={p.id} className="border-b border-theme-default/50">
-                    <td className="py-3 px-3">
-                      <div className="flex items-center gap-2">
-                        <Avatar
-                          src={resolveAvatarUrl(p.user_avatar)}
-                          name={p.user_name}
-                          size="sm"
-                        />
-                        <span className="text-theme-primary">
-                          {p.user_name}
-                          {p.user_id === user?.id && (
-                            <span className="text-xs text-theme-subtle ml-1">({t('detail.you')})</span>
-                          )}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-3">
-                      <Chip
-                        size="sm"
-                        variant="flat"
-                        color={p.role === 'provider' ? 'success' : 'warning'}
-                      >
-                        {p.role}
-                      </Chip>
-                    </td>
-                    {exchange.split_type === 'custom' && (
-                      <td className="py-3 px-3 text-right text-theme-primary">{Number(p.hours)}h</td>
-                    )}
-                    {exchange.split_type === 'weighted' && (
-                      <td className="py-3 px-3 text-right text-theme-primary">{Number(p.weight)}x</td>
-                    )}
-                    <td className="py-3 px-3 text-center">
-                      {p.confirmed ? (
-                        <span className="flex items-center justify-center gap-1 text-emerald-400 text-xs">
-                          <CheckCircle className="w-4 h-4" aria-hidden="true" />
-                          {t('detail.confirmed')}
-                        </span>
-                      ) : (
-                        <span className="text-theme-subtle text-xs">{t('detail.pending')}</span>
+        <Table
+          aria-label="Exchange participants"
+          shadow="sm"
+          isStriped
+          emptyContent={
+            <div className="text-center py-6">
+              <Users className="w-10 h-10 text-theme-subtle mx-auto mb-2" aria-hidden="true" />
+              <p className="text-theme-muted text-sm">{t('detail.no_participants')}</p>
+            </div>
+          }
+        >
+          <TableHeader>
+            <TableColumn>{t('detail.col_name')}</TableColumn>
+            <TableColumn>{t('detail.col_role')}</TableColumn>
+            {exchange.split_type === 'custom' ? (
+              <TableColumn className="text-right">{t('detail.col_hours')}</TableColumn>
+            ) : exchange.split_type === 'weighted' ? (
+              <TableColumn className="text-right">{t('detail.col_weight')}</TableColumn>
+            ) : (
+              <TableColumn>{' '}</TableColumn>
+            )}
+            <TableColumn className="text-center">{t('detail.col_confirmed')}</TableColumn>
+            {canAddParticipants ? (
+              <TableColumn className="text-right">{' '}</TableColumn>
+            ) : (
+              <TableColumn>{' '}</TableColumn>
+            )}
+          </TableHeader>
+          <TableBody>
+            {exchange.participants.map((p) => (
+              <TableRow key={p.id}>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Avatar
+                      src={resolveAvatarUrl(p.user_avatar)}
+                      name={p.user_name}
+                      size="sm"
+                    />
+                    <span className="text-theme-primary">
+                      {p.user_name}
+                      {p.user_id === user?.id && (
+                        <span className="text-xs text-theme-subtle ml-1">({t('detail.you')})</span>
                       )}
-                    </td>
-                    {canAddParticipants && (
-                      <td className="py-3 px-3 text-right">
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="flat"
-                          className="bg-red-500/20 text-red-400"
-                          onPress={() => handleRemoveParticipant(p.user_id)}
-                          aria-label={t('detail.remove_participant', { name: p.user_name })}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color={p.role === 'provider' ? 'success' : 'warning'}
+                  >
+                    {p.role}
+                  </Chip>
+                </TableCell>
+                <TableCell className={exchange.split_type === 'custom' || exchange.split_type === 'weighted' ? 'text-right text-theme-primary' : ''}>
+                  {exchange.split_type === 'custom'
+                    ? `${Number(p.hours)}h`
+                    : exchange.split_type === 'weighted'
+                    ? `${Number(p.weight)}x`
+                    : null}
+                </TableCell>
+                <TableCell className="text-center">
+                  {p.confirmed ? (
+                    <span className="flex items-center justify-center gap-1 text-emerald-400 text-xs">
+                      <CheckCircle className="w-4 h-4" aria-hidden="true" />
+                      {t('detail.confirmed')}
+                    </span>
+                  ) : (
+                    <span className="text-theme-subtle text-xs">{t('detail.pending')}</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  {canAddParticipants && (
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="flat"
+                      className="bg-red-500/20 text-red-400"
+                      onPress={() => handleRemoveParticipant(p.user_id)}
+                      aria-label={t('detail.remove_participant', { name: p.user_name })}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </GlassCard>
 
       {/* Hour Split Preview */}
@@ -692,30 +701,26 @@ export function GroupExchangeDetailPage() {
             {t('detail.hour_split')}
           </h2>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-theme-default">
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_provider')}</th>
-                  <th className="text-center py-2 px-3 text-theme-muted font-medium" aria-hidden="true" />
-                  <th className="text-left py-2 px-3 text-theme-muted font-medium">{t('detail.col_receiver')}</th>
-                  <th className="text-right py-2 px-3 text-theme-muted font-medium">{t('detail.col_hours')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {splitRows.map((row, idx) => (
-                  <tr key={idx} className="border-b border-theme-default/50">
-                    <td className="py-2 px-3 text-emerald-400">{row.providerName}</td>
-                    <td className="py-2 px-3 text-center text-theme-subtle">
-                      <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
-                    </td>
-                    <td className="py-2 px-3 text-amber-400">{row.receiverName}</td>
-                    <td className="py-2 px-3 text-right font-medium text-theme-primary">{row.amount}h</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table aria-label="Hour split" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>{t('detail.col_provider')}</TableColumn>
+              <TableColumn className="text-center" aria-hidden="true">{' '}</TableColumn>
+              <TableColumn>{t('detail.col_receiver')}</TableColumn>
+              <TableColumn className="text-right">{t('detail.col_hours')}</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {splitRows.map((row, idx) => (
+                <TableRow key={idx}>
+                  <TableCell className="text-emerald-400">{row.providerName}</TableCell>
+                  <TableCell className="text-center text-theme-subtle">
+                    <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
+                  </TableCell>
+                  <TableCell className="text-amber-400">{row.receiverName}</TableCell>
+                  <TableCell className="text-right font-medium text-theme-primary">{row.amount}h</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </GlassCard>
       )}
 
