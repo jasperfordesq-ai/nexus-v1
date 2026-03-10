@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Users, MessageSquare, DollarSign, FileText, Calendar, UsersRound, AlertCircle, Shield } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import { useTenant } from '@/contexts/TenantContext';
@@ -286,57 +286,41 @@ export default function FederationTenantFeatures() {
           <h3 className="text-lg font-semibold">Active Partnerships ({partnerships.length})</h3>
         </CardHeader>
         <CardBody>
-          {partnerships.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-default-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Partner</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Level</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Status</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Created</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {partnerships.map(partnership => (
-                    <tr key={partnership.id} className="border-b border-default-100">
-                      <td className="py-3 px-4">
-                        <Link
-                          to={tenantPath(`/admin/super/federation/tenant/${partnership.partner_id}/features`)}
-                          className="text-primary hover:underline"
-                        >
-                          {partnership.partner_name}
-                        </Link>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Chip
-                          size="sm"
-                          color={getLevelColor(partnership.level)}
-                          variant="flat"
-                        >
-                          L{partnership.level}
-                        </Chip>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Chip
-                          size="sm"
-                          color={getStatusColor(partnership.status)}
-                          variant="flat"
-                        >
-                          {partnership.status}
-                        </Chip>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-default-600">
-                        {new Date(partnership.created_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-sm text-default-500 text-center py-8">No active partnerships</p>
-          )}
+          <Table aria-label="Active partnerships" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Partner</TableColumn>
+              <TableColumn>Level</TableColumn>
+              <TableColumn>Status</TableColumn>
+              <TableColumn>Created</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No active partnerships">
+              {partnerships.map(partnership => (
+                <TableRow key={partnership.id}>
+                  <TableCell>
+                    <Link
+                      to={tenantPath(`/admin/super/federation/tenant/${partnership.partner_id}/features`)}
+                      className="text-primary hover:underline"
+                    >
+                      {partnership.partner_name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color={getLevelColor(partnership.level)} variant="flat">
+                      L{partnership.level}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color={getStatusColor(partnership.status)} variant="flat">
+                      {partnership.status}
+                    </Chip>
+                  </TableCell>
+                  <TableCell className="text-sm text-default-600">
+                    {new Date(partnership.created_at).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
     </div>

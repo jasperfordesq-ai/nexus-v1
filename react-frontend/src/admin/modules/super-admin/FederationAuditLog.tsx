@@ -18,6 +18,12 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@heroui/react';
 import { AlertTriangle, AlertCircle, Info, Search, X, FileText } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
@@ -304,86 +310,70 @@ export default function FederationAuditLog() {
           <h3 className="text-lg font-semibold">Audit Entries ({entries.length})</h3>
         </CardHeader>
         <CardBody>
-          {entries.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-default-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Level</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Action</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Category</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Actor</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Tenants</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">IP Address</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Time</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-default-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map(entry => (
-                    <tr key={entry.id} className="border-b border-default-100">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          {getLevelIcon(entry.level)}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="font-medium">{entry.action}</span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Chip
-                          size="sm"
-                          color={getCategoryColor(entry.category)}
-                          variant="flat"
-                        >
-                          {entry.category}
-                        </Chip>
-                      </td>
-                      <td className="py-3 px-4">
-                        {entry.actor_name ? (
-                          <div>
-                            <p className="font-medium text-sm">{entry.actor_name}</p>
-                            <p className="text-xs text-default-500">{entry.actor_email}</p>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-default-500">System</span>
+          <Table aria-label="Federation audit log" shadow="sm" isStriped>
+            <TableHeader>
+              <TableColumn>Level</TableColumn>
+              <TableColumn>Action</TableColumn>
+              <TableColumn>Category</TableColumn>
+              <TableColumn>Actor</TableColumn>
+              <TableColumn>Tenants</TableColumn>
+              <TableColumn>IP Address</TableColumn>
+              <TableColumn>Time</TableColumn>
+              <TableColumn>Actions</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No audit entries found">
+              {entries.map(entry => (
+                <TableRow key={entry.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {getLevelIcon(entry.level)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-medium">{entry.action}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Chip size="sm" color={getCategoryColor(entry.category)} variant="flat">
+                      {entry.category}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    {entry.actor_name ? (
+                      <div>
+                        <p className="font-medium text-sm">{entry.actor_name}</p>
+                        <p className="text-xs text-default-500">{entry.actor_email}</p>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-default-500">System</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {entry.tenant_a_name && (
+                      <div className="text-sm">
+                        <p>{entry.tenant_a_name}</p>
+                        {entry.tenant_b_name && (
+                          <p className="text-default-500">↔ {entry.tenant_b_name}</p>
                         )}
-                      </td>
-                      <td className="py-3 px-4">
-                        {entry.tenant_a_name && (
-                          <div className="text-sm">
-                            <p>{entry.tenant_a_name}</p>
-                            {entry.tenant_b_name && (
-                              <p className="text-default-500">↔ {entry.tenant_b_name}</p>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="text-sm font-mono text-default-600">
-                          {entry.ip_address || '-'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-default-600">
-                        {new Date(entry.created_at).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-4">
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => setSelectedEntry(entry)}
-                        >
-                          Details
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-sm text-default-500 text-center py-8">No audit entries found</p>
-          )}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm font-mono text-default-600">
+                      {entry.ip_address || '-'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-sm text-default-600">
+                    {new Date(entry.created_at).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    <Button size="sm" variant="flat" onPress={() => setSelectedEntry(entry)}>
+                      Details
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardBody>
       </Card>
 

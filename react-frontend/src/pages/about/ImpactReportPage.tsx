@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
+import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   FileText,
   BookOpen,
@@ -329,38 +329,34 @@ export function ImpactReportPage() {
 
               {/* Activity Stats Table */}
               <GlassCard className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
-                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">{t('impact_report.activity_metric_header')}</th>
-                        <th className="px-6 py-4 text-right font-semibold text-theme-primary">{t('impact_report.activity_value_header')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-theme-default">
-                      {[
-                        { icon: Wallet, metric: t('impact_report.activity_metric_0'), value: t('impact_report.activity_value_0'), highlight: false },
-                        { icon: ArrowRightLeft, metric: t('impact_report.activity_metric_1'), value: t('impact_report.activity_value_1'), highlight: false },
-                        { icon: LogIn, metric: t('impact_report.activity_metric_2'), value: t('impact_report.activity_value_2'), highlight: false },
-                        { icon: Clock, metric: t('impact_report.activity_metric_3'), value: t('impact_report.activity_value_3'), highlight: true },
-                      ].map((row) => (
-                        <tr key={row.metric} className={row.highlight ? 'bg-emerald-500/5' : ''}>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="p-1.5 rounded-lg bg-emerald-500/10">
-                                <row.icon className="w-4 h-4 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
-                              </div>
-                              <span className="text-theme-muted">{row.metric}</span>
+                <Table aria-label="TBI activity statistics" shadow="none" isStriped>
+                  <TableHeader>
+                    <TableColumn>{t('impact_report.activity_metric_header')}</TableColumn>
+                    <TableColumn className="text-right">{t('impact_report.activity_value_header')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      { icon: Wallet, metric: t('impact_report.activity_metric_0'), value: t('impact_report.activity_value_0'), highlight: false },
+                      { icon: ArrowRightLeft, metric: t('impact_report.activity_metric_1'), value: t('impact_report.activity_value_1'), highlight: false },
+                      { icon: LogIn, metric: t('impact_report.activity_metric_2'), value: t('impact_report.activity_value_2'), highlight: false },
+                      { icon: Clock, metric: t('impact_report.activity_metric_3'), value: t('impact_report.activity_value_3'), highlight: true },
+                    ].map((row) => (
+                      <TableRow key={row.metric}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="p-1.5 rounded-lg bg-emerald-500/10">
+                              <row.icon className="w-4 h-4 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                             </div>
-                          </td>
-                          <td className={`px-6 py-4 text-right font-semibold ${row.highlight ? 'text-emerald-600 dark:text-emerald-400' : 'text-theme-primary'}`}>
-                            {row.value}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                            <span className="text-theme-muted">{row.metric}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className={`text-right font-semibold ${row.highlight ? 'text-emerald-600 dark:text-emerald-400' : 'text-theme-primary'}`}>
+                          {row.value}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </GlassCard>
 
               <p className="text-xs text-theme-subtle leading-relaxed">
@@ -486,34 +482,30 @@ export function ImpactReportPage() {
                 <div className="p-4 sm:p-6 border-b border-theme-default">
                   <h3 className="text-base font-semibold text-theme-primary">{t('impact_report.sroi_breakdown_heading')}</h3>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
-                        <th className="px-6 py-3 text-left font-semibold text-theme-primary">{t('impact_report.sroi_component_header')}</th>
-                        <th className="px-6 py-3 text-right font-semibold text-theme-primary">{t('impact_report.sroi_value_header')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-theme-default">
-                      <tr>
-                        <td className="px-6 py-3 text-theme-muted">{t('impact_report.sroi_total_investment')}</td>
-                        <td className="px-6 py-3 text-right font-semibold text-theme-primary">&euro;50,000</td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-3 text-theme-muted">{t('impact_report.sroi_total_present_value')}</td>
-                        <td className="px-6 py-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">&euro;803,184</td>
-                      </tr>
-                      <tr className="bg-emerald-500/5">
-                        <td className="px-6 py-3 font-semibold text-theme-primary">{t('impact_report.sroi_net_social_value')}</td>
-                        <td className="px-6 py-3 text-right font-bold text-emerald-600 dark:text-emerald-400">&euro;753,184</td>
-                      </tr>
-                      <tr className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
-                        <td className="px-6 py-3 font-bold text-theme-primary">{t('impact_report.sroi_ratio_label')}</td>
-                        <td className="px-6 py-3 text-right font-extrabold text-emerald-600 dark:text-emerald-400 text-lg">&euro;16.06 : &euro;1</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="SROI breakdown" shadow="none" isStriped>
+                  <TableHeader>
+                    <TableColumn>{t('impact_report.sroi_component_header')}</TableColumn>
+                    <TableColumn className="text-right">{t('impact_report.sroi_value_header')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="text-theme-muted">{t('impact_report.sroi_total_investment')}</TableCell>
+                      <TableCell className="text-right font-semibold text-theme-primary">&euro;50,000</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-theme-muted">{t('impact_report.sroi_total_present_value')}</TableCell>
+                      <TableCell className="text-right font-semibold text-emerald-600 dark:text-emerald-400">&euro;803,184</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-semibold text-theme-primary">{t('impact_report.sroi_net_social_value')}</TableCell>
+                      <TableCell className="text-right font-bold text-emerald-600 dark:text-emerald-400">&euro;753,184</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-bold text-theme-primary">{t('impact_report.sroi_ratio_label')}</TableCell>
+                      <TableCell className="text-right font-extrabold text-emerald-600 dark:text-emerald-400 text-lg">&euro;16.06 : &euro;1</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </GlassCard>
 
               <GlassCard className="p-5">
@@ -576,43 +568,39 @@ export function ImpactReportPage() {
 
             <div className="space-y-6 mt-6">
               <GlassCard className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gradient-to-r from-amber-500/10 to-orange-500/10">
-                        <th className="px-6 py-4 text-left font-semibold text-theme-primary w-8">#</th>
-                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">{t('impact_report.rec_header')}</th>
-                        <th className="px-6 py-4 text-left font-semibold text-theme-primary">{t('impact_report.rec_priority_header')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-theme-default">
-                      {[
-                        { priority: 'Critical' },
-                        { priority: 'High' },
-                        { priority: 'High' },
-                        { priority: 'Medium' },
-                        { priority: 'Medium' },
-                        { priority: 'Medium' },
-                      ].map((row, idx) => (
-                        <tr key={idx} className={idx % 2 === 1 ? 'bg-theme-hover/20' : ''}>
-                          <td className="px-6 py-3 text-theme-subtle font-medium">{idx + 1}</td>
-                          <td className="px-6 py-3 text-theme-muted">{t(`impact_report.rec_${idx}`)}</td>
-                          <td className="px-6 py-3">
-                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              row.priority === 'Critical'
-                                ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
-                                : row.priority === 'High'
-                                ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                                : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
-                            }`}>
-                              {row.priority}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <Table aria-label="Recommendations" shadow="none" isStriped>
+                  <TableHeader>
+                    <TableColumn className="w-8">#</TableColumn>
+                    <TableColumn>{t('impact_report.rec_header')}</TableColumn>
+                    <TableColumn>{t('impact_report.rec_priority_header')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      { priority: 'Critical' },
+                      { priority: 'High' },
+                      { priority: 'High' },
+                      { priority: 'Medium' },
+                      { priority: 'Medium' },
+                      { priority: 'Medium' },
+                    ].map((row, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell className="text-theme-subtle font-medium">{idx + 1}</TableCell>
+                        <TableCell className="text-theme-muted">{t(`impact_report.rec_${idx}`)}</TableCell>
+                        <TableCell>
+                          <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            row.priority === 'Critical'
+                              ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
+                              : row.priority === 'High'
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                              : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
+                          }`}>
+                            {row.priority}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </GlassCard>
             </div>
           </motion.div>

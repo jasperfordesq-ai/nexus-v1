@@ -23,6 +23,12 @@ import {
   ModalFooter,
   Pagination,
   Tooltip,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@heroui/react';
 import {
   Users,
@@ -452,18 +458,18 @@ export function Subscribers() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <button className="text-left" onClick={() => handleStatusFilter('')}>
+        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('')}>
           <StatCard label="Total Subscribers" value={stats.total} icon={Mail} color="primary" loading={loading} />
-        </button>
-        <button className="text-left" onClick={() => handleStatusFilter('active')}>
+        </Button>
+        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('active')}>
           <StatCard label="Active" value={stats.active} icon={CheckCircle} color="success" loading={loading} />
-        </button>
-        <button className="text-left" onClick={() => handleStatusFilter('pending')}>
+        </Button>
+        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('pending')}>
           <StatCard label="Pending" value={stats.pending} icon={Clock} color="warning" loading={loading} />
-        </button>
-        <button className="text-left" onClick={() => handleStatusFilter('unsubscribed')}>
+        </Button>
+        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('unsubscribed')}>
           <StatCard label="Unsubscribed" value={stats.unsubscribed} icon={UserX} color="danger" loading={loading} />
-        </button>
+        </Button>
       </div>
 
       {/* Filter pills + search */}
@@ -495,99 +501,94 @@ export function Subscribers() {
       </div>
 
       {/* Data table */}
-      <Card shadow="sm">
-        <CardBody className="p-0">
-          {loading && items.length === 0 ? (
-            <div className="flex items-center justify-center py-16">
-              <RefreshCw size={24} className="animate-spin text-default-400" />
+      <Table
+        aria-label="Newsletter subscribers"
+        shadow="sm"
+        isStriped
+        bottomContent={
+          totalPages > 1 ? (
+            <div className="flex items-center justify-between px-2 py-2">
+              <p className="text-sm text-default-500">
+                {total} subscriber{total !== 1 ? 's' : ''} total
+              </p>
+              <Pagination
+                total={totalPages}
+                page={page}
+                onChange={setPage}
+                showControls
+                size="sm"
+              />
             </div>
-          ) : items.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-16 text-default-400">
+          ) : undefined
+        }
+      >
+        <TableHeader>
+          <TableColumn>Subscriber</TableColumn>
+          <TableColumn>Status</TableColumn>
+          <TableColumn>Source</TableColumn>
+          <TableColumn>Date</TableColumn>
+          <TableColumn className="text-right">Actions</TableColumn>
+        </TableHeader>
+        <TableBody
+          emptyContent={
+            <div className="flex flex-col items-center gap-2 py-8 text-default-400">
               <Users size={40} />
               <p className="text-lg font-medium">No subscribers found</p>
               <p className="text-sm">Add subscribers manually, import from CSV, or sync your platform members.</p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px]">
-                <thead>
-                  <tr className="border-b border-divider text-left text-xs font-medium uppercase text-default-500">
-                    <th className="px-4 py-3">Subscriber</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Source</th>
-                    <th className="px-4 py-3">Date</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((sub) => (
-                    <tr key={sub.id} className="border-b border-divider last:border-0 hover:bg-default-50">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <Avatar
-                            name={`${sub.first_name || ''} ${sub.last_name || ''}`.trim() || sub.email}
-                            size="sm"
-                            className="shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <p className="truncate font-medium text-foreground">
-                              {sub.first_name || sub.last_name
-                                ? `${sub.first_name || ''} ${sub.last_name || ''}`.trim()
-                                : '--'}
-                            </p>
-                            <p className="truncate text-xs text-default-400">{sub.email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Chip size="sm" variant="flat" color={statusColor(sub.status)}>
-                          {sub.status}
-                        </Chip>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-default-500">
-                        {sourceLabel(sub.source)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-default-500">
-                        {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '--'}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Tooltip content="Remove subscriber">
-                          <Button
-                            isIconOnly
-                            variant="light"
-                            color="danger"
-                            size="sm"
-                            aria-label="Remove subscriber"
-                            onPress={() => setRemoveTarget(sub)}
-                          >
-                            <Trash2 size={14} />
-                          </Button>
-                        </Tooltip>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardBody>
-      </Card>
+          }
+          isLoading={loading && items.length === 0}
+          loadingContent={<RefreshCw size={24} className="animate-spin text-default-400" />}
+        >
+          {items.map((sub) => (
+            <TableRow key={sub.id}>
+              <TableCell>
+                <div className="flex items-center gap-3">
+                  <Avatar
+                    name={`${sub.first_name || ''} ${sub.last_name || ''}`.trim() || sub.email}
+                    size="sm"
+                    className="shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">
+                      {sub.first_name || sub.last_name
+                        ? `${sub.first_name || ''} ${sub.last_name || ''}`.trim()
+                        : '--'}
+                    </p>
+                    <p className="truncate text-xs text-default-400">{sub.email}</p>
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Chip size="sm" variant="flat" color={statusColor(sub.status)}>
+                  {sub.status}
+                </Chip>
+              </TableCell>
+              <TableCell className="text-sm text-default-500">
+                {sourceLabel(sub.source)}
+              </TableCell>
+              <TableCell className="text-sm text-default-500">
+                {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '--'}
+              </TableCell>
+              <TableCell className="text-right">
+                <Tooltip content="Remove subscriber">
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    color="danger"
+                    size="sm"
+                    aria-label="Remove subscriber"
+                    onPress={() => setRemoveTarget(sub)}
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </Tooltip>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-default-500">
-            {total} subscriber{total !== 1 ? 's' : ''} total
-          </p>
-          <Pagination
-            total={totalPages}
-            page={page}
-            onChange={setPage}
-            showControls
-            size="sm"
-          />
-        </div>
-      )}
 
       {/* Public subscribe link */}
       {subscribeUrl && (
