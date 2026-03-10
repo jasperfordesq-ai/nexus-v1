@@ -762,16 +762,17 @@ export function JobDetailPage() {
           {isOwner && (
             <div id="applications">
             <GlassCard className="p-6">
-              <button
-                onClick={() => setShowApplications(!showApplications)}
-                className="flex items-center gap-2 w-full text-left"
+              <Button
+                variant="light"
+                onPress={() => setShowApplications(!showApplications)}
+                className="flex items-center gap-2 w-full text-left justify-start h-auto p-0"
+                startContent={<Users className="w-5 h-5 text-theme-subtle" aria-hidden="true" />}
+                endContent={<ChevronRight className={`w-4 h-4 ml-auto text-theme-subtle transition-transform ${showApplications ? 'rotate-90' : ''}`} aria-hidden="true" />}
               >
-                <Users className="w-5 h-5 text-theme-subtle" aria-hidden="true" />
                 <h2 className="text-lg font-semibold text-theme-primary">
                   {t('detail.applications_tab')} ({vacancy.applications_count})
                 </h2>
-                <ChevronRight className={`w-4 h-4 ml-auto text-theme-subtle transition-transform ${showApplications ? 'rotate-90' : ''}`} aria-hidden="true" />
-              </button>
+              </Button>
 
               {showApplications && (
                 <div className="mt-4 space-y-4">
@@ -1289,13 +1290,15 @@ function ApplicationCard({ application, onUpdateStatus }: ApplicationCardProps) 
 
       {/* J4: History toggle */}
       <div className="mt-2">
-        <button
-          onClick={handleToggleHistory}
-          className="text-xs text-theme-subtle hover:text-theme-primary flex items-center gap-1 transition-colors"
+        <Button
+          variant="light"
+          size="sm"
+          onPress={handleToggleHistory}
+          className="text-xs text-theme-subtle hover:text-theme-primary flex items-center gap-1 transition-colors h-auto p-0 min-w-0"
+          startContent={<History className="w-3 h-3" aria-hidden="true" />}
         >
-          <History className="w-3 h-3" aria-hidden="true" />
           {t('history.title')}
-        </button>
+        </Button>
         {showHistory && (
           <div className="mt-2 pl-4 border-l-2 border-theme-default space-y-2">
             {isLoadingHistory ? (

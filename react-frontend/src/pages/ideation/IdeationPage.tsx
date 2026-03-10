@@ -406,12 +406,15 @@ export function IdeationPage() {
           onValueChange={setSearchQuery}
           startContent={<Search className="w-4 h-4 text-[var(--color-text-tertiary)]" />}
           endContent={searchQuery ? (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="p-0.5 rounded hover:bg-[var(--color-surface-hover)]"
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              onPress={() => setSearchQuery('')}
+              className="p-0.5 rounded hover:bg-[var(--color-surface-hover)] min-w-0 w-auto h-auto"
             >
               <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
-            </button>
+            </Button>
           ) : null}
           variant="bordered"
           size="sm"
@@ -549,12 +552,15 @@ export function IdeationPage() {
                         >
                           {t(`status.${challenge.status}`)}
                         </Chip>
-                        {/* Favorite Button (I8) */}
-                        <button
+                        {/* Favorite Button (I8) — uses onClick to stop Link propagation */}
+                        <span
+                          role="button"
+                          tabIndex={0}
                           onClick={(e) => handleToggleFavorite(e, challenge.id)}
-                          disabled={favoritingIds.has(challenge.id)}
-                          className="p-1 rounded-full hover:bg-[var(--color-surface-hover)] transition-colors disabled:opacity-50"
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); void handleToggleFavorite(e as unknown as React.MouseEvent, challenge.id); } }}
                           aria-label={challenge.is_favorited ? t('favorites.remove') : t('favorites.add')}
+                          aria-disabled={favoritingIds.has(challenge.id)}
+                          className="p-1 rounded-full hover:bg-[var(--color-surface-hover)] transition-colors inline-flex items-center"
                         >
                           <Heart
                             className={`w-4 h-4 ${
@@ -563,7 +569,7 @@ export function IdeationPage() {
                                 : 'text-[var(--color-text-tertiary)]'
                             }`}
                           />
-                        </button>
+                        </span>
                       </div>
                     </div>
 

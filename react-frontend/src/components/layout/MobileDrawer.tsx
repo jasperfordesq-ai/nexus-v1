@@ -419,13 +419,14 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <AccordionItem key="legal" title={t('sections.legal')} aria-label="Legal navigation">
                 <div className="space-y-0.5">
                   {legalNavItems.map(renderNavLink)}
-                  <button
-                    onClick={() => { resetConsent(); onClose(); }}
-                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full text-left"
+                  <Button
+                    variant="light"
+                    onPress={() => { resetConsent(); onClose(); }}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full justify-start h-auto"
                   >
                     <Settings className="w-4 h-4" aria-hidden="true" />
                     <span>{t('cookie_consent.manage', 'Cookie Settings')}</span>
-                  </button>
+                  </Button>
                 </div>
               </AccordionItem>
             </Accordion>

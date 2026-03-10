@@ -305,12 +305,15 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
             <GlassCard key={task.id} className="p-3">
               <div className="flex items-start gap-3">
                 {/* Status Toggle */}
-                <button
-                  onClick={() => {
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="flat"
+                  onPress={() => {
                     const nextStatus = task.status === 'todo' ? 'in_progress' : task.status === 'in_progress' ? 'done' : 'todo';
                     handleUpdateStatus(task.id, nextStatus);
                   }}
-                  className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                  className={`mt-0.5 w-5 h-5 min-w-0 rounded border-2 flex items-center justify-center shrink-0 transition-colors p-0 ${
                     task.status === 'done'
                       ? 'bg-green-500 border-green-500 text-white'
                       : task.status === 'in_progress'
@@ -325,7 +328,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                   {task.status === 'in_progress' && (
                     <Clock className="w-3 h-3 text-amber-500" />
                   )}
-                </button>
+                </Button>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">

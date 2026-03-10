@@ -145,15 +145,18 @@ function SortableItem({ item, isSelected, onSelect, onDelete, depth = 0 }: Sorta
       } ${!item.is_active ? 'opacity-50' : ''}`}
       onClick={onSelect}
     >
-      <button
-        className="cursor-grab active:cursor-grabbing text-default-300 hover:text-default-500 p-0.5"
+      <Button
+        isIconOnly
+        variant="light"
+        size="sm"
+        className="cursor-grab active:cursor-grabbing text-default-300 hover:text-default-500 p-0.5 min-w-0 h-auto"
         {...attributes}
         {...listeners}
         aria-label="Drag to reorder"
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical size={16} />
-      </button>
+      </Button>
 
       <DynamicIcon name={item.icon} className="w-4 h-4 text-theme-muted shrink-0" />
 
@@ -804,13 +807,14 @@ export function MenuBuilder() {
                   <Divider />
 
                   {/* Advanced section (collapsible) */}
-                  <button
-                    className="flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
-                    onClick={() => setShowAdvanced(!showAdvanced)}
+                  <Button
+                    variant="light"
+                    className="flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors h-auto p-0 justify-start"
+                    onPress={() => setShowAdvanced(!showAdvanced)}
                   >
                     {showAdvanced ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                     Advanced options
-                  </button>
+                  </Button>
 
                   {showAdvanced && (
                     <div className="space-y-3 pl-2 border-l-2 border-default-100">

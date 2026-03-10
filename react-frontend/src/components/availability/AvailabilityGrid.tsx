@@ -280,18 +280,18 @@ export function AvailabilityGrid({
                       closeDelay={0}
                       size="sm"
                     >
-                      <button
-                        type="button"
-                        onClick={() => toggleSlot(dayIdx, time)}
-                        disabled={!editable}
+                      <Button
+                        onPress={() => toggleSlot(dayIdx, time)}
+                        isDisabled={!editable}
                         className={`
-                          h-6 rounded-sm transition-all
+                          h-6 rounded-sm transition-all min-w-0 p-0
                           ${isAvail
                             ? 'bg-emerald-500/60 hover:bg-emerald-500/80 border border-emerald-500/30'
                             : 'bg-theme-elevated hover:bg-theme-hover border border-theme-default'
                           }
                           ${editable ? 'cursor-pointer' : 'cursor-default'}
                         `}
+                        variant="flat"
                         aria-label={`${FULL_DAYS[dayIdx]} ${time}: ${isAvail ? 'Available' : 'Unavailable'}`}
                       />
                     </Tooltip>

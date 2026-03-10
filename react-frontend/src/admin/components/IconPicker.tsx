@@ -100,10 +100,11 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
                   if (!Icon) return null;
                   const isSelected = value === name;
                   return (
-                    <button
+                    <Button
                       key={name}
-                      onClick={() => handleSelect(name)}
-                      className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all text-center hover:bg-theme-hover ${
+                      onPress={() => handleSelect(name)}
+                      variant="flat"
+                      className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all text-center hover:bg-theme-hover h-auto min-w-0 ${
                         isSelected
                           ? 'bg-indigo-500/10 ring-2 ring-indigo-500 text-indigo-600 dark:text-indigo-400'
                           : 'text-theme-muted'
@@ -112,7 +113,7 @@ export function IconPicker({ value, onChange, label = 'Icon' }: IconPickerProps)
                     >
                       <Icon className="w-5 h-5" />
                       <span className="text-[10px] leading-tight truncate w-full">{name}</span>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>

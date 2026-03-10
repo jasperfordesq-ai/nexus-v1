@@ -92,13 +92,15 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
           {/* Star Rating */}
           <div className="flex justify-center gap-2 mb-6">
             {[1, 2, 3, 4, 5].map((star) => (
-              <button
+              <Button
                 key={star}
-                type="button"
-                className="p-1 transition-transform hover:scale-110"
+                isIconOnly
+                size="sm"
+                variant="light"
+                onPress={() => setRating(star)}
                 onMouseEnter={() => setHoveredRating(star)}
                 onMouseLeave={() => setHoveredRating(0)}
-                onClick={() => setRating(star)}
+                className="p-1 transition-transform hover:scale-110 w-auto h-auto min-w-0"
                 aria-label={`${star} star${star > 1 ? 's' : ''}`}
               >
                 <Star
@@ -108,7 +110,7 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
                       : 'text-theme-muted'
                   }`}
                 />
-              </button>
+              </Button>
             ))}
           </div>
 
