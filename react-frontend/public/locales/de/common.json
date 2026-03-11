@@ -117,7 +117,11 @@
     "type_listing": "Inserat",
     "type_member": "Mitglied",
     "type_event": "Veranstaltung",
-    "type_group": "Gruppe"
+    "type_group": "Gruppe",
+    "actions": "Aktionen",
+    "no_actions": "Keine passenden Aktionen",
+    "recent": "Kürzlich",
+    "actions_hint": "Tippen Sie > für Schnellaktionen"
   },
   "support": {
     "help_center": "Hilfezentrum",
