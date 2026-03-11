@@ -274,7 +274,7 @@ export function SentryErrorBoundary({ children, fallback }: {
   }
 
   return createElement(Sentry.ErrorBoundary, {
-    fallback: fallback as any,
+    fallback: fallback as Sentry.ErrorBoundaryProps["fallback"],
   }, children);
 }
 
@@ -286,5 +286,5 @@ export function SentryProfiler({ children }: { children: ReactNode }): ReactNode
     return children;
   }
 
-  return Sentry.withProfiler(() => children as any)({});
+  return Sentry.withProfiler(() => children as React.ReactElement)({});
 }

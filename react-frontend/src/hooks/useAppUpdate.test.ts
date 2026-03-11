@@ -25,12 +25,12 @@ describe('useAppUpdate', () => {
     vi.useFakeTimers();
     sessionStorage.clear();
     // Not a native app by default
-    (window as any).Capacitor = undefined;
+    ((window as unknown as Record<string, unknown>)).Capacitor = undefined;
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    delete (window as any).Capacitor;
+    delete ((window as unknown as Record<string, unknown>)).Capacitor;
   });
 
   it('returns null updateInfo when not in native app', () => {
@@ -48,7 +48,7 @@ describe('useAppUpdate', () => {
   });
 
   it('checks for updates in native app after delay', async () => {
-    (window as any).Capacitor = { isNativePlatform: () => true };
+    ((window as unknown as Record<string, unknown>)).Capacitor = { isNativePlatform: () => true };
 
     mockApiPost.mockResolvedValue({
       data: { update_available: false },
@@ -71,7 +71,7 @@ describe('useAppUpdate', () => {
   });
 
   it('sets update info when update is available', async () => {
-    (window as any).Capacitor = { isNativePlatform: () => true };
+    ((window as unknown as Record<string, unknown>)).Capacitor = { isNativePlatform: () => true };
 
     mockApiPost.mockResolvedValue({
       data: {
@@ -100,7 +100,7 @@ describe('useAppUpdate', () => {
   });
 
   it('dismiss hides update info', async () => {
-    (window as any).Capacitor = { isNativePlatform: () => true };
+    ((window as unknown as Record<string, unknown>)).Capacitor = { isNativePlatform: () => true };
 
     mockApiPost.mockResolvedValue({
       data: {
@@ -128,7 +128,7 @@ describe('useAppUpdate', () => {
   });
 
   it('does not check more than once per session', async () => {
-    (window as any).Capacitor = { isNativePlatform: () => true };
+    ((window as unknown as Record<string, unknown>)).Capacitor = { isNativePlatform: () => true };
     sessionStorage.setItem('nexus_update_checked', '1');
 
     renderHook(() => useAppUpdate());
@@ -141,7 +141,7 @@ describe('useAppUpdate', () => {
   });
 
   it('handles API failure gracefully', async () => {
-    (window as any).Capacitor = { isNativePlatform: () => true };
+    ((window as unknown as Record<string, unknown>)).Capacitor = { isNativePlatform: () => true };
 
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mockApiPost.mockRejectedValue(new Error('Network error'));

@@ -49,7 +49,7 @@ vi.mock('react-router-dom', async () => {
     useParams: vi.fn(() => ({})),
     useNavigate: vi.fn(() => vi.fn()),
     useSearchParams: vi.fn(() => [new URLSearchParams(), vi.fn()]),
-    Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
+    Link: ({ children, to, ...props }: Record<string, unknown>) => <a href={to as string} {...props}>{children}</a>,
   };
 });
 
@@ -90,15 +90,7 @@ vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, transition, ...rest } = props;
-      return <div {...rest}>{children}</div>;
-    },
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport', 'layout']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
 
 vi.mock('lucide-react', () => {
   const MockIcon = ({ className, 'aria-hidden': ariaHidden }: { className?: string; 'aria-hidden'?: boolean | string }) => (

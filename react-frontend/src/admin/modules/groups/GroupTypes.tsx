@@ -55,7 +55,7 @@ export default function GroupTypes() {
       setLoading(true);
       const response = await adminGroups.getGroupTypes();
       setTypes((response.data as GroupType[]) || []);
-    } catch (err) {
+    } catch {
       error('Failed to load group types');
     } finally {
       setLoading(false);
@@ -74,7 +74,7 @@ export default function GroupTypes() {
       onCreateClose();
       setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
       loadTypes();
-    } catch (err) {
+    } catch {
       error('Failed to create group type');
     }
   };
@@ -92,7 +92,7 @@ export default function GroupTypes() {
       setSelectedType(null);
       setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
       loadTypes();
-    } catch (err) {
+    } catch {
       error('Failed to update group type');
     }
   };
@@ -106,7 +106,7 @@ export default function GroupTypes() {
       await adminGroups.deleteGroupType(id);
       success('Group type deleted');
       loadTypes();
-    } catch (err) {
+    } catch {
       error('Failed to delete group type');
     }
   };

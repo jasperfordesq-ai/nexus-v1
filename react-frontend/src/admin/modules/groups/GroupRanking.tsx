@@ -27,7 +27,7 @@ export default function GroupRanking() {
       setLoading(true);
       const response = await adminGroups.getFeaturedGroups();
       setGroups((response.data as FeaturedGroup[]) || []);
-    } catch (err) {
+    } catch {
       error('Failed to load featured groups');
     } finally {
       setLoading(false);
@@ -40,7 +40,7 @@ export default function GroupRanking() {
       await adminGroups.updateFeaturedGroups();
       success('Rankings updated successfully');
       loadGroups();
-    } catch (err) {
+    } catch {
       error('Failed to update rankings');
     } finally {
       setUpdating(false);
@@ -52,7 +52,7 @@ export default function GroupRanking() {
       await adminGroups.toggleFeatured(groupId);
       success('Featured status updated');
       loadGroups();
-    } catch (err) {
+    } catch {
       error('Failed to update featured status');
     }
   };

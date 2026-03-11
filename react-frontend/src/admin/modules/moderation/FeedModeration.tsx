@@ -132,7 +132,7 @@ export default function FeedModeration() {
       } else {
         toast.error(response.error || 'Action failed');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setActionLoading(false);

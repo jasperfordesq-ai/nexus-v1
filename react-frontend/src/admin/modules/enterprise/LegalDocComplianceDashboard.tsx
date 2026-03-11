@@ -65,7 +65,7 @@ export default function LegalDocComplianceDashboard() {
       } else {
         error(response.error || 'Failed to load compliance stats');
       }
-    } catch (err) {
+    } catch {
       error('Failed to load compliance stats');
     } finally {
       setLoading(false);
@@ -84,7 +84,7 @@ export default function LegalDocComplianceDashboard() {
       } else {
         error(response.error || 'Failed to load acceptances');
       }
-    } catch (err) {
+    } catch {
       error('Failed to load acceptances');
     } finally {
       setLoadingAcceptances(false);
@@ -115,7 +115,7 @@ export default function LegalDocComplianceDashboard() {
       } else {
         error('Failed to export acceptances');
       }
-    } catch (err) {
+    } catch {
       error('Failed to export acceptances');
     } finally {
       setExportingDocId(null);

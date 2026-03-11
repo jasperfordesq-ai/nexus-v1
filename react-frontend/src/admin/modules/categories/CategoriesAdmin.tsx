@@ -37,7 +37,7 @@ import {
   Tag,
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useToast } from '@/contexts';
 import { adminCategories } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { AdminCategory } from '../../api/types';
@@ -78,7 +78,6 @@ const COLOR_OPTIONS = [
 
 export function CategoriesAdmin() {
   usePageTitle('Admin - Categories');
-  const { tenantPath: _tenantPath } = useTenant();
   const toast = useToast();
 
   // Data state

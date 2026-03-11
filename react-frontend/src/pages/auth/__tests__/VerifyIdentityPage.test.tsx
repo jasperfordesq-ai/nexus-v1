@@ -72,7 +72,9 @@ vi.mock('@/components/ui', () => ({
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, layout, ...rest } = props;
+      const motionKeys = new Set(["variants", "initial", "animate", "transition", "whileInView", "viewport", "layout", "exit", "whileHover", "whileTap"]);
+      const rest: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(props)) { if (!motionKeys.has(k)) rest[k] = v; }
       return <div {...rest}>{children as React.ReactNode}</div>;
     },
   },
@@ -254,7 +256,7 @@ describe('VerifyIdentityPage', () => {
       user: null,
       isAuthenticated: false,
       logout: vi.fn(),
-    } as any);
+    } as ReturnType<typeof useAuth>);
 
     const { default: VerifyIdentityPage } = await import('../VerifyIdentityPage');
     renderWithProviders(<VerifyIdentityPage />);

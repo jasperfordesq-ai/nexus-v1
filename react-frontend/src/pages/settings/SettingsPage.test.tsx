@@ -106,7 +106,7 @@ vi.mock('dompurify', () => ({
 // Mock framer-motion to avoid heavy animation bundle
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
-    get: () => React.forwardRef(({ children, ...props }: any, ref: any) => {
+    get: () => React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) => {
       const safe = Object.fromEntries(
         Object.entries(props).filter(([k]) => !['variants', 'initial', 'animate', 'exit', 'layout', 'whileHover', 'whileTap', 'transition', 'whileInView', 'viewport'].includes(k))
       );

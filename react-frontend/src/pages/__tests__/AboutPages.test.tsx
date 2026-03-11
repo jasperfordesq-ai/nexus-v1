@@ -47,8 +47,8 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 vi.mock('@/lib/helpers', () => ({
-  resolveAssetUrl: vi.fn((url) => url || ''),
-  resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveAssetUrl: vi.fn((url: string) => url || ''),
+  resolveAvatarUrl: vi.fn((url: string) => url || '/default-avatar.png'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 
@@ -56,23 +56,24 @@ vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, whileInView, viewport, layout, transition, ...rest } = props;
-      return <div {...rest}>{children}</div>;
+vi.mock('framer-motion', () => {
+  const motionProps = new Set(['variants', 'initial', 'animate', 'whileInView', 'viewport', 'layout', 'transition', 'exit', 'whileHover', 'whileTap']);
+  const filterMotion = (props: Record<string, unknown>) => {
+    const filtered: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(props)) {
+      if (!motionProps.has(k)) filtered[k] = v;
+    }
+    return filtered;
+  };
+  return {
+    motion: {
+      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,
+      h1: ({ children, ...props }: Record<string, unknown>) => <h1 {...filterMotion(props)}>{children}</h1>,
+      p: ({ children, ...props }: Record<string, unknown>) => <p {...filterMotion(props)}>{children}</p>,
     },
-    h1: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, transition, ...rest } = props;
-      return <h1 {...rest}>{children}</h1>;
-    },
-    p: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, transition, ...rest } = props;
-      return <p {...rest}>{children}</p>;
-    },
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
 
 vi.mock('lucide-react', () => {
   const MockIcon = ({ className, 'aria-hidden': ariaHidden }: { className?: string; 'aria-hidden'?: boolean | string }) => (

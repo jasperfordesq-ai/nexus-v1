@@ -84,7 +84,7 @@ export function ResetPasswordPage() {
         password_confirmation: confirmPassword,
       });
       setIsSuccess(true);
-    } catch (err) {
+    } catch {
       setError(t('reset_password.link_expired_error'));
     } finally {
       setIsLoading(false);

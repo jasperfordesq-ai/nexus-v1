@@ -14,7 +14,7 @@
  * - CategoriesAdmin
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
@@ -71,20 +71,20 @@ vi.mock('@/components/seo', () => ({
 vi.mock('framer-motion');
 
 vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
-  BarChart: ({ children }: any) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Bar: () => null,
   XAxis: () => null,
   YAxis: () => null,
   CartesianGrid: () => null,
   Tooltip: () => null,
   Legend: () => null,
-  LineChart: ({ children }: any) => <div>{children}</div>,
+  LineChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Line: () => null,
-  PieChart: ({ children }: any) => <div>{children}</div>,
+  PieChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Pie: () => null,
   Cell: () => null,
-  AreaChart: ({ children }: any) => <div>{children}</div>,
+  AreaChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Area: () => null,
 }));
 

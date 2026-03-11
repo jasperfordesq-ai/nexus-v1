@@ -25,6 +25,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { AdminGroup, GroupMember as GroupMemberType } from '@/admin/api/types';
+interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: number; total_hours: number; active_members: number; posts_count: number; events_count: number; activity_score: number };  latitude?: number;  longitude?: number;}
 import type { GroupMember } from '@/admin/api/types';
 
 export default function GroupDetail() {
@@ -32,7 +33,7 @@ export default function GroupDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useToast();
-  const [group, setGroup] = useState<any>(null);
+  const [group, setGroup] = useState<AdminGroupDetail | null>(null);
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -50,7 +51,7 @@ export default function GroupDetail() {
       setLoading(true);
       const response = await adminGroups.getGroup(Number(id));
       if (response.success && response.data) {
-        const groupData = response.data as AdminGroup;
+        const groupData = response.data as AdminGroupDetail;
         setGroup(groupData);
         setFormData({
           name: groupData.name || '',
@@ -58,7 +59,7 @@ export default function GroupDetail() {
           location: groupData.location || '',
         });
       }
-    } catch (err) {
+    } catch {
       error('Failed to load group');
     } finally {
       setLoading(false);
@@ -71,7 +72,7 @@ export default function GroupDetail() {
       if (response.success && response.data) {
         setMembers(response.data as GroupMemberType[]);
       }
-    } catch (err) {
+    } catch {
       error('Failed to load members');
     }
   };
@@ -82,7 +83,7 @@ export default function GroupDetail() {
       success('Group updated');
       setEditMode(false);
       loadGroup();
-    } catch (err) {
+    } catch {
       error('Failed to update group');
     }
   };
@@ -92,7 +93,7 @@ export default function GroupDetail() {
       await adminGroups.geocodeGroup(Number(id));
       success('Location geocoded');
       loadGroup();
-    } catch (err) {
+    } catch {
       error('Failed to geocode location');
     }
   };
@@ -102,7 +103,7 @@ export default function GroupDetail() {
       await adminGroups.promoteMember(Number(id), userId);
       success('Member promoted');
       loadMembers();
-    } catch (err) {
+    } catch {
       error('Failed to promote member');
     }
   };
@@ -112,7 +113,7 @@ export default function GroupDetail() {
       await adminGroups.demoteMember(Number(id), userId);
       success('Member demoted');
       loadMembers();
-    } catch (err) {
+    } catch {
       error('Failed to demote member');
     }
   };
@@ -123,7 +124,7 @@ export default function GroupDetail() {
       await adminGroups.kickMember(Number(id), userId);
       success('Member removed');
       loadMembers();
-    } catch (err) {
+    } catch {
       error('Failed to remove member');
     }
   };

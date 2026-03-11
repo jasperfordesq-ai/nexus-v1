@@ -51,7 +51,7 @@ export default function GroupPolicies({ isOpen, onClose, typeId, typeName }: Gro
       const data = (response.data as GroupPolicy[]) || [];
       setPolicies(data);
       organizePolicies(data);
-    } catch (err) {
+    } catch {
       error('Failed to load policies');
     } finally {
       setLoading(false);
@@ -115,7 +115,7 @@ export default function GroupPolicies({ isOpen, onClose, typeId, typeName }: Gro
       );
       setPolicies(updatedPolicies);
       organizePolicies(updatedPolicies);
-    } catch (err) {
+    } catch {
       error('Failed to update policy');
     }
   };

@@ -58,14 +58,6 @@ import type {
   GroupAnalyticsData,
   GroupModerationItem,
   GroupType,
-  // @ts-ignore - Type imports used for type annotations
-  GroupPolicy,
-  // @ts-ignore - Type imports used for type annotations
-  GroupMember,
-  // @ts-ignore - Type imports used for type annotations
-  GroupRecommendation,
-  // @ts-ignore - Type imports used for type annotations
-  FeaturedGroup,
   EnterpriseDashboardStats,
   Role,
   GdprDashboardStats,

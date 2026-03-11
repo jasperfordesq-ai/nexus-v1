@@ -50,7 +50,7 @@ export default function LegalDocVersionComparison({
       } else {
         error(response.error || 'Failed to load comparison');
       }
-    } catch (err) {
+    } catch {
       error('Failed to load comparison');
     } finally {
       setLoading(false);

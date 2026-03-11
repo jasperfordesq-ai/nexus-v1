@@ -40,7 +40,9 @@ vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, layout, ...rest } = props;
+      const motionKeys = new Set(["variants", "initial", "animate", "transition", "whileInView", "viewport", "layout", "exit", "whileHover", "whileTap"]);
+      const rest: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(props)) { if (!motionKeys.has(k)) rest[k] = v; }
       return <div {...rest}>{children}</div>;
     },
   },

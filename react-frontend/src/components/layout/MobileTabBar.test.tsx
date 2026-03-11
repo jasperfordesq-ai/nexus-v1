@@ -34,7 +34,7 @@ vi.mock('react-router-dom', async () => {
 vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...p }: any, ref: any) => {
+      return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<unknown>) => {
         const safe: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(p)) {
           if (!['variants', 'initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'whileInView', 'layout', 'viewport', 'layoutId'].includes(k)) safe[k] = v;
@@ -43,7 +43,7 @@ vi.mock('framer-motion', () => {
       });
     },
   });
-  return { motion: proxy, AnimatePresence: ({ children }: any) => children };
+  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 
 const mockUseAuth = vi.fn();
@@ -51,13 +51,13 @@ const mockUseTenant = vi.fn();
 const mockUseNotifications = vi.fn();
 
 vi.mock('@/contexts', () => ({
-  useAuth: (...args: any[]) => mockUseAuth(...args),
-  useTenant: (...args: any[]) => mockUseTenant(...args),
-  useNotifications: (...args: any[]) => mockUseNotifications(...args),
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+  useNotifications: (...args: unknown[]) => mockUseNotifications(...args),
 }));
 
 vi.mock('./QuickCreateMenu', () => ({
-  QuickCreateMenu: ({ isOpen }: any) => (
+  QuickCreateMenu: ({ isOpen }: { isOpen?: boolean }) => (
     isOpen ? <div data-testid="quick-create-menu">Quick Create</div> : null
   ),
 }));
@@ -65,9 +65,9 @@ vi.mock('./QuickCreateMenu', () => ({
 import { MobileTabBar } from './MobileTabBar';
 
 function setupDefaultMocks(overrides: {
-  auth?: Record<string, any>;
-  tenant?: Record<string, any>;
-  notifications?: Record<string, any>;
+  auth?: Record<string, unknown>;
+  tenant?: Record<string, unknown>;
+  notifications?: Record<string, unknown>;
 } = {}) {
   mockUseAuth.mockReturnValue({
     isAuthenticated: true,

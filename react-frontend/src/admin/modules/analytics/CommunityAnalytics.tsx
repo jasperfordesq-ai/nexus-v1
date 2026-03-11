@@ -453,9 +453,10 @@ export function CommunityAnalytics() {
                       backgroundColor: 'hsl(var(--heroui-content1))',
                       color: 'hsl(var(--heroui-foreground))',
                     }}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={((value: number, name: string) =>
-                      [`${value} listings`, name]) as any}
+                    formatter={
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Recharts Tooltip formatter type mismatch
+                      ((value: number, name: string): [string, string] => [`${value} listings`, name]) as any
+                    }
                   />
                 </PieChart>
               </ResponsiveContainer>

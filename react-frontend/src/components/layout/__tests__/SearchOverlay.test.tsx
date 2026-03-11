@@ -26,7 +26,7 @@ vi.mock('react-router-dom', async () => {
 vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...p }: any, ref: any) => {
+      return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<unknown>) => {
         const safe: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(p)) {
           if (!['variants', 'initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'whileInView', 'layout', 'viewport', 'layoutId'].includes(k)) safe[k] = v;
@@ -35,7 +35,7 @@ vi.mock('framer-motion', () => {
       });
     },
   });
-  return { motion: proxy, AnimatePresence: ({ children }: any) => children };
+  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 
 // Mock i18n

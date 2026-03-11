@@ -18,11 +18,11 @@ const mockUpload = vi.fn().mockResolvedValue({ success: true, data: {} });
 
 vi.mock('@/lib/api', () => ({
   api: {
-    get: (...args: any[]) => mockGet(...args),
-    post: (...args: any[]) => mockPost(...args),
-    put: (...args: any[]) => mockPut(...args),
-    delete: (...args: any[]) => mockDelete(...args),
-    upload: (...args: any[]) => mockUpload(...args),
+    get: (...args: unknown[]) => mockGet(...args),
+    post: (...args: unknown[]) => mockPost(...args),
+    put: (...args: unknown[]) => mockPut(...args),
+    delete: (...args: unknown[]) => mockDelete(...args),
+    upload: (...args: unknown[]) => mockUpload(...args),
   },
   tokenManager: {
     getTenantId: vi.fn(() => '2'),

@@ -33,7 +33,7 @@ vi.mock('@/contexts', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
-  AuthProvider: ({ children }: any) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
     tenantSlug: 'test',
@@ -52,7 +52,7 @@ vi.mock('@/contexts/AuthContext', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
-  AuthProvider: ({ children }: any) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
@@ -96,8 +96,8 @@ vi.mock('@/components/seo', () => ({
 
 // Mock admin components imported by moderation modules (they use direct path imports)
 vi.mock('@/admin/components/PageHeader', () => ({
-  default: ({ children }: any) => <div>{children}</div>,
-  PageHeader: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('@/admin/components/ConfirmModal', () => ({

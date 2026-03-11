@@ -21,7 +21,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => mockNavigate,
     useLocation: () => mockLocation,
-    NavLink: ({ children, to, className }: any) => {
+    NavLink: ({ children, to, className }: { children: React.ReactNode; to: string; className?: string | ((opts: { isActive: boolean }) => string) }) => {
       const cls = typeof className === 'function' ? className({ isActive: false }) : className;
       return <a href={to} className={cls}>{children}</a>;
     },
@@ -33,9 +33,9 @@ const mockUseTenant = vi.fn();
 const mockUseNotifications = vi.fn();
 
 vi.mock('@/contexts', () => ({
-  useAuth: (...args: any[]) => mockUseAuth(...args),
-  useTenant: (...args: any[]) => mockUseTenant(...args),
-  useNotifications: (...args: any[]) => mockUseNotifications(...args),
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+  useNotifications: (...args: unknown[]) => mockUseNotifications(...args),
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
   useCookieConsent: () => ({ showBanner: false, openPreferences: vi.fn() }),
 }));
@@ -99,9 +99,9 @@ vi.mock('@/lib/api', () => ({
 import { MobileDrawer } from './MobileDrawer';
 
 function setupDefaultMocks(overrides: {
-  auth?: Record<string, any>;
-  tenant?: Record<string, any>;
-  notifications?: Record<string, any>;
+  auth?: Record<string, unknown>;
+  tenant?: Record<string, unknown>;
+  notifications?: Record<string, unknown>;
 } = {}) {
   mockUseAuth.mockReturnValue({
     user: null,

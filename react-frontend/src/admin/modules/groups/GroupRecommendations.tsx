@@ -29,7 +29,7 @@ export default function GroupRecommendations() {
       const data = response.data as { recommendations: GroupRecommendation[]; stats: { total: number; avg_score: number; join_rate: number } };
       setRecommendations(data?.recommendations || []);
       setStats(data?.stats || { total: 0, avg_score: 0, join_rate: 0 });
-    } catch (err) {
+    } catch {
       error('Failed to load recommendations');
     } finally {
       setLoading(false);

@@ -35,7 +35,7 @@ vi.mock('@/contexts', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
-  AuthProvider: ({ children }: any) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
     tenantSlug: 'test',
@@ -54,14 +54,14 @@ vi.mock('@/contexts/AuthContext', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
-  AuthProvider: ({ children }: any) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // Super-admin modules import from specific hook/context paths
 vi.mock('@/hooks/useApi', () => {
-  const mockData: any[] = [];
+  const mockData: unknown[] = [];
   const mockMeta = { current_page: 1, last_page: 1, per_page: 25, total: 0 };
   return {
     useApi: vi.fn(() => ({
@@ -105,8 +105,8 @@ vi.mock('@/components/seo', () => ({
 
 // Mock admin components imported by super-admin modules (they use direct path imports)
 vi.mock('../../../components/PageHeader', () => ({
-  default: ({ children }: any) => <div>{children}</div>,
-  PageHeader: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('../../../components/ConfirmModal', () => ({
@@ -115,12 +115,12 @@ vi.mock('../../../components/ConfirmModal', () => ({
 }));
 
 vi.mock('@/admin/components/PageHeader', () => ({
-  default: ({ children }: any) => <div>{children}</div>,
-  PageHeader: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('@/admin/components/DataTable', () => ({
-  DataTable: ({ children }: any) => <div>{children}</div>,
+  DataTable: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   StatusBadge: () => <span>status</span>,
   Column: {},
 }));

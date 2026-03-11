@@ -114,7 +114,7 @@ export default function LegalDocVersionForm({
       } else {
         error(response.error || `Failed to ${isEditMode ? 'update' : 'create'} version`);
       }
-    } catch (err) {
+    } catch {
       error(`Failed to ${isEditMode ? 'update' : 'create'} version`);
     } finally {
       setSubmitting(false);

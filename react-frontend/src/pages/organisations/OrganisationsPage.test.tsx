@@ -46,7 +46,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className, hoverable }: { children: React.ReactNode; className?: string; hoverable?: boolean }) => (
+  GlassCard: ({ children, className, hoverable: _hoverable }: { children: React.ReactNode; className?: string; hoverable?: boolean }) => (
     <div data-testid="glass-card" className={className}>{children}</div>
   ),
 }));
@@ -70,15 +70,7 @@ vi.mock('@/components/navigation', () => ({
   ),
 }));
 
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, layout, ...rest } = props;
-      return <div {...rest}>{children}</div>;
-    },
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
+vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
 
 import { OrganisationsPage } from './OrganisationsPage';
 import { api } from '@/lib/api';

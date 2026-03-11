@@ -9,7 +9,6 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import React from 'react';
 import { useApiErrorHandler } from './useApiErrorHandler';
 import { API_ERROR_EVENT } from '@/lib/api';
 

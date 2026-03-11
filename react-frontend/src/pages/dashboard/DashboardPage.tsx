@@ -1079,7 +1079,7 @@ function PendingReviewsCard() {
   useEffect(() => {
     const fetchPending = async () => {
       try {
-        const response = await api.get<{ local: PendingReview[]; federated: any[]; total_pending: number }>('/v2/reviews/pending');
+        const response = await api.get<{ local: PendingReview[]; federated: PendingReview[]; total_pending: number }>('/v2/reviews/pending');
         if (response.data?.local) {
           setPending(response.data.local.slice(0, 3)); // Show max 3
         }

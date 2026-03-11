@@ -7,7 +7,7 @@
  * Tests for tenant-routing utilities
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import {
   RESERVED_SUBDOMAINS,
   RESERVED_PATHS,

@@ -16,14 +16,14 @@ const mockUseTenant = vi.fn();
 const mockUseFeature = vi.fn();
 
 vi.mock('@/contexts', () => ({
-  useTenant: (...args: any[]) => mockUseTenant(...args),
-  useFeature: (...args: any[]) => mockUseFeature(...args),
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+  useFeature: (...args: unknown[]) => mockUseFeature(...args),
 }));
 
 import { Footer, FooterLink } from './Footer';
 
 function setupDefaultMocks(overrides: {
-  tenant?: Record<string, any>;
+  tenant?: Record<string, unknown>;
   eventsEnabled?: boolean;
   blogEnabled?: boolean;
 } = {}) {

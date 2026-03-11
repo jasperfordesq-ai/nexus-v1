@@ -10,11 +10,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@/test/test-utils";
 
+import React from "react";
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, {
     get: (_target: object, prop: string | symbol) => {
-      const React = require("react");
-      return React.forwardRef(({ children, ...props }: any, ref: any) => {
+      return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
         const motionPropNames = ["variants","initial","animate","exit","transition","whileHover","whileTap","whileInView","layout","layoutId","viewport"];
         const clean: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(props)) {
@@ -42,14 +42,12 @@ vi.mock("@/lib/api", () => ({
 
 vi.mock("@/components/ui", () => ({
   GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => {
-    const React = require("react");
     return React.createElement("div", { "data-testid": "glass-card", className }, children);
   },
 }));
 
 vi.mock("@/components/feedback", () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => {
-    const React = require("react");
     return React.createElement(
       "div", { "data-testid": "empty-state" },
       React.createElement("div", null, title),

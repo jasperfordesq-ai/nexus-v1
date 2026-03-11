@@ -312,7 +312,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
         recipient_id: toUserId,
         is_typing: isTyping,
       });
-    } catch (error) {
+    } catch {
       // Silent fail - typing indicators are not critical
     }
   }, []);

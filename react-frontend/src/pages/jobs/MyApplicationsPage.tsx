@@ -458,7 +458,7 @@ export function MyApplicationsPage() {
         setIsLoadingMore(false);
       }
     },
-    [activeTab, toast], // eslint-disable-line react-hooks/exhaustive-deps
+    [activeTab, toast],  
   );
 
   useEffect(() => {

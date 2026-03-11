@@ -18,25 +18,25 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
-    get: (_: any, tag: string) => {
-      return React.forwardRef(({ children, initial, animate, exit, transition, variants, ...rest }: any, ref: any) =>
-        React.createElement(typeof tag === 'string' ? tag : 'div', { ...rest, ref }, children)
+    get: (_target: Record<string, unknown>, tag: string) => {
+      return React.forwardRef(({ children, ...rest }: Record<string, unknown>, ref: React.Ref<HTMLElement>) =>
+        React.createElement(typeof tag === 'string' ? tag : 'div', { ...rest, ref }, children as React.ReactNode)
       );
     },
   }),
-  AnimatePresence: ({ children }: any) => children,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock contexts
 const mockUseAuth = vi.fn();
 const mockUseTenant = vi.fn();
 vi.mock('@/contexts', () => ({
-  useAuth: (...args: any[]) => mockUseAuth(...args),
-  useTenant: (...args: any[]) => mockUseTenant(...args),
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
 }));
 
 vi.mock('@/components/feedback', () => ({
-  LoadingScreen: ({ message }: any) => <div data-testid="loading">{message}</div>,
+  LoadingScreen: ({ message }: { message?: string }) => <div data-testid="loading">{message}</div>,
 }));
 
 // Mock heavy dependencies that ProtectedRoute might import transitively

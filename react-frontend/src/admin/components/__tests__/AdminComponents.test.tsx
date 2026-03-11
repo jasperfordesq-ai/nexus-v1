@@ -40,7 +40,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('lucide-react', async (importOriginal) => {
   const actual = await importOriginal();
   return {
-    ...actual as any,
+    ...(actual as Record<string, unknown>),
     ChevronRight: () => <span data-testid="chevron-right" />,
     LayoutDashboard: () => <span data-testid="layout-dashboard" />,
     Users: () => <span data-testid="users" />,

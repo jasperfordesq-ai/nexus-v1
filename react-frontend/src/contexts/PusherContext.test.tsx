@@ -7,8 +7,8 @@
  * Tests for PusherContext
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
 import React from 'react';
 import { PusherProvider, usePusher, usePusherOptional } from './PusherContext';
 
@@ -71,15 +71,15 @@ function TestConsumer() {
       <button onClick={() => {
         const unsub = onNewMessage(() => {});
         // Store for later cleanup
-        (window as any).__testUnsub = unsub;
+        (window as unknown as Record<string, unknown>).__testUnsub = unsub;
       }}>Subscribe Messages</button>
       <button onClick={() => {
         const unsub = onTyping(() => {});
-        (window as any).__testTypingUnsub = unsub;
+        (window as unknown as Record<string, unknown>).__testTypingUnsub = unsub;
       }}>Subscribe Typing</button>
       <button onClick={() => {
         const unsub = onUnreadCount(() => {});
-        (window as any).__testUnreadUnsub = unsub;
+        (window as unknown as Record<string, unknown>).__testUnreadUnsub = unsub;
       }}>Subscribe Unread</button>
     </div>
   );
@@ -136,10 +136,10 @@ describe('PusherContext', () => {
     });
 
     // Unsubscribe returns a function
-    expect(typeof (window as any).__testUnsub).toBe('function');
+    expect(typeof (window as unknown as Record<string, unknown>).__testUnsub).toBe('function');
 
     // Calling it should not throw
-    expect(() => (window as any).__testUnsub()).not.toThrow();
+    expect(() => (window as unknown as Record<string, unknown>).__testUnsub()).not.toThrow();
   });
 
   it('registers typing listeners', () => {
@@ -153,7 +153,7 @@ describe('PusherContext', () => {
       screen.getByRole('button', { name: 'Subscribe Typing' }).click();
     });
 
-    expect(typeof (window as any).__testTypingUnsub).toBe('function');
+    expect(typeof (window as unknown as Record<string, unknown>).__testTypingUnsub).toBe('function');
   });
 
   it('registers unread count listeners', () => {
@@ -167,7 +167,7 @@ describe('PusherContext', () => {
       screen.getByRole('button', { name: 'Subscribe Unread' }).click();
     });
 
-    expect(typeof (window as any).__testUnreadUnsub).toBe('function');
+    expect(typeof (window as unknown as Record<string, unknown>).__testUnreadUnsub).toBe('function');
   });
 
   it('throws error when usePusher is outside provider', () => {
