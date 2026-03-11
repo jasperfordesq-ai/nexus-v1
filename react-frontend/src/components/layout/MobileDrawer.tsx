@@ -45,7 +45,7 @@ import {
   FolderOpen,
   Heart,
   Building2,
-  Search,
+  // Search, // temporarily disabled
   Shield,
   Globe,
   Info,
@@ -78,10 +78,10 @@ import { MobileMenuItems } from '@/components/navigation';
 interface MobileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSearchOpen?: () => void;
+  // onSearchOpen?: () => void; // temporarily disabled
 }
 
-export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProps) {
+export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation('common');
@@ -256,21 +256,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         </DrawerHeader>
 
         <DrawerBody>
-          {/* Search Button */}
-          {onSearchOpen && (
-            <div className="px-4 pt-3 pb-1">
-              <Button
-                variant="flat"
-                fullWidth
-                className="flex items-center justify-start gap-3 px-4 py-2.5 rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-sm text-theme-subtle h-auto"
-                onPress={() => { onClose(); onSearchOpen(); }}
-                aria-label="Open search"
-              >
-                <Search className="w-4 h-4" aria-hidden="true" />
-                <span>{t('search.placeholder')}</span>
-              </Button>
-            </div>
-          )}
+          {/* Search Button — temporarily disabled */}
 
           {/* User Section */}
           {isAuthenticated && user && (

@@ -55,7 +55,7 @@ export function Layout({
   // Memoize callbacks to prevent unnecessary re-renders
   const handleMobileMenuOpen = useCallback(() => setIsMobileMenuOpen(true), []);
   const handleMobileMenuClose = useCallback(() => setIsMobileMenuOpen(false), []);
-  const handleSearchOpen = useCallback(() => setIsSearchOpen(true), []);
+  // const handleSearchOpen = useCallback(() => setIsSearchOpen(true), []); // temporarily disabled
   const handleSearchOpenChange = useCallback((open: boolean) => setIsSearchOpen(open), []);
 
   // Listen for API errors and display toast notifications
@@ -101,7 +101,7 @@ export function Layout({
           <MobileDrawer
             isOpen={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
-            onSearchOpen={handleSearchOpen}
+            // onSearchOpen={handleSearchOpen} // temporarily disabled
           />
         </>
       )}
