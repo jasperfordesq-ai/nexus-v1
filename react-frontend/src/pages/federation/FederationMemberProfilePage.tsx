@@ -72,7 +72,6 @@ export function FederationMemberProfilePage() {
       );
       if (response.success && response.data) {
         setConnectionStatus(response.data.status);
-        setConnectionId(response.data.connection_id);
       }
     } catch (err) {
       // Non-critical - just means we can't show status
