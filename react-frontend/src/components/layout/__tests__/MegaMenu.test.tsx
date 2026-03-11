@@ -93,17 +93,17 @@ describe('MegaMenu', () => {
       renderMegaMenu();
       expect(screen.getByText('Volunteering')).toBeTruthy();
       expect(screen.getByText('Goals')).toBeTruthy();
-      expect(screen.getByText('Partner Hub')).toBeTruthy();
+      // Partner Hub is in collapsed federation section — not visible by default
       expect(screen.getAllByText('About').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('Contact')).toBeTruthy();
     });
 
-    it('renders 3-column grid when federation items exist', () => {
+    it('renders 2-column grid always (federation is collapsible)', () => {
       renderMegaMenu();
       // HeroUI Popover renders content via portal, so check the full document
       const nav = document.querySelector('nav[aria-label="More navigation"]');
       expect(nav).toBeTruthy();
-      expect(nav!.className).toContain('grid-cols-3');
+      expect(nav!.className).toContain('grid-cols-2');
     });
 
     it('renders 2-column grid when no federation items', () => {
@@ -181,7 +181,7 @@ describe('MegaMenu', () => {
     it('ArrowRight jumps to next column start', () => {
       renderMegaMenu();
       const buttons = getMegaButtons();
-      // First item in activity column (index 0), ArrowRight should go to federation column (index 2)
+      // First item in activity column (index 0), ArrowRight should go to right column (aboutItems[0])
       buttons[0]?.focus();
       const nav = document.querySelector('nav[aria-label="More navigation"]')!;
       fireEvent.keyDown(nav, { key: 'ArrowRight' });
@@ -191,8 +191,8 @@ describe('MegaMenu', () => {
     it('ArrowLeft jumps to previous column start', () => {
       renderMegaMenu();
       const buttons = getMegaButtons();
-      // First item in federation column, ArrowLeft should go to activity column start
-      const fedStart = activityItems.length;
+      // First item in right column (about), ArrowLeft should go to activity column start
+      const fedStart = activityItems.length; // right col starts at activityItems.length (aboutItems)
       buttons[fedStart]?.focus();
       const nav = document.querySelector('nav[aria-label="More navigation"]')!;
       fireEvent.keyDown(nav, { key: 'ArrowLeft' });
@@ -234,7 +234,8 @@ describe('MegaMenu', () => {
     it('all menu item buttons have data-mega-item attribute', () => {
       renderMegaMenu();
       const buttons = document.querySelectorAll('button[data-mega-item]');
-      expect(buttons.length).toBe(activityItems.length + federationItems.length + aboutItems.length);
+      // Federation starts collapsed — only activity + about items are visible
+      expect(buttons.length).toBe(activityItems.length + aboutItems.length);
     });
 
     it('icons have aria-hidden="true"', () => {
@@ -281,6 +282,33 @@ describe('MegaMenu', () => {
       );
       const aboutButton = screen.getByText('Contact').closest('button');
       expect(aboutButton?.className).not.toContain('bg-theme-active');
+    });
+  });
+
+  describe('Partner Communities (federation)', () => {
+    it('hides federation items by default (collapsed)', () => {
+      renderMegaMenu();
+      expect(screen.queryByText('Partner Hub')).toBeNull();
+    });
+
+    it('shows federation items after clicking the toggle', () => {
+      renderMegaMenu();
+      const toggle = screen.getByText('Partner Communities').closest('button')!;
+      fireEvent.click(toggle);
+      expect(screen.getByText('Partner Hub')).toBeTruthy();
+    });
+
+    it('toggle has aria-expanded=false by default', () => {
+      renderMegaMenu();
+      const toggle = screen.getByText('Partner Communities').closest('button')!;
+      expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('toggle has aria-expanded=true after clicking', () => {
+      renderMegaMenu();
+      const toggle = screen.getByText('Partner Communities').closest('button')!;
+      fireEvent.click(toggle);
+      expect(toggle.getAttribute('aria-expanded')).toBe('true');
     });
   });
 });
