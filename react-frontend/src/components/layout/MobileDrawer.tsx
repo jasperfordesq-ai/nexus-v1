@@ -39,7 +39,6 @@ import {
   Trophy,
   Medal,
   Target,
-  Hexagon,
   ArrowRightLeft,
   Newspaper,
   BookOpen,
@@ -66,6 +65,7 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
+import { TenantLogo } from '@/components/branding';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -86,7 +86,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const location = useLocation();
   const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
-  const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
+  const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
   const { resetConsent } = useCookieConsent();
   const { resolvedTheme, toggleTheme } = useTheme();
@@ -243,14 +243,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       <DrawerContent>
         {/* Header */}
         <DrawerHeader className="flex items-center justify-between">
-          <Link to={tenantPath('/')} className="flex items-center gap-2">
-            {branding.logo ? (
-              <img src={branding.logo} alt={branding.name} className="h-9 w-auto object-contain" loading="lazy" />
-            ) : (
-              <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
-            )}
-            <span className="font-bold text-xl text-gradient">{branding.name}</span>
-          </Link>
+          <TenantLogo size="lg" showName />
           <Button
             isIconOnly
             variant="light"

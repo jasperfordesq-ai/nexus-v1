@@ -24,7 +24,6 @@ import {
   DropdownSection,
 } from '@heroui/react';
 import {
-  Hexagon,
   LayoutDashboard,
   ListTodo,
   MessageSquare,
@@ -76,6 +75,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
 import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
+import { TenantLogo } from '@/components/branding';
 
 interface NavbarProps {
   onMobileMenuOpen?: () => void;
@@ -89,7 +89,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const location = useLocation();
   const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
-  const { tenant, branding, hasFeature, hasModule, tenantPath } = useTenant();
+  const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { headerMenus, hasCustomMenus } = useMenuContext();
@@ -379,21 +379,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               </Button>
 
               {/* Brand */}
-              <Link to={tenantPath('/')} className="flex items-center gap-2">
-                {branding.logo ? (
-                  <img
-                    src={branding.logo}
-                    alt={branding.name}
-                    className="h-8 sm:h-9 w-auto object-contain"
-                    loading="eager"
-                  />
-                ) : (
-                  <Hexagon className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
-                )}
-                <span className="font-bold text-lg sm:text-xl text-gradient hidden min-[480px]:inline">
-                  {branding.name}
-                </span>
-              </Link>
+              <TenantLogo size="md" showName />
             </div>
 
             {/* Desktop Navigation */}
