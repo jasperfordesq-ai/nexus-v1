@@ -1384,6 +1384,19 @@ export interface FederatedMember {
   };
 }
 
+export interface FederationConnection {
+  id: number;
+  user_id: number;
+  name: string;
+  avatar_url?: string | null;
+  tenant_id: number;
+  tenant_name: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  message?: string | null;
+  created_at: string;
+  updated_at?: string | null;
+}
+
 export interface FederatedMessage {
   id: number;
   subject: string;
