@@ -10,13 +10,12 @@
  * Theme-aware styling for light and dark modes.
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { DevelopmentStatusBanner } from './DevelopmentStatusBanner';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Button,
   Avatar,
-  Badge,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
@@ -31,7 +30,6 @@ import {
   Users,
   Users2,
   Calendar,
-  Bell,
   Settings,
   LogOut,
   Menu,
@@ -75,7 +73,9 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
 import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
+import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
+import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 
 interface NavbarProps {
   onMobileMenuOpen?: () => void;
@@ -90,9 +90,32 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
-  const { unreadCount, counts } = useNotifications();
+  const { counts } = useNotifications();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { headerMenus, hasCustomMenus } = useMenuContext();
+
+  // Scroll behavior for utility bar auto-hide + logo shrink
+  const { isScrolled, isUtilityBarVisible } = useHeaderScroll(48);
+
+  // Smart nav: track overflow to collapse items into MegaMenu
+  const navRef = useRef<HTMLElement>(null);
+  const [maxVisibleNav, setMaxVisibleNav] = useState(6);
+
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      const availableWidth = el.offsetWidth;
+      // Each nav item is ~110px avg, Community dropdown ~130px, More ~90px
+      // Reserve 220px for Community + More
+      const itemWidth = 110;
+      const reserved = 220;
+      const count = Math.max(1, Math.floor((availableWidth - reserved) / itemWidth));
+      setMaxVisibleNav(count);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Compute admin status once
   const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
@@ -195,8 +218,28 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     return true;
   };
 
+  // ─── Collapsed primary nav items → overflow into MegaMenu ────────────────
+  const overflowNavItems = useMemo(() => {
+    const items: { label: string; desc: string; href: string; icon: typeof LayoutDashboard; module?: string }[] = [];
+    if (hasModule('dashboard') && maxVisibleNav < 1)
+      items.push({ label: t('nav.dashboard'), desc: t('nav_desc.dashboard', 'Your personal dashboard'), href: tenantPath('/dashboard'), icon: LayoutDashboard, module: 'dashboard' });
+    if (hasModule('feed') && maxVisibleNav < 2)
+      items.push({ label: t('nav.feed'), desc: t('nav_desc.feed', 'Community feed'), href: tenantPath('/feed'), icon: Newspaper, module: 'feed' });
+    if (hasModule('listings') && maxVisibleNav < 3)
+      items.push({ label: t('nav.listings'), desc: t('nav_desc.listings', 'Browse listings'), href: tenantPath('/listings'), icon: ListTodo, module: 'listings' });
+    if (hasModule('messages') && maxVisibleNav < 4)
+      items.push({ label: t('nav.messages'), desc: t('nav_desc.messages', 'Your messages'), href: tenantPath('/messages'), icon: MessageSquare, module: 'messages' });
+    return items;
+  }, [maxVisibleNav, hasModule, t, tenantPath]);
+
   // ─── Left column sections ────────────────────────────────────────────────
   const leftSections = useMemo(() => [
+    // Overflow section — only visible when primary nav items are collapsed
+    ...(overflowNavItems.length > 0 ? [{
+      key: 'main',
+      title: t('sections.main', 'Main'),
+      items: overflowNavItems,
+    }] : []),
     {
       key: 'core',
       title: t('sections.core', 'Core'),
@@ -230,7 +273,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
       ].filter(gateFilter),
     },
-  ], [t, tenantPath, hasFeature, hasModule]);
+  ], [t, tenantPath, hasFeature, hasModule, overflowNavItems]);
 
   // ─── Right column sections ───────────────────────────────────────────────
   const rightSections = useMemo(() => [
@@ -299,8 +342,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         {/* Development status banner — inside fixed header so it's always visible */}
         <DevelopmentStatusBanner />
 
-        {/* Utility Bar — slim top strip for secondary actions */}
-        <div className="hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)]">
+        {/* Utility Bar — slim top strip, auto-hides on scroll down */}
+        <div
+          className={`hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)] transition-all duration-200 overflow-hidden ${
+            isUtilityBarVisible ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0 border-b-0'
+          }`}
+        >
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-end gap-1 h-8 flex-nowrap overflow-x-auto">
               {/* Help Center — authenticated users */}
@@ -378,18 +425,18 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 <Menu className="w-5 h-5" aria-hidden="true" />
               </Button>
 
-              {/* Brand */}
-              <TenantLogo size="md" showName />
+              {/* Brand — shrinks when scrolled */}
+              <TenantLogo size="md" showName compact={isScrolled} />
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
+            {/* Desktop Navigation — uses ResizeObserver for smart collapsing */}
+            <nav ref={navRef} className="hidden lg:flex items-center gap-1 flex-1 justify-center min-w-0" aria-label="Main navigation">
               {hasCustomMenus ? (
                 <DesktopMenuItems menus={headerMenus} />
               ) : (
               <>
-              {/* Dashboard */}
-              {hasModule('dashboard') && (
+              {/* Primary nav items — collapse into More when space is tight */}
+              {hasModule('dashboard') && maxVisibleNav >= 1 && (
                 <NavLink
                   to={tenantPath('/dashboard')}
                   className={({ isActive }) =>
@@ -405,8 +452,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </NavLink>
               )}
 
-              {/* Feed */}
-              {hasModule('feed') && (
+              {hasModule('feed') && maxVisibleNav >= 2 && (
                 <NavLink
                   to={tenantPath('/feed')}
                   className={({ isActive }) =>
@@ -422,8 +468,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </NavLink>
               )}
 
-              {/* Listings */}
-              {hasModule('listings') && (
+              {hasModule('listings') && maxVisibleNav >= 3 && (
                 <NavLink
                   to={tenantPath('/listings')}
                   className={({ isActive }) =>
@@ -439,8 +484,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </NavLink>
               )}
 
-              {/* Messages */}
-              {hasModule('messages') && (
+              {hasModule('messages') && maxVisibleNav >= 4 && (
                 <NavLink
                   to={tenantPath('/messages')}
                   className={({ isActive }) =>
@@ -461,7 +505,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </NavLink>
               )}
 
-              {/* Community Dropdown */}
+              {/* Community Dropdown — always visible on desktop */}
               {communityItems.length > 0 && (
                 <Dropdown placement="bottom-start" isOpen={communityOpen} onOpenChange={handleCommunityOpenChange} shouldBlockScroll={false}>
                   <DropdownTrigger>
@@ -518,30 +562,19 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
             {/* User Actions */}
             <div className="flex items-center gap-1 sm:gap-2">
-              {/* Search Trigger — visible to all users */}
-              <Button
-                variant="flat"
-                size="sm"
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-theme-default bg-theme-elevated hover:bg-theme-hover text-theme-subtle text-sm h-auto"
-                onPress={() => setIsSearchOpen(true)}
+              {/* Command Palette Trigger — single unified button */}
+              <button
+                type="button"
+                onClick={() => setIsSearchOpen(true)}
                 aria-label="Search (Ctrl+K)"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-transparent lg:border-theme-default transition-colors cursor-pointer"
               >
                 <Search className="w-4 h-4" aria-hidden="true" />
-                <span className="text-theme-subtle">{t('search.placeholder')}</span>
-                <kbd className="ml-2 hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-theme-hover text-[10px] font-medium text-theme-subtle border border-theme-default">
+                <span className="hidden lg:inline text-xs text-theme-subtle">Search</span>
+                <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
                   <span className="text-xs">⌘</span>K
                 </kbd>
-              </Button>
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                className="flex md:hidden text-theme-muted hover:text-theme-primary"
-                onPress={() => setIsSearchOpen(true)}
-                aria-label="Search"
-              >
-                <Search className="w-5 h-5" aria-hidden="true" />
-              </Button>
+              </button>
 
               {isAuthenticated ? (
                 <>
@@ -588,29 +621,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     <LanguageSwitcher />
                   </div>
 
-                  {/* Notifications */}
-                  {/* Visually hidden live region announces unread count changes to screen readers */}
-                  <span className="sr-only" aria-live="polite" aria-atomic="true">
-                    {unreadCount > 0 ? t('nav.unread_notifications', '{{count}} unread notifications', { count: unreadCount }) : ''}
-                  </span>
-                  <Badge
-                    content={unreadCount > 99 ? '99+' : unreadCount}
-                    color="danger"
-                    size="sm"
-                    isInvisible={unreadCount === 0}
-                    placement="top-right"
-                  >
-                    <Button
-                      isIconOnly
-                      variant="light"
-                      size="sm"
-                      className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
-                      onPress={() => navigate(tenantPath('/notifications'))}
-                      aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-                    >
-                      <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
-                    </Button>
-                  </Badge>
+                  {/* Notification Flyout — rich popover instead of simple navigate */}
+                  <NotificationFlyout />
 
                   {/* User Dropdown */}
                   <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>

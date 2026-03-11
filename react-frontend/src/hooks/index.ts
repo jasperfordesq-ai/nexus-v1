@@ -12,3 +12,5 @@ export { useMediaQuery } from './useMediaQuery';
 export { useDraftPersistence } from './useDraftPersistence';
 export { useSocialInteractions, AVAILABLE_REACTIONS } from './useSocialInteractions';
 export type { SocialInteractionsOptions, LikerUser, LikersResult, MentionUser } from './useSocialInteractions';
+export { useHeaderScroll } from './useHeaderScroll';
+export type { HeaderScrollState } from './useHeaderScroll';
