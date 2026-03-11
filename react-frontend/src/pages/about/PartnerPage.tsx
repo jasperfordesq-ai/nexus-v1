@@ -195,6 +195,29 @@ export function PartnerPage() {
         </div>
       </section>
 
+      {/* ─── Partner Logos Banner ─── */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <GlassCard className="p-8 sm:p-10 text-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-6">
+                {t('partner.our_partners_heading', 'Our Partners & Supporters')}
+              </h2>
+              <img
+                src="/images/timebank_ireland_west_cork_partnership.jpg"
+                alt={t('partner.partners_banner_alt', 'Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund')}
+                className="w-full max-w-3xl mx-auto rounded-lg bg-white p-4"
+              />
+            </GlassCard>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ─── Addressing the Funding Gap ─── */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
