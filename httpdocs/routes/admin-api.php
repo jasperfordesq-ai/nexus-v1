@@ -482,6 +482,14 @@ $router->add('POST', '/api/v2/federation/messages/{id}/mark-read', 'Nexus\Contro
 $router->add('GET', '/api/v2/federation/settings', 'Nexus\Controllers\Api\FederationV2ApiController@getSettings');
 $router->add('PUT', '/api/v2/federation/settings', 'Nexus\Controllers\Api\FederationV2ApiController@updateSettings');
 
+// Federation Connections (cross-tenant)
+$router->add('GET', '/api/v2/federation/connections', 'Nexus\Controllers\Api\FederationV2ApiController@connections');
+$router->add('POST', '/api/v2/federation/connections', 'Nexus\Controllers\Api\FederationV2ApiController@sendConnectionRequest');
+$router->add('POST', '/api/v2/federation/connections/{id}/accept', 'Nexus\Controllers\Api\FederationV2ApiController@acceptConnection');
+$router->add('POST', '/api/v2/federation/connections/{id}/reject', 'Nexus\Controllers\Api\FederationV2ApiController@rejectConnection');
+$router->add('DELETE', '/api/v2/federation/connections/{id}', 'Nexus\Controllers\Api\FederationV2ApiController@removeConnection');
+$router->add('GET', '/api/v2/federation/connections/status/{userId}/{tenantId}', 'Nexus\Controllers\Api\FederationV2ApiController@connectionStatus');
+
 // Admin Pages
 $router->add('GET', '/api/v2/admin/pages', 'Nexus\Controllers\Api\AdminContentApiController@getPages');
 $router->add('POST', '/api/v2/admin/pages', 'Nexus\Controllers\Api\AdminContentApiController@createPage');

@@ -2089,16 +2089,8 @@ class VolunteerService
             // Initialize owner membership
             OrgMember::initializeOwner((int)$orgId, $userId);
 
-            // Record in feed_activity table
-            try {
-                FeedActivityService::recordActivity($tenantId, $userId, 'org_registered', (int)$orgId, [
-                    'title' => $name,
-                    'content' => $description,
-                    'created_at' => date('Y-m-d H:i:s'),
-                ]);
-            } catch (\Exception $faEx) {
-                error_log("VolunteerService::createOrganization feed_activity record failed: " . $faEx->getMessage());
-            }
+            // Note: org_registered is not a valid feed source_type — organizations
+            // appear in the feed when they create volunteer opportunities.
 
             // Log activity
             try {

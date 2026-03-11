@@ -177,36 +177,64 @@ class OnboardingService
         foreach ($offers as $catId) {
             $catId = (int)$catId;
             $catName = $categories[$catId] ?? 'Service';
+            $title = "I can help with {$catName}";
+            $description = "I'm available to help with {$catName}. Get in touch to arrange!";
             Database::query(
                 "INSERT INTO listings (title, description, type, category_id, user_id, tenant_id, status, created_at)
                  VALUES (?, ?, 'offer', ?, ?, ?, 'active', NOW())",
                 [
-                    "I can help with {$catName}",
-                    "I'm available to help with {$catName}. Get in touch to arrange!",
+                    $title,
+                    $description,
                     $catId,
                     $userId,
                     $tenantId,
                 ]
             );
-            $createdIds[] = (int)Database::lastInsertId();
+            $listingId = (int)Database::lastInsertId();
+            $createdIds[] = $listingId;
+
+            // Record in feed so onboarding listings appear in the community feed
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'listing', $listingId, [
+                    'title' => $title,
+                    'content' => $description,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $e) {
+                error_log("OnboardingService::autoCreateListings feed_activity failed: " . $e->getMessage());
+            }
         }
 
         // Create request listings
         foreach ($needs as $catId) {
             $catId = (int)$catId;
             $catName = $categories[$catId] ?? 'Service';
+            $title = "Looking for help with {$catName}";
+            $description = "I'm looking for someone who can help me with {$catName}.";
             Database::query(
                 "INSERT INTO listings (title, description, type, category_id, user_id, tenant_id, status, created_at)
                  VALUES (?, ?, 'request', ?, ?, ?, 'active', NOW())",
                 [
-                    "Looking for help with {$catName}",
-                    "I'm looking for someone who can help me with {$catName}.",
+                    $title,
+                    $description,
                     $catId,
                     $userId,
                     $tenantId,
                 ]
             );
-            $createdIds[] = (int)Database::lastInsertId();
+            $listingId = (int)Database::lastInsertId();
+            $createdIds[] = $listingId;
+
+            // Record in feed so onboarding listings appear in the community feed
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'listing', $listingId, [
+                    'title' => $title,
+                    'content' => $description,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $e) {
+                error_log("OnboardingService::autoCreateListings feed_activity failed: " . $e->getMessage());
+            }
         }
 
         return $createdIds;

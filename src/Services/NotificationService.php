@@ -41,13 +41,13 @@ class NotificationService
      * Notification type categories for grouping
      */
     private const TYPE_CATEGORIES = [
-        'messages' => ['message', 'new_message', 'message_received'],
-        'connections' => ['connection_request', 'connection_accepted', 'friend_request', 'friend_accepted'],
+        'messages' => ['message', 'new_message', 'message_received', 'federation_message'],
+        'connections' => ['connection_request', 'connection_accepted', 'friend_request', 'friend_accepted', 'federation_connection_request', 'federation_connection_accepted'],
         'reviews' => ['review', 'new_review', 'review_received'],
-        'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received'],
+        'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received', 'federation_transaction'],
         'social' => ['like', 'comment', 'mention', 'post_like', 'post_comment'],
         'events' => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
-        'groups' => ['group_invite', 'group_join', 'group_post'],
+        'groups' => ['group_invite', 'group_join', 'group_post', 'federation_group_join'],
         'listings' => ['listing', 'listing_interest', 'listing_match', 'listing_expiry', 'hot_match', 'mutual_match'],
         'jobs' => ['job_application', 'job_application_status'],
         'system' => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],

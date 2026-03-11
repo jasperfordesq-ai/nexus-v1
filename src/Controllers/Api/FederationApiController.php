@@ -17,6 +17,9 @@ use Nexus\Services\FederationAuditService;
 use Nexus\Services\FederationJwtService;
 use Nexus\Services\FederationExternalPartnerService;
 use Nexus\Services\BrokerMessageVisibilityService;
+use Nexus\Services\FederationEmailService;
+use Nexus\Services\FederationRealtimeService;
+use Nexus\Models\Notification;
 
 /**
  * FederationApiController
@@ -750,6 +753,78 @@ class FederationApiController extends BaseApiController
             null,
             ['message_id' => $messageId, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternalPartner]
         );
+
+        // ── Notification dispatch (email + realtime + in-app + push) ──
+        // Non-blocking: failures are logged but don't affect the API response.
+
+        // Get sender info for notification display
+        $senderName = $input['sender_name'] ?? 'A federation member';
+        $senderTenantName = 'Partner Timebank';
+        try {
+            $senderStmt = $db->prepare("
+                SELECT u.name, u.first_name, u.last_name, t.name as tenant_name
+                FROM users u JOIN tenants t ON u.tenant_id = t.id
+                WHERE u.id = ?
+            ");
+            $senderStmt->execute([$input['sender_id']]);
+            $senderRow = $senderStmt->fetch(\PDO::FETCH_ASSOC);
+            if ($senderRow) {
+                $senderName = $senderRow['name'] ?: trim($senderRow['first_name'] . ' ' . $senderRow['last_name']);
+                $senderTenantName = $senderRow['tenant_name'] ?: 'Partner Timebank';
+            }
+        } catch (\Exception $e) {
+            // Use defaults
+        }
+
+        // 1. Email notification to recipient
+        try {
+            FederationEmailService::sendNewMessageNotification(
+                (int)$input['recipient_id'],
+                (int)$input['sender_id'],
+                (int)$partnerTenantId,
+                substr($input['body'], 0, 200)
+            );
+        } catch (\Exception $e) {
+            error_log("FederationV1: Failed to send federation message email: " . $e->getMessage());
+        }
+
+        // 2. Real-time notification via Pusher
+        try {
+            FederationRealtimeService::broadcastNewMessage(
+                (int)$input['sender_id'],
+                (int)$partnerTenantId,
+                (int)$input['recipient_id'],
+                (int)$recipient['tenant_id'],
+                [
+                    'message_id' => (int)$messageId,
+                    'sender_name' => $senderName,
+                    'sender_tenant_name' => $senderTenantName,
+                    'subject' => $input['subject'],
+                    'body' => $input['body'],
+                ]
+            );
+        } catch (\Exception $e) {
+            error_log("FederationV1: Failed to send federation message realtime: " . $e->getMessage());
+        }
+
+        // 3. In-app notification + push notification
+        try {
+            $notifMessage = "New federated message from {$senderName} ({$senderTenantName}): " . substr($input['subject'], 0, 50);
+            if (strlen($input['subject']) > 50) {
+                $notifMessage .= '...';
+            }
+
+            Notification::create(
+                (int)$input['recipient_id'],
+                $notifMessage,
+                '/federation/messages',
+                'federation_message',
+                true,
+                (int)$recipient['tenant_id']  // Receiver's tenant, not sender's
+            );
+        } catch (\Exception $e) {
+            error_log("FederationV1: Failed to send federation message in-app notification: " . $e->getMessage());
+        }
 
         FederationApiMiddleware::sendSuccess([
             'message_id' => (int)$messageId,

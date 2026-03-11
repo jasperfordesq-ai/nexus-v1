@@ -8,14 +8,13 @@
  * Rich popover showing recent notifications without leaving the current page.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
   Button,
-  Badge,
   Skeleton,
 } from '@heroui/react';
 import {
@@ -52,37 +51,37 @@ const TYPE_ICONS: Record<string, typeof Bell> = {
 export function NotificationFlyout() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
-  const { unreadCount, markAllAsRead } = useNotifications();
+  const { unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const { tenantPath } = useTenant();
 
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasFetched, setHasFetched] = useState(false);
+  const fetchIdRef = useRef(0);
 
+  // Always re-fetch when popover opens — ensures sync with page deletions/reads
   const fetchNotifications = useCallback(async () => {
-    if (hasFetched) return;
+    const fetchId = ++fetchIdRef.current;
     try {
       setIsLoading(true);
       const response = await api.get<Notification[]>('/v2/notifications?per_page=8');
-      if (response.success && response.data) {
+      // Only apply if this is still the latest fetch
+      if (fetchId === fetchIdRef.current && response.success && response.data) {
         setNotifications(response.data);
       }
     } catch (error) {
       logError('Failed to load notifications for flyout', error);
     } finally {
-      setIsLoading(false);
-      setHasFetched(true);
+      if (fetchId === fetchIdRef.current) {
+        setIsLoading(false);
+      }
     }
-  }, [hasFetched]);
+  }, []);
 
+  // Re-fetch every time the popover opens
   useEffect(() => {
     if (isOpen) fetchNotifications();
   }, [isOpen, fetchNotifications]);
-
-  useEffect(() => {
-    setHasFetched(false);
-  }, [unreadCount]);
 
   const handleOpenChange = useCallback((open: boolean) => setIsOpen(open), []);
 
@@ -93,8 +92,15 @@ export function NotificationFlyout() {
 
   const handleNotificationClick = useCallback((notification: Notification) => {
     setIsOpen(false);
+    // Mark as read in context so bell badge updates
+    if (!notification.read_at) {
+      markAsRead(notification.id);
+      setNotifications(prev => prev.map(n =>
+        n.id === notification.id ? { ...n, read_at: new Date().toISOString() } : n
+      ));
+    }
     navigate(notification.link ? tenantPath(notification.link) : tenantPath('/notifications'));
-  }, [navigate, tenantPath]);
+  }, [navigate, tenantPath, markAsRead]);
 
   const handleViewAll = useCallback(() => {
     setIsOpen(false);
@@ -112,27 +118,25 @@ export function NotificationFlyout() {
       isOpen={isOpen}
       onOpenChange={handleOpenChange}
       shouldBlockScroll={false}
+      backdrop="transparent"
       offset={8}
     >
-      <Badge
-        content={unreadCount > 99 ? '99+' : unreadCount}
-        color="danger"
-        size="sm"
-        isInvisible={unreadCount === 0}
-        placement="top-right"
-      >
-        <PopoverTrigger>
-          <Button
-            isIconOnly
-            variant="light"
-            size="sm"
-            className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
-            aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-          >
-            <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
-          </Button>
-        </PopoverTrigger>
-      </Badge>
+      <PopoverTrigger>
+        <Button
+          isIconOnly
+          variant="light"
+          size="sm"
+          className={`relative text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
+          aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+        >
+          <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-white bg-danger rounded-full leading-none">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
       <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[360px] max-w-[90vw]">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
           <h3 className="text-sm font-semibold text-theme-primary">
@@ -194,7 +198,7 @@ export function NotificationFlyout() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm leading-snug ${isUnread ? 'font-medium text-theme-primary' : 'text-theme-secondary'}`}>
-                        {notification.message || notification.title}
+                        {notification.message || notification.body || notification.title}
                       </p>
                       <p className="text-xs text-theme-subtle mt-0.5">
                         {formatRelativeTime(notification.created_at)}

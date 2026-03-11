@@ -28,7 +28,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
-import { useToast, useTenant } from '@/contexts';
+import { useToast, useTenant, useNotifications } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
@@ -42,6 +42,7 @@ export function NotificationsPage() {
   usePageTitle(t('page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { refreshCounts, markAsRead: contextMarkAsRead, markAllAsRead: contextMarkAllAsRead } = useNotifications();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<NotificationFilter>('all');
@@ -53,7 +54,7 @@ export function NotificationsPage() {
   async function loadNotifications() {
     try {
       setIsLoading(true);
-      const response = await api.get<Notification[]>('/v2/notifications?limit=50');
+      const response = await api.get<Notification[]>('/v2/notifications?per_page=50');
       if (response.success && response.data) {
         setNotifications(response.data);
       }
@@ -66,7 +67,8 @@ export function NotificationsPage() {
 
   async function markAsRead(id: number) {
     try {
-      await api.post(`/v2/notifications/${id}/read`);
+      // Use context to update both local state and bell badge count
+      await contextMarkAsRead(id);
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
       );
@@ -78,7 +80,8 @@ export function NotificationsPage() {
 
   async function markAllAsRead() {
     try {
-      await api.post('/v2/notifications/read-all');
+      // Use context to update both local state and bell badge count
+      await contextMarkAllAsRead();
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
       );
@@ -91,8 +94,13 @@ export function NotificationsPage() {
 
   async function deleteNotification(id: number) {
     try {
+      const notification = notifications.find((n) => n.id === id);
       await api.delete(`/v2/notifications/${id}`);
       setNotifications((prev) => prev.filter((n) => n.id !== id));
+      // If deleted notification was unread, refresh the bell badge count
+      if (notification && !notification.read_at) {
+        refreshCounts();
+      }
     } catch (error) {
       logError('Failed to delete notification', error);
       toast.error(t('toast.delete_failed'));
@@ -142,7 +150,7 @@ export function NotificationsPage() {
               size="sm"
               className="bg-theme-elevated text-theme-primary"
               startContent={<CheckCheck className="w-4 h-4" aria-hidden="true" />}
-              onClick={markAllAsRead}
+              onPress={markAllAsRead}
             >
               {t('mark_all_read')}
             </Button>
@@ -167,7 +175,7 @@ export function NotificationsPage() {
           size="sm"
           variant={filter === 'all' ? 'solid' : 'flat'}
           className={filter === 'all' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
-          onClick={() => setFilter('all')}
+          onPress={() => setFilter('all')}
         >
           {t('filter_all')}
         </Button>
@@ -175,7 +183,7 @@ export function NotificationsPage() {
           size="sm"
           variant={filter === 'unread' ? 'solid' : 'flat'}
           className={filter === 'unread' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
-          onClick={() => setFilter('unread')}
+          onPress={() => setFilter('unread')}
         >
           {t('filter_unread', { count: unreadCount })}
         </Button>
@@ -299,7 +307,7 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
               variant="flat"
               size="sm"
               className="bg-theme-elevated text-theme-muted hover:text-theme-primary"
-              onClick={onMarkRead}
+              onPress={onMarkRead}
               aria-label={t('mark_read_aria')}
             >
               <Check className="w-4 h-4" aria-hidden="true" />
@@ -310,7 +318,7 @@ function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCa
             variant="flat"
             size="sm"
             className="bg-theme-elevated text-theme-muted hover:text-red-500 dark:hover:text-red-400"
-            onClick={onDelete}
+            onPress={onDelete}
             aria-label={t('delete_aria')}
           >
             <Trash2 className="w-4 h-4" aria-hidden="true" />

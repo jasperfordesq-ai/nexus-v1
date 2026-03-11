@@ -8,7 +8,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@heroui/react';
 import { useTenant, useFeature, useCookieConsent } from '@/contexts';
-import { Hexagon, Mail, Phone, MapPin, Cookie, Bug } from 'lucide-react';
+import { Mail, Phone, MapPin, Cookie, Bug } from 'lucide-react';
+import { TenantLogo } from '@/components/branding';
 
 export interface FooterProps {
   /** Footer content/links */
@@ -48,14 +49,7 @@ export function Footer({ children, copyright }: FooterProps) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
               {/* Brand + Contact */}
               <div className="col-span-2 sm:col-span-1 space-y-3">
-                <Link to={tenantPath('/')} className="flex items-center gap-2">
-                  {branding.logo ? (
-                    <img src={branding.logo} alt={branding.name} className="h-7 w-auto object-contain" loading="lazy" />
-                  ) : (
-                    <Hexagon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
-                  )}
-                  <span className="font-bold text-lg text-gradient">{branding.name}</span>
-                </Link>
+                <TenantLogo size="sm" showName />
                 <p className="text-sm text-theme-subtle">
                   {branding.tagline || 'Building stronger communities through the exchange of time.'}
                 </p>

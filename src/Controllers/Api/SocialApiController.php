@@ -11,6 +11,7 @@ use Nexus\Core\TenantContext;
 use Nexus\Services\CommentService;
 use Nexus\Services\SocialNotificationService;
 use Nexus\Services\FeedService;
+use Nexus\Services\FeedActivityService;
 use Nexus\Services\FeedRankingService;
 use Nexus\Models\FeedPost;
 
@@ -1554,6 +1555,18 @@ class SocialApiController extends BaseApiController
                 );
             }
             $postId = Database::lastInsertId();
+
+            // Record in feed_activity so post appears in the feed
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'post', (int)$postId, [
+                    'content' => $content,
+                    'image_url' => $imageUrl,
+                    'group_id' => $groupId ?: null,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log('SocialApiController::createPost feed_activity failed: ' . $faEx->getMessage());
+            }
 
             $this->jsonResponse([
                 'success' => true,
