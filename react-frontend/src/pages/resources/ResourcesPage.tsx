@@ -48,12 +48,13 @@ import {
   GripVertical,
   ArrowUp,
   ArrowDown,
+  Trash2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
@@ -238,6 +239,11 @@ export function ResourcesPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  // Delete confirmation state
+  const deleteModal = useDisclosure();
+  const [deletingResource, setDeletingResource] = useState<Resource | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Load categories and category tree on mount
   useEffect(() => {
     const loadCategories = async () => {
@@ -409,6 +415,28 @@ export function ResourcesPage() {
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
+    }
+  }
+
+  // Delete resource handler
+  async function handleDeleteResource() {
+    if (!deletingResource) return;
+    try {
+      setIsDeleting(true);
+      const response = await api.delete(`/v2/resources/${deletingResource.id}`);
+      if (response.success) {
+        toast.success(t('resources.delete_success', 'Resource deleted'), t('resources.delete_success_description', 'The resource has been removed.'));
+        setResources((prev) => prev.filter((r) => r.id !== deletingResource.id));
+        deleteModal.onClose();
+        setDeletingResource(null);
+      } else {
+        toast.error(t('resources.delete_failed', 'Delete failed'), response.error || t('resources.delete_failed_description', 'Could not delete the resource.'));
+      }
+    } catch (err) {
+      logError('Failed to delete resource', err);
+      toast.error(t('resources.delete_failed', 'Delete failed'), t('resources.delete_failed_description', 'Could not delete the resource.'));
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -728,22 +756,37 @@ export function ResourcesPage() {
                         </div>
                       </div>
 
-                      {/* Download */}
-                      <a
-                        href={resource.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-shrink-0"
-                      >
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          className="bg-theme-elevated text-theme-muted"
-                          startContent={<Download className="w-3.5 h-3.5" aria-hidden="true" />}
+                      {/* Actions */}
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <a
+                          href={`${API_BASE}/v2/resources/${resource.id}/download`}
+                          className="flex-shrink-0"
                         >
-                          {t('resources.open')}
-                        </Button>
-                      </a>
+                          <Button
+                            size="sm"
+                            variant="flat"
+                            className="bg-theme-elevated text-theme-muted"
+                            startContent={<Download className="w-3.5 h-3.5" aria-hidden="true" />}
+                          >
+                            {t('resources.download', 'Download')}
+                          </Button>
+                        </a>
+                        {(user?.id === resource.uploader.id || isAdmin) && (
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            className="text-theme-subtle hover:text-red-500"
+                            onPress={() => {
+                              setDeletingResource(resource);
+                              deleteModal.onOpen();
+                            }}
+                            aria-label={t('resources.delete', 'Delete resource')}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </GlassCard>
                 </motion.div>
@@ -768,6 +811,55 @@ export function ResourcesPage() {
 
         </div>{/* end Main Content */}
       </div>{/* end R1 Layout */}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={() => {
+          if (!isDeleting) {
+            deleteModal.onClose();
+            setDeletingResource(null);
+          }
+        }}
+        size="sm"
+        classNames={{
+          base: 'bg-content1 border border-theme-default',
+          header: 'border-b border-theme-default',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary flex items-center gap-2">
+            <Trash2 className="w-5 h-5 text-red-500" aria-hidden="true" />
+            {t('resources.delete_confirm_title', 'Delete Resource')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted text-sm">
+              {t('resources.delete_confirm_message', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: deletingResource?.title })}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => {
+                deleteModal.onClose();
+                setDeletingResource(null);
+              }}
+              isDisabled={isDeleting}
+            >
+              {t('resources.cancel')}
+            </Button>
+            <Button
+              color="danger"
+              onPress={handleDeleteResource}
+              isLoading={isDeleting}
+            >
+              {t('resources.delete_confirm', 'Delete')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* Upload Resource Modal */}
       <Modal

@@ -258,4 +258,118 @@ class ResourcesPublicApiController extends BaseApiController
             'created_at' => date('Y-m-d H:i:s'),
         ], null, 201);
     }
+
+    /**
+     * GET /api/v2/resources/{id}/download
+     *
+     * Stream the resource file with Content-Disposition: attachment header
+     * so the browser downloads it instead of opening it inline.
+     * Also increments the download counter.
+     */
+    public function download(int $id): void
+    {
+        $tenantId = TenantContext::getId();
+
+        $resource = Database::query(
+            "SELECT id, file_path, file_type, title FROM resources WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
+
+        if (!$resource) {
+            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Resource not found', null, 404);
+            return;
+        }
+
+        $filePath = $resource['file_path'] ?? '';
+        if (empty($filePath)) {
+            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'No file associated with this resource', null, 404);
+            return;
+        }
+
+        // Resolve full filesystem path
+        if (str_starts_with($filePath, '/uploads/')) {
+            $fullPath = realpath(__DIR__ . '/../../../httpdocs' . $filePath);
+        } else {
+            $fullPath = realpath(__DIR__ . '/../../../httpdocs/uploads/' . $tenantId . '/resources/' . $filePath);
+        }
+
+        $uploadsDir = realpath(__DIR__ . '/../../../httpdocs/uploads');
+        if (!$fullPath || !$uploadsDir || !str_starts_with($fullPath, $uploadsDir) || !file_exists($fullPath)) {
+            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'File not found', null, 404);
+            return;
+        }
+
+        // Increment download counter
+        Database::query(
+            "UPDATE resources SET downloads = downloads + 1 WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        );
+
+        // Build a friendly download filename from the title
+        $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+        $safeTitle = preg_replace('/[^a-zA-Z0-9_\-\s]/', '', $resource['title'] ?? 'download');
+        $safeTitle = preg_replace('/\s+/', '_', trim($safeTitle));
+        $downloadName = ($safeTitle ?: 'download') . '.' . $ext;
+
+        $mimeType = $resource['file_type'] ?: (mime_content_type($fullPath) ?: 'application/octet-stream');
+
+        header('Content-Type: ' . $mimeType);
+        header('Content-Disposition: attachment; filename="' . $downloadName . '"');
+        header('Content-Length: ' . filesize($fullPath));
+        header('Cache-Control: no-cache, must-revalidate');
+
+        readfile($fullPath);
+        exit;
+    }
+
+    /**
+     * DELETE /api/v2/resources/{id}
+     *
+     * Delete a resource. Only the uploader or an admin can delete.
+     */
+    public function destroy(int $id): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        $resource = Database::query(
+            "SELECT id, user_id, file_path FROM resources WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
+
+        if (!$resource) {
+            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Resource not found', null, 404);
+            return;
+        }
+
+        // Check ownership or admin role
+        $isOwner = (int) $resource['user_id'] === $userId;
+        $userRole = $_SESSION['user_role'] ?? '';
+        $isAdminUser = in_array($userRole, ['admin', 'super_admin', 'tenant_admin'], true);
+
+        if (!$isOwner && !$isAdminUser) {
+            $this->respondWithError(ApiErrorCodes::FORBIDDEN, 'You do not have permission to delete this resource', null, 403);
+            return;
+        }
+
+        // Delete file from disk
+        $filePath = $resource['file_path'] ?? '';
+        if (!empty($filePath)) {
+            $uploadsDir = realpath(__DIR__ . '/../../../httpdocs/uploads');
+            if (str_starts_with($filePath, '/uploads/')) {
+                $fullPath = realpath(__DIR__ . '/../../../httpdocs' . $filePath);
+            } else {
+                $fullPath = realpath(__DIR__ . '/../../../httpdocs/uploads/' . $tenantId . '/resources/' . $filePath);
+            }
+
+            if ($fullPath && $uploadsDir && str_starts_with($fullPath, $uploadsDir) && file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+        }
+
+        // Delete DB record
+        Database::query("DELETE FROM resources WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        $this->respondWithData(['deleted' => true, 'id' => $id]);
+    }
 }
