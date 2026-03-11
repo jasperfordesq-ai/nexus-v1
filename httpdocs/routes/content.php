@@ -180,6 +180,8 @@ $router->add('PUT', '/api/v2/resources/categories/{id}', 'Nexus\Controllers\Api\
 $router->add('DELETE', '/api/v2/resources/categories/{id}', 'Nexus\Controllers\Api\ResourceCategoriesApiController@destroy');
 $router->add('PUT', '/api/v2/resources/reorder', 'Nexus\Controllers\Api\ResourceCategoriesApiController@reorder');
 $router->add('POST', '/api/v2/resources', 'Nexus\Controllers\Api\ResourcesPublicApiController@store');
+$router->add('GET', '/api/v2/resources/{id}/download', 'Nexus\Controllers\Api\ResourcesPublicApiController@download');
+$router->add('DELETE', '/api/v2/resources/{id}', 'Nexus\Controllers\Api\ResourcesPublicApiController@destroy');
 
 // ============================================
 // API V2 - KNOWLEDGE BASE
