@@ -155,19 +155,21 @@ export function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast, advancedFilters]);
+  }, [toast]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const initialQuery = searchParams.get('q');
-    if (initialQuery) {
-      performSearch(initialQuery);
+    const urlQuery = searchParams.get('q');
+    if (urlQuery) {
+      setQuery(urlQuery);
+      performSearch(urlQuery);
     }
-  }, []);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    setSearchParams(query ? { q: query } : {});
-    performSearch(query);
+    if (query.trim()) {
+      setSearchParams({ q: query.trim() });
+    }
   }
 
   function handleRunSavedSearch(queryParams: Record<string, string>) {
@@ -253,8 +255,8 @@ export function SearchPage() {
       <AdvancedSearchFilters
         filters={advancedFilters}
         onChange={setAdvancedFilters}
-        onApply={() => performSearch(query)}
-        onReset={() => performSearch(query)}
+        onApply={() => performSearch(query, advancedFilters)}
+        onReset={() => performSearch(query, { ...defaultFilters })}
       />
 
       {/* Saved Searches */}

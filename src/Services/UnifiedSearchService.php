@@ -596,7 +596,7 @@ class UnifiedSearchService
         }
 
         $db = Database::getConnection();
-        $searchTerm = $query . '%'; // Prefix search for autocomplete
+        $searchTerm = '%' . $query . '%'; // Contains search for autocomplete
 
         $suggestions = [];
 

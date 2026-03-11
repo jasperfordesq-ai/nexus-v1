@@ -121,7 +121,10 @@
     "actions": "Gníomhartha",
     "no_actions": "Gan gníomhartha comhoiriúnacha",
     "recent": "Le déanaí",
-    "actions_hint": "Clóscríobh > le haghaidh mear-ghníomhartha"
+    "actions_hint": "Clóscríobh > le haghaidh mear-ghníomhartha",
+    "view_all": "Féach ar gach toradh",
+    "no_suggestions": "Níor aimsíodh moltaí ar bith",
+    "search_for": "Cuardaigh"
   },
   "support": {
     "help_center": "Ionad Cabhraigh",
@@ -174,7 +177,8 @@
     "switch_to_light": "Athraigh go mód solais",
     "switch_to_dark": "Athraigh go mód dorcha",
     "skip_to_content": "Téigh go dtí an príomhábhar",
-    "menu_opened": "Roghchlár nascleanúna oscailte"
+    "menu_opened": "Roghchlár nascleanúna oscailte",
+    "close": "Dún"
   },
   "cookie_consent": {
     "banner_label": "Toiliú fianán",
