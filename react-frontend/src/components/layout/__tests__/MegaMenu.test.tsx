@@ -38,29 +38,60 @@ const StubIcon: LucideIcon = React.forwardRef((props: Record<string, unknown>, r
 (StubIcon as { displayName: string }).displayName = 'StubIcon';
 
 import { MegaMenu } from '../MegaMenu';
+import type { MegaMenuSection } from '../MegaMenu';
 
-const activityItems = [
-  { label: 'Volunteering', href: '/volunteering', icon: StubIcon },
-  { label: 'Goals', href: '/goals', icon: StubIcon },
+const leftSections: MegaMenuSection[] = [
+  {
+    key: 'core',
+    title: 'Core',
+    items: [
+      { label: 'Volunteering', href: '/volunteering', icon: StubIcon },
+      { label: 'Goals', href: '/goals', icon: StubIcon },
+    ],
+  },
+  {
+    key: 'progress',
+    title: 'Progress',
+    collapsible: true,
+    defaultExpanded: false,
+    items: [
+      { label: 'Achievements', href: '/achievements', icon: StubIcon },
+    ],
+  },
 ];
 
-const federationItems = [
-  { label: 'Partner Hub', href: '/federation', icon: StubIcon },
+const rightSections: MegaMenuSection[] = [
+  {
+    key: 'about',
+    title: 'About',
+    items: [
+      { label: 'About Us', href: '/about', icon: StubIcon },
+      { label: 'Contact', href: '/contact', icon: StubIcon },
+    ],
+  },
+  {
+    key: 'federation',
+    title: 'Partner Communities',
+    collapsible: true,
+    defaultExpanded: false,
+    items: [
+      { label: 'Partner Hub', href: '/federation', icon: StubIcon },
+    ],
+  },
 ];
 
-const aboutItems = [
-  { label: 'About', href: '/about', icon: StubIcon },
-  { label: 'Contact', href: '/contact', icon: StubIcon },
-];
+// Count items that are visible by default (non-collapsible sections only)
+const visibleLeftCount = leftSections.filter(s => !s.collapsible).reduce((n, s) => n + s.items.length, 0);
+const visibleRightCount = rightSections.filter(s => !s.collapsible).reduce((n, s) => n + s.items.length, 0);
+const visibleCount = visibleLeftCount + visibleRightCount;
 
 function renderMegaMenu(overrides: Partial<React.ComponentProps<typeof MegaMenu>> = {}) {
   const defaultProps = {
     isOpen: true,
     onOpenChange: vi.fn(),
     isActive: false,
-    activityItems,
-    federationItems,
-    aboutItems,
+    leftSections,
+    rightSections,
     onNavigate: vi.fn(),
     ...overrides,
   };
@@ -82,32 +113,30 @@ describe('MegaMenu', () => {
       expect(screen.getByText('More')).toBeTruthy();
     });
 
-    it('renders column headings when open', () => {
+    it('renders section headings when open', () => {
       renderMegaMenu();
-      expect(screen.getByText('Activity')).toBeTruthy();
+      expect(screen.getByText('Core')).toBeTruthy();
+      expect(screen.getByText('Progress')).toBeTruthy();
       expect(screen.getByText('Partner Communities')).toBeTruthy();
       expect(screen.getAllByText('About').length).toBeGreaterThanOrEqual(1);
     });
 
-    it('renders all menu items', () => {
+    it('renders non-collapsible section items by default', () => {
       renderMegaMenu();
       expect(screen.getByText('Volunteering')).toBeTruthy();
       expect(screen.getByText('Goals')).toBeTruthy();
-      // Partner Hub is in collapsed federation section — not visible by default
-      expect(screen.getAllByText('About').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText('About Us')).toBeTruthy();
       expect(screen.getByText('Contact')).toBeTruthy();
     });
 
-    it('renders 2-column grid always (federation is collapsible)', () => {
+    it('hides collapsible section items by default', () => {
       renderMegaMenu();
-      // HeroUI Popover renders content via portal, so check the full document
-      const nav = document.querySelector('nav[aria-label="More navigation"]');
-      expect(nav).toBeTruthy();
-      expect(nav!.className).toContain('grid-cols-2');
+      expect(screen.queryByText('Achievements')).toBeNull();
+      expect(screen.queryByText('Partner Hub')).toBeNull();
     });
 
-    it('renders 2-column grid when no federation items', () => {
-      renderMegaMenu({ federationItems: [] });
+    it('renders 2-column grid', () => {
+      renderMegaMenu();
       const nav = document.querySelector('nav[aria-label="More navigation"]');
       expect(nav).toBeTruthy();
       expect(nav!.className).toContain('grid-cols-2');
@@ -115,9 +144,13 @@ describe('MegaMenu', () => {
 
     it('renders item descriptions when provided', () => {
       renderMegaMenu({
-        activityItems: [
-          { label: 'Volunteering', desc: 'Help your community', href: '/volunteering', icon: StubIcon },
-        ],
+        leftSections: [{
+          key: 'test',
+          title: 'Test',
+          items: [
+            { label: 'Volunteering', desc: 'Help your community', href: '/volunteering', icon: StubIcon },
+          ],
+        }],
       });
       expect(screen.getByText('Help your community')).toBeTruthy();
     });
@@ -178,22 +211,20 @@ describe('MegaMenu', () => {
       expect(document.activeElement).toBe(buttons[buttons.length - 1]);
     });
 
-    it('ArrowRight jumps to next column start', () => {
+    it('ArrowRight jumps to right column start', () => {
       renderMegaMenu();
       const buttons = getMegaButtons();
-      // First item in activity column (index 0), ArrowRight should go to right column (aboutItems[0])
       buttons[0]?.focus();
       const nav = document.querySelector('nav[aria-label="More navigation"]')!;
       fireEvent.keyDown(nav, { key: 'ArrowRight' });
-      expect(document.activeElement).toBe(buttons[activityItems.length]);
+      // Right column starts after all visible left items
+      expect(document.activeElement).toBe(buttons[visibleLeftCount]);
     });
 
-    it('ArrowLeft jumps to previous column start', () => {
+    it('ArrowLeft jumps to left column start', () => {
       renderMegaMenu();
       const buttons = getMegaButtons();
-      // First item in right column (about), ArrowLeft should go to activity column start
-      const fedStart = activityItems.length; // right col starts at activityItems.length (aboutItems)
-      buttons[fedStart]?.focus();
+      buttons[visibleLeftCount]?.focus();
       const nav = document.querySelector('nav[aria-label="More navigation"]')!;
       fireEvent.keyDown(nav, { key: 'ArrowLeft' });
       expect(document.activeElement).toBe(buttons[0]);
@@ -231,11 +262,10 @@ describe('MegaMenu', () => {
       expect(screen.getByRole('navigation', { name: 'More navigation' })).toBeTruthy();
     });
 
-    it('all menu item buttons have data-mega-item attribute', () => {
+    it('only visible items have data-mega-item attribute', () => {
       renderMegaMenu();
       const buttons = document.querySelectorAll('button[data-mega-item]');
-      // Federation starts collapsed — only activity + about items are visible
-      expect(buttons.length).toBe(activityItems.length + aboutItems.length);
+      expect(buttons.length).toBe(visibleCount);
     });
 
     it('icons have aria-hidden="true"', () => {
@@ -255,9 +285,8 @@ describe('MegaMenu', () => {
             isOpen={true}
             onOpenChange={vi.fn()}
             isActive={false}
-            activityItems={activityItems}
-            federationItems={[]}
-            aboutItems={aboutItems}
+            leftSections={leftSections}
+            rightSections={rightSections.filter(s => s.key === 'about')}
             onNavigate={vi.fn()}
           />
         </MemoryRouter>
@@ -273,9 +302,8 @@ describe('MegaMenu', () => {
             isOpen={true}
             onOpenChange={vi.fn()}
             isActive={false}
-            activityItems={activityItems}
-            federationItems={[]}
-            aboutItems={aboutItems}
+            leftSections={leftSections}
+            rightSections={rightSections.filter(s => s.key === 'about')}
             onNavigate={vi.fn()}
           />
         </MemoryRouter>
@@ -285,30 +313,53 @@ describe('MegaMenu', () => {
     });
   });
 
-  describe('Partner Communities (federation)', () => {
-    it('hides federation items by default (collapsed)', () => {
+  describe('Collapsible sections', () => {
+    it('hides collapsible section items by default', () => {
       renderMegaMenu();
+      expect(screen.queryByText('Achievements')).toBeNull();
       expect(screen.queryByText('Partner Hub')).toBeNull();
     });
 
-    it('shows federation items after clicking the toggle', () => {
+    it('shows items after clicking the section toggle', () => {
       renderMegaMenu();
-      const toggle = screen.getByText('Partner Communities').closest('button')!;
+      const toggle = screen.getByText('Progress').closest('button')!;
       fireEvent.click(toggle);
-      expect(screen.getByText('Partner Hub')).toBeTruthy();
+      expect(screen.getByText('Achievements')).toBeTruthy();
     });
 
     it('toggle has aria-expanded=false by default', () => {
       renderMegaMenu();
-      const toggle = screen.getByText('Partner Communities').closest('button')!;
+      const toggle = screen.getByText('Progress').closest('button')!;
       expect(toggle.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('toggle has aria-expanded=true after clicking', () => {
       renderMegaMenu();
-      const toggle = screen.getByText('Partner Communities').closest('button')!;
+      const toggle = screen.getByText('Progress').closest('button')!;
       fireEvent.click(toggle);
       expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('federation toggle works independently', () => {
+      renderMegaMenu();
+      const fedToggle = screen.getByText('Partner Communities').closest('button')!;
+      fireEvent.click(fedToggle);
+      expect(screen.getByText('Partner Hub')).toBeTruthy();
+      // Progress should still be collapsed
+      expect(screen.queryByText('Achievements')).toBeNull();
+    });
+
+    it('shows section with defaultExpanded=true', () => {
+      renderMegaMenu({
+        leftSections: [{
+          key: 'expanded',
+          title: 'Expanded',
+          collapsible: true,
+          defaultExpanded: true,
+          items: [{ label: 'Visible Item', href: '/visible', icon: StubIcon }],
+        }],
+      });
+      expect(screen.getByText('Visible Item')).toBeTruthy();
     });
   });
 });

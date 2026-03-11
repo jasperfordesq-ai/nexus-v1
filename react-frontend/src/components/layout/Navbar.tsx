@@ -188,59 +188,102 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     { label: t('nav.ideation'), desc: t('nav_desc.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' as const },
   ].filter(item => hasFeature(item.feature)), [t, tenantPath, hasFeature]);
 
-  const activityItems = useMemo(() => [
-    { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
-    { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
-    { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
-    { label: t('nav.achievements'), desc: t('nav_desc.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' as const, dividerBefore: true },
-    { label: t('nav.leaderboard'), desc: t('nav_desc.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' as const },
-    { label: t('nav.nexus_score', 'NexusScore'), desc: t('nav_desc.nexus_score'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' as const },
-    { label: t('nav.matches', 'Matches'), desc: t('nav_desc.matches'), href: tenantPath('/matches'), icon: Handshake, dividerBefore: true },
-    { label: t('nav.goals'), desc: t('nav_desc.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' as const },
-    { label: t('nav.skills', 'Skills'), desc: t('nav_desc.skills'), href: tenantPath('/skills'), icon: GraduationCap },
-    { label: t('nav.activity', 'My Activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
-    { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' as const },
-  ].filter(item => {
-    if ('feature' in item && item.feature && !hasFeature(item.feature)) return false;
-    if ('module' in item && item.module && !hasModule(item.module)) return false;
+  // Helper to filter items by feature/module gates
+  const gateFilter = (item: { feature?: string; module?: string }) => {
+    if ('feature' in item && item.feature && !hasFeature(item.feature as Parameters<typeof hasFeature>[0])) return false;
+    if ('module' in item && item.module && !hasModule(item.module as Parameters<typeof hasModule>[0])) return false;
     return true;
-  }), [t, tenantPath, hasFeature, hasModule]);
+  };
 
-  const federationItems = useMemo(() => hasFeature('federation') ? [
-    { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
-    { label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
-    { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
-    { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
-    { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
-    { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
-    { label: t('nav.federation_settings'), desc: t('nav_desc.federation_settings'), href: tenantPath('/federation/settings'), icon: Settings },
-  ] : [], [t, tenantPath, hasFeature]);
+  // ─── Left column sections ────────────────────────────────────────────────
+  const leftSections = useMemo(() => [
+    {
+      key: 'core',
+      title: t('sections.core', 'Core'),
+      items: [
+        { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' },
+        { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' },
+        { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' },
+        { label: t('nav.goals'), desc: t('nav_desc.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' },
+      ].filter(gateFilter),
+    },
+    {
+      key: 'progress',
+      title: t('sections.progress', 'Progress'),
+      collapsible: true,
+      defaultExpanded: false,
+      items: [
+        { label: t('nav.achievements'), desc: t('nav_desc.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' },
+        { label: t('nav.leaderboard'), desc: t('nav_desc.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' },
+        { label: t('nav.nexus_score', 'NexusScore'), desc: t('nav_desc.nexus_score'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' },
+      ].filter(gateFilter),
+    },
+    {
+      key: 'tools',
+      title: t('sections.tools', 'Tools'),
+      collapsible: true,
+      defaultExpanded: false,
+      items: [
+        { label: t('nav.matches', 'Matches'), desc: t('nav_desc.matches'), href: tenantPath('/matches'), icon: Handshake },
+        { label: t('nav.skills', 'Skills'), desc: t('nav_desc.skills'), href: tenantPath('/skills'), icon: GraduationCap },
+        { label: t('nav.activity', 'My Activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
+        { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
+      ].filter(gateFilter),
+    },
+  ], [t, tenantPath, hasFeature, hasModule]);
 
-  const aboutItems = useMemo(() => [
-    { label: t('nav.about'), desc: t('nav_desc.about'), href: tenantPath('/about'), icon: Info },
-    { label: t('nav.faq'), desc: t('nav_desc.faq'), href: tenantPath('/faq'), icon: HelpCircle },
-    { label: t('nav.timebanking_guide'), desc: t('nav_desc.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
-    ...(isHourTimebank ? [
-      { label: t('nav.partner_with_us'), desc: t('nav_desc.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
-      { label: t('nav.social_prescribing'), desc: t('nav_desc.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
-      { label: t('nav.our_impact'), desc: t('nav_desc.our_impact'), href: tenantPath('/impact-summary'), icon: TrendingUp },
-      { label: t('nav.impact_report'), desc: t('nav_desc.impact_report'), href: tenantPath('/impact-report'), icon: BarChart3 },
-      { label: t('nav.strategic_plan'), desc: t('nav_desc.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
-    ] : []),
-    ...(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => ({
-      label: p.title,
-      desc: undefined as string | undefined,
-      href: tenantPath(`/page/${p.slug}`),
-      icon: FileText,
-    })),
-  ], [t, tenantPath, isHourTimebank, tenant?.menu_pages?.about]);
+  // ─── Right column sections ───────────────────────────────────────────────
+  const rightSections = useMemo(() => [
+    {
+      key: 'about',
+      title: t('sections.about'),
+      items: [
+        { label: t('nav.about'), desc: t('nav_desc.about'), href: tenantPath('/about'), icon: Info },
+        { label: t('nav.faq'), desc: t('nav_desc.faq'), href: tenantPath('/faq'), icon: HelpCircle },
+        { label: t('nav.timebanking_guide'), desc: t('nav_desc.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
+        ...(tenant?.menu_pages?.about || []).map((pg: { title: string; slug: string }) => ({
+          label: pg.title,
+          desc: undefined as string | undefined,
+          href: tenantPath(`/page/${pg.slug}`),
+          icon: FileText,
+        })),
+      ],
+    },
+    ...(isHourTimebank ? [{
+      key: 'impact',
+      title: t('sections.impact', 'Impact'),
+      collapsible: true,
+      defaultExpanded: false,
+      items: [
+        { label: t('nav.partner_with_us'), desc: t('nav_desc.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
+        { label: t('nav.social_prescribing'), desc: t('nav_desc.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
+        { label: t('nav.our_impact'), desc: t('nav_desc.our_impact'), href: tenantPath('/impact-summary'), icon: TrendingUp },
+        { label: t('nav.impact_report'), desc: t('nav_desc.impact_report'), href: tenantPath('/impact-report'), icon: BarChart3 },
+        { label: t('nav.strategic_plan'), desc: t('nav_desc.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
+      ],
+    }] : []),
+    ...(hasFeature('federation') ? [{
+      key: 'federation',
+      title: t('sections.partner_communities'),
+      collapsible: true,
+      defaultExpanded: false,
+      items: [
+        { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
+        { label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
+        { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
+        { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
+        { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
+        { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
+        { label: t('nav.federation_settings'), desc: t('nav_desc.federation_settings'), href: tenantPath('/federation/settings'), icon: Settings },
+      ],
+    }] : []),
+  ], [t, tenantPath, isHourTimebank, hasFeature, tenant?.menu_pages?.about]);
 
   const communityPaths = useMemo(() => communityItems.map(i => i.href), [communityItems]);
   const morePaths = useMemo(() => [
-    ...activityItems.map(i => i.href),
-    ...federationItems.map(i => i.href),
-    ...aboutItems.map(i => i.href),
-  ], [activityItems, federationItems, aboutItems]);
+    ...leftSections.flatMap(s => s.items.map(i => i.href)),
+    ...rightSections.flatMap(s => s.items.map(i => i.href)),
+  ], [leftSections, rightSections]);
 
   return (
     <>
@@ -479,9 +522,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 isOpen={moreOpen}
                 onOpenChange={handleMoreOpenChange}
                 isActive={isActiveGroup(morePaths)}
-                activityItems={activityItems}
-                federationItems={federationItems}
-                aboutItems={aboutItems}
+                leftSections={leftSections}
+                rightSections={rightSections}
                 onNavigate={dropdownNavigate}
               />
               </>
