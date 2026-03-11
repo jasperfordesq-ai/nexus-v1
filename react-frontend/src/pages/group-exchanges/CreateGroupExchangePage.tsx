@@ -83,23 +83,17 @@ interface SearchResult {
 
 const TOTAL_STEPS = 4;
 
-const SPLIT_TYPE_CARDS: { value: SplitType; title: string; description: string; icon: React.ReactNode }[] = [
+const SPLIT_TYPE_CARDS: { value: SplitType; icon: React.ReactNode }[] = [
   {
     value: 'equal',
-    title: 'Equal Split',
-    description: 'Total hours divided equally among all providers and receivers.',
     icon: <Scale className="w-6 h-6 text-indigo-500" />,
   },
   {
     value: 'custom',
-    title: 'Custom Hours',
-    description: 'Set specific hours for each participant individually.',
     icon: <Clock className="w-6 h-6 text-purple-500" />,
   },
   {
     value: 'weighted',
-    title: 'Weighted Split',
-    description: 'Distribute hours proportionally by assigned weights.',
     icon: <Percent className="w-6 h-6 text-emerald-500" />,
   },
 ];
@@ -369,12 +363,23 @@ export function CreateGroupExchangePage() {
     label: 'text-theme-muted',
   };
 
+  const stepLabels = [
+    t('create.step_details'),
+    t('create.step_participants'),
+    t('create.step_review_split'),
+    t('create.step_confirm'),
+  ];
+
   // ─────────────────────────────────────────────────────────────────────────
   // Render
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-2xl mx-auto py-6 space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-2xl mx-auto space-y-6"
+    >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('title'), href: tenantPath('/group-exchanges') },
@@ -382,39 +387,59 @@ export function CreateGroupExchangePage() {
       ]} />
 
       {/* Title */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center"
-      >
-        <h1 className="text-2xl font-bold text-theme-primary">{t('create.title')}</h1>
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-theme-primary flex items-center justify-center gap-3">
+          <ArrowLeftRight className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          {t('create.title')}
+        </h1>
         <p className="text-theme-muted mt-1">{t('create.subtitle')}</p>
-      </motion.div>
+      </div>
 
-      {/* Progress Bar */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-theme-subtle">{t('create.step_of', { current: currentStep, total: TOTAL_STEPS })}</span>
-          <span className="text-sm text-theme-subtle">
-            {currentStep === 1 && t('create.step_details')}
-            {currentStep === 2 && t('create.step_participants')}
-            {currentStep === 3 && t('create.step_review_split')}
-            {currentStep === 4 && t('create.step_confirm')}
-          </span>
-        </div>
-        <Progress
-          value={(currentStep / TOTAL_STEPS) * 100}
-          classNames={{
-            indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
-            track: 'bg-theme-elevated',
-          }}
-          aria-label={t('create.step_of', { current: currentStep, total: TOTAL_STEPS })}
-        />
-      </motion.div>
+      {/* Step Indicator */}
+      <div className="flex items-center">
+        {stepLabels.map((label, idx) => {
+          const stepNum = idx + 1;
+          const isComplete = currentStep > stepNum;
+          const isCurrent = currentStep === stepNum;
+          return (
+            <div key={stepNum} className="flex-1 flex items-center">
+              <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                <div className={`
+                  w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all
+                  ${isComplete
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                    : isCurrent
+                      ? 'bg-indigo-500/20 text-indigo-400 ring-2 ring-indigo-500'
+                      : 'bg-theme-elevated text-theme-subtle'}
+                `}>
+                  {isComplete ? <CheckCircle className="w-4 h-4" /> : stepNum}
+                </div>
+                <span className={`text-xs text-center hidden sm:block ${isCurrent ? 'text-theme-primary font-medium' : 'text-theme-subtle'}`}>
+                  {label}
+                </span>
+              </div>
+              {idx < stepLabels.length - 1 && (
+                <div className={`flex-1 h-0.5 mx-2 rounded-full transition-all ${
+                  currentStep > stepNum + 1
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600'
+                    : currentStep > stepNum
+                      ? 'bg-indigo-500/40'
+                      : 'bg-theme-elevated'
+                }`} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <Progress
+        value={(currentStep / TOTAL_STEPS) * 100}
+        size="sm"
+        classNames={{
+          indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+          track: 'bg-theme-elevated',
+        }}
+        aria-label={t('create.step_of', { current: currentStep, total: TOTAL_STEPS })}
+      />
 
       {/* Step Content */}
       <AnimatePresence mode="wait" custom={slideDirection}>
@@ -430,7 +455,7 @@ export function CreateGroupExchangePage() {
           {/* ─── Step 1: Exchange Details ─── */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              <GlassCard className="p-6">
+              <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <ArrowLeftRight className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   {t('create.exchange_details')}
@@ -454,6 +479,7 @@ export function CreateGroupExchangePage() {
                     placeholder={t('create.description_placeholder')}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    minRows={4}
                     classNames={{
                       input: 'bg-transparent text-theme-primary',
                       inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -477,7 +503,7 @@ export function CreateGroupExchangePage() {
               </GlassCard>
 
               {/* Split Type Selection */}
-              <GlassCard className="p-6">
+              <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <Scale className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   {t('create.split_type_heading')}
@@ -488,29 +514,28 @@ export function CreateGroupExchangePage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {SPLIT_TYPE_CARDS.map((card) => (
-                    <Button
+                    <button
                       key={card.value}
                       type="button"
-                      variant="light"
-                      onPress={() => setSplitType(card.value)}
+                      onClick={() => setSplitType(card.value)}
                       className={`
-                        p-4 rounded-xl border-2 text-left transition-all cursor-pointer h-auto min-w-0 flex flex-col items-stretch
+                        p-4 rounded-xl border-2 text-center transition-all cursor-pointer
                         ${splitType === card.value
                           ? 'border-indigo-500 bg-indigo-500/10'
-                          : 'border-theme-default bg-theme-elevated hover:border-indigo-500/30'}
+                          : 'border-theme-default bg-theme-elevated hover:border-indigo-500/30 hover:bg-theme-hover'}
                       `}
                       aria-pressed={splitType === card.value}
                     >
                       <div className="flex justify-center mb-3" aria-hidden="true">
                         {card.icon}
                       </div>
-                      <h3 className="font-semibold text-theme-primary text-sm text-center mb-1">
+                      <h3 className="font-semibold text-theme-primary text-sm mb-1">
                         {t('create.split_' + card.value + '_title')}
                       </h3>
-                      <p className="text-xs text-theme-subtle text-center">
+                      <p className="text-xs text-theme-subtle leading-relaxed">
                         {t('create.split_' + card.value + '_desc')}
                       </p>
-                    </Button>
+                    </button>
                   ))}
                 </div>
               </GlassCard>
@@ -533,7 +558,7 @@ export function CreateGroupExchangePage() {
           {currentStep === 2 && (
             <div className="space-y-6">
               {/* Search */}
-              <GlassCard className="p-6">
+              <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <UserPlus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   {t('create.add_participants')}
@@ -552,66 +577,78 @@ export function CreateGroupExchangePage() {
                     classNames={inputClassNames}
                     aria-label={t('detail.search_members_aria')}
                   />
-                </div>
 
-                {/* Search Results */}
-                {searchResults.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    {searchResults.map((result) => {
-                      const displayName = result.name || [result.first_name, result.last_name].filter(Boolean).join(' ') || 'Unknown';
-                      return (
-                        <div
-                          key={result.id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-theme-elevated"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              src={resolveAvatarUrl(result.avatar_url || result.avatar)}
-                              name={displayName}
-                              size="sm"
-                            />
-                            <div>
-                              <p className="font-medium text-theme-primary text-sm">{displayName}</p>
-                              {result.email && (
-                                <p className="text-xs text-theme-subtle">{result.email}</p>
-                              )}
+                  {/* Search Results Dropdown */}
+                  {searchResults.length > 0 && (
+                    <div className="absolute z-50 mt-2 w-full rounded-xl border border-glass-border bg-theme-surface/95 backdrop-blur-xl shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden max-h-72 overflow-y-auto">
+                      {searchResults.map((result, index) => {
+                        const displayName = result.name || [result.first_name, result.last_name].filter(Boolean).join(' ') || 'Unknown';
+                        return (
+                          <div
+                            key={result.id}
+                            className={`flex items-center justify-between p-3 hover:bg-theme-hover transition-colors ${
+                              index < searchResults.length - 1 ? 'border-b border-glass-border/50' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <Avatar
+                                src={resolveAvatarUrl(result.avatar_url || result.avatar)}
+                                name={displayName}
+                                size="sm"
+                                className="shrink-0"
+                              />
+                              <div className="min-w-0">
+                                <p className="font-medium text-theme-primary text-sm truncate">{displayName}</p>
+                                {result.email && (
+                                  <p className="text-xs text-theme-subtle truncate">{result.email}</p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex gap-2 shrink-0 ml-2">
+                              <Button
+                                size="sm"
+                                variant="flat"
+                                className="bg-emerald-500/20 text-emerald-400 min-w-0"
+                                onPress={() => addParticipant(result, 'provider')}
+                                startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
+                              >
+                                <span className="hidden sm:inline">{t('detail.role_provider')}</span>
+                                <span className="sm:hidden">P</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="flat"
+                                className="bg-amber-500/20 text-amber-400 min-w-0"
+                                onPress={() => addParticipant(result, 'receiver')}
+                                startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
+                              >
+                                <span className="hidden sm:inline">{t('detail.role_receiver')}</span>
+                                <span className="sm:hidden">R</span>
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="flat"
-                              className="bg-emerald-500/20 text-emerald-400"
-                              onPress={() => addParticipant(result, 'provider')}
-                              startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
-                            >
-                              {t('detail.role_provider')}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="flat"
-                              className="bg-amber-500/20 text-amber-400"
-                              onPress={() => addParticipant(result, 'receiver')}
-                              startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
-                            >
-                              {t('detail.role_receiver')}
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </GlassCard>
 
               {/* Current Participants */}
-              {participants.length > 0 && (
-                <GlassCard className="p-6">
-                  <h3 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                    {t('detail.participants_heading', { count: participants.length })}
-                  </h3>
+              <GlassCard className="p-6 sm:p-8">
+                <h3 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  {t('detail.participants_heading', { count: participants.length })}
+                </h3>
 
+                {participants.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="w-12 h-12 text-theme-subtle mx-auto mb-3" />
+                    <p className="text-theme-muted text-sm">{t('create.no_participants_yet')}</p>
+                    <p className="text-theme-subtle text-xs mt-1">{t('create.add_participants_desc')}</p>
+                  </div>
+                ) : (
+                  <>
                   {/* Providers */}
                   {providers.length > 0 && (
                     <div className="mb-4">
@@ -655,8 +692,9 @@ export function CreateGroupExchangePage() {
                       </div>
                     </div>
                   )}
-                </GlassCard>
-              )}
+                  </>
+                )}
+              </GlassCard>
 
               {/* Validation message */}
               {!canProceedStep2 && participants.length > 0 && (
@@ -677,7 +715,7 @@ export function CreateGroupExchangePage() {
           {/* ─── Step 3: Review Split ─── */}
           {currentStep === 3 && (
             <div className="space-y-6">
-              <GlassCard className="p-6">
+              <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <Scale className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   {t('create.hour_split_preview')}
@@ -687,18 +725,18 @@ export function CreateGroupExchangePage() {
                 </p>
 
                 {/* Summary */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-theme-elevated rounded-lg p-4 text-center">
-                    <p className="text-sm text-theme-muted">{t('detail.providers')}</p>
-                    <p className="text-2xl font-bold text-emerald-400">{providers.length}</p>
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+                  <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
+                    <p className="text-xs sm:text-sm text-theme-muted">{t('detail.providers')}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-emerald-400">{providers.length}</p>
                   </div>
-                  <div className="bg-theme-elevated rounded-lg p-4 text-center">
-                    <p className="text-sm text-theme-muted">{t('detail.total_hours')}</p>
-                    <p className="text-2xl font-bold text-theme-primary">{totalHours}</p>
+                  <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
+                    <p className="text-xs sm:text-sm text-theme-muted">{t('detail.total_hours')}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-theme-primary">{totalHours}</p>
                   </div>
-                  <div className="bg-theme-elevated rounded-lg p-4 text-center">
-                    <p className="text-sm text-theme-muted">{t('detail.receivers')}</p>
-                    <p className="text-2xl font-bold text-amber-400">{receivers.length}</p>
+                  <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
+                    <p className="text-xs sm:text-sm text-theme-muted">{t('detail.receivers')}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-amber-400">{receivers.length}</p>
                   </div>
                 </div>
 
@@ -709,8 +747,11 @@ export function CreateGroupExchangePage() {
                 {/* Split Table */}
                 <Table
                   aria-label="Hour split preview"
-                  shadow="sm"
+                  shadow="none"
                   isStriped
+                  classNames={{
+                    wrapper: 'bg-transparent shadow-none p-0',
+                  }}
                 >
                   <TableHeader>
                     <TableColumn>{t('detail.col_provider')}</TableColumn>
@@ -734,7 +775,7 @@ export function CreateGroupExchangePage() {
               </GlassCard>
 
               {/* Participant Details */}
-              <GlassCard className="p-6">
+              <GlassCard className="p-6 sm:p-8">
                 <h3 className="text-sm font-medium text-theme-muted mb-3">{t('create.per_participant_summary')}</h3>
                 <div className="space-y-2">
                   {participants.map((p) => {
@@ -750,7 +791,7 @@ export function CreateGroupExchangePage() {
                     }
 
                     return (
-                      <div key={p.user_id} className="flex items-center justify-between p-3 rounded-lg bg-theme-elevated">
+                      <div key={p.user_id} className="flex items-center justify-between p-3 rounded-xl bg-theme-elevated">
                         <div className="flex items-center gap-3">
                           <Avatar
                             src={resolveAvatarUrl(p.avatar)}
@@ -787,7 +828,7 @@ export function CreateGroupExchangePage() {
           {/* ─── Step 4: Confirm and Create ─── */}
           {currentStep === 4 && (
             <div className="space-y-6">
-              <GlassCard className="p-6">
+              <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                   {t('create.review_your_exchange')}
@@ -813,7 +854,7 @@ export function CreateGroupExchangePage() {
                   <div className="border-t border-theme-default" />
 
                   {/* Split & Hours */}
-                  <div className="flex flex-wrap gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <h3 className="text-sm font-medium text-theme-muted mb-1">{t('create.split_type_heading')}</h3>
                       <Chip size="sm" variant="flat" color="primary" className="capitalize">{splitType}</Chip>
@@ -880,7 +921,7 @@ export function CreateGroupExchangePage() {
           )}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
@@ -900,11 +941,12 @@ interface ParticipantRowProps {
 function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWeightChange, inputClassNames }: ParticipantRowProps) {
   const { t } = useTranslation('group_exchanges');
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
+    <div className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated">
       <Avatar
         src={resolveAvatarUrl(participant.avatar)}
         name={participant.name}
         size="sm"
+        className="shrink-0"
       />
       <div className="flex-1 min-w-0">
         <p className="font-medium text-theme-primary text-sm truncate">{participant.name}</p>
@@ -927,7 +969,7 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
           onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
           min="0"
           step="0.25"
-          className="w-24"
+          className="w-24 shrink-0"
           classNames={inputClassNames}
           aria-label={t('create.hours_for', { name: participant.name })}
           endContent={<span className="text-theme-subtle text-xs">h</span>}
@@ -944,7 +986,7 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
           onChange={(e) => onWeightChange(parseFloat(e.target.value) || 0)}
           min="0.1"
           step="0.1"
-          className="w-24"
+          className="w-24 shrink-0"
           classNames={inputClassNames}
           aria-label={t('create.weight_for', { name: participant.name })}
           endContent={<span className="text-theme-subtle text-xs">x</span>}
@@ -955,7 +997,7 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
         isIconOnly
         size="sm"
         variant="flat"
-        className="bg-red-500/20 text-red-400"
+        className="bg-red-500/20 text-red-400 shrink-0"
         onPress={onRemove}
         aria-label={t('detail.remove_participant', { name: participant.name })}
       >

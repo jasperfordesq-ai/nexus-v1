@@ -232,10 +232,20 @@ export function SearchPage() {
             aria-label={t('search_placeholder')}
             size="lg"
             classNames={{
+              base: 'flex-1',
               input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
               inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
             }}
           />
+          <Button
+            type="submit"
+            color="primary"
+            size="lg"
+            isLoading={isLoading}
+            className="sm:w-auto w-full"
+          >
+            {t('search_button', 'Search')}
+          </Button>
         </form>
       </GlassCard>
 
@@ -435,7 +445,7 @@ export function SearchPage() {
                             <div className="flex items-center gap-4 mt-3 text-xs text-theme-subtle">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" aria-hidden="true" />
-                                {new Date(event.start_date).toLocaleDateString()}
+                                {event.start_date ? new Date(event.start_date).toLocaleDateString() : '—'}
                               </span>
                               {event.location && (
                                 <span className="flex items-center gap-1">

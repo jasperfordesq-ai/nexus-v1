@@ -127,6 +127,7 @@
     "add_participants_desc": "Cuardaigh baill agus cuir leo mar sholáthraithe nó faighteoirí. Teastaíonn soláthraí amháin agus faighteoir amháin ar a laghad.",
     "providers_count": "Soláthraithe ({{count}})",
     "receivers_count": "Faighteoirí ({{count}})",
+    "no_participants_yet": "No participants added yet",
     "validation_min_participants": "Teastaíonn soláthraí amháin agus faighteoir amháin ar a laghad le leanúint ar aghaidh.",
     "hour_split_preview": "Réamhamharc Roinnt Uaireanta",
     "hour_split_preview_desc": "Athbhreithnigh conas a roinnfear uaireanta idir rannpháirtithe.",

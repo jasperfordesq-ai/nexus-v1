@@ -82,6 +82,11 @@ $router->add('DELETE', '/api/v2/reviews/{id}', 'Nexus\Controllers\Api\ReviewsApi
 // ============================================
 $router->add('GET', '/api/v2/search', 'Nexus\Controllers\Api\SearchApiController@index');
 $router->add('GET', '/api/v2/search/suggestions', 'Nexus\Controllers\Api\SearchApiController@suggestions');
+$router->add('GET', '/api/v2/search/saved', 'Nexus\Controllers\Api\SearchApiController@savedSearches');
+$router->add('POST', '/api/v2/search/saved', 'Nexus\Controllers\Api\SearchApiController@saveSearch');
+$router->add('DELETE', '/api/v2/search/saved/{id}', 'Nexus\Controllers\Api\SearchApiController@deleteSavedSearch');
+$router->add('POST', '/api/v2/search/saved/{id}/run', 'Nexus\Controllers\Api\SearchApiController@runSavedSearch');
+$router->add('GET', '/api/v2/search/trending', 'Nexus\Controllers\Api\SearchApiController@trending');
 
 // ============================================
 // API V2 - METRICS (Performance Monitoring)

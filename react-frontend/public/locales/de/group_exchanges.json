@@ -127,6 +127,7 @@
     "add_participants_desc": "Suchen Sie nach Mitgliedern und fügen Sie diese als Anbietende oder Empfangende hinzu. Sie benötigen mindestens 1 Anbietende(n) und 1 Empfangende(n).",
     "providers_count": "Anbietende ({{count}})",
     "receivers_count": "Empfangende ({{count}})",
+    "no_participants_yet": "No participants added yet",
     "validation_min_participants": "Sie benötigen mindestens 1 Anbietende(n) und 1 Empfangende(n), um fortzufahren.",
     "hour_split_preview": "Vorschau der Stundenaufteilung",
     "hour_split_preview_desc": "Überprüfen Sie, wie die Stunden zwischen den Teilnehmenden verteilt werden.",
