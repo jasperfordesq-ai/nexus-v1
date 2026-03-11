@@ -81,12 +81,14 @@ class GoalCheckinService
             }
         }
 
-        $progressPercent = isset($data['progress_percent']) ? (float)$data['progress_percent'] : null;
+        // Accept both progress_percent and progress_value (frontend sends progress_value)
+        $progressPercent = isset($data['progress_percent']) ? (float)$data['progress_percent']
+            : (isset($data['progress_value']) ? (float)$data['progress_value'] : null);
         $note = trim($data['note'] ?? '');
         $mood = $data['mood'] ?? null;
 
         // Validate mood
-        $validMoods = ['great', 'good', 'neutral', 'struggling', 'stuck'];
+        $validMoods = ['great', 'good', 'neutral', 'okay', 'struggling', 'stuck', 'motivated', 'grateful'];
         if ($mood !== null && !in_array($mood, $validMoods, true)) {
             self::addError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'Invalid mood value. Must be one of: ' . implode(', ', $validMoods), 'mood');
             return null;
