@@ -60,6 +60,16 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const suggestionsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Lock body scroll when overlay is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   // Auto-focus search input when opened
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
@@ -271,6 +281,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }
   }, [searchQuery, navigate, tenantPath, selectedIndex, suggestions, handleSuggestionClick, closeAndReset, isActionMode, filteredActions, saveRecentSearch]);
 
+  const navigateToSearchPage = useCallback(() => {
+    if (searchQuery.trim()) {
+      saveRecentSearch(searchQuery);
+      navigate(tenantPath(`/search?q=${encodeURIComponent(searchQuery.trim())}`));
+      closeAndReset();
+    }
+  }, [searchQuery, navigate, tenantPath, closeAndReset, saveRecentSearch]);
+
   // Respect prefers-reduced-motion
   const prefersReducedMotion = useMemo(() => {
     if (typeof window === 'undefined') return false;
@@ -325,7 +343,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   aria-activedescendant={selectedIndex >= 0 ? `suggestion-${selectedIndex}` : undefined}
                   startContent={<Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />}
                   endContent={
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-1 flex-shrink-0">
                       {searchQuery && (
                         <Button
                           isIconOnly
@@ -333,14 +351,21 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           size="sm"
                           onPress={() => setSearchQuery('')}
                           className="text-theme-subtle hover:text-theme-primary min-w-6 w-6 h-6"
-                          aria-label="Clear search"
+                          aria-label={t('search.clear')}
                         >
                           <X className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       )}
-                      <kbd className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)]">
-                        ESC
-                      </kbd>
+                      <Button
+                        isIconOnly
+                        variant="light"
+                        size="sm"
+                        onPress={closeAndReset}
+                        className="text-theme-subtle hover:text-theme-primary min-w-7 w-7 h-7 rounded-full"
+                        aria-label={t('accessibility.close', 'Close')}
+                      >
+                        <X className="w-5 h-5" aria-hidden="true" />
+                      </Button>
                     </div>
                   }
                   classNames={{
@@ -423,11 +448,40 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         );
                       })}
                     </div>
+                    <Button
+                      variant="light"
+                      fullWidth
+                      onPress={navigateToSearchPage}
+                      className="mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-left h-auto min-h-0 hover:bg-[var(--surface-hover)] border-t border-[var(--border-default)] pt-3"
+                    >
+                      <Search className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                      <span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                        {t('search.view_all', 'View all results')}
+                      </span>
+                      <ArrowRight className="w-3 h-3 text-indigo-500 ml-auto" aria-hidden="true" />
+                    </Button>
                   </>
                 ) : isLoadingSuggestions ? (
                   <div className="flex items-center gap-2 py-2">
                     <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                     <span className="text-xs text-theme-subtle">{t('search.searching')}</span>
+                  </div>
+                ) : searchQuery.trim().length >= 2 ? (
+                  /* No suggestions found - prompt full search */
+                  <div className="space-y-2">
+                    <p className="text-sm text-theme-subtle py-1">{t('search.no_suggestions', 'No quick matches')}</p>
+                    <Button
+                      variant="light"
+                      fullWidth
+                      onPress={navigateToSearchPage}
+                      className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg h-auto min-h-0 hover:bg-[var(--surface-hover)]"
+                    >
+                      <Search className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                      <span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                        {t('search.search_for', 'Search for')} &ldquo;{searchQuery.trim()}&rdquo;
+                      </span>
+                      <ArrowRight className="w-3 h-3 text-indigo-500 ml-auto" aria-hidden="true" />
+                    </Button>
                   </div>
                 ) : (
                   /* Default: recent searches + quick links + actions hint */
@@ -453,7 +507,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                               variant="light"
                               fullWidth
                               onPress={() => {
-                                setSearchQuery(query);
+                                saveRecentSearch(query);
+                                navigate(tenantPath(`/search?q=${encodeURIComponent(query)}`));
+                                closeAndReset();
                               }}
                               className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-left h-auto min-h-0 justify-start hover:bg-[var(--surface-hover)]"
                             >

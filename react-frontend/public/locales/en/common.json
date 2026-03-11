@@ -121,7 +121,10 @@
     "actions": "Actions",
     "no_actions": "No matching actions",
     "recent": "Recent",
-    "actions_hint": "Type > for quick actions"
+    "actions_hint": "Type > for quick actions",
+    "view_all": "View all results",
+    "no_suggestions": "No quick matches",
+    "search_for": "Search for"
   },
   "support": {
     "help_center": "Help Center",
@@ -174,7 +177,8 @@
     "switch_to_light": "Switch to light mode",
     "switch_to_dark": "Switch to dark mode",
     "skip_to_content": "Skip to main content",
-    "menu_opened": "Navigation menu opened"
+    "menu_opened": "Navigation menu opened",
+    "close": "Close"
   },
   "cookie_consent": {
     "banner_label": "Cookie consent",

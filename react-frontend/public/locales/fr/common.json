@@ -121,7 +121,10 @@
     "actions": "Actions",
     "no_actions": "Aucune action correspondante",
     "recent": "Récent",
-    "actions_hint": "Tapez > pour les actions rapides"
+    "actions_hint": "Tapez > pour les actions rapides",
+    "view_all": "Voir tous les résultats",
+    "no_suggestions": "Aucune suggestion trouvée",
+    "search_for": "Rechercher"
   },
   "support": {
     "help_center": "Centre d'aide",
@@ -174,7 +177,8 @@
     "switch_to_light": "Passer en mode clair",
     "switch_to_dark": "Passer en mode sombre",
     "skip_to_content": "Aller au contenu principal",
-    "menu_opened": "Menu de navigation ouvert"
+    "menu_opened": "Menu de navigation ouvert",
+    "close": "Fermer"
   },
   "cookie_consent": {
     "banner_label": "Consentement aux cookies",
