@@ -64,7 +64,7 @@ export function NotificationFlyout() {
     if (hasFetched) return;
     try {
       setIsLoading(true);
-      const response = await api.get<Notification[]>('/v2/notifications?limit=8');
+      const response = await api.get<Notification[]>('/v2/notifications?per_page=8');
       if (response.success && response.data) {
         setNotifications(response.data);
       }
@@ -93,7 +93,7 @@ export function NotificationFlyout() {
 
   const handleNotificationClick = useCallback((notification: Notification) => {
     setIsOpen(false);
-    navigate(notification.link ? notification.link : tenantPath('/notifications'));
+    navigate(notification.link ? tenantPath(notification.link) : tenantPath('/notifications'));
   }, [navigate, tenantPath]);
 
   const handleViewAll = useCallback(() => {
@@ -114,27 +114,25 @@ export function NotificationFlyout() {
       shouldBlockScroll={false}
       offset={8}
     >
-      <PopoverTrigger>
-        <div className="relative">
-          <Badge
-            content={unreadCount > 99 ? '99+' : unreadCount}
-            color="danger"
+      <Badge
+        content={unreadCount > 99 ? '99+' : unreadCount}
+        color="danger"
+        size="sm"
+        isInvisible={unreadCount === 0}
+        placement="top-right"
+      >
+        <PopoverTrigger>
+          <Button
+            isIconOnly
+            variant="light"
             size="sm"
-            isInvisible={unreadCount === 0}
-            placement="top-right"
+            className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
+            aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
           >
-            <Button
-              isIconOnly
-              variant="light"
-              size="sm"
-              className={`text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
-              aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
-            >
-              <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
-            </Button>
-          </Badge>
-        </div>
-      </PopoverTrigger>
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+          </Button>
+        </PopoverTrigger>
+      </Badge>
       <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[360px] max-w-[90vw]">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
           <h3 className="text-sm font-semibold text-theme-primary">
