@@ -117,7 +117,11 @@
     "type_listing": "Liosta",
     "type_member": "Comhalta",
     "type_event": "Imeacht",
-    "type_group": "Grúpa"
+    "type_group": "Grúpa",
+    "actions": "Gníomhartha",
+    "no_actions": "Gan gníomhartha comhoiriúnacha",
+    "recent": "Le déanaí",
+    "actions_hint": "Clóscríobh > le haghaidh mear-ghníomhartha"
   },
   "support": {
     "help_center": "Ionad Cabhraigh",

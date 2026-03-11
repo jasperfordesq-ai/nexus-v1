@@ -117,7 +117,11 @@
     "type_listing": "Annuncio",
     "type_member": "Membro",
     "type_event": "Evento",
-    "type_group": "Gruppo"
+    "type_group": "Gruppo",
+    "actions": "Azioni",
+    "no_actions": "Nessuna azione corrispondente",
+    "recent": "Recenti",
+    "actions_hint": "Digita > per le azioni rapide"
   },
   "support": {
     "help_center": "Centro Assistenza",
