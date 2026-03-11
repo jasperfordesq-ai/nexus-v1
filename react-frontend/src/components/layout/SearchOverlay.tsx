@@ -4,19 +4,34 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Search Overlay
- * Full-screen search panel with live suggestions and keyboard navigation.
- * Extracted from Navbar for better separation of concerns.
+ * Command Palette / Search Overlay
+ * Full-screen search panel with live suggestions, quick actions,
+ * recent searches, and keyboard navigation.
+ * Triggered by Ctrl/Cmd+K or the search icon.
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input } from '@heroui/react';
-import { Search, X } from 'lucide-react';
+import {
+  Search,
+  X,
+  ListTodo,
+  Calendar,
+  Settings,
+  Sun,
+  Moon,
+  UserCircle,
+  HelpCircle,
+  Clock,
+  ArrowRight,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';
+
+const RECENT_SEARCHES_KEY = 'nexus_recent_searches';
 
 interface SearchSuggestion {
   id: number;
@@ -33,7 +48,9 @@ interface SearchOverlayProps {
 export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
+  const { isAuthenticated } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -130,6 +147,69 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     setSelectedIndex(-1);
   }, [suggestions]);
 
+  // ── Recent searches (localStorage) ──────────────────────────────────────
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      if (stored) setRecentSearches(JSON.parse(stored));
+    } catch { /* ignore */ }
+  }, [isOpen]);
+
+  const saveRecentSearch = useCallback((query: string) => {
+    const trimmed = query.trim();
+    if (!trimmed || trimmed.length < 2) return;
+    setRecentSearches(prev => {
+      const updated = [trimmed, ...prev.filter(s => s !== trimmed)].slice(0, 5);
+      try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
+      return updated;
+    });
+  }, []);
+
+  const clearRecentSearches = useCallback(() => {
+    setRecentSearches([]);
+    try { localStorage.removeItem(RECENT_SEARCHES_KEY); } catch { /* ignore */ }
+  }, []);
+
+  // ── Quick actions ──────────────────────────────────────────────────────
+  const quickActions = useMemo(() => {
+    const actions: { label: string; icon: typeof Search; action: () => void; shortcut?: string }[] = [];
+    if (isAuthenticated) {
+      actions.push(
+        { label: t('create.new_listing', 'New Listing'), icon: ListTodo, action: () => navigate(tenantPath('/listings/create')) },
+      );
+      if (hasFeature('events')) {
+        actions.push(
+          { label: t('create.new_event', 'New Event'), icon: Calendar, action: () => navigate(tenantPath('/events/create')) },
+        );
+      }
+      actions.push(
+        { label: t('user_menu.my_profile', 'My Profile'), icon: UserCircle, action: () => navigate(tenantPath('/profile')) },
+        { label: t('user_menu.settings', 'Settings'), icon: Settings, action: () => navigate(tenantPath('/settings')) },
+      );
+    }
+    actions.push(
+      {
+        label: resolvedTheme === 'dark' ? t('user_menu.light_mode', 'Light Mode') : t('user_menu.dark_mode', 'Dark Mode'),
+        icon: resolvedTheme === 'dark' ? Sun : Moon,
+        action: toggleTheme,
+      },
+      { label: t('support.help_center', 'Help Center'), icon: HelpCircle, action: () => navigate(tenantPath('/help')) },
+    );
+    return actions;
+  }, [isAuthenticated, t, navigate, tenantPath, hasFeature, resolvedTheme, toggleTheme]);
+
+  // Filter quick actions by search query when typing starts with ">"
+  const filteredActions = useMemo(() => {
+    if (!searchQuery.startsWith('>')) return [];
+    const q = searchQuery.slice(1).trim().toLowerCase();
+    if (!q) return quickActions;
+    return quickActions.filter(a => a.label.toLowerCase().includes(q));
+  }, [searchQuery, quickActions]);
+
+  const isActionMode = searchQuery.startsWith('>');
+
   const closeAndReset = useCallback(() => {
     onClose();
     setSearchQuery('');
@@ -148,32 +228,48 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     closeAndReset();
   }, [navigate, tenantPath, closeAndReset]);
 
+  // Total navigable items count for unified keyboard nav
+  const navigableCount = isActionMode ? filteredActions.length : suggestions.length;
+
   const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (suggestions.length === 0) return;
+    if (navigableCount === 0 && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev + 1) % suggestions.length);
+      setSelectedIndex((prev) => (prev + 1) % Math.max(navigableCount, 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+      setSelectedIndex((prev) => (prev <= 0 ? Math.max(navigableCount - 1, 0) : prev - 1));
     } else if (e.key === 'Enter' && selectedIndex >= 0) {
       e.preventDefault();
-      handleSuggestionClick(suggestions[selectedIndex]);
+      if (isActionMode && filteredActions[selectedIndex]) {
+        filteredActions[selectedIndex].action();
+        closeAndReset();
+      } else if (suggestions[selectedIndex]) {
+        handleSuggestionClick(suggestions[selectedIndex]);
+      }
     }
-  }, [suggestions, selectedIndex, handleSuggestionClick]);
+  }, [navigableCount, selectedIndex, isActionMode, filteredActions, suggestions, handleSuggestionClick, closeAndReset]);
 
   const handleSearchSubmit = useCallback((e?: React.FormEvent) => {
     e?.preventDefault();
+    if (isActionMode) {
+      if (selectedIndex >= 0 && filteredActions[selectedIndex]) {
+        filteredActions[selectedIndex].action();
+        closeAndReset();
+      }
+      return;
+    }
     if (selectedIndex >= 0 && suggestions.length > 0) {
       handleSuggestionClick(suggestions[selectedIndex]);
       return;
     }
     if (searchQuery.trim()) {
+      saveRecentSearch(searchQuery);
       navigate(tenantPath(`/search?q=${encodeURIComponent(searchQuery.trim())}`));
       closeAndReset();
     }
-  }, [searchQuery, navigate, tenantPath, selectedIndex, suggestions, handleSuggestionClick, closeAndReset]);
+  }, [searchQuery, navigate, tenantPath, selectedIndex, suggestions, handleSuggestionClick, closeAndReset, isActionMode, filteredActions, saveRecentSearch]);
 
   // Respect prefers-reduced-motion
   const prefersReducedMotion = useMemo(() => {
@@ -255,12 +351,48 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 />
               </form>
 
-              {/* Suggestions or Quick Links */}
-              <div className="border-t border-[var(--border-default)] px-4 py-3 max-h-64 overflow-y-auto">
-                {suggestions.length > 0 ? (
+              {/* Results Panel */}
+              <div className="border-t border-[var(--border-default)] px-4 py-3 max-h-80 overflow-y-auto">
+                {/* Action mode (query starts with ">") */}
+                {isActionMode ? (
+                  <>
+                    <p className="text-xs text-theme-subtle mb-2">{t('search.actions', 'Actions')}</p>
+                    <div className="space-y-0.5" role="listbox" aria-label="Quick actions">
+                      {filteredActions.map((action, index) => {
+                        const Icon = action.icon;
+                        const isSelected = index === selectedIndex;
+                        return (
+                          <Button
+                            id={`suggestion-${index}`}
+                            key={action.label}
+                            variant="light"
+                            fullWidth
+                            role="option"
+                            aria-selected={isSelected}
+                            onPress={() => { action.action(); closeAndReset(); }}
+                            onMouseEnter={() => setSelectedIndex(index)}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left h-auto min-h-0 justify-start ${
+                              isSelected
+                                ? 'bg-indigo-50 dark:bg-indigo-500/10'
+                                : 'hover:bg-[var(--surface-hover)]'
+                            }`}
+                          >
+                            <Icon className="w-4 h-4 text-theme-subtle shrink-0" aria-hidden="true" />
+                            <span className="text-sm text-theme-primary">{action.label}</span>
+                            <ArrowRight className="w-3 h-3 ml-auto text-theme-subtle opacity-0 group-hover:opacity-100" aria-hidden="true" />
+                          </Button>
+                        );
+                      })}
+                      {filteredActions.length === 0 && (
+                        <p className="text-sm text-theme-subtle py-2">{t('search.no_actions', 'No matching actions')}</p>
+                      )}
+                    </div>
+                  </>
+                ) : suggestions.length > 0 ? (
+                  /* Search suggestions */
                   <>
                     <p className="text-xs text-theme-subtle mb-2">{t('search.suggestions')}</p>
-                    <div className="space-y-1" role="listbox" aria-label="Search suggestions">
+                    <div className="space-y-0.5" role="listbox" aria-label="Search suggestions">
                       {suggestions.map((suggestion, index) => {
                         const typeInfo = typeLabels[suggestion.type] || { label: suggestion.type, color: 'bg-[var(--surface-elevated)] text-theme-subtle' };
                         const isSelected = index === selectedIndex;
@@ -298,9 +430,44 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     <span className="text-xs text-theme-subtle">{t('search.searching')}</span>
                   </div>
                 ) : (
+                  /* Default: recent searches + quick links + actions hint */
                   <>
+                    {/* Recent Searches */}
+                    {recentSearches.length > 0 && (
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <p className="text-xs text-theme-subtle">{t('search.recent', 'Recent')}</p>
+                          <Button
+                            variant="light"
+                            size="sm"
+                            className="text-[10px] text-theme-subtle hover:text-theme-primary h-5 min-w-0 px-1"
+                            onPress={clearRecentSearches}
+                          >
+                            {t('search.clear', 'Clear')}
+                          </Button>
+                        </div>
+                        <div className="space-y-0.5">
+                          {recentSearches.map(query => (
+                            <Button
+                              key={query}
+                              variant="light"
+                              fullWidth
+                              onPress={() => {
+                                setSearchQuery(query);
+                              }}
+                              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-left h-auto min-h-0 justify-start hover:bg-[var(--surface-hover)]"
+                            >
+                              <Clock className="w-3.5 h-3.5 text-theme-subtle shrink-0" aria-hidden="true" />
+                              <span className="text-sm text-theme-secondary">{query}</span>
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick Links */}
                     <p className="text-xs text-theme-subtle mb-2">{t('search.quick_links')}</p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 mb-3">
                       {[
                         { label: t('nav.listings'), path: tenantPath('/listings') },
                         { label: t('nav.members'), path: tenantPath('/members') },
@@ -317,6 +484,13 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           {link.label}
                         </Button>
                       ))}
+                    </div>
+
+                    {/* Actions hint */}
+                    <div className="pt-2 border-t border-[var(--border-default)]">
+                      <p className="text-[11px] text-theme-subtle">
+                        {t('search.actions_hint', 'Type > for quick actions')}
+                      </p>
                     </div>
                   </>
                 )}

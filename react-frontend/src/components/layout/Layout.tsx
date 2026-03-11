@@ -23,6 +23,7 @@ import { SessionExpiredModal } from '@/components/feedback';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useApiErrorHandler } from '@/hooks';
+import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 
 interface LayoutProps {
@@ -59,6 +60,9 @@ export function Layout({
 
   // Listen for API errors and display toast notifications
   useApiErrorHandler();
+
+  // Scroll state for dynamic padding — when utility bar hides, reduce top padding
+  const { isUtilityBarVisible } = useHeaderScroll(48);
 
   // Check for native app updates (Capacitor only, no-ops on web)
   const { updateInfo, dismiss: dismissUpdate } = useAppUpdate();
@@ -102,10 +106,16 @@ export function Layout({
         </>
       )}
 
-      {/* Main Content */}
+      {/* Main Content — padding adapts when utility bar hides on scroll */}
       <main
         id="main-content"
-        className={`flex-1 relative z-10 min-w-0 ${withNavbarPadding && showNavbar ? 'pt-20 sm:pt-[7.5rem]' : ''}`}
+        className={`flex-1 relative z-10 min-w-0 transition-[padding-top] duration-200 ${
+          withNavbarPadding && showNavbar
+            ? isUtilityBarVisible
+              ? 'pt-20 sm:pt-[7.5rem]'
+              : 'pt-16 sm:pt-[5.5rem]'
+            : ''
+        }`}
       >
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 min-w-0">
           <Outlet />

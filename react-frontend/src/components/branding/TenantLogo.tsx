@@ -49,6 +49,8 @@ export interface TenantLogoProps {
   showName?: boolean;
   /** Show the tagline below the name (lg+ viewports only). */
   showTagline?: boolean;
+  /** Compact mode — shrinks logo and hides name. Used when header is scrolled. */
+  compact?: boolean;
   /** Extra classes on the outer <Link>. */
   className?: string;
 }
@@ -57,6 +59,7 @@ export function TenantLogo({
   size = 'md',
   showName = true,
   showTagline = false,
+  compact = false,
   className = '',
 }: TenantLogoProps) {
   const { branding, tenantPath } = useTenant();
@@ -65,21 +68,24 @@ export function TenantLogo({
   const darkText = shouldUseDarkText(primaryColor);
   const needsTooltip = branding.name.length > 20;
 
+  // When compact, use smaller sizes
+  const effectiveSize = compact ? 'sm' : size;
+
   /* ── icon / image ────────────────────────────────────────── */
   const iconElement = branding.logo ? (
     <img
       src={branding.logo}
       alt={branding.name}
-      className={imgClassMap[size]}
+      className={`${imgClassMap[effectiveSize]} transition-all duration-200`}
       loading={size === 'sm' ? 'lazy' : 'eager'}
     />
   ) : (
     <Avatar
       name={branding.name}
       getInitials={() => getInitials(branding.name)}
-      size={avatarSizeMap[size]}
+      size={avatarSizeMap[effectiveSize]}
       classNames={{
-        base: 'ring-2 ring-offset-1 ring-offset-transparent ring-default-200 dark:ring-default-100 shrink-0',
+        base: 'ring-2 ring-offset-1 ring-offset-transparent ring-default-200 dark:ring-default-100 shrink-0 transition-all duration-200',
       }}
       style={{
         backgroundColor: primaryColor,
@@ -129,8 +135,8 @@ export function TenantLogo({
         {iconElement}
       </motion.div>
 
-      {showName && (
-        <div className="hidden min-[480px]:flex flex-col min-w-0">
+      {showName && !compact && (
+        <div className="hidden min-[480px]:flex flex-col min-w-0 transition-all duration-200">
           {nameElement}
           {taglineElement}
         </div>
