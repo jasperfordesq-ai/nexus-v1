@@ -12,3 +12,4 @@ export { FederationMessagesPage } from './FederationMessagesPage';
 export { FederationListingsPage } from './FederationListingsPage';
 export { FederationEventsPage } from './FederationEventsPage';
 export { FederationOnboardingPage } from './FederationOnboardingPage';
+export { FederationConnectionsPage } from './FederationConnectionsPage';
