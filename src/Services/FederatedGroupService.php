@@ -8,6 +8,7 @@ namespace Nexus\Services;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Models\Notification;
 
 /**
  * FederatedGroupService
@@ -209,6 +210,70 @@ class FederatedGroupService
              VALUES (?, ?, 'member', ?, 1, ?, NOW())",
             [$groupId, $userId, $status, $userTenantId]
         );
+
+        // ── Notify group owner/admins about federated member join ──
+        try {
+            // Get the joining user's name and tenant name
+            $joinerInfo = Database::query(
+                "SELECT u.name, u.first_name, u.last_name, t.name as tenant_name
+                 FROM users u JOIN tenants t ON u.tenant_id = t.id WHERE u.id = ?",
+                [$userId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            $joinerName = 'A federation member';
+            $joinerTenantName = 'a partner community';
+            if ($joinerInfo) {
+                $joinerName = $joinerInfo['name'] ?: trim($joinerInfo['first_name'] . ' ' . $joinerInfo['last_name']);
+                $joinerTenantName = $joinerInfo['tenant_name'] ?: 'a partner community';
+            }
+
+            $groupName = $group['name'] ?? 'your group';
+            $notifMessage = "{$joinerName} from {$joinerTenantName} joined {$groupName} via federation";
+            $notifLink = '/groups/' . $groupId;
+
+            // Notify group owner
+            if (!empty($group['owner_id']) && (int)$group['owner_id'] !== $userId) {
+                Notification::create(
+                    (int)$group['owner_id'],
+                    $notifMessage,
+                    $notifLink,
+                    'federation_group_join',
+                    true,
+                    $groupTenantId
+                );
+            }
+
+            // Notify group admins/moderators (in the group's tenant)
+            $admins = Database::query(
+                "SELECT user_id FROM group_members
+                 WHERE group_id = ? AND role IN ('admin', 'moderator') AND status = 'active'",
+                [$groupId]
+            )->fetchAll(\PDO::FETCH_ASSOC);
+
+            foreach ($admins as $admin) {
+                $adminId = (int)$admin['user_id'];
+                if ($adminId === $userId || $adminId === (int)($group['owner_id'] ?? 0)) continue;
+                Notification::create(
+                    $adminId,
+                    $notifMessage,
+                    $notifLink,
+                    'federation_group_join',
+                    true,
+                    $groupTenantId
+                );
+            }
+
+            // Audit log
+            FederationAuditService::log(
+                'cross_tenant_group_join',
+                $userTenantId,
+                $groupTenantId,
+                $userId,
+                ['group_id' => $groupId, 'group_name' => $groupName, 'status' => $status]
+            );
+        } catch (\Exception $e) {
+            error_log("FederatedGroupService: Failed to send group join notifications: " . $e->getMessage());
+        }
 
         return [
             'success' => true,

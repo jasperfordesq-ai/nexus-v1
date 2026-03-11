@@ -1265,4 +1265,95 @@ HTML;
 
         return self::getEmailWrapper($content, $siteName, $siteUrl, $basePath, "Your federation activity this week");
     }
+
+    /**
+     * Send notification when a user receives a federated connection request
+     */
+    public static function sendConnectionRequestNotification(
+        int $recipientUserId,
+        int $requesterUserId,
+        int $requesterTenantId,
+        ?string $message = null
+    ): bool {
+        // Get recipient info
+        $recipient = Database::query(
+            "SELECT u.id, u.email, u.first_name, u.last_name, u.tenant_id,
+                    ufs.email_notifications
+             FROM users u
+             LEFT JOIN federation_user_settings ufs ON u.id = ufs.user_id
+             WHERE u.id = ?",
+            [$recipientUserId]
+        )->fetch();
+
+        if (!$recipient || empty($recipient['email'])) {
+            return false;
+        }
+
+        // Check if email notifications are enabled
+        if ($recipient['email_notifications'] === 0) {
+            return false;
+        }
+
+        // Get requester info
+        $requester = Database::query(
+            "SELECT u.first_name, u.last_name, t.name as tenant_name
+             FROM users u
+             JOIN tenants t ON u.tenant_id = t.id
+             WHERE u.id = ? AND u.tenant_id = ?",
+            [$requesterUserId, $requesterTenantId]
+        )->fetch();
+
+        if (!$requester) {
+            return false;
+        }
+
+        // Get recipient's tenant info for branding
+        $recipientTenant = Database::query(
+            "SELECT name, slug FROM tenants WHERE id = ?",
+            [$recipient['tenant_id']]
+        )->fetch();
+
+        $requesterName = trim($requester['first_name'] . ' ' . $requester['last_name']);
+        $tenantName = $requester['tenant_name'];
+        $siteName = $recipientTenant['name'] ?? 'Timebank';
+        $basePath = '/' . ($recipientTenant['slug'] ?? '');
+        $siteUrl = TenantContext::getFrontendUrl();
+
+        $subject = "Federation connection request from {$requesterName}";
+
+        $messageHtml = '';
+        if ($message) {
+            $messageHtml = '<p style="padding:12px;background:#f3f0ff;border-radius:8px;color:#4c1d95;font-style:italic;">'
+                . '"' . htmlspecialchars($message) . '"</p>';
+        }
+
+        $content = <<<HTML
+<tr>
+    <td style="padding:30px 24px;">
+        <h2 style="margin:0 0 16px;font-size:20px;color:#1e293b;">New Connection Request</h2>
+        <p style="margin:0 0 16px;color:#475569;">
+            <strong>{$requesterName}</strong> from <strong>{$tenantName}</strong> wants to connect with you via federation.
+        </p>
+        {$messageHtml}
+        <p style="margin:16px 0;">
+            <a href="{$siteUrl}{$basePath}/federation/connections"
+               style="display:inline-block;padding:12px 24px;background:#8b5cf6;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">
+                View Request
+            </a>
+        </p>
+    </td>
+</tr>
+HTML;
+
+        $html = self::getEmailWrapper($content, $siteName, $siteUrl, $basePath, $subject);
+
+        try {
+            $mailer = Mailer::forCurrentTenant();
+            return $mailer->send($recipient['email'], $subject, $html);
+        } catch (\Throwable $e) {
+            error_log("Failed to send federation connection request notification: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }

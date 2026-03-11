@@ -13,6 +13,10 @@ use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FederationPartnershipService;
 use Nexus\Services\FederationActivityService;
 use Nexus\Services\FederationAuditService;
+use Nexus\Services\FederationEmailService;
+use Nexus\Services\FederationRealtimeService;
+use Nexus\Models\Notification;
+use Nexus\Services\FederatedConnectionService;
 
 /**
  * FederationV2ApiController
@@ -1133,6 +1137,61 @@ class FederationV2ApiController extends BaseApiController
                 FederationAuditService::LEVEL_INFO
             );
 
+            // ── Notification dispatch (email + realtime + in-app + push) ──
+            // These are async/non-blocking: failures are logged but don't affect the response.
+
+            $senderTenantName = $sender['tenant_name'] ?? '';
+
+            // 1. Email notification to recipient
+            try {
+                FederationEmailService::sendNewMessageNotification(
+                    (int)$receiverId,
+                    $userId,
+                    $tenantId,
+                    substr($body, 0, 200)
+                );
+            } catch (\Exception $e) {
+                error_log("FederationV2: Failed to send federation message email: " . $e->getMessage());
+            }
+
+            // 2. Real-time notification via Pusher
+            try {
+                FederationRealtimeService::broadcastNewMessage(
+                    $userId,
+                    $tenantId,
+                    (int)$receiverId,
+                    (int)$receiverTenantId,
+                    [
+                        'message_id' => $outboundId,
+                        'sender_name' => $senderName,
+                        'sender_tenant_name' => $senderTenantName,
+                        'subject' => $subject,
+                        'body' => $body,
+                    ]
+                );
+            } catch (\Exception $e) {
+                error_log("FederationV2: Failed to send federation message realtime: " . $e->getMessage());
+            }
+
+            // 3. In-app notification + push notification
+            try {
+                $notifMessage = "New federated message from {$senderName} ({$senderTenantName}): " . substr($subject ?: '(no subject)', 0, 50);
+                if (strlen($subject) > 50) {
+                    $notifMessage .= '...';
+                }
+
+                Notification::create(
+                    (int)$receiverId,
+                    $notifMessage,
+                    '/federation/messages',
+                    'federation_message',
+                    true,
+                    (int)$receiverTenantId  // Receiver's tenant, not sender's
+                );
+            } catch (\Exception $e) {
+                error_log("FederationV2: Failed to send federation message in-app notification: " . $e->getMessage());
+            }
+
             // Return the outbound message in the expected format
             $this->respondWithData([
                 'id' => $outboundId,
@@ -1304,5 +1363,117 @@ class FederationV2ApiController extends BaseApiController
             'failed' => 'delivered',
         ];
         return $map[$dbStatus] ?? 'delivered';
+    }
+
+    // =========================================================================
+    // FEDERATION CONNECTIONS (cross-tenant)
+    // =========================================================================
+
+    /**
+     * GET /api/v2/federation/connections
+     *
+     * List federated connections for the authenticated user.
+     * Query: status (accepted|pending_sent|pending_received), limit, offset
+     */
+    public function connections(): void
+    {
+        $userId = $this->getUserId();
+        $status = $this->input('status', 'accepted');
+        $limit = min((int)($this->input('limit') ?: 50), 100);
+        $offset = max((int)($this->input('offset') ?: 0), 0);
+
+        $connections = FederatedConnectionService::getConnections($userId, $status, $limit, $offset);
+        $pendingCount = FederatedConnectionService::getPendingCount($userId);
+
+        $this->respondWithData([
+            'connections' => $connections,
+            'pending_count' => $pendingCount,
+        ]);
+    }
+
+    /**
+     * POST /api/v2/federation/connections
+     *
+     * Send a federated connection request.
+     * Body: receiver_id, receiver_tenant_id, message?
+     */
+    public function sendConnectionRequest(): void
+    {
+        $userId = $this->getUserId();
+        $receiverId = (int)$this->input('receiver_id');
+        $receiverTenantId = (int)$this->input('receiver_tenant_id');
+        $message = $this->input('message');
+
+        if (!$receiverId || !$receiverTenantId) {
+            $this->respondWithError('VALIDATION_ERROR', 'receiver_id and receiver_tenant_id are required.', null, 400);
+            return;
+        }
+
+        $result = FederatedConnectionService::sendRequest($userId, $receiverId, $receiverTenantId, $message);
+
+        if (!$result['success']) {
+            $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
+            return;
+        }
+
+        $this->respondWithData($result, null, 201);
+    }
+
+    /**
+     * POST /api/v2/federation/connections/{id}/accept
+     */
+    public function acceptConnection(int $id): void
+    {
+        $userId = $this->getUserId();
+        $result = FederatedConnectionService::acceptRequest($id, $userId);
+
+        if (!$result['success']) {
+            $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
+            return;
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/federation/connections/{id}/reject
+     */
+    public function rejectConnection(int $id): void
+    {
+        $userId = $this->getUserId();
+        $result = FederatedConnectionService::rejectRequest($id, $userId);
+
+        if (!$result['success']) {
+            $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
+            return;
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * DELETE /api/v2/federation/connections/{id}
+     */
+    public function removeConnection(int $id): void
+    {
+        $userId = $this->getUserId();
+        $result = FederatedConnectionService::removeConnection($id, $userId);
+
+        if (!$result['success']) {
+            $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 404);
+            return;
+        }
+
+        $this->respondWithData($result);
+    }
+
+    /**
+     * GET /api/v2/federation/connections/status/{userId}/{tenantId}
+     */
+    public function connectionStatus(int $userId, int $tenantId): void
+    {
+        $currentUserId = $this->getUserId();
+        $status = FederatedConnectionService::getStatus($currentUserId, $userId, $tenantId);
+        $this->respondWithData($status);
     }
 }

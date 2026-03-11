@@ -47,7 +47,7 @@ class FeedService
      *   'user_id' => int (for user profile feed),
      *   'group_id' => int (for group feed),
      *   'cursor' => string,
-     *   'limit' => int (default: 20, max: 100)
+     *   'limit' => int (default: 20, max: 400 for EdgeRank 4x window)
      * ]
      * @return array ['items' => [], 'cursor' => string|null, 'has_more' => bool]
      */
@@ -55,7 +55,7 @@ class FeedService
     {
         $tenantId = TenantContext::getId();
 
-        $limit = min($filters['limit'] ?? 20, 100);
+        $limit = min($filters['limit'] ?? 20, 400);
         $type = $filters['type'] ?? 'all';
         $profileUserId = $filters['user_id'] ?? null;
         $groupId = $filters['group_id'] ?? null;

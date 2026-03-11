@@ -174,7 +174,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
           counts: {
             ...prev.counts,
             total: 0,
-            messages: 0,
+            // Preserve messages count — messages and notifications are separate systems
             listings: 0,
             transactions: 0,
             connections: 0,
@@ -236,9 +236,16 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     // Initialize Pusher (skip if key not configured)
     if (!PUSHER_KEY) {
       if (import.meta.env.DEV) {
-        console.warn('[NotificationsContext] VITE_PUSHER_KEY is not set — real-time notifications disabled.');
+        console.warn('[NotificationsContext] VITE_PUSHER_KEY is not set — real-time notifications disabled, using polling.');
       }
-      return;
+      // Still set up polling fallback even without Pusher
+      pollingRef.current = setInterval(refreshCounts, POLLING_INTERVAL);
+      return () => {
+        if (pollingRef.current) {
+          clearInterval(pollingRef.current);
+          pollingRef.current = null;
+        }
+      };
     }
     try {
       const pusher = new Pusher(PUSHER_KEY, {

@@ -8,6 +8,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Services\FeedActivityService;
 
 class ListingController extends BaseApiController
 {
@@ -83,6 +84,19 @@ class ListingController extends BaseApiController
 
         try {
             $stmt->execute([$tenantId, $userId, $title, $description, $type]);
+            $listingId = (int)$db->lastInsertId();
+
+            // Record in feed_activity so listing appears in the community feed
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'listing', $listingId, [
+                    'title' => $title,
+                    'content' => $description,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $fe) {
+                error_log('ListingController::store feed_activity failed: ' . $fe->getMessage());
+            }
+
             $this->jsonResponse(['success' => true, 'message' => 'Listing Created']);
         } catch (\Exception $e) {
             $this->jsonResponse(['success' => false, 'message' => 'Server error'], 500);

@@ -110,6 +110,19 @@ class Listing
         Database::query($sql, [$tenantId, $userId, $title, $description, $type, $categoryId, $imageUrl, $location, $latitude, $longitude, $federatedVisibility]);
         $id = Database::lastInsertId();
 
+        // Record in feed_activity so listing appears in the community feed
+        try {
+            \Nexus\Services\FeedActivityService::recordActivity($tenantId, $userId, "listing", (int)$id, [
+                "title" => $title,
+                "content" => $description,
+                "image_url" => $imageUrl,
+                "metadata" => ["location" => $location],
+                "created_at" => date("Y-m-d H:i:s"),
+            ]);
+        } catch (\Exception $e) {
+            error_log("Listing::create feed_activity failed: " . $e->getMessage());
+        }
+
         ActivityLog::log($userId, "created_listing", "Posted a new $type: $title");
 
         return $id;

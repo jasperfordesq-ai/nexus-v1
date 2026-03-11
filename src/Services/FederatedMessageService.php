@@ -141,7 +141,8 @@ class FederatedMessageService
                     $notificationMessage,
                     '/federation/messages', // Link to federation messages
                     'federation_message',   // Notification type
-                    true                    // Send push notification
+                    true,                   // Send push notification
+                    $receiverTenantId       // Receiver's tenant, not sender's
                 );
             } catch (\Exception $e) {
                 error_log("Failed to send federation message in-app notification: " . $e->getMessage());
