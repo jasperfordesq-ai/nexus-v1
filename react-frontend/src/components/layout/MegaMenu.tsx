@@ -5,11 +5,13 @@
 
 /**
  * Mega Menu
- * Multi-column popover menu for the "More" navigation dropdown.
+ * Two-column popover menu for the "More" navigation dropdown.
+ * - Left column: Activity items, optionally grouped with thin dividers.
+ * - Right column: About items + collapsible Partner Communities section.
  * Supports keyboard navigation (arrow keys + Enter) and focus management.
  */
 
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Button,
@@ -26,6 +28,8 @@ interface MegaMenuItem {
   desc?: string;
   href: string;
   icon: LucideIcon;
+  /** When true, renders a thin divider line above this item to start a new group */
+  dividerBefore?: boolean;
 }
 
 interface MegaMenuProps {
@@ -50,9 +54,8 @@ export function MegaMenu({
   const { t } = useTranslation('common');
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
+  const [federationExpanded, setFederationExpanded] = useState(false);
 
-  // Flatten all items for keyboard navigation
-  const allItems = [...activityItems, ...federationItems, ...aboutItems];
 
   // Focus the first button when the menu opens
   useEffect(() => {
@@ -65,41 +68,30 @@ export function MegaMenu({
     }
   }, [isOpen]);
 
-  // Keyboard navigation within the mega menu
+  // Two logical columns: Activity (left) | About + Federation (right).
+  // The right column starts at activityItems.length in the flattened keyboard nav order.
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (!menuRef.current) return;
 
     const buttons = Array.from(menuRef.current.querySelectorAll<HTMLButtonElement>('button[data-mega-item]'));
     const currentIndex = buttons.indexOf(document.activeElement as HTMLButtonElement);
+    const rightColStart = activityItems.length;
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      const next = currentIndex < buttons.length - 1 ? currentIndex + 1 : 0;
-      buttons[next]?.focus();
+      buttons[(currentIndex + 1) % buttons.length]?.focus();
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      const prev = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
-      buttons[prev]?.focus();
+      buttons[(currentIndex - 1 + buttons.length) % buttons.length]?.focus();
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      // Jump to next column
-      const columnStarts = [0, activityItems.length, activityItems.length + federationItems.length];
-      const currentCol = columnStarts.findIndex((start, i) =>
-        currentIndex >= start && (i === columnStarts.length - 1 || currentIndex < columnStarts[i + 1])
-      );
-      if (currentCol < columnStarts.length - 1) {
-        const nextColStart = columnStarts[currentCol + 1];
-        if (nextColStart < buttons.length) buttons[nextColStart]?.focus();
+      if (currentIndex < rightColStart && rightColStart < buttons.length) {
+        buttons[rightColStart]?.focus();
       }
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      const columnStarts = [0, activityItems.length, activityItems.length + federationItems.length];
-      const currentCol = columnStarts.findIndex((start, i) =>
-        currentIndex >= start && (i === columnStarts.length - 1 || currentIndex < columnStarts[i + 1])
-      );
-      if (currentCol > 0) {
-        const prevColStart = columnStarts[currentCol - 1];
-        buttons[prevColStart]?.focus();
+      if (currentIndex >= rightColStart) {
+        buttons[0]?.focus();
       }
     } else if (e.key === 'Home') {
       e.preventDefault();
@@ -110,7 +102,7 @@ export function MegaMenu({
     } else if (e.key === 'Escape') {
       onOpenChange(false);
     }
-  }, [activityItems.length, federationItems.length, allItems.length, onOpenChange]);
+  }, [activityItems.length, onOpenChange]);
 
   // Respect prefers-reduced-motion for popover animation
   const reducedMotion = useMemo(() => {
@@ -118,35 +110,90 @@ export function MegaMenu({
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }, []);
 
-  const hasFederation = federationItems.length > 0;
-  const columnCount = hasFederation ? 3 : 2;
+  // Shared item renderer used by both columns
+  const renderItem = (item: MegaMenuItem) => (
+    <Button
+      key={item.href}
+      data-mega-item
+      onPress={() => onNavigate(item.href)}
+      variant="light"
+      className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 h-auto justify-start ${
+        location.pathname.startsWith(item.href)
+          ? "bg-theme-active text-theme-primary"
+          : "text-theme-muted hover:text-theme-primary hover:bg-theme-hover"
+      }`}
+    >
+      <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
+      <div className="min-w-0">
+        <p className="text-sm font-medium leading-tight">{item.label}</p>
+        {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
+      </div>
+    </Button>
+  );
 
-  const renderColumn = (items: MegaMenuItem[], title: string, showBorder: boolean) => {
-    if (items.length === 0) return null;
+  // Left column: Activity items with optional sub-group dividers
+  const renderActivityColumn = () => {
+    if (activityItems.length === 0) return null;
     return (
-      <div className={`p-2 ${showBorder ? 'border-l border-[var(--border-default)]' : ''}`}>
-        <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">{title}</p>
-        <div className="space-y-0.5">
-          {items.map((item) => (
-            <Button
-              key={item.href}
-              data-mega-item
-              onPress={() => onNavigate(item.href)}
-              variant="light"
-              className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-left transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 h-auto justify-start ${
-                location.pathname.startsWith(item.href)
-                  ? 'bg-theme-active text-theme-primary'
-                  : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-              }`}
-            >
-              <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-              <div className="min-w-0">
-                <p className="text-sm font-medium leading-tight">{item.label}</p>
-                {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
-              </div>
-            </Button>
+      <div className="p-2">
+        <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">
+          {t("sections.activity")}
+        </p>
+        <div>
+          {activityItems.map((item, i) => (
+            <div key={item.href}>
+              {item.dividerBefore && i > 0 && (
+                <div className="my-1.5 mx-3 border-t border-[var(--border-default)] opacity-40" />
+              )}
+              {renderItem(item)}
+            </div>
           ))}
         </div>
+      </div>
+    );
+  };
+
+  // Right column: About items + collapsible Partner Communities section
+  const renderRightColumn = () => {
+    const hasAbout = aboutItems.length > 0;
+    const hasFederation = federationItems.length > 0;
+    if (!hasAbout && !hasFederation) return null;
+    return (
+      <div className="p-2 border-l border-[var(--border-default)]">
+        {hasAbout && (
+          <>
+            <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle">
+              {t("sections.about")}
+            </p>
+            <div className="space-y-0.5">
+              {aboutItems.map(item => renderItem(item))}
+            </div>
+          </>
+        )}
+        {hasFederation && (
+          <div className={hasAbout ? "mt-3" : ""}>
+            {hasAbout && (
+              <div className="mx-3 mb-2 border-t border-[var(--border-default)] opacity-40" />
+            )}
+            <button
+              type="button"
+              onClick={() => setFederationExpanded(prev => !prev)}
+              aria-expanded={federationExpanded}
+              className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-theme-subtle hover:text-theme-primary transition-colors motion-reduce:transition-none rounded-md hover:bg-theme-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50"
+            >
+              <span>{t("sections.partner_communities")}</span>
+              <ChevronDown
+                className={"w-3 h-3 transition-transform duration-200 motion-reduce:transition-none " + (federationExpanded ? "rotate-180" : "")}
+                aria-hidden="true"
+              />
+            </button>
+            {federationExpanded && (
+              <div className="space-y-0.5 mt-0.5">
+                {federationItems.map(item => renderItem(item))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   };
@@ -185,15 +232,12 @@ export function MegaMenu({
       <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl max-h-[75vh] max-w-[90vw] overflow-y-auto">
         <nav
           ref={menuRef}
-          className={`grid gap-0 p-2 ${
-            columnCount === 3 ? 'grid-cols-3 min-w-[640px]' : 'grid-cols-2 min-w-[480px]'
-          }`}
+          className="grid grid-cols-2 gap-0 p-2 min-w-[500px]"
           aria-label="More navigation"
           onKeyDown={handleKeyDown}
         >
-          {renderColumn(activityItems, t('sections.activity'), false)}
-          {renderColumn(federationItems, t('sections.partner_communities'), activityItems.length > 0)}
-          {renderColumn(aboutItems, t('sections.about'), activityItems.length > 0 || federationItems.length > 0)}
+          {renderActivityColumn()}
+          {renderRightColumn()}
         </nav>
       </PopoverContent>
     </Popover>
