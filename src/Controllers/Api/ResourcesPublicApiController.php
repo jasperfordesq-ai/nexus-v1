@@ -276,13 +276,13 @@ class ResourcesPublicApiController extends BaseApiController
         )->fetch();
 
         if (!$resource) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Resource not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Resource not found', null, 404);
             return;
         }
 
         $filePath = $resource['file_path'] ?? '';
         if (empty($filePath)) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'No file associated with this resource', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'No file associated with this resource', null, 404);
             return;
         }
 
@@ -295,7 +295,7 @@ class ResourcesPublicApiController extends BaseApiController
 
         $uploadsDir = realpath(__DIR__ . '/../../../httpdocs/uploads');
         if (!$fullPath || !$uploadsDir || !str_starts_with($fullPath, $uploadsDir) || !file_exists($fullPath)) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'File not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'File not found', null, 404);
             return;
         }
 
@@ -338,7 +338,7 @@ class ResourcesPublicApiController extends BaseApiController
         )->fetch();
 
         if (!$resource) {
-            $this->respondWithError(ApiErrorCodes::NOT_FOUND, 'Resource not found', null, 404);
+            $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Resource not found', null, 404);
             return;
         }
 
