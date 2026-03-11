@@ -30,11 +30,12 @@ import {
   Compass,
   Car,
   User,
+  UserPlus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -59,6 +60,25 @@ export function FederationMemberProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const toast = useToast();
+  const [connectionStatus, setConnectionStatus] = useState<string>('none');
+  const [connectLoading, setConnectLoading] = useState(false);
+
+  const loadConnectionStatus = useCallback(async () => {
+    if (!id || !member) return;
+    try {
+      const response = await api.get<{ status: string; connection_id: number | null }>(
+        `/v2/federation/connections/status/${id}/${member.timebank.id}`
+      );
+      if (response.success && response.data) {
+        setConnectionStatus(response.data.status);
+        setConnectionId(response.data.connection_id);
+      }
+    } catch (err) {
+      // Non-critical - just means we can't show status
+    }
+  }, [id, member]);
+
   const loadMember = useCallback(async () => {
     if (!id) return;
     try {
@@ -81,6 +101,32 @@ export function FederationMemberProfilePage() {
   useEffect(() => {
     loadMember();
   }, [loadMember]);
+
+  useEffect(() => {
+    if (member) loadConnectionStatus();
+  }, [member, loadConnectionStatus]);
+
+  const handleConnect = async () => {
+    if (!member) return;
+    try {
+      setConnectLoading(true);
+      const response = await api.post('/v2/federation/connections', {
+        receiver_id: member.id,
+        receiver_tenant_id: member.timebank.id,
+      });
+      if (response.success) {
+        toast.success(t('member_profile.connect_sent', 'Connection request sent!'));
+        loadConnectionStatus();
+      } else {
+        toast.error(response.error || t('member_profile.connect_failed', 'Failed to send request'));
+      }
+    } catch (err) {
+      logError('Failed to send connection request', err);
+      toast.error(t('member_profile.connect_failed', 'Failed to send request'));
+    } finally {
+      setConnectLoading(false);
+    }
+  };
 
   const displayName = member
     ? (member.name?.trim() || `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Member')
@@ -204,6 +250,34 @@ export function FederationMemberProfilePage() {
 
               {/* Actions */}
               <div className="flex flex-wrap gap-3 mt-4">
+                {isAuthenticated && connectionStatus === 'none' && (
+                  <Button
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
+                    isLoading={connectLoading}
+                    onPress={handleConnect}
+                  >
+                    {t('member_profile.connect', 'Connect')}
+                  </Button>
+                )}
+                {connectionStatus === 'pending_sent' && (
+                  <Chip
+                    size="md"
+                    variant="flat"
+                    className="bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  >
+                    {t('member_profile.request_pending', 'Request Pending')}
+                  </Chip>
+                )}
+                {connectionStatus === 'accepted' && (
+                  <Chip
+                    size="md"
+                    variant="flat"
+                    className="bg-green-500/10 text-green-600 dark:text-green-400"
+                  >
+                    {t('member_profile.connected', 'Connected')}
+                  </Chip>
+                )}
                 {isAuthenticated && member.messaging_enabled && (
                   <Button
                     className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
