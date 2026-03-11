@@ -11,19 +11,19 @@ import type { LegalDocument } from '@/hooks/useLegalDocument';
 // Mock framer-motion to strip animation props
 vi.mock('framer-motion', () => {
   const handler = {
-    get: (_: any, tag: string) => {
+    get: (_: unknown, tag: string) => {
       return ({
         children,
-        initial,
-        animate,
-        exit,
-        transition,
-        variants,
-        whileHover,
-        whileTap,
-        whileInView,
+        _initial,
+        _animate,
+        _exit,
+        _transition,
+        _variants,
+        _whileHover,
+        _whileTap,
+        _whileInView,
         ...rest
-      }: any) => {
+      }: Record<string, unknown>) => {
         const Tag = typeof tag === 'string' ? tag : 'div';
         return <Tag {...rest}>{children}</Tag>;
       };
@@ -31,7 +31,7 @@ vi.mock('framer-motion', () => {
   };
   return {
     motion: new Proxy({}, handler),
-    AnimatePresence: ({ children }: any) => children,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
   };
 });
 

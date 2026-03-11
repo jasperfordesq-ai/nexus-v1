@@ -154,7 +154,7 @@ export default function ReportsManagement() {
       } else {
         toast.error(response.error || 'Action failed');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred');
     } finally {
       setActionLoading(false);
@@ -290,7 +290,7 @@ export default function ReportsManagement() {
                 <Flag className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{(stats as any)?.total || 0}</p>
+                <p className="text-2xl font-bold">{stats.reports_pending + stats.reports_resolved + stats.reports_dismissed}</p>
                 <p className="text-sm text-default-500">Total Reports</p>
               </div>
             </CardBody>
@@ -301,7 +301,7 @@ export default function ReportsManagement() {
                 <AlertCircle className="w-6 h-6 text-warning" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{(stats as any)?.pending || 0}</p>
+                <p className="text-2xl font-bold">{stats.reports_pending}</p>
                 <p className="text-sm text-default-500">Pending</p>
               </div>
             </CardBody>
@@ -312,7 +312,7 @@ export default function ReportsManagement() {
                 <CheckCircle2 className="w-6 h-6 text-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{(stats as any)?.resolved || 0}</p>
+                <p className="text-2xl font-bold">{stats.reports_resolved}</p>
                 <p className="text-sm text-default-500">Resolved</p>
               </div>
             </CardBody>
@@ -323,7 +323,7 @@ export default function ReportsManagement() {
                 <XCircle className="w-6 h-6 text-default-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{(stats as any)?.dismissed || 0}</p>
+                <p className="text-2xl font-bold">{stats.reports_dismissed}</p>
                 <p className="text-sm text-default-500">Dismissed</p>
               </div>
             </CardBody>

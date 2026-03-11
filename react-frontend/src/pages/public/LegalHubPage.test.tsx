@@ -24,7 +24,7 @@ vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...p }: any, ref: any) => {
+      return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
         const c: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(p)) {
           if (!['variants','initial','animate','exit','transition','whileHover','whileTap','whileInView','layout','viewport'].includes(k)) c[k] = v;
@@ -33,7 +33,7 @@ vi.mock('framer-motion', () => {
       });
     },
   });
-  return { motion: proxy, AnimatePresence: ({ children }: any) => children };
+  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 
 import { LegalHubPage } from './LegalHubPage';

@@ -9,11 +9,11 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@/test/test-utils";
+import React from "react";
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, {
     get: (_target: object, prop: string | symbol) => {
-      const React = require("react");
-      return React.forwardRef(({ children, ...props }: any, ref: any) => {
+      return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
         const motionPropNames = ["variants","initial","animate","exit","transition","whileHover","whileTap","whileInView","layout","layoutId","viewport"];
         const clean: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(props)) {

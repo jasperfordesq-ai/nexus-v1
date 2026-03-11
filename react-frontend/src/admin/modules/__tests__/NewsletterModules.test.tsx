@@ -61,25 +61,28 @@ vi.mock('@/components/seo', () => ({
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
-    get: (_, tag) => ({ children, ...props }: any) => {
-      const { variants, initial, animate, exit, layout, whileHover, whileTap, transition, ...rest } = props;
-      const Tag = typeof tag === 'string' ? tag : 'div';
-      return <Tag {...rest}>{children}</Tag>;
+    get: (_target: unknown, tag: string | symbol) => {
+      const Component = ({ children, variants, initial, animate, exit, layout, whileHover, whileTap, transition, ...rest }: Record<string, unknown>) => {
+        void variants; void initial; void animate; void exit; void layout; void whileHover; void whileTap; void transition;
+        const Tag = typeof tag === 'string' ? tag : 'div';
+        return <Tag {...rest}>{children}</Tag>;
+      };
+      return Component;
     },
   }),
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
-  BarChart: ({ children }: any) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Bar: () => null, XAxis: () => null, YAxis: () => null,
   CartesianGrid: () => null, Tooltip: () => null, Legend: () => null,
-  LineChart: ({ children }: any) => <div>{children}</div>,
+  LineChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Line: () => null,
-  PieChart: ({ children }: any) => <div>{children}</div>,
+  PieChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Pie: () => null, Cell: () => null,
-  AreaChart: ({ children }: any) => <div>{children}</div>,
+  AreaChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Area: () => null,
 }));
 
@@ -124,13 +127,13 @@ vi.mock('../../api/adminApi', () => ({
 
 // Mock the admin shared components used by newsletter modules
 vi.mock('../../components', () => ({
-  DataTable: ({ children }: any) => <div data-testid="data-table">{children}</div>,
-  PageHeader: ({ title }: any) => <div data-testid="page-header">{title}</div>,
-  StatCard: ({ label, value }: any) => <div data-testid="stat-card"><span>{label}</span><span>{value}</span></div>,
-  StatusBadge: ({ status }: any) => <span>{status}</span>,
+  DataTable: ({ children }: { children: React.ReactNode }) => <div data-testid="data-table">{children}</div>,
+  PageHeader: ({ title }: Record<string, unknown>) => <div data-testid="page-header">{title}</div>,
+  StatCard: ({ label, value }: Record<string, unknown>) => <div data-testid="stat-card"><span>{label}</span><span>{value}</span></div>,
+  StatusBadge: ({ status }: Record<string, unknown>) => <span>{status}</span>,
   ConfirmModal: () => null,
-  EmptyState: ({ title }: any) => <div>{title}</div>,
-  RichTextEditor: ({ value, onChange }: any) => <textarea data-testid="rich-text-editor" value={value} onChange={(e: any) => onChange?.(e.target.value)} />,
+  EmptyState: ({ title }: Record<string, unknown>) => <div>{title}</div>,
+  RichTextEditor: ({ value, onChange }: Record<string, unknown>) => <textarea data-testid="rich-text-editor" value={value} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => (onChange as ((v: string) => void))?.(e.target.value)} />,
   type: null,
 }));
 

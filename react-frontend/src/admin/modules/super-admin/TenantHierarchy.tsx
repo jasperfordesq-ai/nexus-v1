@@ -99,7 +99,7 @@ export function TenantHierarchy() {
       } else {
         toast.error(response.error || 'Failed to move tenant');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred');
     }
   };

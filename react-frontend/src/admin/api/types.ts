@@ -801,7 +801,7 @@ export interface CreateBlogPostPayload {
   noindex?: boolean;
 }
 
-export interface UpdateBlogPostPayload extends Partial<CreateBlogPostPayload> {}
+export type UpdateBlogPostPayload = Partial<CreateBlogPostPayload>;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Broker Controls

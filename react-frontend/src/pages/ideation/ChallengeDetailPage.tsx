@@ -336,7 +336,7 @@ export function ChallengeDetailPage() {
     } finally {
       setIsLoadingDrafts(false);
     }
-  }, [isAuthenticated, challenge]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, challenge]);  
 
   useEffect(() => {
     fetchChallenge();

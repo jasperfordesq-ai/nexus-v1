@@ -34,7 +34,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useParams: vi.fn(() => ({ id: undefined })),
     useNavigate: vi.fn(() => vi.fn()),
-    Link: ({ children, to, ...props }: any) => <a href={to} {...props}>{children}</a>,
+    Link: ({ children, to, ...props }: Record<string, unknown>) => <a href={to} {...props}>{children}</a>,
   };
 });
 
@@ -76,7 +76,7 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('@/components/location', () => ({
-  PlaceAutocompleteInput: ({ label, placeholder, value, onChange }: any) => (
+  PlaceAutocompleteInput: ({ label, placeholder, value, onChange }: Record<string, unknown>) => (
     <div>
       <label>{label}</label>
       <input
@@ -91,7 +91,9 @@ vi.mock('@/components/location', () => ({
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, transition, ...rest } = props;
+      const motionKeys = new Set(["variants", "initial", "animate", "transition", "whileInView", "viewport", "layout", "exit", "whileHover", "whileTap"]);
+      const rest: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(props)) { if (!motionKeys.has(k)) rest[k] = v; }
       return <div {...rest}>{children}</div>;
     },
   },

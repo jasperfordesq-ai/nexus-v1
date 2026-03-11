@@ -456,7 +456,7 @@ export function ConversationPage() {
           };
         });
       }
-    } catch (error) {
+    } catch {
       // Silent fail for polling - don't spam console
     }
   }

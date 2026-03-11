@@ -13,12 +13,12 @@ import React from 'react';
 
 // Mock child components to isolate Layout logic
 vi.mock('./Navbar', () => ({
-  Navbar: ({ onMobileMenuOpen }: any) => (
+  Navbar: ({ onMobileMenuOpen: _onMobileMenuOpen }: Record<string, unknown>) => (
     <nav data-testid="navbar">Navbar Mock</nav>
   ),
 }));
 vi.mock('./MobileDrawer', () => ({
-  MobileDrawer: ({ isOpen }: any) => (
+  MobileDrawer: ({ isOpen }: { isOpen?: boolean }) => (
     isOpen ? <div data-testid="mobile-drawer">MobileDrawer Mock</div> : null
   ),
 }));

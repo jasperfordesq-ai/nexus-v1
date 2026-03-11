@@ -32,10 +32,10 @@ vi.mock('react-i18next', () => ({
 }));
 
 // Stub icon component
-const StubIcon: LucideIcon = React.forwardRef((props: any, ref: any) =>
+const StubIcon: LucideIcon = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<SVGSVGElement>) =>
   React.createElement('svg', { ...props, ref, 'data-testid': 'icon' })
 ) as unknown as LucideIcon;
-(StubIcon as any).displayName = 'StubIcon';
+(StubIcon as { displayName: string }).displayName = 'StubIcon';
 
 import { MegaMenu } from '../MegaMenu';
 

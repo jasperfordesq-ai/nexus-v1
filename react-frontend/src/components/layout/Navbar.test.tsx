@@ -22,7 +22,7 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => mockNavigate,
     useLocation: () => mockLocation,
-    NavLink: ({ children, to, className }: any) => {
+    NavLink: ({ children, to, className }: { children: React.ReactNode; to: string; className?: string | ((opts: { isActive: boolean }) => string) }) => {
       const cls = typeof className === 'function' ? className({ isActive: false }) : className;
       return <a href={to} className={cls} data-testid={`navlink-${to}`}>{children}</a>;
     },
@@ -32,7 +32,7 @@ vi.mock('react-router-dom', async () => {
 vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...p }: any, ref: any) => {
+      return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<unknown>) => {
         const safe: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(p)) {
           if (!['variants', 'initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'whileInView', 'layout', 'viewport', 'layoutId'].includes(k)) safe[k] = v;
@@ -41,7 +41,7 @@ vi.mock('framer-motion', () => {
       });
     },
   });
-  return { motion: proxy, AnimatePresence: ({ children }: any) => children };
+  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 
 const mockUseAuth = vi.fn();
@@ -50,10 +50,10 @@ const mockUseNotifications = vi.fn();
 const mockUseTheme = vi.fn();
 
 vi.mock('@/contexts', () => ({
-  useAuth: (...args: any[]) => mockUseAuth(...args),
-  useTenant: (...args: any[]) => mockUseTenant(...args),
-  useNotifications: (...args: any[]) => mockUseNotifications(...args),
-  useTheme: (...args: any[]) => mockUseTheme(...args),
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+  useNotifications: (...args: unknown[]) => mockUseNotifications(...args),
+  useTheme: (...args: unknown[]) => mockUseTheme(...args),
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
 }));
 

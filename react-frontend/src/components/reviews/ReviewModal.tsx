@@ -71,7 +71,7 @@ export function ReviewModal({
       } else {
         toast.error(response.error || 'Failed to submit review');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to submit review. Please try again.');
     } finally {
       setIsSubmitting(false);

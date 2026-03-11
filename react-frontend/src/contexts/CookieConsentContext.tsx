@@ -118,7 +118,6 @@ async function fetchServerConsent(): Promise<CookieConsent | null> {
 
   try {
     const response = await api.get<{
-      success: boolean;
       consent: {
         analytics: boolean;
         functional: boolean;
@@ -126,13 +125,12 @@ async function fetchServerConsent(): Promise<CookieConsent | null> {
       } | null;
     }>('/cookie-consent');
 
-    const data = 'data' in response ? (response as any).data : response;
-    if (data?.success && data.consent) {
+    if (response.success && response.data?.consent) {
       return {
         essential: true,
-        analytics: !!data.consent.analytics,
-        preferences: !!data.consent.functional,
-        timestamp: data.consent.created_at,
+        analytics: !!response.data.consent.analytics,
+        preferences: !!response.data.consent.functional,
+        timestamp: response.data.consent.created_at,
       };
     }
     return null;

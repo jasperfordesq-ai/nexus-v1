@@ -80,25 +80,28 @@ vi.mock('@/components/seo', () => ({
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
-    get: (_, tag) => ({ children, ...props }: any) => {
-      const { variants, initial, animate, exit, layout, whileHover, whileTap, transition, ...rest } = props;
-      const Tag = typeof tag === 'string' ? tag : 'div';
-      return <Tag {...rest}>{children}</Tag>;
+    get: (_target: unknown, tag: string | symbol) => {
+      const Component = ({ children, variants, initial, animate, exit, layout, whileHover, whileTap, transition, ...rest }: Record<string, unknown>) => {
+        void variants; void initial; void animate; void exit; void layout; void whileHover; void whileTap; void transition;
+        const Tag = typeof tag === 'string' ? tag : 'div';
+        return <Tag {...rest}>{children}</Tag>;
+      };
+      return Component;
     },
   }),
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
-  BarChart: ({ children }: any) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Bar: () => null, XAxis: () => null, YAxis: () => null,
   CartesianGrid: () => null, Tooltip: () => null, Legend: () => null,
-  LineChart: ({ children }: any) => <div>{children}</div>,
+  LineChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Line: () => null,
-  PieChart: ({ children }: any) => <div>{children}</div>,
+  PieChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Pie: () => null, Cell: () => null,
-  AreaChart: ({ children }: any) => <div>{children}</div>,
+  AreaChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Area: () => null,
 }));
 
@@ -167,8 +170,7 @@ vi.mock('../enterprise/LegalDocVersionForm', () => ({
   default: () => <div data-testid="mock-legal-version-form">LegalDocVersionForm</div>,
 }));
 
-vi.mock('../enterprise/LegalDocVersionComparison', () => ({
-  default: ({ onClose }: any) => <div data-testid="mock-legal-version-comparison">LegalDocVersionComparison</div>,
+vi.mock('../enterprise/LegalDocVersionComparison', () => ({ default: ({ onClose: _onClose }: Record<string, unknown>) => <div data-testid="mock-legal-version-comparison">LegalDocVersionComparison</div>,
 }));
 
 // Also mock individual adminApi imports (some components use @/admin/api/adminApi)

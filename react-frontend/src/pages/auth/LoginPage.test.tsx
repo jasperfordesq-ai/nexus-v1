@@ -103,22 +103,24 @@ vi.mock('@/lib/api', () => ({
 }));
 
 // ── Mock UI dependencies ────────────────────────────────────────────────────
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => {
-    const React = require('react');
-    return React.createElement('div', { 'data-testid': 'glass-card', className }, children);
-  },
-}));
+vi.mock('@/components/ui', async () => {
+  const React = await import('react');
+  return {
+    GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => {
+      return React.createElement('div', { 'data-testid': 'glass-card', className }, children);
+    },
+  };
+});
 
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ── Mock framer-motion ──────────────────────────────────────────────────────
-vi.mock('framer-motion', () => {
+vi.mock('framer-motion', async () => {
+  const React = await import('react');
   const handler: ProxyHandler<Record<string, never>> = {
     get: (_target, prop) => {
-      const React = require('react');
-      return ({ children, initial, animate, exit, transition, whileHover, whileTap, variants, layout, ...rest }: Record<string, unknown>) =>
+      return ({ children, _initial, _animate, _exit, _transition, _whileHover, _whileTap, _variants, _layout, ...rest }: Record<string, unknown>) =>
         React.createElement(prop as string, rest, children);
     },
   };
@@ -175,8 +177,8 @@ vi.mock('@heroui/react', async () => {
 });
 
 // ── Mock lucide-react icons ─────────────────────────────────────────────────
-vi.mock('lucide-react', () => {
-  const React = require('react');
+vi.mock('lucide-react', async () => {
+  const React = await import('react');
   const Icon = () => React.createElement('span');
   return {
     Mail: Icon, Lock: Icon, Eye: Icon, EyeOff: Icon,

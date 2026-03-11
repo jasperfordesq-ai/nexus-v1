@@ -721,7 +721,7 @@ export function GroupDetailPage() {
       } else {
         toast.error(response.error || t('toast.image_upload_failed'));
       }
-    } catch (err) {
+    } catch {
       toast.error(t('toast.image_upload_failed'));
     } finally {
       setUploadingImage(false);

@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('@/lib/api', () => ({
@@ -40,7 +40,7 @@ vi.mock('@/lib/helpers', () => ({
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
-      const { variants, initial, animate, exit, layout, ...rest } = props;
+      const { variants, initial, animate, exit, layout, ...rest } = props; void variants; void initial; void animate; void exit; void layout;
       return <div {...rest}>{children}</div>;
     },
   },

@@ -9,8 +9,8 @@ import { LoadingScreen } from './LoadingScreen';
 
 vi.mock('framer-motion', () => {
   const handler = {
-    get: (_: any, tag: string) => {
-      return ({ children, initial, animate, exit, transition, variants, whileHover, whileTap, ...rest }: any) => {
+    get: (_: unknown, tag: string) => {
+      return ({ children, _initial, _animate, _exit, _transition, _variants, _whileHover, _whileTap, ...rest }: Record<string, unknown>) => {
         const Tag = typeof tag === 'string' ? tag : 'div';
         return <Tag {...rest}>{children}</Tag>;
       };
@@ -18,7 +18,7 @@ vi.mock('framer-motion', () => {
   };
   return {
     motion: new Proxy({}, handler),
-    AnimatePresence: ({ children }: any) => children,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
   };
 });
 

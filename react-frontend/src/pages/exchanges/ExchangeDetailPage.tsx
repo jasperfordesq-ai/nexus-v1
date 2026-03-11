@@ -201,7 +201,7 @@ export function ExchangeDetailPage() {
           setRatings(response.data.ratings || []);
           setHasRated(response.data.has_rated || false);
         }
-      } catch (err) {
+      } catch {
         // Ratings endpoint may not exist yet — fail silently
       }
     }

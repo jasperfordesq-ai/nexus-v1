@@ -25,7 +25,7 @@ vi.mock('@/contexts/TenantContext', () => ({
 const mockApiPost = vi.fn().mockResolvedValue({ success: true });
 vi.mock('@/lib/api', () => ({
   api: {
-    post: (...args: any[]) => mockApiPost(...args),
+    post: (...args: unknown[]) => mockApiPost(...args),
   },
 }));
 
@@ -33,11 +33,11 @@ describe('usePushNotifications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // By default, window.Capacitor is not defined (web browser)
-    delete (window as any).Capacitor;
+    delete ((window as unknown as Record<string, unknown>)).Capacitor;
   });
 
   afterEach(() => {
-    delete (window as any).Capacitor;
+    delete ((window as unknown as Record<string, unknown>)).Capacitor;
   });
 
   it('does not throw when called with null userId', () => {
@@ -58,7 +58,7 @@ describe('usePushNotifications', () => {
   });
 
   it('does not register when userId is null even if Capacitor is present', () => {
-    (window as any).Capacitor = { isNativePlatform: () => true };
+    ((window as unknown as Record<string, unknown>)).Capacitor = { isNativePlatform: () => true };
     renderHook(() => usePushNotifications(null));
     // No API call should be made because userId is null
     expect(mockApiPost).not.toHaveBeenCalled();

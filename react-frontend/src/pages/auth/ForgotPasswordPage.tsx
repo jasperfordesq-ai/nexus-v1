@@ -34,7 +34,7 @@ export function ForgotPasswordPage() {
       setIsLoading(true);
       await api.post('/auth/forgot-password', { email });
       setIsSubmitted(true);
-    } catch (err) {
+    } catch {
       // Don't reveal if email exists or not for security
       setIsSubmitted(true);
     } finally {

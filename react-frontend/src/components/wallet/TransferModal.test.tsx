@@ -10,19 +10,8 @@ import { TransferModal } from './TransferModal';
 // Mock framer-motion
 vi.mock('framer-motion', () => {
   const handler = {
-    get: (_: any, tag: string) => {
-      return ({
-        children,
-        initial,
-        animate,
-        exit,
-        transition,
-        variants,
-        whileHover,
-        whileTap,
-        whileInView,
-        ...rest
-      }: any) => {
+    get: (_target: Record<string, unknown>, tag: string) => {
+      return ({ children, ...rest }: Record<string, unknown>) => {
         const Tag = typeof tag === 'string' ? tag : 'div';
         return <Tag {...rest}>{children}</Tag>;
       };
@@ -30,7 +19,7 @@ vi.mock('framer-motion', () => {
   };
   return {
     motion: new Proxy({}, handler),
-    AnimatePresence: ({ children }: any) => children,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
   };
 });
 

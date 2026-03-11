@@ -139,6 +139,6 @@ describe('getUserInitials', () => {
   });
 
   it('handles undefined names', () => {
-    expect(getUserInitials({ first_name: undefined, last_name: undefined } as any)).toBe('');
+    expect(getUserInitials({ first_name: undefined, last_name: undefined } as Parameters<typeof getUserInitials>[0])).toBe('');
   });
 });

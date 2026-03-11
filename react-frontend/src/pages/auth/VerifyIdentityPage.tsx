@@ -161,7 +161,7 @@ export function VerifyIdentityPage() {
           startPolling();
         }
       }
-    } catch (err) {
+    } catch {
       setErrorMessage(t('verify_identity.start_error', { defaultValue: 'Unable to start verification. Please try again later.' }));
     } finally {
       setIsStarting(false);

@@ -24,9 +24,9 @@ export function UpdateAvailableBanner() {
   useEffect(() => {
     // Fix race condition: if onNeedRefresh fired before React mounted,
     // the custom event was missed. Check the global flag set by main.tsx.
-    if ((window as any).__nexus_updatePending) {
+    if ((window as NexusWindow).__nexus_updatePending) {
       setShowBanner(true);
-      (window as any).__nexus_updatePending = false;
+      (window as NexusWindow).__nexus_updatePending = false;
     }
 
     function handleUpdateAvailable() {
@@ -41,7 +41,7 @@ export function UpdateAvailableBanner() {
 
   function handleUpdate() {
     // Call the updateSW function stored by main.tsx to activate the new SW + reload
-    const updateSW = (window as any).__nexus_updateSW;
+    const updateSW = (window as NexusWindow).__nexus_updateSW;
     if (typeof updateSW === 'function') {
       updateSW(true); // true = reload page
     } else {

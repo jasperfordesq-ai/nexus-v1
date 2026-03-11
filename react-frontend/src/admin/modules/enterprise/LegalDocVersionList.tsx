@@ -88,7 +88,7 @@ export default function LegalDocVersionList() {
       } else {
         error(response.error || 'Failed to load versions');
       }
-    } catch (err) {
+    } catch {
       error('Failed to load versions');
     } finally {
       setLoading(false);
@@ -110,7 +110,7 @@ export default function LegalDocVersionList() {
       } else {
         error(response.error || 'Failed to publish version');
       }
-    } catch (err) {
+    } catch {
       error('Failed to publish version');
     } finally {
       setSubmitting(false);
@@ -132,7 +132,7 @@ export default function LegalDocVersionList() {
       } else {
         error(response.error || 'Failed to delete version');
       }
-    } catch (err) {
+    } catch {
       error('Failed to delete version');
     } finally {
       setSubmitting(false);
@@ -153,7 +153,7 @@ export default function LegalDocVersionList() {
       } else {
         error(response.error || 'Failed to send notifications');
       }
-    } catch (err) {
+    } catch {
       error('Failed to send notifications');
     } finally {
       setSubmitting(false);
@@ -169,7 +169,7 @@ export default function LegalDocVersionList() {
       if (response.success && response.data) {
         setPendingCount(response.data.count);
       }
-    } catch (err) {
+    } catch {
       console.error('Failed to fetch pending count', error);
     }
 

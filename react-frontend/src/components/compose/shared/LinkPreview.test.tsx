@@ -203,7 +203,7 @@ describe('LinkPreview', () => {
       data: null,
     });
 
-    const { container } = render(<LinkPreview content="Check https://example.com" />);
+    render(<LinkPreview content="Check https://example.com" />);
 
     await act(async () => {
       vi.advanceTimersByTime(900);

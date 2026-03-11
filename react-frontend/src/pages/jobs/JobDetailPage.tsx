@@ -268,7 +268,7 @@ export function JobDetailPage() {
         if (response.success && response.data) {
           setMatchResult(response.data);
         }
-      } catch (err) {
+      } catch {
         // Non-critical
       }
     };
@@ -685,7 +685,7 @@ export function JobDetailPage() {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'closed' });
                     if (res.success) { toast.success('Vacancy closed'); loadVacancy(); }
-                  } catch {}
+                  } catch { /* silent fail */ }
                 }}>
                   Close Vacancy
                 </Button>
@@ -695,7 +695,7 @@ export function JobDetailPage() {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'open' });
                     if (res.success) { toast.success('Vacancy reopened'); loadVacancy(); }
-                  } catch {}
+                  } catch { /* silent fail */ }
                 }}>
                   Reopen
                 </Button>

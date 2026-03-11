@@ -34,7 +34,7 @@ vi.mock('@/contexts', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
-  AuthProvider: ({ children }: any) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
     tenantSlug: 'test',
@@ -53,7 +53,7 @@ vi.mock('@/contexts/AuthContext', () => ({
     isAuthenticated: true,
     logout: vi.fn(),
   })),
-  AuthProvider: ({ children }: any) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
@@ -95,8 +95,8 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('@/admin/components/PageHeader', () => ({
-  default: ({ children }: any) => <div>{children}</div>,
-  PageHeader: ({ children }: any) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PageHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('@/admin/components/ConfirmModal', () => ({
@@ -105,9 +105,9 @@ vi.mock('@/admin/components/ConfirmModal', () => ({
 }));
 
 vi.mock('@/admin/components/DataTable', () => ({
-  DataTable: ({ children }: any) => <div>{children}</div>,
+  DataTable: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   StatusBadge: () => null,
-  Column: {} as any,
+  Column: {} as Record<string, unknown>,
 }));
 
 vi.mock('@/lib/tenant-routing', () => ({
@@ -123,10 +123,10 @@ vi.mock('@/lib/logger', () => ({
 
 // Mock recharts to avoid SVG rendering issues in JSDOM
 vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
-  BarChart: ({ children }: any) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Bar: () => null,
-  PieChart: ({ children }: any) => <div>{children}</div>,
+  PieChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Pie: () => null,
   Cell: () => null,
   XAxis: () => null,
@@ -134,16 +134,16 @@ vi.mock('recharts', () => ({
   CartesianGrid: () => null,
   Tooltip: () => null,
   Legend: () => null,
-  AreaChart: ({ children }: any) => <div>{children}</div>,
+  AreaChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Area: () => null,
-  ComposedChart: ({ children }: any) => <div>{children}</div>,
+  ComposedChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 // Mock admin components barrel (StatCard, EmptyState, etc.)
 vi.mock('../../components', () => ({
-  PageHeader: ({ children }: any) => <div>{children}</div>,
+  PageHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   StatCard: () => <div data-testid="stat-card" />,
-  DataTable: ({ children }: any) => <div>{children}</div>,
+  DataTable: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ConfirmModal: () => null,
   EmptyState: () => <div>Empty</div>,
 }));

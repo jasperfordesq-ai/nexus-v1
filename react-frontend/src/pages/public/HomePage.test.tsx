@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render } from '@/test/test-utils';
 import React from 'react';
 
 vi.mock('@/lib/api', () => ({
@@ -36,7 +36,7 @@ vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('framer-motion', () => {
   const motionProxy = new Proxy({}, {
     get: (_target, prop) => {
-      return React.forwardRef(({ children, ...props }: any, ref: any) => {
+      return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
         const clean = { ...props };
         delete clean.variants; delete clean.initial; delete clean.animate;
         delete clean.exit; delete clean.transition; delete clean.whileHover;
@@ -49,7 +49,7 @@ vi.mock('framer-motion', () => {
   });
   return {
     motion: motionProxy,
-    AnimatePresence: ({ children }: any) => children,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
     useAnimation: () => ({ start: vi.fn() }),
     useInView: () => true,
   };

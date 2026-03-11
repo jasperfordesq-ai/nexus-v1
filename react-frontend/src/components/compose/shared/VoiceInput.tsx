@@ -52,7 +52,6 @@ interface SpeechRecognitionConstructor {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const win = window as unknown as Record<string, unknown>;
   const Ctor =
     (win.SpeechRecognition as SpeechRecognitionConstructor | undefined) ??

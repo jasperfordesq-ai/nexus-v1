@@ -9,7 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes, Outlet } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import React from 'react';
 
 // --- Mocks ---
@@ -21,15 +21,15 @@ const mockUseTenant = vi.fn();
 const mockUseAuth = vi.fn();
 
 vi.mock('@/contexts', () => ({
-  TenantProvider: ({ children, tenantSlug }: any) => {
+  TenantProvider: ({ children, tenantSlug }: { children: React.ReactNode; tenantSlug?: string }) => {
     capturedTenantSlug = tenantSlug;
     return <div data-testid="tenant-provider" data-slug={tenantSlug || ''}>{children}</div>;
   },
-  AuthProvider: ({ children }: any) => <div data-testid="auth-provider">{children}</div>,
-  NotificationsProvider: ({ children }: any) => <div>{children}</div>,
-  PusherProvider: ({ children }: any) => <div>{children}</div>,
-  useTenant: (...args: any[]) => mockUseTenant(...args),
-  useAuth: (...args: any[]) => mockUseAuth(...args),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="auth-provider">{children}</div>,
+  NotificationsProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  PusherProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
 }));
 
 vi.mock('@/lib/tenant-routing', () => ({
@@ -42,7 +42,7 @@ vi.mock('@/lib/tenant-routing', () => ({
 }));
 
 vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: any) => <div className={className}>{children}</div>,
+  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
 }));
 
 vi.mock('@/hooks', () => ({
@@ -52,7 +52,7 @@ vi.mock('@/hooks', () => ({
 vi.mock('framer-motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...p }: any, ref: any) => {
+      return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
         const safe: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(p)) {
           if (!['variants', 'initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'whileInView', 'layout', 'viewport', 'layoutId'].includes(k)) safe[k] = v;
@@ -61,14 +61,14 @@ vi.mock('framer-motion', () => {
       });
     },
   });
-  return { motion: proxy, AnimatePresence: ({ children }: any) => children };
+  return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };
 });
 
 import { TenantShell } from './TenantShell';
 
 function setupDefaultMocks(overrides: {
-  tenant?: Record<string, any>;
-  auth?: Record<string, any>;
+  tenant?: Record<string, unknown>;
+  auth?: Record<string, unknown>;
 } = {}) {
   mockUseTenant.mockReturnValue({
     isLoading: false,

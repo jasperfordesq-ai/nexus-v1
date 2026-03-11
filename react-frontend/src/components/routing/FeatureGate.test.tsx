@@ -42,7 +42,7 @@ describe('FeatureGate', () => {
       hasModule: vi.fn(() => true),
       isLoading: false,
       tenantPath: vi.fn((p: string) => `/test${p}`),
-    } as any);
+    } as ReturnType<typeof useTenant>);
 
     render(
       <FeatureGate feature="events">
@@ -58,7 +58,7 @@ describe('FeatureGate', () => {
       hasModule: vi.fn(() => true),
       isLoading: false,
       tenantPath: vi.fn((p: string) => `/test${p}`),
-    } as any);
+    } as ReturnType<typeof useTenant>);
 
     render(
       <FeatureGate feature="events" fallback={<div>Feature unavailable</div>}>
@@ -75,7 +75,7 @@ describe('FeatureGate', () => {
       hasModule: vi.fn(() => false),
       isLoading: true,
       tenantPath: vi.fn((p: string) => `/test${p}`),
-    } as any);
+    } as ReturnType<typeof useTenant>);
 
     render(
       <FeatureGate feature="events">
@@ -91,7 +91,7 @@ describe('FeatureGate', () => {
       hasModule: vi.fn(() => true),
       isLoading: false,
       tenantPath: vi.fn((p: string) => `/test${p}`),
-    } as any);
+    } as ReturnType<typeof useTenant>);
 
     render(
       <FeatureGate>

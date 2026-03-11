@@ -77,7 +77,7 @@ vi.mock('@vis.gl/react-google-maps', () => ({
 }));
 
 // Mock Google Maps globals
-(global as any).google = {
+(global as Record<string, unknown>).google = {
   maps: {
     LatLngBounds: vi.fn(() => ({
       extend: vi.fn(),
@@ -112,8 +112,8 @@ describe('EntityMapView', () => {
         <EntityMapView
           items={[]}
           getCoordinates={() => ({ lat: 53.35, lng: -6.26 })}
-          getMarkerConfig={(item: any) => ({ id: item.id, title: item.title })}
-          renderInfoContent={(item: any) => <div>{item.title}</div>}
+          getMarkerConfig={(item: Record<string, unknown>) => ({ id: item.id, title: item.title })}
+          renderInfoContent={(item: Record<string, unknown>) => <div>{item.title}</div>}
           center={{ lat: 53.35, lng: -6.26 }}
         />
       </W>
@@ -129,9 +129,9 @@ describe('EntityMapView', () => {
       <W>
         <EntityMapView
           items={entities}
-          getCoordinates={(item: any) => ({ lat: item.latitude, lng: item.longitude })}
-          getMarkerConfig={(item: any) => ({ id: item.id, title: item.title })}
-          renderInfoContent={(item: any) => <div>{item.title}</div>}
+          getCoordinates={(item: Record<string, unknown>) => ({ lat: item.latitude, lng: item.longitude })}
+          getMarkerConfig={(item: Record<string, unknown>) => ({ id: item.id, title: item.title })}
+          renderInfoContent={(item: Record<string, unknown>) => <div>{item.title}</div>}
           center={{ lat: 53.35, lng: -6.26 }}
         />
       </W>

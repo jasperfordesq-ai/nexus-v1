@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { EMOJI_CATEGORIES, EMOJI_KEYWORDS, type EmojiCategory } from './emoji-data';
+import { EMOJI_CATEGORIES, EMOJI_KEYWORDS } from './emoji-data';
 
 describe('EMOJI_CATEGORIES', () => {
   it('has exactly 8 categories', () => {

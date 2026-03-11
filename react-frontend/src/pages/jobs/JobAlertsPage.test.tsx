@@ -77,7 +77,7 @@ vi.mock('@/components/feedback', () => ({
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, variants, initial, animate, layout, ...rest }: Record<string, unknown>) => (
+    div: ({ children, variants: _v, initial: _i, animate: _a, layout: _l, ...rest }: Record<string, unknown>) => (
       <div {...(rest as object)}>{children as ReactNode}</div>
     ),
   },

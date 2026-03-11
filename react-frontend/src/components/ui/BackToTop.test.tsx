@@ -11,13 +11,13 @@ import { BackToTop } from './BackToTop';
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
     get: (_, tag) => {
-      return ({ children, ...props }: any) => {
+      return ({ children, ...props }: Record<string, unknown>) => {
         const Tag = typeof tag === 'string' ? tag : 'div';
         return <Tag {...props}>{children}</Tag>;
       };
     },
   }),
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock HeroUI Button
@@ -25,7 +25,7 @@ vi.mock('@heroui/react', async () => {
   const actual = await vi.importActual('@heroui/react');
   return {
     ...actual,
-    Button: ({ children, 'aria-label': ariaLabel, onPress, ...props }: any) => (
+    Button: ({ children, 'aria-label': ariaLabel, onPress, ...props }: Record<string, unknown>) => (
       <button aria-label={ariaLabel} onClick={onPress} {...props}>
         {children}
       </button>
