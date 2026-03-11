@@ -323,6 +323,7 @@ class SearchApiController extends BaseApiController
     public function trending(): void
     {
         $this->getUserIdOptional();
+        $this->rateLimit('search_trending', 30, 60);
 
         $days = $this->queryInt('days', 7, 1, 30);
         $limit = $this->queryInt('limit', 10, 1, 50);

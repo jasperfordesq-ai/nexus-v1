@@ -12,6 +12,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Input, Tooltip } from '@heroui/react';
 import { Bookmark, Trash2, Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useToast, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
@@ -30,6 +31,7 @@ interface SavedSearchesProps {
 export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: SavedSearchesProps) {
   const { isAuthenticated } = useAuth();
   const toast = useToast();
+  const { t } = useTranslation('search_page');
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showSaveForm, setShowSaveForm] = useState(false);
@@ -77,11 +79,11 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
         setSavedSearches((prev) => [response.data!, ...prev]);
         setSaveName('');
         setShowSaveForm(false);
-        toast.success('Search saved');
+        toast.success(t('toast_search_saved'));
       }
     } catch (error) {
       logError('Failed to save search', error);
-      toast.error('Failed to save search');
+      toast.error(t('toast_search_save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -91,10 +93,10 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
     try {
       await api.delete(`/v2/search/saved/${id}`);
       setSavedSearches((prev) => prev.filter((s) => s.id !== id));
-      toast.success('Saved search removed');
+      toast.success(t('toast_search_deleted'));
     } catch (error) {
       logError('Failed to delete saved search', error);
-      toast.error('Failed to delete saved search');
+      toast.error(t('toast_search_delete_failed'));
     }
   };
 
@@ -117,8 +119,8 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
             <div className="flex gap-2">
               <Input
                 size="sm"
-                placeholder="Name this search..."
-                aria-label="Saved search name"
+                placeholder={t('save_search_name')}
+                aria-label={t('save_search_name')}
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
                 onKeyDown={(e) => {
@@ -136,7 +138,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                 onPress={handleSave}
                 isDisabled={!saveName.trim()}
               >
-                Save
+                {t('save')}
               </Button>
               <Button
                 size="sm"
@@ -146,7 +148,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                   setSaveName('');
                 }}
               >
-                Cancel
+                {t('cancel')}
               </Button>
             </div>
           ) : (
@@ -157,7 +159,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
               startContent={<Bookmark className="w-4 h-4" />}
               onPress={() => setShowSaveForm(true)}
             >
-              Save this search
+              {t('save_this_search')}
             </Button>
           )}
         </div>
@@ -172,7 +174,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-theme-muted flex items-center gap-2">
             <Bookmark className="w-4 h-4" />
-            Saved Searches ({savedSearches.length})
+            {t('saved_searches', { count: savedSearches.length })}
           </h4>
           {savedSearches.map((search) => (
             <GlassCard key={search.id} className="p-3 flex items-center gap-3">
@@ -181,7 +183,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                   {search.name}
                 </div>
                 <div className="text-xs text-theme-subtle truncate">
-                  {search.query_params.q || 'No query'}
+                  {search.query_params.q || t('no_query')}
                   {search.last_result_count !== null && (
                     <span className="ml-1">
                       ({search.last_result_count} results)
@@ -190,24 +192,24 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <Tooltip content="Run search">
+                <Tooltip content={t('run_search')}>
                   <Button
                     isIconOnly
                     size="sm"
                     variant="light"
                     onPress={() => handleRun(search)}
-                    aria-label="Run saved search"
+                    aria-label={t('run_search')}
                   >
                     <Play className="w-4 h-4 text-emerald-500" />
                   </Button>
                 </Tooltip>
-                <Tooltip content="Delete">
+                <Tooltip content={t('delete')}>
                   <Button
                     isIconOnly
                     size="sm"
                     variant="light"
                     onPress={() => handleDelete(search.id)}
-                    aria-label="Delete saved search"
+                    aria-label={t('delete_saved_search')}
                   >
                     <Trash2 className="w-4 h-4 text-rose-400" />
                   </Button>

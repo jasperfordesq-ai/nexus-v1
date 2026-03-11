@@ -122,10 +122,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         if (response.success && response.data) {
           const allSuggestions: SearchSuggestion[] = [];
           const data = response.data;
-          if (data.listings) allSuggestions.push(...data.listings.map((s: SearchSuggestion) => ({ ...s, type: 'listing' as const })));
-          if (data.users) allSuggestions.push(...data.users.map((s: SearchSuggestion) => ({ ...s, type: 'user' as const })));
-          if (data.events) allSuggestions.push(...data.events.map((s: SearchSuggestion) => ({ ...s, type: 'event' as const })));
-          if (data.groups) allSuggestions.push(...data.groups.map((s: SearchSuggestion) => ({ ...s, type: 'group' as const })));
+          if (data.listings) allSuggestions.push(...data.listings.filter((s) => s.id).map((s) => ({ ...s, type: 'listing' as const })));
+          if (data.users) allSuggestions.push(...data.users.filter((s) => s.id).map((s) => ({ ...s, type: 'user' as const })));
+          if (data.events) allSuggestions.push(...data.events.filter((s) => s.id).map((s) => ({ ...s, type: 'event' as const })));
+          if (data.groups) allSuggestions.push(...data.groups.filter((s) => s.id).map((s) => ({ ...s, type: 'group' as const })));
           setSuggestions(allSuggestions.slice(0, 8));
         }
       } catch {

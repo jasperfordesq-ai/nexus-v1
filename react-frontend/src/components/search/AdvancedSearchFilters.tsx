@@ -17,6 +17,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Input, Select, SelectItem, Chip } from '@heroui/react';
 import { Filter, X, Calendar, Tag, SlidersHorizontal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -55,6 +56,7 @@ export function AdvancedSearchFilters({
   onApply,
   onReset,
 }: AdvancedSearchFiltersProps) {
+  const { t } = useTranslation('search_page');
   const [isExpanded, setIsExpanded] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [popularTags, setPopularTags] = useState<string[]>([]);
@@ -80,7 +82,7 @@ export function AdvancedSearchFilters({
     try {
       const response = await api.get<Array<{ tag: string; count: number }>>('/v2/listings/tags/popular?limit=10');
       if (response.success && response.data) {
-        setPopularTags(response.data.map((t) => t.tag));
+        setPopularTags(response.data.map((item) => item.tag));
       }
     } catch (error) {
       logError('Failed to load popular tags', error);
@@ -136,8 +138,9 @@ export function AdvancedSearchFilters({
           ) : null
         }
         onPress={() => setIsExpanded(!isExpanded)}
+        aria-label={t('advanced_filters')}
       >
-        Advanced Filters
+        {t('advanced_filters')}
       </Button>
 
       {/* Expanded filter panel */}
@@ -146,7 +149,7 @@ export function AdvancedSearchFilters({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Content type */}
             <Select
-              label="Content Type"
+              label={t('filter_content_type')}
               selectedKeys={filters.type ? [filters.type] : ['all']}
               onChange={(e) => updateFilter('type', e.target.value)}
               classNames={{
@@ -154,30 +157,30 @@ export function AdvancedSearchFilters({
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="all">All Types</SelectItem>
-              <SelectItem key="listings">Listings</SelectItem>
-              <SelectItem key="users">Members</SelectItem>
-              <SelectItem key="events">Events</SelectItem>
-              <SelectItem key="groups">Groups</SelectItem>
+              <SelectItem key="all">{t('filter_all_types')}</SelectItem>
+              <SelectItem key="listings">{t('filter_listings')}</SelectItem>
+              <SelectItem key="users">{t('filter_members')}</SelectItem>
+              <SelectItem key="events">{t('filter_events')}</SelectItem>
+              <SelectItem key="groups">{t('filter_groups')}</SelectItem>
             </Select>
 
             {/* Category */}
             <Select
-              label="Category"
+              label={t('filter_category')}
               selectedKeys={filters.category_id ? [filters.category_id] : []}
               onChange={(e) => updateFilter('category_id', e.target.value)}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 value: 'text-theme-primary',
               }}
-              items={[{ id: 0, name: 'All Categories', slug: '' }, ...categories]}
+              items={[{ id: 0, name: t('filter_all_categories'), slug: '' }, ...categories]}
             >
               {(cat) => <SelectItem key={cat.id || ''}>{cat.name}</SelectItem>}
             </Select>
 
             {/* Sort */}
             <Select
-              label="Sort By"
+              label={t('filter_sort_by')}
               selectedKeys={filters.sort ? [filters.sort] : ['relevance']}
               onChange={(e) => updateFilter('sort', e.target.value)}
               classNames={{
@@ -185,15 +188,15 @@ export function AdvancedSearchFilters({
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="relevance">Relevance</SelectItem>
-              <SelectItem key="newest">Newest First</SelectItem>
-              <SelectItem key="oldest">Oldest First</SelectItem>
+              <SelectItem key="relevance">{t('filter_relevance')}</SelectItem>
+              <SelectItem key="newest">{t('filter_newest')}</SelectItem>
+              <SelectItem key="oldest">{t('filter_oldest')}</SelectItem>
             </Select>
 
             {/* Date from */}
             <Input
               type="date"
-              label="From Date"
+              label={t('filter_from_date')}
               value={filters.date_from}
               onChange={(e) => updateFilter('date_from', e.target.value)}
               startContent={<Calendar className="w-4 h-4 text-theme-subtle" />}
@@ -206,7 +209,7 @@ export function AdvancedSearchFilters({
             {/* Date to */}
             <Input
               type="date"
-              label="To Date"
+              label={t('filter_to_date')}
               value={filters.date_to}
               onChange={(e) => updateFilter('date_to', e.target.value)}
               startContent={<Calendar className="w-4 h-4 text-theme-subtle" />}
@@ -218,8 +221,8 @@ export function AdvancedSearchFilters({
 
             {/* Location */}
             <Input
-              label="Location"
-              placeholder="e.g. London, Bristol..."
+              label={t('filter_location')}
+              placeholder={t('filter_location_placeholder')}
               value={filters.location}
               onChange={(e) => updateFilter('location', e.target.value)}
               classNames={{
@@ -233,13 +236,13 @@ export function AdvancedSearchFilters({
           <div>
             <label className="text-sm font-medium text-theme-muted mb-2 flex items-center gap-1">
               <Tag className="w-4 h-4" />
-              Skill Tags
+              {t('filter_skills')}
             </label>
             <div className="flex gap-2 mb-2">
               <Input
                 size="sm"
-                placeholder="Add a skill tag..."
-                aria-label="Add a skill tag"
+                placeholder={t('filter_skills_placeholder')}
+                aria-label={t('filter_skills_placeholder')}
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -274,9 +277,9 @@ export function AdvancedSearchFilters({
             {/* Popular tags */}
             {popularTags.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                <span className="text-xs text-theme-subtle">Popular:</span>
+                <span className="text-xs text-theme-subtle">{t('filter_popular')}</span>
                 {popularTags
-                  .filter((t) => !skillsList.includes(t))
+                  .filter((tag) => !skillsList.includes(tag))
                   .slice(0, 8)
                   .map((tag) => (
                     <Button
@@ -301,7 +304,7 @@ export function AdvancedSearchFilters({
               startContent={<X className="w-4 h-4" />}
               onPress={handleReset}
             >
-              Reset
+              {t('filter_reset')}
             </Button>
             <Button
               size="sm"
@@ -309,7 +312,7 @@ export function AdvancedSearchFilters({
               startContent={<Filter className="w-4 h-4" />}
               onPress={onApply}
             >
-              Apply Filters
+              {t('filter_apply')}
             </Button>
           </div>
         </GlassCard>

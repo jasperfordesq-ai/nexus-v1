@@ -363,6 +363,7 @@ class UnifiedSearchService
                 l.image_url,
                 l.location,
                 l.is_featured,
+                l.hours_estimate,
                 l.created_at,
                 CASE
                     WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != ''
@@ -389,6 +390,7 @@ class UnifiedSearchService
                 'image_url' => $row['image_url'],
                 'location' => $row['location'],
                 'is_featured' => (bool)($row['is_featured'] ?? false),
+                'hours_estimate' => isset($row['hours_estimate']) ? (float)$row['hours_estimate'] : null,
                 'user' => [
                     'name' => trim($row['user_name'] ?? ''),
                     'avatar_url' => $row['user_avatar'],
@@ -600,21 +602,22 @@ class UnifiedSearchService
 
         // Listing titles
         $stmt = $db->prepare("
-            SELECT DISTINCT title as suggestion, 'listing' as type
+            SELECT id, title, 'listing' as type
             FROM listings
             WHERE tenant_id = ? AND status = 'active' AND title LIKE ?
+            ORDER BY title
             LIMIT ?
         ");
         $stmt->execute([$tenantId, $searchTerm, $limit]);
-        $suggestions['listings'] = array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'suggestion');
+        $suggestions['listings'] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // User names
         $stmt = $db->prepare("
-            SELECT DISTINCT
+            SELECT id,
                 CASE
                     WHEN profile_type = 'organisation' AND organization_name IS NOT NULL THEN organization_name
                     ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, ''))
-                END as suggestion,
+                END as name,
                 'user' as type
             FROM users
             WHERE tenant_id = ? AND status = 'active'
@@ -625,29 +628,31 @@ class UnifiedSearchService
             LIMIT ?
         ");
         $stmt->execute([$tenantId, $searchTerm, $searchTerm, $limit]);
-        $suggestions['users'] = array_filter(array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'suggestion'), function ($s) {
-            return trim($s) !== '';
-        });
+        $suggestions['users'] = array_values(array_filter($stmt->fetchAll(\PDO::FETCH_ASSOC), function ($s) {
+            return trim($s['name'] ?? '') !== '';
+        }));
 
         // Event titles
         $stmt = $db->prepare("
-            SELECT DISTINCT title as suggestion, 'event' as type
+            SELECT id, title, 'event' as type
             FROM events
             WHERE tenant_id = ? AND title LIKE ?
+            ORDER BY title
             LIMIT ?
         ");
         $stmt->execute([$tenantId, $searchTerm, $limit]);
-        $suggestions['events'] = array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'suggestion');
+        $suggestions['events'] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         // Group names
         $stmt = $db->prepare("
-            SELECT DISTINCT name as suggestion, 'group' as type
+            SELECT id, name, 'group' as type
             FROM `groups`
             WHERE tenant_id = ? AND name LIKE ?
+            ORDER BY name
             LIMIT ?
         ");
         $stmt->execute([$tenantId, $searchTerm, $limit]);
-        $suggestions['groups'] = array_column($stmt->fetchAll(\PDO::FETCH_ASSOC), 'suggestion');
+        $suggestions['groups'] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $suggestions;
     }

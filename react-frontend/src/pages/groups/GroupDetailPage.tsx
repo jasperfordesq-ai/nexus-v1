@@ -625,6 +625,8 @@ export function GroupDetailPage() {
       return;
     }
 
+    if (!id) return;
+
     try {
       setExpandedDiscussionId(discussionId);
       setExpandedLoading(true);
