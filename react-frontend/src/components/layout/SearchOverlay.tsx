@@ -77,16 +77,16 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }
   }, [isOpen]);
 
-  // Stable ref for onClose so ESC handler never has a stale closure
-  const onCloseRef = useRef(onClose);
-  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+  // Stable ref for closeAndReset so ESC handler properly resets
+  // query/suggestions/selectedIndex — not just closes the overlay
+  const closeAndResetRef = useRef<() => void>(() => {});
 
-  // Keyboard shortcut: Escape closes
+  // Keyboard shortcut: Escape closes and fully resets overlay state
   useEffect(() => {
     if (!isOpen) return;
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        onCloseRef.current();
+        closeAndResetRef.current();
       }
     }
     document.addEventListener('keydown', handleKeyDown);
@@ -231,6 +231,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     setSelectedIndex(-1);
   }, [onClose]);
 
+  // Keep ref in sync so the ESC keydown handler always calls the latest closeAndReset
+  useEffect(() => { closeAndResetRef.current = closeAndReset; }, [closeAndReset]);
+
   const handleSuggestionClick = useCallback((suggestion: SearchSuggestion) => {
     const pathMap: Record<string, string> = {
       listing: tenantPath(`/listings/${suggestion.id}`),
@@ -301,7 +304,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
   const typeLabels: Record<string, { label: string; color: string }> = {
     listing: { label: t('search.type_listing'), color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-    user: { label: t('search.type_member'), color: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
+    user: { label: t('search.type_member'), color: 'bg-indigo-500/20 text-[var(--color-primary)]' },
     event: { label: t('search.type_event'), color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
     group: { label: t('search.type_group'), color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
   };
@@ -315,7 +318,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[400]"
             onMouseDown={closeAndReset}
           />
 
@@ -325,7 +328,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
             transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.15 }}
-            className="fixed top-20 sm:top-28 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
+            className="fixed top-20 sm:top-28 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[500]"
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div
@@ -361,15 +364,16 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           <X className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       )}
-                      <kbd
-                        className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)] cursor-pointer select-none"
-                        onClick={closeAndReset}
-                        role="button"
-                        tabIndex={0}
+                      <Button
+                        variant="light"
+                        size="sm"
+                        onPress={closeAndReset}
+                        className="hidden sm:inline-flex items-center gap-1 px-2 py-1 min-w-0 h-7 rounded-md bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)] hover:text-theme-primary hover:bg-[var(--surface-hover)]"
                         aria-label={t('accessibility.close', 'Close (ESC)')}
                       >
-                        ESC
-                      </kbd>
+                        <X className="w-3.5 h-3.5" aria-hidden="true" />
+                        <kbd className="text-[11px] leading-none select-none">ESC</kbd>
+                      </Button>
                       <Button
                         isIconOnly
                         variant="light"
@@ -412,7 +416,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             onMouseEnter={() => setSelectedIndex(index)}
                             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left h-auto min-h-0 justify-start ${
                               isSelected
-                                ? 'bg-indigo-50 dark:bg-indigo-500/10'
+                                ? 'bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]'
                                 : 'hover:bg-[var(--surface-hover)]'
                             }`}
                           >
@@ -448,7 +452,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             onMouseEnter={() => setSelectedIndex(index)}
                             className={`flex items-center justify-between px-3 py-2 rounded-lg text-left h-auto min-h-0 ${
                               isSelected
-                                ? 'bg-indigo-50 dark:bg-indigo-500/10'
+                                ? 'bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]'
                                 : 'hover:bg-[var(--surface-hover)]'
                             }`}
                           >
@@ -468,16 +472,16 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       onPress={navigateToSearchPage}
                       className="mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-left h-auto min-h-0 hover:bg-[var(--surface-hover)] border-t border-[var(--border-default)] pt-3"
                     >
-                      <Search className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-                      <span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                      <Search className="w-4 h-4 text-[var(--color-primary)]" aria-hidden="true" />
+                      <span className="text-sm text-[var(--color-primary)] font-medium">
                         {t('search.view_all', 'View all results')}
                       </span>
-                      <ArrowRight className="w-3 h-3 text-indigo-500 ml-auto" aria-hidden="true" />
+                      <ArrowRight className="w-3 h-3 text-[var(--color-primary)] ml-auto" aria-hidden="true" />
                     </Button>
                   </>
                 ) : isLoadingSuggestions ? (
                   <div className="flex items-center gap-2 py-2">
-                    <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
                     <span className="text-xs text-theme-subtle">{t('search.searching')}</span>
                   </div>
                 ) : searchQuery.trim().length >= 2 ? (
@@ -490,11 +494,11 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       onPress={navigateToSearchPage}
                       className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg h-auto min-h-0 hover:bg-[var(--surface-hover)]"
                     >
-                      <Search className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-                      <span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                      <Search className="w-4 h-4 text-[var(--color-primary)]" aria-hidden="true" />
+                      <span className="text-sm text-[var(--color-primary)] font-medium">
                         {t('search.search_for', 'Search for')} &ldquo;{searchQuery.trim()}&rdquo;
                       </span>
-                      <ArrowRight className="w-3 h-3 text-indigo-500 ml-auto" aria-hidden="true" />
+                      <ArrowRight className="w-3 h-3 text-[var(--color-primary)] ml-auto" aria-hidden="true" />
                     </Button>
                   </div>
                 ) : (
