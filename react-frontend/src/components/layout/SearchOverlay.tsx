@@ -77,17 +77,21 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }
   }, [isOpen]);
 
+  // Stable ref for onClose so ESC handler never has a stale closure
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
   // Keyboard shortcut: Escape closes
   useEffect(() => {
     if (!isOpen) return;
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        closeAndReset();
+        onCloseRef.current();
       }
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Focus trap — keep Tab cycling within the dialog
   useEffect(() => {
@@ -312,7 +316,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             animate={{ opacity: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
-            onClick={closeAndReset}
+            onMouseDown={closeAndReset}
           />
 
           {/* Search Panel */}
@@ -322,6 +326,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
             transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.15 }}
             className="fixed top-20 sm:top-28 left-1/2 -translate-x-1/2 w-[90vw] max-w-xl z-[70]"
+            onMouseDown={(e) => e.stopPropagation()}
           >
             <div
               ref={dialogRef}
@@ -356,12 +361,21 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           <X className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       )}
+                      <kbd
+                        className="hidden sm:inline-flex items-center px-2 py-1 rounded bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)] cursor-pointer select-none"
+                        onClick={closeAndReset}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={t('accessibility.close', 'Close (ESC)')}
+                      >
+                        ESC
+                      </kbd>
                       <Button
                         isIconOnly
                         variant="light"
                         size="sm"
                         onPress={closeAndReset}
-                        className="text-theme-subtle hover:text-theme-primary min-w-7 w-7 h-7 rounded-full"
+                        className="sm:hidden text-theme-subtle hover:text-theme-primary min-w-7 w-7 h-7 rounded-full"
                         aria-label={t('accessibility.close', 'Close')}
                       >
                         <X className="w-5 h-5" aria-hidden="true" />
