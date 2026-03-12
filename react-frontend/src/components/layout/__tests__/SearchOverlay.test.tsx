@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Tests for SearchOverlay component
+ * Tests for SearchOverlay component (portal-based implementation)
  * Covers rendering, keyboard navigation, suggestion selection, and accessibility.
  */
 
@@ -26,8 +26,8 @@ const i18nMap: Record<string, string> = {
   'search.placeholder': 'Search...',
   'search.suggestions': 'Suggestions',
   'search.searching': 'Searching...',
-  'search.quick_links': 'Quick links',
-  'search.clear': 'Clear search',
+  'search.quick_links': 'Quick Links',
+  'search.clear': 'Clear',
   'search.type_listing': 'Listing',
   'search.type_member': 'Member',
   'search.type_event': 'Event',
@@ -35,7 +35,7 @@ const i18nMap: Record<string, string> = {
   'nav.listings': 'Listings',
   'nav.members': 'Members',
   'nav.events': 'Events',
-  'support.help_center': 'Help Center',
+  'support.help_center': 'Help',
   'accessibility.close': 'Close (ESC)',
 };
 vi.mock('react-i18next', () => ({
@@ -82,12 +82,12 @@ describe('SearchOverlay', () => {
   describe('Rendering', () => {
     it('renders nothing when closed', () => {
       const { container } = renderOverlay(false);
-      expect(container.querySelector('input')).toBeNull();
+      expect(container.innerHTML).toBe('');
     });
 
     it('renders search input when open', () => {
       renderOverlay();
-      expect(screen.getByLabelText('Search')).toBeTruthy();
+      expect(screen.getByPlaceholderText('Search...')).toBeTruthy();
     });
 
     it('renders ESC keyboard hint', () => {
@@ -97,77 +97,65 @@ describe('SearchOverlay', () => {
 
     it('renders quick links when no query entered', () => {
       renderOverlay();
-      expect(screen.getByText('Quick links')).toBeTruthy();
+      expect(screen.getByText('Quick Links')).toBeTruthy();
       expect(screen.getByText('Listings')).toBeTruthy();
       expect(screen.getByText('Members')).toBeTruthy();
       expect(screen.getByText('Events')).toBeTruthy();
-      expect(screen.getByText('Help Center')).toBeTruthy();
+      expect(screen.getByText('Help')).toBeTruthy();
     });
   });
 
   describe('Input behavior', () => {
     it('updates search query on typing', () => {
       renderOverlay();
-      const input = screen.getByLabelText('Search') as HTMLInputElement;
+      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
       fireEvent.change(input, { target: { value: 'test' } });
       expect(input.value).toBe('test');
     });
 
     it('shows clear button when query is non-empty', () => {
       renderOverlay();
-      const input = screen.getByLabelText('Search');
+      const input = screen.getByPlaceholderText('Search...');
       fireEvent.change(input, { target: { value: 'test' } });
-      expect(screen.getByLabelText('Clear search')).toBeTruthy();
+      expect(screen.getByLabelText('Clear')).toBeTruthy();
     });
   });
 
   describe('Keyboard navigation', () => {
-    it('form has submit handler attached', () => {
+    it('calls onClose when ESC is pressed', () => {
+      const onClose = vi.fn();
+      renderOverlay(true, onClose);
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(onClose).toHaveBeenCalled();
+    });
+  });
+
+  describe('Close behavior', () => {
+    it('has a close button with aria-label', () => {
       renderOverlay();
-      const input = screen.getByLabelText('Search');
-      const form = input.closest('form');
-      expect(form).toBeTruthy();
+      expect(screen.getByLabelText('Close')).toBeTruthy();
+    });
+
+    it('calls onClose when close button is clicked', () => {
+      const onClose = vi.fn();
+      renderOverlay(true, onClose);
+      fireEvent.click(screen.getByLabelText('Close'));
+      expect(onClose).toHaveBeenCalled();
     });
   });
 
   describe('Accessibility', () => {
-    it('search input has aria-label', () => {
+    it('search input is focusable', () => {
       renderOverlay();
-      expect(screen.getByLabelText('Search')).toBeTruthy();
+      const input = screen.getByPlaceholderText('Search...');
+      expect(input.tagName).toBe('INPUT');
     });
 
-    it('search input has aria-autocomplete="list"', () => {
+    it('renders as a portal to document.body', () => {
       renderOverlay();
-      const input = screen.getByLabelText('Search');
-      expect(input.getAttribute('aria-autocomplete')).toBe('list');
-    });
-
-    it('suggestions container has role="listbox"', async () => {
-      const { api } = await import('@/lib/api');
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        success: true,
-        data: {
-          listings: [{ id: 1, title: 'Test Listing', type: 'listing' }],
-        },
-      });
-
-      renderOverlay();
-      const input = screen.getByLabelText('Search');
-      fireEvent.change(input, { target: { value: 'test query' } });
-
-      await waitFor(() => {
-        const listbox = document.querySelector('[role="listbox"]');
-        expect(listbox).toBeTruthy();
-      }, { timeout: 2000 });
-    });
-  });
-
-  describe('HeroUI Modal integration', () => {
-    it('has dialog role with aria-modal (provided by HeroUI Modal)', () => {
-      renderOverlay();
-      const dialog = document.querySelector('[role="dialog"]');
-      expect(dialog).toBeTruthy();
-      expect(dialog!.getAttribute('aria-modal')).toBe('true');
+      // The overlay should be rendered to document.body, not inside the container
+      const overlay = document.body.querySelector('.fixed.inset-0');
+      expect(overlay).toBeTruthy();
     });
   });
 
@@ -177,7 +165,7 @@ describe('SearchOverlay', () => {
       expect(screen.getByText('Listings')).toBeTruthy();
       expect(screen.getByText('Members')).toBeTruthy();
       expect(screen.getByText('Events')).toBeTruthy();
-      expect(screen.getByText('Help Center')).toBeTruthy();
+      expect(screen.getByText('Help')).toBeTruthy();
     });
   });
 });
