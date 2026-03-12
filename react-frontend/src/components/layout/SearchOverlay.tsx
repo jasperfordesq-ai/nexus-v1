@@ -4,19 +4,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Command Palette / Search Overlay
+ * Search Overlay / Command Palette
  *
- * Full-screen search panel with live suggestions, quick actions,
- * recent searches, and keyboard navigation.
- * Triggered by Ctrl/Cmd+K or the search icon.
- *
- * Built on HeroUI Modal which handles ESC, backdrop click, focus trap,
- * body scroll lock, and accessibility out of the box.
+ * SIMPLE implementation using portal + basic React.
+ * No HeroUI Modal, no complex refs, no fancy abstractions.
+ * Just works.
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Modal, ModalContent, Button, Input } from '@heroui/react';
 import {
   Search,
   X,
@@ -55,454 +52,408 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const { isAuthenticated } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  // ─── State ─────────────────────────────────────────────────────────────
+  const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const suggestionsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  // Reset state when modal closes
+  // ─── Close and reset everything ────────────────────────────────────────
   const handleClose = useCallback(() => {
-    onClose();
-    setSearchQuery('');
+    setQuery('');
     setSuggestions([]);
     setSelectedIndex(-1);
+    onClose();
   }, [onClose]);
 
-  // Auto-focus search input when opened
+  // ─── ESC key handler (on document) ─────────────────────────────────────
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEsc, true);
+    return () => document.removeEventListener('keydown', handleEsc, true);
+  }, [isOpen, handleClose]);
+
+  // ─── Lock body scroll when open ────────────────────────────────────────
   useEffect(() => {
     if (isOpen) {
-      // Small delay to let HeroUI Modal finish mounting
-      const timer = setTimeout(() => searchInputRef.current?.focus(), 50);
-      return () => clearTimeout(timer);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // ─── Load recent searches on open ──────────────────────────────────────
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      if (stored) setRecentSearches(JSON.parse(stored));
+    } catch {
+      // ignore
     }
   }, [isOpen]);
 
-  // Debounced suggestions fetch
+  // ─── Debounced search ──────────────────────────────────────────────────
   useEffect(() => {
-    if (suggestionsTimerRef.current) {
-      clearTimeout(suggestionsTimerRef.current);
-    }
+    if (!isOpen) return;
 
-    if (!isOpen || searchQuery.trim().length < 2) {
+    const trimmed = query.trim();
+    if (trimmed.length < 2 || trimmed.startsWith('>')) {
       setSuggestions([]);
       return;
     }
 
-    suggestionsTimerRef.current = setTimeout(async () => {
+    setIsLoading(true);
+    const timer = setTimeout(async () => {
       try {
-        setIsLoadingSuggestions(true);
         const response = await api.get<Record<string, SearchSuggestion[]>>(
-          `/v2/search/suggestions?q=${encodeURIComponent(searchQuery.trim())}&limit=5`
+          `/v2/search/suggestions?q=${encodeURIComponent(trimmed)}&limit=5`
         );
         if (response.success && response.data) {
-          const allSuggestions: SearchSuggestion[] = [];
-          const data = response.data;
-          if (data.listings) allSuggestions.push(...data.listings.filter((s) => s.id).map((s) => ({ ...s, type: 'listing' as const })));
-          if (data.users) allSuggestions.push(...data.users.filter((s) => s.id).map((s) => ({ ...s, type: 'user' as const })));
-          if (data.events) allSuggestions.push(...data.events.filter((s) => s.id).map((s) => ({ ...s, type: 'event' as const })));
-          if (data.groups) allSuggestions.push(...data.groups.filter((s) => s.id).map((s) => ({ ...s, type: 'group' as const })));
-          setSuggestions(allSuggestions.slice(0, 8));
+          const all: SearchSuggestion[] = [];
+          const d = response.data;
+          if (d.listings) all.push(...d.listings.map(s => ({ ...s, type: 'listing' as const })));
+          if (d.users) all.push(...d.users.map(s => ({ ...s, type: 'user' as const })));
+          if (d.events) all.push(...d.events.map(s => ({ ...s, type: 'event' as const })));
+          if (d.groups) all.push(...d.groups.map(s => ({ ...s, type: 'group' as const })));
+          setSuggestions(all.slice(0, 8));
         }
       } catch {
-        // Silently fail — suggestions are non-critical
+        // ignore
       } finally {
-        setIsLoadingSuggestions(false);
+        setIsLoading(false);
       }
     }, 250);
 
-    return () => {
-      if (suggestionsTimerRef.current) {
-        clearTimeout(suggestionsTimerRef.current);
-      }
-    };
-  }, [searchQuery, isOpen]);
+    return () => clearTimeout(timer);
+  }, [query, isOpen]);
 
   // Reset selection when suggestions change
   useEffect(() => {
     setSelectedIndex(-1);
   }, [suggestions]);
 
-  // ── Recent searches (localStorage) ──────────────────────────────────────
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    try {
-      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
-      if (stored) setRecentSearches(JSON.parse(stored));
-    } catch { /* ignore */ }
-  }, [isOpen]);
-
-  const saveRecentSearch = useCallback((query: string) => {
-    const trimmed = query.trim();
+  // ─── Recent searches helpers ───────────────────────────────────────────
+  const saveRecent = useCallback((q: string) => {
+    const trimmed = q.trim();
     if (!trimmed || trimmed.length < 2) return;
     setRecentSearches(prev => {
       const updated = [trimmed, ...prev.filter(s => s !== trimmed)].slice(0, 5);
-      try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
+      try {
+        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
       return updated;
     });
   }, []);
 
-  const clearRecentSearches = useCallback(() => {
+  const clearRecent = useCallback(() => {
     setRecentSearches([]);
-    try { localStorage.removeItem(RECENT_SEARCHES_KEY); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem(RECENT_SEARCHES_KEY);
+    } catch {
+      // ignore
+    }
   }, []);
 
-  // ── Quick actions ──────────────────────────────────────────────────────
+  // ─── Quick actions ─────────────────────────────────────────────────────
   const quickActions = useMemo(() => {
     const actions: { label: string; icon: typeof Search; action: () => void }[] = [];
     if (isAuthenticated) {
-      actions.push(
-        { label: t('create.new_listing', 'New Listing'), icon: ListTodo, action: () => navigate(tenantPath('/listings/create')) },
-      );
+      actions.push({ label: t('create.new_listing', 'New Listing'), icon: ListTodo, action: () => navigate(tenantPath('/listings/create')) });
       if (hasFeature('events')) {
-        actions.push(
-          { label: t('create.new_event', 'New Event'), icon: Calendar, action: () => navigate(tenantPath('/events/create')) },
-        );
+        actions.push({ label: t('create.new_event', 'New Event'), icon: Calendar, action: () => navigate(tenantPath('/events/create')) });
       }
       actions.push(
         { label: t('user_menu.my_profile', 'My Profile'), icon: UserCircle, action: () => navigate(tenantPath('/profile')) },
-        { label: t('user_menu.settings', 'Settings'), icon: Settings, action: () => navigate(tenantPath('/settings')) },
+        { label: t('user_menu.settings', 'Settings'), icon: Settings, action: () => navigate(tenantPath('/settings')) }
       );
     }
     actions.push(
-      {
-        label: resolvedTheme === 'dark' ? t('user_menu.light_mode', 'Light Mode') : t('user_menu.dark_mode', 'Dark Mode'),
-        icon: resolvedTheme === 'dark' ? Sun : Moon,
-        action: toggleTheme,
-      },
-      { label: t('support.help_center', 'Help Center'), icon: HelpCircle, action: () => navigate(tenantPath('/help')) },
+      { label: resolvedTheme === 'dark' ? t('user_menu.light_mode', 'Light Mode') : t('user_menu.dark_mode', 'Dark Mode'), icon: resolvedTheme === 'dark' ? Sun : Moon, action: toggleTheme },
+      { label: t('support.help_center', 'Help Center'), icon: HelpCircle, action: () => navigate(tenantPath('/help')) }
     );
     return actions;
   }, [isAuthenticated, t, navigate, tenantPath, hasFeature, resolvedTheme, toggleTheme]);
 
+  const isActionMode = query.startsWith('>');
   const filteredActions = useMemo(() => {
-    if (!searchQuery.startsWith('>')) return [];
-    const q = searchQuery.slice(1).trim().toLowerCase();
-    if (!q) return quickActions;
-    return quickActions.filter(a => a.label.toLowerCase().includes(q));
-  }, [searchQuery, quickActions]);
+    if (!isActionMode) return [];
+    const q = query.slice(1).trim().toLowerCase();
+    return q ? quickActions.filter(a => a.label.toLowerCase().includes(q)) : quickActions;
+  }, [query, quickActions, isActionMode]);
 
-  const isActionMode = searchQuery.startsWith('>');
-
-  // ── Navigation helpers ──────────────────────────────────────────────────
-  const handleSuggestionClick = useCallback((suggestion: SearchSuggestion) => {
-    const pathMap: Record<string, string> = {
-      listing: tenantPath(`/listings/${suggestion.id}`),
-      user: tenantPath(`/profile/${suggestion.id}`),
-      event: tenantPath(`/events/${suggestion.id}`),
-      group: tenantPath(`/groups/${suggestion.id}`),
+  // ─── Navigation helpers ────────────────────────────────────────────────
+  const goToSuggestion = useCallback((s: SearchSuggestion) => {
+    const paths: Record<string, string> = {
+      listing: tenantPath(`/listings/${s.id}`),
+      user: tenantPath(`/profile/${s.id}`),
+      event: tenantPath(`/events/${s.id}`),
+      group: tenantPath(`/groups/${s.id}`),
     };
-    navigate(pathMap[suggestion.type] || tenantPath('/search'));
+    navigate(paths[s.type] || tenantPath('/search'));
     handleClose();
   }, [navigate, tenantPath, handleClose]);
 
-  const navigateToSearchPage = useCallback(() => {
-    if (searchQuery.trim()) {
-      saveRecentSearch(searchQuery);
-      navigate(tenantPath(`/search?q=${encodeURIComponent(searchQuery.trim())}`));
+  const goToSearch = useCallback(() => {
+    const trimmed = query.trim();
+    if (trimmed) {
+      saveRecent(trimmed);
+      navigate(tenantPath(`/search?q=${encodeURIComponent(trimmed)}`));
       handleClose();
     }
-  }, [searchQuery, navigate, tenantPath, handleClose, saveRecentSearch]);
+  }, [query, navigate, tenantPath, handleClose, saveRecent]);
 
-  // ── Keyboard navigation ─────────────────────────────────────────────────
-  const navigableCount = isActionMode ? filteredActions.length : suggestions.length;
+  // ─── Keyboard navigation in input ──────────────────────────────────────
+  const items = isActionMode ? filteredActions : suggestions;
+  const itemCount = items.length;
 
-  const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev + 1) % Math.max(navigableCount, 1));
+      setSelectedIndex(i => (i + 1) % Math.max(itemCount, 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev <= 0 ? Math.max(navigableCount - 1, 0) : prev - 1));
-    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      setSelectedIndex(i => (i <= 0 ? Math.max(itemCount - 1, 0) : i - 1));
+    } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (isActionMode && filteredActions[selectedIndex]) {
-        filteredActions[selectedIndex].action();
-        handleClose();
-      } else if (suggestions[selectedIndex]) {
-        handleSuggestionClick(suggestions[selectedIndex]);
+      if (selectedIndex >= 0 && selectedIndex < itemCount) {
+        if (isActionMode) {
+          filteredActions[selectedIndex]?.action();
+          handleClose();
+        } else {
+          goToSuggestion(suggestions[selectedIndex]);
+        }
+      } else {
+        goToSearch();
       }
     }
-  }, [navigableCount, selectedIndex, isActionMode, filteredActions, suggestions, handleSuggestionClick, handleClose]);
-
-  const handleSearchSubmit = useCallback((e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (isActionMode) {
-      if (selectedIndex >= 0 && filteredActions[selectedIndex]) {
-        filteredActions[selectedIndex].action();
-        handleClose();
-      }
-      return;
-    }
-    if (selectedIndex >= 0 && suggestions.length > 0) {
-      handleSuggestionClick(suggestions[selectedIndex]);
-      return;
-    }
-    if (searchQuery.trim()) {
-      saveRecentSearch(searchQuery);
-      navigate(tenantPath(`/search?q=${encodeURIComponent(searchQuery.trim())}`));
-      handleClose();
-    }
-  }, [searchQuery, navigate, tenantPath, selectedIndex, suggestions, handleSuggestionClick, handleClose, isActionMode, filteredActions, saveRecentSearch]);
-
-  // ── Type labels for suggestion badges ───────────────────────────────────
-  const typeLabels: Record<string, { label: string; color: string }> = {
-    listing: { label: t('search.type_listing'), color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-    user: { label: t('search.type_member'), color: 'bg-indigo-500/20 text-[var(--color-primary)]' },
-    event: { label: t('search.type_event'), color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
-    group: { label: t('search.type_group'), color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
   };
 
-  const selectedClass = 'bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]';
+  // ─── Type badges ───────────────────────────────────────────────────────
+  const typeLabels: Record<string, { label: string; color: string }> = {
+    listing: { label: t('search.type_listing', 'Listing'), color: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
+    user: { label: t('search.type_member', 'Member'), color: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' },
+    event: { label: t('search.type_event', 'Event'), color: 'bg-amber-500/20 text-amber-600 dark:text-amber-400' },
+    group: { label: t('search.type_group', 'Group'), color: 'bg-purple-500/20 text-purple-600 dark:text-purple-400' },
+  };
 
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      placement="top"
-      backdrop="blur"
-      hideCloseButton
-      size="xl"
-      classNames={{
-        backdrop: 'bg-black/50',
-        base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl mt-16 sm:mt-24',
-        body: 'p-0',
-      }}
-    >
-      <ModalContent>
-        {/* Search Input */}
-        <form onSubmit={handleSearchSubmit} className="flex items-center px-4 py-3 gap-3">
-          <Input
-            ref={searchInputRef}
-            type="text"
-            value={searchQuery}
-            onValueChange={setSearchQuery}
-            onKeyDown={handleSearchKeyDown}
-            placeholder={t('search.placeholder')}
-            aria-label="Search"
-            aria-autocomplete="list"
-            aria-activedescendant={selectedIndex >= 0 ? `suggestion-${selectedIndex}` : undefined}
-            startContent={<Search className="w-5 h-5 text-theme-subtle flex-shrink-0" aria-hidden="true" />}
-            endContent={
-              <div className="flex items-center gap-1 flex-shrink-0">
-                {searchQuery && (
-                  <Button
-                    isIconOnly
-                    variant="light"
-                    size="sm"
-                    onPress={() => setSearchQuery('')}
-                    className="text-theme-subtle hover:text-theme-primary min-w-6 w-6 h-6"
-                    aria-label={t('search.clear')}
-                  >
-                    <X className="w-4 h-4" aria-hidden="true" />
-                  </Button>
-                )}
-                <Button
-                  variant="light"
-                  size="sm"
-                  onPress={handleClose}
-                  className="hidden sm:inline-flex items-center gap-1 px-2 py-1 min-w-0 h-7 rounded-md bg-[var(--surface-elevated)] text-xs text-theme-subtle border border-[var(--border-default)] hover:text-theme-primary hover:bg-[var(--surface-hover)]"
-                  aria-label={t('accessibility.close', 'Close (ESC)')}
-                >
-                  <X className="w-3.5 h-3.5" aria-hidden="true" />
-                  <kbd className="text-[11px] leading-none select-none">ESC</kbd>
-                </Button>
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={handleClose}
-                  className="sm:hidden text-theme-subtle hover:text-theme-primary min-w-7 w-7 h-7 rounded-full"
-                  aria-label={t('accessibility.close', 'Close')}
-                >
-                  <X className="w-5 h-5" aria-hidden="true" />
-                </Button>
-              </div>
-            }
-            classNames={{
-              base: 'flex-1',
-              input: 'bg-transparent text-theme-primary text-base',
-              inputWrapper: 'bg-transparent shadow-none border-0 px-0 h-auto hover:bg-transparent focus-within:bg-transparent',
-            }}
-          />
-        </form>
+  // ─── Don't render if not open ──────────────────────────────────────────
+  if (!isOpen) return null;
 
-        {/* Results Panel */}
-        <div className="border-t border-[var(--border-default)] px-4 py-3 max-h-80 overflow-y-auto">
-          {/* Action mode (query starts with ">") */}
-          {isActionMode ? (
-            <>
-              <p className="text-xs text-theme-subtle mb-2">{t('search.actions', 'Actions')}</p>
-              <div className="space-y-0.5" role="listbox" aria-label="Quick actions">
-                {filteredActions.map((action, index) => {
-                  const Icon = action.icon;
-                  const isSelected = index === selectedIndex;
-                  return (
-                    <Button
-                      id={`suggestion-${index}`}
-                      key={action.label}
-                      variant="light"
-                      fullWidth
-                      role="option"
-                      aria-selected={isSelected}
-                      onPress={() => { action.action(); handleClose(); }}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left h-auto min-h-0 justify-start ${
-                        isSelected ? selectedClass : 'hover:bg-[var(--surface-hover)]'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4 text-theme-subtle shrink-0" aria-hidden="true" />
-                      <span className="text-sm text-theme-primary">{action.label}</span>
-                      <ArrowRight className="w-3 h-3 ml-auto text-theme-subtle opacity-0 group-hover:opacity-100" aria-hidden="true" />
-                    </Button>
-                  );
-                })}
-                {filteredActions.length === 0 && (
-                  <p className="text-sm text-theme-subtle py-2">{t('search.no_actions', 'No matching actions')}</p>
-                )}
-              </div>
-            </>
-          ) : suggestions.length > 0 ? (
-            /* Search suggestions */
-            <>
-              <p className="text-xs text-theme-subtle mb-2">{t('search.suggestions')}</p>
-              <div className="space-y-0.5" role="listbox" aria-label="Search suggestions">
-                {suggestions.map((suggestion, index) => {
-                  const typeInfo = typeLabels[suggestion.type] || { label: suggestion.type, color: 'bg-[var(--surface-elevated)] text-theme-subtle' };
-                  const isSelected = index === selectedIndex;
+  // ─── Render via portal ─────────────────────────────────────────────────
+  return createPortal(
+    <div className="fixed inset-0 z-[9999]">
+      {/* Backdrop - clicking closes */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={handleClose}
+        aria-hidden="true"
+      />
 
-                  return (
-                    <Button
-                      id={`suggestion-${index}`}
-                      key={`${suggestion.type}-${suggestion.id}`}
-                      variant="light"
-                      fullWidth
-                      role="option"
-                      aria-selected={isSelected}
-                      onPress={() => handleSuggestionClick(suggestion)}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-left h-auto min-h-0 ${
-                        isSelected ? selectedClass : 'hover:bg-[var(--surface-hover)]'
-                      }`}
-                    >
-                      <span className="text-sm text-theme-primary truncate">
-                        {suggestion.title || suggestion.name}
-                      </span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${typeInfo.color} ml-2 flex-shrink-0`}>
-                        {typeInfo.label}
-                      </span>
-                    </Button>
-                  );
-                })}
-              </div>
-              <Button
-                variant="light"
-                fullWidth
-                onPress={navigateToSearchPage}
-                className="mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-left h-auto min-h-0 hover:bg-[var(--surface-hover)] border-t border-[var(--border-default)] pt-3"
+      {/* Modal panel */}
+      <div
+        className="absolute top-16 sm:top-24 left-1/2 -translate-x-1/2 w-[92vw] max-w-xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden">
+          {/* Search input row */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-200 dark:border-zinc-700">
+            <Search className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={t('search.placeholder', 'Search...')}
+              autoFocus
+              className="flex-1 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-base outline-none"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                aria-label="Clear"
               >
-                <Search className="w-4 h-4 text-[var(--color-primary)]" aria-hidden="true" />
-                <span className="text-sm text-[var(--color-primary)] font-medium">
-                  {t('search.view_all', 'View all results')}
-                </span>
-                <ArrowRight className="w-3 h-3 text-[var(--color-primary)] ml-auto" aria-hidden="true" />
-              </Button>
-            </>
-          ) : isLoadingSuggestions ? (
-            <div className="flex items-center gap-2 py-2">
-              <div className="w-4 h-4 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs text-theme-subtle">{t('search.searching')}</span>
-            </div>
-          ) : searchQuery.trim().length >= 2 ? (
-            /* No suggestions found - prompt full search */
-            <div className="space-y-2">
-              <p className="text-sm text-theme-subtle py-1">{t('search.no_suggestions', 'No quick matches')}</p>
-              <Button
-                variant="light"
-                fullWidth
-                onPress={navigateToSearchPage}
-                className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg h-auto min-h-0 hover:bg-[var(--surface-hover)]"
-              >
-                <Search className="w-4 h-4 text-[var(--color-primary)]" aria-hidden="true" />
-                <span className="text-sm text-[var(--color-primary)] font-medium">
-                  {t('search.search_for', 'Search for')} &ldquo;{searchQuery.trim()}&rdquo;
-                </span>
-                <ArrowRight className="w-3 h-3 text-[var(--color-primary)] ml-auto" aria-hidden="true" />
-              </Button>
-            </div>
-          ) : (
-            /* Default: recent searches + quick links + actions hint */
-            <>
-              {/* Recent Searches */}
-              {recentSearches.length > 0 && (
-                <div className="mb-3">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-xs text-theme-subtle">{t('search.recent', 'Recent')}</p>
-                    <Button
-                      variant="light"
-                      size="sm"
-                      className="text-[10px] text-theme-subtle hover:text-theme-primary h-5 min-w-0 px-1"
-                      onPress={clearRecentSearches}
-                    >
-                      {t('search.clear', 'Clear')}
-                    </Button>
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 text-xs border border-zinc-200 dark:border-zinc-600"
+              aria-label="Close"
+            >
+              <X className="w-3.5 h-3.5" />
+              <kbd className="text-[10px]">ESC</kbd>
+            </button>
+          </div>
+
+          {/* Results area */}
+          <div className="px-4 py-3 max-h-80 overflow-y-auto">
+            {/* Action mode */}
+            {isActionMode ? (
+              <div>
+                <p className="text-xs text-zinc-500 mb-2">{t('search.actions', 'Actions')}</p>
+                {filteredActions.length > 0 ? (
+                  <div className="space-y-1">
+                    {filteredActions.map((action, i) => {
+                      const Icon = action.icon;
+                      return (
+                        <button
+                          key={action.label}
+                          type="button"
+                          onClick={() => { action.action(); handleClose(); }}
+                          onMouseEnter={() => setSelectedIndex(i)}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
+                            i === selectedIndex
+                              ? 'bg-indigo-50 dark:bg-indigo-500/10'
+                              : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4 text-zinc-500" />
+                          <span className="text-sm text-zinc-800 dark:text-zinc-200">{action.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div className="space-y-0.5">
-                    {recentSearches.map(query => (
-                      <Button
-                        key={query}
-                        variant="light"
-                        fullWidth
-                        onPress={() => {
-                          saveRecentSearch(query);
-                          navigate(tenantPath(`/search?q=${encodeURIComponent(query)}`));
-                          handleClose();
-                        }}
-                        className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-left h-auto min-h-0 justify-start hover:bg-[var(--surface-hover)]"
+                ) : (
+                  <p className="text-sm text-zinc-500">{t('search.no_actions', 'No matching actions')}</p>
+                )}
+              </div>
+            ) : suggestions.length > 0 ? (
+              /* Suggestions */
+              <div>
+                <p className="text-xs text-zinc-500 mb-2">{t('search.suggestions', 'Suggestions')}</p>
+                <div className="space-y-1">
+                  {suggestions.map((s, i) => {
+                    const type = typeLabels[s.type] || { label: s.type, color: 'bg-zinc-200 text-zinc-600' };
+                    return (
+                      <button
+                        key={`${s.type}-${s.id}`}
+                        type="button"
+                        onClick={() => goToSuggestion(s)}
+                        onMouseEnter={() => setSelectedIndex(i)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left ${
+                          i === selectedIndex
+                            ? 'bg-indigo-50 dark:bg-indigo-500/10'
+                            : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                        }`}
                       >
-                        <Clock className="w-3.5 h-3.5 text-theme-subtle shrink-0" aria-hidden="true" />
-                        <span className="text-sm text-theme-secondary">{query}</span>
-                      </Button>
-                    ))}
-                  </div>
+                        <span className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{s.title || s.name}</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${type.color} ml-2 flex-shrink-0`}>{type.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-
-              {/* Quick Links */}
-              <p className="text-xs text-theme-subtle mb-2">{t('search.quick_links')}</p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {[
-                  { label: t('nav.listings'), path: tenantPath('/listings') },
-                  { label: t('nav.members'), path: tenantPath('/members') },
-                  { label: t('nav.events'), path: tenantPath('/events') },
-                  { label: t('support.help_center'), path: tenantPath('/help') },
-                ].map((link) => (
-                  <Button
-                    key={link.path}
-                    variant="flat"
-                    size="sm"
-                    onPress={() => { navigate(link.path); handleClose(); }}
-                    className="px-3 py-1.5 rounded-lg bg-[var(--surface-elevated)] text-sm text-theme-muted hover:text-theme-primary hover:bg-[var(--surface-hover)]"
-                  >
-                    {link.label}
-                  </Button>
-                ))}
+                <button
+                  type="button"
+                  onClick={goToSearch}
+                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-700 text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
+                >
+                  <Search className="w-4 h-4" />
+                  {t('search.view_all', 'View all results')}
+                  <ArrowRight className="w-3 h-3" />
+                </button>
               </div>
+            ) : isLoading ? (
+              /* Loading */
+              <div className="flex items-center gap-2 py-4">
+                <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm text-zinc-500">{t('search.searching', 'Searching...')}</span>
+              </div>
+            ) : query.trim().length >= 2 ? (
+              /* No results */
+              <div className="py-4 text-center">
+                <p className="text-sm text-zinc-500 mb-2">{t('search.no_suggestions', 'No quick matches')}</p>
+                <button
+                  type="button"
+                  onClick={goToSearch}
+                  className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
+                >
+                  <Search className="w-4 h-4" />
+                  {t('search.search_for', 'Search for')} "{query.trim()}"
+                </button>
+              </div>
+            ) : (
+              /* Default state: recent + quick links */
+              <div>
+                {recentSearches.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-zinc-500">{t('search.recent', 'Recent')}</p>
+                      <button
+                        type="button"
+                        onClick={clearRecent}
+                        className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                      >
+                        {t('search.clear', 'Clear')}
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {recentSearches.map(q => (
+                        <button
+                          key={q}
+                          type="button"
+                          onClick={() => {
+                            saveRecent(q);
+                            navigate(tenantPath(`/search?q=${encodeURIComponent(q)}`));
+                            handleClose();
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                        >
+                          <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                          <span className="text-sm text-zinc-600 dark:text-zinc-400">{q}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-              {/* Actions hint */}
-              <div className="pt-2 border-t border-[var(--border-default)]">
-                <p className="text-[11px] text-theme-subtle">
+                <p className="text-xs text-zinc-500 mb-2">{t('search.quick_links', 'Quick Links')}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {[
+                    { label: t('nav.listings', 'Listings'), path: tenantPath('/listings') },
+                    { label: t('nav.members', 'Members'), path: tenantPath('/members') },
+                    { label: t('nav.events', 'Events'), path: tenantPath('/events') },
+                    { label: t('support.help_center', 'Help'), path: tenantPath('/help') },
+                  ].map(link => (
+                    <button
+                      key={link.path}
+                      type="button"
+                      onClick={() => { navigate(link.path); handleClose(); }}
+                      className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                    >
+                      {link.label}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-[11px] text-zinc-400 pt-2 border-t border-zinc-200 dark:border-zinc-700">
                   {t('search.actions_hint', 'Type > for quick actions')}
                 </p>
               </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
-      </ModalContent>
-    </Modal>
+      </div>
+    </div>,
+    document.body
   );
 }
 
