@@ -71,7 +71,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { navigateToLegacyAdmin } from '@/lib/nav-helpers';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
-// import { SearchOverlay } from '@/components/layout/SearchOverlay'; // temporarily disabled
+import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
@@ -80,12 +80,11 @@ import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 interface NavbarProps {
   onMobileMenuOpen?: () => void;
   /** External control for search overlay (from MobileDrawer) */
-  // @ts-ignore temporarily disabled
   externalSearchOpen?: boolean;
   onSearchOpenChange?: (open: boolean) => void;
 }
 
-export function Navbar({ onMobileMenuOpen, externalSearchOpen: _externalSearchOpen, onSearchOpenChange: _onSearchOpenChange }: NavbarProps) {
+export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation('common');
@@ -122,13 +121,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen: _externalSearchOp
   const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
 
   // Search state — can be controlled externally
-  // @ts-ignore temporarily disabled
-  const [_internalSearchOpen, setInternalSearchOpen] = useState(false);
-  // const isSearchOpen = __externalSearchOpen ?? _internalSearchOpen; // temporarily disabled
+  const [internalSearchOpen, setInternalSearchOpen] = useState(false);
+  const isSearchOpen = externalSearchOpen ?? internalSearchOpen;
   const setIsSearchOpen = useCallback((open: boolean) => {
     setInternalSearchOpen(open);
-    _onSearchOpenChange?.(open);
-  }, [_onSearchOpenChange]);
+    onSearchOpenChange?.(open);
+  }, [onSearchOpenChange]);
 
   // Dropdown state - controlled to fix close behavior
   const [communityOpen, setCommunityOpen] = useState(false);
@@ -178,8 +176,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen: _externalSearchOp
     closeAllDropdowns();
   }, [location.pathname, closeAllDropdowns]);
 
-  // Keyboard shortcut: Ctrl/Cmd+K opens search (temporarily disabled)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // Keyboard shortcut: Ctrl/Cmd+K opens search
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -760,10 +757,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen: _externalSearchOp
         </div>
 
         {/* Search Overlay */}
-        {/* <SearchOverlay
+        <SearchOverlay
           isOpen={isSearchOpen}
           onClose={() => setIsSearchOpen(false)}
-        /> */}
+        />
       </header>
     </>
   );
