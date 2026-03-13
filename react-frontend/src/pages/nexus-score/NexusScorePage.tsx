@@ -31,6 +31,7 @@ import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { CHART_COLOR_MAP } from '@/lib/chartColors';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -263,8 +264,8 @@ export default function NexusScorePage() {
                   strokeLinecap="round" />
                 <defs>
                   <linearGradient id="score-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="100%" stopColor="#a78bfa" />
+                    <stop offset="0%" stopColor={CHART_COLOR_MAP.primary} />
+                    <stop offset="100%" stopColor={CHART_COLOR_MAP.primaryLight} />
                   </linearGradient>
                 </defs>
               </svg>

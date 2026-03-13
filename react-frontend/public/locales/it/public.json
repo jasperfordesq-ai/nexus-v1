@@ -474,5 +474,10 @@
       "description_before_email": "Se scopre una vulnerabilità di sicurezza, La preghiamo di non aprire una segnalazione pubblica. Ci contatti invece in modo confidenziale a",
       "description_after_email": ". Risponderemo entro 72 ore e lavoreremo con Lei per una divulgazione responsabile."
     }
+  },
+  "kb": {
+    "title": "Base di conoscenza",
+    "description": "Trova risposte, guide e risorse utili",
+    "search_placeholder": "Cerca nella base di conoscenza..."
   }
 }

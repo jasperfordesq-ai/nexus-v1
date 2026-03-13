@@ -65,7 +65,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { CHART_COLORS } from '@/lib/chartColors';
+import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
@@ -278,7 +278,7 @@ export function HoursReportsPage() {
                   <XAxis type="number" tick={{ fontSize: 12 }} />
                   <YAxis type="category" dataKey="category" tick={{ fontSize: 11 }} width={80} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="total_hours" name="Hours" fill="#6366f1" radius={[0, 4, 4, 0]} fillOpacity={0.8} />
+                  <Bar dataKey="total_hours" name="Hours" fill={CHART_COLOR_MAP.primary} radius={[0, 4, 4, 0]} fillOpacity={0.8} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -428,12 +428,12 @@ export function HoursReportsPage() {
               <AreaChart data={periods} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="hrTotalGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    <stop offset="5%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="hrTxGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    <stop offset="5%" stopColor={CHART_COLOR_MAP.success} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={CHART_COLOR_MAP.success} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
@@ -445,7 +445,7 @@ export function HoursReportsPage() {
                   type="monotone"
                   dataKey="total_hours"
                   name="Total Hours"
-                  stroke="#6366f1"
+                  stroke={CHART_COLOR_MAP.primary}
                   fill="url(#hrTotalGrad)"
                   strokeWidth={2}
                 />
@@ -453,7 +453,7 @@ export function HoursReportsPage() {
                   type="monotone"
                   dataKey="transaction_count"
                   name="Transactions"
-                  stroke="#10b981"
+                  stroke={CHART_COLOR_MAP.success}
                   fill="url(#hrTxGrad)"
                   strokeWidth={2}
                 />

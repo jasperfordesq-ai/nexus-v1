@@ -474,5 +474,10 @@
       "description_before_email": "If you discover a security vulnerability, please do not open a public issue. Instead, contact us confidentially at",
       "description_after_email": ". We will respond within 72 hours and work with you on responsible disclosure."
     }
+  },
+  "kb": {
+    "title": "Knowledge Base",
+    "description": "Find answers, guides, and helpful resources",
+    "search_placeholder": "Search the knowledge base..."
   }
 }

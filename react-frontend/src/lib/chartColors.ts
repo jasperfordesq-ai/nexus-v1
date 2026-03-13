@@ -22,4 +22,8 @@ export const CHART_COLOR_MAP = {
   warning: '#f59e0b',
   danger: '#ef4444',
   info: '#06b6d4',
+  purple: '#7828c8',
+  primaryLight: '#a78bfa',
+  dangerAlt: '#f31260',
+  warningAlt: '#f5a524',
 } as const;

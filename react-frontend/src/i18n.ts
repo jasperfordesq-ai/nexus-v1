@@ -23,7 +23,7 @@ i18n
       'exchanges', 'group_exchanges', 'feed', 'notifications',
       'search_page', 'onboarding', 'gamification', 'blog',
       'community', 'utility', 'public', 'legal', 'about',
-      'federation',
+      'federation', 'connections', 'chat',
     ],
     debug: import.meta.env.DEV,
 

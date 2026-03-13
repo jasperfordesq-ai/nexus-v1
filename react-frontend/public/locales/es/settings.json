@@ -71,5 +71,27 @@
   "passkey_rename": "Renombrar passkey",
   "passkey_rename_input": "Nuevo nombre del passkey",
   "passkey_renamed": "Passkey renombrado.",
-  "passkey_rename_failed": "Error al renombrar el passkey"
+  "passkey_rename_failed": "Error al renombrar el passkey",
+  "profile": {
+    "section_title": "Profile Information",
+    "photo_label": "Profile Photo",
+    "photo_hint": "JPG, PNG or GIF. Max 5MB.",
+    "first_name": "First Name",
+    "first_name_placeholder": "Your first name",
+    "last_name": "Last Name",
+    "last_name_placeholder": "Your last name",
+    "phone": "Phone Number",
+    "phone_placeholder": "+1 555 123 4567",
+    "profile_type": "Profile Type",
+    "type_individual": "Individual",
+    "type_organisation": "Organisation",
+    "org_name": "Organisation Name",
+    "org_name_placeholder": "Your organisation name",
+    "tagline": "Tagline",
+    "tagline_placeholder": "A short description about yourself",
+    "bio": "Bio",
+    "bio_placeholder": "Tell others about yourself...",
+    "location": "Location",
+    "location_placeholder": "City, Country"
+  }
 }

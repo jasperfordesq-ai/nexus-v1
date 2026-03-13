@@ -38,6 +38,7 @@ import {
   Send,
 } from 'lucide-react';
 import { useTenant, useToast } from '@/contexts';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
@@ -122,6 +123,7 @@ interface ConnectionCardProps {
 }
 
 function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: ConnectionCardProps) {
+  const { t } = useTranslation('connections');
   const { user } = connection;
   const joinedDate = new Date(connection.created_at).toLocaleDateString([], {
     year: 'numeric',
@@ -161,7 +163,7 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
                 <p className="text-sm text-[var(--color-text-muted)] mt-1 line-clamp-2">{user.bio}</p>
               )}
               <p className="text-xs text-[var(--color-text-muted)] mt-1.5">
-                Connected since {joinedDate}
+                {t('connected_since', { date: joinedDate })}
               </p>
             </div>
           </div>
@@ -175,7 +177,7 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
               color="primary"
               startContent={<MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />}
             >
-              Message
+              {t('message')}
             </Button>
             <Button
               size="sm"
@@ -186,7 +188,7 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
               isLoading={isActing}
               isDisabled={isActing}
             >
-              Disconnect
+              {t('disconnect')}
             </Button>
           </div>
         </CardBody>
@@ -208,6 +210,7 @@ interface PendingCardProps {
 }
 
 function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }: PendingCardProps) {
+  const { t } = useTranslation('connections');
   const { user } = connection;
 
   return (
@@ -245,7 +248,7 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
               <div className="flex items-center gap-1 mt-1.5">
                 <Clock className="w-3 h-3 text-amber-500" aria-hidden="true" />
                 <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                  Wants to connect with you
+                  {t('wants_to_connect')}
                 </p>
               </div>
             </div>
@@ -260,7 +263,7 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
               isLoading={isActing}
               isDisabled={isActing}
             >
-              Accept
+              {t('accept')}
             </Button>
             <Button
               size="sm"
@@ -271,7 +274,7 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
               isLoading={isActing}
               isDisabled={isActing}
             >
-              Decline
+              {t('decline')}
             </Button>
           </div>
         </CardBody>
@@ -292,6 +295,7 @@ interface SentCardProps {
 }
 
 function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProps) {
+  const { t } = useTranslation('connections');
   const { user } = connection;
 
   return (
@@ -329,7 +333,7 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
               <div className="flex items-center gap-1 mt-1.5">
                 <Send className="w-3 h-3 text-indigo-500" aria-hidden="true" />
                 <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                  Request pending
+                  {t('request_pending')}
                 </p>
               </div>
             </div>
@@ -345,7 +349,7 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
               isLoading={isActing}
               isDisabled={isActing}
             >
-              Cancel Request
+              {t('cancel_request')}
             </Button>
           </div>
         </CardBody>
@@ -359,7 +363,8 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ConnectionsPage() {
-  usePageTitle('Connections');
+  const { t } = useTranslation('connections');
+  usePageTitle(t('title'));
 
   const { tenantPath } = useTenant();
   const { success: toastSuccess, error: toastError, info: toastInfo } = useToast();
@@ -426,7 +431,7 @@ export default function ConnectionsPage() {
         setHasMore(prev => ({ ...prev, [status]: hasMoreItems }));
       }
     } catch {
-      toastError('Failed to load connections');
+      toastError(t('toast_load_failed'));
     } finally {
       if (isInitial) {
         setLoading(prev => ({ ...prev, [status]: false }));
@@ -435,7 +440,7 @@ export default function ConnectionsPage() {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toastError]);
+  }, [toastError, t]);
 
   // Load all three tabs on mount
   useEffect(() => {
@@ -464,12 +469,12 @@ export default function ConnectionsPage() {
         if (accepted_conn) {
           setAccepted(prev => [{ ...accepted_conn, status: 'accepted' }, ...prev]);
         }
-        toastSuccess('Connection accepted!');
+        toastSuccess(t('toast_accepted'));
       } else {
-        toastError('Failed to accept connection');
+        toastError(t('toast_accept_failed'));
       }
     } catch {
-      toastError('Failed to accept connection');
+      toastError(t('toast_accept_failed'));
     } finally {
       markActing(connectionId, false);
     }
@@ -481,12 +486,12 @@ export default function ConnectionsPage() {
       const response = await api.delete(`/v2/connections/${connectionId}`);
       if (response.success) {
         setPendingReceived(prev => prev.filter(c => c.connection_id !== connectionId));
-        toastInfo('Request declined');
+        toastInfo(t('toast_declined'));
       } else {
-        toastError('Failed to decline request');
+        toastError(t('toast_decline_failed'));
       }
     } catch {
-      toastError('Failed to decline request');
+      toastError(t('toast_decline_failed'));
     } finally {
       markActing(connectionId, false);
     }
@@ -498,12 +503,12 @@ export default function ConnectionsPage() {
       const response = await api.delete(`/v2/connections/${connectionId}`);
       if (response.success) {
         setAccepted(prev => prev.filter(c => c.connection_id !== connectionId));
-        toastInfo('Disconnected');
+        toastInfo(t('toast_disconnected'));
       } else {
-        toastError('Failed to disconnect');
+        toastError(t('toast_disconnect_failed'));
       }
     } catch {
-      toastError('Failed to disconnect');
+      toastError(t('toast_disconnect_failed'));
     } finally {
       markActing(connectionId, false);
     }
@@ -515,12 +520,12 @@ export default function ConnectionsPage() {
       const response = await api.delete(`/v2/connections/${connectionId}`);
       if (response.success) {
         setPendingSent(prev => prev.filter(c => c.connection_id !== connectionId));
-        toastInfo('Request cancelled');
+        toastInfo(t('toast_cancelled'));
       } else {
-        toastError('Failed to cancel request');
+        toastError(t('toast_cancel_failed'));
       }
     } catch {
-      toastError('Failed to cancel request');
+      toastError(t('toast_cancel_failed'));
     } finally {
       markActing(connectionId, false);
     }
@@ -548,26 +553,26 @@ export default function ConnectionsPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
               <Users2 className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
-            <h1 className="text-2xl font-bold text-[var(--color-text)]">Connections</h1>
+            <h1 className="text-2xl font-bold text-[var(--color-text)]">{t('title')}</h1>
             {pendingReceivedCount > 0 && (
               <Chip size="sm" color="warning" variant="solid" className="font-semibold">
-                {pendingReceivedCount} pending
+                {t('pending_count', { count: pendingReceivedCount })}
               </Chip>
             )}
           </div>
           <p className="text-[var(--color-text-muted)] ml-13 text-sm">
-            Manage your community connections
+            {t('subtitle')}
           </p>
         </div>
 
         {/* Search */}
         <div className="mb-4">
           <Input
-            placeholder="Search by name or location..."
+            placeholder={t('search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-[var(--color-text-muted)]" aria-hidden="true" />}
-            aria-label="Search connections"
+            aria-label={t('search_placeholder')}
             variant="bordered"
             classNames={{
               inputWrapper: 'bg-[var(--color-surface)] border-[var(--border-default)] hover:border-indigo-400',
@@ -588,14 +593,14 @@ export default function ConnectionsPage() {
             tab: 'text-sm font-medium',
             tabContent: 'text-[var(--color-text-muted)] group-data-[selected=true]:text-indigo-500',
           }}
-          aria-label="Connection tabs"
+          aria-label={t('title')}
         >
           <Tab
             key="accepted"
             title={
               <div className="flex items-center gap-2">
                 <UserCheck className="w-4 h-4" aria-hidden="true" />
-                <span>My Connections</span>
+                <span>{t('tab_my_connections')}</span>
                 {!loading.accepted && (
                   <span className="text-xs bg-[var(--color-surface-elevated)] rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
                     {accepted.length}
@@ -612,11 +617,11 @@ export default function ConnectionsPage() {
               ) : filterBySearch(accepted).length === 0 ? (
                 <EmptyState
                   icon={<Users2 className="w-7 h-7" />}
-                  title="No connections yet"
+                  title={t('empty_no_connections_title')}
                   description={
                     searchQuery
-                      ? 'No connections match your search.'
-                      : 'Find members to connect with and build your community network.'
+                      ? t('empty_no_connections_search')
+                      : t('empty_no_connections_description')
                   }
                   action={
                     !searchQuery ? (
@@ -627,7 +632,7 @@ export default function ConnectionsPage() {
                         size="sm"
                         startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Find Members
+                        {t('find_members')}
                       </Button>
                     ) : undefined
                   }
@@ -652,7 +657,7 @@ export default function ConnectionsPage() {
                         onPress={() => void fetchConnections('accepted', cursors.accepted)}
                         isLoading={loadingMore}
                       >
-                        Load more
+                        {t('load_more')}
                       </Button>
                     </div>
                   )}
@@ -666,7 +671,7 @@ export default function ConnectionsPage() {
             title={
               <div className="flex items-center gap-2">
                 <UserPlus className="w-4 h-4" aria-hidden="true" />
-                <span>Pending</span>
+                <span>{t('tab_pending')}</span>
                 {pendingReceivedCount > 0 && (
                   <Chip size="sm" color="warning" variant="solid" className="text-xs min-w-[20px]">
                     {pendingReceivedCount}
@@ -683,11 +688,11 @@ export default function ConnectionsPage() {
               ) : filterBySearch(pendingReceived).length === 0 ? (
                 <EmptyState
                   icon={<UserPlus className="w-7 h-7" />}
-                  title="No pending requests"
+                  title={t('empty_no_pending_title')}
                   description={
                     searchQuery
-                      ? 'No pending requests match your search.'
-                      : 'When someone sends you a connection request, it will appear here.'
+                      ? t('empty_no_pending_search')
+                      : t('empty_no_pending_description')
                   }
                 />
               ) : (
@@ -711,7 +716,7 @@ export default function ConnectionsPage() {
                         onPress={() => void fetchConnections('pending_received', cursors.pending_received)}
                         isLoading={loadingMore}
                       >
-                        Load more
+                        {t('load_more')}
                       </Button>
                     </div>
                   )}
@@ -725,7 +730,7 @@ export default function ConnectionsPage() {
             title={
               <div className="flex items-center gap-2">
                 <Send className="w-4 h-4" aria-hidden="true" />
-                <span>Sent</span>
+                <span>{t('tab_sent')}</span>
                 {pendingSentCount > 0 && (
                   <span className="text-xs bg-[var(--color-surface-elevated)] rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
                     {pendingSentCount}
@@ -742,11 +747,11 @@ export default function ConnectionsPage() {
               ) : filterBySearch(pendingSent).length === 0 ? (
                 <EmptyState
                   icon={<Send className="w-7 h-7" />}
-                  title="No sent requests"
+                  title={t('empty_no_sent_title')}
                   description={
                     searchQuery
-                      ? 'No sent requests match your search.'
-                      : 'Connection requests you send will appear here until they are accepted or declined.'
+                      ? t('empty_no_sent_search')
+                      : t('empty_no_sent_description')
                   }
                   action={
                     !searchQuery ? (
@@ -758,7 +763,7 @@ export default function ConnectionsPage() {
                         variant="flat"
                         startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
                       >
-                        Find Members
+                        {t('find_members')}
                       </Button>
                     ) : undefined
                   }
@@ -783,7 +788,7 @@ export default function ConnectionsPage() {
                         onPress={() => void fetchConnections('pending_sent', cursors.pending_sent)}
                         isLoading={loadingMore}
                       >
-                        Load more
+                        {t('load_more')}
                       </Button>
                     </div>
                   )}

@@ -594,42 +594,42 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="jobs/create" element={
-            <FeatureGate feature="job_vacancies" redirect="/">
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <CreateJobPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="jobs/:id/edit" element={
-            <FeatureGate feature="job_vacancies" redirect="/">
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <CreateJobPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="jobs/:id" element={
-            <FeatureGate feature="job_vacancies" redirect="/">
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <JobDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="jobs/:id/analytics" element={
-            <FeatureGate feature="job_vacancies" redirect="/">
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <JobAnalyticsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="jobs/alerts" element={
-            <FeatureGate feature="job_vacancies" redirect="/">
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <JobAlertsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="jobs/my-applications" element={
-            <FeatureGate feature="job_vacancies" redirect="/">
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <MyApplicationsPage />
               </FeatureErrorBoundary>
@@ -645,49 +645,49 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="ideation/create" element={
-            <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <CreateChallengePage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="ideation/:id/edit" element={
-            <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <CreateChallengePage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="ideation/:id" element={
-            <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <ChallengeDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="ideation/:challengeId/ideas/:id" element={
-            <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <IdeaDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="ideation/campaigns" element={
-            <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <CampaignsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="ideation/campaigns/:id" element={
-            <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <CampaignDetailPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="ideation/outcomes" element={
-            <FeatureGate feature="ideation_challenges" redirect="/">
+            <FeatureGate feature="ideation_challenges" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Ideation Challenges">
                 <OutcomesDashboardPage />
               </FeatureErrorBoundary>

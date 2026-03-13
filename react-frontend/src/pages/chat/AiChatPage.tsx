@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -62,19 +63,21 @@ interface AiChatResponse {
 // Suggested starter questions
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STARTER_QUESTIONS = [
-  'What time credits do I have and how can I use them?',
-  'What skills are community members currently offering?',
-  'How does timebanking work?',
-  'What upcoming events are happening?',
-  'How do I create a listing to offer my skills?',
-];
+const STARTER_QUESTION_KEYS = [
+  'starter_q1',
+  'starter_q2',
+  'starter_q3',
+  'starter_q4',
+  'starter_q5',
+] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Typing indicator
 // ─────────────────────────────────────────────────────────────────────────────
 
 function TypingIndicator() {
+  const { t } = useTranslation('chat');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -91,7 +94,7 @@ function TypingIndicator() {
         }}
       />
       <div className="bg-[var(--color-surface)] border border-[var(--border-default)] rounded-2xl rounded-bl-sm px-4 py-3">
-        <div className="flex items-center gap-1" aria-label="AI is typing">
+        <div className="flex items-center gap-1" aria-label={t('typing_aria')}>
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
@@ -117,6 +120,7 @@ interface MessageBubbleProps {
 }
 
 function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
+  const { t } = useTranslation('chat');
   const isUser = message.role === 'user';
   const time = message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -161,7 +165,7 @@ function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
           {message.isError && (
             <div className="flex items-center gap-1.5 mb-1 font-medium">
               <AlertCircle className="w-3.5 h-3.5" aria-hidden="true" />
-              <span className="text-xs">Error</span>
+              <span className="text-xs">{t('error_label')}</span>
             </div>
           )}
           {message.content}
@@ -177,14 +181,16 @@ function MessageBubble({ message, userName, userAvatar }: MessageBubbleProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FeatureNotAvailable() {
+  const { t } = useTranslation('chat');
+
   return (
     <div className="flex flex-col items-center justify-center h-full px-6 py-16 text-center">
       <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4">
         <Bot className="w-8 h-8 text-indigo-500" aria-hidden="true" />
       </div>
-      <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">AI Assistant Not Available</h2>
+      <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_unavailable_title')}</h2>
       <p className="text-[var(--color-text-muted)] max-w-sm">
-        The AI Assistant feature is not enabled for this community. Contact your timebank administrator to learn more.
+        {t('feature_unavailable_description')}
       </p>
     </div>
   );
@@ -199,6 +205,8 @@ interface EmptyStateProps {
 }
 
 function EmptyState({ onQuestionClick }: EmptyStateProps) {
+  const { t } = useTranslation('chat');
+
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-8">
       <motion.div
@@ -216,9 +224,9 @@ function EmptyState({ onQuestionClick }: EmptyStateProps) {
         transition={{ delay: 0.1, duration: 0.3 }}
         className="text-center mb-8"
       >
-        <h2 className="text-2xl font-bold text-[var(--color-text)] mb-2">AI Assistant</h2>
+        <h2 className="text-2xl font-bold text-[var(--color-text)] mb-2">{t('empty_title')}</h2>
         <p className="text-[var(--color-text-muted)] max-w-sm">
-          Ask me anything about timebanking, your account, or this community.
+          {t('empty_description')}
         </p>
       </motion.div>
 
@@ -229,25 +237,28 @@ function EmptyState({ onQuestionClick }: EmptyStateProps) {
         className="w-full max-w-md"
       >
         <p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3 text-center">
-          Try asking...
+          {t('try_asking')}
         </p>
         <div className="flex flex-col gap-2">
-          {STARTER_QUESTIONS.map((q, i) => (
-            <motion.div
-              key={q}
-              initial={{ x: -10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.25 + i * 0.06, duration: 0.25 }}
-            >
+          {STARTER_QUESTION_KEYS.map((key, i) => {
+            const question = t(key);
+            return (
+              <motion.div
+                key={key}
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.25 + i * 0.06, duration: 0.25 }}
+              >
               <Button
                 variant="flat"
-                onPress={() => onQuestionClick(q)}
+                onPress={() => onQuestionClick(question)}
                 className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--border-default)] text-sm text-[var(--color-text)] hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all justify-start h-auto"
               >
-                {q}
+                {question}
               </Button>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </motion.div>
     </div>
@@ -259,7 +270,9 @@ function EmptyState({ onQuestionClick }: EmptyStateProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function AiChatPage() {
-  usePageTitle('AI Assistant');
+  const { t } = useTranslation('chat');
+
+  usePageTitle(t('page_title'));
 
   const { user } = useAuth();
   const { hasFeature } = useTenant();
@@ -339,14 +352,14 @@ export default function AiChatPage() {
           setLimits(data.limits);
         }
       } else {
-        const errorText = data.error ?? 'Something went wrong. Please try again.';
+        const errorText = data.error ?? t('error_generic');
         const isLimit = response.status === 429;
 
         const errorMsg: ChatMessage = {
           id: `error-${Date.now()}`,
           role: 'assistant',
           content: isLimit
-            ? 'You have reached your usage limit for now. Please try again later.'
+            ? t('error_rate_limit')
             : errorText,
           timestamp: new Date(),
           isError: true,
@@ -354,23 +367,23 @@ export default function AiChatPage() {
         setMessages(prev => [...prev, errorMsg]);
 
         if (isLimit) {
-          warning('Usage limit reached');
+          warning(t('toast_rate_limit'));
         }
       }
     } catch {
       const errorMsg: ChatMessage = {
         id: `error-${Date.now()}`,
         role: 'assistant',
-        content: 'Failed to connect to the AI service. Please check your connection and try again.',
+        content: t('error_connection'),
         timestamp: new Date(),
         isError: true,
       };
       setMessages(prev => [...prev, errorMsg]);
-      toastError('Failed to reach AI service');
+      toastError(t('toast_connection_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, conversationId, warning, toastError]);
+  }, [isLoading, conversationId, warning, toastError, t]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -402,9 +415,8 @@ export default function AiChatPage() {
 
   return (
     <div
-      className="flex flex-col"
-      style={{ height: 'calc(100dvh - 4rem)' }}
-      aria-label="AI Chat"
+      className="flex flex-col h-[calc(100dvh-4rem)]"
+      aria-label={t('aria_chat')}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--color-surface)] flex-shrink-0">
@@ -413,8 +425,8 @@ export default function AiChatPage() {
             <Bot className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
           <div>
-            <h1 className="font-semibold text-[var(--color-text)]">AI Assistant</h1>
-            <p className="text-xs text-[var(--color-text-muted)]">Powered by AI</p>
+            <h1 className="font-semibold text-[var(--color-text)]">{t('header_title')}</h1>
+            <p className="text-xs text-[var(--color-text-muted)]">{t('header_subtitle')}</p>
           </div>
         </div>
 
@@ -427,7 +439,7 @@ export default function AiChatPage() {
               startContent={<Zap className="w-3 h-3" aria-hidden="true" />}
               className="text-xs hidden sm:flex"
             >
-              {limits.daily_remaining} left today
+              {t('limits_left_today', { count: limits.daily_remaining })}
             </Chip>
           )}
           {hasMessages && (
@@ -436,7 +448,7 @@ export default function AiChatPage() {
               variant="light"
               isIconOnly
               onPress={handleNewConversation}
-              aria-label="Start new conversation"
+              aria-label={t('new_conversation_aria')}
               className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
             >
               <RefreshCw className="w-4 h-4" aria-hidden="true" />
@@ -490,8 +502,8 @@ export default function AiChatPage() {
               <div className="flex items-end gap-2 p-2">
                 <Textarea
                   ref={textareaRef}
-                  aria-label="Message"
-                  placeholder="Ask me anything... (Enter to send, Shift+Enter for new line)"
+                  aria-label={t('input_aria')}
+                  placeholder={t('input_placeholder')}
                   value={input}
                   onValueChange={setInput}
                   onKeyDown={handleKeyDown}
@@ -511,7 +523,7 @@ export default function AiChatPage() {
                   size="sm"
                   onPress={() => void sendMessage(input)}
                   isDisabled={!input.trim() || isLoading}
-                  aria-label="Send message"
+                  aria-label={t('send_aria')}
                 >
                   <Send className="w-4 h-4" aria-hidden="true" />
                 </Button>
@@ -519,7 +531,7 @@ export default function AiChatPage() {
             </CardBody>
           </Card>
           <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">
-            AI responses may not always be accurate. Verify important information.
+            {t('disclaimer')}
           </p>
         </div>
       </div>

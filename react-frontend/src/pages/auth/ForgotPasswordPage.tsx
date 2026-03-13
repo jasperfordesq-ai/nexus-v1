@@ -115,7 +115,7 @@ export function ForgotPasswordPage() {
             <Input
               type="email"
               label={t('forgot_password.email_address_label')}
-              placeholder="you@example.com"
+              placeholder={t('forgot_password.email_placeholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
