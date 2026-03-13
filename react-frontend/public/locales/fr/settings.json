@@ -95,14 +95,22 @@
     "location_placeholder": "City, Country"
   },
   "delete_modal": {
-    "aria_label": "Tapez DELETE pour confirmer"
+    "aria_label": "Tapez DELETE pour confirmer",
+    "title": "Delete Account",
+    "warning": "Warning: This action cannot be undone",
+    "warning_desc": "All your data, including listings, messages, and transaction history will be permanently deleted.",
+    "type_confirm": "Type DELETE to confirm:",
+    "submit": "Delete My Account"
   },
   "twofa_qr_alt": "Code QR 2FA",
   "password": {
     "hide_current": "Masquer le mot de passe actuel",
     "show_current": "Afficher le mot de passe actuel",
     "hide_new": "Masquer le nouveau mot de passe",
-    "show_new": "Afficher le nouveau mot de passe"
+    "show_new": "Afficher le nouveau mot de passe",
+    "current": "Current Password",
+    "new": "New Password",
+    "confirm": "Confirm New Password"
   },
   "toasts": {
     "profile_updated": "Profil mis a jour",
@@ -180,5 +188,157 @@
     "skill_removed": "Compétence supprimée",
     "skill_add_failed": "Échec de l'ajout de la compétence",
     "skill_remove_failed": "Échec de la suppression de la compétence"
+  },
+  "notification_prefs": {
+    "new_messages": "New Messages",
+    "connection_requests": "Connection Requests",
+    "listing_activity": "Listing Activity",
+    "credit_transactions": "Credit Transactions",
+    "new_reviews": "New Reviews",
+    "gamification_digest": "Gamification Digest",
+    "achievement_milestones": "Achievement Milestones",
+    "weekly_digest": "Weekly Digest",
+    "payment_notifications": "Payment Notifications",
+    "transfer_notifications": "Transfer Notifications",
+    "membership_updates": "Membership Updates",
+    "admin_notifications": "Admin Notifications",
+    "hot_match_alerts": "Hot Match Alerts",
+    "mutual_match_alerts": "Mutual Match Alerts",
+    "enable_push": "Enable Push Notifications",
+    "marketing_emails": "Marketing Emails"
+  },
+  "privacy_prefs": {
+    "profile_visibility": "Who can see your profile",
+    "search_indexing": "Search Engine Indexing",
+    "allow_contact": "Allow Contact"
+  },
+  "insurance": {
+    "type_label": "Insurance Type",
+    "title": "Insurance Certificates",
+    "description": "Upload your insurance certificates for verification. Accepted formats: PDF, JPG, PNG (max 10MB).",
+    "loading": "Loading certificates...",
+    "unknown_provider": "Unknown provider",
+    "expires": "Expires {{date}}",
+    "public_liability": "Public Liability",
+    "professional_indemnity": "Professional Indemnity",
+    "employers_liability": "Employer's Liability",
+    "product_liability": "Product Liability",
+    "personal_accident": "Personal Accident",
+    "other": "Other",
+    "uploading": "Uploading...",
+    "upload_certificate": "Upload Certificate"
+  },
+  "tabs": {
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "security": "Security",
+    "skills": "Skills",
+    "availability": "Availability",
+    "linked": "Linked"
+  },
+  "header": {
+    "title": "Settings",
+    "subtitle": "Manage your account preferences"
+  },
+  "save_changes": "Save Changes",
+  "save_preferences": "Save Preferences",
+  "save_privacy": "Save Privacy Settings",
+  "cancel": "Cancel",
+  "try_again": "Try Again",
+  "notification_sections": {
+    "title": "Notification Preferences",
+    "messages_communication": "Messages & Communication",
+    "activity_listings": "Activity & Listings",
+    "community_achievements": "Community & Achievements",
+    "organisation_notifications": "Organisation Notifications",
+    "match_digest": "Match Digest Emails",
+    "push_notifications": "Push Notifications",
+    "marketing_communications": "Marketing & Communications"
+  },
+  "notification_descriptions": {
+    "new_messages": "Get notified when you receive a new message",
+    "connection_requests": "Connection requests and updates",
+    "listing_activity": "Updates about your listings (new responses, etc.)",
+    "credit_transactions": "Notifications for credit transactions",
+    "new_reviews": "New reviews received on your profile or listings",
+    "gamification_digest": "Periodic summary of your gamification activity and progress",
+    "achievement_milestones": "Badge unlocks, level ups, and achievement notifications",
+    "weekly_digest": "A weekly summary of community activity",
+    "payment_notifications": "Notifications for organisation payment activity",
+    "transfer_notifications": "Notifications for credit transfers",
+    "membership_updates": "Member joins, leaves, and membership changes",
+    "admin_notifications": "Administrative alerts and system notifications",
+    "hot_match_alerts": "Get notified about high-compatibility matches",
+    "mutual_match_alerts": "Get notified when someone you matched with also matches you",
+    "enable_push": "Receive real-time notifications on your device",
+    "marketing_emails": "Receive newsletters, promotions, and community updates"
+  },
+  "match_digest": {
+    "frequency": "Digest Frequency",
+    "frequency_description": "How often you receive match digest emails",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "fortnightly": "Fortnightly",
+    "never": "Never"
+  },
+  "privacy_sections": {
+    "title": "Privacy Settings",
+    "profile_visibility": "Profile Visibility",
+    "search_discovery": "Search & Discovery",
+    "contact_preferences": "Contact Preferences"
+  },
+  "privacy_descriptions": {
+    "search_indexing": "Allow search engines to index your profile",
+    "allow_contact": "Allow other members to contact me"
+  },
+  "visibility_options": {
+    "public": "Public - Anyone can view",
+    "members": "Members Only - Community members",
+    "connections": "Connections Only - Your connections"
+  },
+  "federation": {
+    "title": "Federation Settings",
+    "description": "Manage your visibility and preferences across partner communities"
+  },
+  "gdpr": {
+    "title": "Data & Privacy Rights",
+    "description": "Under the General Data Protection Regulation (GDPR), you have the right to access, export, and request deletion of your personal data. These requests are processed within 30 days.",
+    "info": "All six GDPR data subject rights are available above. Contact our Data Protection Officer for any additional concerns.",
+    "download_title": "Download My Data",
+    "download_desc": "Get a copy of all your personal data",
+    "portability_title": "Data Portability Request",
+    "portability_desc": "Export data in a machine-readable format",
+    "deletion_title": "Request Data Deletion",
+    "deletion_desc": "Request permanent deletion of your data",
+    "rectification_title": "Data Rectification",
+    "rectification_desc": "Request correction of inaccurate personal data",
+    "restriction_title": "Restriction of Processing",
+    "restriction_desc": "Request restriction of your data processing",
+    "objection_title": "Right to Object",
+    "objection_desc": "Object to processing of your personal data",
+    "deletion_irreversible": "This request is irreversible",
+    "deletion_modal_desc": "Once your data is deleted, it cannot be recovered. Your account and all associated data will be permanently removed.",
+    "download_modal_desc": "We will prepare a downloadable archive of all your personal data, including your profile, listings, messages, and transaction history. You will receive an email with a download link within 30 days.",
+    "portability_modal_desc": "We will export your data in a structured, commonly used, and machine-readable format (JSON/CSV). This allows you to transfer your data to another service. You will receive an email within 30 days.",
+    "rectification_modal_desc": "Request correction of any inaccurate or incomplete personal data we hold about you. We will review your request and update the records within 30 days.",
+    "restriction_modal_desc": "Request that we restrict the processing of your personal data. While restricted, we will store but not actively process your data. We will respond within 30 days.",
+    "objection_modal_desc": "Object to the processing of your personal data for specific purposes, such as direct marketing or profiling. We will review your objection within 30 days.",
+    "confirmation_email": "A confirmation email will be sent to your registered email address.",
+    "confirm_deletion": "Confirm Deletion Request",
+    "submit_request": "Submit Request"
+  },
+  "skills": {
+    "title": "Your Skills",
+    "description": "Add skills to your profile so other members can find you. Community members can endorse your skills."
+  },
+  "password_modal": {
+    "title": "Change Password",
+    "submit": "Change Password"
+  },
+  "logout_modal": {
+    "title": "Log Out",
+    "confirm_message": "Are you sure you want to log out of your account?",
+    "submit": "Log Out"
   }
 }
