@@ -123,7 +123,7 @@ export function ListingDetailPage() {
       }
     } catch (err) {
       logError('Failed to load listing', err);
-      setError('Listing not found or has been removed');
+      setError(t('not_found_error'));
     } finally {
       setIsLoading(false);
     }
@@ -178,12 +178,12 @@ export function ListingDetailPage() {
     try {
       const response = await api.post<{ renewed: boolean; new_expires_at: string }>(`/v2/listings/${listing.id}/renew`, {});
       if (response.success) {
-        toast.success('Listing renewed successfully');
+        toast.success(t('renew_success'));
         loadListing(); // Reload to get updated data
       }
     } catch (err) {
       logError('Failed to renew listing', err);
-      toast.error('Failed to renew listing');
+      toast.error(t('renew_error'));
     } finally {
       setIsRenewing(false);
     }
@@ -270,7 +270,7 @@ export function ListingDetailPage() {
                 startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => setShowAnalytics(!showAnalytics)}
               >
-                Analytics
+                {t('detail_analytics')}
               </Button>
               {(listing.status === 'expired' || listing.expires_at) && (
                 <Button
@@ -281,7 +281,7 @@ export function ListingDetailPage() {
                   onPress={handleRenew}
                   isLoading={isRenewing}
                 >
-                  {listing.status === 'expired' ? 'Renew Listing' : 'Extend'}
+                  {listing.status === 'expired' ? t('detail_renew') : t('detail_extend')}
                 </Button>
               )}
               <Button
@@ -323,7 +323,7 @@ export function ListingDetailPage() {
               <div className="text-xs text-theme-subtle">{t('detail_duration')}</div>
               <div className="text-theme-primary">
                 {(listing.hours_estimate ?? listing.estimated_hours)
-                  ? `${listing.hours_estimate ?? listing.estimated_hours} hours`
+                  ? t('detail_hours', { count: listing.hours_estimate ?? listing.estimated_hours })
                   : t('detail_flexible')}
               </div>
             </div>
@@ -551,7 +551,7 @@ export function ListingDetailPage() {
         <GlassCard className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <Tag className="w-4 h-4 text-theme-muted" aria-hidden="true" />
-            <span className="text-sm font-medium text-theme-muted">Skills</span>
+            <span className="text-sm font-medium text-theme-muted">{t('detail_skills')}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {listing.skill_tags.map((tag) => (
@@ -578,12 +578,12 @@ export function ListingDetailPage() {
             <Calendar className="w-4 h-4 text-theme-muted" aria-hidden="true" />
             <span className="text-theme-muted">
               {listing.status === 'expired'
-                ? `Expired on ${new Date(listing.expires_at).toLocaleDateString()}`
-                : `Expires ${new Date(listing.expires_at).toLocaleDateString()}`}
+                ? t('detail_expired_on', { date: new Date(listing.expires_at).toLocaleDateString() })
+                : t('detail_expires_on', { date: new Date(listing.expires_at).toLocaleDateString() })}
             </span>
             {listing.renewal_count !== undefined && listing.renewal_count > 0 && (
               <span className="text-xs text-theme-subtle">
-                (renewed {listing.renewal_count} {listing.renewal_count === 1 ? 'time' : 'times'})
+                ({t('detail_renewed_count', { count: listing.renewal_count })})
               </span>
             )}
           </div>

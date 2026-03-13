@@ -259,7 +259,6 @@ class SocialApiController extends BaseApiController
         if (!$success) {
             $errors = \Nexus\Services\PollService::getErrors();
             $this->respondWithErrors($errors, 400);
-            return;
         }
 
         $poll = \Nexus\Services\PollService::getById($id, $userId);
@@ -481,7 +480,7 @@ class SocialApiController extends BaseApiController
 
                 // Decrement likes_count on feed_posts if applicable
                 if ($targetType === 'post') {
-                    Database::query("UPDATE feed_posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = ?", [$targetId]);
+                    Database::query("UPDATE feed_posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
                 }
 
                 $action = 'unliked';
@@ -494,7 +493,7 @@ class SocialApiController extends BaseApiController
 
                 // Increment likes_count on feed_posts if applicable
                 if ($targetType === 'post') {
-                    Database::query("UPDATE feed_posts SET likes_count = likes_count + 1 WHERE id = ?", [$targetId]);
+                    Database::query("UPDATE feed_posts SET likes_count = likes_count + 1 WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
                 }
 
                 $action = 'liked';
@@ -816,6 +815,7 @@ class SocialApiController extends BaseApiController
         $userId = $this->getUserId();
         $commentId = (int)$this->getInput('comment_id', 0);
         $content = trim($this->getInput('content', ''));
+        $tenantId = TenantContext::getId();
 
         if ($commentId <= 0 || empty($content)) {
             $this->jsonResponse(['error' => 'Invalid edit data'], 400);
@@ -827,11 +827,11 @@ class SocialApiController extends BaseApiController
                 $this->jsonResponse($result);
             } else {
                 // Fallback - verify ownership
-                $comment = Database::query("SELECT user_id FROM comments WHERE id = ?", [$commentId])->fetch();
+                $comment = Database::query("SELECT user_id FROM comments WHERE id = ? AND tenant_id = ?", [$commentId, $tenantId])->fetch();
                 if (!$comment || $comment['user_id'] != $userId) {
                     $this->jsonResponse(['error' => 'Unauthorized'], 403);
                 }
-                Database::query("UPDATE comments SET content = ?, updated_at = NOW() WHERE id = ?", [$content, $commentId]);
+                Database::query("UPDATE comments SET content = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$content, $commentId, $tenantId]);
                 $this->jsonResponse(['success' => true, 'status' => 'success', 'is_edited' => true]);
             }
         } catch (\Exception $e) {
@@ -1174,10 +1174,10 @@ class SocialApiController extends BaseApiController
                 Database::query("DELETE FROM comments WHERE target_type = 'volunteering' AND target_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete applications for this opportunity
-                Database::query("DELETE FROM vol_applications WHERE opportunity_id = ?", [$targetId]);
+                Database::query("DELETE FROM vol_applications WHERE opportunity_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete shifts for this opportunity
-                Database::query("DELETE FROM vol_shifts WHERE opportunity_id = ?", [$targetId]);
+                Database::query("DELETE FROM vol_shifts WHERE opportunity_id = ? AND tenant_id = ?", [$targetId, $tenantId]);
 
                 // Delete the opportunity
                 Database::query("DELETE FROM vol_opportunities WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
@@ -1576,7 +1576,8 @@ class SocialApiController extends BaseApiController
 
         } catch (\Exception $e) {
             error_log("Create Post Error: " . $e->getMessage());
-            $this->jsonResponse(['error' => 'Failed to create post: ' . $e->getMessage()], 500);
+            error_log('Create Post Exception: ' . $e->getMessage());
+            $this->jsonResponse(['error' => 'Failed to create post'], 500);
         }
     }
 

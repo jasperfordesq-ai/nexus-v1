@@ -98,9 +98,9 @@ export function ListingsPage() {
     } catch (error) {
       logError('Failed to load listings', error);
       if (reset && listings.length === 0) {
-        setLoadError('Failed to load listings. Please try again.');
+        setLoadError(t('load_error'));
       } else {
-        toast.error('Failed to load more listings');
+        toast.error(t('load_more_error'));
       }
     } finally {
       setIsLoading(false);
@@ -192,8 +192,8 @@ export function ListingsPage() {
     <>
       <PageMeta
         title={t('title')}
-        description="Browse services and requests from the community. Find offers and requests for time-banked services."
-        keywords="listings, services, offers, requests, time banking"
+        description={t("page_meta_description")}
+        keywords={t("page_meta_keywords")}
       />
       <div className="space-y-6">
         {/* Header */}
@@ -450,7 +450,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             {imageUrl ? (
               <img
                 src={imageUrl}
-                alt=""
+                alt={listing.title || 'Listing image'}
                 className="w-16 h-16 rounded-lg object-cover shrink-0"
                 loading="lazy"
               />
@@ -522,7 +522,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
         {imageUrl && (
           <img
             src={imageUrl}
-            alt=""
+            alt={listing.title || 'Listing image'}
             className="w-full h-36 object-cover"
             loading="lazy"
           />

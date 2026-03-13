@@ -84,6 +84,7 @@ export function EventsPage() {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Debounce search query
   useEffect(() => {
@@ -102,6 +103,15 @@ export function EventsPage() {
   }, [searchQuery]);
 
   const loadEvents = useCallback(async (append = false) => {
+    // Abort any in-flight request to prevent race conditions
+    if (!append && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    if (!append) {
+      abortControllerRef.current = controller;
+    }
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -125,6 +135,7 @@ export function EventsPage() {
       }
 
       const response = await api.get<Event[]>(`/v2/events?${params}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         if (append) {
           setEvents((prev) => [...prev, ...response.data!]);
@@ -134,13 +145,14 @@ export function EventsPage() {
         const cursor = response.meta?.cursor ?? null;
         nextCursorRef.current = cursor;
         setNextCursor(cursor);
-        setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
+        setHasMore(response.meta?.has_more ?? (response.data?.length ?? 0) >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
           setError(t('unable_to_load'));
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load events', err);
       if (!append) {
         setError(t('unable_to_load'));
@@ -158,6 +170,11 @@ export function EventsPage() {
     setNextCursor(null);
     setHasMore(true);
     loadEvents();
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [debouncedQuery, filter, selectedCategory, loadEvents]);
 
   // Update URL params

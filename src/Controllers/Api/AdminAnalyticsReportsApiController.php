@@ -108,6 +108,7 @@ class AdminAnalyticsReportsApiController extends BaseApiController
             $this->respondWithData(['message' => 'Social value configuration updated', 'config' => $config]);
         } else {
             $this->respondWithError('SERVER_ERROR', 'Failed to save configuration', null, 500);
+            return;
         }
     }
 
@@ -315,7 +316,6 @@ class AdminAnalyticsReportsApiController extends BaseApiController
                 return;
             }
             ReportExportService::sendPdfDownload($result['pdf'], $result['filename']);
-            return;
         }
 
         $result = ReportExportService::export($type, $tenantId, $filters);
@@ -401,6 +401,7 @@ class AdminAnalyticsReportsApiController extends BaseApiController
             $this->respondWithData($result);
         } else {
             $this->respondWithError('REVIEW_FAILED', $result['message'], null, 400);
+            return;
         }
     }
 
@@ -452,6 +453,7 @@ class AdminAnalyticsReportsApiController extends BaseApiController
             ]);
         } else {
             $this->respondWithError('SERVER_ERROR', 'Failed to update moderation settings', null, 500);
+            return;
         }
     }
 

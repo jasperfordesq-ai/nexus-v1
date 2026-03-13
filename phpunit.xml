@@ -28,8 +28,8 @@
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
-    <!-- DB_DATABASE: defaults to nexus; tests use transactions for isolation -->
-    <env name="DB_DATABASE" value="nexus" force="false"/>
+    <!-- DB_DATABASE: force=true ensures tests never accidentally hit production DB -->
+    <env name="DB_DATABASE" value="nexus_test" force="true"/>
     <env name="CACHE_DRIVER" value="array"/>
     <env name="SESSION_DRIVER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>

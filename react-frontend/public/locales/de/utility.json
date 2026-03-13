@@ -101,7 +101,8 @@
     "allowed_file_types": "PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, SVG (max. 10MB)",
     "uploading_progress": "Wird hochgeladen... {{progress}}%",
     "cancel": "Abbrechen",
-    "upload": "Hochladen"
+    "upload": "Hochladen",
+    "save_order_failed": "Neue Reihenfolge konnte nicht gespeichert werden."
   },
   "not_found": {
     "page_title": "Seite nicht gefunden",
@@ -120,7 +121,7 @@
   },
   "newsletter": {
     "page_title": "Newsletter abbestellen",
-    "processing": "Verarbeitung\u2026",
+    "processing": "Verarbeitung…",
     "removing_from_list": "Sie werden von der Mailingliste entfernt.",
     "unsubscribed": "Sie sind abgemeldet",
     "unsubscribed_description": "Sie wurden aus unserem Newsletter entfernt. Sie erhalten weiterhin wichtige Kontobenachrichtigungen.",

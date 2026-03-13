@@ -77,6 +77,7 @@ class AdminImpactReportApiController extends BaseApiController
                 'hourly_value',
                 400
             );
+            return;
         }
 
         if ($socialMultiplier <= 0 || $socialMultiplier > 100) {
@@ -86,6 +87,7 @@ class AdminImpactReportApiController extends BaseApiController
                 'social_multiplier',
                 400
             );
+            return;
         }
 
         $tenantId = TenantContext::getId();

@@ -40,6 +40,7 @@ export function BackToTop() {
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.2 }}
           className="fixed bottom-20 md:bottom-8 right-4 z-40"
+          style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           <Button
             isIconOnly

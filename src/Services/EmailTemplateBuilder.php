@@ -505,7 +505,7 @@ HTML;
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
             <tr>
                 <td style="padding: 0 40px 20px; text-align: ' . $align . ';" class="mobile-padding">
-                    <p style="margin: 0; font-size: 16px; line-height: 1.8; color: ' . $this->textColor . ';" class="text-dark">' . $section['content'] . '</p>
+                    <p style="margin: 0; font-size: 16px; line-height: 1.8; color: ' . $this->textColor . ';" class="text-dark">' . htmlspecialchars($section['content'], ENT_QUOTES, 'UTF-8') . '</p>
                 </td>
             </tr>
         </table>';

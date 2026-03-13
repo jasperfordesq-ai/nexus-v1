@@ -58,6 +58,7 @@ class MemberVerificationBadgeApiController extends BaseApiController
 
         if (empty($badgeType)) {
             $this->respondWithError('VALIDATION_ERROR', 'badge_type is required', 'badge_type', 400);
+            return;
         }
 
         $badgeId = MemberVerificationBadgeService::grantBadge($id, $badgeType, $adminId, $note, $expiresAt);

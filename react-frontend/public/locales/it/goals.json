@@ -1,0 +1,9 @@
+{
+  "checkin_recorded": "Check-in registrato!",
+  "checkin_failed": "Impossibile registrare il check-in.",
+  "reminder_set_failed": "Impossibile impostare il promemoria.",
+  "reminder_removed": "Promemoria rimosso.",
+  "reminder_remove_failed": "Impossibile rimuovere il promemoria.",
+  "template_created": "Obiettivo creato dal modello!",
+  "template_create_failed": "Impossibile creare l'obiettivo dal modello."
+}

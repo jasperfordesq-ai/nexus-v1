@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class Poll
 {
@@ -39,7 +40,8 @@ class Poll
 
     public static function find($id)
     {
-        return Database::query("SELECT * FROM polls WHERE id = ?", [$id])->fetch();
+        $tenantId = TenantContext::getId();
+        return Database::query("SELECT * FROM polls WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
     }
 
     public static function getOptions($id)
@@ -70,13 +72,14 @@ class Poll
 
     public static function update($id, $question, $description, $endDate)
     {
-        $sql = "UPDATE polls SET question = ?, description = ?, end_date = ? WHERE id = ?";
-        Database::query($sql, [$question, $description, $endDate, $id]);
+        $tenantId = TenantContext::getId();
+        $sql = "UPDATE polls SET question = ?, description = ?, end_date = ? WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$question, $description, $endDate, $id, $tenantId]);
     }
 
     public static function delete($id)
     {
-        $tenantId = \Nexus\Core\TenantContext::getId();
+        $tenantId = TenantContext::getId();
         Database::query("DELETE FROM polls WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
     }
 }

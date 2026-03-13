@@ -53,7 +53,14 @@
     "exported": "Exportiert",
     "exported_desc": "Transaktionen als CSV exportiert",
     "transfer_success": "Übertragung erfolgreich",
-    "transfer_desc": "{{amount}} Stunden an {{recipient}} gesendet"
+    "transfer_desc": "{{amount}} Stunden an {{recipient}} gesendet",
+    "rating_required": "Bewertung erforderlich",
+    "rating_required_desc": "Bitte wählen Sie eine Sternebewertung",
+    "rating_submitted": "Bewertung eingereicht",
+    "rating_submitted_desc": "Vielen Dank für Ihr Feedback!",
+    "submit_failed": "Einreichung fehlgeschlagen",
+    "try_again": "Bitte versuchen Sie es erneut",
+    "submit_error_desc": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
   },
   "error": {
     "load_balance": "Kontostand konnte nicht geladen werden",

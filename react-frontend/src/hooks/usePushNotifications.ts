@@ -79,9 +79,13 @@ export function usePushNotifications(userId: number | null) {
   // Register device token with backend
   const registerToken = useCallback(async (token: string) => {
     try {
+      const platform = (() => {
+        try { return window.Capacitor?.getPlatform?.() || 'android'; }
+        catch { return 'android'; }
+      })();
       await api.post('/push/register-device', {
         token,
-        platform: 'android',
+        platform,
       });
       logDebug('[Push] Device token registered with server');
     } catch (err) {

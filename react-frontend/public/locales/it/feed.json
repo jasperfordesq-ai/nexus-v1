@@ -41,7 +41,10 @@
     "report_failed": "Impossibile segnalare il post",
     "deleted": "Post eliminato",
     "delete_failed": "Impossibile eliminare il post",
-    "vote_failed": "Impossibile inviare il voto"
+    "vote_failed": "Impossibile inviare il voto",
+    "post_shared": "Post condiviso nel tuo feed",
+    "share_removed": "Condivisione rimossa",
+    "share_failed": "Impossibile condividere il post"
   },
   "realtime": {
     "new_post_singular": "1 nuovo post",
@@ -220,5 +223,18 @@
     "no_match": "Nessun hashtag corrispondente a \"{{query}}\"",
     "no_trending": "Nessun hashtag di tendenza nella tua comunità ancora.",
     "post_count": "{{count}} post"
+  },
+  "share": {
+    "tooltip_remove": "Rimuovi condivisione",
+    "tooltip_share": "Condividi nel tuo feed",
+    "button_label": "Condividi",
+    "button_label_count": "Condividi ({{count}})",
+    "shared_by": "<0>{{name}}</0> ha condiviso questo"
+  },
+  "trending": {
+    "title": "Di tendenza",
+    "view_all": "Vedi tutti gli hashtag",
+    "post_count": "{{count}} post",
+    "post_count_plural": "{{count}} post"
   }
 }

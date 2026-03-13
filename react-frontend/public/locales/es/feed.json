@@ -41,7 +41,10 @@
     "report_failed": "Error al reportar la publicación",
     "deleted": "Publicación eliminada",
     "delete_failed": "Error al eliminar la publicación",
-    "vote_failed": "Error al enviar el voto"
+    "vote_failed": "Error al enviar el voto",
+    "post_shared": "Publicación compartida en tu feed",
+    "share_removed": "Compartido eliminado",
+    "share_failed": "Error al compartir la publicación"
   },
   "realtime": {
     "new_post_singular": "1 nueva publicación",
@@ -220,5 +223,18 @@
     "no_match": "No hay hashtags que coincidan con \"{{query}}\"",
     "no_trending": "Aún no hay hashtags en tendencia en tu comunidad.",
     "post_count": "{{count}} publicaciones"
+  },
+  "share": {
+    "tooltip_remove": "Quitar compartido",
+    "tooltip_share": "Compartir en tu feed",
+    "button_label": "Compartir",
+    "button_label_count": "Compartir ({{count}})",
+    "shared_by": "<0>{{name}}</0> compartió esto"
+  },
+  "trending": {
+    "title": "Tendencias",
+    "view_all": "Ver todos los hashtags",
+    "post_count": "{{count}} publicación",
+    "post_count_plural": "{{count}} publicaciones"
   }
 }

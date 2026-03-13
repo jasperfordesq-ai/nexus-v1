@@ -231,14 +231,16 @@ class Group
 
     public static function updateSettings($groupId, $visibility)
     {
-        $sql = "UPDATE `groups` SET visibility = ? WHERE id = ?";
-        return Database::query($sql, [$visibility, $groupId]);
+        $tenantId = TenantContext::getId();
+        $sql = "UPDATE `groups` SET visibility = ? WHERE id = ? AND tenant_id = ?";
+        return Database::query($sql, [$visibility, $groupId, $tenantId]);
     }
 
     public static function updateMemberRole($groupId, $userId, $role)
     {
-        $sql = "UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ?";
-        return Database::query($sql, [$role, $groupId, $userId]);
+        $tenantId = TenantContext::getId();
+        $sql = "UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)";
+        return Database::query($sql, [$role, $groupId, $userId, $tenantId]);
     }
 
     public static function isAdmin($groupId, $userId)
@@ -257,8 +259,9 @@ class Group
 
     public static function updateMemberStatus($groupId, $userId, $status)
     {
-        $sql = "UPDATE group_members SET status = ? WHERE group_id = ? AND user_id = ?";
-        return Database::query($sql, [$status, $groupId, $userId]);
+        $tenantId = TenantContext::getId();
+        $sql = "UPDATE group_members SET status = ? WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)";
+        return Database::query($sql, [$status, $groupId, $userId, $tenantId]);
     }
 
     public static function getUserGroups($userId)

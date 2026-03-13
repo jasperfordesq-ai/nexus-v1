@@ -295,6 +295,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'status' => 'accepted']);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to approve exchange', null, 500);
+            return;
         }
     }
 
@@ -351,6 +352,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'status' => 'cancelled']);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to reject exchange', null, 500);
+            return;
         }
     }
 
@@ -528,6 +530,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'reviewed' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to mark message as reviewed', null, 500);
+            return;
         }
     }
 
@@ -638,6 +641,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'flagged' => true, 'flag_reason' => $reason, 'flag_severity' => $severity]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to flag message', null, 500);
+            return;
         }
     }
 
@@ -735,6 +739,7 @@ class AdminBrokerApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to load message detail', null, 500);
+            return;
         }
     }
 
@@ -881,6 +886,7 @@ class AdminBrokerApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to archive message', null, 500);
+            return;
         }
     }
 
@@ -1020,6 +1026,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData($archive);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to load archive', null, 500);
+            return;
         }
     }
 
@@ -1138,6 +1145,7 @@ class AdminBrokerApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log("[AdminBrokerApiController] setMonitoring failed for user {$userId}: " . $e->getMessage());
             $this->respondWithError('SERVER_ERROR', 'Failed to update monitoring', null, 500);
+            return;
         }
     }
 
@@ -1241,6 +1249,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData(['id' => $tagId, 'listing_id' => $listingId, 'risk_level' => $riskLevel]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to save risk tag', null, 500);
+            return;
         }
     }
 
@@ -1289,6 +1298,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData(['listing_id' => $listingId, 'removed' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to remove risk tag', null, 500);
+            return;
         }
     }
 
@@ -1504,6 +1514,7 @@ class AdminBrokerApiController extends BaseApiController
             $this->respondWithData($config);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to save configuration', null, 500);
+            return;
         }
     }
 
@@ -1606,6 +1617,7 @@ class AdminBrokerApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to load exchange', null, 500);
+            return;
         }
     }
 

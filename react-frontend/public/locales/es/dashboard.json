@@ -77,7 +77,9 @@
     "badges": "Insignias",
     "streak": "Racha",
     "xp_progress": "Progreso de XP",
-    "start_earning": "¡Empieza a ganar XP participando en la comunidad!"
+    "start_earning": "¡Empieza a ganar XP participando en la comunidad!",
+    "streak_days_one": "{{count}} dia",
+    "streak_days_other": "{{count}} dias"
   },
   "reviews": {
     "sent": "Enviado {{amount}}h",

@@ -24,6 +24,7 @@ import {
   Target,
   X,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import type { TenantFeatures, TenantModules } from '@/types/api';
 
@@ -32,9 +33,9 @@ interface QuickCreateMenuProps {
   onClose: () => void;
 }
 
-interface CreateOption {
-  label: string;
-  description: string;
+interface CreateOptionDef {
+  labelKey: string;
+  descKey: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
@@ -42,34 +43,34 @@ interface CreateOption {
   module?: keyof TenantModules;
 }
 
-const createOptions: CreateOption[] = [
+const createOptionDefs: CreateOptionDef[] = [
   {
-    label: 'New Listing',
-    description: 'Offer or request a service',
+    labelKey: 'quick_create.new_listing',
+    descKey: 'quick_create.new_listing_desc',
     href: '/listings/create',
     icon: ListTodo,
     color: 'from-emerald-500 to-teal-600',
     module: 'listings',
   },
   {
-    label: 'New Event',
-    description: 'Organise a community event',
+    labelKey: 'quick_create.new_event',
+    descKey: 'quick_create.new_event_desc',
     href: '/events/create',
     icon: Calendar,
     color: 'from-amber-500 to-orange-600',
     feature: 'events',
   },
   {
-    label: 'New Group',
-    description: 'Start a community group',
+    labelKey: 'quick_create.new_group',
+    descKey: 'quick_create.new_group_desc',
     href: '/groups/create',
     icon: Users,
     color: 'from-purple-500 to-pink-600',
     feature: 'groups',
   },
   {
-    label: 'New Goal',
-    description: 'Set a personal goal',
+    labelKey: 'quick_create.new_goal',
+    descKey: 'quick_create.new_goal_desc',
     href: '/goals',
     icon: Target,
     color: 'from-blue-500 to-cyan-600',
@@ -79,9 +80,10 @@ const createOptions: CreateOption[] = [
 
 export function QuickCreateMenu({ isOpen, onClose }: QuickCreateMenuProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const { hasFeature, hasModule, tenantPath } = useTenant();
 
-  const visibleOptions = createOptions.filter((option) => {
+  const visibleOptions = createOptionDefs.filter((option) => {
     if (option.feature && !hasFeature(option.feature)) return false;
     if (option.module && !hasModule(option.module)) return false;
     return true;
@@ -118,14 +120,14 @@ export function QuickCreateMenu({ isOpen, onClose }: QuickCreateMenuProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 pt-5 pb-3">
                   <h2 className="text-lg font-semibold text-theme-primary">
-                    Create New
+                    {t('quick_create.title')}
                   </h2>
                   <Button
                     isIconOnly
                     variant="light"
                     size="sm"
                     onPress={onClose}
-                    aria-label="Close create menu"
+                    aria-label={t('quick_create.close_aria')}
                     className="text-theme-muted hover:text-theme-primary"
                   >
                     <X className="w-5 h-5" aria-hidden="true" />
@@ -155,10 +157,10 @@ export function QuickCreateMenu({ isOpen, onClose }: QuickCreateMenuProps) {
                           </div>
                           <div className="text-center">
                             <p className="text-sm font-medium text-theme-primary">
-                              {option.label}
+                              {t(option.labelKey)}
                             </p>
                             <p className="text-[11px] text-theme-subtle leading-tight mt-0.5">
-                              {option.description}
+                              {t(option.descKey)}
                             </p>
                           </div>
                         </Button>

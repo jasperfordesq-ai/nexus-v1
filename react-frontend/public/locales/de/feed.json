@@ -41,7 +41,10 @@
     "report_failed": "Beitrag konnte nicht gemeldet werden",
     "deleted": "Beitrag gelöscht",
     "delete_failed": "Beitrag konnte nicht gelöscht werden",
-    "vote_failed": "Abstimmung konnte nicht abgegeben werden"
+    "vote_failed": "Abstimmung konnte nicht abgegeben werden",
+    "post_shared": "Beitrag in deinem Feed geteilt",
+    "share_removed": "Teilen entfernt",
+    "share_failed": "Beitrag konnte nicht geteilt werden"
   },
   "realtime": {
     "new_post_singular": "1 neuer Beitrag",
@@ -220,5 +223,18 @@
     "no_match": "Keine Hashtags passend zu \"{{query}}\"",
     "no_trending": "Noch keine Trend-Hashtags in Ihrer Gemeinschaft.",
     "post_count": "{{count}} Beiträge"
+  },
+  "share": {
+    "tooltip_remove": "Teilen rückgängig machen",
+    "tooltip_share": "In deinem Feed teilen",
+    "button_label": "Teilen",
+    "button_label_count": "Teilen ({{count}})",
+    "shared_by": "<0>{{name}}</0> hat dies geteilt"
+  },
+  "trending": {
+    "title": "Im Trend",
+    "view_all": "Alle Hashtags anzeigen",
+    "post_count": "{{count}} Beitrag",
+    "post_count_plural": "{{count}} Beiträge"
   }
 }

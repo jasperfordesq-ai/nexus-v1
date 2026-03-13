@@ -18,6 +18,7 @@ import {
   Textarea,
 } from '@heroui/react';
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
@@ -32,6 +33,7 @@ interface RatingModalProps {
 
 export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRatingComplete }: RatingModalProps) {
   const toast = useToast();
+  const { t } = useTranslation('wallet');
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -39,7 +41,7 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
 
   async function handleSubmit() {
     if (rating === 0) {
-      toast.error('Rating required', 'Please select a star rating');
+      toast.error(t('toast.rating_required'), t('toast.rating_required_desc'));
       return;
     }
 
@@ -51,17 +53,17 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
       });
 
       if (response.success) {
-        toast.success('Rating submitted', 'Thank you for your feedback!');
+        toast.success(t('toast.rating_submitted'), t('toast.rating_submitted_desc'));
         setRating(0);
         setComment('');
         onClose();
         onRatingComplete?.();
       } else {
-        toast.error('Failed to submit', response.error || 'Please try again');
+        toast.error(t('toast.submit_failed'), response.error || t('toast.try_again'));
       }
     } catch (err) {
       logError('Rating submission failed', err);
-      toast.error('Failed to submit', 'An error occurred. Please try again.');
+      toast.error(t('toast.submit_failed'), t('toast.submit_error_desc'));
     } finally {
       setIsSubmitting(false);
     }

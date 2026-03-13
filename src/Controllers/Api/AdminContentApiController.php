@@ -1021,7 +1021,7 @@ class AdminContentApiController extends BaseApiController
      */
     public function createPlan(): void
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $input = $this->getAllInput();
         $name = trim($input['name'] ?? '');
@@ -1092,7 +1092,7 @@ class AdminContentApiController extends BaseApiController
      */
     public function updatePlan(): void
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $uri = $_SERVER['REQUEST_URI'] ?? '';
         preg_match('#/api/v2/admin/plans/(\d+)#', $uri, $matches);
@@ -1210,7 +1210,7 @@ class AdminContentApiController extends BaseApiController
      */
     public function deletePlan(): void
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         $uri = $_SERVER['REQUEST_URI'] ?? '';
         preg_match('#/api/v2/admin/plans/(\d+)#', $uri, $matches);

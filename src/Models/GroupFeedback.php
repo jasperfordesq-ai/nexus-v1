@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class GroupFeedback
 {
@@ -108,7 +109,8 @@ class GroupFeedback
      */
     public static function delete($id, $groupId)
     {
-        $sql = "DELETE FROM group_feedback WHERE id = ? AND group_id = ?";
-        return Database::query($sql, [$id, $groupId]);
+        $tenantId = TenantContext::getId();
+        $sql = "DELETE FROM group_feedback WHERE id = ? AND group_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)";
+        return Database::query($sql, [$id, $groupId, $tenantId]);
     }
 }

@@ -452,14 +452,14 @@ export function SettingsPage() {
       };
       const response = await api.put('/v2/users/me', payload);
       if (response.success) {
-        toast.success('Profile updated successfully');
+        toast.success(t('toasts.profile_updated'));
         if (refreshUser) await refreshUser();
       } else {
-        toast.error(response.error || 'Failed to save profile');
+        toast.error(response.error || t('toasts.profile_save_failed'));
       }
     } catch (error) {
       logError('Failed to save profile', error);
-      toast.error('Failed to save profile');
+      toast.error(t('toasts.profile_save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -478,13 +478,13 @@ export function SettingsPage() {
         }),
       ]);
       if (notifResponse.success && matchResponse.success) {
-        toast.success('Notification settings saved');
+        toast.success(t('toasts.notifications_saved'));
       } else {
-        toast.error(notifResponse.error || matchResponse.error || 'Failed to save notifications');
+        toast.error(notifResponse.error || matchResponse.error || t('toasts.notifications_save_failed'));
       }
     } catch (error) {
       logError('Failed to save notifications', error);
-      toast.error('Failed to save notifications');
+      toast.error(t('toasts.notifications_save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -502,13 +502,13 @@ export function SettingsPage() {
         },
       });
       if (response.success) {
-        toast.success('Privacy settings saved');
+        toast.success(t('toasts.privacy_saved'));
       } else {
-        toast.error(response.error || 'Failed to save privacy settings');
+        toast.error(response.error || t('toasts.privacy_save_failed'));
       }
     } catch (error) {
       logError('Failed to save privacy settings', error);
-      toast.error('Failed to save privacy settings');
+      toast.error(t('toasts.privacy_save_failed'));
     } finally {
       setIsSavingPrivacy(false);
     }
@@ -529,12 +529,12 @@ export function SettingsPage() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Invalid file type', 'Please upload an image file (JPG, PNG, or GIF)');
+      toast.error(t('toasts.invalid_file_type'), t('toasts.invalid_file_type_desc'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File too large', 'Please upload an image smaller than 5MB');
+      toast.error(t('toasts.file_too_large'), t('toasts.avatar_file_too_large_desc'));
       return;
     }
 
@@ -548,13 +548,13 @@ export function SettingsPage() {
       if (response.success && response.data) {
         setProfileData((prev) => ({ ...prev, avatar: response.data!.avatar_url }));
         if (refreshUser) await refreshUser();
-        toast.success('Avatar updated', 'Your profile photo has been updated');
+        toast.success(t('toasts.avatar_updated'), t('toasts.avatar_updated_desc'));
       } else {
-        toast.error('Upload failed', 'Failed to upload avatar. Please try again.');
+        toast.error(t('toasts.upload_failed'), t('toasts.avatar_upload_failed_desc'));
       }
     } catch (error) {
       logError('Failed to upload avatar', error);
-      toast.error('Upload failed', 'Failed to upload avatar. Please try again.');
+      toast.error(t('toasts.upload_failed'), t('toasts.avatar_upload_failed_desc'));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -566,17 +566,17 @@ export function SettingsPage() {
   // Password change handler
   async function handleChangePassword() {
     if (!passwordData.current_password || !passwordData.new_password || !passwordData.confirm_password) {
-      toast.error('Missing fields', 'Please fill in all password fields');
+      toast.error(t('toasts.missing_fields'), t('toasts.missing_password_fields'));
       return;
     }
 
     if (passwordData.new_password.length < 8) {
-      toast.error('Password too short', 'New password must be at least 8 characters');
+      toast.error(t('toasts.password_too_short'), t('toasts.password_too_short_desc'));
       return;
     }
 
     if (passwordData.new_password !== passwordData.confirm_password) {
-      toast.error('Passwords don\'t match', 'New password and confirmation must match');
+      toast.error(t('toasts.passwords_dont_match'), t('toasts.passwords_dont_match_desc'));
       return;
     }
 
@@ -588,15 +588,15 @@ export function SettingsPage() {
       });
 
       if (response.success) {
-        toast.success('Password changed', 'Your password has been updated successfully');
+        toast.success(t('toasts.password_changed'), t('toasts.password_changed_desc'));
         passwordModal.onClose();
         setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
       } else {
-        toast.error('Password change failed', response.error || 'Failed to change password');
+        toast.error(t('toasts.password_change_failed'), response.error || t('toasts.password_change_failed'));
       }
     } catch (error) {
       logError('Failed to change password', error);
-      toast.error('Password change failed', 'Current password may be incorrect');
+      toast.error(t('toasts.password_change_failed'), t('toasts.password_incorrect_desc'));
     } finally {
       setIsChangingPassword(false);
     }
@@ -605,7 +605,7 @@ export function SettingsPage() {
   // Delete account handler
   async function handleDeleteAccount() {
     if (deleteConfirmation !== 'DELETE') {
-      toast.error('Confirmation required', 'Please type DELETE to confirm');
+      toast.error(t('toasts.confirmation_required'), t('toasts.type_delete_to_confirm'));
       return;
     }
 
@@ -614,15 +614,15 @@ export function SettingsPage() {
       const response = await api.delete('/v2/users/me');
 
       if (response.success) {
-        toast.success('Account deleted', 'Your account has been permanently deleted');
+        toast.success(t('toasts.account_deleted'), t('toasts.account_deleted_desc'));
         await logout();
         navigate(tenantPath('/'));
       } else {
-        toast.error('Delete failed', 'Failed to delete account. Please try again.');
+        toast.error(t('toasts.delete_failed'), t('toasts.delete_failed_desc'));
       }
     } catch (error) {
       logError('Failed to delete account', error);
-      toast.error('Delete failed', 'Failed to delete account. Please try again.');
+      toast.error(t('toasts.delete_failed'), t('toasts.delete_failed_desc'));
     } finally {
       setIsDeleting(false);
     }
@@ -642,19 +642,19 @@ export function SettingsPage() {
       if (response.success && response.data) {
         setTwoFactorSetupData(response.data);
       } else {
-        toast.error('2FA setup failed', response.error || 'Unable to start 2FA setup');
+        toast.error(t('toasts.twofa_setup_failed'), response.error || t('toasts.twofa_setup_failed_desc'));
         twoFactorSetupModal.onClose();
       }
     } catch (error) {
       logError('Failed to setup 2FA', error);
-      toast.error('2FA setup failed', 'Unable to start 2FA setup');
+      toast.error(t('toasts.twofa_setup_failed'), t('toasts.twofa_setup_failed_desc'));
       twoFactorSetupModal.onClose();
     }
   }
 
   async function handleVerify2FA() {
     if (!twoFactorVerifyCode || twoFactorVerifyCode.length < 6) {
-      toast.error('Invalid code', 'Please enter a valid 6-digit code');
+      toast.error(t('toasts.invalid_code'), t('toasts.invalid_code_desc'));
       return;
     }
 
@@ -670,18 +670,18 @@ export function SettingsPage() {
           setBackupCodes(response.data.backup_codes);
           setBackupCodesRemaining(response.data.backup_codes.length);
         }
-        toast.success('2FA enabled', 'Two-factor authentication is now active');
+        toast.success(t('toasts.twofa_enabled'), t('toasts.twofa_enabled_desc'));
         twoFactorSetupModal.onClose();
         // Show backup codes
         if (response.data?.backup_codes?.length) {
           backupCodesModal.onOpen();
         }
       } else {
-        toast.error('Verification failed', response.error || 'Invalid verification code');
+        toast.error(t('toasts.verification_failed'), response.error || t('toasts.verification_failed'));
       }
     } catch (error) {
       logError('Failed to verify 2FA', error);
-      toast.error('Verification failed', 'Please try again with a new code');
+      toast.error(t('toasts.verification_failed'), t('toasts.verification_failed_desc'));
     } finally {
       setIsVerifying2FA(false);
     }
@@ -689,7 +689,7 @@ export function SettingsPage() {
 
   async function handleDisable2FA() {
     if (!twoFactorDisablePassword) {
-      toast.error('Password required', 'Please enter your password to disable 2FA');
+      toast.error(t('toasts.password_required'), t('toasts.password_required_desc'));
       return;
     }
 
@@ -702,15 +702,15 @@ export function SettingsPage() {
       if (response.success) {
         setTwoFactorEnabled(false);
         setBackupCodesRemaining(0);
-        toast.success('2FA disabled', 'Two-factor authentication has been disabled');
+        toast.success(t('toasts.twofa_disabled'), t('toasts.twofa_disabled_desc'));
         twoFactorDisableModal.onClose();
         setTwoFactorDisablePassword('');
       } else {
-        toast.error('Failed to disable 2FA', response.error || 'Password may be incorrect');
+        toast.error(t('toasts.twofa_disable_failed'), response.error || t('toasts.twofa_disable_failed_desc'));
       }
     } catch (error) {
       logError('Failed to disable 2FA', error);
-      toast.error('Failed to disable 2FA', 'Password may be incorrect');
+      toast.error(t('toasts.twofa_disable_failed'), t('toasts.twofa_disable_failed_desc'));
     } finally {
       setIsDisabling2FA(false);
     }
@@ -729,13 +729,13 @@ export function SettingsPage() {
       });
       if (response.success) {
         setMarketingConsent(checked);
-        toast.success(checked ? 'Subscribed to marketing emails' : 'Unsubscribed from marketing emails');
+        toast.success(checked ? t('toasts.marketing_subscribed') : t('toasts.marketing_unsubscribed'));
       } else {
-        toast.error('Failed to update marketing consent');
+        toast.error(t('toasts.marketing_consent_failed'));
       }
     } catch (error) {
       logError('Failed to update marketing consent', error);
-      toast.error('Failed to update marketing consent');
+      toast.error(t('toasts.marketing_consent_failed'));
     } finally {
       setMarketingConsentLoading(false);
     }
@@ -765,15 +765,15 @@ export function SettingsPage() {
       });
 
       if (response.success) {
-        toast.success('Request submitted', 'Your data request has been submitted. We will contact you via email.');
+        toast.success(t('toasts.request_submitted'), t('toasts.gdpr_request_submitted_desc'));
         gdprModal.onClose();
         setGdprRequestType('');
       } else {
-        toast.error('Request failed', response.error || 'Failed to submit GDPR request');
+        toast.error(t('toasts.request_failed'), response.error || t('toasts.gdpr_request_failed_desc'));
       }
     } catch (error) {
       logError('Failed to submit GDPR request', error);
-      toast.error('Request failed', 'Failed to submit your data request. Please try again.');
+      toast.error(t('toasts.request_failed'), t('toasts.gdpr_request_failed_desc'));
     } finally {
       setIsSubmittingGdpr(false);
     }
@@ -791,11 +791,11 @@ export function SettingsPage() {
 
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Invalid file', 'Only PDF, JPG, and PNG files are accepted');
+      toast.error(t('toasts.invalid_file'), t('toasts.invalid_insurance_file_desc'));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('File too large', 'File must be under 10MB');
+      toast.error(t('toasts.file_too_large'), t('toasts.insurance_file_too_large_desc'));
       return;
     }
 
@@ -808,14 +808,14 @@ export function SettingsPage() {
       const res = await api.upload('/v2/users/me/insurance', formData);
 
       if (res.success) {
-        toast.success('Certificate uploaded', 'Your insurance certificate has been submitted for review');
+        toast.success(t('toasts.certificate_uploaded'), t('toasts.certificate_uploaded_desc'));
         loadInsuranceCerts();
         setInsuranceType('public_liability');
       } else {
-        toast.error('Upload failed', res.error || 'Failed to upload insurance certificate');
+        toast.error(t('toasts.upload_failed'), res.error || t('toasts.insurance_upload_failed_desc'));
       }
     } catch {
-      toast.error('Upload failed', 'Failed to upload insurance certificate');
+      toast.error(t('toasts.upload_failed'), t('toasts.insurance_upload_failed_desc'));
     } finally {
       setInsuranceUploading(false);
       event.target.value = '';
@@ -826,9 +826,9 @@ export function SettingsPage() {
   async function handleCopyBackupCodes() {
     try {
       await navigator.clipboard.writeText(backupCodes.join('\n'));
-      toast.success('Copied', 'Backup codes copied to clipboard');
+      toast.success(t('toasts.copied'), t('toasts.backup_codes_copied_desc'));
     } catch {
-      toast.error('Copy failed', 'Unable to copy to clipboard');
+      toast.error(t('toasts.copy_failed'), t('toasts.copy_failed_desc'));
     }
   }
 
@@ -877,9 +877,9 @@ export function SettingsPage() {
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-          Settings
+          {t("header.title")}
         </h1>
-        <p className="text-theme-muted mt-1">Manage your account preferences</p>
+        <p className="text-theme-muted mt-1">{t("header.subtitle")}</p>
       </motion.div>
 
       {/* Tabs */}
@@ -898,7 +898,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <User className="w-4 h-4" aria-hidden="true" />
-                Profile
+                {t("tabs.profile")}
               </span>
             }
           />
@@ -907,7 +907,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Bell className="w-4 h-4" aria-hidden="true" />
-                Notifications
+                {t("tabs.notifications")}
               </span>
             }
           />
@@ -916,7 +916,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Shield className="w-4 h-4" aria-hidden="true" />
-                Privacy
+                {t("tabs.privacy")}
               </span>
             }
           />
@@ -925,7 +925,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Lock className="w-4 h-4" aria-hidden="true" />
-                Security
+                {t("tabs.security")}
               </span>
             }
           />
@@ -934,7 +934,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4" aria-hidden="true" />
-                Skills
+                {t("tabs.skills")}
               </span>
             }
           />
@@ -943,7 +943,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" aria-hidden="true" />
-                Availability
+                {t("tabs.availability")}
               </span>
             }
           />
@@ -952,7 +952,7 @@ export function SettingsPage() {
             title={
               <span className="flex items-center gap-2">
                 <Users className="w-4 h-4" aria-hidden="true" />
-                Linked
+                {t("tabs.linked")}
               </span>
             }
           />
@@ -1116,7 +1116,7 @@ export function SettingsPage() {
                 startContent={<Save className="w-4 h-4" aria-hidden="true" />}
                 isLoading={isSaving}
               >
-                Save Changes
+                {t("save_changes")}
               </Button>
             </div>
           </GlassCard>
@@ -1163,7 +1163,7 @@ export function SettingsPage() {
         {/* ─────────────────────────────────────────────────────────────────── */}
         {activeTab === 'notifications' && (
           <GlassCard className="p-6">
-            <h2 className="text-lg font-semibold text-theme-primary mb-6">Notification Preferences</h2>
+            <h2 className="text-lg font-semibold text-theme-primary mb-6">{t("notification_sections.title")}</h2>
 
             {notificationError ? (
               <div className="text-center py-8">
@@ -1173,7 +1173,7 @@ export function SettingsPage() {
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                   onPress={loadNotificationSettings}
                 >
-                  Try Again
+                  {t("try_again")}
                 </Button>
               </div>
             ) : (
@@ -1182,19 +1182,19 @@ export function SettingsPage() {
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <Mail className="w-4 h-4" aria-hidden="true" />
-                    Messages & Communication
+                    {t("notification_sections.messages_communication")}
                   </h3>
 
                   <SettingToggle
-                    label="New Messages"
-                    description="Get notified when you receive a new message"
+                    label={t("notification_prefs.new_messages")}
+                    description={t("notification_descriptions.new_messages")}
                     checked={notifications.email_messages}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_messages: checked }))}
                   />
 
                   <SettingToggle
-                    label="Connection Requests"
-                    description="Connection requests and updates"
+                    label={t("notification_prefs.connection_requests")}
+                    description={t("notification_descriptions.connection_requests")}
                     checked={notifications.email_connections}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_connections: checked }))}
                   />
@@ -1204,26 +1204,26 @@ export function SettingsPage() {
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <CreditCard className="w-4 h-4" aria-hidden="true" />
-                    Activity & Listings
+                    {t("notification_sections.activity_listings")}
                   </h3>
 
                   <SettingToggle
-                    label="Listing Activity"
-                    description="Updates about your listings (new responses, etc.)"
+                    label={t("notification_prefs.listing_activity")}
+                    description={t("notification_descriptions.listing_activity")}
                     checked={notifications.email_listings}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_listings: checked }))}
                   />
 
                   <SettingToggle
-                    label="Credit Transactions"
-                    description="Notifications for credit transactions"
+                    label={t("notification_prefs.credit_transactions")}
+                    description={t("notification_descriptions.credit_transactions")}
                     checked={notifications.email_transactions}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_transactions: checked }))}
                   />
 
                   <SettingToggle
-                    label="New Reviews"
-                    description="New reviews received on your profile or listings"
+                    label={t("notification_prefs.new_reviews")}
+                    description={t("notification_descriptions.new_reviews")}
                     checked={notifications.email_reviews}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_reviews: checked }))}
                   />
@@ -1233,26 +1233,26 @@ export function SettingsPage() {
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <Trophy className="w-4 h-4" aria-hidden="true" />
-                    Community & Achievements
+                    {t("notification_sections.community_achievements")}
                   </h3>
 
                   <SettingToggle
-                    label="Gamification Digest"
-                    description="Periodic summary of your gamification activity and progress"
+                    label={t("notification_prefs.gamification_digest")}
+                    description={t("notification_descriptions.gamification_digest")}
                     checked={notifications.email_gamification_digest}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_gamification_digest: checked }))}
                   />
 
                   <SettingToggle
-                    label="Achievement Milestones"
-                    description="Badge unlocks, level ups, and achievement notifications"
+                    label={t("notification_prefs.achievement_milestones")}
+                    description={t("notification_descriptions.achievement_milestones")}
                     checked={notifications.email_gamification_milestones}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_gamification_milestones: checked }))}
                   />
 
                   <SettingToggle
-                    label="Weekly Digest"
-                    description="A weekly summary of community activity"
+                    label={t("notification_prefs.weekly_digest")}
+                    description={t("notification_descriptions.weekly_digest")}
                     checked={notifications.email_digest}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, email_digest: checked }))}
                   />
@@ -1263,33 +1263,33 @@ export function SettingsPage() {
                   <div className="pt-4 border-t border-theme-default space-y-4">
                     <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                       <Building2 className="w-4 h-4" aria-hidden="true" />
-                      Organisation Notifications
+                      {t("notification_sections.organisation_notifications")}
                     </h3>
 
                     <SettingToggle
-                      label="Payment Notifications"
-                      description="Notifications for organisation payment activity"
+                      label={t("notification_prefs.payment_notifications")}
+                      description={t("notification_descriptions.payment_notifications")}
                       checked={notifications.email_org_payments}
                       onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_payments: checked }))}
                     />
 
                     <SettingToggle
-                      label="Transfer Notifications"
-                      description="Notifications for credit transfers"
+                      label={t("notification_prefs.transfer_notifications")}
+                      description={t("notification_descriptions.transfer_notifications")}
                       checked={notifications.email_org_transfers}
                       onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_transfers: checked }))}
                     />
 
                     <SettingToggle
-                      label="Membership Updates"
-                      description="Member joins, leaves, and membership changes"
+                      label={t("notification_prefs.membership_updates")}
+                      description={t("notification_descriptions.membership_updates")}
                       checked={notifications.email_org_membership}
                       onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_membership: checked }))}
                     />
 
                     <SettingToggle
-                      label="Admin Notifications"
-                      description="Administrative alerts and system notifications"
+                      label={t("notification_prefs.admin_notifications")}
+                      description={t("notification_descriptions.admin_notifications")}
                       checked={notifications.email_org_admin}
                       onChange={(checked) => setNotifications((prev) => ({ ...prev, email_org_admin: checked }))}
                     />
@@ -1300,14 +1300,14 @@ export function SettingsPage() {
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <Search className="w-4 h-4" aria-hidden="true" />
-                    Match Digest Emails
+                    {t("notification_sections.match_digest")}
                   </h3>
 
                   <div className="p-4 rounded-lg bg-theme-elevated">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div>
-                        <p className="font-medium text-theme-primary">Digest Frequency</p>
-                        <p className="text-sm text-theme-subtle">How often you receive match digest emails</p>
+                        <p className="font-medium text-theme-primary">{t("match_digest.frequency")}</p>
+                        <p className="text-sm text-theme-subtle">{t("match_digest.frequency_description")}</p>
                       </div>
                       <Select
                         aria-label="Match digest frequency"
@@ -1322,24 +1322,24 @@ export function SettingsPage() {
                           value: 'text-theme-primary',
                         }}
                       >
-                        <SelectItem key="daily">Daily</SelectItem>
-                        <SelectItem key="weekly">Weekly</SelectItem>
-                        <SelectItem key="fortnightly">Fortnightly</SelectItem>
-                        <SelectItem key="never">Never</SelectItem>
+                        <SelectItem key="daily">{t("match_digest.daily")}</SelectItem>
+                        <SelectItem key="weekly">{t("match_digest.weekly")}</SelectItem>
+                        <SelectItem key="fortnightly">{t("match_digest.fortnightly")}</SelectItem>
+                        <SelectItem key="never">{t("match_digest.never")}</SelectItem>
                       </Select>
                     </div>
                   </div>
 
                   <SettingToggle
-                    label="Hot Match Alerts"
-                    description="Get notified about high-compatibility matches"
+                    label={t("notification_prefs.hot_match_alerts")}
+                    description={t("notification_descriptions.hot_match_alerts")}
                     checked={notifyHotMatches}
                     onChange={setNotifyHotMatches}
                   />
 
                   <SettingToggle
-                    label="Mutual Match Alerts"
-                    description="Get notified when someone you matched with also matches you"
+                    label={t("notification_prefs.mutual_match_alerts")}
+                    description={t("notification_descriptions.mutual_match_alerts")}
                     checked={notifyMutualMatches}
                     onChange={setNotifyMutualMatches}
                   />
@@ -1349,12 +1349,12 @@ export function SettingsPage() {
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <Smartphone className="w-4 h-4" aria-hidden="true" />
-                    Push Notifications
+                    {t("notification_sections.push_notifications")}
                   </h3>
 
                   <SettingToggle
-                    label="Enable Push Notifications"
-                    description="Receive real-time notifications on your device"
+                    label={t("notification_prefs.enable_push")}
+                    description={t("notification_descriptions.enable_push")}
                     checked={notifications.push_enabled}
                     onChange={(checked) => setNotifications((prev) => ({ ...prev, push_enabled: checked }))}
                   />
@@ -1364,12 +1364,12 @@ export function SettingsPage() {
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <Mail className="w-4 h-4" aria-hidden="true" />
-                    Marketing & Communications
+                    {t("notification_sections.marketing_communications")}
                   </h3>
 
                   <SettingToggle
-                    label="Marketing Emails"
-                    description="Receive newsletters, promotions, and community updates"
+                    label={t("notification_prefs.marketing_emails")}
+                    description={t("notification_descriptions.marketing_emails")}
                     checked={marketingConsent}
                     onChange={handleMarketingConsentToggle}
                     disabled={marketingConsentLoading}
@@ -1382,7 +1382,7 @@ export function SettingsPage() {
                   startContent={<Save className="w-4 h-4" aria-hidden="true" />}
                   isLoading={isSaving}
                 >
-                  Save Preferences
+                  {t("save_preferences")}
                 </Button>
               </div>
             )}
@@ -1395,18 +1395,18 @@ export function SettingsPage() {
         {activeTab === 'privacy' && (
           <div className="space-y-6">
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-theme-primary mb-6">Privacy Settings</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-6">{t("privacy_sections.title")}</h2>
 
               <div className="space-y-6">
                 {/* Profile Visibility */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <Eye className="w-4 h-4" aria-hidden="true" />
-                    Profile Visibility
+                    {t("privacy_sections.profile_visibility")}
                   </h3>
 
                   <Select
-                    label="Who can see your profile"
+                    label={t("privacy_prefs.profile_visibility")}
                     selectedKeys={[privacy.profile_visibility]}
                     onSelectionChange={(keys) => {
                       const value = Array.from(keys)[0] as string;
@@ -1419,9 +1419,9 @@ export function SettingsPage() {
                     }}
                     classNames={selectClassNames}
                   >
-                    <SelectItem key="public">Public - Anyone can view</SelectItem>
-                    <SelectItem key="members">Members Only - Community members</SelectItem>
-                    <SelectItem key="connections">Connections Only - Your connections</SelectItem>
+                    <SelectItem key="public">{t("visibility_options.public")}</SelectItem>
+                    <SelectItem key="members">{t("visibility_options.members")}</SelectItem>
+                    <SelectItem key="connections">{t("visibility_options.connections")}</SelectItem>
                   </Select>
                 </div>
 
@@ -1429,12 +1429,12 @@ export function SettingsPage() {
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <Search className="w-4 h-4" aria-hidden="true" />
-                    Search & Discovery
+                    {t("privacy_sections.search_discovery")}
                   </h3>
 
                   <SettingToggle
-                    label="Search Engine Indexing"
-                    description="Allow search engines to index your profile"
+                    label={t("privacy_prefs.search_indexing")}
+                    description={t("privacy_descriptions.search_indexing")}
                     checked={privacy.search_indexing}
                     onChange={(checked) => setPrivacy((prev) => ({ ...prev, search_indexing: checked }))}
                   />
@@ -1444,12 +1444,12 @@ export function SettingsPage() {
                 <div className="pt-4 border-t border-theme-default space-y-4">
                   <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
                     <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                    Contact Preferences
+                    {t("privacy_sections.contact_preferences")}
                   </h3>
 
                   <SettingToggle
-                    label="Allow Contact"
-                    description="Allow other members to contact me"
+                    label={t("privacy_prefs.allow_contact")}
+                    description={t("privacy_descriptions.allow_contact")}
                     checked={privacy.contact_permission}
                     onChange={(checked) => setPrivacy((prev) => ({ ...prev, contact_permission: checked }))}
                   />
@@ -1461,7 +1461,7 @@ export function SettingsPage() {
                   startContent={<Save className="w-4 h-4" aria-hidden="true" />}
                   isLoading={isSavingPrivacy}
                 >
-                  Save Privacy Settings
+                  {t("save_privacy")}
                 </Button>
               </div>
             </GlassCard>
@@ -1478,8 +1478,8 @@ export function SettingsPage() {
                         <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                       </div>
                       <div className="text-left">
-                        <p className="font-medium">Federation Settings</p>
-                        <p className="text-sm text-theme-subtle font-normal">Manage your visibility and preferences across partner communities</p>
+                        <p className="font-medium">{t("federation.title")}</p>
+                        <p className="text-sm text-theme-subtle font-normal">{t("federation.description")}</p>
                       </div>
                     </div>
                   }
@@ -1493,11 +1493,10 @@ export function SettingsPage() {
             <GlassCard className="p-6">
               <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
-                Data & Privacy Rights
+                {t("gdpr.title")}
               </h2>
               <p className="text-theme-subtle text-sm mb-6">
-                Under the General Data Protection Regulation (GDPR), you have the right to access, export, and request
-                deletion of your personal data. These requests are processed within 30 days.
+                {t("gdpr.description")}
               </p>
 
               <div className="space-y-3">
@@ -1512,8 +1511,8 @@ export function SettingsPage() {
                   onPress={() => openGdprModal('download')}
                 >
                   <div className="text-left">
-                    <p className="font-medium">Download My Data</p>
-                    <p className="text-sm text-theme-subtle font-normal">Get a copy of all your personal data</p>
+                    <p className="font-medium">{t("gdpr.download_title")}</p>
+                    <p className="text-sm text-theme-subtle font-normal">{t("gdpr.download_desc")}</p>
                   </div>
                 </Button>
 
@@ -1528,8 +1527,8 @@ export function SettingsPage() {
                   onPress={() => openGdprModal('portability')}
                 >
                   <div className="text-left">
-                    <p className="font-medium">Data Portability Request</p>
-                    <p className="text-sm text-theme-subtle font-normal">Export data in a machine-readable format</p>
+                    <p className="font-medium">{t("gdpr.portability_title")}</p>
+                    <p className="text-sm text-theme-subtle font-normal">{t("gdpr.portability_desc")}</p>
                   </div>
                 </Button>
 
@@ -1544,8 +1543,8 @@ export function SettingsPage() {
                   onPress={() => openGdprModal('deletion')}
                 >
                   <div className="text-left">
-                    <p className="font-medium text-red-600 dark:text-red-400">Request Data Deletion</p>
-                    <p className="text-sm text-theme-subtle font-normal">Request permanent deletion of your data</p>
+                    <p className="font-medium text-red-600 dark:text-red-400">{t("gdpr.deletion_title")}</p>
+                    <p className="text-sm text-theme-subtle font-normal">{t("gdpr.deletion_desc")}</p>
                   </div>
                 </Button>
 
@@ -1560,8 +1559,8 @@ export function SettingsPage() {
                   onPress={() => openGdprModal('rectification')}
                 >
                   <div className="text-left">
-                    <p className="font-medium">Data Rectification</p>
-                    <p className="text-sm text-theme-subtle font-normal">Request correction of inaccurate personal data</p>
+                    <p className="font-medium">{t("gdpr.rectification_title")}</p>
+                    <p className="text-sm text-theme-subtle font-normal">{t("gdpr.rectification_desc")}</p>
                   </div>
                 </Button>
 
@@ -1576,8 +1575,8 @@ export function SettingsPage() {
                   onPress={() => openGdprModal('restriction')}
                 >
                   <div className="text-left">
-                    <p className="font-medium">Restriction of Processing</p>
-                    <p className="text-sm text-theme-subtle font-normal">Request restriction of your data processing</p>
+                    <p className="font-medium">{t("gdpr.restriction_title")}</p>
+                    <p className="text-sm text-theme-subtle font-normal">{t("gdpr.restriction_desc")}</p>
                   </div>
                 </Button>
 
@@ -1592,8 +1591,8 @@ export function SettingsPage() {
                   onPress={() => openGdprModal('objection')}
                 >
                   <div className="text-left">
-                    <p className="font-medium">Right to Object</p>
-                    <p className="text-sm text-theme-subtle font-normal">Object to processing of your personal data</p>
+                    <p className="font-medium">{t("gdpr.objection_title")}</p>
+                    <p className="text-sm text-theme-subtle font-normal">{t("gdpr.objection_desc")}</p>
                   </div>
                 </Button>
               </div>
@@ -1601,7 +1600,7 @@ export function SettingsPage() {
               <div className="mt-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <p className="text-sm text-theme-muted flex items-start gap-2">
                   <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  All six GDPR data subject rights are available above. Contact our Data Protection Officer for any additional concerns.
+                  {t("gdpr.info")}
                 </p>
               </div>
             </GlassCard>
@@ -1611,16 +1610,16 @@ export function SettingsPage() {
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
                   <FileCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                  Insurance Certificates
+                  {t("insurance.title")}
                 </h2>
                 <p className="text-theme-subtle text-sm mb-4">
-                  Upload your insurance certificates for verification. Accepted formats: PDF, JPG, PNG (max 10MB).
+                  {t("insurance.description")}
                 </p>
 
                 {insuranceLoading ? (
                   <div className="flex items-center gap-2 text-sm text-theme-muted">
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    Loading certificates...
+                    {t("insurance.loading")}
                   </div>
                 ) : (
                   <>
@@ -1636,7 +1635,7 @@ export function SettingsPage() {
                                 {cert.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
                               </p>
                               <p className="text-xs text-theme-muted">
-                                {cert.provider_name || 'Unknown provider'}
+                                {cert.provider_name || t("insurance.unknown_provider")}
                                 {cert.expiry_date ? ` — Expires ${new Date(cert.expiry_date).toLocaleDateString()}` : ''}
                               </p>
                             </div>
@@ -1656,7 +1655,7 @@ export function SettingsPage() {
                     {/* #4: Insurance type selector */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3">
                       <Select
-                        label="Insurance Type"
+                        label={t("insurance.type_label")}
                         selectedKeys={[insuranceType]}
                         onSelectionChange={(keys) => {
                           const val = Array.from(keys)[0] as string;
@@ -1666,17 +1665,17 @@ export function SettingsPage() {
                         size="sm"
                         className="max-w-xs"
                       >
-                        <SelectItem key="public_liability">Public Liability</SelectItem>
-                        <SelectItem key="professional_indemnity">Professional Indemnity</SelectItem>
-                        <SelectItem key="employers_liability">{"Employer's Liability"}</SelectItem>
-                        <SelectItem key="product_liability">Product Liability</SelectItem>
-                        <SelectItem key="personal_accident">Personal Accident</SelectItem>
-                        <SelectItem key="other">Other</SelectItem>
+                        <SelectItem key="public_liability">{t("insurance.public_liability")}</SelectItem>
+                        <SelectItem key="professional_indemnity">{t("insurance.professional_indemnity")}</SelectItem>
+                        <SelectItem key="employers_liability">{t("insurance.employers_liability")}</SelectItem>
+                        <SelectItem key="product_liability">{t("insurance.product_liability")}</SelectItem>
+                        <SelectItem key="personal_accident">{t("insurance.personal_accident")}</SelectItem>
+                        <SelectItem key="other">{t("insurance.other")}</SelectItem>
                       </Select>
                       <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-default-200">
                         <Upload className="w-4 h-4 text-theme-primary" />
                         <span className="text-sm font-medium text-theme-primary">
-                          {insuranceUploading ? 'Uploading...' : 'Upload Certificate'}
+                          {insuranceUploading ? t('insurance.uploading') : t('insurance.upload_certificate')}
                         </span>
                         <input
                           type="file"
@@ -1865,9 +1864,9 @@ export function SettingsPage() {
         {activeTab === 'skills' && (
           <div className="space-y-6">
             <GlassCard className="p-6">
-              <h2 className="text-lg font-semibold text-theme-primary mb-2">Your Skills</h2>
+              <h2 className="text-lg font-semibold text-theme-primary mb-2">{t("skills.title")}</h2>
               <p className="text-sm text-theme-muted mb-6">
-                Add skills to your profile so other members can find you. Community members can endorse your skills.
+                {t("skills.description")}
               </p>
               <SkillsTabContent />
             </GlassCard>
@@ -1913,12 +1912,12 @@ export function SettingsPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Change Password</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t("password_modal.title")}</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
                 type={showCurrentPassword ? 'text' : 'password'}
-                label="Current Password"
+                label={t("password.current")}
                 value={passwordData.current_password}
                 onChange={(e) => setPasswordData((prev) => ({ ...prev, current_password: e.target.value }))}
                 endContent={
@@ -1928,7 +1927,7 @@ export function SettingsPage() {
                     variant="light"
                     className="min-w-0 w-auto h-auto p-0"
                     onPress={() => setShowCurrentPassword(!showCurrentPassword)}
-                    aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                    aria-label={showCurrentPassword ? t('password.hide_current') : t('password.show_current')}
                   >
                     {showCurrentPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : <Eye className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                   </Button>
@@ -1937,7 +1936,7 @@ export function SettingsPage() {
               />
               <Input
                 type={showNewPassword ? 'text' : 'password'}
-                label="New Password"
+                label={t("password.new")}
                 value={passwordData.new_password}
                 onChange={(e) => setPasswordData((prev) => ({ ...prev, new_password: e.target.value }))}
                 endContent={
@@ -1947,7 +1946,7 @@ export function SettingsPage() {
                     variant="light"
                     className="min-w-0 w-auto h-auto p-0"
                     onPress={() => setShowNewPassword(!showNewPassword)}
-                    aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                    aria-label={showNewPassword ? t('password.hide_new') : t('password.show_new')}
                   >
                     {showNewPassword ? <EyeOff className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : <Eye className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                   </Button>
@@ -1956,7 +1955,7 @@ export function SettingsPage() {
               />
               <Input
                 type="password"
-                label="Confirm New Password"
+                label={t("password.confirm")}
                 value={passwordData.confirm_password}
                 onChange={(e) => setPasswordData((prev) => ({ ...prev, confirm_password: e.target.value }))}
                 classNames={inputClassNames}
@@ -1965,14 +1964,14 @@ export function SettingsPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={passwordModal.onClose}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={handleChangePassword}
               isLoading={isChangingPassword}
             >
-              Change Password
+              {t("password_modal.submit")}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -1990,21 +1989,21 @@ export function SettingsPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">Log Out</ModalHeader>
+          <ModalHeader className="text-theme-primary">{t("logout_modal.title")}</ModalHeader>
           <ModalBody>
             <p className="text-theme-muted">
-              Are you sure you want to log out of your account?
+              {t("logout_modal.confirm_message")}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={logoutModal.onClose}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={handleLogout}
             >
-              Log Out
+              {t("logout_modal.submit")}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -2024,25 +2023,25 @@ export function SettingsPage() {
         <ModalContent>
           <ModalHeader className="text-red-600 dark:text-red-400 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" aria-hidden="true" />
-            Delete Account
+            {t("delete_modal.title")}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-red-600 dark:text-red-400 font-medium">Warning: This action cannot be undone</p>
+                <p className="text-red-600 dark:text-red-400 font-medium">{t("delete_modal.warning")}</p>
                 <p className="text-theme-muted text-sm mt-1">
-                  All your data, including listings, messages, and transaction history will be permanently deleted.
+                  {t("delete_modal.warning_desc")}
                 </p>
               </div>
               <div>
                 <p className="text-theme-muted mb-2">
-                  Type <span className="font-mono text-red-600 dark:text-red-400">DELETE</span> to confirm:
+                  {t("delete_modal.type_confirm")}
                 </p>
                 <Input
                   value={deleteConfirmation}
                   onChange={(e) => setDeleteConfirmation(e.target.value)}
                   placeholder="DELETE"
-                  aria-label="Type DELETE to confirm account deletion"
+                  aria-label={t('delete_modal.aria_label')}
                   classNames={{
                     input: 'bg-transparent text-theme-primary font-mono',
                     inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -2053,7 +2052,7 @@ export function SettingsPage() {
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={deleteModal.onClose}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               className="bg-red-500 text-white"
@@ -2061,7 +2060,7 @@ export function SettingsPage() {
               isLoading={isDeleting}
               isDisabled={deleteConfirmation !== 'DELETE'}
             >
-              Delete My Account
+              {t("delete_modal.submit")}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -2120,7 +2119,7 @@ export function SettingsPage() {
                   <div className="inline-block p-4 bg-white rounded-xl">
                     <img
                       src={twoFactorSetupData.qr_code_url}
-                      alt="2FA QR Code"
+                      alt={t('twofa_qr_alt')}
                       className="w-48 h-48"
                       loading="lazy"
                     />
@@ -2279,72 +2278,65 @@ export function SettingsPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {gdprRequestType === 'download' && 'Download My Data'}
-            {gdprRequestType === 'portability' && 'Data Portability Request'}
-            {gdprRequestType === 'deletion' && 'Request Data Deletion'}
-            {gdprRequestType === 'rectification' && 'Data Rectification'}
-            {gdprRequestType === 'restriction' && 'Restriction of Processing'}
-            {gdprRequestType === 'objection' && 'Right to Object'}
+            {gdprRequestType === 'download' && t('gdpr.download_title')}
+            {gdprRequestType === 'portability' && t('gdpr.portability_title')}
+            {gdprRequestType === 'deletion' && t('gdpr.deletion_title')}
+            {gdprRequestType === 'rectification' && t('gdpr.rectification_title')}
+            {gdprRequestType === 'restriction' && t('gdpr.restriction_title')}
+            {gdprRequestType === 'objection' && t('gdpr.objection_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               {gdprRequestType === 'deletion' && (
                 <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <p className="text-red-600 dark:text-red-400 font-medium">This request is irreversible</p>
+                  <p className="text-red-600 dark:text-red-400 font-medium">{t("gdpr.deletion_irreversible")}</p>
                   <p className="text-theme-muted text-sm mt-1">
-                    Once your data is deleted, it cannot be recovered. Your account and all associated
-                    data will be permanently removed.
+                    {t("gdpr.deletion_modal_desc")}
                   </p>
                 </div>
               )}
 
               {gdprRequestType === 'download' && (
                 <p className="text-theme-muted">
-                  We will prepare a downloadable archive of all your personal data, including your profile,
-                  listings, messages, and transaction history. You will receive an email with a download link
-                  within 30 days.
+                  {t("gdpr.download_modal_desc")}
                 </p>
               )}
 
               {gdprRequestType === 'portability' && (
                 <p className="text-theme-muted">
-                  We will export your data in a structured, commonly used, and machine-readable format (JSON/CSV).
-                  This allows you to transfer your data to another service. You will receive an email within 30 days.
+                  {t("gdpr.portability_modal_desc")}
                 </p>
               )}
 
               {gdprRequestType === 'rectification' && (
                 <p className="text-theme-muted">
-                  Request correction of any inaccurate or incomplete personal data we hold about you.
-                  We will review your request and update the records within 30 days.
+                  {t("gdpr.rectification_modal_desc")}
                 </p>
               )}
 
               {gdprRequestType === 'restriction' && (
                 <p className="text-theme-muted">
-                  Request that we restrict the processing of your personal data. While restricted, we will
-                  store but not actively process your data. We will respond within 30 days.
+                  {t("gdpr.restriction_modal_desc")}
                 </p>
               )}
 
               {gdprRequestType === 'objection' && (
                 <p className="text-theme-muted">
-                  Object to the processing of your personal data for specific purposes, such as
-                  direct marketing or profiling. We will review your objection within 30 days.
+                  {t("gdpr.objection_modal_desc")}
                 </p>
               )}
 
               <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <p className="text-sm text-theme-muted flex items-start gap-2">
                   <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                  A confirmation email will be sent to your registered email address.
+                  {t("gdpr.confirmation_email")}
                 </p>
               </div>
             </div>
           </ModalBody>
           <ModalFooter>
             <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={gdprModal.onClose}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               className={
@@ -2355,7 +2347,7 @@ export function SettingsPage() {
               onPress={handleGdprRequest}
               isLoading={isSubmittingGdpr}
             >
-              {gdprRequestType === 'deletion' ? 'Confirm Deletion Request' : 'Submit Request'}
+              {gdprRequestType === 'deletion' ? t('gdpr.confirm_deletion') : t('gdpr.submit_request')}
             </Button>
           </ModalFooter>
         </ModalContent>

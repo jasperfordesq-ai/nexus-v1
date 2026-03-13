@@ -78,6 +78,7 @@ class AdminEventsApiController extends BaseApiController
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } else {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete event', null, 400);
+            return;
         }
     }
 
@@ -92,6 +93,7 @@ class AdminEventsApiController extends BaseApiController
             $this->respondWithData(['cancelled' => true, 'id' => $id]);
         } else {
             $this->respondWithError('CANCEL_FAILED', 'Failed to cancel event', null, 400);
+            return;
         }
     }
 }

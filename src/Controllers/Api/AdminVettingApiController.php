@@ -101,6 +101,7 @@ class AdminVettingApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to fetch vetting record', null, 500);
+            return;
         }
     }
 
@@ -186,6 +187,7 @@ class AdminVettingApiController extends BaseApiController
             $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to create vetting record', null, 500);
+            return;
         }
     }
 
@@ -270,6 +272,7 @@ class AdminVettingApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to update vetting record', null, 500);
+            return;
         }
     }
 
@@ -302,6 +305,7 @@ class AdminVettingApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to verify vetting record', null, 500);
+            return;
         }
     }
 
@@ -335,6 +339,7 @@ class AdminVettingApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to reject vetting record', null, 500);
+            return;
         }
     }
 
@@ -362,6 +367,7 @@ class AdminVettingApiController extends BaseApiController
             $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to delete vetting record', null, 500);
+            return;
         }
     }
 
@@ -510,6 +516,7 @@ class AdminVettingApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to upload document', null, 500);
+            return;
         }
     }
 }

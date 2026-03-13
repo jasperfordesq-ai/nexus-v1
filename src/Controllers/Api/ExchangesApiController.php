@@ -204,7 +204,6 @@ class ExchangesApiController extends BaseApiController
 
         if (!$success) {
             $this->error('Unable to accept this exchange request', 400);
-            return;
         }
 
         $exchange = ExchangeWorkflowService::getExchange($id);

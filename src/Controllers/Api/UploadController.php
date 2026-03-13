@@ -45,6 +45,7 @@ class UploadController extends BaseApiController
         // Check if any files were uploaded
         if (empty($files) || (isset($files['error']) && $files['error'] === UPLOAD_ERR_NO_FILE)) {
             $this->respondWithError('NO_FILES', 'No files were uploaded', 'files', 400);
+            return;
         }
 
         // Normalize $_FILES structure if multiple files
@@ -88,6 +89,7 @@ class UploadController extends BaseApiController
                     'files',
                     400
                 );
+                return;
             }
 
             try {
@@ -95,6 +97,7 @@ class UploadController extends BaseApiController
                 $uploadedUrls[] = $url;
             } catch (\Exception $e) {
                 $this->respondWithError('UPLOAD_FAILED', $e->getMessage(), 'files', 400);
+                return;
             }
         }
 

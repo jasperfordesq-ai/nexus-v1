@@ -108,7 +108,7 @@
     "make_private_aria": "Tornar grupo privado",
     "save_changes": "Guardar Alterações",
     "delete_modal_title": "Eliminar Grupo",
-    "delete_confirm": "Tem a certeza de que pretende eliminar \u201c{{name}}\u201d?",
+    "delete_confirm": "Tem a certeza de que pretende eliminar “{{name}}”?",
     "delete_desc": "Esta ação não pode ser revertida. Todas as discussões, membros e dados do grupo serão permanentemente removidos.",
     "delete_btn": "Eliminar Grupo"
   },
@@ -228,5 +228,7 @@
     "role_update_failed": "Falha ao atualizar função",
     "member_removed": "Membro removido",
     "member_remove_failed": "Falha ao remover membro"
-  }
+  },
+  "load_error": "Falha ao carregar grupos.",
+  "load_more_error": "Falha ao carregar mais grupos"
 }

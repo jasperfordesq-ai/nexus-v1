@@ -101,7 +101,8 @@
     "allowed_file_types": "PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, SVG (max 10MB)",
     "uploading_progress": "Uploading... {{progress}}%",
     "cancel": "Cancel",
-    "upload": "Upload"
+    "upload": "Upload",
+    "save_order_failed": "Failed to save new order."
   },
   "not_found": {
     "page_title": "Page Not Found",
@@ -120,7 +121,7 @@
   },
   "newsletter": {
     "page_title": "Unsubscribe from Newsletter",
-    "processing": "Processing\u2026",
+    "processing": "Processing…",
     "removing_from_list": "Removing you from the mailing list.",
     "unsubscribed": "You're unsubscribed",
     "unsubscribed_description": "You've been removed from our newsletter. You'll still receive important account notifications.",

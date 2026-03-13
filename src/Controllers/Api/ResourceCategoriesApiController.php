@@ -174,6 +174,7 @@ class ResourceCategoriesApiController extends BaseApiController
                 'items',
                 400
             );
+            return;
         }
 
         $success = ResourceOrderService::reorder($items);

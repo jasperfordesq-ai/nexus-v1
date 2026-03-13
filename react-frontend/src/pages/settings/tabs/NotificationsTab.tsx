@@ -9,6 +9,7 @@ import {
   Select,
   SelectItem,
 } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import {
   Save,
   Mail,
@@ -114,9 +115,11 @@ export function NotificationsTab({
   onSave,
   onRetry,
 }: NotificationsTabProps) {
+  const { t } = useTranslation('settings');
+
   return (
     <GlassCard className="p-6">
-      <h2 className="text-lg font-semibold text-theme-primary mb-6">Notification Preferences</h2>
+      <h2 className="text-lg font-semibold text-theme-primary mb-6">{t('notifications')}</h2>
 
       {notificationError ? (
         <div className="text-center py-8">
@@ -139,14 +142,14 @@ export function NotificationsTab({
             </h3>
 
             <SettingToggle
-              label="New Messages"
+              label={t('notification_prefs.new_messages')}
               description="Get notified when you receive a new message"
               checked={notifications.email_messages}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_messages: checked }))}
             />
 
             <SettingToggle
-              label="Connection Requests"
+              label={t('notification_prefs.connection_requests')}
               description="Connection requests and updates"
               checked={notifications.email_connections}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_connections: checked }))}
@@ -161,21 +164,21 @@ export function NotificationsTab({
             </h3>
 
             <SettingToggle
-              label="Listing Activity"
+              label={t('notification_prefs.listing_activity')}
               description="Updates about your listings (new responses, etc.)"
               checked={notifications.email_listings}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_listings: checked }))}
             />
 
             <SettingToggle
-              label="Credit Transactions"
+              label={t('notification_prefs.credit_transactions')}
               description="Notifications for credit transactions"
               checked={notifications.email_transactions}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_transactions: checked }))}
             />
 
             <SettingToggle
-              label="New Reviews"
+              label={t('notification_prefs.new_reviews')}
               description="New reviews received on your profile or listings"
               checked={notifications.email_reviews}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_reviews: checked }))}
@@ -190,21 +193,21 @@ export function NotificationsTab({
             </h3>
 
             <SettingToggle
-              label="Gamification Digest"
+              label={t('notification_prefs.gamification_digest')}
               description="Periodic summary of your gamification activity and progress"
               checked={notifications.email_gamification_digest}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_gamification_digest: checked }))}
             />
 
             <SettingToggle
-              label="Achievement Milestones"
+              label={t('notification_prefs.achievement_milestones')}
               description="Badge unlocks, level ups, and achievement notifications"
               checked={notifications.email_gamification_milestones}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_gamification_milestones: checked }))}
             />
 
             <SettingToggle
-              label="Weekly Digest"
+              label={t('notification_prefs.weekly_digest')}
               description="A weekly summary of community activity"
               checked={notifications.email_digest}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_digest: checked }))}
@@ -220,28 +223,28 @@ export function NotificationsTab({
               </h3>
 
               <SettingToggle
-                label="Payment Notifications"
+                label={t('notification_prefs.payment_notifications')}
                 description="Notifications for organisation payment activity"
                 checked={notifications.email_org_payments}
                 onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_org_payments: checked }))}
               />
 
               <SettingToggle
-                label="Transfer Notifications"
+                label={t('notification_prefs.transfer_notifications')}
                 description="Notifications for credit transfers"
                 checked={notifications.email_org_transfers}
                 onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_org_transfers: checked }))}
               />
 
               <SettingToggle
-                label="Membership Updates"
+                label={t('notification_prefs.membership_updates')}
                 description="Member joins, leaves, and membership changes"
                 checked={notifications.email_org_membership}
                 onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_org_membership: checked }))}
               />
 
               <SettingToggle
-                label="Admin Notifications"
+                label={t('notification_prefs.admin_notifications')}
                 description="Administrative alerts and system notifications"
                 checked={notifications.email_org_admin}
                 onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, email_org_admin: checked }))}
@@ -284,14 +287,14 @@ export function NotificationsTab({
             </div>
 
             <SettingToggle
-              label="Hot Match Alerts"
+              label={t('notification_prefs.hot_match_alerts')}
               description="Get notified about high-compatibility matches"
               checked={notifyHotMatches}
               onChange={onNotifyHotMatchesChange}
             />
 
             <SettingToggle
-              label="Mutual Match Alerts"
+              label={t('notification_prefs.mutual_match_alerts')}
               description="Get notified when someone you matched with also matches you"
               checked={notifyMutualMatches}
               onChange={onNotifyMutualMatchesChange}
@@ -306,7 +309,7 @@ export function NotificationsTab({
             </h3>
 
             <SettingToggle
-              label="Enable Push Notifications"
+              label={t('notification_prefs.enable_push')}
               description="Receive real-time notifications on your device"
               checked={notifications.push_enabled}
               onChange={(checked) => onNotificationsChange((prev) => ({ ...prev, push_enabled: checked }))}
@@ -321,7 +324,7 @@ export function NotificationsTab({
             </h3>
 
             <SettingToggle
-              label="Marketing Emails"
+              label={t('notification_prefs.marketing_emails')}
               description="Receive newsletters, promotions, and community updates"
               checked={marketingConsent}
               onChange={onMarketingConsentToggle}

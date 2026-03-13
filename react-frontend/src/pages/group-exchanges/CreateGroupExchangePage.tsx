@@ -323,7 +323,7 @@ export function CreateGroupExchangePage() {
       const response = await api.post<{ id: number }>('/v2/group-exchanges', payload);
 
       if (response.success && response.data) {
-        const newId = response.data.id;
+        const newId = response.data?.id;
         toast.success(t('toast.created'), t('toast.created_desc'));
         navigate(tenantPath(`/group-exchanges/${newId}`));
       } else {

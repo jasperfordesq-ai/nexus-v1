@@ -104,5 +104,20 @@
   "exchange_status_accepted": "Acceptée",
   "exchange_status_in_progress": "En cours",
   "exchange_status_pending_confirmation": "Confirmer les heures",
-  "exchange_status_disputed": "En cours d'examen"
+  "exchange_status_disputed": "En cours d'examen",
+  "renew_success": "Annonce renouvelee",
+  "renew_error": "Echec du renouvellement",
+  "detail_analytics": "Statistiques",
+  "detail_renew": "Renouveler",
+  "detail_extend": "Prolonger",
+  "detail_skills": "Competences",
+  "detail_hours": "{{count}} heures",
+  "detail_expired_on": "Expire le {{date}}",
+  "detail_expires_on": "Expire le {{date}}",
+  "detail_renewed_count_one": "renouvele {{count}} fois",
+  "detail_renewed_count_other": "renouvele {{count}} fois",
+  "load_error": "Impossible de charger les annonces.",
+  "load_more_error": "Impossible de charger plus",
+  "page_meta_description": "Parcourez les services.",
+  "page_meta_keywords": "annonces, services, offres"
 }

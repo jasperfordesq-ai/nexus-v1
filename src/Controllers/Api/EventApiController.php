@@ -69,10 +69,12 @@ class EventApiController extends BaseApiController
 
         if (!$eventId) {
             $this->respondWithError('VALIDATION_ERROR', 'event_id is required', 'event_id', 400);
+            return;
         }
 
         if (!$status) {
             $this->respondWithError('VALIDATION_ERROR', 'status is required', 'status', 400);
+            return;
         }
 
         $validStatuses = ['going', 'interested', 'not_going', 'maybe'];
@@ -83,6 +85,7 @@ class EventApiController extends BaseApiController
                 'status',
                 400
             );
+            return;
         }
 
         try {
@@ -96,6 +99,7 @@ class EventApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('RSVP_FAILED', $e->getMessage(), null, 500);
+            return;
         }
     }
 }

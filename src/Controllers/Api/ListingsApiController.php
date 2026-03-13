@@ -153,6 +153,7 @@ class ListingsApiController extends BaseApiController
 
         if ($lat === null || $lon === null) {
             $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+            return;
         }
 
         $lat = (float)$lat;
@@ -161,9 +162,11 @@ class ListingsApiController extends BaseApiController
         // Validate coordinates
         if ($lat < -90 || $lat > 90) {
             $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+            return;
         }
         if ($lon < -180 || $lon > 180) {
             $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+            return;
         }
 
         $filters = [
@@ -277,6 +280,7 @@ class ListingsApiController extends BaseApiController
 
         if (!$listing) {
             $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
         }
 
         // Track view (skip if viewer is the listing owner)
@@ -440,6 +444,7 @@ class ListingsApiController extends BaseApiController
 
         if (!$result) {
             $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
         }
 
         // Update save count cache
@@ -511,15 +516,18 @@ class ListingsApiController extends BaseApiController
 
         if (!$listing) {
             $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
         }
 
         if (!ListingService::canModify($listing, $userId)) {
             $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+            return;
         }
 
         // Check for uploaded file
         if (empty($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
             $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+            return;
         }
 
         try {
@@ -531,6 +539,7 @@ class ListingsApiController extends BaseApiController
             $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+            return;
         }
     }
 
@@ -550,10 +559,12 @@ class ListingsApiController extends BaseApiController
 
         if (!$listing) {
             $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+            return;
         }
 
         if (!ListingService::canModify($listing, $userId)) {
             $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+            return;
         }
 
         ListingService::update($id, $userId, ['image_url' => null]);

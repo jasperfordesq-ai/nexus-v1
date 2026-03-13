@@ -77,7 +77,9 @@
     "badges": "Abzeichen",
     "streak": "Serie",
     "xp_progress": "XP-Fortschritt",
-    "start_earning": "Verdienen Sie XP, indem Sie an der Gemeinschaft teilnehmen!"
+    "start_earning": "Verdienen Sie XP, indem Sie an der Gemeinschaft teilnehmen!",
+    "streak_days_one": "{{count}} Tag",
+    "streak_days_other": "{{count}} Tage"
   },
   "reviews": {
     "sent": "Gesendet {{amount}}h",

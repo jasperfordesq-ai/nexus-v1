@@ -105,6 +105,7 @@ class NotificationsApiController extends BaseApiController
 
         if (!$notification) {
             $this->respondWithError('NOT_FOUND', 'Notification not found', null, 404);
+            return;
         }
 
         $this->respondWithData($notification);

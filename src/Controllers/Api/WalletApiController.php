@@ -104,6 +104,7 @@ class WalletApiController extends BaseApiController
 
         if (!$transaction) {
             $this->respondWithError('NOT_FOUND', 'Transaction not found', null, 404);
+            return;
         }
 
         $this->respondWithData($transaction);
@@ -133,10 +134,12 @@ class WalletApiController extends BaseApiController
 
         if (empty($recipient)) {
             $this->respondWithError('VALIDATION_ERROR', 'Recipient is required', 'recipient', 400);
+            return;
         }
 
         if ($amount <= 0) {
             $this->respondWithError('VALIDATION_ERROR', 'Amount must be greater than 0', 'amount', 400);
+            return;
         }
 
         $transactionId = WalletService::transfer($userId, $recipient, $amount, 'transfer', $description, $categoryId);

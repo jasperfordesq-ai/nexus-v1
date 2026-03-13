@@ -23,7 +23,7 @@ on:
           - all
 
 env:
-  E2E_BASE_URL: ${{ secrets.E2E_BASE_URL || 'http://staging.timebank.local' }}
+  E2E_BASE_URL: ${{ secrets.E2E_BASE_URL || 'https://app.project-nexus.ie' }}
   E2E_TENANT: ${{ secrets.E2E_TENANT || 'hour-timebank' }}
   E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
   E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}

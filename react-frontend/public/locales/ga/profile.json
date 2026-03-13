@@ -38,7 +38,8 @@
     "listings": "Liostaí",
     "reviews": "Léirmheasanna",
     "achievements": "Éachtaí",
-    "activity": "Gníomhaíocht"
+    "activity": "Gníomhaíocht",
+    "availability": "Infhaighteacht"
   },
   "about": {
     "heading": "Faoi",
@@ -80,7 +81,10 @@
     "removed_title": "Bainte",
     "removed": "Nasc bainte",
     "failed": "Theip",
-    "error": "Chuaigh rud éigin mícheart"
+    "error": "Chuaigh rud éigin mícheart",
+    "select_rating": "Roghnaigh rátáil le do thoil",
+    "review_submitted": "Léirmheas curtha isteach go rathúil!",
+    "review_submit_failed": "Theip ar chur isteach an léirmheasa. Bain triail eile as."
   },
   "form": {
     "first_name": "Céadainm",
@@ -89,5 +93,6 @@
     "location": "Suíomh",
     "phone": "Fón",
     "save": "Sábháil Athruithe"
-  }
+  },
+  "load_error": "Theip ar lodail an proifile."
 }

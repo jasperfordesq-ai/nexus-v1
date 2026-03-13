@@ -47,6 +47,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 
+import { useTranslation } from 'react-i18next';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface KBArticleFull {
@@ -80,6 +81,7 @@ export function KBArticlePage() {
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { t } = useTranslation('kb');
 
   const [article, setArticle] = useState<KBArticleFull | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -124,7 +126,7 @@ export function KBArticlePage() {
 
       if (response.success) {
         setFeedbackGiven(isHelpful ? 'helpful' : 'not_helpful');
-        toast.success('Thank you for your feedback!');
+        toast.success(t('feedback_thanks'));
         // Update local counts
         setArticle((prev) => {
           if (!prev) return prev;
@@ -137,7 +139,7 @@ export function KBArticlePage() {
       }
     } catch (err) {
       logError('Failed to submit KB feedback', err);
-      toast.error('Failed to submit feedback.');
+      toast.error(t('feedback_failed'));
     } finally {
       setIsSubmittingFeedback(false);
     }

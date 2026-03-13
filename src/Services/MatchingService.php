@@ -210,8 +210,8 @@ class MatchingService
 
             // Get listing category for ML learning
             $listing = Database::query(
-                "SELECT category_id FROM listings WHERE id = ?",
-                [$listingId]
+                "SELECT category_id FROM listings WHERE id = ? AND tenant_id = ?",
+                [$listingId, $tenantId]
             )->fetch();
 
             // Update ML learning data

@@ -633,6 +633,6 @@ class AdminTimebankingApiController extends BaseApiController
         }
 
         fclose($output);
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 }

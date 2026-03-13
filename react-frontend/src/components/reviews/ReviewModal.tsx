@@ -19,6 +19,7 @@ import {
   Avatar,
 } from '@heroui/react';
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -43,6 +44,7 @@ export function ReviewModal({
   transactionId,
 }: ReviewModalProps) {
   const toast = useToast();
+  const { t } = useTranslation('profile');
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -50,7 +52,7 @@ export function ReviewModal({
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      toast.error('Please select a rating');
+      toast.error(t('toast.select_rating'));
       return;
     }
 
@@ -65,14 +67,14 @@ export function ReviewModal({
       });
 
       if (response.success) {
-        toast.success('Review submitted successfully!');
+        toast.success(t('toast.review_submitted'));
         handleClose();
         onSuccess?.();
       } else {
         toast.error(response.error || 'Failed to submit review');
       }
     } catch {
-      toast.error('Failed to submit review. Please try again.');
+      toast.error(t('toast.review_submit_failed'));
     } finally {
       setIsSubmitting(false);
     }

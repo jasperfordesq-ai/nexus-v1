@@ -90,6 +90,7 @@ class AdminInsuranceCertificateApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to fetch insurance certificate', null, 500);
+            return;
         }
     }
 
@@ -142,6 +143,7 @@ class AdminInsuranceCertificateApiController extends BaseApiController
             $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to create insurance certificate', null, 500);
+            return;
         }
     }
 
@@ -201,6 +203,7 @@ class AdminInsuranceCertificateApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to update insurance certificate', null, 500);
+            return;
         }
     }
 
@@ -229,6 +232,7 @@ class AdminInsuranceCertificateApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to verify insurance certificate', null, 500);
+            return;
         }
     }
 
@@ -258,6 +262,7 @@ class AdminInsuranceCertificateApiController extends BaseApiController
             $this->respondWithData($record);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to reject insurance certificate', null, 500);
+            return;
         }
     }
 
@@ -280,6 +285,7 @@ class AdminInsuranceCertificateApiController extends BaseApiController
             $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to delete insurance certificate', null, 500);
+            return;
         }
     }
 

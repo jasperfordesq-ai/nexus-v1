@@ -338,7 +338,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         {t('accessibility.skip_to_content', 'Skip to main content')}
       </a>
 
-      <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip">
+      <header className="fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         {/* Development status banner — inside fixed header so it's always visible */}
         <DevelopmentStatusBanner />
 
@@ -370,7 +370,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     variant="light"
                     size="sm"
                     className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
-                    onPress={() => navigate('/admin')}
+                    onPress={() => navigate(tenantPath('/admin'))}
                     aria-label={t('user_menu.admin_panel')}
                   >
                     <Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
@@ -418,7 +418,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 isIconOnly
                 variant="light"
                 size="sm"
-                className="lg:hidden text-theme-muted hover:text-theme-primary"
+                className="lg:hidden text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
                 onPress={onMobileMenuOpen}
                 aria-label="Open menu"
               >
@@ -567,7 +567,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 variant="light"
                 onPress={() => setIsSearchOpen(true)}
                 aria-label="Search (Ctrl+K)"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 min-w-0 h-auto rounded-lg text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-transparent lg:border-theme-default transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 min-w-[44px] min-h-[44px] h-auto rounded-lg text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-transparent lg:border-theme-default transition-colors"
               >
                 <Search className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden lg:inline text-xs text-theme-subtle">Search</span>

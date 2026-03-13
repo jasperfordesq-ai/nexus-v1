@@ -38,7 +38,8 @@
     "listings": "Listings",
     "reviews": "Reviews",
     "achievements": "Achievements",
-    "activity": "Activity"
+    "activity": "Activity",
+    "availability": "Availability"
   },
   "about": {
     "heading": "About",
@@ -80,7 +81,10 @@
     "removed_title": "Removed",
     "removed": "Connection removed",
     "failed": "Failed",
-    "error": "Something went wrong"
+    "error": "Something went wrong",
+    "select_rating": "Please select a rating",
+    "review_submitted": "Review submitted successfully!",
+    "review_submit_failed": "Failed to submit review. Please try again."
   },
   "form": {
     "first_name": "First Name",
@@ -89,5 +93,6 @@
     "location": "Location",
     "phone": "Phone",
     "save": "Save Changes"
-  }
+  },
+  "load_error": "Failed to load profile. Please try again."
 }

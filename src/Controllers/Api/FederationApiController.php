@@ -984,13 +984,13 @@ class FederationApiController extends BaseApiController
 
         if (isset($result['error'])) {
             $this->jsonResponse($result, 400);
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         }
 
         header('Cache-Control: no-store');
         header('Pragma: no-cache');
         $this->jsonResponse($result, 200);
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

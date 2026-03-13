@@ -85,6 +85,8 @@ export function TransferModal({
 
   // Reset form when modal opens/closes
   useEffect(() => {
+    let cancelled = false;
+
     if (isOpen) {
       setFormData({ recipient: null, amount: '', description: '', category_id: null });
       setSearchQuery('');
@@ -95,6 +97,7 @@ export function TransferModal({
       if (initialRecipientId) {
         api.get<{ id: number; first_name: string; last_name: string; avatar_url?: string; username?: string }>(`/v2/users/${initialRecipientId}`)
           .then((res) => {
+            if (cancelled) return;
             if (res.success && res.data) {
               const u = res.data;
               setFormData((prev) => ({
@@ -118,8 +121,9 @@ export function TransferModal({
       }
     }
 
-    // Cleanup timeout on unmount
+    // Cleanup: cancel in-flight request and clear timeout
     return () => {
+      cancelled = true;
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }

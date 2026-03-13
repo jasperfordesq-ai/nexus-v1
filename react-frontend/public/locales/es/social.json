@@ -24,5 +24,14 @@
   "share_to_feed": "Compartir en el Feed",
   "shared_to_feed": "Compartido en tu feed",
   "write_comment": "Escribe un comentario...",
-  "write_reply": "Escribe una respuesta..."
+  "write_reply": "Escribe una respuesta...",
+  "endorsement_update_failed": "Error al actualizar la recomendación",
+  "endorse": {
+    "tooltip_remove": "Quitar recomendación para {{skillName}}",
+    "tooltip_endorse": "Recomendar {{skillName}}",
+    "aria_remove": "Quitar recomendación {{skillName}}",
+    "aria_endorse": "Recomendar {{skillName}}",
+    "endorsed": "Recomendado",
+    "endorse": "Recomendar"
+  }
 }

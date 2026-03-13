@@ -142,10 +142,11 @@ export function VolunteeringPage() {
   const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     if (isAuthenticated) {
       api.get<Array<{ status: string; member_role: string }>>('/v2/volunteering/my-organisations')
         .then((res) => {
-          if (res.success && Array.isArray(res.data)) {
+          if (!cancelled && res.success && Array.isArray(res.data)) {
             setHasApprovedOrg(
               res.data.some((org) => org.status === 'approved' && ['owner', 'admin'].includes(org.member_role)),
             );
@@ -153,6 +154,7 @@ export function VolunteeringPage() {
         })
         .catch(() => { /* silent — button just won't show */ });
     }
+    return () => { cancelled = true; };
   }, [isAuthenticated]);
 
   // Feature gate

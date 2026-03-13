@@ -358,7 +358,7 @@ export function SearchPage() {
                             {listing.image_url && (
                               <img
                                 src={resolveAssetUrl(listing.image_url)}
-                                alt=""
+                                alt={listing.title || 'Listing image'}
                                 className="w-full h-32 object-cover"
                                 loading="lazy"
                               />

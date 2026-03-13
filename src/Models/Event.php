@@ -133,7 +133,8 @@ class Event
         }
 
         $params[] = $id;
-        $sql = "UPDATE events SET " . implode(', ', $fields) . " WHERE id = ?";
+        $params[] = \Nexus\Core\TenantContext::getId();
+        $sql = "UPDATE events SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?";
         return Database::query($sql, $params);
     }
 

@@ -100,7 +100,7 @@ export function ExchangesPage() {
         } else {
           setExchanges(response.data);
         }
-        setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
+        setHasMore(response.meta?.has_more ?? (response.data?.length ?? 0) >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
           setError(t('error.load_failed'));

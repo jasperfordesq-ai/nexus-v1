@@ -1,0 +1,9 @@
+{
+  "checkin_recorded": "Pointage enregistré !",
+  "checkin_failed": "Échec de l'enregistrement du pointage.",
+  "reminder_set_failed": "Échec de la définition du rappel.",
+  "reminder_removed": "Rappel supprimé.",
+  "reminder_remove_failed": "Échec de la suppression du rappel.",
+  "template_created": "Objectif créé à partir du modèle !",
+  "template_create_failed": "Échec de la création de l'objectif à partir du modèle."
+}

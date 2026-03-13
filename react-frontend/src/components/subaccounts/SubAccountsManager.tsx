@@ -39,6 +39,7 @@ import {
   Clock,
   RefreshCw,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
@@ -73,6 +74,7 @@ interface SubAccount {
 
 export function SubAccountsManager() {
   const toast = useToast();
+  const { t } = useTranslation('settings');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [subAccounts, setSubAccounts] = useState<SubAccount[]>([]);
@@ -109,7 +111,7 @@ export function SubAccountsManager() {
   // Add sub-account
   const handleAdd = async () => {
     if (!addEmail.trim()) {
-      toast.error('Please enter an email address');
+      toast.error(t('toasts.subaccount_enter_email'));
       return;
     }
 
@@ -121,7 +123,7 @@ export function SubAccountsManager() {
       });
 
       if (response.success) {
-        toast.success('Linked account request sent');
+        toast.success(t('toasts.subaccount_request_sent'));
         setAddEmail('');
         setAddName('');
         onClose();
@@ -131,7 +133,7 @@ export function SubAccountsManager() {
       }
     } catch (err) {
       logError('Failed to add sub-account', err);
-      toast.error('Failed to send request');
+      toast.error(t('toasts.subaccount_send_failed'));
     } finally {
       setIsAdding(false);
     }
@@ -153,11 +155,11 @@ export function SubAccountsManager() {
           )
         );
       } else {
-        toast.error(response.error || 'Failed to update permission');
+        toast.error(response.error || t('toasts.subaccount_permission_failed'));
       }
     } catch (err) {
       logError('Failed to update permission', err);
-      toast.error('Failed to update permission');
+      toast.error(t('toasts.subaccount_permission_failed'));
     }
   };
 
@@ -166,14 +168,14 @@ export function SubAccountsManager() {
     try {
       const response = await api.delete(`/v2/users/me/sub-accounts/${accountId}`);
       if (response.success) {
-        toast.success('Linked account removed');
+        toast.success(t('toasts.subaccount_removed'));
         setSubAccounts((prev) => prev.filter((sa) => sa.id !== accountId));
       } else {
         toast.error(response.error || 'Failed to remove');
       }
     } catch (err) {
       logError('Failed to remove sub-account', err);
-      toast.error('Failed to remove linked account');
+      toast.error(t('toasts.subaccount_remove_failed'));
     }
   };
 
@@ -182,14 +184,14 @@ export function SubAccountsManager() {
     try {
       const response = await api.put(`/v2/users/me/sub-accounts/${accountId}/approve`);
       if (response.success) {
-        toast.success('Request approved');
+        toast.success(t('toasts.subaccount_approved'));
         loadSubAccounts();
       } else {
         toast.error(response.error || 'Failed to approve');
       }
     } catch (err) {
       logError('Failed to approve sub-account', err);
-      toast.error('Failed to approve request');
+      toast.error(t('toasts.subaccount_approve_failed'));
     }
   };
 

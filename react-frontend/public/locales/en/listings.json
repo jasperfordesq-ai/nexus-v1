@@ -104,5 +104,20 @@
   "exchange_status_accepted": "Accepted",
   "exchange_status_in_progress": "In Progress",
   "exchange_status_pending_confirmation": "Confirm Hours",
-  "exchange_status_disputed": "Under Review"
+  "exchange_status_disputed": "Under Review",
+  "renew_success": "Listing renewed successfully",
+  "renew_error": "Failed to renew listing",
+  "detail_analytics": "Analytics",
+  "detail_renew": "Renew Listing",
+  "detail_extend": "Extend",
+  "detail_skills": "Skills",
+  "detail_hours": "{{count}} hours",
+  "detail_expired_on": "Expired on {{date}}",
+  "detail_expires_on": "Expires {{date}}",
+  "detail_renewed_count_one": "renewed {{count}} time",
+  "detail_renewed_count_other": "renewed {{count}} times",
+  "load_error": "Failed to load listings. Please try again.",
+  "load_more_error": "Failed to load more listings",
+  "page_meta_description": "Browse services and requests from the community. Find offers and requests for time-banked services.",
+  "page_meta_keywords": "listings, services, offers, requests, time banking"
 }

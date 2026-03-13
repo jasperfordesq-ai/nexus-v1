@@ -246,6 +246,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
             if (!$role) {
                 $this->respondWithError('NOT_FOUND', 'Role not found', null, 404);
+                return;
             }
 
             $role['permissions'] = json_decode($role['permissions'] ?? '[]', true) ?: [];
@@ -253,6 +254,7 @@ class AdminEnterpriseApiController extends BaseApiController
             $this->respondWithData($role);
         } catch (\Exception $e) {
             $this->respondWithError('NOT_FOUND', 'Role not found or roles table not available', null, 404);
+            return;
         }
     }
 
@@ -321,6 +323,7 @@ class AdminEnterpriseApiController extends BaseApiController
             Database::rollback();
             error_log('createRole error: ' . $e->getMessage());
             $this->respondWithError('CREATE_FAILED', 'Failed to create role', null, 500);
+            return;
         }
     }
 
@@ -355,14 +358,24 @@ class AdminEnterpriseApiController extends BaseApiController
             }
 
             // Update permissions if provided
+            // Verify the role belongs to the current tenant before modifying permissions
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                Database::query("DELETE FROM role_permissions WHERE role_id = ?", [$id]);
+                $roleCheck = Database::query(
+                    "SELECT id FROM roles WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
+                )->fetch();
+                if (!$roleCheck) {
+                    Database::rollback();
+                    $this->respondWithError('NOT_FOUND', 'Role not found for this tenant', null, 404);
+                    return;
+                }
+                Database::query("DELETE FROM role_permissions WHERE role_id = ? AND tenant_id = ?", [$id, $tenantId]);
                 foreach ($data['permissions'] as $permName) {
                     $perm = Database::query("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName])->fetch();
                     if (!empty($perm)) {
                         Database::query(
-                            "INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
-                            [$id, $perm['id']]
+                            "INSERT INTO role_permissions (role_id, permission_id, tenant_id) VALUES (?, ?, ?)",
+                            [$id, $perm['id'], $tenantId]
                         );
                     }
                 }
@@ -393,6 +406,7 @@ class AdminEnterpriseApiController extends BaseApiController
             Database::rollback();
             error_log('updateRole error: ' . $e->getMessage());
             $this->respondWithError('UPDATE_FAILED', 'Failed to update role', null, 500);
+            return;
         }
     }
 
@@ -412,6 +426,7 @@ class AdminEnterpriseApiController extends BaseApiController
             $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete role', null, 500);
+            return;
         }
     }
 
@@ -542,6 +557,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
         if (empty($status)) {
             $this->respondWithError('VALIDATION_ERROR', 'Status is required', 'status', 422);
+            return;
         }
 
         try {
@@ -567,6 +583,7 @@ class AdminEnterpriseApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'status' => $status, 'updated' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update GDPR request', null, 500);
+            return;
         }
     }
 
@@ -648,6 +665,7 @@ class AdminEnterpriseApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'message' => 'Breach reported successfully'], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('CREATE_FAILED', 'Failed to report breach: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -890,6 +908,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
         if (empty($newConfig)) {
             $this->respondWithError('VALIDATION_ERROR', 'No configuration data provided', null, 422);
+            return;
         }
 
         try {
@@ -917,6 +936,7 @@ class AdminEnterpriseApiController extends BaseApiController
             $this->respondWithData($merged);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update configuration', null, 500);
+            return;
         }
     }
 
@@ -1005,11 +1025,13 @@ class AdminEnterpriseApiController extends BaseApiController
 
             if (!$doc) {
                 $this->respondWithError('NOT_FOUND', 'Legal document not found', null, 404);
+                return;
             }
 
             $this->respondWithData($doc);
         } catch (\Exception $e) {
             $this->respondWithError('NOT_FOUND', 'Legal document not found or table not available', null, 404);
+            return;
         }
     }
 
@@ -1042,6 +1064,7 @@ class AdminEnterpriseApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log('createLegalDoc error: ' . $e->getMessage());
             $this->respondWithError('CREATE_FAILED', 'Failed to create legal document: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -1073,6 +1096,7 @@ class AdminEnterpriseApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log('updateLegalDoc error: ' . $e->getMessage());
             $this->respondWithError('UPDATE_FAILED', 'Failed to update legal document', null, 500);
+            return;
         }
     }
 
@@ -1092,6 +1116,7 @@ class AdminEnterpriseApiController extends BaseApiController
             $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete legal document', null, 500);
+            return;
         }
     }
 

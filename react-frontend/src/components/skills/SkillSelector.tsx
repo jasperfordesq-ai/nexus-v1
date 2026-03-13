@@ -26,6 +26,7 @@ import {
   useDisclosure,
 } from '@heroui/react';
 import { Search, Plus, X, Star, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -149,6 +150,7 @@ export function SkillSelector({
   onSkillsChange: () => void;
 }) {
   const toast = useToast();
+  const { t } = useTranslation('settings');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [categories, setCategories] = useState<SkillCategory[]>([]);
@@ -214,18 +216,18 @@ export function SkillSelector({
       });
 
       if (response.success) {
-        toast.success('Skill added successfully');
+        toast.success(t('toasts.skill_added'));
         setSelectedSkill('');
         setSearchQuery('');
         setSearchResults([]);
         onSkillsChange();
         onClose();
       } else {
-        toast.error(response.error || 'Failed to add skill');
+        toast.error(response.error || t('toasts.skill_add_failed'));
       }
     } catch (err) {
       logError('Failed to add skill', err);
-      toast.error('Failed to add skill');
+      toast.error(t('toasts.skill_add_failed'));
     } finally {
       setIsAdding(false);
     }
@@ -236,14 +238,14 @@ export function SkillSelector({
     try {
       const response = await api.delete(`/v2/users/me/skills/${skillId}`);
       if (response.success) {
-        toast.success('Skill removed');
+        toast.success(t('toasts.skill_removed'));
         onSkillsChange();
       } else {
-        toast.error(response.error || 'Failed to remove skill');
+        toast.error(response.error || t('toasts.skill_remove_failed'));
       }
     } catch (err) {
       logError('Failed to remove skill', err);
-      toast.error('Failed to remove skill');
+      toast.error(t('toasts.skill_remove_failed'));
     }
   };
 

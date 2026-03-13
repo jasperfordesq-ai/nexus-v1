@@ -27,6 +27,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
+import { useTranslation } from 'react-i18next';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface GoalReminder {
@@ -55,6 +56,7 @@ const FREQUENCIES = [
 
 export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggleProps) {
   const toast = useToast();
+  const { t } = useTranslation('goals');
   const [reminder, setReminder] = useState<GoalReminder | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -90,11 +92,11 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
         await loadReminder();
         setIsPopoverOpen(false);
       } else {
-        toast.error('Failed to set reminder.');
+        toast.error(t('reminder_set_failed'));
       }
     } catch (err) {
       logError('Failed to set goal reminder', err);
-      toast.error('Failed to set reminder.');
+      toast.error(t('reminder_set_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -105,15 +107,15 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
       setIsSaving(true);
       const response = await api.delete(`/v2/goals/${goalId}/reminder`);
       if (response.success) {
-        toast.success('Reminder removed.');
+        toast.success(t('reminder_removed'));
         setReminder(null);
         setIsPopoverOpen(false);
       } else {
-        toast.error('Failed to remove reminder.');
+        toast.error(t('reminder_remove_failed'));
       }
     } catch (err) {
       logError('Failed to delete goal reminder', err);
-      toast.error('Failed to remove reminder.');
+      toast.error(t('reminder_remove_failed'));
     } finally {
       setIsSaving(false);
     }

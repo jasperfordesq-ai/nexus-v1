@@ -101,7 +101,8 @@
     "allowed_file_types": "PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, SVG (uasmhéid 10MB)",
     "uploading_progress": "Ag uaslódáil... {{progress}}%",
     "cancel": "Cealaigh",
-    "upload": "Uaslódáil"
+    "upload": "Uaslódáil",
+    "save_order_failed": "Theip ar an ord nua a shábháil."
   },
   "not_found": {
     "page_title": "Leathanach Gan Aimsiú",
@@ -120,7 +121,7 @@
   },
   "newsletter": {
     "page_title": "Díliostáil ón Nuachtlitir",
-    "processing": "Á phróiseáil\u2026",
+    "processing": "Á phróiseáil…",
     "removing_from_list": "Á bhaint den liosta seoltaí.",
     "unsubscribed": "Tá tú díliostáilte",
     "unsubscribed_description": "Baineadh thú ónár nuachtlitir. Gheobhaidh tú fógraí tábhachtacha cuntais fós.",

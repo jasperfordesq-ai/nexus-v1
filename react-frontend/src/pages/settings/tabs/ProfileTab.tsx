@@ -90,7 +90,7 @@ export function ProfileTab({
   return (
     <div className="space-y-6">
       <GlassCard className="p-6">
-        <h2 className="text-lg font-semibold text-theme-primary mb-6">Profile Information</h2>
+        <h2 className="text-lg font-semibold text-theme-primary mb-6">{t('profile.section_title')}</h2>
 
         {/* Avatar */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-8">
@@ -121,8 +121,8 @@ export function ProfileTab({
             </Button>
           </div>
           <div>
-            <p className="text-theme-primary font-medium">Profile Photo</p>
-            <p className="text-theme-subtle text-sm">JPG, PNG or GIF. Max 5MB.</p>
+            <p className="text-theme-primary font-medium">{t('profile.photo_label')}</p>
+            <p className="text-theme-subtle text-sm">{t('profile.photo_hint')}</p>
           </div>
         </div>
 
@@ -131,15 +131,15 @@ export function ProfileTab({
           {/* Name fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="First Name"
-              placeholder="Your first name"
+              label={t('profile.first_name')}
+              placeholder={t('profile.first_name_placeholder')}
               value={profileData.first_name}
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, first_name: e.target.value }))}
               classNames={inputClassNames}
             />
             <Input
-              label="Last Name"
-              placeholder="Your last name"
+              label={t('profile.last_name')}
+              placeholder={t('profile.last_name_placeholder')}
               value={profileData.last_name}
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, last_name: e.target.value }))}
               classNames={inputClassNames}
@@ -149,8 +149,8 @@ export function ProfileTab({
           {/* Phone */}
           <Input
             type="tel"
-            label="Phone Number"
-            placeholder="+1 555 123 4567"
+            label={t('profile.phone')}
+            placeholder={t('profile.phone_placeholder')}
             value={profileData.phone}
             onChange={(e) => onProfileDataChange((prev) => ({ ...prev, phone: e.target.value }))}
             startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -159,7 +159,7 @@ export function ProfileTab({
 
           {/* Profile Type */}
           <Select
-            label="Profile Type"
+            label={t('profile.profile_type')}
             selectedKeys={[profileData.profile_type]}
             onSelectionChange={(keys) => {
               const value = Array.from(keys)[0] as string;
@@ -172,15 +172,15 @@ export function ProfileTab({
             }}
             classNames={selectClassNames}
           >
-            <SelectItem key="individual">Individual</SelectItem>
-            <SelectItem key="organisation">Organisation</SelectItem>
+            <SelectItem key="individual">{t('profile.type_individual')}</SelectItem>
+            <SelectItem key="organisation">{t('profile.type_organisation')}</SelectItem>
           </Select>
 
           {/* Organisation Name (conditional) */}
           {profileData.profile_type === 'organisation' && (
             <Input
-              label="Organisation Name"
-              placeholder="Your organisation name"
+              label={t('profile.org_name')}
+              placeholder={t('profile.org_name_placeholder')}
               value={profileData.organization_name}
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, organization_name: e.target.value }))}
               startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -189,16 +189,16 @@ export function ProfileTab({
           )}
 
           <Input
-            label="Tagline"
-            placeholder="A short description about yourself"
+            label={t('profile.tagline')}
+            placeholder={t('profile.tagline_placeholder')}
             value={profileData.tagline}
             onChange={(e) => onProfileDataChange((prev) => ({ ...prev, tagline: e.target.value }))}
             classNames={inputClassNames}
           />
 
           <Textarea
-            label="Bio"
-            placeholder="Tell others about yourself..."
+            label={t('profile.bio')}
+            placeholder={t('profile.bio_placeholder')}
             value={profileData.bio}
             onChange={(e) => onProfileDataChange((prev) => ({ ...prev, bio: e.target.value }))}
             minRows={4}
@@ -210,8 +210,8 @@ export function ProfileTab({
           />
 
           <PlaceAutocompleteInput
-            label="Location"
-            placeholder="City, Country"
+            label={t('profile.location')}
+            placeholder={t('profile.location_placeholder')}
             value={profileData.location}
             onChange={(val) => onProfileDataChange((prev) => ({ ...prev, location: val }))}
             onPlaceSelect={(place) => {

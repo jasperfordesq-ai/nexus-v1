@@ -63,7 +63,7 @@ class PusherAuthController extends BaseApiController
             $this->jsonResponse(['error' => 'Invalid channel type'], 400);
         } catch (\Throwable $e) {
             error_log('[PusherAuth] Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-            $this->jsonResponse(['error' => 'Server error: ' . $e->getMessage()], 500);
+            $this->jsonResponse(['error' => 'Server error'], 500);
         }
     }
 
@@ -82,10 +82,10 @@ class PusherAuthController extends BaseApiController
             // Return raw JSON from Pusher
             header('Content-Type: application/json');
             echo $auth;
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             error_log('[PusherAuth] authPrivate error: ' . $e->getMessage());
-            $this->jsonResponse(['error' => 'Auth error: ' . $e->getMessage()], 500);
+            $this->jsonResponse(['error' => 'Auth error'], 500);
         }
     }
 
@@ -107,10 +107,10 @@ class PusherAuthController extends BaseApiController
             // Return raw JSON from Pusher
             header('Content-Type: application/json');
             echo $auth;
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             error_log('[PusherAuth] authPresence error: ' . $e->getMessage());
-            $this->jsonResponse(['error' => 'Auth error: ' . $e->getMessage()], 500);
+            $this->jsonResponse(['error' => 'Auth error'], 500);
         }
     }
 
@@ -130,10 +130,10 @@ class PusherAuthController extends BaseApiController
             // Return raw JSON from Pusher
             header('Content-Type: application/json');
             echo $auth;
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         } catch (\Throwable $e) {
             error_log('[PusherAuth] authFederation error: ' . $e->getMessage());
-            $this->jsonResponse(['error' => 'Auth error: ' . $e->getMessage()], 500);
+            $this->jsonResponse(['error' => 'Auth error'], 500);
         }
     }
 
@@ -205,9 +205,7 @@ class PusherAuthController extends BaseApiController
         } catch (\Throwable $e) {
             $this->jsonResponse([
                 'status' => 'error',
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
+                'error' => 'Internal error',
             ], 500);
         }
     }

@@ -116,15 +116,15 @@ export function GroupsPage() {
         }
       } else {
         if (!append) {
-          setError('Failed to load groups. Please try again.');
+          setError(t('load_error'));
         }
       }
     } catch (err) {
       logError('Failed to load groups', err);
       if (!append) {
-        setError('Failed to load groups. Please try again.');
+        setError(t('load_error'));
       } else {
-        toast.error('Failed to load more groups');
+        toast.error(t('load_more_error'));
       }
     } finally {
       setIsLoading(false);

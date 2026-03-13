@@ -52,6 +52,7 @@ class IdeationChallengesApiController extends BaseApiController
     {
         if (!TenantContext::hasFeature('ideation_challenges')) {
             $this->respondWithError('FEATURE_DISABLED', 'Ideation Challenges module is not enabled for this community', null, 403);
+            return;
         }
     }
 
@@ -168,6 +169,7 @@ class IdeationChallengesApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         // Track view (fire-and-forget)
@@ -248,6 +250,7 @@ class IdeationChallengesApiController extends BaseApiController
                 'status',
                 400
             );
+            return;
         }
 
         $success = IdeationChallengeService::updateChallengeStatus($id, $userId, $newStatus);
@@ -397,6 +400,7 @@ class IdeationChallengesApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         $this->respondWithData($idea);
@@ -538,6 +542,7 @@ class IdeationChallengesApiController extends BaseApiController
                 'status',
                 400
             );
+            return;
         }
 
         $success = IdeationChallengeService::updateIdeaStatus($id, $userId, $newStatus);
@@ -1016,7 +1021,6 @@ class IdeationChallengesApiController extends BaseApiController
         if (!$success) {
             $errors = CampaignService::getErrors();
             $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
-            return;
         }
 
         $this->respondWithData(['linked' => true], null, 201);

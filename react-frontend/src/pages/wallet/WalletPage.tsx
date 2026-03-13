@@ -313,7 +313,7 @@ export function WalletPage() {
                 onClick={() => setIsDonateModalOpen(true)}
                 isDisabled={isLoading || !balance || balance.balance <= 0}
               >
-                Donate
+                {t('donate')}
               </Button>
             </div>
           </div>

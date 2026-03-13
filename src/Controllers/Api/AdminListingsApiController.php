@@ -59,7 +59,7 @@ class AdminListingsApiController extends BaseApiController
         $order = strtoupper($_GET['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
         // Whitelist sort columns
         $allowedSorts = ['title', 'type', 'status', 'created_at', 'user_name'];
-        if (!in_array($sort, $allowedSorts)) {
+        if (!in_array($sort, $allowedSorts, true)) {
             $sort = 'created_at';
         }
 

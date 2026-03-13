@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from '@heroui/react';
 import { TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -27,6 +28,7 @@ interface TrendingHashtag {
 
 export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
   const { tenantPath } = useTenant();
+  const { t } = useTranslation('feed');
   const [hashtags, setHashtags] = useState<TrendingHashtag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -52,7 +54,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
       <GlassCard className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-          <h3 className="font-semibold text-theme-primary text-sm">Trending</h3>
+          <h3 className="font-semibold text-theme-primary text-sm">{t('trending.title')}</h3>
         </div>
         <div className="flex justify-center py-3">
           <Spinner size="sm" />
@@ -67,7 +69,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
     <GlassCard className="p-4">
       <div className="flex items-center gap-2 mb-3">
         <TrendingUp className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-        <h3 className="font-semibold text-theme-primary text-sm">Trending</h3>
+        <h3 className="font-semibold text-theme-primary text-sm">{t('trending.title')}</h3>
       </div>
 
       <div className="space-y-2">
@@ -84,7 +86,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
                   #{hashtag.tag}
                 </span>
                 <p className="text-xs text-theme-subtle">
-                  {hashtag.post_count} post{hashtag.post_count !== 1 ? 's' : ''}
+                  {hashtag.post_count === 1 ? t('trending.post_count', { count: hashtag.post_count }) : t('trending.post_count_plural', { count: hashtag.post_count })}
                 </p>
               </div>
             </div>
@@ -99,7 +101,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
         to={tenantPath('/feed/hashtags')}
         className="block text-center text-xs text-indigo-500 hover:text-indigo-600 mt-3 pt-2 border-t border-theme-default"
       >
-        View all hashtags
+        {t('trending.view_all')}
       </Link>
     </GlassCard>
   );

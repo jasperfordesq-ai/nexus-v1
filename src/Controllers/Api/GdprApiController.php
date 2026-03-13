@@ -54,6 +54,7 @@ class GdprApiController extends BaseApiController
 
         if (!$consentId && !$this->input('consent_type')) {
             $this->respondWithError('VALIDATION_ERROR', 'Missing consent_id', 'consent_id', 400);
+            return;
         }
 
         // Resolve consent_id (int) to consent type slug, or use consent_type directly
@@ -83,6 +84,7 @@ class GdprApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('CONSENT_UPDATE_FAILED', $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -123,6 +125,7 @@ class GdprApiController extends BaseApiController
                 'type',
                 400
             );
+            return;
         }
 
         try {
@@ -140,6 +143,7 @@ class GdprApiController extends BaseApiController
             ], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('REQUEST_FAILED', $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -170,11 +174,13 @@ class GdprApiController extends BaseApiController
 
         if (empty($password)) {
             $this->respondWithError('VALIDATION_ERROR', 'Password is required', 'password', 400);
+            return;
         }
 
         // Verify password
         if (!$this->verifyPassword($userId, $password)) {
             $this->respondWithError('INVALID_PASSWORD', 'Invalid password', 'password', 403);
+            return;
         }
 
         try {
@@ -201,6 +207,7 @@ class GdprApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('DELETE_FAILED', $e->getMessage(), null, 500);
+            return;
         }
     }
 

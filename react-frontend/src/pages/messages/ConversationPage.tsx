@@ -81,6 +81,7 @@ export function ConversationPage() {
   const lastMessageIdRef = useRef<number | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isMountedRef = useRef(true);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   // Determine if this is a new conversation (user ID) or existing (conversation ID)
@@ -306,6 +307,12 @@ export function ConversationPage() {
     }
   }, [targetId, isNewConversationRoute]);
 
+  // Cleanup ref for unmount guard
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => { isMountedRef.current = false; };
+  }, []);
+
   // Load initial conversation
   useEffect(() => {
     loadConversation();
@@ -316,7 +323,7 @@ export function ConversationPage() {
     api.get<{ messaging_disabled: boolean; under_monitoring: boolean; restriction_reason: string | null }>(
       '/v2/messages/restriction-status'
     ).then((res) => {
-      if (res.success && res.data) {
+      if (isMountedRef.current && res.success && res.data) {
         setMessagingRestriction(res.data);
       }
     }).catch(() => { /* non-critical */ });

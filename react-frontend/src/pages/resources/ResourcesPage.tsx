@@ -457,7 +457,7 @@ export function ResourcesPage() {
       await api.put('/v2/resources/reorder', { order: orderedIds });
     } catch (err) {
       logError('Failed to reorder resources', err);
-      toast.error('Failed to save new order.');
+      toast.error(t('resources.save_order_failed'));
       loadResources();
     }
   };

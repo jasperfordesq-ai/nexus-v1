@@ -101,7 +101,8 @@
     "allowed_file_types": "PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, JPG, PNG, GIF, SVG (máx. 10MB)",
     "uploading_progress": "A carregar... {{progress}}%",
     "cancel": "Cancelar",
-    "upload": "Carregar"
+    "upload": "Carregar",
+    "save_order_failed": "Falha ao salvar a nova ordem."
   },
   "not_found": {
     "page_title": "Página Não Encontrada",
@@ -120,7 +121,7 @@
   },
   "newsletter": {
     "page_title": "Cancelar Subscrição da Newsletter",
-    "processing": "A processar\u2026",
+    "processing": "A processar…",
     "removing_from_list": "A removê-lo da lista de correio.",
     "unsubscribed": "Subscrição cancelada",
     "unsubscribed_description": "Foi removido da nossa newsletter. Continuará a receber notificações importantes da conta.",

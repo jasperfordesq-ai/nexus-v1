@@ -108,7 +108,7 @@
     "make_private_aria": "Make group private",
     "save_changes": "Save Changes",
     "delete_modal_title": "Delete Group",
-    "delete_confirm": "Are you sure you want to delete \u201c{{name}}\u201d?",
+    "delete_confirm": "Are you sure you want to delete “{{name}}”?",
     "delete_desc": "This action cannot be undone. All discussions, members, and group data will be permanently removed.",
     "delete_btn": "Delete Group"
   },
@@ -228,5 +228,7 @@
     "role_update_failed": "Failed to update role",
     "member_removed": "Member removed",
     "member_remove_failed": "Failed to remove member"
-  }
+  },
+  "load_error": "Failed to load groups. Please try again.",
+  "load_more_error": "Failed to load more groups"
 }

@@ -41,7 +41,10 @@
     "report_failed": "Theip ar an bpostáil a thuairisciú",
     "deleted": "Postáil scriosta",
     "delete_failed": "Theip ar an bpostáil a scriosadh",
-    "vote_failed": "Theip ar an vóta a sheoladh"
+    "vote_failed": "Theip ar an vóta a sheoladh",
+    "post_shared": "Postáil roinnte le do fhotha",
+    "share_removed": "Roinnt bainte",
+    "share_failed": "Theip ar an bpostáil a roinnt"
   },
   "realtime": {
     "new_post_singular": "1 postáil nua",
@@ -220,5 +223,18 @@
     "no_match": "Gan haischlibeanna ag meaitseáil \"{{query}}\"",
     "no_trending": "Gan haischlibeanna treochta i do phobal fós.",
     "post_count": "{{count}} postáil"
+  },
+  "share": {
+    "tooltip_remove": "Bain comhroinnt",
+    "tooltip_share": "Comhroinn le do fhotha",
+    "button_label": "Comhroinn",
+    "button_label_count": "Comhroinn ({{count}})",
+    "shared_by": "<0>{{name}}</0> a chomhroinn é seo"
+  },
+  "trending": {
+    "title": "Ag Treocht",
+    "view_all": "Féach ar gach haischlib",
+    "post_count": "{{count}} postáil",
+    "post_count_plural": "{{count}} postálacha"
   }
 }

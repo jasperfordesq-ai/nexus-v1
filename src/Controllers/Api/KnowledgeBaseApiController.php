@@ -109,6 +109,7 @@ class KnowledgeBaseApiController extends BaseApiController
                 'q',
                 400
             );
+            return;
         }
 
         $limit = $this->queryInt('limit', 20, 1, 50);
@@ -131,6 +132,7 @@ class KnowledgeBaseApiController extends BaseApiController
 
         if (!$article) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Article not found', null, 404);
+            return;
         }
 
         // Check if unpublished — only admins can see
@@ -138,10 +140,12 @@ class KnowledgeBaseApiController extends BaseApiController
             $userId = $this->getOptionalUserId();
             if (!$userId) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Article not found', null, 404);
+                return;
             }
             $role = $this->getAuthenticatedUserRole() ?? 'member';
             if (!in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Article not found', null, 404);
+                return;
             }
         }
 
@@ -172,16 +176,19 @@ class KnowledgeBaseApiController extends BaseApiController
 
         if (!$article) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Article not found', null, 404);
+            return;
         }
 
         if (!$article['is_published']) {
             $userId = $this->getOptionalUserId();
             if (!$userId) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Article not found', null, 404);
+                return;
             }
             $role = $this->getAuthenticatedUserRole() ?? 'member';
             if (!in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'])) {
                 $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Article not found', null, 404);
+                return;
             }
         }
 
@@ -312,6 +319,7 @@ class KnowledgeBaseApiController extends BaseApiController
                 'is_helpful',
                 400
             );
+            return;
         }
 
         $comment = $this->input('comment');

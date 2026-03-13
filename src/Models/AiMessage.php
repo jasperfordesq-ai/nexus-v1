@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 /**
  * AI Message Model
@@ -146,8 +147,9 @@ class AiMessage
         }
 
         $values[] = $id;
+        $values[] = TenantContext::getId();
 
-        $sql = "UPDATE ai_messages SET " . implode(', ', $fields) . " WHERE id = ?";
+        $sql = "UPDATE ai_messages SET " . implode(', ', $fields) . " WHERE id = ? AND conversation_id IN (SELECT id FROM ai_conversations WHERE tenant_id = ?)";
         $stmt = $db->prepare($sql);
 
         return $stmt->execute($values);
@@ -159,8 +161,9 @@ class AiMessage
     public static function delete(int $id): bool
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("DELETE FROM ai_messages WHERE id = ?");
-        return $stmt->execute([$id]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("DELETE FROM ai_messages WHERE id = ? AND conversation_id IN (SELECT id FROM ai_conversations WHERE tenant_id = ?)");
+        return $stmt->execute([$id, $tenantId]);
     }
 
     /**
@@ -193,7 +196,8 @@ class AiMessage
     public static function deleteByConversationId(int $conversationId): bool
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("DELETE FROM ai_messages WHERE conversation_id = ?");
-        return $stmt->execute([$conversationId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("DELETE FROM ai_messages WHERE conversation_id = ? AND conversation_id IN (SELECT id FROM ai_conversations WHERE tenant_id = ?)");
+        return $stmt->execute([$conversationId, $tenantId]);
     }
 }

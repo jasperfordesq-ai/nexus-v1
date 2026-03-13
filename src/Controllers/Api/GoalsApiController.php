@@ -192,6 +192,7 @@ class GoalsApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         // Check if user can view this goal
@@ -202,6 +203,7 @@ class GoalsApiController extends BaseApiController
                 null,
                 403
             );
+            return;
         }
 
         // Add ownership and buddy flags
@@ -363,6 +365,7 @@ class GoalsApiController extends BaseApiController
                 'increment',
                 400
             );
+            return;
         }
 
         $goal = GoalService::updateProgress($id, $userId, (float)$increment);
@@ -596,6 +599,7 @@ class GoalsApiController extends BaseApiController
         $goal = GoalService::getById($id);
         if (!$goal) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Goal not found', null, 404);
+            return;
         }
 
         $filters = [
@@ -637,6 +641,7 @@ class GoalsApiController extends BaseApiController
         $goal = GoalService::getById($id);
         if (!$goal) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Goal not found', null, 404);
+            return;
         }
 
         $summary = GoalProgressService::getSummary($id);

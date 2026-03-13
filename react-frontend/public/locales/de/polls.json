@@ -2,7 +2,6 @@
   "title": "Umfragen",
   "subtitle": "Stimmen Sie ab und sehen Sie, was die Gemeinschaft denkt",
   "page_title": "Umfragen",
-
   "create_poll": "Umfrage erstellen",
   "question": "Frage",
   "question_placeholder": "Was möchten Sie fragen?",
@@ -15,7 +14,6 @@
   "expires_at": "Enddatum (optional)",
   "no_deadline": "Leer lassen für keine Frist",
   "submit": "Umfrage erstellen",
-
   "vote": "Abstimmen",
   "votes": "Stimmen",
   "votes_one": "Stimme",
@@ -23,54 +21,48 @@
   "results": "Ergebnisse",
   "total_votes": "{{count}} Stimmen",
   "total_votes_one": "{{count}} Stimme",
-
   "status": {
     "open": "Offen",
     "closed": "Geschlossen"
   },
-
   "tabs": {
     "open": "Offen",
     "closed": "Geschlossen",
     "mine": "Meine Umfragen",
     "aria_label": "Umfrage-Filter-Tabs"
   },
-
   "empty": {
     "title": "Noch keine Umfragen",
     "description": "Erstellen Sie die erste Umfrage und holen Sie die Meinung der Gemeinschaft ein.",
     "description_closed": "Keine geschlossenen Umfragen vorhanden.",
     "description_mine": "Sie haben noch keine Umfragen erstellt."
   },
-
   "time_remaining": "Noch {{time}}",
   "expired": "Abgelaufen",
   "created_by": "von",
   "delete_poll": "Umfrage löschen",
-
   "confirm_delete": {
     "title": "Umfrage löschen",
     "message": "Möchten Sie diese Umfrage wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "confirm": "Löschen",
     "cancel": "Abbrechen"
   },
-
   "toast": {
     "created": "Umfrage erfolgreich erstellt!",
     "create_failed": "Umfrage konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
     "voted": "Stimme registriert!",
     "vote_failed": "Stimme konnte nicht registriert werden. Bitte versuchen Sie es erneut.",
     "deleted": "Umfrage gelöscht.",
-    "delete_failed": "Umfrage konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+    "delete_failed": "Umfrage konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+    "csv_exported": "CSV erfolgreich exportiert.",
+    "export_failed": "Export der Umfrageergebnisse fehlgeschlagen."
   },
-
   "errors": {
     "question_required": "Bitte geben Sie eine Frage für Ihre Umfrage ein.",
     "min_options": "Bitte geben Sie mindestens 2 Optionen an.",
     "load_failed": "Umfragen konnten nicht geladen werden.",
     "load_more_failed": "Weitere Umfragen konnten nicht geladen werden."
   },
-
   "load_more": "Mehr laden",
   "try_again": "Erneut versuchen",
   "collapse": "Einklappen",

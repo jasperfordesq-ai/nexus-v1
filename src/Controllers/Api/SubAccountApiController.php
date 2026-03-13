@@ -86,6 +86,7 @@ class SubAccountApiController extends BaseApiController
 
         if ($childUserId <= 0) {
             $this->respondWithError('VALIDATION_ERROR', 'child_user_id is required', 'child_user_id', 400);
+            return;
         }
 
         $relationshipId = SubAccountService::requestRelationship($userId, $childUserId, $relationshipType, $permissions);
@@ -131,6 +132,7 @@ class SubAccountApiController extends BaseApiController
 
         if (empty($permissions)) {
             $this->respondWithError('VALIDATION_ERROR', 'permissions object is required', 'permissions', 400);
+            return;
         }
 
         $success = SubAccountService::updatePermissions($userId, $id, $permissions);

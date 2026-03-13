@@ -2,7 +2,6 @@
   "title": "Pobalbhreitheanna",
   "subtitle": "Vótáil agus féach cad a cheapann an pobal",
   "page_title": "Pobalbhreitheanna",
-
   "create_poll": "Cruthaigh Pobalbhreith",
   "question": "Ceist",
   "question_placeholder": "Cad ba mhaith leat a fhiafraí?",
@@ -15,7 +14,6 @@
   "expires_at": "Dáta deiridh (roghnach)",
   "no_deadline": "Fág folamh le haghaidh gan spriocdháta",
   "submit": "Cruthaigh Pobalbhreith",
-
   "vote": "Vótáil",
   "votes": "vótaí",
   "votes_one": "vóta",
@@ -23,54 +21,48 @@
   "results": "Torthaí",
   "total_votes": "{{count}} vóta",
   "total_votes_one": "{{count}} vóta",
-
   "status": {
     "open": "Oscailte",
     "closed": "Dúnta"
   },
-
   "tabs": {
     "open": "Oscailte",
     "closed": "Dúnta",
     "mine": "Mo Chuid Pobalbhreitheanna",
     "aria_label": "Cluaisíní scagtha pobalbhreith"
   },
-
   "empty": {
     "title": "Gan pobalbhreitheanna fós",
     "description": "Bí ar an gcéad duine a chruthaíonn pobalbhreith agus tuairim an phobail a fháil.",
     "description_closed": "Gan pobalbhreitheanna dúnta le taispeáint.",
     "description_mine": "Níor chruthaigh tú aon phobalbhreith fós."
   },
-
   "time_remaining": "{{time}} fágtha",
   "expired": "Éagtha",
   "created_by": "le",
   "delete_poll": "Scrios Pobalbhreith",
-
   "confirm_delete": {
     "title": "Scrios Pobalbhreith",
     "message": "An bhfuil tú cinnte gur mhaith leat an phobalbhreith seo a scriosadh? Ní féidir an gníomh seo a chur ar ceal.",
     "confirm": "Scrios",
     "cancel": "Cealaigh"
   },
-
   "toast": {
     "created": "Pobalbhreith cruthaithe go rathúil!",
     "create_failed": "Theip ar chruthú na pobalbhreithe. Bain triail eile as le do thoil.",
     "voted": "Vóta taifeadta!",
     "vote_failed": "Theip ar thaifeadadh an vóta. Bain triail eile as le do thoil.",
     "deleted": "Pobalbhreith scriosta.",
-    "delete_failed": "Theip ar scriosadh na pobalbhreithe. Bain triail eile as le do thoil."
+    "delete_failed": "Theip ar scriosadh na pobalbhreithe. Bain triail eile as le do thoil.",
+    "csv_exported": "CSV easpórtáilte go rathúil.",
+    "export_failed": "Theip ar thorthaí an phobalbhreith a easpórtáil."
   },
-
   "errors": {
     "question_required": "Cuir ceist isteach do do phobalbhreith le do thoil.",
     "min_options": "Cuir ar a laghad 2 rogha ar fáil le do thoil.",
     "load_failed": "Ní féidir pobalbhreitheanna a luchtú.",
     "load_more_failed": "Theip ar luchtú tuilleadh pobalbhreitheanna."
   },
-
   "load_more": "Luchtaigh Tuilleadh",
   "try_again": "Bain Triail Eile As",
   "collapse": "Laghdaigh",

@@ -1,0 +1,9 @@
+{
+  "checkin_recorded": "Check-in aufgezeichnet!",
+  "checkin_failed": "Check-in konnte nicht aufgezeichnet werden.",
+  "reminder_set_failed": "Erinnerung konnte nicht gesetzt werden.",
+  "reminder_removed": "Erinnerung entfernt.",
+  "reminder_remove_failed": "Erinnerung konnte nicht entfernt werden.",
+  "template_created": "Ziel aus Vorlage erstellt!",
+  "template_create_failed": "Ziel konnte nicht aus Vorlage erstellt werden."
+}

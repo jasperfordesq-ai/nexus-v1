@@ -83,8 +83,8 @@ class NotificationService
         }
 
         // Build query
-        $sql = "SELECT * FROM notifications WHERE user_id = ? AND deleted_at IS NULL";
-        $params = [$userId];
+        $sql = "SELECT * FROM notifications WHERE user_id = ? AND tenant_id = ? AND deleted_at IS NULL";
+        $params = [$userId, TenantContext::getId()];
 
         if ($unreadOnly) {
             $sql .= " AND is_read = 0";
@@ -142,9 +142,9 @@ class NotificationService
         $db = Database::getConnection();
 
         $stmt = $db->prepare(
-            "SELECT * FROM notifications WHERE id = ? AND user_id = ? AND deleted_at IS NULL"
+            "SELECT * FROM notifications WHERE id = ? AND user_id = ? AND tenant_id = ? AND deleted_at IS NULL"
         );
-        $stmt->execute([$id, $userId]);
+        $stmt->execute([$id, $userId, TenantContext::getId()]);
         $notification = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$notification) {
@@ -371,10 +371,10 @@ class NotificationService
         $stmt = $db->prepare(
             "SELECT type, COUNT(*) as count
              FROM notifications
-             WHERE user_id = ? AND is_read = 0 AND deleted_at IS NULL
+             WHERE user_id = ? AND tenant_id = ? AND is_read = 0 AND deleted_at IS NULL
              GROUP BY type"
         );
-        $stmt->execute([$userId]);
+        $stmt->execute([$userId, TenantContext::getId()]);
         $typeCounts = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         // Aggregate into categories
@@ -426,8 +426,8 @@ class NotificationService
         $db = Database::getConnection();
 
         // Verify ownership
-        $stmt = $db->prepare("SELECT id FROM notifications WHERE id = ? AND user_id = ?");
-        $stmt->execute([$id, $userId]);
+        $stmt = $db->prepare("SELECT id FROM notifications WHERE id = ? AND user_id = ? AND tenant_id = ?");
+        $stmt->execute([$id, $userId, TenantContext::getId()]);
 
         if (!$stmt->fetch()) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Notification not found'];
@@ -435,8 +435,8 @@ class NotificationService
         }
 
         try {
-            $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?");
-            $stmt->execute([$id, $userId]);
+            $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ? AND tenant_id = ?");
+            $stmt->execute([$id, $userId, TenantContext::getId()]);
             return true;
         } catch (\Exception $e) {
             error_log("NotificationService::markRead error: " . $e->getMessage());
@@ -490,8 +490,8 @@ class NotificationService
         $db = Database::getConnection();
 
         // Verify ownership
-        $stmt = $db->prepare("SELECT id FROM notifications WHERE id = ? AND user_id = ?");
-        $stmt->execute([$id, $userId]);
+        $stmt = $db->prepare("SELECT id FROM notifications WHERE id = ? AND user_id = ? AND tenant_id = ?");
+        $stmt->execute([$id, $userId, TenantContext::getId()]);
 
         if (!$stmt->fetch()) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Notification not found'];
@@ -499,8 +499,8 @@ class NotificationService
         }
 
         try {
-            $stmt = $db->prepare("UPDATE notifications SET deleted_at = NOW() WHERE id = ? AND user_id = ?");
-            $stmt->execute([$id, $userId]);
+            $stmt = $db->prepare("UPDATE notifications SET deleted_at = NOW() WHERE id = ? AND user_id = ? AND tenant_id = ?");
+            $stmt->execute([$id, $userId, TenantContext::getId()]);
             return true;
         } catch (\Exception $e) {
             error_log("NotificationService::delete error: " . $e->getMessage());
@@ -520,8 +520,8 @@ class NotificationService
     {
         $db = Database::getConnection();
 
-        $sql = "UPDATE notifications SET deleted_at = NOW() WHERE user_id = ? AND deleted_at IS NULL";
-        $params = [$userId];
+        $sql = "UPDATE notifications SET deleted_at = NOW() WHERE user_id = ? AND tenant_id = ? AND deleted_at IS NULL";
+        $params = [$userId, TenantContext::getId()];
 
         if ($category && isset(self::TYPE_CATEGORIES[$category])) {
             $types = self::TYPE_CATEGORIES[$category];

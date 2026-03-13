@@ -684,7 +684,7 @@ export function JobDetailPage() {
                 <Button size="sm" color="warning" variant="flat" onPress={async () => {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'closed' });
-                    if (res.success) { toast.success('Vacancy closed'); loadVacancy(); }
+                    if (res.success) { toast.success(t('vacancy_closed')); loadVacancy(); }
                   } catch { /* silent fail */ }
                 }}>
                   Close Vacancy
@@ -694,7 +694,7 @@ export function JobDetailPage() {
                 <Button size="sm" color="success" variant="flat" onPress={async () => {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'open' });
-                    if (res.success) { toast.success('Vacancy reopened'); loadVacancy(); }
+                    if (res.success) { toast.success(t('vacancy_reopened')); loadVacancy(); }
                   } catch { /* silent fail */ }
                 }}>
                   Reopen

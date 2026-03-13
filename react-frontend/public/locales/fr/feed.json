@@ -41,7 +41,10 @@
     "report_failed": "Impossible de signaler la publication",
     "deleted": "Publication supprimée",
     "delete_failed": "Impossible de supprimer la publication",
-    "vote_failed": "Impossible de soumettre le vote"
+    "vote_failed": "Impossible de soumettre le vote",
+    "post_shared": "Publication partagée dans votre fil",
+    "share_removed": "Partage supprimé",
+    "share_failed": "Échec du partage de la publication"
   },
   "realtime": {
     "new_post_singular": "1 nouvelle publication",
@@ -220,5 +223,18 @@
     "no_match": "Aucun hashtag correspondant à « {{query}} »",
     "no_trending": "Aucun hashtag tendance dans votre communauté pour l'instant.",
     "post_count": "{{count}} publications"
+  },
+  "share": {
+    "tooltip_remove": "Retirer le partage",
+    "tooltip_share": "Partager dans votre fil",
+    "button_label": "Partager",
+    "button_label_count": "Partager ({{count}})",
+    "shared_by": "<0>{{name}}</0> a partagé ceci"
+  },
+  "trending": {
+    "title": "Tendances",
+    "view_all": "Voir tous les hashtags",
+    "post_count": "{{count}} publication",
+    "post_count_plural": "{{count}} publications"
   }
 }

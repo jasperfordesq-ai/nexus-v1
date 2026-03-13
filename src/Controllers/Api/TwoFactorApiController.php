@@ -52,6 +52,7 @@ class TwoFactorApiController extends BaseApiController
 
         if (TotpService::isEnabled($userId)) {
             $this->respondWithError('ALREADY_ENABLED', '2FA is already enabled on your account', null, 409);
+            return;
         }
 
         try {
@@ -67,6 +68,7 @@ class TwoFactorApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('SETUP_FAILED', 'Failed to initialize 2FA setup', null, 500);
+            return;
         }
     }
 
@@ -88,12 +90,14 @@ class TwoFactorApiController extends BaseApiController
 
         if (empty($code)) {
             $this->respondWithError('VALIDATION_ERROR', 'Verification code is required', 'code', 400);
+            return;
         }
 
         $result = TotpService::completeSetup($userId, $code);
 
         if (!$result['success']) {
             $this->respondWithError('VERIFICATION_FAILED', $result['error'] ?? 'Invalid verification code', 'code', 400);
+            return;
         }
 
         $this->respondWithData([
@@ -118,12 +122,14 @@ class TwoFactorApiController extends BaseApiController
 
         if (empty($password)) {
             $this->respondWithError('VALIDATION_ERROR', 'Password is required', 'password', 400);
+            return;
         }
 
         $result = TotpService::disable($userId, $password);
 
         if (!$result['success']) {
             $this->respondWithError('DISABLE_FAILED', $result['error'] ?? 'Failed to disable 2FA', 'password', 403);
+            return;
         }
 
         $this->respondWithData([

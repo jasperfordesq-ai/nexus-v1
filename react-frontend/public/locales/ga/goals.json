@@ -1,0 +1,9 @@
+{
+  "checkin_recorded": "Seiceail taifeadta!",
+  "checkin_failed": "Theip ar an seiceail a thaifeadadh.",
+  "reminder_set_failed": "Theip ar an meabhruchan a shocru.",
+  "reminder_removed": "Meabhruchan bainte.",
+  "reminder_remove_failed": "Theip ar an meabhruchan a bhaint.",
+  "template_created": "Sprioc cruthaithe on teimplead!",
+  "template_create_failed": "Theip ar sprioc a chruthú ón teimpléad."
+}

@@ -38,7 +38,8 @@
     "listings": "Anuncios",
     "reviews": "Reseñas",
     "achievements": "Logros",
-    "activity": "Actividad"
+    "activity": "Actividad",
+    "availability": "Disponibilidad"
   },
   "about": {
     "heading": "Acerca de",
@@ -80,7 +81,10 @@
     "removed_title": "Eliminado",
     "removed": "Conexión eliminada",
     "failed": "Error",
-    "error": "Algo salió mal"
+    "error": "Algo salió mal",
+    "select_rating": "Por favor, selecciona una valoración",
+    "review_submitted": "¡Reseña enviada correctamente!",
+    "review_submit_failed": "Error al enviar la reseña. Por favor, inténtalo de nuevo."
   },
   "form": {
     "first_name": "Nombre",
@@ -89,5 +93,6 @@
     "location": "Ubicación",
     "phone": "Teléfono",
     "save": "Guardar Cambios"
-  }
+  },
+  "load_error": "Error al cargar el perfil."
 }

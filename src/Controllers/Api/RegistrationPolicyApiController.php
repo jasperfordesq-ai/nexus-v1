@@ -74,6 +74,7 @@ class RegistrationPolicyApiController extends BaseApiController
                 null,
                 422
             );
+            return;
         }
     }
 
@@ -179,6 +180,7 @@ class RegistrationPolicyApiController extends BaseApiController
         if (\Nexus\Services\RateLimitService::check("verify:start:$userId", 5, 3600)) {
             header('Retry-After: 3600');
             $this->respondWithError(ApiErrorCodes::RATE_LIMIT_EXCEEDED, 'Too many verification attempts. Please try again later.', null, 429);
+            return;
         }
         \Nexus\Services\RateLimitService::increment("verify:start:$userId", 3600);
 
@@ -192,6 +194,7 @@ class RegistrationPolicyApiController extends BaseApiController
                 null,
                 503
             );
+            return;
         }
     }
 
@@ -227,6 +230,7 @@ class RegistrationPolicyApiController extends BaseApiController
                 null,
                 422
             );
+            return;
         }
     }
 
@@ -260,6 +264,7 @@ class RegistrationPolicyApiController extends BaseApiController
                 null,
                 422
             );
+            return;
         }
     }
 
@@ -388,6 +393,7 @@ class RegistrationPolicyApiController extends BaseApiController
 
         if ($expiresAt && !strtotime($expiresAt)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_INVALID_FORMAT, 'Invalid expires_at date', null, 422);
+            return;
         }
 
         $codes = InviteCodeService::generate($tenantId, $adminId, $count, $maxUses, $expiresAt, $note);
@@ -407,11 +413,13 @@ class RegistrationPolicyApiController extends BaseApiController
 
         if (!$codeId) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Code ID required', null, 400);
+            return;
         }
 
         $success = InviteCodeService::deactivate($tenantId, $codeId);
         if (!$success) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Invite code not found', null, 404);
+            return;
         }
 
         $this->respondWithData(['deactivated' => true]);
@@ -430,6 +438,7 @@ class RegistrationPolicyApiController extends BaseApiController
         if (\Nexus\Services\RateLimitService::check("invite:validate:$ip", 10, 60)) {
             header('Retry-After: 60');
             $this->respondWithError(ApiErrorCodes::RATE_LIMIT_EXCEEDED, 'Too many attempts. Please try again later.', null, 429);
+            return;
         }
         \Nexus\Services\RateLimitService::increment("invite:validate:$ip", 60);
 
@@ -438,6 +447,7 @@ class RegistrationPolicyApiController extends BaseApiController
 
         if (!$code || strlen($code) < 4) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Invite code required', null, 400);
+            return;
         }
 
         $tenantId = TenantContext::getId();
@@ -458,6 +468,7 @@ class RegistrationPolicyApiController extends BaseApiController
         if (\Nexus\Services\RateLimitService::check("reg:info:$ip", 30, 60)) {
             header('Retry-After: 60');
             $this->respondWithError(ApiErrorCodes::RATE_LIMIT_EXCEEDED, 'Too many requests.', null, 429);
+            return;
         }
         \Nexus\Services\RateLimitService::increment("reg:info:$ip", 60);
 

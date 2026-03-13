@@ -62,6 +62,7 @@ class SkillTaxonomyApiController extends BaseApiController
 
         if (!$category) {
             $this->respondWithError('NOT_FOUND', 'Category not found', null, 404);
+            return;
         }
 
         // Include skills in this category

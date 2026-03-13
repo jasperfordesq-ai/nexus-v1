@@ -262,7 +262,7 @@ class AiChatController extends BaseAiController
             flush();
         }
 
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

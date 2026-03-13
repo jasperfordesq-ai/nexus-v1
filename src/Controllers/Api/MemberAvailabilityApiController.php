@@ -69,6 +69,7 @@ class MemberAvailabilityApiController extends BaseApiController
 
         if (empty($schedule) || !is_array($schedule)) {
             $this->respondWithError('VALIDATION_ERROR', 'schedule is required and must be an object', 'schedule', 400);
+            return;
         }
 
         $success = MemberAvailabilityService::setBulkAvailability($userId, $schedule);
@@ -167,6 +168,7 @@ class MemberAvailabilityApiController extends BaseApiController
         $otherUserId = $this->queryInt('user_id');
         if (!$otherUserId) {
             $this->respondWithError('VALIDATION_ERROR', 'user_id query parameter is required', 'user_id', 400);
+            return;
         }
 
         $compatible = MemberAvailabilityService::findCompatibleTimes($userId, $otherUserId);
@@ -186,6 +188,7 @@ class MemberAvailabilityApiController extends BaseApiController
         $day = $this->queryInt('day');
         if ($day === null || $day < 0 || $day > 6) {
             $this->respondWithError('VALIDATION_ERROR', 'day query parameter is required (0-6)', 'day', 400);
+            return;
         }
 
         $time = $this->query('time');

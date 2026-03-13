@@ -240,7 +240,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         body: 'p-0',
       }}
     >
-      <DrawerContent>
+      <DrawerContent style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {/* Header */}
         <DrawerHeader className="flex items-center justify-between">
           <TenantLogo size="lg" showName />
@@ -458,7 +458,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                         variant="light"
                         size="sm"
                         className="text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2 gap-1.5 text-xs"
-                        onPress={() => { onClose(); navigate('/admin'); }}
+                        onPress={() => { onClose(); navigate(tenantPath('/admin')); }}
                       >
                         <Shield className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('user_menu.admin_panel')}
@@ -483,7 +483,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                     isIconOnly
                     variant="light"
                     size="sm"
-                    className="text-theme-muted hover:text-theme-primary w-8 h-8 min-w-8"
+                    className="text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
                     onPress={toggleTheme}
                     aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
                   >

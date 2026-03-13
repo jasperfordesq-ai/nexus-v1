@@ -1,0 +1,6 @@
+{
+  "hours_load_failed": "Failed to load pending hour reviews. Please try again.",
+  "something_wrong": "Something went wrong. Please try again.",
+  "applications_load_failed": "Failed to load applications.",
+  "application_submitted": "Application submitted successfully!"
+}

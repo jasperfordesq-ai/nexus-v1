@@ -119,8 +119,8 @@ function formatActivityAction(item: FeedActivityItem, t: (key: string) => string
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function DashboardPage() {
-  usePageTitle('Dashboard');
   const { t } = useTranslation('dashboard');
+  usePageTitle(t('meta.title'));
   const { user } = useAuth();
   const { branding, tenantPath } = useTenant();
   const { counts: notificationCounts } = useNotifications();
@@ -966,7 +966,7 @@ export function DashboardPage() {
                           <div className="text-xs text-theme-subtle">{t('gamification.badges')}</div>
                         </div>
                         <div className="text-center p-2 rounded-lg bg-theme-elevated">
-                          <div className="text-lg font-bold text-theme-primary">{stats.gamification.streak_days} day</div>
+                          <div className="text-lg font-bold text-theme-primary">{t('gamification.streak_days', { count: stats.gamification.streak_days })}</div>
                           <div className="text-xs text-theme-subtle">{t('gamification.streak')}</div>
                         </div>
                       </div>
@@ -1073,6 +1073,7 @@ interface PendingReview {
 function PendingReviewsCard() {
   const { tenantPath } = useTenant();
   const { t } = useTranslation('dashboard');
+  usePageTitle(t('meta.title'));
   const [pending, setPending] = useState<PendingReview[]>([]);
   const [loading, setLoading] = useState(true);
 

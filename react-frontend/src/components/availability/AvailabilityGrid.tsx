@@ -13,6 +13,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button, Spinner, Tooltip } from '@heroui/react';
 import { Calendar, Save, RefreshCw, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -61,6 +62,7 @@ export function AvailabilityGrid({
   compact?: boolean;
 }) {
   const toast = useToast();
+  const { t } = useTranslation('settings');
   const [slots, setSlots] = useState<Map<string, boolean>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -166,14 +168,14 @@ export function AvailabilityGrid({
       });
 
       if (response.success) {
-        toast.success('Availability saved successfully');
+        toast.success(t('toasts.availability_saved'));
         setIsDirty(false);
       } else {
-        toast.error(response.error || 'Failed to save availability');
+        toast.error(response.error || t('toasts.availability_save_failed'));
       }
     } catch (err) {
       logError('Failed to save availability', err);
-      toast.error('Failed to save availability');
+      toast.error(t('toasts.availability_save_failed'));
     } finally {
       setIsSaving(false);
     }
