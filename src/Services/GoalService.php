@@ -531,8 +531,9 @@ class GoalService
         $params[] = $id;
 
         try {
+            $params[] = TenantContext::getId();
             Database::query(
-                "UPDATE goals SET " . implode(', ', $updates) . " WHERE id = ?",
+                "UPDATE goals SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?",
                 $params
             );
             return true;
@@ -577,16 +578,17 @@ class GoalService
         $newValue = max(0, (float)$goal['current_value'] + $increment);
         $targetValue = (float)$goal['target_value'];
 
-        try {
+$tenantId = TenantContext::getId();
+
+                try {
             $oldValue = (float)$goal['current_value'];
 
             Database::query(
-                "UPDATE goals SET current_value = ? WHERE id = ?",
-                [$newValue, $id]
+                "UPDATE goals SET current_value = ? WHERE id = ? AND tenant_id = ?",
+                [$newValue, $id, $tenantId]
             );
 
             // Log progress update in history
-            $tenantId = TenantContext::getId();
             GoalProgressService::logEvent($id, $tenantId, 'progress_update', (string)$oldValue, (string)$newValue, $userId, [
                 'increment' => $increment,
             ]);
@@ -594,8 +596,8 @@ class GoalService
             // Check if goal is now completed
             if ($targetValue > 0 && $newValue >= $targetValue) {
                 Database::query(
-                    "UPDATE goals SET status = 'completed', completed_at = NOW() WHERE id = ?",
-                    [$id]
+                    "UPDATE goals SET status = 'completed', completed_at = NOW() WHERE id = ? AND tenant_id = ?",
+                    [$id, $tenantId]
                 );
 
                 // Log completion
@@ -659,8 +661,8 @@ class GoalService
             $tenantId = TenantContext::getId();
 
             Database::query(
-                "UPDATE goals SET mentor_id = ? WHERE id = ?",
-                [$userId, $goalId]
+                "UPDATE goals SET mentor_id = ? WHERE id = ? AND tenant_id = ?",
+                [$userId, $goalId, $tenantId]
             );
 
             // Log buddy joined in progress history
@@ -715,8 +717,8 @@ class GoalService
         // Check ownership (or admin)
         if ((int)$goal['user_id'] !== $userId) {
             $user = Database::query(
-                "SELECT role FROM users WHERE id = ?",
-                [$userId]
+                "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch();
 
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {
