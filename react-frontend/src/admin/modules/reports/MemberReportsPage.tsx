@@ -61,6 +61,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
@@ -304,7 +305,7 @@ export function MemberReportsPage() {
                 <YAxis tick={{ fontSize: 12 }} tickLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend />
-                <Bar dataKey="count" name="New Registrations" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name="New Registrations" fill={CHART_COLOR_MAP.success} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (

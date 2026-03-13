@@ -20,6 +20,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
+import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { NewsletterBounce, SuppressionListEntry, BounceTrendsData, BounceReasonSummary } from '../../api/types';
 
@@ -256,9 +257,9 @@ export function NewsletterBounces() {
                   <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="hard" name="Hard" fill="#f31260" stackId="a" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="soft" name="Soft" fill="#f5a524" stackId="a" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="complaint" name="Complaint" fill="#7828c8" stackId="a" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="hard" name="Hard" fill={CHART_COLOR_MAP.dangerAlt} stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="soft" name="Soft" fill={CHART_COLOR_MAP.warningAlt} stackId="a" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="complaint" name="Complaint" fill={CHART_COLOR_MAP.purple} stackId="a" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardBody>

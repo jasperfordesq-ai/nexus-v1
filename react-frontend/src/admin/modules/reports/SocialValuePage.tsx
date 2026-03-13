@@ -61,6 +61,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
@@ -408,8 +409,8 @@ export function SocialValuePage() {
               <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="svHoursGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    <stop offset="5%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
@@ -423,7 +424,7 @@ export function SocialValuePage() {
                   type="monotone"
                   dataKey="hours"
                   name="Hours"
-                  stroke="#6366f1"
+                  stroke={CHART_COLOR_MAP.primary}
                   fill="url(#svHoursGrad)"
                   strokeWidth={2}
                 />
@@ -431,7 +432,7 @@ export function SocialValuePage() {
                   yAxisId="tx"
                   dataKey="transactions"
                   name="Transactions"
-                  fill="#10b981"
+                  fill={CHART_COLOR_MAP.success}
                   radius={[4, 4, 0, 0]}
                   fillOpacity={0.7}
                 />

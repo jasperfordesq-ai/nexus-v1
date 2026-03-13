@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Activity Dashboard",
+    "description": "Your activity overview — hours, skills, connections, and recent actions."
+  },
+  "page_title": "Activity Dashboard",
+  "page_subtitle": "Your community participation at a glance.",
+  "error_load_failed": "Failed to load activity dashboard",
+  "error_load_failed_detail": "Failed to load your activity data. Please try again.",
+  "unable_to_load": "Unable to load",
+  "try_again": "Try Again",
+  "stats": {
+    "hours_given": "Hours Given",
+    "hours_received": "Hours Received",
+    "connections": "Connections",
+    "exchanges": "Exchanges"
+  },
+  "chart": {
+    "given": "Given",
+    "received": "Received",
+    "monthly_activity": "Monthly Activity"
+  },
+  "recent_activity": "Recent Activity",
+  "empty_title": "No recent activity",
+  "empty_description": "Start participating in your community to see your activity here.",
+  "quick_stats": "Quick Stats",
+  "groups_joined": "Groups Joined",
+  "posts_30d": "Posts (30d)",
+  "likes_received_30d": "Likes Received (30d)",
+  "net_balance": "Net Balance",
+  "my_skills": "My Skills",
+  "skill_offer": "Offer"
+}

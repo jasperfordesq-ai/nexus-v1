@@ -474,5 +474,10 @@
       "description_before_email": "Si vous découvrez une vulnérabilité de sécurité, veuillez ne pas ouvrir un ticket public. Contactez-nous plutôt de manière confidentielle à",
       "description_after_email": ". Nous répondrons dans les 72 heures et travaillerons avec vous sur une divulgation responsable."
     }
+  },
+  "kb": {
+    "title": "Base de connaissances",
+    "description": "Trouvez des réponses, des guides et des ressources utiles",
+    "search_placeholder": "Rechercher dans la base de connaissances..."
   }
 }

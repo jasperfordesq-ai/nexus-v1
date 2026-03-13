@@ -17,6 +17,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
 import {
@@ -150,7 +151,7 @@ function StatCard({
 // Simple Bar Chart (no recharts dependency for basic display)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function SimpleBarChart({ data }: { data: MonthlyEntry[] }) {
+function SimpleBarChart({ data, givenLabel, receivedLabel }: { data: MonthlyEntry[]; givenLabel: string; receivedLabel: string }) {
   if (data.length === 0) return null;
 
   const maxVal = Math.max(...data.flatMap((d) => [d.given, d.received]), 1);
@@ -160,17 +161,17 @@ function SimpleBarChart({ data }: { data: MonthlyEntry[] }) {
       <div className="flex items-center gap-4 mb-3 text-xs text-theme-subtle">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm bg-emerald-500" />
-          <span>Given</span>
+          <span>{givenLabel}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm bg-indigo-500" />
-          <span>Received</span>
+          <span>{receivedLabel}</span>
         </div>
       </div>
       <div className="flex items-end gap-1 h-32">
         {data.map((item, idx) => (
           <div key={idx} className="flex-1 flex flex-col items-center gap-0.5">
-            <div className="w-full flex gap-0.5 items-end" style={{ height: '100%' }}>
+            <div className="w-full flex gap-0.5 items-end h-full">
               <div
                 className="flex-1 bg-emerald-500/60 rounded-t-sm transition-all"
                 style={{ height: `${Math.max((item.given / maxVal) * 100, 4)}%` }}
@@ -195,7 +196,8 @@ function SimpleBarChart({ data }: { data: MonthlyEntry[] }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ActivityDashboardPage() {
-  usePageTitle('Activity Dashboard');
+  const { t } = useTranslation('activity');
+  usePageTitle(t('page_title'));
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -212,11 +214,11 @@ export function ActivityDashboardPage() {
       if (response.success && response.data) {
         setDashboard(response.data);
       } else {
-        setError('Failed to load activity dashboard');
+        setError(t('error_load_failed'));
       }
     } catch (err) {
       logError('Failed to load activity dashboard', err);
-      setError('Failed to load your activity data. Please try again.');
+      setError(t('error_load_failed_detail'));
     } finally {
       setIsLoading(false);
     }
@@ -245,14 +247,14 @@ export function ActivityDashboardPage() {
       <div className="max-w-4xl mx-auto">
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to load</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadDashboard}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       </div>
@@ -276,10 +278,10 @@ export function ActivityDashboardPage() {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <Activity className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
-          Activity Dashboard
+          {t('page_title')}
         </h1>
         <p className="text-theme-muted mt-1 text-sm">
-          Your community participation at a glance.
+          {t('page_subtitle')}
         </p>
       </motion.div>
 
@@ -287,25 +289,25 @@ export function ActivityDashboardPage() {
       <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard
           icon={<ArrowUpRight className="w-5 h-5" aria-hidden="true" />}
-          label="Hours Given"
+          label={t('stats.hours_given')}
           value={hours_summary.hours_given}
           color="from-emerald-500/20 to-teal-500/20 text-emerald-500"
         />
         <StatCard
           icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
-          label="Hours Received"
+          label={t('stats.hours_received')}
           value={hours_summary.hours_received}
           color="from-indigo-500/20 to-blue-500/20 text-indigo-500"
         />
         <StatCard
           icon={<Users className="w-5 h-5" aria-hidden="true" />}
-          label="Connections"
+          label={t('stats.connections')}
           value={connection_stats.total_connections}
           color="from-blue-500/20 to-cyan-500/20 text-blue-500"
         />
         <StatCard
           icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
-          label="Exchanges"
+          label={t('stats.exchanges')}
           value={hours_summary.transactions_given + hours_summary.transactions_received}
           color="from-purple-500/20 to-fuchsia-500/20 text-purple-500"
         />
@@ -320,9 +322,9 @@ export function ActivityDashboardPage() {
             <GlassCard className="p-5">
               <div className="flex items-center gap-2 mb-4">
                 <BarChart3 className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-                <h3 className="font-semibold text-theme-primary">Monthly Activity</h3>
+                <h3 className="font-semibold text-theme-primary">{t('chart.monthly_activity')}</h3>
               </div>
-              <SimpleBarChart data={monthly_hours} />
+              <SimpleBarChart data={monthly_hours} givenLabel={t('chart.given')} receivedLabel={t('chart.received')} />
             </GlassCard>
           )}
 
@@ -331,7 +333,7 @@ export function ActivityDashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-                <h3 className="font-semibold text-theme-primary">Recent Activity</h3>
+                <h3 className="font-semibold text-theme-primary">{t('recent_activity')}</h3>
               </div>
             </div>
 
@@ -357,8 +359,8 @@ export function ActivityDashboardPage() {
             ) : (
               <EmptyState
                 icon={<Sparkles className="w-10 h-10" aria-hidden="true" />}
-                title="No recent activity"
-                description="Start participating in your community to see your activity here."
+                title={t('empty_title')}
+                description={t('empty_description')}
               />
             )}
           </GlassCard>
@@ -368,33 +370,33 @@ export function ActivityDashboardPage() {
         <motion.div variants={itemVariants} className="space-y-4">
           {/* Quick Stats */}
           <GlassCard className="p-5">
-            <h3 className="font-semibold text-theme-primary mb-3 text-sm">Quick Stats</h3>
+            <h3 className="font-semibold text-theme-primary mb-3 text-sm">{t('quick_stats')}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
                   <Users className="w-4 h-4" aria-hidden="true" />
-                  Groups Joined
+                  {t('groups_joined')}
                 </span>
                 <span className="font-semibold text-theme-primary">{connection_stats.groups_joined}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
                   <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                  Posts (30d)
+                  {t('posts_30d')}
                 </span>
                 <span className="font-semibold text-theme-primary">{engagement.posts_count}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
                   <Star className="w-4 h-4" aria-hidden="true" />
-                  Likes Received (30d)
+                  {t('likes_received_30d')}
                 </span>
                 <span className="font-semibold text-theme-primary">{engagement.likes_received}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-theme-muted flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" aria-hidden="true" />
-                  Net Balance
+                  {t('net_balance')}
                 </span>
                 <span className={`font-semibold ${hours_summary.net_balance >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                   {hours_summary.net_balance >= 0 ? '+' : ''}{hours_summary.net_balance}h
@@ -406,14 +408,14 @@ export function ActivityDashboardPage() {
           {/* Skills */}
           {skills_breakdown.skills.length > 0 && (
             <GlassCard className="p-5">
-              <h3 className="font-semibold text-theme-primary mb-3 text-sm">My Skills</h3>
+              <h3 className="font-semibold text-theme-primary mb-3 text-sm">{t('my_skills')}</h3>
               <div className="space-y-2">
                 {skills_breakdown.skills.slice(0, 6).map((skill, idx) => (
                   <div key={idx} className="flex items-center justify-between">
                     <span className="text-sm text-theme-muted truncate">{skill.skill_name}</span>
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                       {skill.is_offering && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Offer</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('skill_offer')}</span>
                       )}
                       {skill.endorsements > 0 && (
                         <span className="text-[10px] text-indigo-500 font-semibold">×{skill.endorsements}</span>

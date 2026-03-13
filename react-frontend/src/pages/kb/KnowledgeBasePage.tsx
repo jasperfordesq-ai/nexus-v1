@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
+import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
@@ -62,7 +63,8 @@ interface KBArticle {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function KnowledgeBasePage() {
-  usePageTitle('Knowledge Base');
+  const { t } = useTranslation('public');
+  usePageTitle(t('kb.title', 'Knowledge Base'));
   const { tenantPath } = useTenant();
 
   const [articles, setArticles] = useState<KBArticle[]>([]);
@@ -149,19 +151,19 @@ export function KnowledgeBasePage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <BookOpen className="w-7 h-7 text-blue-400" aria-hidden="true" />
-          Knowledge Base
+          {t('kb.title', 'Knowledge Base')}
         </h1>
-        <p className="text-theme-muted mt-1">Find answers, guides, and helpful resources</p>
+        <p className="text-theme-muted mt-1">{t('kb.description', 'Find answers, guides, and helpful resources')}</p>
       </div>
 
       {/* Search */}
       <div className="max-w-xl">
         <Input
-          placeholder="Search the knowledge base..."
+          placeholder={t('kb.search_placeholder', 'Search the knowledge base...')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
-          aria-label="Search the knowledge base"
+          aria-label={t('kb.search_placeholder', 'Search the knowledge base')}
           endContent={isSearching ? <Spinner size="sm" /> : undefined}
           classNames={{
             input: 'bg-transparent text-theme-primary',

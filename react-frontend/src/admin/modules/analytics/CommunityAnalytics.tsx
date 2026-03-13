@@ -27,7 +27,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { CHART_COLORS } from '@/lib/chartColors';
+import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
 import {
   TrendingUp,
   Users,
@@ -270,8 +270,8 @@ export function CommunityAnalytics() {
                     x2="0"
                     y2="1"
                   >
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
@@ -323,7 +323,7 @@ export function CommunityAnalytics() {
                   type="monotone"
                   dataKey="total_volume"
                   name="Hours Exchanged"
-                  stroke="#6366f1"
+                  stroke={CHART_COLOR_MAP.primary}
                   fill="url(#volumeGradient)"
                   strokeWidth={2}
                 />
@@ -332,7 +332,7 @@ export function CommunityAnalytics() {
                   type="monotone"
                   dataKey="transaction_count"
                   name="Transactions"
-                  stroke="#10b981"
+                  stroke={CHART_COLOR_MAP.success}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
@@ -392,7 +392,7 @@ export function CommunityAnalytics() {
                   <Bar
                     dataKey="new_users"
                     name="New Users"
-                    fill="#10b981"
+                    fill={CHART_COLOR_MAP.success}
                     radius={[4, 4, 0, 0]}
                     fillOpacity={0.8}
                   />

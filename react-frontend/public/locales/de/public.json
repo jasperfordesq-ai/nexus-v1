@@ -474,5 +474,10 @@
       "description_before_email": "Wenn Sie eine Sicherheitslücke entdecken, eröffnen Sie bitte kein öffentliches Issue. Kontaktieren Sie uns stattdessen vertraulich unter",
       "description_after_email": ". Wir werden innerhalb von 72 Stunden antworten und mit Ihnen an einer verantwortungsvollen Offenlegung arbeiten."
     }
+  },
+  "kb": {
+    "title": "Wissensdatenbank",
+    "description": "Finden Sie Antworten, Anleitungen und hilfreiche Ressourcen",
+    "search_placeholder": "Wissensdatenbank durchsuchen..."
   }
 }

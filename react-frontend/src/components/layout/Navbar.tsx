@@ -563,18 +563,18 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
             {/* User Actions */}
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Command Palette Trigger — single unified button */}
-              <button
-                type="button"
-                onClick={() => setIsSearchOpen(true)}
+              <Button
+                variant="light"
+                onPress={() => setIsSearchOpen(true)}
                 aria-label="Search (Ctrl+K)"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-transparent lg:border-theme-default transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 min-w-0 h-auto rounded-lg text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-transparent lg:border-theme-default transition-colors"
               >
                 <Search className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden lg:inline text-xs text-theme-subtle">Search</span>
                 <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
                   <span className="text-xs">⌘</span>K
                 </kbd>
-              </button>
+              </Button>
 
               {isAuthenticated ? (
                 <>

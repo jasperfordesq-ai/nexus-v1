@@ -474,5 +474,10 @@
       "description_before_email": "Má aimsíonn tú leochaileacht slándála, ná hoscail saincheist phoiblí le do thoil. Ina ionad sin, déan teagmháil linn go rúnda ag",
       "description_after_email": ". Freagróimid laistigh de 72 uair an chloig agus oibreoimid leat ar nochtadh freagrach."
     }
+  },
+  "kb": {
+    "title": "Bonn Eolais",
+    "description": "Faigh freagraí, treoir, agus acmhainní cabhrach",
+    "search_placeholder": "Cuardaigh an bonn eolais..."
   }
 }
