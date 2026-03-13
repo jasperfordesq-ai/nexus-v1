@@ -10,6 +10,7 @@ namespace Nexus\Services\Enterprise;
 
 use Nexus\Core\Database;
 use PDO;
+use Nexus\Core\TenantContext;
 
 /**
  * Permission Service - Enterprise PBAC System
@@ -530,8 +531,8 @@ class PermissionService
 
         // Update cache invalidation timestamp
         Database::query(
-            "UPDATE users SET permissions_last_updated = NOW() WHERE id = ?",
-            [$userId]
+            "UPDATE users SET permissions_last_updated = NOW() WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         );
     }
 

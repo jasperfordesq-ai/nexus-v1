@@ -1106,7 +1106,8 @@ HTML;
      */
     private static function getUserLevel($userId)
     {
-        $user = Database::query("SELECT level FROM users WHERE id = ?", [$userId])->fetch();
+        $tenantId = TenantContext::getId();
+        $user = Database::query("SELECT level FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
         return (int)($user['level'] ?? 1);
     }
 
@@ -1118,11 +1119,13 @@ HTML;
         $user = \Nexus\Models\User::findById($userId);
         if (!$user) return null;
 
+        $tenantId = TenantContext::getId();
+
         // Get XP and level directly from database to ensure we have them
         // (User::findById may not include these columns on older installations)
         $gamificationData = Database::query(
-            "SELECT COALESCE(xp, 0) as xp, COALESCE(level, 1) as level FROM users WHERE id = ?",
-            [$userId]
+            "SELECT COALESCE(xp, 0) as xp, COALESCE(level, 1) as level FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         $xp = (int)($gamificationData['xp'] ?? 0);
