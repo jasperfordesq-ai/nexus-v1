@@ -1,4 +1,8 @@
 <?php
+// Copyright (c) 2024-2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 // Seed missing category types for T3 (Public Sector Demo)
 // Only inserts types that have zero categories for this tenant.
 require '/var/www/html/vendor/autoload.php';

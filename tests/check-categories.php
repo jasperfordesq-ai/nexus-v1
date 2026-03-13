@@ -1,4 +1,8 @@
 <?php
+// Copyright (c) 2024-2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 require '/var/www/html/vendor/autoload.php';
 $db = \Nexus\Core\Database::getInstance();
 $r = $db->prepare('SELECT tenant_id, type, COUNT(*) as n FROM categories GROUP BY tenant_id, type ORDER BY tenant_id, type');

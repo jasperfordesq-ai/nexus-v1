@@ -123,7 +123,7 @@ export const loginResponseSchema = z.union([
  * Validates the pagination meta object.
  */
 export const paginationMetaSchema = z.object({
-  per_page: z.number().optional(),
+  per_page: z.number(),
   has_more: z.boolean().optional(),
   cursor: z.string().nullable().optional(),
   next_cursor: z.string().nullable().optional(),
