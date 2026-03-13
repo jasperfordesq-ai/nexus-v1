@@ -1,4 +1,8 @@
 <?php
+// Copyright (c) 2024-2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 // Test response meta shape for paginated endpoints
 $ch = curl_init("http://localhost/api/auth/login");
 curl_setopt_array($ch, [

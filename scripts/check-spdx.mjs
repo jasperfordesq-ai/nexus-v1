@@ -48,5 +48,6 @@ console.log(`TOTAL: ${totalFiles} files, ${totalWithHeader} with header, ${total
 if (totalMissing === 0) {
   console.log('ALL FILES HAVE SPDX HEADERS');
 } else {
-  console.log(`WARNING: ${totalMissing} files are missing SPDX headers!`);
+  console.error(`ERROR: ${totalMissing} files are missing SPDX headers!`);
+  process.exitCode = 1;
 }
