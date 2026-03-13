@@ -84,8 +84,8 @@ class GroupModerationService
         try {
             // Get flag details
             $flag = Database::query(
-                "SELECT * FROM group_content_flags WHERE id = ?",
-                [$flagId]
+                "SELECT * FROM group_content_flags WHERE id = ? AND tenant_id = ?",
+                [$flagId, TenantContext::getId()]
             )->fetch();
 
             if (!$flag) {
@@ -100,8 +100,8 @@ class GroupModerationService
                      moderation_action = ?,
                      moderator_notes = ?,
                      resolved_at = NOW()
-                 WHERE id = ?",
-                [$moderatorId, $action, $moderatorNotes, $flagId]
+                 WHERE id = ? AND tenant_id = ?",
+                [$moderatorId, $action, $moderatorNotes, $flagId, TenantContext::getId()]
             );
 
             // Take action based on type
@@ -152,20 +152,21 @@ class GroupModerationService
     {
         switch ($contentType) {
             case self::CONTENT_DISCUSSION:
-                Database::query("DELETE FROM group_discussions WHERE id = ?", [$contentId]);
-                Database::query("DELETE FROM group_posts WHERE discussion_id = ?", [$contentId]);
+                $tenantId = TenantContext::getId();
+                Database::query("DELETE FROM group_discussions WHERE id = ? AND tenant_id = ?", [$contentId, $tenantId]);
+                Database::query("DELETE FROM group_posts WHERE discussion_id = ? AND tenant_id = ?", [$contentId, $tenantId]);
                 break;
 
             case self::CONTENT_POST:
-                Database::query("DELETE FROM group_posts WHERE id = ?", [$contentId]);
+                Database::query("DELETE FROM group_posts WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()]);
                 break;
 
             case self::CONTENT_FEEDBACK:
-                Database::query("DELETE FROM group_feedback WHERE id = ?", [$contentId]);
+                Database::query("DELETE FROM group_feedback WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()]);
                 break;
 
             case self::CONTENT_GROUP:
-                Database::query("DELETE FROM group_members WHERE group_id = ?", [$contentId]);
+                Database::query("DELETE FROM group_members WHERE group_id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()]);
                 $tenantId = TenantContext::getId();
                 Database::query("DELETE FROM `groups` WHERE id = ? AND tenant_id = ?", [$contentId, $tenantId]);
                 GroupAuditService::logGroupDeleted($contentId, $moderatorId, $reason);
@@ -181,15 +182,15 @@ class GroupModerationService
         switch ($contentType) {
             case self::CONTENT_DISCUSSION:
                 Database::query(
-                    "UPDATE group_discussions SET is_hidden = 1 WHERE id = ?",
-                    [$contentId]
+                    "UPDATE group_discussions SET is_hidden = 1 WHERE id = ? AND tenant_id = ?",
+                    [$contentId, TenantContext::getId()]
                 );
                 break;
 
             case self::CONTENT_POST:
                 Database::query(
-                    "UPDATE group_posts SET is_hidden = 1 WHERE id = ?",
-                    [$contentId]
+                    "UPDATE group_posts SET is_hidden = 1 WHERE id = ? AND tenant_id = ?",
+                    [$contentId, TenantContext::getId()]
                 );
                 break;
         }
@@ -213,8 +214,8 @@ class GroupModerationService
 
             // Remove from all groups
             Database::query(
-                "DELETE FROM group_members WHERE user_id = ?",
-                [$userId]
+                "DELETE FROM group_members WHERE user_id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
 
             return true;

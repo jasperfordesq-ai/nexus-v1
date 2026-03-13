@@ -161,8 +161,8 @@ class ListingExpiryService
         // Authorization: owner or admin
         if ((int)$listing['user_id'] !== $userId) {
             $user = Database::query(
-                "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-                [$userId]
+                "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
 
             if (!$user || (!in_array($user['role'], ['admin', 'tenant_admin']) && !$user['is_super_admin'] && !$user['is_tenant_super_admin'])) {

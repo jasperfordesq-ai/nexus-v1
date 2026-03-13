@@ -176,12 +176,13 @@ class ChallengeTagService
      */
     public static function getTagsForChallenge(int $challengeId): array
     {
+        $tenantId = TenantContext::getId();
         return Database::query(
             "SELECT t.* FROM challenge_tags t
              INNER JOIN challenge_tag_links ctl ON t.id = ctl.tag_id
-             WHERE ctl.challenge_id = ?
+             WHERE ctl.challenge_id = ? AND t.tenant_id = ?
              ORDER BY t.name ASC",
-            [$challengeId]
+            [$challengeId, $tenantId]
         )->fetchAll();
     }
 
@@ -193,6 +194,8 @@ class ChallengeTagService
      */
     public static function syncTagsForChallenge(int $challengeId, array $tagIds): void
     {
+        $tenantId = TenantContext::getId();
+
         // Remove existing links
         Database::query(
             "DELETE FROM challenge_tag_links WHERE challenge_id = ?",
@@ -274,9 +277,10 @@ class ChallengeTagService
 
     private static function isAdmin(int $userId): bool
     {
+        $tenantId = TenantContext::getId();
         $user = Database::query(
-            "SELECT role FROM users WHERE id = ?",
-            [$userId]
+            "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         return $user && in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin']);

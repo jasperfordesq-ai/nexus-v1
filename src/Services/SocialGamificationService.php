@@ -164,8 +164,8 @@ class SocialGamificationService
         }
 
         Database::query(
-            "UPDATE friend_challenges SET status = 'active', accepted_at = NOW() WHERE id = ?",
-            [$challengeId]
+            "UPDATE friend_challenges SET status = 'active', accepted_at = NOW() WHERE id = ? AND tenant_id = ?",
+            [$challengeId, \Nexus\Core\TenantContext::getId()]
         );
 
         // Notify challenger
@@ -186,8 +186,8 @@ class SocialGamificationService
     {
         Database::query(
             "UPDATE friend_challenges SET status = 'declined', declined_at = NOW()
-             WHERE id = ? AND challenged_id = ? AND status = 'pending'",
-            [$challengeId, $userId]
+             WHERE id = ? AND challenged_id = ? AND status = 'pending' AND tenant_id = ?",
+            [$challengeId, $userId, \Nexus\Core\TenantContext::getId()]
         );
 
         return true;
@@ -208,9 +208,10 @@ class SocialGamificationService
              JOIN users challenger ON fc.challenger_id = challenger.id
              JOIN users challenged ON fc.challenged_id = challenged.id
              WHERE (fc.challenger_id = ? OR fc.challenged_id = ?)
+             AND fc.tenant_id = ?
              AND fc.status IN ('pending', 'active')
              ORDER BY fc.created_at DESC",
-            [$userId, $userId]
+            [$userId, $userId, \Nexus\Core\TenantContext::getId()]
         )->fetchAll();
     }
 
@@ -223,22 +224,23 @@ class SocialGamificationService
         $challenges = Database::query(
             "SELECT * FROM friend_challenges
              WHERE (challenger_id = ? OR challenged_id = ?)
+             AND tenant_id = ?
              AND status = 'active'
              AND challenge_type = ?
              AND end_date >= CURDATE()",
-            [$userId, $userId, $actionType]
+            [$userId, $userId, \Nexus\Core\TenantContext::getId(), $actionType]
         )->fetchAll();
 
         foreach ($challenges as $challenge) {
             if ($challenge['challenger_id'] == $userId) {
                 Database::query(
-                    "UPDATE friend_challenges SET challenger_progress = challenger_progress + ? WHERE id = ?",
-                    [$amount, $challenge['id']]
+                    "UPDATE friend_challenges SET challenger_progress = challenger_progress + ? WHERE id = ? AND tenant_id = ?",
+                    [$amount, $challenge['id'], \Nexus\Core\TenantContext::getId()]
                 );
             } else {
                 Database::query(
-                    "UPDATE friend_challenges SET challenged_progress = challenged_progress + ? WHERE id = ?",
-                    [$amount, $challenge['id']]
+                    "UPDATE friend_challenges SET challenged_progress = challenged_progress + ? WHERE id = ? AND tenant_id = ?",
+                    [$amount, $challenge['id'], \Nexus\Core\TenantContext::getId()]
                 );
             }
 
@@ -253,8 +255,8 @@ class SocialGamificationService
     private static function checkChallengeCompletion(int $challengeId): void
     {
         $challenge = Database::query(
-            "SELECT * FROM friend_challenges WHERE id = ?",
-            [$challengeId]
+            "SELECT * FROM friend_challenges WHERE id = ? AND tenant_id = ?",
+            [$challengeId, \Nexus\Core\TenantContext::getId()]
         )->fetch();
 
         if (!$challenge || $challenge['status'] !== 'active') {
@@ -284,8 +286,8 @@ class SocialGamificationService
 
         // Update challenge status
         Database::query(
-            "UPDATE friend_challenges SET status = 'completed', winner_id = ?, completed_at = NOW() WHERE id = ?",
-            [$winnerId, $challengeId]
+            "UPDATE friend_challenges SET status = 'completed', winner_id = ?, completed_at = NOW() WHERE id = ? AND tenant_id = ?",
+            [$winnerId, $challengeId, \Nexus\Core\TenantContext::getId()]
         );
 
         // Award XP to winner
@@ -412,8 +414,8 @@ class SocialGamificationService
 
         // Notify the achievement owner
         $celebrator = Database::query(
-            "SELECT first_name FROM users WHERE id = ?",
-            [$userId]
+            "SELECT first_name FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         )->fetch();
 
         \Nexus\Models\Notification::create(

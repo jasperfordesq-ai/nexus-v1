@@ -105,8 +105,8 @@ class PostSharingService
             // Notify original post author
             try {
                 $sharerName = Database::query(
-                    "SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = ?",
-                    [$userId]
+                    "SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = ? AND tenant_id = ?",
+                    [$userId, TenantContext::getId()]
                 )->fetchColumn();
 
                 Notification::create(

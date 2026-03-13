@@ -615,7 +615,7 @@ class FeedService
             $db->prepare("DELETE FROM likes WHERE id = ? AND tenant_id = ?")->execute([$existing['id'], $tenantId]);
 
             if ($targetType === 'post') {
-                $db->prepare("UPDATE feed_posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = ?")->execute([$targetId]);
+                $db->prepare("UPDATE feed_posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = ? AND tenant_id = ?")->execute([$targetId, $tenantId]);
             }
 
             $action = 'unliked';
@@ -625,7 +625,7 @@ class FeedService
                 ->execute([$userId, $targetType, $targetId, $tenantId]);
 
             if ($targetType === 'post') {
-                $db->prepare("UPDATE feed_posts SET likes_count = likes_count + 1 WHERE id = ?")->execute([$targetId]);
+                $db->prepare("UPDATE feed_posts SET likes_count = likes_count + 1 WHERE id = ? AND tenant_id = ?")->execute([$targetId, $tenantId]);
             }
 
             $action = 'liked';

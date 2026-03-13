@@ -487,8 +487,8 @@ class TotpService
     public static function isSetupRequired(int $userId): bool
     {
         $stmt = Database::query(
-            "SELECT totp_setup_required FROM users WHERE id = ?",
-            [$userId]
+            "SELECT totp_setup_required FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         );
         $user = $stmt->fetch();
 

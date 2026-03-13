@@ -285,9 +285,9 @@ class UserService
                 "SELECT b.name, b.badge_key, b.icon, b.description, ub.awarded_at as earned_at
                  FROM user_badges ub
                  JOIN badges b ON ub.badge_key = b.badge_key AND ub.tenant_id = b.tenant_id
-                 WHERE ub.user_id = ?
+                 WHERE ub.user_id = ? AND ub.tenant_id = ?
                  ORDER BY ub.awarded_at DESC",
-                [$userId]
+                [$userId, TenantContext::getId()]
             )->fetchAll(\PDO::FETCH_ASSOC);
 
             return $badges;
@@ -741,13 +741,13 @@ class UserService
 
             // Anonymize messages (keep for other party's history)
             Database::query(
-                "UPDATE messages SET sender_id = NULL WHERE sender_id = ?",
-                [$userId]
+                "UPDATE messages SET sender_id = NULL WHERE sender_id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             );
 
             // Remove from groups and connections
             Database::query("DELETE FROM group_members WHERE user_id = ?", [$userId]);
-            Database::query("DELETE FROM connections WHERE user_id = ? OR connected_user_id = ?", [$userId, $userId]);
+            Database::query("DELETE FROM connections WHERE (user_id = ? OR connected_user_id = ?) AND tenant_id = ?", [$userId, $userId, TenantContext::getId()]);
 
             Database::commit();
 

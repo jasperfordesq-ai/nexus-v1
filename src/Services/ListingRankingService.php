@@ -804,8 +804,8 @@ class ListingRankingService
     {
         try {
             return Database::query(
-                "SELECT * FROM users WHERE id = ?",
-                [$userId]
+                "SELECT * FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             return null;

@@ -583,13 +583,13 @@ class MessageService
             $messageId = $db->lastInsertId();
 
             // Get the inserted message
-            $stmt = $db->prepare("SELECT * FROM messages WHERE id = ?");
-            $stmt->execute([$messageId]);
+            $stmt = $db->prepare("SELECT * FROM messages WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$messageId, $tenantId]);
             $message = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             // Get sender info for notifications
-            $stmt = $db->prepare("SELECT name, first_name, last_name FROM users WHERE id = ?");
-            $stmt->execute([$senderId]);
+            $stmt = $db->prepare("SELECT name, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$senderId, TenantContext::getId()]);
             $sender = $stmt->fetch(\PDO::FETCH_ASSOC);
             $senderName = $sender['name'] ?? trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
 
@@ -1041,8 +1041,8 @@ class MessageService
             return [];
         }
 
-        $stmt = $db->prepare("SELECT reactions FROM messages WHERE id = ?");
-        $stmt->execute([$messageId]);
+        $stmt = $db->prepare("SELECT reactions FROM messages WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$messageId, TenantContext::getId()]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$result || empty($result['reactions'])) {

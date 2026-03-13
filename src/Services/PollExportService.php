@@ -71,8 +71,8 @@ class PollExportService
 
         // Only poll creator or admin can export
         if ((int)$poll['user_id'] !== $userId) {
-            $user = Database::query("SELECT role FROM users WHERE id = ?", [$userId])->fetch();
-            if (!$user || !in_array($user['role'], ['admin', 'super_admin', 'tenant_admin'])) {
+            $user = Database::query("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId])->fetch();
+            if (!$user || !in_array($user['role'], ['admin', 'super_admin', 'tenant_admin', TenantContext::getId()])) {
                 self::addError(ApiErrorCodes::RESOURCE_FORBIDDEN, 'Only the poll creator or admin can export results');
                 return null;
             }

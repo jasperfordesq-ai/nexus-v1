@@ -712,8 +712,8 @@ class JobVacancyService
             // Notify job owner of new application
             try {
                 $applicant = Database::query(
-                    "SELECT first_name, last_name, email FROM users WHERE id = ?",
-                    [$userId]
+                    "SELECT first_name, last_name, email FROM users WHERE id = ? AND tenant_id = ?",
+                    [$userId, TenantContext::getId()]
                 )->fetch();
                 $applicantName = trim(($applicant['first_name'] ?? '') . ' ' . ($applicant['last_name'] ?? '')) ?: 'Someone';
                 $jobTitle = $vacancy['title'] ?? 'your job posting';
@@ -729,8 +729,8 @@ class JobVacancyService
 
                 // Email notification for owner
                 $owner = Database::query(
-                    "SELECT email, first_name FROM users WHERE id = ?",
-                    [$ownerId]
+                    "SELECT email, first_name FROM users WHERE id = ? AND tenant_id = ?",
+                    [$ownerId, TenantContext::getId()]
                 )->fetch();
                 if ($owner && !empty($owner['email'])) {
                     $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();
@@ -958,8 +958,8 @@ HTML;
 
                 // Email notification for applicant
                 $applicant = Database::query(
-                    "SELECT email, first_name FROM users WHERE id = ?",
-                    [$applicantId]
+                    "SELECT email, first_name FROM users WHERE id = ? AND tenant_id = ?",
+                    [$applicantId, TenantContext::getId()]
                 )->fetch();
                 if ($applicant && !empty($applicant['email'])) {
                     $baseUrl = \Nexus\Core\TenantContext::getFrontendUrl();

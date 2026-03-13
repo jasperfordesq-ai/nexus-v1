@@ -294,23 +294,23 @@ class ListingService
 
         // Add like count
         $likeCount = Database::query(
-            "SELECT COUNT(*) as cnt FROM likes WHERE target_type = 'listing' AND target_id = ?",
-            [$id]
+            "SELECT COUNT(*) as cnt FROM likes WHERE target_type = 'listing' AND target_id = ? AND tenant_id = ?",
+            [$id, TenantContext::getId()]
         )->fetch(\PDO::FETCH_ASSOC);
         $listing['likes_count'] = (int)($likeCount['cnt'] ?? 0);
 
         // Add comment count
         $commentCount = Database::query(
-            "SELECT COUNT(*) as cnt FROM comments WHERE target_type = 'listing' AND target_id = ?",
-            [$id]
+            "SELECT COUNT(*) as cnt FROM comments WHERE target_type = 'listing' AND target_id = ? AND tenant_id = ?",
+            [$id, TenantContext::getId()]
         )->fetch(\PDO::FETCH_ASSOC);
         $listing['comments_count'] = (int)($commentCount['cnt'] ?? 0);
 
         // Add is_liked flag (for authenticated users)
         if ($currentUserId) {
             $isLiked = Database::query(
-                "SELECT COUNT(*) as cnt FROM likes WHERE target_type = 'listing' AND target_id = ? AND user_id = ?",
-                [$id, $currentUserId]
+                "SELECT COUNT(*) as cnt FROM likes WHERE target_type = 'listing' AND target_id = ? AND user_id = ? AND tenant_id = ?",
+                [$id, $currentUserId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
             $listing['is_liked'] = (int)($isLiked['cnt'] ?? 0) > 0;
         } else {
@@ -422,8 +422,8 @@ class ListingService
 
         if (empty($location) || empty($latitude) || empty($longitude)) {
             $user = Database::query(
-                "SELECT location, latitude, longitude FROM users WHERE id = ?",
-                [$userId]
+                "SELECT location, latitude, longitude FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
 
             if ($user) {
@@ -742,8 +742,8 @@ class ListingService
 
         // Check if user is admin
         $user = Database::query(
-            "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-            [$userId]
+            "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         )->fetch(\PDO::FETCH_ASSOC);
 
         if ($user) {

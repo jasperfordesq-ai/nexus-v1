@@ -118,8 +118,8 @@ class ChallengeOutcomeService
         // Validate winning idea belongs to this challenge
         if ($winningIdeaId) {
             $idea = Database::query(
-                "SELECT id FROM challenge_ideas WHERE id = ? AND challenge_id = ?",
-                [$winningIdeaId, $challengeId]
+                "SELECT id FROM challenge_ideas WHERE id = ? AND challenge_id = ? AND tenant_id = ?",
+                [$winningIdeaId, $challengeId, $tenantId]
             )->fetch();
 
             if (!$idea) {
@@ -201,9 +201,10 @@ class ChallengeOutcomeService
 
     private static function isAdmin(int $userId): bool
     {
+        $tenantId = TenantContext::getId();
         $user = Database::query(
-            "SELECT role FROM users WHERE id = ?",
-            [$userId]
+            "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         return $user && in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin']);

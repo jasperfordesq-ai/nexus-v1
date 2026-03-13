@@ -98,8 +98,8 @@ class EndorsementService
         // Send notification
         try {
             $endorserName = Database::query(
-                "SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ?",
-                [$endorserId]
+                "SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ? AND tenant_id = ?",
+                [$endorserId, $tenantId]
             )->fetchColumn();
 
             $basePath = TenantContext::getSlugPrefix();

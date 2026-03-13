@@ -81,8 +81,8 @@ class FederatedTransactionService
             $db->beginTransaction();
 
             // 1. Deduct from sender's balance
-            $stmt = $db->prepare("UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?");
-            $stmt->execute([$amount, $senderId, $amount]);
+            $stmt = $db->prepare("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?");
+            $stmt->execute([$amount, $senderId, $senderTenantId, $amount]);
 
             if ($stmt->rowCount() === 0) {
                 $db->rollBack();
@@ -90,8 +90,8 @@ class FederatedTransactionService
             }
 
             // 2. Add to receiver's balance
-            $stmt = $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ?");
-            $stmt->execute([$amount, $receiverId]);
+            $stmt = $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$amount, $receiverId, $receiverTenantId]);
 
             // 3. Create federated transaction record
             $stmt = $db->prepare("

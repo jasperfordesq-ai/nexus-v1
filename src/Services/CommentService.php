@@ -191,8 +191,9 @@ class CommentService
         // Re-process mentions
         $mentions = self::extractMentions($newContent);
         // Clear old mentions and add new ones
-        $stmt = $pdo->prepare("DELETE FROM mentions WHERE comment_id = ?");
-        $stmt->execute([$commentId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $pdo->prepare("DELETE FROM mentions WHERE comment_id = ? AND tenant_id = ?");
+        $stmt->execute([$commentId, $tenantId]);
 
         if (!empty($mentions)) {
             $tenantId = TenantContext::getId();
@@ -367,7 +368,8 @@ class CommentService
     public static function markMentionsAsSeen(int $userId): void
     {
         $pdo = Database::getInstance();
-        $stmt = $pdo->prepare("UPDATE mentions SET seen_at = NOW() WHERE mentioned_user_id = ? AND seen_at IS NULL");
-        $stmt->execute([$userId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $pdo->prepare("UPDATE mentions SET seen_at = NOW() WHERE mentioned_user_id = ? AND tenant_id = ? AND seen_at IS NULL");
+        $stmt->execute([$userId, $tenantId]);
     }
 }

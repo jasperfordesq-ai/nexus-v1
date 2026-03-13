@@ -200,9 +200,10 @@ class CookieInventoryService
     public static function deleteCookie(int $id): bool
     {
         // Soft delete (set is_active = 0)
+        $tenantId = TenantContext::getId();
         Database::query(
-            "UPDATE cookie_inventory SET is_active = 0, updated_at = NOW() WHERE id = ?",
-            [$id]
+            "UPDATE cookie_inventory SET is_active = 0, updated_at = NOW() WHERE id = ? AND (tenant_id IS NULL OR tenant_id = ?)",
+            [$id, $tenantId]
         );
 
         return true;

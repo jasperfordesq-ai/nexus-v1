@@ -237,8 +237,8 @@ class GeocodingService
         }
 
         try {
-            $sql = "UPDATE users SET latitude = ?, longitude = ? WHERE id = ?";
-            Database::query($sql, [$coords['latitude'], $coords['longitude'], $userId]);
+            $sql = "UPDATE users SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?";
+            Database::query($sql, [$coords['latitude'], $coords['longitude'], $userId, TenantContext::getId()]);
 
             // Also invalidate the user's match cache since their location changed
             SmartMatchingEngine::invalidateCacheForUser($userId);
@@ -269,8 +269,8 @@ class GeocodingService
         }
 
         try {
-            $sql = "UPDATE listings SET latitude = ?, longitude = ? WHERE id = ?";
-            Database::query($sql, [$coords['latitude'], $coords['longitude'], $listingId]);
+            $sql = "UPDATE listings SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?";
+            Database::query($sql, [$coords['latitude'], $coords['longitude'], $listingId, TenantContext::getId()]);
             return true;
         } catch (\Exception $e) {
             error_log("Failed to update listing coordinates: " . $e->getMessage());

@@ -272,8 +272,8 @@ class LeaderboardService
 
             // Get user details
             $user = Database::query(
-                "SELECT id as user_id, name, first_name, last_name, avatar_url FROM users WHERE id = ?",
-                [$userId]
+                "SELECT id as user_id, name, first_name, last_name, avatar_url FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             )->fetch();
 
             if ($user) {
@@ -295,70 +295,71 @@ class LeaderboardService
      */
     private static function getUserScore($userId, $type, $period)
     {
+        $tenantId = TenantContext::getId();
         $dateFilter = self::getDateFilter($period);
 
         try {
             switch ($type) {
                 case 'credits_earned':
                     $result = Database::query(
-                        "SELECT COALESCE(SUM(amount), 0) as score FROM transactions WHERE receiver_id = ? AND deleted_for_receiver = 0 " . str_replace('AND created_at', 'AND transactions.created_at', $dateFilter),
-                        [$userId]
+                        "SELECT COALESCE(SUM(amount), 0) as score FROM transactions WHERE receiver_id = ? AND tenant_id = ? AND deleted_for_receiver = 0 " . str_replace('AND created_at', 'AND transactions.created_at', $dateFilter),
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'credits_spent':
                     $result = Database::query(
-                        "SELECT COALESCE(SUM(amount), 0) as score FROM transactions WHERE sender_id = ? AND deleted_for_sender = 0 " . str_replace('AND created_at', 'AND transactions.created_at', $dateFilter),
-                        [$userId]
+                        "SELECT COALESCE(SUM(amount), 0) as score FROM transactions WHERE sender_id = ? AND tenant_id = ? AND deleted_for_sender = 0 " . str_replace('AND created_at', 'AND transactions.created_at', $dateFilter),
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'vol_hours':
                     $result = Database::query(
-                        "SELECT COALESCE(SUM(hours), 0) as score FROM vol_logs WHERE user_id = ? AND status = 'approved' " . str_replace('AND created_at', 'AND vol_logs.created_at', $dateFilter),
-                        [$userId]
+                        "SELECT COALESCE(SUM(hours), 0) as score FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND status = 'approved' " . str_replace('AND created_at', 'AND vol_logs.created_at', $dateFilter),
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'badges':
                     $result = Database::query(
-                        "SELECT COUNT(*) as score FROM user_badges WHERE user_id = ? " . str_replace('AND created_at', 'AND user_badges.awarded_at', $dateFilter),
-                        [$userId]
+                        "SELECT COUNT(*) as score FROM user_badges WHERE user_id = ? AND tenant_id = ? " . str_replace('AND created_at', 'AND user_badges.awarded_at', $dateFilter),
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'xp':
                     $result = Database::query(
-                        "SELECT COALESCE(xp, 0) as score FROM users WHERE id = ?",
-                        [$userId]
+                        "SELECT COALESCE(xp, 0) as score FROM users WHERE id = ? AND tenant_id = ?",
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'connections':
                     $result = Database::query(
-                        "SELECT COUNT(DISTINCT id) as score FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND status = 'accepted' " . str_replace('AND created_at', 'AND connections.created_at', $dateFilter),
-                        [$userId, $userId]
+                        "SELECT COUNT(DISTINCT id) as score FROM connections WHERE (requester_id = ? OR receiver_id = ?) AND tenant_id = ? AND status = 'accepted' " . str_replace('AND created_at', 'AND connections.created_at', $dateFilter),
+                        [$userId, $userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'reviews':
                     $result = Database::query(
-                        "SELECT COUNT(*) as score FROM reviews WHERE reviewer_id = ? " . str_replace('AND created_at', 'AND reviews.created_at', $dateFilter),
-                        [$userId]
+                        "SELECT COUNT(*) as score FROM reviews WHERE reviewer_id = ? AND tenant_id = ? " . str_replace('AND created_at', 'AND reviews.created_at', $dateFilter),
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'posts':
                     $result = Database::query(
-                        "SELECT COUNT(*) as score FROM feed_posts WHERE user_id = ? " . str_replace('AND created_at', 'AND feed_posts.created_at', $dateFilter),
-                        [$userId]
+                        "SELECT COUNT(*) as score FROM feed_posts WHERE user_id = ? AND tenant_id = ? " . str_replace('AND created_at', 'AND feed_posts.created_at', $dateFilter),
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 
                 case 'streak':
                     $result = Database::query(
-                        "SELECT COALESCE(current_streak, 0) as score FROM user_streaks WHERE user_id = ? AND streak_type = 'login'",
-                        [$userId]
+                        "SELECT COALESCE(current_streak, 0) as score FROM user_streaks WHERE user_id = ? AND tenant_id = ? AND streak_type = 'login'",
+                        [$userId, $tenantId]
                     )->fetch();
                     break;
 

@@ -68,8 +68,8 @@ class ReferralService
     {
         // Check if user already has a code
         $existing = Database::query(
-            "SELECT referral_code FROM users WHERE id = ?",
-            [$userId]
+            "SELECT referral_code FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         )->fetch();
 
         if (!empty($existing['referral_code'])) {
@@ -106,8 +106,8 @@ class ReferralService
     public static function getReferralCode($userId)
     {
         $result = Database::query(
-            "SELECT referral_code FROM users WHERE id = ?",
-            [$userId]
+            "SELECT referral_code FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         )->fetch();
 
         if (empty($result['referral_code'])) {

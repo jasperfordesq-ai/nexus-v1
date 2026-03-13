@@ -7,9 +7,10 @@ module.exports = {
   ci: {
     collect: {
       staticDistDir: './dist',
+      // Lighthouse CI serves staticDistDir on a local port automatically.
+      // Hash-based routes removed — Lighthouse can't render client-side SPA routes.
       url: [
         'http://localhost/index.html',
-        'http://localhost/index.html#/login',
       ],
       numberOfRuns: 1,
     },

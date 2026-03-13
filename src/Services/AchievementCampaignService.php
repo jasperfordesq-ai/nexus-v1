@@ -210,6 +210,7 @@ class AchievementCampaignService
      */
     public static function runCampaign($id)
     {
+        $tenantId = TenantContext::getId();
         $campaign = self::getCampaign($id);
 
         if (!$campaign || $campaign['status'] !== 'active') {
@@ -253,15 +254,15 @@ class AchievementCampaignService
 
         // Update last run time
         Database::query(
-            "UPDATE achievement_campaigns SET last_run_at = NOW(), total_awards = total_awards + ? WHERE id = ?",
-            [$awarded, $id]
+            "UPDATE achievement_campaigns SET last_run_at = NOW(), total_awards = total_awards + ? WHERE id = ? AND tenant_id = ?",
+            [$awarded, $id, $tenantId]
         );
 
         // If one-time campaign, mark as completed
         if ($campaign['type'] === 'one_time') {
             Database::query(
-                "UPDATE achievement_campaigns SET status = 'completed' WHERE id = ?",
-                [$id]
+                "UPDATE achievement_campaigns SET status = 'completed' WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
             );
         }
 

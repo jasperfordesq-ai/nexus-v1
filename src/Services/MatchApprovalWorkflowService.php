@@ -55,8 +55,8 @@ class MatchApprovalWorkflowService
 
             // Get listing owner
             $listing = Database::query(
-                "SELECT user_id, title FROM listings WHERE id = ?",
-                [$listingId]
+                "SELECT user_id, title FROM listings WHERE id = ? AND tenant_id = ?",
+                [$listingId, TenantContext::getId()]
             )->fetch();
 
             if (!$listing) {
@@ -485,8 +485,8 @@ class MatchApprovalWorkflowService
         try {
             // Get user name
             $user = Database::query(
-                "SELECT first_name, last_name FROM users WHERE id = ?",
-                [$userId]
+                "SELECT first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch();
 
             $userName = $user ? trim($user['first_name'] . ' ' . $user['last_name']) : 'A member';
@@ -520,7 +520,7 @@ class MatchApprovalWorkflowService
     {
         try {
             $listing = Database::query(
-                "SELECT id, title, type, category_id FROM listings WHERE id = ?",
+                "SELECT id, title, type, category_id FROM listings WHERE id = ? AND tenant_id = ?",
                 [$request['listing_id']]
             )->fetch();
 
@@ -558,7 +558,7 @@ class MatchApprovalWorkflowService
     {
         try {
             $listing = Database::query(
-                "SELECT title FROM listings WHERE id = ?",
+                "SELECT title FROM listings WHERE id = ? AND tenant_id = ?",
                 [$request['listing_id']]
             )->fetch();
 

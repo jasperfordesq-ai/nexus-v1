@@ -345,7 +345,7 @@ export function HomePage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <GlassCard className="p-6 h-full text-center relative group hover:scale-[1.02] transition-transform">
-                  <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                  <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
                     {index + 1}
                   </div>
                   <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} mb-4`}>

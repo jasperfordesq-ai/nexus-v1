@@ -270,9 +270,10 @@ class AchievementUnlockablesService
      */
     private static function getUserLevel(int $userId): int
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT level FROM users WHERE id = ?",
-            [$userId]
+            "SELECT level FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         return (int)($result['level'] ?? 1);
@@ -283,9 +284,10 @@ class AchievementUnlockablesService
      */
     private static function getUserBadgeKeys(int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $badges = Database::query(
-            "SELECT badge_key FROM user_badges WHERE user_id = ?",
-            [$userId]
+            "SELECT badge_key FROM user_badges WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetchAll();
 
         return array_column($badges, 'badge_key');
@@ -296,9 +298,10 @@ class AchievementUnlockablesService
      */
     public static function getUserActiveUnlockables(int $userId): array
     {
+        $tenantId = TenantContext::getId();
         $result = Database::query(
-            "SELECT unlockable_type, unlockable_key FROM user_active_unlockables WHERE user_id = ?",
-            [$userId]
+            "SELECT unlockable_type, unlockable_key FROM user_active_unlockables WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetchAll();
 
         $active = [];
@@ -330,11 +333,12 @@ class AchievementUnlockablesService
         }
 
         // Upsert the active unlockable
+        $tenantId = TenantContext::getId();
         Database::query(
-            "INSERT INTO user_active_unlockables (user_id, unlockable_type, unlockable_key, activated_at)
-             VALUES (?, ?, ?, NOW())
+            "INSERT INTO user_active_unlockables (tenant_id, user_id, unlockable_type, unlockable_key, activated_at)
+             VALUES (?, ?, ?, ?, NOW())
              ON DUPLICATE KEY UPDATE unlockable_key = ?, activated_at = NOW()",
-            [$userId, $type, $key, $key]
+            [$tenantId, $userId, $type, $key, $key]
         );
 
         return true;
@@ -345,9 +349,10 @@ class AchievementUnlockablesService
      */
     public static function removeActiveUnlockable(int $userId, string $type): bool
     {
+        $tenantId = TenantContext::getId();
         Database::query(
-            "DELETE FROM user_active_unlockables WHERE user_id = ? AND unlockable_type = ?",
-            [$userId, $type]
+            "DELETE FROM user_active_unlockables WHERE user_id = ? AND unlockable_type = ? AND tenant_id = ?",
+            [$userId, $type, $tenantId]
         );
 
         return true;

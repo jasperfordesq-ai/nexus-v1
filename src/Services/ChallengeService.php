@@ -106,16 +106,16 @@ class ChallengeService
                     }
                     $newCount = $progress['current_count'] + $increment;
                     Database::query(
-                        "UPDATE user_challenge_progress SET current_count = ? WHERE id = ?",
-                        [$newCount, $progress['id']]
+                        "UPDATE user_challenge_progress SET current_count = ? WHERE id = ? AND tenant_id = ?",
+                        [$newCount, $progress['id'], TenantContext::getId()]
                     );
                 }
 
                 // Check if just completed
                 if ($newCount >= $challenge['target_count']) {
                     Database::query(
-                        "UPDATE user_challenge_progress SET completed_at = NOW() WHERE user_id = ? AND challenge_id = ?",
-                        [$userId, $challenge['id']]
+                        "UPDATE user_challenge_progress SET completed_at = NOW() WHERE user_id = ? AND challenge_id = ? AND tenant_id = ?",
+                        [$userId, $challenge['id'], TenantContext::getId()]
                     );
 
                     Database::commit();
@@ -166,8 +166,8 @@ class ChallengeService
 
         // Mark as claimed
         Database::query(
-            "UPDATE user_challenge_progress SET reward_claimed = 1 WHERE user_id = ? AND challenge_id = ?",
-            [$userId, $challenge['id']]
+            "UPDATE user_challenge_progress SET reward_claimed = 1 WHERE user_id = ? AND challenge_id = ? AND tenant_id = ?",
+            [$userId, $challenge['id'], TenantContext::getId()]
         );
     }
 

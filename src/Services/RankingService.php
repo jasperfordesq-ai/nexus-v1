@@ -371,8 +371,8 @@ class RankingService
             // Fallback: Check last_login_at
             try {
                 $user = Database::query(
-                    "SELECT last_login_at FROM users WHERE id = ?",
-                    [$userId]
+                    "SELECT last_login_at FROM users WHERE id = ? AND tenant_id = ?",
+                    [$userId, TenantContext::getId()]
                 )->fetch(\PDO::FETCH_ASSOC);
 
                 if ($user && $user['last_login_at']) {
@@ -508,8 +508,8 @@ class RankingService
     {
         try {
             $result = Database::query(
-                "SELECT latitude, longitude FROM users WHERE id = ?",
-                [$userId]
+                "SELECT latitude, longitude FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
 
             return [
