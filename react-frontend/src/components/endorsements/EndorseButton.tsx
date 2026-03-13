@@ -13,6 +13,7 @@
 import { useState } from 'react';
 import { Button, Tooltip } from '@heroui/react';
 import { ThumbsUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -35,6 +36,7 @@ export function EndorseButton({
   compact = false,
 }: EndorseButtonProps) {
   const toast = useToast();
+  const { t } = useTranslation('social');
   const [localCount, setLocalCount] = useState(endorsementCount);
   const [localIsEndorsed, setLocalIsEndorsed] = useState(isEndorsed);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +79,7 @@ export function EndorseButton({
       // Revert on error
       setLocalIsEndorsed(isEndorsed);
       setLocalCount(endorsementCount);
-      toast.error('Failed to update endorsement');
+      toast.error(t('endorsement_update_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +88,7 @@ export function EndorseButton({
   if (compact) {
     return (
       <Tooltip
-        content={localIsEndorsed ? `Remove endorsement for ${skillName}` : `Endorse ${skillName}`}
+        content={localIsEndorsed ? t('endorse.tooltip_remove', { skillName }) : t('endorse.tooltip_endorse', { skillName })}
         delay={300}
         closeDelay={0}
         size="sm"
@@ -101,7 +103,7 @@ export function EndorseButton({
               ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
               : 'bg-theme-elevated text-theme-subtle hover:bg-indigo-500/10 hover:text-indigo-500'
           }`}
-          aria-label={`${localIsEndorsed ? 'Remove endorsement' : 'Endorse'} ${skillName}`}
+          aria-label={localIsEndorsed ? t('endorse.aria_remove', { skillName }) : t('endorse.aria_endorse', { skillName })}
         >
           <ThumbsUp className={`w-3 h-3 ${localIsEndorsed ? 'fill-current' : ''}`} aria-hidden="true" />
           {localCount > 0 && <span>{localCount}</span>}
@@ -128,7 +130,7 @@ export function EndorseButton({
       onPress={handleToggle}
       isLoading={isLoading}
     >
-      {localIsEndorsed ? 'Endorsed' : 'Endorse'} {localCount > 0 && `(${localCount})`}
+      {localIsEndorsed ? t('endorse.endorsed') : t('endorse.endorse')} {localCount > 0 && `(${localCount})`}
     </Button>
   );
 }

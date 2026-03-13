@@ -97,6 +97,7 @@ class RegistrationApiController extends BaseApiController
                 null,
                 429
             );
+            return;
         }
         \Nexus\Services\RateLimitService::increment("auth:register:$ip", 60);
         $this->rateLimit('registration', 5, 3600);
@@ -110,6 +111,7 @@ class RegistrationApiController extends BaseApiController
                 null,
                 403
             );
+            return;
         }
 
         // Collect input - Basic
@@ -246,6 +248,7 @@ class RegistrationApiController extends BaseApiController
                 'tenant_id',
                 422
             );
+            return;
         }
         $tenantCheck = $db->prepare("SELECT id FROM tenants WHERE id = ? AND is_active = 1");
         $tenantCheck->execute([$tenantId]);
@@ -256,6 +259,7 @@ class RegistrationApiController extends BaseApiController
                 'tenant_id',
                 422
             );
+            return;
         }
 
         // Validate invite code if tenant requires it
@@ -269,6 +273,7 @@ class RegistrationApiController extends BaseApiController
                     'invite_code',
                     422
                 );
+                return;
             }
             $codeResult = \Nexus\Services\Identity\InviteCodeService::validate($tenantId, $inviteCode);
             if (!$codeResult['valid']) {
@@ -278,6 +283,7 @@ class RegistrationApiController extends BaseApiController
                     'invite_code',
                     422
                 );
+                return;
             }
         }
 
@@ -292,6 +298,7 @@ class RegistrationApiController extends BaseApiController
                 'email',
                 409
             );
+            return;
         }
 
         // Create the user
@@ -329,6 +336,7 @@ class RegistrationApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
 
         // Redeem invite code if used

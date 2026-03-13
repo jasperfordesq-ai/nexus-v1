@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class Gamification
 {
@@ -34,7 +35,8 @@ class Gamification
         // For safely, let's use a try-catch to update 'points'.
 
         try {
-            $db->query("UPDATE users SET points = points + ? WHERE id = ?", [$points, $userId]);
+            $tenantId = TenantContext::getId();
+            $db->query("UPDATE users SET points = points + ? WHERE id = ? AND tenant_id = ?", [$points, $userId, $tenantId]);
 
             // Log if table exists
             // $db->query("INSERT INTO user_points_log (user_id, points, reason, created_at) VALUES (?, ?, ?, NOW())", [$userId, $points, $reason]);

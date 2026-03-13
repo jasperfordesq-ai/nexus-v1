@@ -1234,7 +1234,7 @@ class AuthController extends BaseApiController
         if (empty($token)) {
             http_response_code(400);
             echo 'Missing token';
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         }
 
         // Validate the JWT
@@ -1242,14 +1242,14 @@ class AuthController extends BaseApiController
         if (!$payload) {
             http_response_code(401);
             echo 'Invalid or expired token';
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         }
 
         $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
         if (!$userId) {
             http_response_code(401);
             echo 'Invalid token payload';
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         }
 
         // Load user from DB
@@ -1261,7 +1261,7 @@ class AuthController extends BaseApiController
         if (!$user) {
             http_response_code(404);
             echo 'User not found';
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         }
 
         // Check admin privileges
@@ -1270,7 +1270,7 @@ class AuthController extends BaseApiController
         if (!$isAdmin) {
             http_response_code(403);
             echo 'Admin access required';
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         }
 
         // NOTE: The legacy admin always runs on the API domain (api.project-nexus.ie).
@@ -1296,6 +1296,6 @@ class AuthController extends BaseApiController
 
         // Redirect to legacy admin
         header('Location: ' . $redirect);
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 }

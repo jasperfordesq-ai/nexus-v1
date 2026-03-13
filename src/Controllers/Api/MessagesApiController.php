@@ -118,6 +118,7 @@ class MessagesApiController extends BaseApiController
                 $this->respondWithErrors($errors, 404);
             }
             $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
+            return;
         }
 
         // Get messages
@@ -274,6 +275,7 @@ class MessagesApiController extends BaseApiController
         $conversation = MessageService::getConversation($otherUserId, $userId);
         if (!$conversation) {
             $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
+            return;
         }
 
         MessageService::archiveConversation($otherUserId, $userId);
@@ -305,6 +307,7 @@ class MessagesApiController extends BaseApiController
 
         if (!$recipientId) {
             $this->respondWithError('VALIDATION_ERROR', 'Recipient ID is required', 'recipient_id', 400);
+            return;
         }
 
         MessageService::setTypingIndicator($recipientId, $userId, $isTyping);
@@ -348,6 +351,7 @@ class MessagesApiController extends BaseApiController
             }
             else {
                 $this->respondWithError('VALIDATION_ERROR', 'No audio data provided', 'audio', 400);
+                return;
             }
 
             $this->respondWithData([
@@ -356,6 +360,7 @@ class MessagesApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to upload audio: ' . $e->getMessage(), 'audio', 400);
+            return;
         }
     }
 
@@ -380,11 +385,13 @@ class MessagesApiController extends BaseApiController
         $recipientId = (int) ($_POST['recipient_id'] ?? 0);
         if (!$recipientId) {
             $this->respondWithError('VALIDATION_ERROR', 'Recipient ID is required', 'recipient_id', 400);
+            return;
         }
 
         // Check if voice message file is provided
         if (empty($_FILES['voice_message']) || $_FILES['voice_message']['error'] !== UPLOAD_ERR_OK) {
             $this->respondWithError('VALIDATION_ERROR', 'Voice message file is required', 'voice_message', 400);
+            return;
         }
 
         try {
@@ -408,6 +415,7 @@ class MessagesApiController extends BaseApiController
             $this->respondWithData($message, null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to send voice message: ' . $e->getMessage(), 'voice_message', 400);
+            return;
         }
     }
 
@@ -434,12 +442,14 @@ class MessagesApiController extends BaseApiController
         $emoji = $this->input('emoji', '');
         if (empty($emoji)) {
             $this->respondWithError('VALIDATION_ERROR', 'Emoji is required', 'emoji', 400);
+            return;
         }
 
         // Validate emoji is in allowed list
         $allowedEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
         if (!in_array($emoji, $allowedEmojis, true)) {
             $this->respondWithError('VALIDATION_ERROR', 'Invalid emoji', 'emoji', 400);
+            return;
         }
 
         $result = MessageService::toggleReaction($id, $userId, $emoji);
@@ -450,6 +460,7 @@ class MessagesApiController extends BaseApiController
                 $this->respondWithErrors($errors, 404);
             }
             $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+            return;
         }
 
         $this->respondWithData([
@@ -479,6 +490,7 @@ class MessagesApiController extends BaseApiController
         $conversation = MessageService::getConversation($otherUserId, $userId);
         if (!$conversation) {
             $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
+            return;
         }
 
         $success = MessageService::archiveConversation($otherUserId, $userId);
@@ -489,6 +501,7 @@ class MessagesApiController extends BaseApiController
                 $this->respondWithErrors($errors, 500);
             }
             $this->respondWithError('ARCHIVE_FAILED', 'Failed to archive conversation', null, 500);
+            return;
         }
 
         $this->respondWithData(['success' => true, 'message' => 'Conversation archived']);
@@ -516,10 +529,12 @@ class MessagesApiController extends BaseApiController
         $body = trim($this->input('body', ''));
         if (empty($body)) {
             $this->respondWithError('VALIDATION_ERROR', 'Message body is required', 'body', 400);
+            return;
         }
 
         if (strlen($body) > 10000) {
             $this->respondWithError('VALIDATION_ERROR', 'Message is too long (max 10000 characters)', 'body', 400);
+            return;
         }
 
         $result = MessageService::editMessage($id, $userId, $body);
@@ -530,6 +545,7 @@ class MessagesApiController extends BaseApiController
                 $this->respondWithErrors($errors, 403);
             }
             $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+            return;
         }
 
         $this->respondWithData($result);
@@ -557,6 +573,7 @@ class MessagesApiController extends BaseApiController
                 $this->respondWithErrors($errors, 403);
             }
             $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+            return;
         }
 
         $this->respondWithData(['success' => true, 'message' => 'Message deleted']);
@@ -581,6 +598,7 @@ class MessagesApiController extends BaseApiController
 
         if ($count === 0) {
             $this->respondWithError('NOT_FOUND', 'No archived conversation found', null, 404);
+            return;
         }
 
         $this->respondWithData(['success' => true, 'message' => 'Conversation restored', 'restored_count' => $count]);

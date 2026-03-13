@@ -53,7 +53,14 @@
     "exported": "Exporté",
     "exported_desc": "Transactions exportées en CSV",
     "transfer_success": "Transfert réussi",
-    "transfer_desc": "{{amount}} heures envoyées à {{recipient}}"
+    "transfer_desc": "{{amount}} heures envoyées à {{recipient}}",
+    "rating_required": "Évaluation requise",
+    "rating_required_desc": "Veuillez sélectionner une évaluation par étoiles",
+    "rating_submitted": "Évaluation soumise",
+    "rating_submitted_desc": "Merci pour votre retour !",
+    "submit_failed": "Échec de la soumission",
+    "try_again": "Veuillez réessayer",
+    "submit_error_desc": "Une erreur s'est produite. Veuillez réessayer."
   },
   "error": {
     "load_balance": "Impossible de charger le solde du portefeuille",

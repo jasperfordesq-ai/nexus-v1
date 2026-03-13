@@ -248,7 +248,7 @@ export function LoginPage() {
       // User cancelled — do nothing
     } else if (result.error?.includes('not found') || result.error?.includes('Credential not found')) {
       // No passkey registered for this account
-      toast.error('No passkey found for this account. Log in with your password, then go to Settings to register a passkey.');
+      toast.error(t('passkey_not_found'));
     }
   };
 
@@ -291,7 +291,7 @@ export function LoginPage() {
 
   return (
     <>
-      <PageMeta title="Log In" description="Sign in to your account" noIndex />
+      <PageMeta title={t("login_meta_title")} description={t("login_meta_description")} noIndex />
       <div className="min-h-screen flex items-center justify-center p-4">
         {/* Background blobs */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">

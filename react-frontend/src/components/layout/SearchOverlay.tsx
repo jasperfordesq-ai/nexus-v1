@@ -280,6 +280,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               onChange={e => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t('search.placeholder', 'Search...')}
+              aria-label={t('search.placeholder', 'Search...')}
               autoFocus
               className="flex-1 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-base outline-none"
             />

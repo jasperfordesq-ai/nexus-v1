@@ -41,7 +41,10 @@
     "report_failed": "Failed to report post",
     "deleted": "Post deleted",
     "delete_failed": "Failed to delete post",
-    "vote_failed": "Failed to submit vote"
+    "vote_failed": "Failed to submit vote",
+    "post_shared": "Post shared to your feed",
+    "share_removed": "Share removed",
+    "share_failed": "Failed to share post"
   },
   "realtime": {
     "new_post_singular": "1 new post",
@@ -220,5 +223,18 @@
     "no_match": "No hashtags matching \"{{query}}\"",
     "no_trending": "No trending hashtags in your community yet.",
     "post_count": "{{count}} posts"
+  },
+  "share": {
+    "tooltip_remove": "Remove share",
+    "tooltip_share": "Share to your feed",
+    "button_label": "Share",
+    "button_label_count": "Share ({{count}})",
+    "shared_by": "<0>{{name}}</0> shared this"
+  },
+  "trending": {
+    "title": "Trending",
+    "view_all": "View all hashtags",
+    "post_count": "{{count}} post",
+    "post_count_plural": "{{count}} posts"
   }
 }

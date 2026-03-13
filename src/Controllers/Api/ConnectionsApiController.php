@@ -123,6 +123,7 @@ class ConnectionsApiController extends BaseApiController
 
         if (!$receiverId) {
             $this->respondWithError('VALIDATION_ERROR', 'User ID is required', 'user_id', 400);
+            return;
         }
 
         $success = ConnectionService::sendRequest($userId, $receiverId);

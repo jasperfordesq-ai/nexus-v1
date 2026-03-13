@@ -62,8 +62,8 @@ class ReviewService
             // Check if review already exists for this transaction
             if ($transactionId) {
                 $existing = Database::query(
-                    "SELECT id FROM reviews WHERE transaction_id = ? AND reviewer_id = ?",
-                    [$transactionId, $reviewerId]
+                    "SELECT id FROM reviews WHERE transaction_id = ? AND reviewer_id = ? AND reviewer_tenant_id = ?",
+                    [$transactionId, $reviewerId, $reviewerTenantId]
                 )->fetch();
                 if ($existing) {
                     return ['success' => false, 'error' => 'You have already reviewed this exchange'];
@@ -72,8 +72,8 @@ class ReviewService
 
             if ($federationTransactionId) {
                 $existing = Database::query(
-                    "SELECT id FROM reviews WHERE federation_transaction_id = ? AND reviewer_id = ?",
-                    [$federationTransactionId, $reviewerId]
+                    "SELECT id FROM reviews WHERE federation_transaction_id = ? AND reviewer_id = ? AND reviewer_tenant_id = ?",
+                    [$federationTransactionId, $reviewerId, $reviewerTenantId]
                 )->fetch();
                 if ($existing) {
                     return ['success' => false, 'error' => 'You have already reviewed this exchange'];

@@ -38,6 +38,14 @@ function isNativeApp(): boolean {
   }
 }
 
+function getNativePlatform(): string {
+  try {
+    return window.Capacitor?.getPlatform?.() || 'android';
+  } catch {
+    return 'android';
+  }
+}
+
 export function useAppUpdate() {
   const [updateInfo, setUpdateInfo] = useState<AppUpdateInfo | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -53,7 +61,7 @@ export function useAppUpdate() {
       try {
         const res = await api.post('/app/check-version', {
           version: APP_VERSION,
-          platform: 'android',
+          platform: getNativePlatform(),
         });
 
         const data = (res?.data && typeof res.data === 'object' ? res.data : {}) as Record<string, unknown>;

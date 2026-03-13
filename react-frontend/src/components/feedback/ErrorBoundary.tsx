@@ -14,6 +14,7 @@ import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { GlassCard } from '@/components/ui';
 import { logError } from '@/lib/logger';
+import i18n from 'i18next';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -90,11 +91,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 </div>
 
                 <h1 className="text-2xl font-bold text-theme-primary mb-2">
-                  Something went wrong
+                  {i18n.t('error_boundary.title', { ns: 'common' })}
                 </h1>
 
                 <p className="text-theme-muted mb-6">
-                  An unexpected error occurred. Please try again or go back to the home page.
+                  {i18n.t('error_boundary.description', { ns: 'common' })}
                 </p>
 
                 {/* Error details in development */}
@@ -106,7 +107,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                     {this.state.errorInfo?.componentStack && (
                       <details className="mt-2">
                         <summary className="text-theme-subtle text-xs cursor-pointer">
-                          Component Stack
+                          {i18n.t('error_boundary.component_stack', { ns: 'common' })}
                         </summary>
                         <pre className="text-theme-subtle/70 text-xs mt-2 overflow-auto max-h-40">
                           {this.state.errorInfo.componentStack}
@@ -122,7 +123,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                     className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     startContent={<RefreshCw className="w-4 h-4" />}
                   >
-                    Try Again
+                    {i18n.t('error_boundary.try_again', { ns: 'common' })}
                   </Button>
 
                   <Button
@@ -131,7 +132,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                     className="flex-1 bg-theme-elevated text-theme-muted"
                     startContent={<Home className="w-4 h-4" />}
                   >
-                    Go Home
+                    {i18n.t('error_boundary.go_home', { ns: 'common' })}
                   </Button>
                 </div>
               </div>

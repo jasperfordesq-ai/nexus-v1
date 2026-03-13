@@ -6,7 +6,6 @@
   "search_placeholder": "Cerca offerte...",
   "search_aria": "Cerca offerte di lavoro",
   "filter_aria": "Filtra per categoria",
-
   "filter_by_commitment": "Filtra per impegno",
   "type": {
     "all": "Tutti i Tipi",
@@ -38,7 +37,6 @@
     "rejected": "Rifiutata",
     "withdrawn": "Ritirata"
   },
-
   "views": "{{count}} visualizzazioni",
   "applications": "{{count}} candidature",
   "remote": "Da remoto",
@@ -50,13 +48,11 @@
   "load_more": "Carica Altro",
   "try_again": "Riprova",
   "featured": "In Evidenza",
-
   "empty_title": "Nessuna offerta trovata",
   "empty_description": "Non ci sono offerte di lavoro che corrispondono ai tuoi criteri",
   "empty_search": "Nessuna offerta corrisponde alla tua ricerca",
   "unable_to_load": "Impossibile Caricare le Offerte",
   "error_load_more": "Impossibile caricare altre offerte",
-
   "saved": {
     "title": "Lavori Salvati",
     "empty_title": "Nessun lavoro salvato",
@@ -68,7 +64,6 @@
     "unsave_success": "Lavoro rimosso dai salvati",
     "save_error": "Impossibile salvare il lavoro"
   },
-
   "match": {
     "title": "Corrispondenza Competenze",
     "percentage": "{{count}}% di corrispondenza",
@@ -81,7 +76,6 @@
     "no_skills_required": "Nessuna competenza specifica richiesta",
     "no_user_skills": "Aggiungi competenze al tuo profilo per vedere la tua corrispondenza"
   },
-
   "qualified": {
     "title": "Sono qualificato?",
     "subtitle": "Scopri come le tue competenze corrispondono a questo ruolo",
@@ -92,7 +86,6 @@
     "level_low": "Potresti voler sviluppare piu competenze per questo ruolo",
     "check_button": "Verifica Qualificazione"
   },
-
   "pipeline": {
     "title": "Pipeline Candidature",
     "applied": "Candidatura inviata",
@@ -103,7 +96,6 @@
     "rejected": "Rifiutata",
     "move_to": "Sposta a {{stage}}"
   },
-
   "history": {
     "title": "Storico dello Stato",
     "changed_from": "Cambiato da {{from}} a {{to}}",
@@ -111,7 +103,6 @@
     "by": "da {{name}}",
     "empty": "Nessuno storico disponibile"
   },
-
   "alerts": {
     "title": "Avvisi Lavoro",
     "subtitle": "Ricevi una notifica quando nuovi lavori corrispondono alle tue preferenze",
@@ -143,7 +134,6 @@
     "toggle_error": "Impossibile cambiare lo stato dell'avviso",
     "delete_error": "Impossibile eliminare l'avviso"
   },
-
   "renew": {
     "button": "Rinnova",
     "title": "Rinnova Offerta di Lavoro",
@@ -153,7 +143,6 @@
     "error": "Impossibile rinnovare il lavoro",
     "expiring_soon": "In scadenza"
   },
-
   "analytics": {
     "title": "Analisi del Lavoro",
     "total_views": "Visualizzazioni Totali",
@@ -168,7 +157,6 @@
     "applications_by_stage": "Candidature per Fase",
     "no_data": "Nessun dato analitico ancora"
   },
-
   "salary": {
     "label": "Compenso",
     "range": "{{min}} - {{max}}",
@@ -185,7 +173,6 @@
     "form_currency_placeholder": "es. USD, EUR, GBP",
     "form_negotiable_label": "Lo stipendio e negoziabile"
   },
-
   "detail": {
     "loading": "Caricamento offerta...",
     "unable_to_load": "Impossibile Caricare l'Offerta",
@@ -228,7 +215,6 @@
     "analytics": "Analisi",
     "check_qualification": "Sono qualificato?"
   },
-
   "apply": {
     "button": "Candidati Ora",
     "applied": "Candidatura inviata",
@@ -243,7 +229,6 @@
     "closed": "Le candidature non sono piu accettate",
     "login_required": "Accedi per candidarti"
   },
-
   "form": {
     "create_title": "Pubblica un'Offerta di Lavoro",
     "edit_title": "Modifica Offerta di Lavoro",
@@ -292,10 +277,13 @@
       "description_required": "La descrizione e obbligatoria"
     }
   },
-
   "my_applications": {
     "title": "Le Mie Candidature",
     "empty_title": "Nessuna candidatura ancora",
     "empty_description": "Le tue candidature appariranno qui"
-  }
+  },
+  "application_withdrawn": "Candidatura ritirata con successo.",
+  "something_wrong": "Qualcosa è andato storto. Riprova.",
+  "vacancy_closed": "Posizione chiusa",
+  "vacancy_reopened": "Posizione riaperta"
 }

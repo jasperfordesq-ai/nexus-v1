@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 class Review
 {
@@ -130,8 +131,9 @@ class Review
      */
     public static function update($reviewId, $rating, $comment)
     {
-        $sql = "UPDATE reviews SET rating = ?, comment = ? WHERE id = ?";
-        return Database::query($sql, [$rating, $comment, $reviewId]);
+        $tenantId = TenantContext::getId();
+        $sql = "UPDATE reviews SET rating = ?, comment = ? WHERE id = ? AND tenant_id = ?";
+        return Database::query($sql, [$rating, $comment, $reviewId, $tenantId]);
     }
 
     /**
@@ -140,7 +142,7 @@ class Review
     public static function delete($reviewId, $tenantId = null)
     {
         if ($tenantId === null) {
-            $tenantId = \Nexus\Core\TenantContext::getId();
+            $tenantId = TenantContext::getId();
         }
         $sql = "DELETE FROM reviews WHERE id = ? AND tenant_id = ?";
         return Database::query($sql, [$reviewId, $tenantId]);
@@ -151,7 +153,8 @@ class Review
      */
     public static function findById($reviewId)
     {
-        $sql = "SELECT * FROM reviews WHERE id = ?";
-        return Database::query($sql, [$reviewId])->fetch();
+        $tenantId = TenantContext::getId();
+        $sql = "SELECT * FROM reviews WHERE id = ? AND tenant_id = ?";
+        return Database::query($sql, [$reviewId, $tenantId])->fetch();
     }
 }

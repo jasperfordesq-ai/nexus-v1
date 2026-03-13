@@ -64,6 +64,7 @@ class EmailVerificationApiController extends BaseApiController
                 'token',
                 400
             );
+            return;
         }
 
         // Find and validate the verification token (tenant-scoped)
@@ -76,6 +77,7 @@ class EmailVerificationApiController extends BaseApiController
                 'token',
                 400
             );
+            return;
         }
 
         $userId = $verificationRecord['user_id'];
@@ -93,6 +95,7 @@ class EmailVerificationApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         if (!empty($user['email_verified_at'])) {
@@ -163,6 +166,7 @@ class EmailVerificationApiController extends BaseApiController
                 null,
                 429
             );
+            return;
         }
 
         // Get user details (tenant-scoped)
@@ -179,6 +183,7 @@ class EmailVerificationApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         // Check if already verified
@@ -222,6 +227,7 @@ class EmailVerificationApiController extends BaseApiController
                 null,
                 429
             );
+            return;
         }
         \Nexus\Services\RateLimitService::increment("resend_verify:$ip", 300);
 

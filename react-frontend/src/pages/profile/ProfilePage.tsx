@@ -284,7 +284,7 @@ export function ProfilePage() {
       }
     } catch (err) {
       logError('Failed to load profile', err);
-      setError('Failed to load profile. Please try again.');
+      setError(t('load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -729,7 +729,7 @@ export function ProfilePage() {
             title={
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" aria-hidden="true" />
-                Availability
+                {t('tabs.availability')}
               </span>
             }
           />
@@ -828,7 +828,7 @@ export function ProfilePage() {
                         {listing.image_url && (
                           <img
                             src={resolveAssetUrl(listing.image_url)}
-                            alt=""
+                            alt={listing.title || 'Listing image'}
                             className="w-full h-32 object-cover"
                             loading="lazy"
                           />

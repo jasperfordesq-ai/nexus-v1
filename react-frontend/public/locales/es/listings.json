@@ -104,5 +104,20 @@
   "exchange_status_accepted": "Aceptado",
   "exchange_status_in_progress": "En Progreso",
   "exchange_status_pending_confirmation": "Confirmar Horas",
-  "exchange_status_disputed": "En Revisión"
+  "exchange_status_disputed": "En Revisión",
+  "renew_success": "Anuncio renovado exitosamente",
+  "renew_error": "Error al renovar el anuncio",
+  "detail_analytics": "Analiticas",
+  "detail_renew": "Renovar anuncio",
+  "detail_extend": "Extender",
+  "detail_skills": "Habilidades",
+  "detail_hours": "{{count}} horas",
+  "detail_expired_on": "Expiro el {{date}}",
+  "detail_expires_on": "Expira el {{date}}",
+  "detail_renewed_count_one": "renovado {{count}} vez",
+  "detail_renewed_count_other": "renovado {{count}} veces",
+  "load_error": "Error al cargar los anuncios.",
+  "load_more_error": "Error al cargar mas anuncios",
+  "page_meta_description": "Explora servicios y solicitudes.",
+  "page_meta_keywords": "anuncios, servicios, ofertas"
 }

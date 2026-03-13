@@ -74,6 +74,7 @@ class EndorsementApiController extends BaseApiController
 
         if (empty($skillName)) {
             $this->respondWithError('VALIDATION_ERROR', 'skill_name is required', 'skill_name', 400);
+            return;
         }
 
         EndorsementService::removeEndorsement($userId, $id, $skillName);

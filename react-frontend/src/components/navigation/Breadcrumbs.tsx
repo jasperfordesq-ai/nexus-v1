@@ -36,7 +36,7 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
           <li className="flex items-center">
             <Link
               to={tenantPath('/')}
-              className="text-theme-subtle hover:text-theme-primary transition-colors"
+              className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] text-theme-subtle hover:text-theme-primary transition-colors"
               aria-label="Home"
             >
               <Home className="w-3.5 h-3.5" aria-hidden="true" />
@@ -62,7 +62,7 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
                 <>
                   <Link
                     to={tenantPath(item.href)}
-                    className="text-theme-subtle hover:text-theme-primary transition-colors"
+                    className="inline-flex items-center min-h-[44px] px-1 text-theme-subtle hover:text-theme-primary transition-colors"
                   >
                     {item.label}
                   </Link>

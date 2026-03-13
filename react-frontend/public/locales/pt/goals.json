@@ -1,0 +1,9 @@
+{
+  "checkin_recorded": "Check-in registrado!",
+  "checkin_failed": "Falha ao registrar o check-in.",
+  "reminder_set_failed": "Falha ao definir o lembrete.",
+  "reminder_removed": "Lembrete removido.",
+  "reminder_remove_failed": "Falha ao remover o lembrete.",
+  "template_created": "Meta criada a partir do modelo!",
+  "template_create_failed": "Falha ao criar meta a partir do modelo."
+}

@@ -77,6 +77,7 @@ class AdminResourcesApiController extends BaseApiController
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } else {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete article', null, 400);
+            return;
         }
     }
 }

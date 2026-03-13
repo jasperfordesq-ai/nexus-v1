@@ -218,6 +218,7 @@ class AdminGamificationApiController extends BaseApiController
 
         if (empty($name)) {
             $this->respondWithError('VALIDATION_ERROR', 'Badge name is required', 'name');
+            return;
         }
 
         // Auto-generate slug if not provided
@@ -246,6 +247,7 @@ class AdminGamificationApiController extends BaseApiController
             ], null, 201);
         } catch (\Throwable $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to create badge. The custom_badges table may not exist.', null, 500);
+            return;
         }
     }
 
@@ -268,6 +270,7 @@ class AdminGamificationApiController extends BaseApiController
 
             if (!$badge) {
                 $this->respondWithError('NOT_FOUND', 'Badge not found', null, 404);
+                return;
             }
 
             // Remove user_badges referencing this custom badge
@@ -288,6 +291,7 @@ class AdminGamificationApiController extends BaseApiController
             $this->respondWithData(['deleted' => true]);
         } catch (\Throwable $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to delete badge', null, 500);
+            return;
         }
     }
 
@@ -338,6 +342,7 @@ class AdminGamificationApiController extends BaseApiController
         $name = trim($this->input('name', ''));
         if (empty($name)) {
             $this->respondWithError('VALIDATION_ERROR', 'Campaign name is required', 'name');
+            return;
         }
 
         $data = [
@@ -361,6 +366,7 @@ class AdminGamificationApiController extends BaseApiController
             ], null, 201);
         } catch (\Throwable $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to create campaign: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -377,6 +383,7 @@ class AdminGamificationApiController extends BaseApiController
         $campaign = AchievementCampaignService::getCampaign($id);
         if (!$campaign) {
             $this->respondWithError('NOT_FOUND', 'Campaign not found', null, 404);
+            return;
         }
 
         $data = [
@@ -405,6 +412,7 @@ class AdminGamificationApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Throwable $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to update campaign: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -420,6 +428,7 @@ class AdminGamificationApiController extends BaseApiController
         $campaign = AchievementCampaignService::getCampaign($id);
         if (!$campaign) {
             $this->respondWithError('NOT_FOUND', 'Campaign not found', null, 404);
+            return;
         }
 
         try {
@@ -427,6 +436,7 @@ class AdminGamificationApiController extends BaseApiController
             $this->respondWithData(['deleted' => true]);
         } catch (\Throwable $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to delete campaign', null, 500);
+            return;
         }
     }
 
@@ -458,6 +468,7 @@ class AdminGamificationApiController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             $this->respondWithError('SERVER_ERROR', 'Badge recheck failed: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -475,10 +486,12 @@ class AdminGamificationApiController extends BaseApiController
 
         if (empty($badgeSlug)) {
             $this->respondWithError('VALIDATION_ERROR', 'Badge slug is required', 'badge_slug');
+            return;
         }
 
         if (empty($userIds) || !is_array($userIds)) {
             $this->respondWithError('VALIDATION_ERROR', 'User IDs array is required', 'user_ids');
+            return;
         }
 
         $awarded = 0;

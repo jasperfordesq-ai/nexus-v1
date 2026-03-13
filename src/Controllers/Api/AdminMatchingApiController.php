@@ -444,6 +444,7 @@ class AdminMatchingApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to clear cache: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -509,6 +510,7 @@ class AdminMatchingApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to load matching stats: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 }

@@ -16,7 +16,7 @@
  * API: GET /api/v2/users/me/activity/dashboard
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
@@ -202,11 +202,7 @@ export function ActivityDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -222,7 +218,36 @@ export function ActivityDashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await api.get<DashboardData>('/v2/users/me/activity/dashboard');
+        if (!cancelled) {
+          if (response.success && response.data) {
+            setDashboard(response.data);
+          } else {
+            setError(t('error_load_failed'));
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          logError('Failed to load activity dashboard', err);
+          setError(t('error_load_failed_detail'));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [t]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

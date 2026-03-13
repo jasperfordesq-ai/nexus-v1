@@ -65,7 +65,7 @@ export function RequestExchangePage() {
       if (listingResponse.success && listingResponse.data) {
         setListing(listingResponse.data);
         // Pre-fill hours with listing estimate
-        const estimatedHours = listingResponse.data.hours_estimate || listingResponse.data.estimated_hours;
+        const estimatedHours = listingResponse.data?.hours_estimate || listingResponse.data?.estimated_hours;
         if (estimatedHours) {
           setProposedHours(estimatedHours.toString());
         }
@@ -75,7 +75,7 @@ export function RequestExchangePage() {
 
       if (configResponse.success && configResponse.data) {
         setConfig(configResponse.data);
-        if (!configResponse.data.exchange_workflow_enabled) {
+        if (!configResponse.data?.exchange_workflow_enabled) {
           setError(t('request.workflow_not_enabled'));
         }
       }

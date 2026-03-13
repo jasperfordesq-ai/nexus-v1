@@ -1043,7 +1043,7 @@ class AiApiController extends BaseApiController
             flush();
         }
 
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 
     /**

@@ -108,7 +108,7 @@
     "make_private_aria": "Gruppe privat machen",
     "save_changes": "Änderungen speichern",
     "delete_modal_title": "Gruppe löschen",
-    "delete_confirm": "Sind Sie sicher, dass Sie \u201e{{name}}\u201c löschen möchten?",
+    "delete_confirm": "Sind Sie sicher, dass Sie „{{name}}“ löschen möchten?",
     "delete_desc": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Diskussionen, Mitglieder und Gruppendaten werden dauerhaft entfernt.",
     "delete_btn": "Gruppe löschen"
   },
@@ -228,5 +228,7 @@
     "role_update_failed": "Rolle konnte nicht aktualisiert werden",
     "member_removed": "Mitglied entfernt",
     "member_remove_failed": "Mitglied konnte nicht entfernt werden"
-  }
+  },
+  "load_error": "Gruppen konnten nicht geladen werden.",
+  "load_more_error": "Weitere Gruppen konnten nicht geladen werden"
 }

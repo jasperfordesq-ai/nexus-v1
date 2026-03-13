@@ -134,6 +134,7 @@ class EventsApiController extends BaseApiController
 
         if ($lat === null || $lon === null) {
             $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+            return;
         }
 
         $lat = (float)$lat;
@@ -142,9 +143,11 @@ class EventsApiController extends BaseApiController
         // Validate coordinates
         if ($lat < -90 || $lat > 90) {
             $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+            return;
         }
         if ($lon < -180 || $lon > 180) {
             $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+            return;
         }
 
         $filters = [
@@ -187,6 +190,7 @@ class EventsApiController extends BaseApiController
 
         if (!$event) {
             $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return;
         }
 
         $this->respondWithData($event);
@@ -352,6 +356,7 @@ class EventsApiController extends BaseApiController
 
         if (empty($status)) {
             $this->respondWithError('VALIDATION_ERROR', 'RSVP status is required', 'status', 400);
+            return;
         }
 
         $success = EventService::rsvp($id, $userId, $status);
@@ -454,6 +459,7 @@ class EventsApiController extends BaseApiController
         $event = EventService::getById($id);
         if (!$event) {
             $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
+            return;
         }
 
         $filters = [
@@ -493,6 +499,7 @@ class EventsApiController extends BaseApiController
         // Check for uploaded file
         if (empty($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
             $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+            return;
         }
 
         try {
@@ -521,6 +528,7 @@ class EventsApiController extends BaseApiController
             $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+            return;
         }
     }
 
@@ -612,6 +620,7 @@ class EventsApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('CHECKIN_ERROR', 'Failed to check in attendee: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -985,7 +994,6 @@ class EventsApiController extends BaseApiController
         if (!$seriesId) {
             $errors = EventService::getErrors();
             $this->respondWithErrors($errors, 422);
-            return;
         }
 
         $series = EventService::getSeriesInfo($seriesId);

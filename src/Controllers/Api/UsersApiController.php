@@ -47,6 +47,7 @@ class UsersApiController extends BaseApiController
 
         if (!$profile) {
             $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return;
         }
 
         $this->respondWithData($profile);
@@ -79,6 +80,7 @@ class UsersApiController extends BaseApiController
             }
 
             $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+            return;
         }
 
         $this->respondWithData($profile);
@@ -276,6 +278,7 @@ class UsersApiController extends BaseApiController
         // Check for uploaded file
         if (empty($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
             $this->respondWithError('VALIDATION_ERROR', 'No avatar file uploaded or upload error', 'avatar', 400);
+            return;
         }
 
         $avatarUrl = UserService::updateAvatar($userId, $_FILES['avatar']);
@@ -312,10 +315,12 @@ class UsersApiController extends BaseApiController
 
         if (empty($currentPassword)) {
             $this->respondWithError('VALIDATION_ERROR', 'Current password is required', 'current_password', 400);
+            return;
         }
 
         if (empty($newPassword)) {
             $this->respondWithError('VALIDATION_ERROR', 'New password is required', 'new_password', 400);
+            return;
         }
 
         $success = UserService::updatePassword($userId, $currentPassword, $newPassword);
@@ -404,12 +409,14 @@ class UsersApiController extends BaseApiController
 
         if (empty($prefs)) {
             $this->respondWithError('VALIDATION_ERROR', 'No valid preferences provided', null, 400);
+            return;
         }
 
         $success = \Nexus\Models\User::updateNotificationPreferences($userId, $prefs);
 
         if (!$success) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update preferences', null, 500);
+            return;
         }
 
         $this->respondWithData(['message' => 'Notification preferences updated']);
@@ -451,6 +458,7 @@ class UsersApiController extends BaseApiController
 
         if (empty($slug)) {
             $this->respondWithError('VALIDATION_ERROR', 'Missing consent slug', 'slug', 400);
+            return;
         }
 
         try {
@@ -465,6 +473,7 @@ class UsersApiController extends BaseApiController
             $this->respondWithData($result);
         } catch (\Exception $e) {
             $this->respondWithError('CONSENT_UPDATE_FAILED', $e->getMessage(), null, 400);
+            return;
         }
     }
 
@@ -497,6 +506,7 @@ class UsersApiController extends BaseApiController
                 'type',
                 400
             );
+            return;
         }
 
         try {
@@ -519,8 +529,10 @@ class UsersApiController extends BaseApiController
         } catch (\RuntimeException $e) {
             // Duplicate request
             $this->respondWithError('DUPLICATE_REQUEST', $e->getMessage(), null, 409);
+            return;
         } catch (\Exception $e) {
             $this->respondWithError('REQUEST_FAILED', $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -668,6 +680,7 @@ class UsersApiController extends BaseApiController
 
         if ($lat === null || $lon === null) {
             $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+            return;
         }
 
         $lat = (float)$lat;
@@ -676,9 +689,11 @@ class UsersApiController extends BaseApiController
         // Validate coordinates
         if ($lat < -90 || $lat > 90) {
             $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+            return;
         }
         if ($lon < -180 || $lon > 180) {
             $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+            return;
         }
 
         $filters = [
@@ -728,6 +743,7 @@ class UsersApiController extends BaseApiController
                 'theme',
                 400
             );
+            return;
         }
 
         $success = \Nexus\Core\Database::query(
@@ -737,6 +753,7 @@ class UsersApiController extends BaseApiController
 
         if (!$success) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update theme preference', null, 500);
+            return;
         }
 
         $this->respondWithData([
@@ -773,6 +790,7 @@ class UsersApiController extends BaseApiController
                 'language',
                 400
             );
+            return;
         }
 
         $success = \Nexus\Core\Database::query(
@@ -782,6 +800,7 @@ class UsersApiController extends BaseApiController
 
         if (!$success) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update language preference', null, 500);
+            return;
         }
 
         // Update session so PHP admin views pick it up immediately

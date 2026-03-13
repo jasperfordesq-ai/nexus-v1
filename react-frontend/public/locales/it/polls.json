@@ -2,7 +2,6 @@
   "title": "Sondaggi",
   "subtitle": "Vota e scopri cosa pensa la comunita",
   "page_title": "Sondaggi",
-
   "create_poll": "Crea Sondaggio",
   "question": "Domanda",
   "question_placeholder": "Cosa vorresti chiedere?",
@@ -15,7 +14,6 @@
   "expires_at": "Data di fine (opzionale)",
   "no_deadline": "Lascia vuoto per nessuna scadenza",
   "submit": "Crea Sondaggio",
-
   "vote": "Vota",
   "votes": "voti",
   "votes_one": "voto",
@@ -23,54 +21,48 @@
   "results": "Risultati",
   "total_votes": "{{count}} voti",
   "total_votes_one": "{{count}} voto",
-
   "status": {
     "open": "Aperto",
     "closed": "Chiuso"
   },
-
   "tabs": {
     "open": "Aperti",
     "closed": "Chiusi",
     "mine": "I Miei Sondaggi",
     "aria_label": "Schede filtro sondaggi"
   },
-
   "empty": {
     "title": "Nessun sondaggio ancora",
     "description": "Sii il primo a creare un sondaggio e a raccogliere l'opinione della comunita.",
     "description_closed": "Nessun sondaggio chiuso da mostrare.",
     "description_mine": "Non hai ancora creato nessun sondaggio."
   },
-
   "time_remaining": "{{time}} rimanenti",
   "expired": "Scaduto",
   "created_by": "di",
   "delete_poll": "Elimina Sondaggio",
-
   "confirm_delete": {
     "title": "Elimina Sondaggio",
     "message": "Sei sicuro di voler eliminare questo sondaggio? Questa azione non puo essere annullata.",
     "confirm": "Elimina",
     "cancel": "Annulla"
   },
-
   "toast": {
     "created": "Sondaggio creato con successo!",
     "create_failed": "Impossibile creare il sondaggio. Riprova.",
     "voted": "Voto registrato!",
     "vote_failed": "Impossibile registrare il voto. Riprova.",
     "deleted": "Sondaggio eliminato.",
-    "delete_failed": "Impossibile eliminare il sondaggio. Riprova."
+    "delete_failed": "Impossibile eliminare il sondaggio. Riprova.",
+    "csv_exported": "CSV esportato con successo.",
+    "export_failed": "Impossibile esportare i risultati del sondaggio."
   },
-
   "errors": {
     "question_required": "Inserisci una domanda per il tuo sondaggio.",
     "min_options": "Fornisci almeno 2 opzioni.",
     "load_failed": "Impossibile caricare i sondaggi.",
     "load_more_failed": "Impossibile caricare altri sondaggi."
   },
-
   "load_more": "Carica Altro",
   "try_again": "Riprova",
   "collapse": "Comprimi",

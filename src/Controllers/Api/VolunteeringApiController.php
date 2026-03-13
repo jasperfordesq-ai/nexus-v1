@@ -18,8 +18,7 @@ class VolunteeringApiController extends BaseApiController
     {
         $this->getUserId();
         if (!TenantContext::hasFeature('volunteering')) {
-            $this->respondWithError(ApiErrorCodes::FORBIDDEN, 'Feature not available', null, 403);
-            return;
+            return $this->respondWithError(ApiErrorCodes::FORBIDDEN, 'Feature not available', null, 403);
         }
         $this->rateLimit('volunteering_legacy_list', 60, 60);
         // Assuming search method exists or direct query.

@@ -65,7 +65,7 @@ class AdminUsersApiController extends BaseApiController
         $order = strtoupper($_GET['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
         // Whitelist sort columns
         $allowedSorts = ['name', 'email', 'role', 'created_at', 'balance', 'status'];
-        if (!in_array($sort, $allowedSorts)) {
+        if (!in_array($sort, $allowedSorts, true)) {
             $sort = 'created_at';
         }
 
@@ -421,6 +421,7 @@ class AdminUsersApiController extends BaseApiController
             ], null, 201);
         } else {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to create user', null, 500);
+            return;
         }
     }
 
@@ -623,7 +624,6 @@ class AdminUsersApiController extends BaseApiController
         // Idempotency: prevent double-approval (and double welcome credits)
         if (!empty($user['is_approved'])) {
             $this->respondWithData(['approved' => true, 'id' => $id, 'already_approved' => true]);
-            return;
         }
 
         User::updateAdminFields($id, $user['role'] ?? 'member', 1, null, (int) $user['tenant_id']);
@@ -1158,6 +1158,7 @@ class AdminUsersApiController extends BaseApiController
             ], null, 201);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to award badge: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -1205,6 +1206,7 @@ class AdminUsersApiController extends BaseApiController
             $this->respondWithData(['removed' => true, 'user_id' => $id, 'badge_id' => $badgeId]);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to remove badge: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -1368,7 +1370,7 @@ class AdminUsersApiController extends BaseApiController
         fputcsv($output, ['John', 'Smith', 'john@example.com', '', 'member']);
 
         fclose($output);
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 
     /**
@@ -1438,6 +1440,7 @@ class AdminUsersApiController extends BaseApiController
             $this->respondWithData($responseData);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to generate impersonation token', null, 500);
+            return;
         }
     }
 
@@ -1505,6 +1508,7 @@ class AdminUsersApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'is_tenant_super_admin' => $grant]);
         } catch (\Exception $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update super admin status', null, 500);
+            return;
         }
     }
 
@@ -1557,6 +1561,7 @@ class AdminUsersApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
         } catch (\Exception $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to update global super admin status', null, 500);
+            return;
         }
     }
 
@@ -1615,6 +1620,7 @@ class AdminUsersApiController extends BaseApiController
             ]);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Badge recheck failed: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -1790,6 +1796,7 @@ class AdminUsersApiController extends BaseApiController
             $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to send password reset email: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -1863,6 +1870,7 @@ class AdminUsersApiController extends BaseApiController
             $this->respondWithData(['sent' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to send welcome email: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 }

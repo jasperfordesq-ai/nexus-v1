@@ -52,6 +52,7 @@ class JobVacanciesApiController extends BaseApiController
     {
         if (!TenantContext::hasFeature('job_vacancies')) {
             $this->respondWithError('FEATURE_DISABLED', 'Job Vacancies module is not enabled for this community', null, 403);
+            return;
         }
     }
 
@@ -164,6 +165,7 @@ class JobVacanciesApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         // Increment views (fire-and-forget) — J8: pass userId for analytics
@@ -342,6 +344,7 @@ class JobVacanciesApiController extends BaseApiController
                 'status',
                 400
             );
+            return;
         }
 
         $success = JobVacancyService::updateApplicationStatus($id, $userId, $status, $notes);

@@ -18,8 +18,26 @@ class AdminNewsletterApiController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    /**
+     * Allowed tables for existence checks — prevents SQL injection via table name.
+     */
+    private const ALLOWED_TABLES = [
+        'newsletters',
+        'newsletter_subscribers',
+        'newsletter_segments',
+        'newsletter_templates',
+        'newsletter_queue',
+        'newsletter_bounces',
+        'newsletter_opens',
+        'newsletter_clicks',
+        'newsletter_suppression_list',
+    ];
+
     private function tableExists(string $table): bool
     {
+        if (!in_array($table, self::ALLOWED_TABLES, true)) {
+            return false;
+        }
         try {
             Database::query("SELECT 1 FROM `{$table}` LIMIT 1");
             return true;
@@ -90,6 +108,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData($item);
         } catch (\Exception $e) {
             $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
+            return;
         }
     }
 
@@ -155,6 +174,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'name' => $name, 'status' => $status], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('CREATE_FAILED', 'Failed to create newsletter: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -219,6 +239,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update newsletter');
+            return;
         }
     }
 
@@ -237,6 +258,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->noContent();
         } catch (\Exception $e) {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete newsletter');
+            return;
         }
     }
 
@@ -385,6 +407,7 @@ class AdminNewsletterApiController extends BaseApiController
             ], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('CREATE_FAILED', 'Failed to add subscriber: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -408,6 +431,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->noContent();
         } catch (\Exception $e) {
             $this->respondWithError('DELETE_FAILED', 'Failed to remove subscriber');
+            return;
         }
     }
 
@@ -435,6 +459,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('IMPORT_FAILED', 'Failed to import subscribers: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -444,7 +469,6 @@ class AdminNewsletterApiController extends BaseApiController
 
         if (!$this->tableExists('newsletter_subscribers')) {
             $this->respondWithData([]);
-            return;
         }
 
         try {
@@ -475,6 +499,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('SYNC_FAILED', 'Failed to sync members: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -672,6 +697,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData($segment);
         } catch (\Exception $e) {
             $this->respondWithError('FETCH_FAILED', 'Failed to fetch segment');
+            return;
         }
     }
 
@@ -722,6 +748,7 @@ class AdminNewsletterApiController extends BaseApiController
             ], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('CREATE_FAILED', 'Failed to create segment: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -811,6 +838,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update segment: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -842,6 +870,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->noContent();
         } catch (\Exception $e) {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete segment');
+            return;
         }
     }
 
@@ -1209,6 +1238,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData($item);
         } catch (\Exception $e) {
             $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+            return;
         }
     }
 
@@ -1246,6 +1276,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'name' => $name], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('CREATE_FAILED', 'Failed to create template: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -1296,6 +1327,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'updated' => true]);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update template');
+            return;
         }
     }
 
@@ -1317,6 +1349,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->noContent();
         } catch (\Exception $e) {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete template');
+            return;
         }
     }
 
@@ -1364,6 +1397,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['id' => $newId, 'name' => $newName], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate template: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -1394,6 +1428,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
+            return;
         }
     }
 
@@ -1844,6 +1879,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('FETCH_FAILED', 'Failed to fetch newsletter stats');
+            return;
         }
     }
 
@@ -1888,6 +1924,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['success' => true, 'winner' => $winner]);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to select A/B test winner');
+            return;
         }
     }
 
@@ -1990,6 +2027,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['success' => true, 'email' => $email]);
         } catch (\Exception $e) {
             $this->respondWithError('UNSUPPRESS_FAILED', 'Failed to remove email from suppression list');
+            return;
         }
     }
 
@@ -2013,6 +2051,7 @@ class AdminNewsletterApiController extends BaseApiController
             $this->respondWithData(['success' => true, 'email' => $email]);
         } catch (\Exception $e) {
             $this->respondWithError('SUPPRESS_FAILED', 'Failed to add email to suppression list');
+            return;
         }
     }
 
@@ -2077,6 +2116,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('FETCH_FAILED', 'Failed to fetch resend info');
+            return;
         }
     }
 
@@ -2168,6 +2208,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('RESEND_FAILED', 'Failed to queue resend: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -2326,6 +2367,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('SEND_FAILED', $e->getMessage());
+            return;
         }
     }
 
@@ -2390,9 +2432,11 @@ class AdminNewsletterApiController extends BaseApiController
                 ]);
             } else {
                 $this->respondWithError('SEND_FAILED', 'Failed to send test email. Check email configuration.');
+                return;
             }
         } catch (\Exception $e) {
             $this->respondWithError('SEND_FAILED', 'Failed to send test email: ' . $e->getMessage());
+            return;
         }
     }
 
@@ -2483,6 +2527,7 @@ class AdminNewsletterApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate newsletter: ' . $e->getMessage());
+            return;
         }
     }
 

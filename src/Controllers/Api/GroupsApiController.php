@@ -131,6 +131,7 @@ class GroupsApiController extends BaseApiController
 
         if (!$group) {
             $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return;
         }
 
         $this->respondWithData($group);
@@ -376,6 +377,7 @@ class GroupsApiController extends BaseApiController
         $group = GroupService::getById($id);
         if (!$group) {
             $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            return;
         }
 
         $filters = [
@@ -422,6 +424,7 @@ class GroupsApiController extends BaseApiController
 
         if (empty($role)) {
             $this->respondWithError('VALIDATION_ERROR', 'Role is required', 'role', 400);
+            return;
         }
 
         $success = GroupService::updateMemberRole($id, $targetUserId, $userId, $role);
@@ -535,6 +538,7 @@ class GroupsApiController extends BaseApiController
 
         if (empty($action)) {
             $this->respondWithError('VALIDATION_ERROR', 'Action is required', 'action', 400);
+            return;
         }
 
         $success = GroupService::handleJoinRequest($id, $requesterId, $userId, $action);
@@ -790,6 +794,7 @@ class GroupsApiController extends BaseApiController
         // Check for uploaded file
         if (empty($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
             $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+            return;
         }
 
         $imageType = $this->query('type', 'avatar');
@@ -823,6 +828,7 @@ class GroupsApiController extends BaseApiController
             $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {
             $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+            return;
         }
     }
 

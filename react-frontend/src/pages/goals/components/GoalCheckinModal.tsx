@@ -48,6 +48,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 
+import { useTranslation } from 'react-i18next';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface CheckIn {
@@ -101,6 +102,7 @@ export function GoalCheckinModal({
   onCheckinCreated,
 }: GoalCheckinModalProps) {
   const toast = useToast();
+  const { t } = useTranslation('goals');
 
   // Form state
   const [progressValue, setProgressValue] = useState(currentProgress);
@@ -154,15 +156,15 @@ export function GoalCheckinModal({
       });
 
       if (response.success) {
-        toast.success('Check-in recorded!');
+        toast.success(t('checkin_recorded'));
         onCheckinCreated();
         onClose();
       } else {
-        toast.error('Failed to record check-in.');
+        toast.error(t('checkin_failed'));
       }
     } catch (err) {
       logError('Failed to create check-in', err);
-      toast.error('Failed to record check-in.');
+      toast.error(t('checkin_failed'));
     } finally {
       setIsSubmitting(false);
     }

@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   Modal,
@@ -23,6 +24,7 @@ import { SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { useTenant, useAuth } from '@/contexts';
 
 export function SessionExpiredModal() {
+  const { t } = useTranslation('errors');
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
@@ -75,7 +77,7 @@ export function SessionExpiredModal() {
                   <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
-              <span className="text-xl font-semibold text-theme-primary">Session Expired</span>
+              <span className="text-xl font-semibold text-theme-primary">{t('session_expired')}</span>
             </ModalHeader>
 
             <ModalBody
@@ -83,7 +85,7 @@ export function SessionExpiredModal() {
               className="text-center pb-4"
             >
               <p className="text-theme-muted">
-                Your session has expired due to inactivity. Please log in again to continue.
+                {t('session_expired_message')}
               </p>
             </ModalBody>
 
@@ -93,14 +95,14 @@ export function SessionExpiredModal() {
                 className="flex-1 bg-theme-elevated text-theme-primary"
                 onPress={onClose}
               >
-                Dismiss
+                {t('dismiss')}
               </Button>
               <Button
                 className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                 startContent={<LogIn className="w-4 h-4" />}
                 onPress={handleLogin}
               >
-                Log In
+                {t('auth.log_in', { ns: 'common' })}
               </Button>
             </ModalFooter>
           </>

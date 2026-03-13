@@ -141,6 +141,7 @@ class AdminToolsApiController extends BaseApiController
             ], null, 201);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to create redirect: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -182,6 +183,7 @@ class AdminToolsApiController extends BaseApiController
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Redirect not found or table does not exist', 'id', 404);
+            return;
         }
     }
 
@@ -283,6 +285,7 @@ class AdminToolsApiController extends BaseApiController
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, '404 error entry not found or table does not exist', 'id', 404);
+            return;
         }
     }
 

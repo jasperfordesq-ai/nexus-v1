@@ -61,6 +61,7 @@ class VolunteerApiController extends BaseApiController
     {
         if (!TenantContext::hasFeature('volunteering')) {
             $this->respondWithError('FEATURE_DISABLED', 'Volunteering module is not enabled for this community', null, 403);
+            return;
         }
     }
 
@@ -438,7 +439,6 @@ class VolunteerApiController extends BaseApiController
             $errors = VolunteerService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData([
@@ -689,7 +689,6 @@ class VolunteerApiController extends BaseApiController
             $errors = VolunteerService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData([
@@ -892,7 +891,6 @@ class VolunteerApiController extends BaseApiController
             $errors = VolunteerService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData([
@@ -1090,7 +1088,6 @@ class VolunteerApiController extends BaseApiController
             $errors = \Nexus\Services\ShiftSwapService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData(['id' => $swapId, 'status' => $action === 'accept' ? 'accepted' : 'rejected']);
@@ -1149,7 +1146,6 @@ class VolunteerApiController extends BaseApiController
             $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData(['id' => $reservationId, 'message' => "Reserved {$slots} slots"], null, 201);
@@ -1178,7 +1174,6 @@ class VolunteerApiController extends BaseApiController
             $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData(['message' => 'Member added to group reservation']);
@@ -1425,7 +1420,6 @@ class VolunteerApiController extends BaseApiController
             $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData($result);
@@ -1459,7 +1453,6 @@ class VolunteerApiController extends BaseApiController
             $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData(['message' => 'Successfully checked out']);
@@ -1558,7 +1551,6 @@ class VolunteerApiController extends BaseApiController
             $errors = \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
-            return;
         }
 
         $this->respondWithData(['id' => $alertId, 'response' => $response]);
@@ -1758,6 +1750,7 @@ class VolunteerApiController extends BaseApiController
         } catch (\Throwable $e) {
             error_log("Wellbeing checkin failed: " . $e->getMessage());
             $this->respondWithError('SERVER_ERROR', 'Failed to save check-in', null, 500);
+            return;
         }
     }
 
@@ -2027,11 +2020,13 @@ class VolunteerApiController extends BaseApiController
 
         if (empty($type)) {
             $this->respondWithError('VALIDATION_ERROR', 'Credential type is required', 'credential_type');
+            return;
         }
 
         $uploadedFile = $_FILES['file'] ?? $_FILES['document'] ?? null;
         if (empty($uploadedFile) || !isset($uploadedFile['error']) || $uploadedFile['error'] !== UPLOAD_ERR_OK) {
             $this->respondWithError('VALIDATION_ERROR', 'A credential file is required', 'file');
+            return;
         }
 
         // Handle file upload
@@ -2044,11 +2039,13 @@ class VolunteerApiController extends BaseApiController
             $mimeType = $finfo->file($uploadedFile['tmp_name']);
             if (!in_array($mimeType, $allowedMimes, true)) {
                 $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPEG, PNG, and WebP files are allowed', 'file');
+                return;
             }
 
             // 10 MB limit
             if (($uploadedFile['size'] ?? 0) > 10 * 1024 * 1024) {
                 $this->respondWithError('VALIDATION_ERROR', 'File size must be under 10 MB', 'file');
+                return;
             }
 
             $fileUrl = \Nexus\Core\ImageUploader::upload($uploadedFile, 'credentials');
@@ -2087,6 +2084,7 @@ class VolunteerApiController extends BaseApiController
 
         if ($stmt->rowCount() === 0) {
             $this->respondWithError('NOT_FOUND', 'Credential not found', null, 404);
+            return;
         }
 
         $this->respondWithData(['success' => true]);

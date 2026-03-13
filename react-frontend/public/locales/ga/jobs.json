@@ -6,7 +6,6 @@
   "search_placeholder": "Cuardaigh foluntais...",
   "search_aria": "Cuardaigh foluntais poist",
   "filter_aria": "Scag de reir catagoire",
-
   "filter_by_commitment": "Scag de reir tiomantais",
   "type": {
     "all": "Gach Cineál",
@@ -38,7 +37,6 @@
     "rejected": "Diúltaithe",
     "withdrawn": "Tarraingthe siar"
   },
-
   "views": "{{count}} amharc",
   "applications": "{{count}} iarratas",
   "remote": "Cianda",
@@ -50,13 +48,11 @@
   "load_more": "Luchtaigh Tuilleadh",
   "try_again": "Bain Triail Eile As",
   "featured": "Molta",
-
   "empty_title": "Níor aimsíodh aon fholúntas",
   "empty_description": "Níl aon fholúntais poist ag freagairt do do chritéir",
   "empty_search": "Níl aon fholúntas ag freagairt do do chuardach",
   "unable_to_load": "Ní Féidir Folúntais a Luchtú",
   "error_load_more": "Theip ar luchtú tuilleadh folúntas",
-
   "saved": {
     "title": "Poist Shábháilte",
     "empty_title": "Gan poist shábháilte",
@@ -68,7 +64,6 @@
     "unsave_success": "Post bainte ó shábháilte",
     "save_error": "Theip ar shábháil an phoist"
   },
-
   "match": {
     "title": "Meaitseáil Scileanna",
     "percentage": "{{count}}% meaitseáil",
@@ -81,7 +76,6 @@
     "no_skills_required": "Níl aon scileanna sonracha ag teastáil",
     "no_user_skills": "Cuir scileanna le do phróifíl chun do mheaitseáil a fheiceáil"
   },
-
   "qualified": {
     "title": "An bhfuil mé cáilithe?",
     "subtitle": "Féach conas a oireann do scileanna don ról seo",
@@ -92,7 +86,6 @@
     "level_low": "B'fhéidir gur mhaith leat tuilleadh scileanna a fhorbairt don ról seo",
     "check_button": "Seiceáil Cáilíocht"
   },
-
   "pipeline": {
     "title": "Píblíne Iarratas",
     "applied": "Iarratas déanta",
@@ -103,7 +96,6 @@
     "rejected": "Diúltaithe",
     "move_to": "Bog go {{stage}}"
   },
-
   "history": {
     "title": "Stair Stádais",
     "changed_from": "Athraithe ó {{from}} go {{to}}",
@@ -111,7 +103,6 @@
     "by": "ag {{name}}",
     "empty": "Níl aon stair ar fáil"
   },
-
   "alerts": {
     "title": "Foláireamh Poist",
     "subtitle": "Faigh fógra nuair a oireann poist nua do do roghanna",
@@ -143,7 +134,6 @@
     "toggle_error": "Theip ar athrú an fholáirimh",
     "delete_error": "Theip ar scriosadh an fholáirimh"
   },
-
   "renew": {
     "button": "Athnuaigh",
     "title": "Athnuaigh Folúntas Poist",
@@ -153,7 +143,6 @@
     "error": "Theip ar athnuachan an phoist",
     "expiring_soon": "Ag dul in éag go luath"
   },
-
   "analytics": {
     "title": "Anailísíocht Poist",
     "total_views": "Amhairc Iomlána",
@@ -168,7 +157,6 @@
     "applications_by_stage": "Iarratais de réir Céime",
     "no_data": "Gan sonraí anailísíochta fós"
   },
-
   "salary": {
     "label": "Cúiteamh",
     "range": "{{min}} - {{max}}",
@@ -185,7 +173,6 @@
     "form_currency_placeholder": "m.sh. USD, EUR, GBP",
     "form_negotiable_label": "Tá an tuarastal inshocraithe"
   },
-
   "detail": {
     "loading": "Folúntas á luchtú...",
     "unable_to_load": "Ní Féidir an Folúntas a Luchtú",
@@ -228,7 +215,6 @@
     "analytics": "Anailísíocht",
     "check_qualification": "An bhfuil mé cáilithe?"
   },
-
   "apply": {
     "button": "Cuir Isteach Anois",
     "applied": "Iarratas déanta",
@@ -243,7 +229,6 @@
     "closed": "Níl iarratais á nglacadh a thuilleadh",
     "login_required": "Logáil isteach chun iarratas a chur isteach"
   },
-
   "form": {
     "create_title": "Postáil Folúntas Poist",
     "edit_title": "Cuir Folúntas Poist in Eagar",
@@ -292,10 +277,13 @@
       "description_required": "Tá cur síos ag teastáil"
     }
   },
-
   "my_applications": {
     "title": "Mo Chuid Iarratas",
     "empty_title": "Gan iarratais fós",
     "empty_description": "Beidh d'iarratais poist le feiceáil anseo"
-  }
+  },
+  "application_withdrawn": "D'éirigh le tarraingt siar an iarratais.",
+  "something_wrong": "Chuaigh rud éigin mícheart. Bain triail eile as.",
+  "vacancy_closed": "Folúntas dúnta",
+  "vacancy_reopened": "Folúntas athoscailte"
 }

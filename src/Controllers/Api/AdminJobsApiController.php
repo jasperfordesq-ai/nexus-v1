@@ -80,6 +80,7 @@ class AdminJobsApiController extends BaseApiController
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } else {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete job', null, 400);
+            return;
         }
     }
 
@@ -94,6 +95,7 @@ class AdminJobsApiController extends BaseApiController
             $this->respondWithData(['featured' => true, 'id' => $id, 'duration_days' => $days]);
         } else {
             $this->respondWithError('FEATURE_FAILED', 'Failed to feature job', null, 400);
+            return;
         }
     }
 
@@ -107,6 +109,7 @@ class AdminJobsApiController extends BaseApiController
             $this->respondWithData(['featured' => false, 'id' => $id]);
         } else {
             $this->respondWithError('UNFEATURE_FAILED', 'Failed to unfeature job', null, 400);
+            return;
         }
     }
 
@@ -151,6 +154,7 @@ class AdminJobsApiController extends BaseApiController
             $errors = JobVacancyService::getErrors();
             $first = $errors[0] ?? [];
             $this->respondWithError($first['code'] ?? 'UPDATE_FAILED', $first['message'] ?? 'Failed to update', null, 400);
+            return;
         }
     }
 }

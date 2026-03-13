@@ -250,5 +250,24 @@
     "message": "Une nouvelle version est disponible.",
     "update_now": "Mettre à jour",
     "dismiss": "Ignorer la notification de mise à jour"
+  },
+  "error_boundary": {
+    "title": "Une erreur est survenue",
+    "description": "Une erreur inattendue s'est produite. Veuillez réessayer ou revenir à la page d'accueil.",
+    "component_stack": "Pile de composants",
+    "try_again": "Réessayer",
+    "go_home": "Accueil"
+  },
+  "quick_create": {
+    "title": "Créer",
+    "close_aria": "Fermer le menu de création",
+    "new_listing": "Nouvelle annonce",
+    "new_listing_desc": "Offrir ou demander un service",
+    "new_event": "Nouvel événement",
+    "new_event_desc": "Organiser un événement communautaire",
+    "new_group": "Nouveau groupe",
+    "new_group_desc": "Créer un groupe communautaire",
+    "new_goal": "Nouvel objectif",
+    "new_goal_desc": "Définir un objectif personnel"
   }
 }

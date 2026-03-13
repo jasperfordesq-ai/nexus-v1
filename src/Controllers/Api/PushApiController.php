@@ -35,6 +35,7 @@ class PushApiController extends BaseApiController
 
         if (empty($publicKey)) {
             $this->respondWithError('PUSH_NOT_CONFIGURED', 'Push notifications not configured', null, 500);
+            return;
         }
 
         $this->respondWithData(['public_key' => $publicKey]);
@@ -65,13 +66,14 @@ class PushApiController extends BaseApiController
 
         if (empty($endpoint)) {
             $this->respondWithError('VALIDATION_ERROR', 'Endpoint is required', 'endpoint', 400);
+            return;
         }
 
         try {
             $db = Database::getConnection();
 
             // Check if subscription already exists
-            $stmt = $db->prepare("SELECT id FROM push_subscriptions WHERE endpoint = ? AND user_id = ?");
+            $stmt = $db->prepare("SELECT id FROM push_subscriptions WHERE endpoint = ? AND user_id = ? AND tenant_id = ?");
             $stmt->execute([$endpoint, $userId]);
             $existing = $stmt->fetch();
 
@@ -111,6 +113,7 @@ class PushApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log('[PushApi] Subscribe error: ' . $e->getMessage());
             $this->respondWithError('SUBSCRIBE_FAILED', 'Failed to save subscription', null, 500);
+            return;
         }
     }
 
@@ -127,16 +130,18 @@ class PushApiController extends BaseApiController
     public function unsubscribe(): void
     {
         $userId = $this->getUserId();
+        $tenantId = $this->getAuthenticatedTenantId() ?? TenantContext::getId();
         $this->rateLimit('push_unsubscribe', 10, 60);
 
         $endpoint = $this->input('endpoint');
 
         if (empty($endpoint)) {
             $this->respondWithError('VALIDATION_ERROR', 'Endpoint is required', 'endpoint', 400);
+            return;
         }
 
         $db = Database::getConnection();
-        $stmt = $db->prepare("DELETE FROM push_subscriptions WHERE endpoint = ? AND user_id = ?");
+        $stmt = $db->prepare("DELETE FROM push_subscriptions WHERE endpoint = ? AND user_id = ? AND tenant_id = ?");
         $stmt->execute([$endpoint, $userId]);
 
         $this->respondWithData(['unsubscribed' => true]);
@@ -173,6 +178,7 @@ class PushApiController extends BaseApiController
 
         if (empty($title) || empty($body)) {
             $this->respondWithError('VALIDATION_ERROR', 'Title and body are required', null, 400);
+            return;
         }
 
         $db = Database::getConnection();
@@ -243,9 +249,10 @@ class PushApiController extends BaseApiController
     public function status(): void
     {
         $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
 
         $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT COUNT(*) as count FROM push_subscriptions WHERE user_id = ?");
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM push_subscriptions WHERE user_id = ? AND tenant_id = ?");
         $stmt->execute([$userId]);
         $result = $stmt->fetch();
 
@@ -277,6 +284,7 @@ class PushApiController extends BaseApiController
 
         if (empty($token)) {
             $this->respondWithError('VALIDATION_ERROR', 'Token is required', 'token', 400);
+            return;
         }
 
         // User might not be logged in yet - device can be registered
@@ -310,10 +318,12 @@ class PushApiController extends BaseApiController
                 ]);
             } else {
                 $this->respondWithError('REGISTRATION_FAILED', 'Failed to register device', null, 500);
+                return;
             }
         } catch (\Exception $e) {
             error_log('[PushApi] Register device error: ' . $e->getMessage());
             $this->respondWithError('SERVER_ERROR', 'Server error', null, 500);
+            return;
         }
     }
 
@@ -335,6 +345,7 @@ class PushApiController extends BaseApiController
 
         if (empty($token)) {
             $this->respondWithError('VALIDATION_ERROR', 'Token is required', 'token', 400);
+            return;
         }
 
         try {
@@ -347,6 +358,7 @@ class PushApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log('[PushApi] Unregister device error: ' . $e->getMessage());
             $this->respondWithError('SERVER_ERROR', 'Server error', null, 500);
+            return;
         }
     }
 

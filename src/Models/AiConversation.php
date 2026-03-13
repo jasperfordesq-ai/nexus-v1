@@ -152,8 +152,9 @@ class AiConversation
     public static function touch(int $id): bool
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("UPDATE ai_conversations SET updated_at = NOW() WHERE id = ?");
-        return $stmt->execute([$id]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("UPDATE ai_conversations SET updated_at = NOW() WHERE id = ? AND tenant_id = ?");
+        return $stmt->execute([$id, $tenantId]);
     }
 
     /**

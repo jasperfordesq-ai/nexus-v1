@@ -45,6 +45,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 
+import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -89,6 +90,7 @@ export function MatchesPage() {
   useAuth(); // ensure authenticated
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { t } = useTranslation('matches');
 
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,7 +114,7 @@ export function MatchesPage() {
       }
     } catch (err) {
       logError('MatchesPage.load', err);
-      toast.error('Failed to load matches');
+      toast.error(t('load_failed'));
     }
 
     setLoading(false);
@@ -132,7 +134,7 @@ export function MatchesPage() {
     try {
       await api.post(`/v2/matches/${listingId}/dismiss`, { reason: 'not_relevant' });
       setMatches((prev) => prev.filter((m) => !(m.source_type === 'listing' && m.source_id === listingId)));
-      toast.success('Match hidden — we\'ll show you fewer like this');
+      toast.success(t('match_hidden'));
     } catch (err) {
       logError('MatchesPage.dismiss', err);
     }

@@ -24,5 +24,14 @@
   "share_to_feed": "Roinn ar an bhFotha",
   "shared_to_feed": "Roinnte ar d'fhotha",
   "write_comment": "Scriobh tracht...",
-  "write_reply": "Scriobh freagra..."
+  "write_reply": "Scriobh freagra...",
+  "endorsement_update_failed": "Theip ar nuashonrú an fhormhuinithe",
+  "endorse": {
+    "tooltip_remove": "Bain formhuiniú do {{skillName}}",
+    "tooltip_endorse": "Formhuinigh {{skillName}}",
+    "aria_remove": "Bain formhuiniú {{skillName}}",
+    "aria_endorse": "Formhuinigh {{skillName}}",
+    "endorsed": "Formhuinithe",
+    "endorse": "Formhuinigh"
+  }
 }

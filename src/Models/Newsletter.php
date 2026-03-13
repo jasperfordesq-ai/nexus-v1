@@ -287,8 +287,9 @@ class Newsletter
      */
     public static function markRecurringSent($id)
     {
-        $sql = "UPDATE newsletters SET last_recurring_sent = NOW() WHERE id = ?";
-        Database::query($sql, [$id]);
+        $tenantId = TenantContext::getId();
+        $sql = "UPDATE newsletters SET last_recurring_sent = NOW() WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$id, $tenantId]);
     }
 
     /**

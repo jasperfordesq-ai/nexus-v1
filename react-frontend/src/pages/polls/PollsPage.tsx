@@ -720,13 +720,13 @@ export function PollsPage() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        toast.success('CSV exported successfully.');
+        toast.success(t('toast.csv_exported'));
       } else {
-        toast.error('Failed to export poll results.');
+        toast.error(t('toast.export_failed'));
       }
     } catch (err) {
       logError('Failed to export poll', err);
-      toast.error('Failed to export poll results.');
+      toast.error(t('toast.export_failed'));
     }
   };
 

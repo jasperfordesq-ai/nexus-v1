@@ -41,6 +41,7 @@ class PollsApiController extends BaseApiController
     {
         if (!TenantContext::hasFeature('polls')) {
             $this->respondWithError('FEATURE_DISABLED', 'Polls module is not enabled for this community', null, 403);
+            return;
         }
     }
 
@@ -127,6 +128,7 @@ class PollsApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         $this->respondWithData($poll);
@@ -293,6 +295,7 @@ class PollsApiController extends BaseApiController
                 'option_id',
                 400
             );
+            return;
         }
 
         $success = PollService::vote($id, (int)$optionId, $userId);
@@ -357,6 +360,7 @@ class PollsApiController extends BaseApiController
                 'rankings',
                 400
             );
+            return;
         }
 
         $success = PollRankingService::submitRanking($id, $userId, $rankings);
@@ -396,10 +400,12 @@ class PollsApiController extends BaseApiController
         $poll = PollService::getById($id, $userId);
         if (!$poll) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Poll not found', null, 404);
+            return;
         }
 
         if (($poll['poll_type'] ?? 'standard') !== 'ranked') {
             $this->respondWithError(ApiErrorCodes::VALIDATION_INVALID_VALUE, 'This is not a ranked-choice poll', null, 400);
+            return;
         }
 
         $results = PollRankingService::calculateResults($id);
@@ -452,7 +458,7 @@ class PollsApiController extends BaseApiController
         header('Content-Disposition: attachment; filename="poll-' . $id . '-export.csv"');
         header('Content-Length: ' . strlen($csv));
         echo $csv;
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 
     // ============================================

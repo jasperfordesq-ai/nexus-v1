@@ -361,19 +361,19 @@ class SocialNotificationService
                     return $result ? $result['user_id'] : null;
 
                 case 'listing':
-                    $result = $dbClass::query("SELECT user_id FROM listings WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM listings WHERE id = ? AND tenant_id = ?", [$contentId])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'event':
-                    $result = $dbClass::query("SELECT user_id FROM events WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM events WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'goal':
-                    $result = $dbClass::query("SELECT user_id FROM goals WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM goals WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'poll':
-                    $result = $dbClass::query("SELECT user_id FROM polls WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM polls WHERE id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'resource':
@@ -386,7 +386,7 @@ class SocialNotificationService
 
                 case 'review':
                     // For reviews, the owner is the person who wrote the review (reviewer_id)
-                    $result = $dbClass::query("SELECT reviewer_id as user_id FROM reviews WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT reviewer_id as user_id FROM reviews WHERE id = ? AND tenant_id = ?", [$contentId])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 default:
@@ -408,22 +408,22 @@ class SocialNotificationService
 
             switch ($contentType) {
                 case 'post':
-                    $result = $dbClass::query("SELECT content FROM feed_posts WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT content FROM feed_posts WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     $text = $result ? $result['content'] : '';
                     break;
 
                 case 'listing':
-                    $result = $dbClass::query("SELECT title, description FROM listings WHERE id = ?", [$contentId])->fetch();
-                    $text = $result ? ($result['title'] . ': ' . $result['description']) : '';
+                    $result = $dbClass::query("SELECT title, description FROM listings WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
+                    $text = $result ? ($result['title'] . ': ' . ($result['description'] ?? '')) : '';
                     break;
 
                 case 'event':
-                    $result = $dbClass::query("SELECT title, description FROM events WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT title, description FROM events WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     $text = $result ? ($result['title'] . ': ' . ($result['description'] ?? '')) : '';
                     break;
 
                 case 'review':
-                    $result = $dbClass::query("SELECT comment FROM reviews WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT comment FROM reviews WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     $text = $result ? $result['comment'] : '';
                     break;
 

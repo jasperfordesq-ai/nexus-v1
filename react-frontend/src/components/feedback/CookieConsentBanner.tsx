@@ -56,6 +56,7 @@ export function CookieConsentBanner() {
         exit={{ y: 100, opacity: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className="fixed bottom-0 inset-x-0 z-[700] p-3 sm:p-4"
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}
         role="dialog"
         aria-label={t('cookie_consent.banner_label', 'Cookie consent')}
         aria-modal="false"

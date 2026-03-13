@@ -108,7 +108,7 @@
     "make_private_aria": "Rendi il gruppo privato",
     "save_changes": "Salva le modifiche",
     "delete_modal_title": "Elimina gruppo",
-    "delete_confirm": "È sicuro/a di voler eliminare \u201c{{name}}\u201d?",
+    "delete_confirm": "È sicuro/a di voler eliminare “{{name}}”?",
     "delete_desc": "Questa azione non può essere annullata. Tutte le discussioni, i membri e i dati del gruppo verranno rimossi definitivamente.",
     "delete_btn": "Elimina gruppo"
   },
@@ -228,5 +228,7 @@
     "role_update_failed": "Aggiornamento del ruolo non riuscito",
     "member_removed": "Membro rimosso",
     "member_remove_failed": "Rimozione del membro non riuscita"
-  }
+  },
+  "load_error": "Impossibile caricare i gruppi.",
+  "load_more_error": "Impossibile caricare altri gruppi"
 }

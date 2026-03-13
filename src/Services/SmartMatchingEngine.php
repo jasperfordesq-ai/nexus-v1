@@ -479,8 +479,8 @@ class SmartMatchingEngine
 
         try {
             $row = Database::query(
-                "SELECT name, parent_id FROM categories WHERE id = ?",
-                [$categoryId]
+                "SELECT name, parent_id FROM categories WHERE id = ? AND tenant_id = ?",
+                [$categoryId, TenantContext::getId()]
             )->fetch();
 
             if ($row) {
@@ -949,7 +949,7 @@ class SmartMatchingEngine
                     COALESCE(u.latitude, 0) as latitude,
                     COALESCE(u.longitude, 0) as longitude,
                     (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id) as avg_rating,
-                    (SELECT COUNT(*) FROM transactions WHERE (sender_id = u.id OR receiver_id = u.id) AND status = 'completed') as transaction_count
+                    (SELECT COUNT(*) FROM transactions WHERE (sender_id = u.id OR receiver_id = u.id) AND tenant_id = u.tenant_id AND status = 'completed') as transaction_count
              FROM users u
              WHERE u.id = ? AND u.tenant_id = ?",
             [$userId, $tenantId]

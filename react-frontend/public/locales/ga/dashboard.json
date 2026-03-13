@@ -77,7 +77,9 @@
     "badges": "Suaitheantas",
     "streak": "Sraith",
     "xp_progress": "Dul Chun Cinn XP",
-    "start_earning": "Tosaigh ag tuilleamh XP trí bheith rannpháirteach sa phobal!"
+    "start_earning": "Tosaigh ag tuilleamh XP trí bheith rannpháirteach sa phobal!",
+    "streak_days_one": "{{count}} la",
+    "streak_days_other": "{{count}} la"
   },
   "reviews": {
     "sent": "Seolta {{amount}}u",

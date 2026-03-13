@@ -77,7 +77,9 @@
     "badges": "Insígnias",
     "streak": "Sequência",
     "xp_progress": "Progresso de XP",
-    "start_earning": "Comece a ganhar XP participando na comunidade!"
+    "start_earning": "Comece a ganhar XP participando na comunidade!",
+    "streak_days_one": "{{count}} dia",
+    "streak_days_other": "{{count}} dias"
   },
   "reviews": {
     "sent": "Enviou {{amount}}h",

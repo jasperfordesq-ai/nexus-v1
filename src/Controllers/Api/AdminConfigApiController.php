@@ -99,14 +99,17 @@ class AdminConfigApiController extends BaseApiController
 
         if (!$featureName || !is_string($featureName)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Feature name is required', 'feature', 422);
+            return;
         }
 
         if (!array_key_exists($featureName, self::FEATURE_DEFAULTS)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Unknown feature: ' . $featureName, 'feature', 422);
+            return;
         }
 
         if ($enabled === null) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Enabled value is required', 'enabled', 422);
+            return;
         }
 
         // Read current features
@@ -169,14 +172,17 @@ class AdminConfigApiController extends BaseApiController
 
         if (!$moduleName || !is_string($moduleName)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Module name is required', 'module', 422);
+            return;
         }
 
         if (!array_key_exists($moduleName, self::MODULE_DEFAULTS)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Unknown module: ' . $moduleName, 'module', 422);
+            return;
         }
 
         if ($enabled === null) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Enabled value is required', 'enabled', 422);
+            return;
         }
 
         // Read current configuration
@@ -251,6 +257,7 @@ class AdminConfigApiController extends BaseApiController
             }
         } catch (\Throwable $e) {
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Failed to clear cache', null, 500);
+            return;
         }
 
         $this->respondWithData(['cleared' => true, 'type' => $type]);

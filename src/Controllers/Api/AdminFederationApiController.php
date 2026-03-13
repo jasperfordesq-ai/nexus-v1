@@ -20,8 +20,23 @@ class AdminFederationApiController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    /**
+     * Allowed tables for existence checks — prevents SQL injection via table name.
+     */
+    private const ALLOWED_TABLES = [
+        'federation_partnerships',
+        'federation_transactions',
+        'federation_messages',
+        'federation_api_keys',
+        'federation_user_settings',
+        'federation_audit_log',
+    ];
+
     private function tableExists(string $table): bool
     {
+        if (!in_array($table, self::ALLOWED_TABLES, true)) {
+            return false;
+        }
         try {
             Database::query("SELECT 1 FROM `{$table}` LIMIT 1");
             return true;
@@ -120,6 +135,7 @@ class AdminFederationApiController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update federation settings: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -178,6 +194,7 @@ class AdminFederationApiController extends BaseApiController
             $this->respondWithData(['message' => 'Partnership approved']);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to approve partnership');
+            return;
         }
     }
 
@@ -211,6 +228,7 @@ class AdminFederationApiController extends BaseApiController
             $this->respondWithData(['message' => 'Partnership rejected']);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to reject partnership');
+            return;
         }
     }
 
@@ -244,6 +262,7 @@ class AdminFederationApiController extends BaseApiController
             $this->respondWithData(['message' => 'Partnership terminated']);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to terminate partnership');
+            return;
         }
     }
 
@@ -335,9 +354,11 @@ class AdminFederationApiController extends BaseApiController
                 $this->respondWithData($result, null, 201);
             } else {
                 $this->respondWithError('REQUEST_FAILED', $result['error'] ?? 'Failed to send partnership request');
+                return;
             }
         } catch (\Exception $e) {
             $this->respondWithError('REQUEST_FAILED', 'Failed to send partnership request');
+            return;
         }
     }
 
@@ -405,6 +426,7 @@ class AdminFederationApiController extends BaseApiController
             $this->respondWithData($config['federation_profile']);
         } catch (\Exception $e) {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update federation profile', null, 500);
+            return;
         }
     }
 
@@ -509,10 +531,12 @@ class AdminFederationApiController extends BaseApiController
 
         if (!$name) {
             $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name');
+            return;
         }
 
         if (!$this->tableExists('federation_api_keys')) {
             $this->respondWithError('TABLE_MISSING', 'Federation API keys table not configured', null, 503);
+            return;
         }
 
         try {
@@ -535,6 +559,7 @@ class AdminFederationApiController extends BaseApiController
             ], null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('CREATE_FAILED', 'Failed to create API key');
+            return;
         }
     }
 
@@ -671,11 +696,12 @@ class AdminFederationApiController extends BaseApiController
             }
 
             fclose($output);
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
 
         } catch (\Exception $e) {
             error_log("Federation export error ({$type}): " . $e->getMessage());
             $this->respondWithError('EXPORT_FAILED', 'Failed to export data', 500);
+            return;
         }
     }
 }

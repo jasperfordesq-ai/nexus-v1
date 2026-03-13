@@ -6,7 +6,6 @@
   "search_placeholder": "Rechercher des offres...",
   "search_aria": "Rechercher des offres d'emploi",
   "filter_aria": "Filtrer par categorie",
-
   "filter_by_commitment": "Filtrer par engagement",
   "type": {
     "all": "Tous les types",
@@ -38,7 +37,6 @@
     "rejected": "Refuse",
     "withdrawn": "Retire"
   },
-
   "views": "{{count}} vues",
   "applications": "{{count}} candidatures",
   "remote": "A distance",
@@ -50,13 +48,11 @@
   "load_more": "Charger plus",
   "try_again": "Reessayer",
   "featured": "En vedette",
-
   "empty_title": "Aucune offre trouvee",
   "empty_description": "Il n'y a pas d'offres d'emploi correspondant a vos criteres",
   "empty_search": "Aucune offre ne correspond a votre recherche",
   "unable_to_load": "Impossible de charger les offres",
   "error_load_more": "Echec du chargement des offres supplementaires",
-
   "saved": {
     "title": "Offres sauvegardees",
     "empty_title": "Aucune offre sauvegardee",
@@ -68,7 +64,6 @@
     "unsave_success": "Offre retiree des sauvegardes",
     "save_error": "Echec de la sauvegarde de l'offre"
   },
-
   "match": {
     "title": "Correspondance des competences",
     "percentage": "{{count}}% de correspondance",
@@ -81,7 +76,6 @@
     "no_skills_required": "Aucune competence specifique requise",
     "no_user_skills": "Ajoutez des competences a votre profil pour voir votre correspondance"
   },
-
   "qualified": {
     "title": "Suis-je qualifie ?",
     "subtitle": "Voyez comment vos competences correspondent a ce poste",
@@ -92,7 +86,6 @@
     "level_low": "Vous pourriez vouloir developper plus de competences pour ce poste",
     "check_button": "Verifier la qualification"
   },
-
   "pipeline": {
     "title": "Pipeline de candidatures",
     "applied": "Candidature envoyee",
@@ -103,7 +96,6 @@
     "rejected": "Refuse",
     "move_to": "Deplacer vers {{stage}}"
   },
-
   "history": {
     "title": "Historique du statut",
     "changed_from": "Change de {{from}} a {{to}}",
@@ -111,7 +103,6 @@
     "by": "par {{name}}",
     "empty": "Aucun historique disponible"
   },
-
   "alerts": {
     "title": "Alertes emploi",
     "subtitle": "Soyez notifie quand de nouvelles offres correspondent a vos preferences",
@@ -143,7 +134,6 @@
     "toggle_error": "Echec du basculement de l'alerte",
     "delete_error": "Echec de la suppression de l'alerte"
   },
-
   "renew": {
     "button": "Renouveler",
     "title": "Renouveler l'offre d'emploi",
@@ -153,7 +143,6 @@
     "error": "Echec du renouvellement de l'offre",
     "expiring_soon": "Expire bientot"
   },
-
   "analytics": {
     "title": "Analytique de l'offre",
     "total_views": "Vues totales",
@@ -168,7 +157,6 @@
     "applications_by_stage": "Candidatures par etape",
     "no_data": "Aucune donnee analytique pour le moment"
   },
-
   "salary": {
     "label": "Remuneration",
     "range": "{{min}} - {{max}}",
@@ -185,7 +173,6 @@
     "form_currency_placeholder": "ex. USD, EUR, GBP",
     "form_negotiable_label": "Le salaire est negociable"
   },
-
   "detail": {
     "loading": "Chargement de l'offre...",
     "unable_to_load": "Impossible de charger l'offre",
@@ -228,7 +215,6 @@
     "analytics": "Analytique",
     "check_qualification": "Suis-je qualifie ?"
   },
-
   "apply": {
     "button": "Postuler maintenant",
     "applied": "Candidature envoyee",
@@ -243,7 +229,6 @@
     "closed": "Les candidatures ne sont plus acceptees",
     "login_required": "Connectez-vous pour postuler"
   },
-
   "form": {
     "create_title": "Publier une offre d'emploi",
     "edit_title": "Modifier l'offre d'emploi",
@@ -292,10 +277,13 @@
       "description_required": "La description est requise"
     }
   },
-
   "my_applications": {
     "title": "Mes candidatures",
     "empty_title": "Aucune candidature pour le moment",
     "empty_description": "Vos candidatures apparaitront ici"
-  }
+  },
+  "application_withdrawn": "Candidature retirée avec succès.",
+  "something_wrong": "Quelque chose s'est mal passé. Veuillez réessayer.",
+  "vacancy_closed": "Poste fermé",
+  "vacancy_reopened": "Poste rouvert"
 }

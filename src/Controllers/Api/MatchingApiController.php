@@ -81,6 +81,7 @@ class MatchingApiController extends BaseApiController
 
         if ($listingId <= 0) {
             $this->respondWithError('VALIDATION_ERROR', 'Invalid listing ID', 'id', 400);
+            return;
         }
 
         $reason = $this->input('reason');

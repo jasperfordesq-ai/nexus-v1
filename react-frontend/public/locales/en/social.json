@@ -24,5 +24,14 @@
   "share_to_feed": "Share to Feed",
   "shared_to_feed": "Shared to your feed",
   "write_comment": "Write a comment...",
-  "write_reply": "Write a reply..."
+  "write_reply": "Write a reply...",
+  "endorsement_update_failed": "Failed to update endorsement",
+  "endorse": {
+    "tooltip_remove": "Remove endorsement for {{skillName}}",
+    "tooltip_endorse": "Endorse {{skillName}}",
+    "aria_remove": "Remove endorsement {{skillName}}",
+    "aria_endorse": "Endorse {{skillName}}",
+    "endorsed": "Endorsed",
+    "endorse": "Endorse"
+  }
 }

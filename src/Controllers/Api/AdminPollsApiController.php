@@ -76,6 +76,7 @@ class AdminPollsApiController extends BaseApiController
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } else {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete poll', null, 400);
+            return;
         }
     }
 }

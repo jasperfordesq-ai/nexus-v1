@@ -250,5 +250,24 @@
     "message": "Hay una nueva versión disponible.",
     "update_now": "Actualizar ahora",
     "dismiss": "Descartar notificación de actualización"
+  },
+  "error_boundary": {
+    "title": "Algo salió mal",
+    "description": "Ocurrió un error inesperado. Inténtalo de nuevo o vuelve a la página de inicio.",
+    "component_stack": "Pila de componentes",
+    "try_again": "Intentar de nuevo",
+    "go_home": "Ir al inicio"
+  },
+  "quick_create": {
+    "title": "Crear nuevo",
+    "close_aria": "Cerrar menú de creación",
+    "new_listing": "Nuevo anuncio",
+    "new_listing_desc": "Ofrecer o solicitar un servicio",
+    "new_event": "Nuevo evento",
+    "new_event_desc": "Organizar un evento comunitario",
+    "new_group": "Nuevo grupo",
+    "new_group_desc": "Iniciar un grupo comunitario",
+    "new_goal": "Nuevo objetivo",
+    "new_goal_desc": "Establecer un objetivo personal"
   }
 }

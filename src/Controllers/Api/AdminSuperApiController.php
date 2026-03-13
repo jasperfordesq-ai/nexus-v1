@@ -50,7 +50,7 @@ class AdminSuperApiController extends BaseApiController
         if (preg_match('#/api/v2/admin/super/' . preg_quote($segment, '#') . '/(\d+)#', $uri, $m)) {
             return (int) $m[1];
         }
-        $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Missing or invalid ID', 'id', 400);
+        return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Missing or invalid ID', 'id', 400);
         return 0; // unreachable
     }
 
@@ -75,7 +75,7 @@ class AdminSuperApiController extends BaseApiController
         $access = \Nexus\Middleware\SuperPanelAccess::getAccess($userId);
 
         if (!$access['granted']) {
-            $this->respondWithError(
+            return $this->respondWithError(
                 ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED,
                 'Super Panel access denied: ' . ($access['reason'] ?? 'Unknown reason'),
                 null,

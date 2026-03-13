@@ -11,6 +11,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
+import { useTranslation } from 'react-i18next';
 interface HourLogUser {
   id: number;
   name: string;
@@ -48,6 +49,7 @@ interface PendingHoursResponse {
 
 export function HoursReviewTab() {
   const toast = useToast();
+  const { t } = useTranslation('volunteering');
   const [entries, setEntries] = useState<HourLogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -84,7 +86,7 @@ export function HoursReviewTab() {
     } catch (err) {
       logError('Failed to load pending hours', err);
       if (!append) {
-        toast.error('Failed to load pending hour reviews. Please try again.');
+        toast.error(t('hours_load_failed'));
       }
     } finally {
       setIsLoading(false);
@@ -128,7 +130,7 @@ export function HoursReviewTab() {
       setEntries((prev) =>
         prev.map((e) => (e.id === entryId ? { ...e, status: 'pending' } : e)),
       );
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('something_wrong'));
     } finally {
       setActionInFlight((prev) => {
         const next = new Set(prev);

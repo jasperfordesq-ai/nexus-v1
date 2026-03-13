@@ -89,7 +89,7 @@ export function MessageInputArea({
   const { tenantPath } = useTenant();
 
   return (
-    <div className="p-4 border-t border-theme-default">
+    <div className="p-4 border-t border-theme-default" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}>
       {/* Messaging disabled notice (feature flag) */}
       {!isDirectMessagingEnabled && (
         <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">

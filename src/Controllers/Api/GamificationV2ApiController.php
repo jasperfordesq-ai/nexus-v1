@@ -80,6 +80,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         $xp = (int)($user['xp'] ?? 0);
@@ -200,6 +201,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 404
             );
+            return;
         }
 
         // Check if user has this badge
@@ -408,6 +410,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -435,6 +438,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -462,6 +466,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -489,6 +494,7 @@ class GamificationV2ApiController extends BaseApiController
                     null,
                     409
                 );
+                return;
             }
 
             $this->respondWithData([
@@ -502,6 +508,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -529,6 +536,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -560,6 +568,7 @@ class GamificationV2ApiController extends BaseApiController
                 'item_id',
                 400
             );
+            return;
         }
 
         try {
@@ -574,6 +583,7 @@ class GamificationV2ApiController extends BaseApiController
                     null,
                     400
                 );
+                return;
             }
         } catch (\Throwable $e) {
             $this->respondWithError(
@@ -582,6 +592,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -613,6 +624,7 @@ class GamificationV2ApiController extends BaseApiController
                 'badge_keys',
                 400
             );
+            return;
         }
 
         if (count($badgeKeys) > 5) {
@@ -622,6 +634,7 @@ class GamificationV2ApiController extends BaseApiController
                 'badge_keys',
                 400
             );
+            return;
         }
 
         // Verify user owns these badges
@@ -636,6 +649,7 @@ class GamificationV2ApiController extends BaseApiController
                 'badge_keys',
                 400
             );
+            return;
         }
 
         try {
@@ -661,6 +675,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -686,6 +701,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -713,6 +729,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -798,6 +815,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -864,6 +882,7 @@ class GamificationV2ApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 }

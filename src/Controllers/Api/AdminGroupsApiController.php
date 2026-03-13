@@ -120,6 +120,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -208,6 +209,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -269,6 +271,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -337,6 +340,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -405,6 +409,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -473,6 +478,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -530,6 +536,7 @@ class AdminGroupsApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'status' => $newStatus]);
         } catch (\Exception $e) {
             $this->respondWithError('GROUPS_STATUS_ERROR', 'Failed to update group status: ' . $e->getMessage(), null, 500);
+            return;
         }
     }
 
@@ -596,6 +603,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -675,6 +683,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -729,6 +738,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -794,6 +804,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -865,6 +876,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -910,6 +922,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -963,6 +976,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1020,6 +1034,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1105,6 +1120,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1171,6 +1187,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1230,6 +1247,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1289,6 +1307,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1346,6 +1365,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1417,6 +1437,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1484,6 +1505,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1573,6 +1595,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1603,6 +1626,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1638,6 +1662,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 
@@ -1694,6 +1719,7 @@ class AdminGroupsApiController extends BaseApiController
                 null,
                 500
             );
+            return;
         }
     }
 }

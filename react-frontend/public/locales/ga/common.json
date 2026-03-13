@@ -250,5 +250,24 @@
     "message": "Tá leagan nua ar fáil.",
     "update_now": "Nuashonraigh anois",
     "dismiss": "Díbir fógra nuashonraithe"
+  },
+  "error_boundary": {
+    "title": "Chuaigh rud éigin mícheart",
+    "description": "Tharla earráid gan choinne. Bain triail eile as nó téigh ar ais go dtí an leathanach baile.",
+    "component_stack": "Cruach Comhpháirteanna",
+    "try_again": "Bain Triail Eile As",
+    "go_home": "Téigh Abhaile"
+  },
+  "quick_create": {
+    "title": "Cruthaigh Nua",
+    "close_aria": "Dún roghchlár cruthaithe",
+    "new_listing": "Liostú Nua",
+    "new_listing_desc": "Tairg nó iarr seirbhís",
+    "new_event": "Imeacht Nua",
+    "new_event_desc": "Eagraigh imeacht pobail",
+    "new_group": "Grúpa Nua",
+    "new_group_desc": "Tosaigh grúpa pobail",
+    "new_goal": "Sprioc Nua",
+    "new_goal_desc": "Socraigh sprioc phearsanta"
   }
 }

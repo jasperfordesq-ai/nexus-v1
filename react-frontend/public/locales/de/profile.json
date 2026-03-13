@@ -38,7 +38,8 @@
     "listings": "Inserate",
     "reviews": "Bewertungen",
     "achievements": "Erfolge",
-    "activity": "Aktivität"
+    "activity": "Aktivität",
+    "availability": "Verfuegbarkeit"
   },
   "about": {
     "heading": "Über mich",
@@ -80,7 +81,10 @@
     "removed_title": "Entfernt",
     "removed": "Verbindung entfernt",
     "failed": "Fehlgeschlagen",
-    "error": "Etwas ist schiefgelaufen"
+    "error": "Etwas ist schiefgelaufen",
+    "select_rating": "Bitte wählen Sie eine Bewertung",
+    "review_submitted": "Bewertung erfolgreich eingereicht!",
+    "review_submit_failed": "Bewertung konnte nicht eingereicht werden. Bitte versuchen Sie es erneut."
   },
   "form": {
     "first_name": "Vorname",
@@ -89,5 +93,6 @@
     "location": "Standort",
     "phone": "Telefon",
     "save": "Änderungen speichern"
-  }
+  },
+  "load_error": "Profil konnte nicht geladen werden."
 }

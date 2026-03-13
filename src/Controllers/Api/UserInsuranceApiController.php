@@ -121,6 +121,7 @@ class UserInsuranceApiController extends BaseApiController
             $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to upload insurance certificate', null, 500);
+            return;
         }
     }
 }

@@ -40,6 +40,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
+import { useTranslation } from 'react-i18next';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface GoalTemplate {
@@ -83,6 +84,7 @@ export function GoalTemplatePickerModal({
   onTemplateSelected,
 }: GoalTemplatePickerModalProps) {
   const toast = useToast();
+  const { t } = useTranslation('goals');
   const [templates, setTemplates] = useState<GoalTemplate[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -130,15 +132,15 @@ export function GoalTemplatePickerModal({
       const response = await api.post(`/v2/goals/from-template/${template.id}`, {});
 
       if (response.success) {
-        toast.success('Goal created from template!');
+        toast.success(t('template_created'));
         onTemplateSelected();
         onClose();
       } else {
-        toast.error('Failed to create goal from template.');
+        toast.error(t('template_create_failed'));
       }
     } catch (err) {
       logError('Failed to create goal from template', err);
-      toast.error('Failed to create goal from template.');
+      toast.error(t('template_create_failed'));
     } finally {
       setCreatingFromId(null);
     }

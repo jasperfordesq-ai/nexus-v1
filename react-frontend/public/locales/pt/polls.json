@@ -53,7 +53,9 @@
     "voted": "Voto registado!",
     "vote_failed": "Falha ao registar voto. Tente novamente.",
     "deleted": "Sondagem eliminada.",
-    "delete_failed": "Falha ao eliminar sondagem. Tente novamente."
+    "delete_failed": "Falha ao eliminar sondagem. Tente novamente.",
+    "csv_exported": "CSV exportado com sucesso.",
+    "export_failed": "Falha ao exportar os resultados da enquete."
   },
   "errors": {
     "question_required": "Introduza uma pergunta para a sua sondagem.",

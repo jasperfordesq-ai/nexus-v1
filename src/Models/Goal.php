@@ -7,6 +7,7 @@
 namespace Nexus\Models;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 use PDO;
 
 class Goal
@@ -92,19 +93,22 @@ class Goal
     public static function setMentor($goalId, $mentorId)
     {
         $db = Database::getConnection();
-        $stmt = $db->prepare("UPDATE goals SET mentor_id = ? WHERE id = ?");
-        $stmt->execute([$mentorId, $goalId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $db->prepare("UPDATE goals SET mentor_id = ? WHERE id = ? AND tenant_id = ?");
+        $stmt->execute([$mentorId, $goalId, $tenantId]);
     }
 
     public static function update($id, $title, $description, $deadline, $isPublic)
     {
-        $sql = "UPDATE goals SET title = ?, description = ?, deadline = ?, is_public = ? WHERE id = ?";
-        Database::query($sql, [$title, $description, $deadline ?: null, $isPublic, $id]);
+        $tenantId = TenantContext::getId();
+        $sql = "UPDATE goals SET title = ?, description = ?, deadline = ?, is_public = ? WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$title, $description, $deadline ?: null, $isPublic, $id, $tenantId]);
     }
 
     public static function setStatus($id, $status)
     {
-        Database::query("UPDATE goals SET status = ? WHERE id = ?", [$status, $id]);
+        $tenantId = TenantContext::getId();
+        Database::query("UPDATE goals SET status = ? WHERE id = ? AND tenant_id = ?", [$status, $id, $tenantId]);
     }
 
     public static function delete($id)

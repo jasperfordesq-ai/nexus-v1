@@ -9,6 +9,7 @@
  * Force updates cannot be dismissed.
  */
 
+import { useTranslation } from 'react-i18next';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
 import { Download, Sparkles } from 'lucide-react';
 import type { AppUpdateInfo } from '@/hooks/useAppUpdate';
@@ -19,6 +20,7 @@ interface AppUpdateModalProps {
 }
 
 export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
+  const { t } = useTranslation('errors');
   const notes = Object.values(updateInfo.releaseNotes).flat();
 
   const handleUpdate = () => {
@@ -36,18 +38,18 @@ export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           <Sparkles size={20} className="text-primary" />
-          Update Available
+          {t('update_available')}
         </ModalHeader>
         <ModalBody>
           <p className="text-default-600">{updateInfo.updateMessage}</p>
 
           <p className="text-sm text-default-400">
-            Version {updateInfo.currentVersion} is now available (you have {updateInfo.clientVersion})
+            {t('version_info', { currentVersion: updateInfo.currentVersion, clientVersion: updateInfo.clientVersion })}
           </p>
 
           {notes.length > 0 && (
             <div className="mt-2">
-              <p className="text-sm font-medium text-default-700 mb-1">What's new:</p>
+              <p className="text-sm font-medium text-default-700 mb-1">{t('whats_new')}</p>
               <ul className="list-disc list-inside text-sm text-default-500 space-y-0.5">
                 {notes.map((note, i) => (
                   <li key={i}>{note}</li>
@@ -59,7 +61,7 @@ export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
         <ModalFooter>
           {!updateInfo.forceUpdate && (
             <Button variant="flat" onPress={onDismiss}>
-              Later
+              {t('later')}
             </Button>
           )}
           <Button
@@ -67,7 +69,7 @@ export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
             startContent={<Download size={16} />}
             onPress={handleUpdate}
           >
-            Download Update
+            {t('download_update')}
           </Button>
         </ModalFooter>
       </ModalContent>

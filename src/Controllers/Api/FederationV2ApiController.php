@@ -143,6 +143,7 @@ class FederationV2ApiController extends BaseApiController
             $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         } else {
             $this->respondWithError('OPT_IN_FAILED', 'Failed to enable federation. Please try again.', null, 500);
+            return;
         }
     }
 
@@ -208,6 +209,7 @@ class FederationV2ApiController extends BaseApiController
             $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         } else {
             $this->respondWithError('SETUP_FAILED', 'Failed to enable federation. Please try again.', null, 500);
+            return;
         }
     }
 
@@ -236,6 +238,7 @@ class FederationV2ApiController extends BaseApiController
             $this->respondWithData(['success' => true, 'message' => 'Federation disabled successfully.']);
         } else {
             $this->respondWithError('OPT_OUT_FAILED', 'Failed to disable federation. Please try again.', null, 500);
+            return;
         }
     }
 
@@ -933,6 +936,7 @@ class FederationV2ApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log("FederationV2Api::member error: " . $e->getMessage());
             $this->respondWithError('INTERNAL_ERROR', 'Failed to load member profile.', null, 500);
+            return;
         }
     }
 
@@ -1220,6 +1224,7 @@ class FederationV2ApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log("FederationV2Api::sendMessage error: " . $e->getMessage());
             $this->respondWithError('SEND_FAILED', 'Failed to send message. Please try again.', null, 500);
+            return;
         }
     }
 
@@ -1257,6 +1262,7 @@ class FederationV2ApiController extends BaseApiController
         } catch (\Exception $e) {
             error_log("FederationV2Api::markMessageRead error: " . $e->getMessage());
             $this->respondWithError('INTERNAL_ERROR', 'Failed to mark message as read.', null, 500);
+            return;
         }
     }
 
@@ -1328,6 +1334,7 @@ class FederationV2ApiController extends BaseApiController
             $this->respondWithData(['success' => true, 'message' => 'Settings updated successfully.']);
         } else {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update settings. Please try again.', null, 500);
+            return;
         }
     }
 

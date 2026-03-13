@@ -47,9 +47,10 @@ class AppController extends BaseApiController
      */
     public function checkVersion()
     {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $clientVersion = $input['version'] ?? '0.0.0';
-        $platform = $input['platform'] ?? 'android';
+        $this->rateLimit('app_check_version', 30, 60);
+
+        $clientVersion = $this->input('version', '0.0.0');
+        $platform = $this->input('platform', 'android');
 
         // Compare versions
         $needsUpdate = version_compare($clientVersion, self::CURRENT_VERSION, '<');
@@ -105,12 +106,17 @@ class AppController extends BaseApiController
      */
     public function log()
     {
-        $input = json_decode(file_get_contents('php://input'), true);
+        $this->rateLimit('app_log', 30, 60);
 
-        $event = $input['event'] ?? 'unknown';
-        $version = $input['version'] ?? 'unknown';
-        $platform = $input['platform'] ?? 'unknown';
-        $data = $input['data'] ?? [];
+        $event = $this->input('event', 'unknown');
+        $version = $this->input('version', 'unknown');
+        $platform = $this->input('platform', 'unknown');
+        $data = $this->input('data', []);
+
+        // Sanitize event name to prevent log injection
+        $event = preg_replace('/[^a-zA-Z0-9_.-]/', '', substr($event, 0, 64));
+        $version = preg_replace('/[^a-zA-Z0-9_.-]/', '', substr($version, 0, 20));
+        $platform = preg_replace('/[^a-zA-Z0-9_.-]/', '', substr($platform, 0, 20));
 
         // Log to error log for now (could be extended to database)
         error_log(sprintf(

@@ -108,7 +108,7 @@
     "make_private_aria": "Rendre le groupe privé",
     "save_changes": "Enregistrer les modifications",
     "delete_modal_title": "Supprimer le groupe",
-    "delete_confirm": "Êtes-vous sûr(e) de vouloir supprimer \u00ab {{name}} \u00bb ?",
+    "delete_confirm": "Êtes-vous sûr(e) de vouloir supprimer « {{name}} » ?",
     "delete_desc": "Cette action est irréversible. Toutes les discussions, tous les membres et toutes les données du groupe seront définitivement supprimés.",
     "delete_btn": "Supprimer le groupe"
   },
@@ -228,5 +228,7 @@
     "role_update_failed": "Échec de la mise à jour du rôle",
     "member_removed": "Membre retiré",
     "member_remove_failed": "Échec du retrait du membre"
-  }
+  },
+  "load_error": "Impossible de charger les groupes.",
+  "load_more_error": "Impossible de charger plus de groupes"
 }

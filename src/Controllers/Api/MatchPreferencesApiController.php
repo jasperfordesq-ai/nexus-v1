@@ -67,6 +67,7 @@ class MatchPreferencesApiController extends BaseApiController
             $this->respondWithData(MatchingService::getPreferences($userId));
         } else {
             $this->respondWithError('SERVER_ERROR', 'Failed to save match preferences');
+            return;
         }
     }
 }

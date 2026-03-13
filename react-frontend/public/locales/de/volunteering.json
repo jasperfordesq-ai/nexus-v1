@@ -1,0 +1,6 @@
+{
+  "hours_load_failed": "Ausstehende Stundenüberprüfungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+  "something_wrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+  "applications_load_failed": "Bewerbungen konnten nicht geladen werden.",
+  "application_submitted": "Bewerbung erfolgreich eingereicht!"
+}

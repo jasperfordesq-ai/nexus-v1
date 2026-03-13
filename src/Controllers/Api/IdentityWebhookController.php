@@ -37,6 +37,7 @@ class IdentityWebhookController extends BaseApiController
         if (\Nexus\Services\RateLimitService::check("webhook:identity:$ip", 60, 60)) {
             header('Retry-After: 60');
             $this->respondWithError(ApiErrorCodes::RATE_LIMIT_EXCEEDED, 'Too many webhook requests', null, 429);
+            return;
         }
         \Nexus\Services\RateLimitService::increment("webhook:identity:$ip", 60);
 
@@ -44,6 +45,7 @@ class IdentityWebhookController extends BaseApiController
         $providerSlug = $this->getRouteParam('provider_slug');
         if (!$providerSlug || !IdentityProviderRegistry::has($providerSlug)) {
             $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Unknown identity provider', null, 404);
+            return;
         }
 
         $provider = IdentityProviderRegistry::get($providerSlug);
@@ -56,12 +58,14 @@ class IdentityWebhookController extends BaseApiController
         if (!$provider->verifyWebhookSignature($rawBody, $headers)) {
             error_log("[IdentityWebhook] Signature verification failed for provider '{$providerSlug}' from IP {$ip}");
             $this->respondWithError(ApiErrorCodes::FORBIDDEN, 'Invalid webhook signature', null, 403);
+            return;
         }
 
         // Parse payload
         $payload = json_decode($rawBody, true);
         if (!is_array($payload)) {
             $this->respondWithError(ApiErrorCodes::VALIDATION_INVALID_FORMAT, 'Invalid webhook payload', null, 400);
+            return;
         }
 
         // Process through provider adapter
@@ -70,6 +74,7 @@ class IdentityWebhookController extends BaseApiController
         } catch (\Throwable $e) {
             error_log("[IdentityWebhook] Provider '{$providerSlug}' handleWebhook() failed: " . $e->getMessage());
             $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, 'Webhook processing failed', null, 500);
+            return;
         }
 
         // Find the matching session
@@ -78,7 +83,6 @@ class IdentityWebhookController extends BaseApiController
             error_log("[IdentityWebhook] No provider_session_id in result from '{$providerSlug}'");
             // Acknowledge receipt but log the issue
             $this->respondWithData(['received' => true, 'warning' => 'no_session_match']);
-            return;
         }
 
         $session = IdentityVerificationSessionService::findByProviderSession($providerSlug, $providerSessionId);

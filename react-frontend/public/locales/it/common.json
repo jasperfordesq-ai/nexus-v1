@@ -250,5 +250,24 @@
     "message": "È disponibile una nuova versione.",
     "update_now": "Aggiorna ora",
     "dismiss": "Ignora notifica di aggiornamento"
+  },
+  "error_boundary": {
+    "title": "Qualcosa è andato storto",
+    "description": "Si è verificato un errore imprevisto. Riprova o torna alla pagina iniziale.",
+    "component_stack": "Stack dei componenti",
+    "try_again": "Riprova",
+    "go_home": "Vai alla Home"
+  },
+  "quick_create": {
+    "title": "Crea nuovo",
+    "close_aria": "Chiudi menu di creazione",
+    "new_listing": "Nuovo annuncio",
+    "new_listing_desc": "Offri o richiedi un servizio",
+    "new_event": "Nuovo evento",
+    "new_event_desc": "Organizza un evento comunitario",
+    "new_group": "Nuovo gruppo",
+    "new_group_desc": "Avvia un gruppo comunitario",
+    "new_goal": "Nuovo obiettivo",
+    "new_goal_desc": "Imposta un obiettivo personale"
   }
 }

@@ -82,7 +82,7 @@ class PollApiController extends BaseApiController
             $this->jsonResponse(['success' => true]);
         } catch (\PDOException $e) {
             error_log("Poll vote error: " . $e->getMessage());
-            $this->jsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
+            $this->jsonResponse(['error' => 'Database error'], 500);
         } catch (\Exception $e) {
             error_log("Poll vote error: " . $e->getMessage());
             $this->jsonResponse(['error' => 'Server error'], 500);

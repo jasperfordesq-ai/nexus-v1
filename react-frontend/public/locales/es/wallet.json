@@ -53,7 +53,14 @@
     "exported": "Exportado",
     "exported_desc": "Transacciones exportadas a CSV",
     "transfer_success": "Transferencia exitosa",
-    "transfer_desc": "Enviadas {{amount}} horas a {{recipient}}"
+    "transfer_desc": "Enviadas {{amount}} horas a {{recipient}}",
+    "rating_required": "Valoración requerida",
+    "rating_required_desc": "Por favor, selecciona una valoración con estrellas",
+    "rating_submitted": "Valoración enviada",
+    "rating_submitted_desc": "¡Gracias por tu opinión!",
+    "submit_failed": "Error al enviar",
+    "try_again": "Por favor, inténtalo de nuevo",
+    "submit_error_desc": "Se produjo un error. Por favor, inténtalo de nuevo."
   },
   "error": {
     "load_balance": "Error al cargar el saldo de la billetera",

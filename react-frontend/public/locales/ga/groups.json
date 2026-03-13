@@ -108,7 +108,7 @@
     "make_private_aria": "Déan an grúpa príobháideach",
     "save_changes": "Sábháil Athruithe",
     "delete_modal_title": "Scrios Grúpa",
-    "delete_confirm": "An bhfuil tú cinnte gur mhaith leat \u201c{{name}}\u201d a scriosadh?",
+    "delete_confirm": "An bhfuil tú cinnte gur mhaith leat “{{name}}” a scriosadh?",
     "delete_desc": "Ní féidir an gníomh seo a chur ar ceal. Scriosfar gach plé, ball, agus sonraí grúpa go buan.",
     "delete_btn": "Scrios Grúpa"
   },
@@ -228,5 +228,7 @@
     "role_update_failed": "Theip ar nuashonrú an róil",
     "member_removed": "Ball bainte",
     "member_remove_failed": "Theip ar bhaint an bhaill"
-  }
+  },
+  "load_error": "Theip ar lodail na ngrupai.",
+  "load_more_error": "Theip ar thuilleadh grupai"
 }

@@ -267,6 +267,7 @@ class AdminVolunteeringApiController extends BaseApiController
             $this->respondWithData(['message' => 'Application approved']);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to approve application', null, 500);
+            return;
         }
     }
 
@@ -275,7 +276,6 @@ class AdminVolunteeringApiController extends BaseApiController
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
-            return;
         }
         $this->verifyCsrf();
         $tenantId = TenantContext::getId();
@@ -306,6 +306,7 @@ class AdminVolunteeringApiController extends BaseApiController
             $this->respondWithData(['message' => 'Application declined']);
         } catch (\Exception $e) {
             $this->respondWithError('SERVER_ERROR', 'Failed to decline application', null, 500);
+            return;
         }
     }
 
@@ -314,7 +315,6 @@ class AdminVolunteeringApiController extends BaseApiController
         $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             $this->jsonResponse(['error' => 'Feature not available'], 403);
-            return;
         }
         $tenantId = TenantContext::getId();
 

@@ -1,0 +1,6 @@
+{
+  "hours_load_failed": "Error al cargar las revisiones de horas pendientes. Inténtalo de nuevo.",
+  "something_wrong": "Algo salió mal. Inténtalo de nuevo.",
+  "applications_load_failed": "Error al cargar las solicitudes.",
+  "application_submitted": "¡Solicitud enviada correctamente!"
+}

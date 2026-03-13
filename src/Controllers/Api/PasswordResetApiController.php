@@ -67,6 +67,7 @@ class PasswordResetApiController extends BaseApiController
                 'email',
                 400
             );
+            return;
         }
 
         // Additional rate limit by email - 3 requests per hour
@@ -147,6 +148,7 @@ class PasswordResetApiController extends BaseApiController
                 'password_confirmation',
                 400
             );
+            return;
         }
 
         // Validate password strength
@@ -165,6 +167,7 @@ class PasswordResetApiController extends BaseApiController
                 'token',
                 400
             );
+            return;
         }
 
         // Update the password — scope by user ID to prevent cross-tenant updates
@@ -183,6 +186,7 @@ class PasswordResetApiController extends BaseApiController
                 'token',
                 400
             );
+            return;
         }
 
         // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates

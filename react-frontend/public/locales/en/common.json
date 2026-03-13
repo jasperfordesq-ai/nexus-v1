@@ -250,5 +250,24 @@
     "message": "A new version is available.",
     "update_now": "Update now",
     "dismiss": "Dismiss update notification"
+  },
+  "error_boundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again or go back to the home page.",
+    "component_stack": "Component Stack",
+    "try_again": "Try Again",
+    "go_home": "Go Home"
+  },
+  "quick_create": {
+    "title": "Create New",
+    "close_aria": "Close create menu",
+    "new_listing": "New Listing",
+    "new_listing_desc": "Offer or request a service",
+    "new_event": "New Event",
+    "new_event_desc": "Organise a community event",
+    "new_group": "New Group",
+    "new_group_desc": "Start a community group",
+    "new_goal": "New Goal",
+    "new_goal_desc": "Set a personal goal"
   }
 }

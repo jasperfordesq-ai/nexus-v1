@@ -33,7 +33,7 @@ class VoiceMessageController extends BaseApiController
         if (!$userId) {
             http_response_code(401);
             echo json_encode(['error' => 'Unauthorized']);
-            if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+            if (!defined('TESTING')) { exit; }
         }
 
         // CSRF check - automatically skipped for Bearer token auth
@@ -117,6 +117,6 @@ class VoiceMessageController extends BaseApiController
             echo json_encode(['error' => $e->getMessage()]); // nosemgrep: echoed-request
         }
 
-        if (!defined('TESTING')) { if (!defined('TESTING')) { exit; } }
+        if (!defined('TESTING')) { exit; }
     }
 }

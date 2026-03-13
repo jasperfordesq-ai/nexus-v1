@@ -41,7 +41,10 @@
     "report_failed": "Falha ao reportar publicação",
     "deleted": "Publicação eliminada",
     "delete_failed": "Falha ao eliminar publicação",
-    "vote_failed": "Falha ao submeter voto"
+    "vote_failed": "Falha ao submeter voto",
+    "post_shared": "Publicação partilhada no seu feed",
+    "share_removed": "Partilha removida",
+    "share_failed": "Falha ao partilhar publicação"
   },
   "realtime": {
     "new_post_singular": "1 nova publicação",
@@ -220,5 +223,18 @@
     "no_match": "Nenhuma hashtag correspondente a \"{{query}}\"",
     "no_trending": "Ainda sem hashtags em tendência na sua comunidade.",
     "post_count": "{{count}} publicações"
+  },
+  "share": {
+    "tooltip_remove": "Remover partilha",
+    "tooltip_share": "Partilhar no seu feed",
+    "button_label": "Partilhar",
+    "button_label_count": "Partilhar ({{count}})",
+    "shared_by": "<0>{{name}}</0> partilhou isto"
+  },
+  "trending": {
+    "title": "Em alta",
+    "view_all": "Ver todas as hashtags",
+    "post_count": "{{count}} publicação",
+    "post_count_plural": "{{count}} publicações"
   }
 }

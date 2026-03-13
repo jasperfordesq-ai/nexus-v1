@@ -1,0 +1,6 @@
+{
+  "hours_load_failed": "Échec du chargement des révisions d'heures en attente. Veuillez réessayer.",
+  "something_wrong": "Quelque chose s'est mal passé. Veuillez réessayer.",
+  "applications_load_failed": "Échec du chargement des candidatures.",
+  "application_submitted": "Candidature soumise avec succès !"
+}

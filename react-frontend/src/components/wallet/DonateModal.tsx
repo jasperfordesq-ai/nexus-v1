@@ -21,6 +21,7 @@ import {
   Radio,
 } from '@heroui/react';
 import { Heart, Users, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
@@ -33,6 +34,7 @@ interface DonateModalProps {
 }
 
 export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplete }: DonateModalProps) {
+  const { t } = useTranslation('wallet');
   const toast = useToast();
   const [recipientType, setRecipientType] = useState<'community_fund' | 'user'>('community_fund');
   const [recipientId, setRecipientId] = useState('');
@@ -43,17 +45,17 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
   async function handleDonate() {
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      toast.error('Invalid amount', 'Please enter an amount greater than 0');
+      toast.error(t('donate_invalid_amount'), t('donate_invalid_amount_desc'));
       return;
     }
 
     if (parsedAmount > currentBalance) {
-      toast.error('Insufficient balance', 'You do not have enough credits');
+      toast.error(t('donate_insufficient'), t('donate_insufficient_desc'));
       return;
     }
 
     if (recipientType === 'user' && !recipientId) {
-      toast.error('Recipient required', 'Please enter a recipient ID');
+      toast.error(t('donate_recipient_required'), t('donate_recipient_required_desc'));
       return;
     }
 
@@ -67,18 +69,18 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
       });
 
       if (response.success) {
-        toast.success('Donation sent!', 'Thank you for your generosity.');
+        toast.success(t('donate_success'), t('donate_success_desc'));
         setAmount('');
         setMessage('');
         setRecipientId('');
         onClose();
         onDonationComplete?.();
       } else {
-        toast.error('Donation failed', response.error || 'Please try again');
+        toast.error(t('donate_failed'), response.error || t('donate_error'));
       }
     } catch (err) {
       logError('Donation failed', err);
-      toast.error('Donation failed', 'An error occurred. Please try again.');
+      toast.error(t('donate_failed'), t('donate_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -98,39 +100,39 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
       <ModalContent>
         <ModalHeader className="text-theme-primary flex items-center gap-2">
           <Heart className="w-5 h-5 text-rose-400" />
-          Donate Credits
+          {t('donate_credits')}
         </ModalHeader>
         <ModalBody>
           <RadioGroup
-            label="Donate to"
+            label={t('donate_to')}
             value={recipientType}
             onValueChange={(v) => setRecipientType(v as 'community_fund' | 'user')}
             classNames={{ label: 'text-theme-muted' }}
           >
             <Radio
               value="community_fund"
-              description="Support your community's time credit pool"
+              description={t('donate_community_desc')}
             >
               <span className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
-                Community Fund
+                {t('donate_community_fund')}
               </span>
             </Radio>
             <Radio
               value="user"
-              description="Gift credits directly to another member"
+              description={t('donate_member_desc')}
             >
               <span className="flex items-center gap-2">
                 <User className="w-4 h-4" />
-                Another Member
+                {t('donate_member')}
               </span>
             </Radio>
           </RadioGroup>
 
           {recipientType === 'user' && (
             <Input
-              label="Recipient ID"
-              placeholder="Enter member ID"
+              label={t('donate_recipient_id')}
+              placeholder={t('donate_recipient_placeholder')}
               value={recipientId}
               onChange={(e) => setRecipientId(e.target.value)}
               type="number"
@@ -142,7 +144,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
           )}
 
           <Input
-            label="Amount (hours)"
+            label={t('donate_amount')}
             placeholder="1"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -150,7 +152,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             min="0.25"
             step="0.25"
             endContent={<span className="text-theme-muted text-sm">hours</span>}
-            description={`Your balance: ${currentBalance} hours`}
+            description={t('donate_balance_info', { balance: currentBalance })}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -158,8 +160,8 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
           />
 
           <Textarea
-            label="Message (optional)"
-            placeholder="Add a note with your donation..."
+            label={t('donate_message')}
+            placeholder={t('donate_message_placeholder')}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             maxLength={500}
@@ -175,7 +177,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             onPress={onClose}
             className="bg-theme-elevated text-theme-primary"
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             color="danger"
@@ -183,7 +185,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             isLoading={isSubmitting}
             startContent={<Heart className="w-4 h-4" />}
           >
-            Donate
+            {t('donate_confirm')}
           </Button>
         </ModalFooter>
       </ModalContent>

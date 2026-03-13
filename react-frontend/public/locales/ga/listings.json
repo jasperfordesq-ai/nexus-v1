@@ -104,5 +104,20 @@
   "exchange_status_accepted": "Glactha",
   "exchange_status_in_progress": "Ar Siúl",
   "exchange_status_pending_confirmation": "Deimhnigh Uaireanta",
-  "exchange_status_disputed": "Faoi Athbhreithniú"
+  "exchange_status_disputed": "Faoi Athbhreithniú",
+  "renew_success": "Liostail athnuaite",
+  "renew_error": "Theip ar athnuachan",
+  "detail_analytics": "Anailisiocht",
+  "detail_renew": "Athnuaigh",
+  "detail_extend": "Fadaigh",
+  "detail_skills": "Scileanna",
+  "detail_hours": "{{count}} uair",
+  "detail_expired_on": "In eag ar {{date}}",
+  "detail_expires_on": "In eag {{date}}",
+  "detail_renewed_count_one": "athnuaite {{count}} uair",
+  "detail_renewed_count_other": "athnuaite {{count}} uair",
+  "load_error": "Theip ar lodail na liostalacha.",
+  "load_more_error": "Theip ar thuilleadh liostalacha",
+  "page_meta_description": "Brabhsail seirbhisi.",
+  "page_meta_keywords": "liostalacha, seirbhisi"
 }

@@ -38,7 +38,8 @@
     "listings": "Annonces",
     "reviews": "Évaluations",
     "achievements": "Succès",
-    "activity": "Activité"
+    "activity": "Activité",
+    "availability": "Disponibilite"
   },
   "about": {
     "heading": "À propos",
@@ -80,7 +81,10 @@
     "removed_title": "Supprimé(e)",
     "removed": "Connexion supprimée",
     "failed": "Échec",
-    "error": "Une erreur s'est produite"
+    "error": "Une erreur s'est produite",
+    "select_rating": "Veuillez sélectionner une évaluation",
+    "review_submitted": "Avis soumis avec succès !",
+    "review_submit_failed": "Échec de la soumission de l'avis. Veuillez réessayer."
   },
   "form": {
     "first_name": "Prénom",
@@ -89,5 +93,6 @@
     "location": "Localisation",
     "phone": "Téléphone",
     "save": "Enregistrer les modifications"
-  }
+  },
+  "load_error": "Impossible de charger le profil."
 }

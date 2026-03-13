@@ -1,0 +1,9 @@
+{
+  "checkin_recorded": "Check-in recorded!",
+  "checkin_failed": "Failed to record check-in.",
+  "reminder_set_failed": "Failed to set reminder.",
+  "reminder_removed": "Reminder removed.",
+  "reminder_remove_failed": "Failed to remove reminder.",
+  "template_created": "Goal created from template!",
+  "template_create_failed": "Failed to create goal from template."
+}

@@ -37,6 +37,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 
+import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -394,6 +395,7 @@ export function MyApplicationsPage() {
   useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { t } = useTranslation('jobs');
 
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -479,7 +481,7 @@ export function MyApplicationsPage() {
     try {
       const res = await api.put(`/v2/jobs/applications/${withdrawTarget.id}`, { status: 'withdrawn' });
       if (res.success) {
-        toast.success('Application withdrawn successfully.');
+        toast.success(t('application_withdrawn'));
         closeWithdraw();
         // Refresh the list
         cursorRef.current = null;
@@ -491,7 +493,7 @@ export function MyApplicationsPage() {
       }
     } catch (err) {
       logError('MyApplicationsPage.confirmWithdraw', err);
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('something_wrong'));
     } finally {
       setIsWithdrawing(false);
     }

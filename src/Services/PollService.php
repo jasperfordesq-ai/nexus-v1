@@ -464,8 +464,8 @@ class PollService
         if ((int)$poll['user_id'] !== $userId) {
             // Check if user is admin
             $user = Database::query(
-                "SELECT role FROM users WHERE id = ?",
-                [$userId]
+                "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch();
 
             if (!$user || !in_array($user['role'], ['admin', 'super_admin'])) {

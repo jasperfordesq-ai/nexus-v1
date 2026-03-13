@@ -250,5 +250,24 @@
     "message": "Eine neue Version ist verfügbar.",
     "update_now": "Jetzt aktualisieren",
     "dismiss": "Aktualisierungsbenachrichtigung schließen"
+  },
+  "error_boundary": {
+    "title": "Etwas ist schiefgelaufen",
+    "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut oder gehe zurück zur Startseite.",
+    "component_stack": "Komponentenstapel",
+    "try_again": "Erneut versuchen",
+    "go_home": "Zur Startseite"
+  },
+  "quick_create": {
+    "title": "Neu erstellen",
+    "close_aria": "Erstellungsmenü schließen",
+    "new_listing": "Neues Inserat",
+    "new_listing_desc": "Einen Service anbieten oder anfragen",
+    "new_event": "Neue Veranstaltung",
+    "new_event_desc": "Eine Gemeinschaftsveranstaltung organisieren",
+    "new_group": "Neue Gruppe",
+    "new_group_desc": "Eine Gemeinschaftsgruppe gründen",
+    "new_goal": "Neues Ziel",
+    "new_goal_desc": "Ein persönliches Ziel setzen"
   }
 }

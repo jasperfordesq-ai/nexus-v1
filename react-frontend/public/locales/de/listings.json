@@ -104,5 +104,20 @@
   "exchange_status_accepted": "Akzeptiert",
   "exchange_status_in_progress": "In Bearbeitung",
   "exchange_status_pending_confirmation": "Stunden bestätigen",
-  "exchange_status_disputed": "In Prüfung"
+  "exchange_status_disputed": "In Prüfung",
+  "renew_success": "Inserat erfolgreich erneuert",
+  "renew_error": "Inserat konnte nicht erneuert werden",
+  "detail_analytics": "Analysen",
+  "detail_renew": "Inserat erneuern",
+  "detail_extend": "Verlangern",
+  "detail_skills": "Fahigkeiten",
+  "detail_hours": "{{count}} Stunden",
+  "detail_expired_on": "Abgelaufen am {{date}}",
+  "detail_expires_on": "Lauft ab am {{date}}",
+  "detail_renewed_count_one": "{{count}} Mal erneuert",
+  "detail_renewed_count_other": "{{count}} Mal erneuert",
+  "load_error": "Inserate konnten nicht geladen werden.",
+  "load_more_error": "Weitere Inserate konnten nicht geladen werden",
+  "page_meta_description": "Durchsuchen Sie Dienste und Anfragen.",
+  "page_meta_keywords": "Inserate, Dienste, Angebote"
 }

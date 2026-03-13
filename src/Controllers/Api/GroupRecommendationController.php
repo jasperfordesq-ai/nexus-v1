@@ -77,10 +77,12 @@ class GroupRecommendationController extends BaseApiController
 
         if (!$groupId) {
             $this->respondWithError('VALIDATION_ERROR', 'group_id is required', 'group_id', 400);
+            return;
         }
 
         if (!$action) {
             $this->respondWithError('VALIDATION_ERROR', 'action is required', 'action', 400);
+            return;
         }
 
         // Validate action
@@ -92,6 +94,7 @@ class GroupRecommendationController extends BaseApiController
                 'action',
                 400
             );
+            return;
         }
 
         GroupRecommendationEngine::trackInteraction($userId, $groupId, $action);

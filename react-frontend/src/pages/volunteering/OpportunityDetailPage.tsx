@@ -58,6 +58,7 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
+import { useTranslation } from 'react-i18next';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface Shift {
@@ -144,6 +145,7 @@ interface ApplicationsPanelProps {
 
 function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
   const toast = useToast();
+  const { t } = useTranslation('volunteering');
   const [applications, setApplications] = useState<OppApplicationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -177,7 +179,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
       }
     } catch (err) {
       logError('Failed to load applications', err);
-      toast.error('Failed to load applications.');
+      toast.error(t('applications_load_failed'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -208,7 +210,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
       }
     } catch (err) {
       logError(`Failed to ${action} application`, err);
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('something_wrong'));
     } finally {
       setActionLoading((prev) => ({ ...prev, [applicationId]: false }));
     }
@@ -445,6 +447,7 @@ export function OpportunityDetailPage() {
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { t } = useTranslation('volunteering');
 
   usePageTitle('Opportunity Details');
 
@@ -490,7 +493,7 @@ export function OpportunityDetailPage() {
 
       const response = await api.post(`/v2/volunteering/opportunities/${id}/apply`, body);
       if (response.success) {
-        toast.success('Application submitted successfully!');
+        toast.success(t('application_submitted'));
         applyModal.onClose();
         setApplyMessage('');
         setSelectedShiftId(null);
@@ -500,7 +503,7 @@ export function OpportunityDetailPage() {
       }
     } catch (err) {
       logError('Failed to apply', err);
-      toast.error('Something went wrong. Please try again.');
+      toast.error(t('something_wrong'));
     } finally {
       setIsApplying(false);
     }

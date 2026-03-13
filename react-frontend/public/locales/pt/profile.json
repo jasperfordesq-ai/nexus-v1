@@ -38,7 +38,8 @@
     "listings": "Anúncios",
     "reviews": "Avaliações",
     "achievements": "Conquistas",
-    "activity": "Atividade"
+    "activity": "Atividade",
+    "availability": "Disponibilidade"
   },
   "about": {
     "heading": "Sobre",
@@ -80,7 +81,10 @@
     "removed_title": "Removido",
     "removed": "Conexão removida",
     "failed": "Falhou",
-    "error": "Algo correu mal"
+    "error": "Algo correu mal",
+    "select_rating": "Por favor, selecione uma avaliação",
+    "review_submitted": "Avaliação enviada com sucesso!",
+    "review_submit_failed": "Falha ao enviar avaliação. Por favor, tente novamente."
   },
   "form": {
     "first_name": "Nome Próprio",
@@ -89,5 +93,6 @@
     "location": "Localização",
     "phone": "Telefone",
     "save": "Guardar Alterações"
-  }
+  },
+  "load_error": "Falha ao carregar perfil."
 }

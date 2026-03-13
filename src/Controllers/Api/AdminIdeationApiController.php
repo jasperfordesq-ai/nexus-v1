@@ -78,6 +78,7 @@ class AdminIdeationApiController extends BaseApiController
             $this->respondWithData(['deleted' => true, 'id' => $id]);
         } else {
             $this->respondWithError('DELETE_FAILED', 'Failed to delete challenge', null, 400);
+            return;
         }
     }
 
@@ -97,6 +98,7 @@ class AdminIdeationApiController extends BaseApiController
             $this->respondWithData(['id' => $id, 'status' => $status]);
         } else {
             $this->respondWithError('UPDATE_FAILED', 'Failed to update challenge status', null, 400);
+            return;
         }
     }
 }
