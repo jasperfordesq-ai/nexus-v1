@@ -141,8 +141,8 @@ class SubAccountService
         // Notify the child user
         try {
             $parentName = Database::query(
-                "SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = ?",
-                [$parentUserId]
+                "SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE id = ? AND tenant_id = ?",
+                [$parentUserId, TenantContext::getId()]
             )->fetchColumn();
 
             Notification::create(

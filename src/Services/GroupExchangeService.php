@@ -366,8 +366,8 @@ class GroupExchangeService
 
                     // Debit provider
                     Database::query(
-                        "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-                        [$amount, $providerId, $tenantId]
+                        "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                        [$amount, $providerId, $tenantId, $amount]
                     );
 
                     // Credit receiver

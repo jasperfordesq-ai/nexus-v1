@@ -108,11 +108,12 @@ class LegalDocumentService
         $stmt = Database::query(
             "SELECT ldv.*, u.name as created_by_name, u2.name as published_by_name
              FROM legal_document_versions ldv
+             JOIN legal_documents ld ON ldv.document_id = ld.id
              LEFT JOIN users u ON ldv.created_by = u.id
              LEFT JOIN users u2 ON ldv.published_by = u2.id
-             WHERE ldv.document_id = ?
+             WHERE ldv.document_id = ? AND ld.tenant_id = ?
              ORDER BY ldv.created_at DESC",
-            [$documentId]
+            [$documentId, TenantContext::getId()]
         );
 
         return $stmt->fetchAll();
@@ -127,8 +128,8 @@ class LegalDocumentService
             "SELECT ldv.*, ld.document_type, ld.title, ld.tenant_id
              FROM legal_document_versions ldv
              JOIN legal_documents ld ON ldv.document_id = ld.id
-             WHERE ldv.id = ?",
-            [$versionId]
+             WHERE ldv.id = ? AND ld.tenant_id = ?",
+            [$versionId, TenantContext::getId()]
         );
 
         return $stmt->fetch() ?: null;
@@ -468,7 +469,7 @@ class LegalDocumentService
             return false; // Can only delete drafts
         }
 
-        Database::query("DELETE FROM legal_document_versions WHERE id = ?", [$versionId]);
+        Database::query("DELETE FROM legal_document_versions WHERE id = ? AND document_id IN (SELECT id FROM legal_documents WHERE tenant_id = ?)", [$versionId, TenantContext::getId()]);
         return true;
     }
 

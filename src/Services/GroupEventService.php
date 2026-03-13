@@ -239,7 +239,7 @@ class GroupEventService
             $db = Database::getConnection();
 
             // Delete RSVPs first
-            $db->prepare("DELETE FROM event_rsvps WHERE event_id = ?")->execute([$eventId]);
+            $db->prepare("DELETE FROM event_rsvps WHERE event_id = ? AND tenant_id = ?")->execute([$eventId, $tenantId]);
 
             // Delete event (scoped by group and tenant)
             $stmt = $db->prepare("DELETE FROM events WHERE id = ? AND group_id = ? AND tenant_id = ?");

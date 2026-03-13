@@ -399,8 +399,8 @@ class GdprService
 
         $stats = $this->query(
             "SELECT xp_points, level, login_streak
-             FROM users WHERE id = ?",
-            [$userId]
+             FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $this->tenantId]
         )->fetch();
 
         return [

@@ -71,7 +71,7 @@ class GoalCheckinService
         // Must be goal owner or buddy
         if ((int)$goal['user_id'] !== $userId) {
             $isBuddy = Database::query(
-                "SELECT id FROM goals WHERE id = ? AND mentor_id = ?",
+                "SELECT id FROM goals WHERE id = ? AND tenant_id = ? AND mentor_id = ?",
                 [$goalId, $userId]
             )->fetch();
 

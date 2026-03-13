@@ -245,16 +245,10 @@ class WalletService
                 );
             }
 
-            // Send in-app + email notification to recipient
+            // Send email notification to recipient
+            // (In-app notification is already created by Transaction::create())
             try {
                 $senderName = $sender['name'] ?? trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
-                $hourLabel = $amount == 1 ? 'hour' : 'hours';
-                \Nexus\Models\Notification::create(
-                    $receiverId,
-                    "{$senderName} sent you {$amount} {$hourLabel}" . ($description ? ": {$description}" : ''),
-                    '/wallet',
-                    'credit_received'
-                );
                 NotificationDispatcher::sendCreditEmail($receiverId, $senderName, $amount, $description);
             } catch (\Throwable $e) {
                 error_log("Credit notification error: " . $e->getMessage());

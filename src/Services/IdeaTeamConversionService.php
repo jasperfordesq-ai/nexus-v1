@@ -220,8 +220,8 @@ class IdeaTeamConversionService
     private static function isAdmin(int $userId): bool
     {
         $user = Database::query(
-            "SELECT role FROM users WHERE id = ?",
-            [$userId]
+            "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, TenantContext::getId()]
         )->fetch();
 
         return $user && in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin']);

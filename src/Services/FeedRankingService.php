@@ -400,8 +400,8 @@ class FeedRankingService
     {
         try {
             $row = Database::query(
-                "SELECT latitude, longitude FROM users WHERE id = ? LIMIT 1",
-                [$userId]
+                "SELECT latitude, longitude FROM users WHERE id = ? AND tenant_id = ? LIMIT 1",
+                [$userId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
 
             if ($row && $row['latitude'] !== null && $row['longitude'] !== null) {
@@ -454,13 +454,15 @@ class FeedRankingService
     private static function getViewerConnectedUserIds(int $viewerId): array
     {
         try {
+            $tenantId = TenantContext::getId();
             $rows = Database::query(
                 "SELECT DISTINCT
                     CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as connected_id
                  FROM transactions
                  WHERE (sender_id = ? OR receiver_id = ?)
+                   AND tenant_id = ?
                    AND status = 'completed'",
-                [$viewerId, $viewerId, $viewerId]
+                [$viewerId, $viewerId, $viewerId, $tenantId]
             )->fetchAll(\PDO::FETCH_COLUMN);
 
             return array_map('intval', $rows);
@@ -749,8 +751,9 @@ class FeedRankingService
             }
 
             // Ultimate fallback: user registration date
-            $sql = "SELECT created_at FROM users WHERE id = ?";
-            $result = Database::query($sql, [$userId])->fetch();
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT created_at FROM users WHERE id = ? AND tenant_id = ?";
+            $result = Database::query($sql, [$userId, $tenantId])->fetch();
 
             return $result['created_at'] ?? null;
 
@@ -1475,8 +1478,9 @@ class FeedRankingService
     public static function getViewerCoordinates(int $viewerId): array
     {
         try {
-            $sql = "SELECT latitude, longitude FROM users WHERE id = ?";
-            $result = Database::query($sql, [$viewerId])->fetch();
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT latitude, longitude FROM users WHERE id = ? AND tenant_id = ?";
+            $result = Database::query($sql, [$viewerId, $tenantId])->fetch();
 
             return [
                 'lat' => $result['latitude'] ?? null,
@@ -1580,8 +1584,9 @@ class FeedRankingService
     private static function getUserCreatedAt(int $userId): ?string
     {
         try {
-            $sql = "SELECT created_at FROM users WHERE id = ?";
-            $result = Database::query($sql, [$userId])->fetch();
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT created_at FROM users WHERE id = ? AND tenant_id = ?";
+            $result = Database::query($sql, [$userId, $tenantId])->fetch();
             return $result['created_at'] ?? null;
         } catch (\Exception $e) {
             return null;

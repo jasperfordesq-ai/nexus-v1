@@ -292,8 +292,8 @@ class BadgeCollectionService
     public static function removeBadgeFromCollection($collectionId, $badgeKey)
     {
         Database::query(
-            "DELETE FROM badge_collection_items WHERE collection_id = ? AND badge_key = ?",
-            [$collectionId, $badgeKey]
+            "DELETE FROM badge_collection_items WHERE collection_id = ? AND badge_key = ? AND collection_id IN (SELECT id FROM badge_collections WHERE tenant_id = ?)",
+            [$collectionId, $badgeKey, TenantContext::getId()]
         );
     }
 

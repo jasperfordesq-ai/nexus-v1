@@ -270,8 +270,8 @@ class FederationCreditService
 
             // Debit source user (deduct from their wallet)
             $db->prepare(
-                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?"
-            )->execute([$amount, $userId, $fromTenantId]);
+                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?"
+            )->execute([$amount, $userId, $fromTenantId, $amount]);
 
             // Update inter-tenant balance
             self::updateBalance($fromTenantId, $toTenantId, $convertedAmount);

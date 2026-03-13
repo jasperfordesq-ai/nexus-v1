@@ -835,8 +835,8 @@ HTML;
         try {
             // Get user email
             $user = Database::query(
-                "SELECT email, name, first_name FROM users WHERE id = ?",
-                [$userId]
+                "SELECT email, name, first_name FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetch();
 
             if (!$user || empty($user['email'])) {
@@ -1496,8 +1496,8 @@ HTML;
     {
         try {
             $user = Database::query(
-                "SELECT email, name, first_name FROM users WHERE id = ?",
-                [$receiverUserId]
+                "SELECT email, name, first_name FROM users WHERE id = ? AND tenant_id = ?",
+                [$receiverUserId, TenantContext::getId()]
             )->fetch();
 
             if (!$user || empty($user['email'])) {

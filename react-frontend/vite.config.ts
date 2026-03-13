@@ -17,7 +17,9 @@ const commitHash = process.env.BUILD_COMMIT || (() => {
   }
 })()
 
-export default defineConfig({
+const isDocker = !!process.env.DOCKER_ENV
+
+export default defineConfig(({ command }) => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -48,14 +50,15 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//, /^\/admin-legacy\//, /^\/health\.php/],
       },
     }),
-    ViteImageOptimizer({
+    // Image optimizer only runs during build — skip in dev for faster startup
+    ...(command === 'build' ? [ViteImageOptimizer({
       png: { quality: 80 },
       jpeg: { quality: 80 },
       jpg: { quality: 80 },
       webp: { lossless: false, quality: 80 },
       svg: { plugins: [{ name: 'preset-default' }] },
       logStats: true,
-    }),
+    })] : []),
   ],
   define: {
     __BUILD_COMMIT__: JSON.stringify(commitHash),
@@ -66,11 +69,27 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    // Pre-bundle heavy deps so Vite doesn't re-crawl them on every page load
+    include: [
+      '@heroui/react',
+      'framer-motion',
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'recharts',
+      'i18next',
+      'react-i18next',
+      'lucide-react',
+    ],
+  },
   server: {
     port: 5173,
     host: '0.0.0.0', // Required for Docker
     watch: {
-      usePolling: true, // Required for Docker on Windows (bind mounts don't trigger inotify)
+      // Polling is only needed inside Docker on Windows (bind mounts don't trigger inotify).
+      // Native Windows dev uses efficient fs events instead.
+      usePolling: isDocker,
       interval: 1000,
     },
     proxy: {
@@ -111,4 +130,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

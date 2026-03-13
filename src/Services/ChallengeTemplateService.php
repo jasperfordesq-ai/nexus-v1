@@ -321,9 +321,10 @@ class ChallengeTemplateService
 
     private static function isAdmin(int $userId): bool
     {
+        $tenantId = TenantContext::getId();
         $user = Database::query(
-            "SELECT role FROM users WHERE id = ?",
-            [$userId]
+            "SELECT role FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         return $user && in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin']);

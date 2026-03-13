@@ -682,8 +682,9 @@ class EventService
             // Check if user was 'going' — we need to know for waitlist promotion
             $currentStatus = EventRsvp::getUserStatus($eventId, $userId);
 
-            $stmt = $db->prepare("DELETE FROM event_rsvps WHERE event_id = ? AND user_id = ?");
-            $stmt->execute([$eventId, $userId]);
+            $tenantId = TenantContext::getId();
+            $stmt = $db->prepare("DELETE FROM event_rsvps WHERE event_id = ? AND user_id = ? AND tenant_id = ?");
+            $stmt->execute([$eventId, $userId, $tenantId]);
 
             // Also remove any reminders for this user/event
             self::cancelReminders($eventId, $userId);
@@ -1510,7 +1511,7 @@ class EventService
         $db = Database::getConnection();
 
         try {
-            $db->prepare("DELETE FROM event_attendance WHERE event_id = ? AND user_id = ?")->execute([$eventId, $attendeeId]);
+            $db->prepare("DELETE FROM event_attendance WHERE event_id = ? AND user_id = ? AND tenant_id = ?")->execute([$eventId, $attendeeId, TenantContext::getId()]);
             // Revert RSVP status back to going
             EventRsvp::rsvp($eventId, $attendeeId, 'going');
             return true;

@@ -95,17 +95,17 @@ class GamificationEmailService
         $xpData = Database::query(
             "SELECT SUM(xp_amount) as total_xp, COUNT(*) as xp_events
              FROM xp_history
-             WHERE user_id = ? AND created_at >= ?",
-            [$userId, $weekAgo]
+             WHERE user_id = ? AND tenant_id = ? AND created_at >= ?",
+            [$userId, $tenantId, $weekAgo]
         )->fetch();
 
         // Badges earned this week
         $badges = Database::query(
             "SELECT badge_key, name, icon, awarded_at
              FROM user_badges
-             WHERE user_id = ? AND awarded_at >= ?
+             WHERE user_id = ? AND tenant_id = ? AND awarded_at >= ?
              ORDER BY awarded_at DESC",
-            [$userId, $weekAgo]
+            [$userId, $tenantId, $weekAgo]
         )->fetchAll();
 
         // Challenges completed this week
@@ -113,15 +113,15 @@ class GamificationEmailService
             "SELECT c.title, c.xp_reward, ucp.completed_at
              FROM user_challenge_progress ucp
              JOIN challenges c ON ucp.challenge_id = c.id
-             WHERE ucp.user_id = ? AND ucp.completed_at >= ?
+             WHERE ucp.user_id = ? AND c.tenant_id = ? AND ucp.completed_at >= ?
              ORDER BY ucp.completed_at DESC",
-            [$userId, $weekAgo]
+            [$userId, $tenantId, $weekAgo]
         )->fetchAll();
 
         // Current user stats
         $userStats = Database::query(
-            "SELECT xp, level FROM users WHERE id = ?",
-            [$userId]
+            "SELECT xp, level FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         // Leaderboard position
@@ -135,8 +135,8 @@ class GamificationEmailService
         // Weekly rank change
         $lastWeekRank = Database::query(
             "SELECT rank_position FROM weekly_rank_snapshots
-             WHERE user_id = ? ORDER BY snapshot_date DESC LIMIT 1",
-            [$userId]
+             WHERE user_id = ? AND tenant_id = ? ORDER BY snapshot_date DESC LIMIT 1",
+            [$userId, $tenantId]
         )->fetch()['rank_position'] ?? $rank;
 
         $rankChange = $lastWeekRank - $rank;
@@ -819,9 +819,10 @@ HTML;
      */
     public static function sendMilestoneEmail(int $userId, string $type, array $data): bool
     {
+        $tenantId = TenantContext::getId();
         $user = Database::query(
-            "SELECT id, email, first_name, last_name FROM users WHERE id = ?",
-            [$userId]
+            "SELECT id, email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
         )->fetch();
 
         if (!$user || empty($user['email'])) {

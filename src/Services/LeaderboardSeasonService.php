@@ -169,7 +169,7 @@ class LeaderboardSeasonService
 
         // Calculate position from users table
         $tenantId = TenantContext::getId();
-        $user = Database::query("SELECT xp FROM users WHERE id = ?", [$userId])->fetch();
+        $user = Database::query("SELECT xp FROM users WHERE id = ? AND tenant_id = ?", [$userId])->fetch();
 
         if (!$user) {
             return null;

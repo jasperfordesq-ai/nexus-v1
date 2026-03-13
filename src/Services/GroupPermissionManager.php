@@ -211,8 +211,8 @@ class GroupPermissionManager
         try {
             // Check if owner
             $group = Database::query(
-                "SELECT owner_id FROM groups WHERE id = ?",
-                [$groupId]
+                "SELECT owner_id FROM groups WHERE id = ? AND tenant_id = ?",
+                [$groupId, TenantContext::getId()]
             )->fetch();
 
             if ($group && $group['owner_id'] == $userId) {
