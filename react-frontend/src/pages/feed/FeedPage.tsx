@@ -464,7 +464,7 @@ export function FeedPage() {
 
       {/* Quick Post Box */}
       {isAuthenticated && (
-        <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={onCreateOpen}>
+        <GlassCard className="p-4 hover:border-[var(--color-primary)]/20 transition-colors cursor-pointer" onClick={() => { setComposeDefaultTab("listing"); onCreateOpen(); }}>
           <div className="flex items-center gap-3">
             <Avatar
               name={user?.first_name || 'You'}
