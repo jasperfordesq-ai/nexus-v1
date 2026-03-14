@@ -13,7 +13,7 @@
  * Desktop: HeroUI Modal with underlined tabs and glass background.
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Modal,
   ModalContent,
@@ -28,12 +28,14 @@ import {
   ShoppingBag,
   Calendar,
   Target,
+  FileText,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ComposeSubmitProvider } from './ComposeSubmitContext';
 import { MobileComposeOverlay } from './MobileComposeOverlay';
+import { PostTab } from './tabs/PostTab';
 import { PollTab } from './tabs/PollTab';
 import { ListingTab } from './tabs/ListingTab';
 import { EventTab } from './tabs/EventTab';
@@ -44,12 +46,13 @@ import type { ComposeHubProps, ComposeTab, ComposeTabConfig } from './types';
 
 const ALL_TABS: ComposeTabConfig[] = [
   { key: 'listing', label: 'Listing', icon: ShoppingBag, gate: { type: 'module', key: 'listings' } },
+  { key: 'post', label: 'Post', icon: FileText },
   { key: 'event', label: 'Event', icon: Calendar, gate: { type: 'feature', key: 'events' } },
   { key: 'goal', label: 'Goal', icon: Target, gate: { type: 'feature', key: 'goals' } },
   { key: 'poll', label: 'Poll', icon: BarChart3, gate: { type: 'feature', key: 'polls' } },
 ];
 
-const TABS_WITH_GROUPS: ComposeTab[] = ['poll', 'event'];
+const TABS_WITH_GROUPS: ComposeTab[] = ['post', 'poll', 'event'];
 
 export function ComposeHub({
   isOpen,
@@ -63,6 +66,11 @@ export function ComposeHub({
   const [activeTab, setActiveTab] = useState<ComposeTab>(defaultTab);
   const [sharedGroupId, setSharedGroupId] = useState<number | null>(groupId ?? null);
   const [templateData, setTemplateData] = useState<{ title?: string; content: string } | null>(null);
+  // Sync activeTab when defaultTab prop changes (e.g. user clicks different quick-action)
+  useEffect(() => {
+    setActiveTab(defaultTab);
+  }, [defaultTab]);
+
   const isMobile = useMediaQuery('(max-width: 639px)');
 
   const handleTemplateSelect = useCallback((data: { title?: string; content: string }) => {
@@ -111,8 +119,9 @@ export function ComposeHub({
         </div>
       )}
 
-      {activeTab === 'poll' && <PollTab {...tabProps} />}
       {activeTab === 'listing' && <ListingTab {...tabProps} />}
+      {activeTab === 'post' && <PostTab {...tabProps} />}
+      {activeTab === 'poll' && <PollTab {...tabProps} />}
       {activeTab === 'event' && <EventTab {...tabProps} />}
       {activeTab === 'goal' && <GoalTab {...tabProps} />}
     </>
