@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { TransferModal, DonateModal, CommunityFundCard } from '@/components/wallet';
 import { useToast } from '@/contexts';
@@ -64,7 +65,7 @@ export function WalletPage() {
       setTxCursor(null);
       const [balanceRes, transactionsRes] = await Promise.all([
         api.get<WalletBalance>('/v2/wallet/balance'),
-        api.get<Transaction[]>('/v2/wallet/transactions?limit=50'),
+        api.get<Transaction[]>('/v2/wallet/transactions?per_page=50'),
       ]);
 
       if (balanceRes.success && balanceRes.data) {
@@ -107,7 +108,7 @@ export function WalletPage() {
 
     try {
       setIsLoadingMore(true);
-      const response = await api.get<Transaction[]>(`/v2/wallet/transactions?limit=50&cursor=${encodeURIComponent(txCursor)}`);
+      const response = await api.get<Transaction[]>(`/v2/wallet/transactions?per_page=50&cursor=${encodeURIComponent(txCursor)}`);
 
       if (response.success && response.data) {
         if (response.data.length > 0) {
@@ -229,6 +230,12 @@ export function WalletPage() {
   };
 
   return (
+    <>
+    <PageMeta
+      title={t("title")}
+      description={t("subtitle")}
+      noIndex
+    />
     <motion.div
       variants={containerVariants}
       initial="hidden"
@@ -461,6 +468,7 @@ export function WalletPage() {
         onDonationComplete={() => loadWalletData()}
       />
     </motion.div>
+    </>
   );
 }
 

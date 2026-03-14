@@ -317,7 +317,7 @@ export function BlogPostPage() {
       <article className="max-w-3xl mx-auto space-y-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[
-          { label: t('page_title'), href: tenantPath('/blog') },
+          { label: t('page_title'), href: '/blog' },
           { label: post.title },
         ]} />
 

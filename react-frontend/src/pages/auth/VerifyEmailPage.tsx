@@ -53,9 +53,14 @@ export function VerifyEmailPage() {
 
     async function verifyEmail() {
       try {
-        await api.post('/auth/verify-email', { token });
+        const response = await api.post('/auth/verify-email', { token });
         if (!cancelled) {
-          setState('success');
+          if (response.success) {
+            setState('success');
+          } else {
+            setState('error');
+            setErrorMessage(response.error || t('verify_email.expired_error'));
+          }
         }
       } catch {
         if (!cancelled) {
@@ -138,9 +143,9 @@ export function VerifyEmailPage() {
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-medium text-amber-600 dark:text-amber-400">Awaiting admin approval</p>
+                    <p className="font-medium text-amber-600 dark:text-amber-400">{t('verify_email.awaiting_approval_title', { defaultValue: 'Awaiting admin approval' })}</p>
                     <p className="text-amber-600/80 dark:text-amber-300/80 mt-1">
-                      Your email is verified, but your account still needs to be approved by a community administrator. You&apos;ll receive an email once approved.
+                      {t("verify_email.awaiting_approval_body", { defaultValue: "Your email is verified, but your account still needs to be approved by a community administrator. You will receive an email once approved." })}
                     </p>
                   </div>
                 </div>
@@ -156,7 +161,7 @@ export function VerifyEmailPage() {
             ) : (
               <Link to={tenantPath('/login')}>
                 <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  {requiresApproval ? 'Back to Login' : t('verify_email.go_to_login')}
+                  {requiresApproval ? t('verify_email.back_to_login', { defaultValue: 'Back to Login' }) : t('verify_email.go_to_login')}
                 </Button>
               </Link>
             )}

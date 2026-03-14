@@ -209,7 +209,8 @@
     "try_again": "Réessayer",
     "no_posts": "Aucune publication trouvée",
     "no_posts_desc": "Aucune publication n'a encore été étiquetée avec #{{tag}}.",
-    "load_more": "Charger plus"
+    "load_more": "Charger plus",
+    "page_description": "Posts tagged with #{{tag}}"
   },
   "hashtags": {
     "title": "Hashtags tendance",

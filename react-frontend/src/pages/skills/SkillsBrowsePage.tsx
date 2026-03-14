@@ -62,11 +62,11 @@ interface SkillMember {
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const proficiencyConfig: Record<string, { label: string; color: string; bg: string; dots: number }> = {
-  beginner: { label: 'Beginner', color: 'text-emerald-500', bg: 'bg-emerald-500', dots: 1 },
-  intermediate: { label: 'Intermediate', color: 'text-blue-500', bg: 'bg-blue-500', dots: 2 },
-  advanced: { label: 'Advanced', color: 'text-purple-500', bg: 'bg-purple-500', dots: 3 },
-  expert: { label: 'Expert', color: 'text-amber-500', bg: 'bg-amber-500', dots: 4 },
+const proficiencyConfig: Record<string, { labelKey: string; fallback: string; color: string; bg: string; dots: number }> = {
+  beginner: { labelKey: 'skills.proficiency.beginner', fallback: 'Beginner', color: 'text-emerald-500', bg: 'bg-emerald-500', dots: 1 },
+  intermediate: { labelKey: 'skills.proficiency.intermediate', fallback: 'Intermediate', color: 'text-blue-500', bg: 'bg-blue-500', dots: 2 },
+  advanced: { labelKey: 'skills.proficiency.advanced', fallback: 'Advanced', color: 'text-purple-500', bg: 'bg-purple-500', dots: 3 },
+  expert: { labelKey: 'skills.proficiency.expert', fallback: 'Expert', color: 'text-amber-500', bg: 'bg-amber-500', dots: 4 },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,6 +74,7 @@ const proficiencyConfig: Record<string, { label: string; color: string; bg: stri
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ProficiencyBadge({ level }: { level: string }) {
+  const { t } = useTranslation('common');
   const config = proficiencyConfig[level] ?? proficiencyConfig.beginner;
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-medium ${config.color}`}>
@@ -83,7 +84,7 @@ function ProficiencyBadge({ level }: { level: string }) {
           className={`w-1.5 h-1.5 rounded-full ${d <= config.dots ? config.bg : 'bg-theme-hover'}`}
         />
       ))}
-      <span className="ml-0.5">{config.label}</span>
+      <span className="ml-0.5">{t(config.labelKey, config.fallback)}</span>
     </span>
   );
 }

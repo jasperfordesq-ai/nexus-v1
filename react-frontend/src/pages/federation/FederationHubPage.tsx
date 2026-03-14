@@ -662,8 +662,8 @@ export default function FederationHubPage() {
       // If opted in, load additional data in parallel
       if (status.enabled) {
         const [partnersRes, activityRes] = await Promise.all([
-          api.get<{ data: FederationPartner[]; meta?: { total?: number } }>('/v2/federation/partners'),
-          api.get<{ data: FederationActivityItem[] }>('/v2/federation/activity'),
+          api.get<FederationPartner[]>('/v2/federation/partners'),
+          api.get<FederationActivityItem[]>('/v2/federation/activity'),
         ]);
 
         if (partnersRes.success && partnersRes.data) {

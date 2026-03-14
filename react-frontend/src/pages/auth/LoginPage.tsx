@@ -344,7 +344,7 @@ export function LoginPage() {
                         <div className="mt-3">
                           {resendVerificationSent ? (
                             <p className="text-emerald-600 dark:text-emerald-400 text-xs">
-                              Verification email sent! Check your inbox.
+                              {t('login.verification_email_sent', { defaultValue: 'Verification email sent! Check your inbox.' })}
                             </p>
                           ) : (
                             <Button
@@ -355,7 +355,7 @@ export function LoginPage() {
                               className="bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
                               startContent={!isResendingVerification ? <Mail className="w-3 h-3" /> : undefined}
                             >
-                              Resend verification email
+                              {t('login.resend_verification', { defaultValue: 'Resend verification email' })}
                             </Button>
                           )}
                         </div>

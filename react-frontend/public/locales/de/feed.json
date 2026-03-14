@@ -209,7 +209,8 @@
     "try_again": "Erneut versuchen",
     "no_posts": "Keine Beiträge gefunden",
     "no_posts_desc": "Es wurden noch keine Beiträge mit #{{tag}} markiert.",
-    "load_more": "Mehr laden"
+    "load_more": "Mehr laden",
+    "page_description": "Posts tagged with #{{tag}}"
   },
   "hashtags": {
     "title": "Trend-Hashtags",

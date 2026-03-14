@@ -304,7 +304,7 @@ export function RequestExchangePage() {
               type="button"
               variant="flat"
               className="flex-1 bg-theme-elevated text-theme-primary"
-              onClick={() => navigate(tenantPath(id ? `/listings/${id}` : '/listings'))}
+              onPress={() => navigate(tenantPath(id ? `/listings/${id}` : '/listings'))}
             >
               {t('request.cancel')}
             </Button>

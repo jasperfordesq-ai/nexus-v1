@@ -9,10 +9,8 @@
   "unknown": "Desconhecido",
   "hours_count": "{{count}} hora",
   "hours_count_other": "{{count}} horas",
-
   "workflow_not_enabled_title": "Fluxo de Trocas Não Ativado",
   "workflow_not_enabled_description": "O sistema de fluxo de trocas não está ativado para esta comunidade. Contacte o seu coordenador para mais informações.",
-
   "tabs": {
     "aria_label": "Filtro de estado de troca",
     "active": "Ativas",
@@ -24,18 +22,15 @@
     "all": "Todas",
     "all_aria": "Mostrar todas as trocas"
   },
-
   "error": {
     "load_failed": "Falha ao carregar trocas. Tente novamente.",
     "unable_to_load": "Não Foi Possível Carregar as Trocas"
   },
-
   "empty": {
     "title": "Nenhuma Troca Encontrada",
     "active_description": "Não tem trocas ativas. Explore os anúncios para solicitar um serviço.",
     "filter_description": "Nenhuma troca corresponde a este filtro."
   },
-
   "card": {
     "aria_label": "Troca: {{title}} - {{status}}",
     "with_party": "Com {{name}}",
@@ -46,12 +41,10 @@
     "waiting_for_other": "À espera do outro",
     "respond": "Responder"
   },
-
   "breadcrumb": {
     "exchanges": "Trocas",
     "exchange": "Troca"
   },
-
   "toast": {
     "load_more_failed": "Falha ao carregar mais trocas",
     "accepted": "Troca aceite!",
@@ -71,7 +64,6 @@
     "request_sent": "Pedido de troca enviado!",
     "request_failed": "Falha ao criar pedido de troca"
   },
-
   "detail": {
     "page_title": "Detalhes da Troca",
     "loading": "A carregar troca...",
@@ -111,9 +103,11 @@
       "sent_to_broker": "Enviada ao Mediador",
       "disputed": "Troca Contestada",
       "fallback": "Estado Atualizado"
-    }
+    },
+    "prep_time": "Preparation Time",
+    "ratings": "Ratings",
+    "rate_exchange": "Rate This Exchange"
   },
-
   "modal": {
     "decline_title": "Recusar Pedido de Troca",
     "decline_reason_label": "Motivo (opcional)",
@@ -130,7 +124,6 @@
     "cancel_description": "Tem a certeza de que pretende cancelar esta troca? Esta ação não pode ser revertida.",
     "keep_exchange": "Manter Troca"
   },
-
   "request": {
     "page_title": "Solicitar Troca",
     "title": "Solicitar Troca",

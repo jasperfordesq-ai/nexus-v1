@@ -983,7 +983,7 @@ export function ConversationPage() {
 
           setTimeout(() => scrollToBottom(), 50);
         } else {
-          console.error('[Messages] Send failed:', response);
+          logError('Message send failed', response);
           toast.error(t('error_title'), response.error || t('send_error'));
           refreshRestrictionStatus();
         }

@@ -182,8 +182,8 @@ export function OrganisationDetailPage() {
     return (
       <div className="space-y-6">
         <Breadcrumbs items={[
-          { label: t('organisation_detail.breadcrumb_volunteering'), href: tenantPath('/volunteering') },
-          { label: t('organisation_detail.breadcrumb_organisations'), href: tenantPath('/organisations') },
+          { label: t('organisation_detail.breadcrumb_volunteering'), href: '/volunteering' },
+          { label: t('organisation_detail.breadcrumb_organisations'), href: '/organisations' },
           { label: t('organisation_detail.breadcrumb_error') },
         ]} />
         <GlassCard className="p-8 text-center">
@@ -217,8 +217,8 @@ export function OrganisationDetailPage() {
     <div className="space-y-6">
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('organisation_detail.breadcrumb_volunteering'), href: tenantPath('/volunteering') },
-        { label: t('organisation_detail.breadcrumb_organisations'), href: tenantPath('/organisations') },
+        { label: t('organisation_detail.breadcrumb_volunteering'), href: '/volunteering' },
+        { label: t('organisation_detail.breadcrumb_organisations'), href: '/organisations' },
         { label: organisation.name },
       ]} />
 

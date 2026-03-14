@@ -9,10 +9,8 @@
   "unknown": "Unknown",
   "hours_count": "{{count}} hour",
   "hours_count_other": "{{count}} hours",
-
   "workflow_not_enabled_title": "Exchange Workflow Not Enabled",
   "workflow_not_enabled_description": "The exchange workflow system is not enabled for this community. Contact your coordinator for more information.",
-
   "tabs": {
     "aria_label": "Exchange status filter",
     "active": "Active",
@@ -24,18 +22,15 @@
     "all": "All",
     "all_aria": "Show all exchanges"
   },
-
   "error": {
     "load_failed": "Failed to load exchanges. Please try again.",
     "unable_to_load": "Unable to Load Exchanges"
   },
-
   "empty": {
     "title": "No Exchanges Found",
     "active_description": "You don't have any active exchanges. Browse listings to request a service.",
     "filter_description": "No exchanges match this filter."
   },
-
   "card": {
     "aria_label": "Exchange: {{title}} - {{status}}",
     "with_party": "With {{name}}",
@@ -46,12 +41,10 @@
     "waiting_for_other": "Waiting for other",
     "respond": "Respond"
   },
-
   "breadcrumb": {
     "exchanges": "Exchanges",
     "exchange": "Exchange"
   },
-
   "toast": {
     "load_more_failed": "Failed to load more exchanges",
     "accepted": "Exchange accepted!",
@@ -71,7 +64,6 @@
     "request_sent": "Exchange request sent!",
     "request_failed": "Failed to create exchange request"
   },
-
   "detail": {
     "page_title": "Exchange Details",
     "loading": "Loading exchange...",
@@ -111,9 +103,11 @@
       "sent_to_broker": "Sent to Broker",
       "disputed": "Exchange Disputed",
       "fallback": "Status Updated"
-    }
+    },
+    "prep_time": "Preparation Time",
+    "ratings": "Ratings",
+    "rate_exchange": "Rate This Exchange"
   },
-
   "modal": {
     "decline_title": "Decline Exchange Request",
     "decline_reason_label": "Reason (optional)",
@@ -130,7 +124,6 @@
     "cancel_description": "Are you sure you want to cancel this exchange? This action cannot be undone.",
     "keep_exchange": "Keep Exchange"
   },
-
   "request": {
     "page_title": "Request Exchange",
     "title": "Request Exchange",

@@ -553,7 +553,7 @@ export function ResourcesPage() {
               startContent={<GripVertical className="w-3.5 h-3.5" aria-hidden="true" />}
               onPress={() => setIsReordering(!isReordering)}
             >
-              {isReordering ? 'Done Reordering' : 'Reorder'}
+              {isReordering ? t('resources.done_reordering', 'Done Reordering') : t('resources.reorder', 'Reorder')}
             </Button>
           )}
 
@@ -620,7 +620,7 @@ export function ResourcesPage() {
                     }`}
                     startContent={<FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />}
                   >
-                    All Resources
+                    {t('resources.all_resources', 'All Resources')}
                   </Button>
                   {categoryTree.map((node) => (
                     <CategoryTreeItem

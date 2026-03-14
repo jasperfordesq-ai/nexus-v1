@@ -9,10 +9,8 @@
   "unknown": "Anaithnid",
   "hours_count": "{{count}} uair",
   "hours_count_other": "{{count}} uair",
-
   "workflow_not_enabled_title": "Sreabhadh Oibre Malartaithe Gan Cur ar Siúl",
   "workflow_not_enabled_description": "Níl an córas sreabhadh oibre malartaithe cumasaithe don phobal seo. Déan teagmháil le do chomhordaitheoir le haghaidh tuilleadh eolais.",
-
   "tabs": {
     "aria_label": "Scagaire stádais malartaithe",
     "active": "Gníomhach",
@@ -24,18 +22,15 @@
     "all": "Gach Ceann",
     "all_aria": "Taispeáin gach malartú"
   },
-
   "error": {
     "load_failed": "Theip ar lódáil na malartuithe. Bain triail eile as.",
     "unable_to_load": "Ní Féidir Malartuithe a Lódáil"
   },
-
   "empty": {
     "title": "Níor Aimsíodh Malartuithe",
     "active_description": "Níl aon mhalartuithe gníomhacha agat. Brabhsáil liostuithe chun seirbhís a iarraidh.",
     "filter_description": "Ní mheaitseálann aon mhalartuithe leis an scagaire seo."
   },
-
   "card": {
     "aria_label": "Malartú: {{title}} - {{status}}",
     "with_party": "Le {{name}}",
@@ -46,12 +41,10 @@
     "waiting_for_other": "Ag fanacht leis an duine eile",
     "respond": "Freagair"
   },
-
   "breadcrumb": {
     "exchanges": "Malartuithe",
     "exchange": "Malartú"
   },
-
   "toast": {
     "load_more_failed": "Theip ar lódáil tuilleadh malartuithe",
     "accepted": "Malartú glactha!",
@@ -71,7 +64,6 @@
     "request_sent": "Iarratas malartaithe seolta!",
     "request_failed": "Theip ar chruthú an iarratais mhalartaithe"
   },
-
   "detail": {
     "page_title": "Sonraí Malartaithe",
     "loading": "Ag lódáil malartaithe...",
@@ -111,9 +103,11 @@
       "sent_to_broker": "Seolta chuig an mBróicéir",
       "disputed": "Malartú faoi Dhíospóid",
       "fallback": "Stádas Nuashonraithe"
-    }
+    },
+    "prep_time": "Preparation Time",
+    "ratings": "Ratings",
+    "rate_exchange": "Rate This Exchange"
   },
-
   "modal": {
     "decline_title": "Diúltaigh d'Iarratas Malartaithe",
     "decline_reason_label": "Cúis (roghnach)",
@@ -130,7 +124,6 @@
     "cancel_description": "An bhfuil tú cinnte gur mian leat an malartú seo a chealú? Ní féidir an gníomh seo a chur ar ais.",
     "keep_exchange": "Coinnigh an Malartú"
   },
-
   "request": {
     "page_title": "Iarr Malartú",
     "title": "Iarr Malartú",

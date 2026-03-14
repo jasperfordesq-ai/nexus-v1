@@ -9,10 +9,8 @@
   "unknown": "Desconocido",
   "hours_count": "{{count}} hora",
   "hours_count_other": "{{count}} horas",
-
   "workflow_not_enabled_title": "Flujo de Intercambio No Habilitado",
   "workflow_not_enabled_description": "El sistema de flujo de intercambio no está habilitado para esta comunidad. Contacta con tu coordinador para más información.",
-
   "tabs": {
     "aria_label": "Filtro de estado de intercambio",
     "active": "Activos",
@@ -24,18 +22,15 @@
     "all": "Todos",
     "all_aria": "Mostrar todos los intercambios"
   },
-
   "error": {
     "load_failed": "Error al cargar los intercambios. Por favor intenta de nuevo.",
     "unable_to_load": "No se Pudieron Cargar los Intercambios"
   },
-
   "empty": {
     "title": "No se Encontraron Intercambios",
     "active_description": "No tienes intercambios activos. Explora los anuncios para solicitar un servicio.",
     "filter_description": "Ningún intercambio coincide con este filtro."
   },
-
   "card": {
     "aria_label": "Intercambio: {{title}} - {{status}}",
     "with_party": "Con {{name}}",
@@ -46,12 +41,10 @@
     "waiting_for_other": "Esperando al otro",
     "respond": "Responder"
   },
-
   "breadcrumb": {
     "exchanges": "Intercambios",
     "exchange": "Intercambio"
   },
-
   "toast": {
     "load_more_failed": "Error al cargar más intercambios",
     "accepted": "¡Intercambio aceptado!",
@@ -71,7 +64,6 @@
     "request_sent": "¡Solicitud de intercambio enviada!",
     "request_failed": "Error al crear la solicitud de intercambio"
   },
-
   "detail": {
     "page_title": "Detalles del Intercambio",
     "loading": "Cargando intercambio...",
@@ -111,9 +103,11 @@
       "sent_to_broker": "Enviado al Coordinador",
       "disputed": "Intercambio Disputado",
       "fallback": "Estado Actualizado"
-    }
+    },
+    "prep_time": "Preparation Time",
+    "ratings": "Ratings",
+    "rate_exchange": "Rate This Exchange"
   },
-
   "modal": {
     "decline_title": "Rechazar Solicitud de Intercambio",
     "decline_reason_label": "Motivo (opcional)",
@@ -130,7 +124,6 @@
     "cancel_description": "¿Estás seguro de que quieres cancelar este intercambio? Esta acción no se puede deshacer.",
     "keep_exchange": "Mantener Intercambio"
   },
-
   "request": {
     "page_title": "Solicitar Intercambio",
     "title": "Solicitar Intercambio",

@@ -209,7 +209,8 @@
     "try_again": "Bain Triail Eile As",
     "no_posts": "Gan postálacha le fáil",
     "no_posts_desc": "Níor clibeáladh aon phostálacha le #{{tag}} fós.",
-    "load_more": "Lódáil Tuilleadh"
+    "load_more": "Lódáil Tuilleadh",
+    "page_description": "Posts tagged with #{{tag}}"
   },
   "hashtags": {
     "title": "Haischlibeanna Treochta",

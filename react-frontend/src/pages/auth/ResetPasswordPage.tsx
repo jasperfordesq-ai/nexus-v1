@@ -78,12 +78,16 @@ export function ResetPasswordPage() {
 
     try {
       setIsLoading(true);
-      await api.post('/auth/reset-password', {
+      const response = await api.post('/auth/reset-password', {
         token,
         password,
         password_confirmation: confirmPassword,
       });
-      setIsSuccess(true);
+      if (response.success) {
+        setIsSuccess(true);
+      } else {
+        setError(response.error || t('reset_password.link_expired_error'));
+      }
     } catch {
       setError(t('reset_password.link_expired_error'));
     } finally {

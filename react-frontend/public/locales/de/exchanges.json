@@ -9,10 +9,8 @@
   "unknown": "Unbekannt",
   "hours_count": "{{count}} Stunde",
   "hours_count_other": "{{count}} Stunden",
-
   "workflow_not_enabled_title": "Tausch-Workflow nicht aktiviert",
   "workflow_not_enabled_description": "Das Tausch-Workflow-System ist für diese Gemeinschaft nicht aktiviert. Kontaktieren Sie Ihren Koordinator für weitere Informationen.",
-
   "tabs": {
     "aria_label": "Tauschstatus-Filter",
     "active": "Aktiv",
@@ -24,18 +22,15 @@
     "all": "Alle",
     "all_aria": "Alle Tauschgeschäfte anzeigen"
   },
-
   "error": {
     "load_failed": "Tauschgeschäfte konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "unable_to_load": "Tauschgeschäfte können nicht geladen werden"
   },
-
   "empty": {
     "title": "Keine Tauschgeschäfte gefunden",
     "active_description": "Sie haben keine aktiven Tauschgeschäfte. Durchsuchen Sie Angebote, um eine Dienstleistung anzufragen.",
     "filter_description": "Keine Tauschgeschäfte entsprechen diesem Filter."
   },
-
   "card": {
     "aria_label": "Tausch: {{title}} - {{status}}",
     "with_party": "Mit {{name}}",
@@ -46,12 +41,10 @@
     "waiting_for_other": "Auf Gegenpartei warten",
     "respond": "Antworten"
   },
-
   "breadcrumb": {
     "exchanges": "Tauschgeschäfte",
     "exchange": "Tauschgeschäft"
   },
-
   "toast": {
     "load_more_failed": "Weitere Tauschgeschäfte konnten nicht geladen werden",
     "accepted": "Tauschgeschäft angenommen!",
@@ -71,7 +64,6 @@
     "request_sent": "Tauschanfrage gesendet!",
     "request_failed": "Tauschanfrage konnte nicht erstellt werden"
   },
-
   "detail": {
     "page_title": "Tauschdetails",
     "loading": "Tauschgeschäft wird geladen...",
@@ -111,9 +103,11 @@
       "sent_to_broker": "An Vermittler gesendet",
       "disputed": "Tauschgeschäft angefochten",
       "fallback": "Status aktualisiert"
-    }
+    },
+    "prep_time": "Preparation Time",
+    "ratings": "Ratings",
+    "rate_exchange": "Rate This Exchange"
   },
-
   "modal": {
     "decline_title": "Tauschanfrage ablehnen",
     "decline_reason_label": "Grund (optional)",
@@ -130,7 +124,6 @@
     "cancel_description": "Sind Sie sicher, dass Sie dieses Tauschgeschäft stornieren möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
     "keep_exchange": "Tausch beibehalten"
   },
-
   "request": {
     "page_title": "Tausch anfragen",
     "title": "Tausch anfragen",

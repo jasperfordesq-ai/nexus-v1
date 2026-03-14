@@ -537,7 +537,7 @@ export function OpportunityDetailPage() {
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <Breadcrumbs
         items={[
-          { label: 'Volunteering', href: tenantPath('/volunteering') },
+          { label: 'Volunteering', href: '/volunteering' },
           { label: opp.title },
         ]}
       />

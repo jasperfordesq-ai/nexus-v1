@@ -11,7 +11,7 @@
  * - List of closed/archived challenges with their outcomes
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -75,24 +75,25 @@ export function OutcomesDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await api.get<OutcomeDashboard>('/v2/ideation-outcomes/dashboard');
-        if (response.success && response.data) {
-          setDashboard(response.data);
-        }
-      } catch (err) {
-        logError('Failed to fetch outcomes dashboard', err);
-        setError(t('challenges.load_error'));
-      } finally {
-        setIsLoading(false);
+  const fetchDashboard = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await api.get<OutcomeDashboard>('/v2/ideation-outcomes/dashboard');
+      if (response.success && response.data) {
+        setDashboard(response.data);
       }
-    };
-    fetchDashboard();
+    } catch (err) {
+      logError('Failed to fetch outcomes dashboard', err);
+      setError(t('challenges.load_error'));
+    } finally {
+      setIsLoading(false);
+    }
   }, [t]);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null;
@@ -144,7 +145,7 @@ export function OutcomesDashboardPage() {
               color="primary"
               variant="flat"
               startContent={<RefreshCw className="w-4 h-4" />}
-              onPress={() => window.location.reload()}
+              onPress={fetchDashboard}
             >
               {t('actions.retry', { defaultValue: 'Retry' })}
             </Button>

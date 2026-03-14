@@ -134,7 +134,7 @@ export default function RegisterOrganisationPage() {
     >
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('organisations.heading'), href: tenantPath('/organisations') },
+        { label: t('organisations.heading'), href: '/organisations' },
         { label: t('organisations.register_page_title') },
       ]} />
 
