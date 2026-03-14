@@ -209,7 +209,8 @@
     "try_again": "Try Again",
     "no_posts": "No posts found",
     "no_posts_desc": "No posts have been tagged with #{{tag}} yet.",
-    "load_more": "Load More"
+    "load_more": "Load More",
+    "page_description": "Posts tagged with #{{tag}}"
   },
   "hashtags": {
     "title": "Trending Hashtags",

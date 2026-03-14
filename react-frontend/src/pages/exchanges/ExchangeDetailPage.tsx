@@ -516,7 +516,7 @@ export function ExchangeDetailPage() {
         {/* Prep Time */}
         {exchange.prep_time != null && exchange.prep_time > 0 && (
           <div className="bg-theme-elevated rounded-lg p-4 mb-6">
-            <h3 className="text-sm font-medium text-theme-muted mb-1">Preparation Time</h3>
+            <h3 className="text-sm font-medium text-theme-muted mb-1">{t('detail.prep_time')}</h3>
             <p className="text-lg font-semibold text-theme-primary">{exchange.prep_time}h</p>
           </div>
         )}
@@ -534,7 +534,7 @@ export function ExchangeDetailPage() {
           <div className="mb-6">
             <h3 className="text-sm font-medium text-theme-muted mb-3 flex items-center gap-2">
               <Star className="w-4 h-4 text-amber-400" />
-              Ratings
+              {t('detail.ratings')}
             </h3>
             <div className="space-y-3">
               {ratings.map((r) => (
@@ -567,7 +567,7 @@ export function ExchangeDetailPage() {
               startContent={<Star className="w-4 h-4" />}
               onPress={() => setShowRatingModal(true)}
             >
-              Rate This Exchange
+              {t('detail.rate_exchange')}
             </Button>
           </div>
         )}
@@ -579,7 +579,7 @@ export function ExchangeDetailPage() {
               <Button
                 color="success"
                 startContent={<Check className="w-4 h-4" aria-hidden="true" />}
-                onClick={handleAccept}
+                onPress={handleAccept}
                 isLoading={isSubmitting}
               >
                 {t('detail.accept_request')}
@@ -590,7 +590,7 @@ export function ExchangeDetailPage() {
                 color="danger"
                 variant="flat"
                 startContent={<X className="w-4 h-4" aria-hidden="true" />}
-                onClick={() => setShowDeclineModal(true)}
+                onPress={() => setShowDeclineModal(true)}
               >
                 {t('detail.decline')}
               </Button>
@@ -599,7 +599,7 @@ export function ExchangeDetailPage() {
               <Button
                 color="primary"
                 startContent={<Play className="w-4 h-4" aria-hidden="true" />}
-                onClick={handleStart}
+                onPress={handleStart}
                 isLoading={isSubmitting}
               >
                 {t('detail.start_exchange')}
@@ -609,7 +609,7 @@ export function ExchangeDetailPage() {
               <Button
                 color="success"
                 startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
-                onClick={handleComplete}
+                onPress={handleComplete}
                 isLoading={isSubmitting}
               >
                 {t('detail.mark_complete')}
@@ -619,7 +619,7 @@ export function ExchangeDetailPage() {
               <Button
                 color="warning"
                 startContent={<CheckCircle className="w-4 h-4" aria-hidden="true" />}
-                onClick={() => setShowConfirmModal(true)}
+                onPress={() => setShowConfirmModal(true)}
               >
                 {t('detail.confirm_hours')}
               </Button>
@@ -629,7 +629,7 @@ export function ExchangeDetailPage() {
                 color="danger"
                 variant="flat"
                 startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
-                onClick={() => setShowCancelModal(true)}
+                onPress={() => setShowCancelModal(true)}
               >
                 {t('detail.cancel_exchange')}
               </Button>
@@ -741,12 +741,12 @@ export function ExchangeDetailPage() {
           <ModalFooter>
             <Button
               variant="flat"
-              onClick={() => setShowDeclineModal(false)}
+              onPress={() => setShowDeclineModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
               {t('modal.cancel')}
             </Button>
-            <Button color="danger" onClick={handleDecline} isLoading={isSubmitting}>
+            <Button color="danger" onPress={handleDecline} isLoading={isSubmitting}>
               {t('modal.decline_confirm')}
             </Button>
           </ModalFooter>
@@ -792,12 +792,12 @@ export function ExchangeDetailPage() {
           <ModalFooter>
             <Button
               variant="flat"
-              onClick={() => setShowConfirmModal(false)}
+              onPress={() => setShowConfirmModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
               {t('modal.cancel')}
             </Button>
-            <Button color="success" onClick={handleConfirm} isLoading={isSubmitting}>
+            <Button color="success" onPress={handleConfirm} isLoading={isSubmitting}>
               {t('detail.confirm_hours')}
             </Button>
           </ModalFooter>
@@ -825,12 +825,12 @@ export function ExchangeDetailPage() {
           <ModalFooter>
             <Button
               variant="flat"
-              onClick={() => setShowCancelModal(false)}
+              onPress={() => setShowCancelModal(false)}
               className="bg-theme-elevated text-theme-primary"
             >
               {t('modal.keep_exchange')}
             </Button>
-            <Button color="danger" onClick={handleCancel} isLoading={isSubmitting}>
+            <Button color="danger" onPress={handleCancel} isLoading={isSubmitting}>
               {t('detail.cancel_exchange')}
             </Button>
           </ModalFooter>

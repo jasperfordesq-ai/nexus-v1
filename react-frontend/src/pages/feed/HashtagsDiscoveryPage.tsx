@@ -24,6 +24,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -112,6 +113,11 @@ export function HashtagsDiscoveryPage() {
   };
 
   return (
+    <>
+    <PageMeta
+      title={t("hashtags.title")}
+      description={t("hashtags.subtitle")}
+    />
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
@@ -217,6 +223,7 @@ export function HashtagsDiscoveryPage() {
         </>
       )}
     </div>
+    </>
   );
 }
 

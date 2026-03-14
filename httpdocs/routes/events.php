@@ -16,4 +16,7 @@ $router->add('POST', '/api/v2/events/{id}/rsvp', 'Nexus\Controllers\Api\EventsAp
 $router->add('DELETE', '/api/v2/events/{id}/rsvp', 'Nexus\Controllers\Api\EventsApiController@removeRsvp');
 $router->add('GET', '/api/v2/events/{id}/attendees', 'Nexus\Controllers\Api\EventsApiController@attendees');
 $router->add('POST', '/api/v2/events/{id}/attendees/{attendeeId}/check-in', 'Nexus\Controllers\Api\EventsApiController@checkIn');
+$router->add('POST', '/api/v2/events/{id}/cancel', 'Nexus\Controllers\Api\EventsApiController@cancel');
+$router->add('POST', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@waitlist');
+$router->add('DELETE', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@leaveWaitlist');
 $router->add('POST', '/api/v2/events/{id}/image', 'Nexus\Controllers\Api\EventsApiController@uploadImage');

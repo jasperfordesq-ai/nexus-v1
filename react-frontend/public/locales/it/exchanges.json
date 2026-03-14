@@ -9,10 +9,8 @@
   "unknown": "Sconosciuto",
   "hours_count": "{{count}} ora",
   "hours_count_other": "{{count}} ore",
-
   "workflow_not_enabled_title": "Flusso di scambio non attivato",
-  "workflow_not_enabled_description": "Il sistema di flusso di scambio non \u00e8 attivato per questa comunit\u00e0. Contatti il Suo coordinatore per maggiori informazioni.",
-
+  "workflow_not_enabled_description": "Il sistema di flusso di scambio non è attivato per questa comunità. Contatti il Suo coordinatore per maggiori informazioni.",
   "tabs": {
     "aria_label": "Filtro stato scambi",
     "active": "Attivi",
@@ -24,20 +22,17 @@
     "all": "Tutti",
     "all_aria": "Mostra tutti gli scambi"
   },
-
   "error": {
     "load_failed": "Impossibile caricare gli scambi. La preghiamo di riprovare.",
     "unable_to_load": "Impossibile caricare gli scambi"
   },
-
   "empty": {
     "title": "Nessuno scambio trovato",
     "active_description": "Non ha scambi attivi. Sfoglia gli annunci per richiedere un servizio.",
     "filter_description": "Nessuno scambio corrisponde a questo filtro."
   },
-
   "card": {
-    "aria_label": "Scambio: {{title}} \u2013 {{status}}",
+    "aria_label": "Scambio: {{title}} – {{status}}",
     "with_party": "Con {{name}}",
     "from_party": "Da {{name}}",
     "you_requested": "Lei ha richiesto",
@@ -46,12 +41,10 @@
     "waiting_for_other": "In attesa dell'altra parte",
     "respond": "Rispondi"
   },
-
   "breadcrumb": {
     "exchanges": "Scambi",
     "exchange": "Scambio"
   },
-
   "toast": {
     "load_more_failed": "Impossibile caricare altri scambi",
     "accepted": "Scambio accettato!",
@@ -71,10 +64,9 @@
     "request_sent": "Richiesta di scambio inviata!",
     "request_failed": "Impossibile creare la richiesta di scambio"
   },
-
   "detail": {
     "page_title": "Dettagli dello scambio",
-    "loading": "Caricamento dello scambio\u2026",
+    "loading": "Caricamento dello scambio…",
     "not_found": "Scambio non trovato",
     "not_found_title": "Scambio non trovato",
     "not_found_description": "Lo scambio che sta cercando non esiste",
@@ -111,13 +103,15 @@
       "sent_to_broker": "Inviato al coordinatore",
       "disputed": "Scambio contestato",
       "fallback": "Stato aggiornato"
-    }
+    },
+    "prep_time": "Preparation Time",
+    "ratings": "Ratings",
+    "rate_exchange": "Rate This Exchange"
   },
-
   "modal": {
     "decline_title": "Rifiuta richiesta di scambio",
     "decline_reason_label": "Motivazione (facoltativo)",
-    "decline_reason_placeholder": "Comunichi il motivo del Suo rifiuto\u2026",
+    "decline_reason_placeholder": "Comunichi il motivo del Suo rifiuto…",
     "decline_confirm": "Rifiuta richiesta",
     "cancel": "Annulla",
     "confirm_title": "Conferma ore lavorate",
@@ -127,22 +121,21 @@
     "hours_unit": "ore",
     "originally_proposed": "Inizialmente proposte: {{hours}} ore (max: {{max}})",
     "cancel_title": "Annullare lo scambio?",
-    "cancel_description": "\u00c8 sicuro di voler annullare questo scambio? Questa azione non pu\u00f2 essere annullata.",
+    "cancel_description": "È sicuro di voler annullare questo scambio? Questa azione non può essere annullata.",
     "keep_exchange": "Mantieni lo scambio"
   },
-
   "request": {
     "page_title": "Richiedi scambio",
     "title": "Richiedi scambio",
     "subtitle": "Invii una richiesta per scambiare crediti-tempo per questo servizio",
-    "loading": "Caricamento\u2026",
+    "loading": "Caricamento…",
     "listing_not_found": "Annuncio non trovato",
-    "workflow_not_enabled": "Il flusso di scambio non \u00e8 attivato",
+    "workflow_not_enabled": "Il flusso di scambio non è attivato",
     "load_failed": "Impossibile caricare l'annuncio",
     "cannot_request": "Impossibile richiedere uno scambio",
-    "not_available": "Questo annuncio non \u00e8 disponibile per le richieste di scambio.",
-    "own_listing_title": "Questo \u00e8 il Suo annuncio",
-    "own_listing_description": "Non \u00e8 possibile richiedere uno scambio per il proprio annuncio.",
+    "not_available": "Questo annuncio non è disponibile per le richieste di scambio.",
+    "own_listing_title": "Questo è il Suo annuncio",
+    "own_listing_description": "Non è possibile richiedere uno scambio per il proprio annuncio.",
     "view_listing": "Vedi annuncio",
     "breadcrumb_listings": "Annunci",
     "breadcrumb_listing": "Annuncio",
@@ -155,10 +148,10 @@
     "proposed_hours_description": "Il tempo stimato per questo servizio (max: {{max}})",
     "hours_unit": "ore",
     "message_label": "Messaggio (facoltativo)",
-    "message_placeholder": "Aggiunga un messaggio al fornitore del servizio\u2026",
+    "message_placeholder": "Aggiunga un messaggio al fornitore del servizio…",
     "message_description": "Spieghi le Sue esigenze o ponga le Sue domande",
     "broker_approval_title": "Approvazione del coordinatore necessaria",
-    "broker_approval_description": "Questo scambio dovr\u00e0 essere approvato da un coordinatore della comunit\u00e0 prima di poter procedere.",
+    "broker_approval_description": "Questo scambio dovrà essere approvato da un coordinatore della comunità prima di poter procedere.",
     "cancel": "Annulla",
     "send_request": "Invia richiesta"
   }

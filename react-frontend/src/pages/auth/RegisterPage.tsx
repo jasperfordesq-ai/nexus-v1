@@ -110,7 +110,7 @@ export function RegisterPage() {
     if (!value.trim()) return true; // Empty is fine (optional field)
     return /^\+[1-9]\d{1,14}$/.test(value.replace(/[\s\-()]/g, ''));
   };
-  const phoneError = phone.trim() && !isPhoneValid(phone) ? 'Enter a valid international number (e.g. +1 555 123 4567)' : '';
+  const phoneError = phone.trim() && !isPhoneValid(phone) ? t('register.phone_error', { defaultValue: 'Enter a valid international number (e.g. +1 555 123 4567)' }) : '';
 
   // Form state - Consents
   const [termsAccepted, setTermsAccepted] = useState(false);

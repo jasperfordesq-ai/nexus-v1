@@ -23,6 +23,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem, PollData } from '@/components/feed/types';
@@ -185,6 +186,11 @@ export function HashtagPage() {
   };
 
   return (
+    <>
+    <PageMeta
+      title={tag ? `#${tag}` : t("hashtag.title")}
+      description={t("hashtag.page_description", { tag: tag || "" })}
+    />
     <div className="max-w-2xl mx-auto space-y-5">
       {/* Header */}
       <div className="flex items-center gap-4">
@@ -278,6 +284,7 @@ export function HashtagPage() {
         </>
       )}
     </div>
+    </>
   );
 }
 

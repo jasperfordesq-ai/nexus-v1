@@ -174,7 +174,11 @@ export default function NexusScorePage() {
 
     try {
       const res = await api.get<NexusScoreData>('/v2/gamification/nexus-score');
-      setData(res.data ?? null);
+      if (res.success && res.data) {
+        setData(res.data);
+      } else {
+        setError(res.error ?? t('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
+      }
     } catch (err) {
       logError('NexusScorePage.load', err);
       setError(t('nexus_score.load_error', 'Could not load your NexusScore. Please try again.'));
@@ -229,7 +233,7 @@ export default function NexusScorePage() {
       <motion.div variants={itemVariants} className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-indigo-400" />
+            <Trophy className="w-6 h-6 text-indigo-400" aria-hidden="true" />
             {t('nexus_score.title', 'NexusScore')}
           </h1>
           <p className="text-sm text-theme-subtle mt-0.5">
@@ -242,7 +246,7 @@ export default function NexusScorePage() {
           color="default"
           isLoading={refreshing}
           onPress={() => load(true)}
-          startContent={!refreshing && <RefreshCw className="w-3.5 h-3.5" />}
+          startContent={!refreshing && <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
         >
           {t('common.refresh', 'Refresh')}
         </Button>
@@ -310,7 +314,7 @@ export default function NexusScorePage() {
       {/* ── Category breakdown ─────────────────────────────────────────────── */}
       <motion.div variants={itemVariants}>
         <h2 className="text-base font-semibold text-theme-primary mb-3 flex items-center gap-2">
-          <Info className="w-4 h-4 text-theme-subtle" />
+          <Info className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
           {t('nexus_score.breakdown_title', 'Score Breakdown')}
         </h2>
         <div className="space-y-3">
@@ -357,7 +361,7 @@ export default function NexusScorePage() {
         <motion.div variants={itemVariants}>
           <GlassCard className="p-5">
             <h2 className="text-base font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-indigo-400" />
+              <TrendingUp className="w-4 h-4 text-indigo-400" aria-hidden="true" />
               {t('nexus_score.insights_title', 'How to improve')}
             </h2>
             <ul className="space-y-2">
@@ -383,7 +387,7 @@ export default function NexusScorePage() {
           variant="flat"
           color="secondary"
           size="sm"
-          startContent={<Trophy className="w-4 h-4" />}
+          startContent={<Trophy className="w-4 h-4" aria-hidden="true" />}
         >
           {t('nexus_score.view_leaderboard', 'View Leaderboard')}
         </Button>

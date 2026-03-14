@@ -209,7 +209,8 @@
     "try_again": "Riprova",
     "no_posts": "Nessun post trovato",
     "no_posts_desc": "Nessun post è stato taggato con #{{tag}} ancora.",
-    "load_more": "Carica altro"
+    "load_more": "Carica altro",
+    "page_description": "Posts tagged with #{{tag}}"
   },
   "hashtags": {
     "title": "Hashtag di tendenza",

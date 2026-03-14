@@ -68,7 +68,7 @@ interface Connection {
 
 function ConnectionSkeleton() {
   return (
-    <Card className="bg-[var(--color-surface)] border border-[var(--border-default)]">
+    <Card className="bg-theme-elevated border border-theme-default">
       <CardBody className="p-4">
         <div className="flex items-start gap-3">
           <Skeleton className="w-12 h-12 rounded-full flex-shrink-0" />
@@ -101,11 +101,11 @@ interface EmptyStateProps {
 function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface-elevated)] flex items-center justify-center mb-4 text-[var(--color-text-muted)]">
+      <div className="w-14 h-14 rounded-2xl bg-theme-elevated flex items-center justify-center mb-4 text-theme-muted">
         {icon}
       </div>
-      <h3 className="font-semibold text-[var(--color-text)] mb-1">{title}</h3>
-      <p className="text-sm text-[var(--color-text-muted)] max-w-xs mb-4">{description}</p>
+      <h3 className="font-semibold text-theme-primary mb-1">{title}</h3>
+      <p className="text-sm text-theme-muted max-w-xs mb-4">{description}</p>
       {action}
     </div>
   );
@@ -137,7 +137,7 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className="bg-[var(--color-surface)] border border-[var(--border-default)] hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+      <Card className="bg-theme-elevated border border-theme-default hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
         <CardBody className="p-4">
           <div className="flex items-start gap-3">
             <Link to={tenantPathFn(`/profile/${user.id}`)}>
@@ -152,17 +152,17 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
             <div className="flex-1 min-w-0">
               <Link
                 to={tenantPathFn(`/profile/${user.id}`)}
-                className="font-semibold text-[var(--color-text)] hover:text-indigo-500 transition-colors truncate block"
+                className="font-semibold text-theme-primary hover:text-indigo-500 transition-colors truncate block"
               >
                 {user.name}
               </Link>
               {user.location && (
-                <p className="text-xs text-[var(--color-text-muted)] mt-0.5 truncate">{user.location}</p>
+                <p className="text-xs text-theme-muted mt-0.5 truncate">{user.location}</p>
               )}
               {user.bio && (
-                <p className="text-sm text-[var(--color-text-muted)] mt-1 line-clamp-2">{user.bio}</p>
+                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{user.bio}</p>
               )}
-              <p className="text-xs text-[var(--color-text-muted)] mt-1.5">
+              <p className="text-xs text-theme-muted mt-1.5">
                 {t('connected_since', { date: joinedDate })}
               </p>
             </div>
@@ -220,7 +220,7 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className="bg-[var(--color-surface)] border border-[var(--border-default)]">
+      <Card className="bg-theme-elevated border border-theme-default">
         <CardBody className="p-4">
           <div className="flex items-start gap-3">
             <Link to={tenantPathFn(`/profile/${user.id}`)}>
@@ -235,15 +235,15 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
             <div className="flex-1 min-w-0">
               <Link
                 to={tenantPathFn(`/profile/${user.id}`)}
-                className="font-semibold text-[var(--color-text)] hover:text-indigo-500 transition-colors truncate block"
+                className="font-semibold text-theme-primary hover:text-indigo-500 transition-colors truncate block"
               >
                 {user.name}
               </Link>
               {user.location && (
-                <p className="text-xs text-[var(--color-text-muted)] mt-0.5 truncate">{user.location}</p>
+                <p className="text-xs text-theme-muted mt-0.5 truncate">{user.location}</p>
               )}
               {user.bio && (
-                <p className="text-sm text-[var(--color-text-muted)] mt-1 line-clamp-2">{user.bio}</p>
+                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{user.bio}</p>
               )}
               <div className="flex items-center gap-1 mt-1.5">
                 <Clock className="w-3 h-3 text-amber-500" aria-hidden="true" />
@@ -305,7 +305,7 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className="bg-[var(--color-surface)] border border-[var(--border-default)]">
+      <Card className="bg-theme-elevated border border-theme-default">
         <CardBody className="p-4">
           <div className="flex items-start gap-3">
             <Link to={tenantPathFn(`/profile/${user.id}`)}>
@@ -320,15 +320,15 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
             <div className="flex-1 min-w-0">
               <Link
                 to={tenantPathFn(`/profile/${user.id}`)}
-                className="font-semibold text-[var(--color-text)] hover:text-indigo-500 transition-colors truncate block"
+                className="font-semibold text-theme-primary hover:text-indigo-500 transition-colors truncate block"
               >
                 {user.name}
               </Link>
               {user.location && (
-                <p className="text-xs text-[var(--color-text-muted)] mt-0.5 truncate">{user.location}</p>
+                <p className="text-xs text-theme-muted mt-0.5 truncate">{user.location}</p>
               )}
               {user.bio && (
-                <p className="text-sm text-[var(--color-text-muted)] mt-1 line-clamp-2">{user.bio}</p>
+                <p className="text-sm text-theme-muted mt-1 line-clamp-2">{user.bio}</p>
               )}
               <div className="flex items-center gap-1 mt-1.5">
                 <Send className="w-3 h-3 text-indigo-500" aria-hidden="true" />
@@ -545,7 +545,7 @@ export default function ConnectionsPage() {
   const pendingSentCount = pendingSent.length;
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] py-6 px-4">
+    <div className="min-h-screen py-6 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Page header */}
         <div className="mb-6">
@@ -553,14 +553,14 @@ export default function ConnectionsPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
               <Users2 className="w-5 h-5 text-white" aria-hidden="true" />
             </div>
-            <h1 className="text-2xl font-bold text-[var(--color-text)]">{t('title')}</h1>
+            <h1 className="text-2xl font-bold text-theme-primary">{t('title')}</h1>
             {pendingReceivedCount > 0 && (
               <Chip size="sm" color="warning" variant="solid" className="font-semibold">
                 {t('pending_count', { count: pendingReceivedCount })}
               </Chip>
             )}
           </div>
-          <p className="text-[var(--color-text-muted)] ml-13 text-sm">
+          <p className="text-theme-muted ml-13 text-sm">
             {t('subtitle')}
           </p>
         </div>
@@ -571,11 +571,11 @@ export default function ConnectionsPage() {
             placeholder={t('search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-[var(--color-text-muted)]" aria-hidden="true" />}
+            startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
             aria-label={t('search_placeholder')}
             variant="bordered"
             classNames={{
-              inputWrapper: 'bg-[var(--color-surface)] border-[var(--border-default)] hover:border-indigo-400',
+              inputWrapper: 'bg-theme-elevated border-theme-default hover:border-indigo-400',
             }}
             isClearable
             onClear={() => setSearchQuery('')}
@@ -588,10 +588,10 @@ export default function ConnectionsPage() {
           onSelectionChange={(key) => setActiveTab(key as TabKey)}
           variant="underlined"
           classNames={{
-            tabList: 'gap-4 border-b border-[var(--border-default)]',
+            tabList: 'gap-4 border-b border-theme-default',
             cursor: 'bg-indigo-500',
             tab: 'text-sm font-medium',
-            tabContent: 'text-[var(--color-text-muted)] group-data-[selected=true]:text-indigo-500',
+            tabContent: 'text-theme-muted group-data-[selected=true]:text-indigo-500',
           }}
           aria-label={t('title')}
         >
@@ -602,7 +602,7 @@ export default function ConnectionsPage() {
                 <UserCheck className="w-4 h-4" aria-hidden="true" />
                 <span>{t('tab_my_connections')}</span>
                 {!loading.accepted && (
-                  <span className="text-xs bg-[var(--color-surface-elevated)] rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                  <span className="text-xs bg-theme-elevated rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
                     {accepted.length}
                   </span>
                 )}
@@ -732,7 +732,7 @@ export default function ConnectionsPage() {
                 <Send className="w-4 h-4" aria-hidden="true" />
                 <span>{t('tab_sent')}</span>
                 {pendingSentCount > 0 && (
-                  <span className="text-xs bg-[var(--color-surface-elevated)] rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                  <span className="text-xs bg-theme-elevated rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
                     {pendingSentCount}
                   </span>
                 )}

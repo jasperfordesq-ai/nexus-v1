@@ -7,7 +7,7 @@
  * Listings Page - Browse all listings
  */
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -59,21 +59,26 @@ export function ListingsPage() {
   const [selectedType, setSelectedType] = useState<ListingType>((searchParams.get('type') as ListingType) || 'all');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
+
+  // Use a ref for cursor to avoid infinite re-render loop (same pattern as FeedPage)
+  const cursorRef = useRef<string | null>(null);
   // Track in-flight save requests to prevent double-clicks
   const [savingIds, setSavingIds] = useState<Set<number>>(new Set());
 
   const loadListings = useCallback(async (reset = false) => {
     try {
       setIsLoading(true);
-      if (reset) setLoadError(null);
+      if (reset) {
+        setLoadError(null);
+        cursorRef.current = null;
+      }
       const params = new URLSearchParams();
 
       if (searchQuery) params.set('q', searchQuery);
       if (selectedType !== 'all') params.set('type', selectedType);
       if (selectedCategory) params.set('category', selectedCategory);
-      if (!reset && cursor) params.set('cursor', cursor);
+      if (!reset && cursorRef.current) params.set('cursor', cursorRef.current);
       params.set('per_page', '20');
 
       const response = await api.get<Listing[]>(`/v2/listings?${params}`);
@@ -86,8 +91,7 @@ export function ListingsPage() {
         }
 
         // Handle pagination meta if present
-        const nextCursor = response.meta?.cursor ?? null;
-        setCursor(nextCursor);
+        cursorRef.current = response.meta?.cursor ?? null;
         setHasMore(response.meta?.has_more ?? false);
       } else {
         if (reset) {
@@ -105,7 +109,7 @@ export function ListingsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedType, selectedCategory, cursor]);
+  }, [searchQuery, selectedType, selectedCategory]);
 
   const loadCategories = useCallback(async () => {
     try {

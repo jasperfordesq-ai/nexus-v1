@@ -368,11 +368,11 @@ export function SettingsPage() {
       if (response.success && response.data) {
         setSessions(Array.isArray(response.data) ? response.data : []);
       } else {
-        setSessionsError('Session management coming soon');
+        setSessionsError(t('security.sessions_coming_soon', { defaultValue: 'Session management coming soon' }));
       }
     } catch (error) {
       logError('Failed to load sessions', error);
-      setSessionsError('Session management coming soon');
+      setSessionsError(t('security.sessions_coming_soon', { defaultValue: 'Session management coming soon' }));
     } finally {
       setSessionsLoading(false);
     }

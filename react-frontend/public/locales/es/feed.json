@@ -209,7 +209,8 @@
     "try_again": "Intentar de Nuevo",
     "no_posts": "No se encontraron publicaciones",
     "no_posts_desc": "Aún no hay publicaciones etiquetadas con #{{tag}}.",
-    "load_more": "Cargar Más"
+    "load_more": "Cargar Más",
+    "page_description": "Posts tagged with #{{tag}}"
   },
   "hashtags": {
     "title": "Hashtags Tendencia",

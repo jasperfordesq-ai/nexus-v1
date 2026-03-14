@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, AlgorithmLabel } from '@/components/ui';
+import { PageMeta } from '@/components/seo';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
 import { TrendingHashtags } from '@/components/hashtags/TrendingHashtags';
@@ -352,6 +353,11 @@ export function FeedPage() {
   };
 
   return (
+    <>
+    <PageMeta
+      title={t("title")}
+      description={t("subtitle")}
+    />
     <div className="max-w-5xl mx-auto flex gap-6">
       {/* Main Feed Column */}
       <div className="flex-1 min-w-0 max-w-2xl space-y-5">
@@ -630,6 +636,7 @@ export function FeedPage() {
         <TopEndorsedWidget limit={5} />
       </aside>
     </div>
+    </>
   );
 }
 
