@@ -33,7 +33,7 @@ export function QuickActionsWidget() {
     {
       label: t('sidebar.actions.create_poll', 'Create Poll'),
       icon: BarChart3,
-      path: '/polls/create',
+      path: '/polls',
       color: 'text-indigo-500',
       bg: 'bg-indigo-500/10 hover:bg-indigo-500/20',
       feature: 'polls' as const,
@@ -41,7 +41,7 @@ export function QuickActionsWidget() {
     {
       label: t('sidebar.actions.set_goal', 'Set Goal'),
       icon: Target,
-      path: '/goals/create',
+      path: '/goals',
       color: 'text-amber-500',
       bg: 'bg-amber-500/10 hover:bg-amber-500/20',
       feature: 'goals' as const,
