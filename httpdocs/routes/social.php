@@ -29,6 +29,13 @@ $router->add('POST', '/api/v2/feed/posts/{id}/delete', 'Nexus\Controllers\Api\So
 $router->add('POST', '/api/v2/feed/users/{id}/mute', 'Nexus\Controllers\Api\SocialApiController@muteUserV2');
 
 // ============================================
+// API V2 - FEED SIDEBAR & COMMUNITY STATS
+// ============================================
+$router->add('GET', '/api/v2/community/stats', 'Nexus\Controllers\Api\FeedSidebarApiController@communityStats');
+$router->add('GET', '/api/v2/members/suggested', 'Nexus\Controllers\Api\FeedSidebarApiController@suggestedMembers');
+$router->add('GET', '/api/v2/feed/sidebar', 'Nexus\Controllers\Api\FeedSidebarApiController@sidebar');
+
+// ============================================
 // API V2 - FEED SHARING & HASHTAGS (F2, F4)
 // ============================================
 $router->add('POST', '/api/v2/feed/posts/{id}/share', 'Nexus\Controllers\Api\FeedSocialApiController@sharePost');

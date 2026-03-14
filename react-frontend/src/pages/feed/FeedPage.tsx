@@ -46,8 +46,11 @@ import { GlassCard, AlgorithmLabel } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
-import { TrendingHashtags } from '@/components/hashtags/TrendingHashtags';
-import { TopEndorsedWidget } from '@/components/endorsements/TopEndorsedWidget';
+import { FeedSidebar } from '@/components/feed/sidebar';
+import { StoriesBar } from '@/components/feed/StoriesBar';
+import { FeedModeToggle } from '@/components/feed/FeedModeToggle';
+import { SubFilterChips } from '@/components/feed/SubFilterChips';
+import { MobileFAB } from '@/components/feed/MobileFAB';
 import { useAuth, useToast, usePusherOptional, useTenant } from '@/contexts';
 import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
@@ -57,6 +60,7 @@ import { usePageTitle } from '@/hooks';
 import { FeedCard } from '@/components/feed/FeedCard';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
+import type { Friend } from '@/components/feed/sidebar/FriendsWidget';
 
 /* ───────────────────────── Feed Card Skeleton ───────────────────────── */
 
@@ -101,6 +105,13 @@ export function FeedPage() {
   // Count of real-time posts received while the user hasn't scrolled to top
   const [pendingPostCount, setPendingPostCount] = useState(0);
 
+  // Feed mode: EdgeRank vs chronological
+  const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>('ranking');
+  // Sub-filter (e.g. listings -> offers/requests)
+  const [subFilter, setSubFilter] = useState<string | null>(null);
+  // Stories friends
+  const [storiesFriends, setStoriesFriends] = useState<Friend[]>([]);
+
   // Compose Hub
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
   const [composeDefaultTab, setComposeDefaultTab] = useState<ComposeTab>('listing');
@@ -114,6 +125,22 @@ export function FeedPage() {
   // Use a ref for cursor to avoid infinite re-render loop
   const cursorRef = useRef<string | undefined>();
 
+  // Load friends for StoriesBar
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const loadFriends = async () => {
+      try {
+        const response = await api.get<{ friends?: Friend[] }>('/v2/feed/sidebar');
+        if (response.success && response.data?.friends) {
+          setStoriesFriends(response.data.friends);
+        }
+      } catch (err) {
+        logError('Failed to load stories friends', err);
+      }
+    };
+    loadFriends();
+  }, [isAuthenticated]);
+
   const loadFeed = useCallback(async (append = false) => {
     try {
       if (append) {
@@ -125,7 +152,9 @@ export function FeedPage() {
 
       const params = new URLSearchParams();
       params.set('per_page', '20');
+      params.set('sort', feedMode);
       if (filter !== 'all') params.set('type', filter);
+      if (subFilter) params.set('subtype', subFilter);
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
       const response = await api.get<FeedItem[]>(
@@ -152,13 +181,18 @@ export function FeedPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [filter]);
+  }, [filter, feedMode, subFilter]);
 
   useEffect(() => {
     cursorRef.current = undefined;
     setPendingPostCount(0);
     loadFeed();
-  }, [filter, loadFeed]);
+  }, [filter, feedMode, subFilter, loadFeed]);
+
+  // Reset sub-filter when main filter changes
+  useEffect(() => {
+    setSubFilter(null);
+  }, [filter]);
 
   /* ───────── Real-time feed subscription ───────── */
 
@@ -378,7 +412,7 @@ export function FeedPage() {
 
         {isAuthenticated && (
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
+            className="hidden sm:flex bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={onCreateOpen}
           >
@@ -386,6 +420,26 @@ export function FeedPage() {
           </Button>
         )}
       </div>
+
+      {/* Feed Mode Toggle (For You / Recent) */}
+      <div className="flex items-center justify-between">
+        <FeedModeToggle mode={feedMode} onModeChange={setFeedMode} />
+        {isAuthenticated && (
+          <Button
+            size="sm"
+            className="sm:hidden bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md"
+            startContent={<Plus className="w-3.5 h-3.5" aria-hidden="true" />}
+            onPress={onCreateOpen}
+          >
+            {t('new_post')}
+          </Button>
+        )}
+      </div>
+
+      {/* Stories Bar */}
+      {isAuthenticated && storiesFriends.length > 0 && (
+        <StoriesBar friends={storiesFriends} />
+      )}
 
       {/* Quick Post Box */}
       {isAuthenticated && (
@@ -446,6 +500,9 @@ export function FeedPage() {
           </Button>
         ))}
       </div>
+
+      {/* Sub-Filter Chips (contextual, e.g. Listings -> Offers/Requests) */}
+      <SubFilterChips filter={filter} subFilter={subFilter} onSubFilterChange={setSubFilter} />
 
       {/* New posts banner — appears when real-time posts arrive off-screen */}
       <AnimatePresence>
@@ -630,12 +687,14 @@ export function FeedPage() {
       </Modal>
       </div>
 
-      {/* Right Sidebar - Trending & Top Endorsed (hidden on mobile) */}
-      <aside className="hidden lg:block w-72 flex-shrink-0 space-y-4 sticky top-24 self-start">
-        <TrendingHashtags limit={8} />
-        <TopEndorsedWidget limit={5} />
+      {/* Right Sidebar — Full widget panel (hidden on mobile) */}
+      <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-24 self-start">
+        <FeedSidebar />
       </aside>
     </div>
+
+    {/* Mobile FAB */}
+    {isAuthenticated && <MobileFAB onPress={onCreateOpen} />}
     </>
   );
 }
