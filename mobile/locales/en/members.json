@@ -12,7 +12,12 @@
   "profile": {
     "timeCredits": "{{count}} time credit",
     "timeCredits_other": "{{count}} time credits",
+    "hoursGiven": "Hours Given",
+    "hoursReceived": "Hours Received",
     "memberSince": "Member since {{date}}",
+    "sendMessage": "Send Message",
+    "verified": "Verified",
+    "loadError": "Could not load member profile. Please try again.",
     "connect": "Connect",
     "message": "Message",
     "skills": "Skills",

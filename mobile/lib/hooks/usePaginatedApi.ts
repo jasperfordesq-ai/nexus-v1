@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type DependencyList } from 'react';
 import { ApiResponseError } from '@/lib/api/client';
 
 export interface PaginatedApiState<TItem> {
@@ -49,6 +49,9 @@ export interface PaginatedApiState<TItem> {
  *                  and returns a Promise of the raw API response.
  * @param extractor Function that maps the raw API response to a normalised shape
  *                  containing `items`, the next `cursor`, and `hasMore`.
+ * @param deps      Optional dependency list. When any dep changes, the hook
+ *                  resets to page 1 and re-fetches. Useful when the fetchFn
+ *                  closes over reactive values (e.g. a search query).
  */
 export function usePaginatedApi<TItem, TResponse>(
   fetchFn: (cursor: string | null) => Promise<TResponse>,
@@ -57,6 +60,7 @@ export function usePaginatedApi<TItem, TResponse>(
     cursor: string | null;
     hasMore: boolean;
   },
+  deps?: DependencyList,
 ): PaginatedApiState<TItem> {
   const [items, setItems] = useState<TItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,13 +139,12 @@ export function usePaginatedApi<TItem, TResponse>(
     [fetchFn, extractor],
   );
 
-  // Initial load on mount.
+  // Initial load on mount, and reset + re-fetch when deps change.
   useEffect(() => {
     cursorRef.current = null;
     void fetchPage(null, true);
-    // fetchPage is stable; this only runs once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, deps ?? []);
 
   /** Append the next page to the list. No-op if already fetching or no more pages. */
   const loadMore = useCallback(() => {

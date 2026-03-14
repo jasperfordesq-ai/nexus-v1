@@ -166,6 +166,7 @@ $router->add('GET', '/api/v2/users', function () {
     echo json_encode(['error' => 'Internal server error']);
   }
 });
+$router->add('GET', '/api/v2/me/stats', 'Nexus\Controllers\Api\UsersApiController@stats');
 $router->add('GET', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@me');
 $router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@update');
 $router->add('GET', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@getPreferences');

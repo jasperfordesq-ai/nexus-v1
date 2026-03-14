@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -15,17 +15,19 @@ import {
   View,
 } from 'react-native';
 import { router } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 
 import { updatePassword } from '@/lib/api/profile';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import OfflineBanner from '@/components/OfflineBanner';
 
 export default function ChangePasswordScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -57,10 +59,12 @@ export default function ChangePasswordScreen() {
         new_password: newPassword,
         new_password_confirmation: confirmPassword,
       });
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Password changed', 'Your password has been updated successfully.', [
         { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (err: unknown) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       const message =
         err instanceof Error ? err.message : 'Could not change password. Please try again.';
       Alert.alert('Error', message);
@@ -80,6 +84,7 @@ export default function ChangePasswordScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
+          <OfflineBanner />
           <Text style={styles.hint}>
             Enter your current password, then choose a new one.
           </Text>

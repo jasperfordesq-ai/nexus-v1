@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,8 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { getEvent, rsvpEvent, removeRsvp, type Event } from '@/lib/api/events';
 import { useApi } from '@/lib/hooks/useApi';
@@ -27,18 +27,33 @@ import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function EventDetailScreen() {
+  const { t } = useTranslation('events');
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  const { data, isLoading } = useApi(() => getEvent(Number(id)));
+  const eventId = Number(id);
+  const safeEventId = isNaN(eventId) || eventId <= 0 ? 0 : eventId;
+
+  const { data, isLoading } = useApi(() => getEvent(safeEventId), [safeEventId]);
 
   const event = data?.data ?? null;
 
   const [rsvp, setRsvp] = useState<'going' | 'interested' | 'not_going' | null>(null);
   const [rsvpCounts, setRsvpCounts] = useState<{ going: number; interested: number } | null>(null);
   const [updating, setUpdating] = useState(false);
+
+  if (isNaN(eventId) || eventId <= 0) {
+    return (
+      <SafeAreaView style={styles.center}>
+        <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
+        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
+          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   // Use server data as initial RSVP state once loaded
   const currentRsvp = rsvp ?? event?.user_rsvp ?? null;
@@ -56,7 +71,7 @@ export default function EventDetailScreen() {
         setRsvp(null);
         setRsvpCounts({ ...counts, [status]: Math.max(0, counts[status] - 1) });
       } catch {
-        Alert.alert('Error', 'Could not update RSVP.');
+        Alert.alert('Error', t('rsvpError'));
       } finally {
         setUpdating(false);
       }
@@ -68,7 +83,7 @@ export default function EventDetailScreen() {
       setRsvp(result.data.rsvp);
       setRsvpCounts(result.data.rsvp_counts);
     } catch {
-      Alert.alert('Error', 'Could not update RSVP.');
+      Alert.alert('Error', t('rsvpError'));
     } finally {
       setUpdating(false);
     }
@@ -85,9 +100,9 @@ export default function EventDetailScreen() {
   if (!event) {
     return (
       <SafeAreaView style={styles.center}>
-        <Text style={styles.errorText}>Event not found.</Text>
+        <Text style={styles.errorText}>{t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>Go back</Text>
+          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -119,7 +134,7 @@ export default function EventDetailScreen() {
           {event.is_online ? (
             <MetaRow
               icon="videocam-outline"
-              text={event.online_url ? 'Online — tap to join' : 'Online event'}
+              text={event.online_url ? t('onlineTapToJoin') : t('onlineEvent')}
               onPress={event.online_url ? () => void Linking.openURL(event.online_url!) : undefined}
               tint={event.online_url ? primary : undefined}
               theme={theme}
@@ -133,11 +148,11 @@ export default function EventDetailScreen() {
         <View style={styles.attendeesRow}>
           <Ionicons name="people-outline" size={16} color={theme.textSecondary} />
           <Text style={styles.attendeesText}>
-            {counts.going} going · {counts.interested} interested
+            {t('attendees', { going: counts.going, interested: counts.interested })}
           </Text>
           {event.is_full && (
             <View style={styles.fullBadge}>
-              <Text style={styles.fullBadgeText}>Full</Text>
+              <Text style={styles.fullBadgeText}>{t('full')}</Text>
             </View>
           )}
         </View>
@@ -145,7 +160,7 @@ export default function EventDetailScreen() {
         {/* RSVP buttons */}
         <View style={styles.rsvpRow}>
           <RsvpButton
-            label="Going"
+            label={t('going')}
             icon="checkmark-circle"
             selected={currentRsvp === 'going'}
             primary={primary}
@@ -154,7 +169,7 @@ export default function EventDetailScreen() {
             onPress={() => void handleRsvp('going')}
           />
           <RsvpButton
-            label="Interested"
+            label={t('interested')}
             icon="star"
             selected={currentRsvp === 'interested'}
             primary={primary}
@@ -167,14 +182,14 @@ export default function EventDetailScreen() {
         {/* Description */}
         {event.description ? (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About</Text>
+            <Text style={styles.sectionTitle}>{t('detail.about')}</Text>
             <Text style={styles.description}>{event.description}</Text>
           </View>
         ) : null}
 
         {/* Organizer */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Organizer</Text>
+          <Text style={styles.sectionTitle}>{t('detail.organizer')}</Text>
           <View style={styles.organizerRow}>
             <Avatar uri={event.organizer.avatar} name={event.organizer.name} size={36} />
             <Text style={styles.organizerName}>{event.organizer.name}</Text>

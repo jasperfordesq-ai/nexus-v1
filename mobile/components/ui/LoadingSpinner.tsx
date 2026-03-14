@@ -5,6 +5,7 @@
 
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';
@@ -13,9 +14,10 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({ size = 'large', fullScreen = false }: LoadingSpinnerProps) {
   const primary = usePrimaryColor();
+  const theme = useTheme();
 
   return (
-    <View style={[styles.container, fullScreen && styles.fullScreen]}>
+    <View style={[styles.container, fullScreen && [styles.fullScreen, { backgroundColor: theme.bg + 'CC' }]]}>
       <ActivityIndicator size={size} color={primary} />
     </View>
   );
@@ -31,7 +33,6 @@ const styles = StyleSheet.create({
   fullScreen: {
     position: 'absolute',
     inset: 0,
-    backgroundColor: 'rgba(255,255,255,0.8)',
     zIndex: 10,
   },
 });

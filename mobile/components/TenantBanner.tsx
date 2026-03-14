@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useMemo } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -16,7 +17,7 @@ export default function TenantBanner() {
   const { tenant } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   if (!tenant) return null;
 

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -17,6 +17,7 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+import { useTranslation } from 'react-i18next';
 import { getFeed, type FeedItem as FeedItemType, type FeedResponse } from '@/lib/api/feed';
 import { getNotificationCounts } from '@/lib/api/notifications';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
@@ -38,10 +39,11 @@ function extractFeedPage(response: FeedResponse) {
 }
 
 export default function HomeScreen() {
+  const { t } = useTranslation('home');
   const { displayName } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const fetchFeed = useCallback(
     (cursor: string | null) => getFeed(1, cursor),
@@ -72,15 +74,15 @@ export default function HomeScreen() {
           <View style={styles.headerRow}>
             <View>
               <Text style={styles.greetingText}>
-                Hello, {displayName.split(' ')[0] || 'there'} 👋
+                {t('feed.greeting', { name: displayName.split(' ')[0] || 'there' })} 👋
               </Text>
-              <Text style={styles.subText}>{"Here's what's happening in your timebank"}</Text>
+              <Text style={styles.subText}>{t('feed.subtitle')}</Text>
             </View>
             <TouchableOpacity
               onPress={() => router.push('/(modals)/notifications')}
               style={styles.bellButton}
               activeOpacity={0.7}
-              accessibilityLabel="Notifications"
+              accessibilityLabel={t('notifications.title')}
               accessibilityRole="button"
             >
               <Ionicons name="notifications-outline" size={24} color={theme.text} />
@@ -104,10 +106,13 @@ export default function HomeScreen() {
           ) : error ? (
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
+                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>No activity yet. Say hello to your community!</Text>
+              <Text style={styles.emptyText}>{t('feed.emptyTitle')}</Text>
             </View>
           )
         }
@@ -152,7 +157,8 @@ function makeStyles(theme: Theme) {
     },
     bellBadgeText: { color: '#fff', fontSize: 9, fontWeight: '700' },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
+    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center' },
     footer: { paddingVertical: 16, alignItems: 'center' },
   });

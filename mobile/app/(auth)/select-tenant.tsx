@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -17,7 +18,7 @@ import { router } from 'expo-router';
 
 import { listTenants, type TenantListItem } from '@/lib/api/tenant';
 import { useApi } from '@/lib/hooks/useApi';
-import { useTenant } from '@/lib/hooks/useTenant';
+import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 
 /**
@@ -29,9 +30,11 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
  */
 export default function SelectTenantScreen() {
   const { setTenantSlug, tenantSlug } = useTenant();
+  const primary = usePrimaryColor();
   const { data, isLoading, error } = useApi(() => listTenants());
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme, primary), [theme, primary]);
+  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
 
   const tenants = data?.data ?? [];
 
@@ -49,7 +52,7 @@ export default function SelectTenantScreen() {
 
       {isLoading && (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#006FEE" />
+          <ActivityIndicator size="large" color={primary} />
         </View>
       )}
 
@@ -84,14 +87,14 @@ export default function SelectTenantScreen() {
             )}
           </TouchableOpacity>
         )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={Separator}
         contentContainerStyle={styles.list}
       />
     </SafeAreaView>
   );
 }
 
-function makeStyles(theme: Theme) {
+function makeStyles(theme: Theme, primary: string) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.surface },
     header: { padding: 24, paddingBottom: 8 },
@@ -106,19 +109,19 @@ function makeStyles(theme: Theme) {
       paddingVertical: 14,
       gap: 12,
     },
-    tenantRowActive: { backgroundColor: '#EFF6FF', borderRadius: 10, paddingHorizontal: 8 },
+    tenantRowActive: { backgroundColor: theme.infoBg, borderRadius: 10, paddingHorizontal: 8 },
     logo: { width: 40, height: 40, borderRadius: 8 },
     logoPlaceholder: {
       width: 40,
       height: 40,
       borderRadius: 8,
-      backgroundColor: '#006FEE',
+      backgroundColor: primary,
       justifyContent: 'center',
       alignItems: 'center',
     },
     logoInitial: { color: '#fff', fontWeight: '700', fontSize: 18 },
     tenantName: { flex: 1, fontSize: 16, fontWeight: '500', color: theme.text },
-    checkmark: { color: '#006FEE', fontSize: 18, fontWeight: '700' },
+    checkmark: { color: primary, fontSize: 18, fontWeight: '700' },
     separator: { height: 1, backgroundColor: theme.borderSubtle },
   });
 }

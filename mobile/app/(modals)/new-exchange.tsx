@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,12 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   StyleSheet,
 } from 'react-native';
 import { router } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { createExchange, type ExchangeType } from '@/lib/api/exchanges';
 import { ApiResponseError } from '@/lib/api/client';
@@ -24,6 +27,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { useApi } from '@/lib/hooks/useApi';
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
+import OfflineBanner from '@/components/OfflineBanner';
 
 interface Category {
   id: number;
@@ -35,9 +39,10 @@ function getCategories(): Promise<{ data: Category[] }> {
 }
 
 export default function NewExchangeModal() {
+  const { t } = useTranslation('exchanges');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { data: catData } = useApi(() => getCategories());
   const categories = catData?.data ?? [];
 
@@ -50,9 +55,9 @@ export default function NewExchangeModal() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit() {
-    if (!title.trim()) { setError('Please enter a title.'); return; }
+    if (!title.trim()) { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); setError(t('validation.titleRequired')); return; }
     const credits = parseFloat(timeCredits);
-    if (isNaN(credits) || credits <= 0) { setError('Please enter a valid number of time credits.'); return; }
+    if (isNaN(credits) || credits <= 0) { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); setError(t('validation.invalidCredits')); return; }
 
     setIsLoading(true);
     setError(null);
@@ -64,34 +69,40 @@ export default function NewExchangeModal() {
         hours_estimate: credits,
         category_id: categoryId ?? (categories[0]?.id ?? 1),
       });
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (err) {
-      setError(err instanceof ApiResponseError ? err.message : 'Failed to create exchange.');
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError(err instanceof ApiResponseError ? err.message : t('createError'));
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
+    <SafeAreaView style={styles.flex}>
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <OfflineBanner />
         {/* Type toggle */}
-        <Text style={styles.label}>Type</Text>
+        <Text style={styles.label}>{t('type')}</Text>
         <View style={styles.toggle}>
-          {(['offer', 'request'] as ExchangeType[]).map((t) => (
+          {(['offer', 'request'] as ExchangeType[]).map((tp) => (
             <TouchableOpacity
-              key={t}
+              key={tp}
               style={[
                 styles.toggleOption,
-                type === t && { backgroundColor: primary, borderColor: primary },
+                type === tp && { backgroundColor: primary, borderColor: primary },
               ]}
-              onPress={() => setType(t)}
+              onPress={() => setType(tp)}
+              accessibilityLabel={t(tp) + ' type'}
+              accessibilityRole="button"
             >
-              <Text style={[styles.toggleText, type === t && styles.toggleTextActive]}>
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+              <Text style={[styles.toggleText, type === tp && styles.toggleTextActive]}>
+                {t(tp)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -103,29 +114,29 @@ export default function NewExchangeModal() {
           </View>
         )}
 
-        <Text style={styles.label}>Title</Text>
+        <Text style={styles.label}>{t('titleLabel')}</Text>
         <TextInput
           style={styles.input}
           value={title}
           onChangeText={setTitle}
-          placeholder={type === 'offer' ? 'e.g. Gardening help' : 'e.g. Need a lift to hospital'}
+          placeholder={type === 'offer' ? t('offerPlaceholder') : t('requestPlaceholder')}
           placeholderTextColor={theme.textMuted}
           returnKeyType="next"
         />
 
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>{t('description')}</Text>
         <TextInput
           style={[styles.input, styles.textarea]}
           value={description}
           onChangeText={setDescription}
-          placeholder="Tell your community more…"
+          placeholder={t('descriptionPlaceholder')}
           placeholderTextColor={theme.textMuted}
           multiline
           numberOfLines={4}
           textAlignVertical="top"
         />
 
-        <Text style={styles.label}>Time credits (hours)</Text>
+        <Text style={styles.label}>{t('timeCredits')}</Text>
         <TextInput
           style={styles.input}
           value={timeCredits}
@@ -139,7 +150,7 @@ export default function NewExchangeModal() {
         {/* Category picker */}
         {categories.length > 0 && (
           <>
-            <Text style={styles.label}>Category</Text>
+            <Text style={styles.label}>{t('category')}</Text>
             <View style={styles.categoryGrid}>
               {categories.map((cat) => {
                 const selected = categoryId === cat.id || (categoryId === null && categories[0]?.id === cat.id);
@@ -152,6 +163,8 @@ export default function NewExchangeModal() {
                     ]}
                     onPress={() => setCategoryId(cat.id)}
                     activeOpacity={0.7}
+                    accessibilityLabel={cat.name + ' category'}
+                    accessibilityRole="button"
                   >
                     <Text style={[styles.categoryChipText, selected && { color: primary, fontWeight: '600' }]}>
                       {cat.name}
@@ -168,17 +181,20 @@ export default function NewExchangeModal() {
           onPress={() => void handleSubmit()}
           disabled={isLoading}
           activeOpacity={0.8}
+          accessibilityLabel={type === 'offer' ? t('postOffer') : t('postRequest')}
+          accessibilityRole="button"
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.buttonText}>
-              Post {type === 'offer' ? 'offer' : 'request'}
+              {type === 'offer' ? t('postOffer') : t('postRequest')}
             </Text>
           )}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

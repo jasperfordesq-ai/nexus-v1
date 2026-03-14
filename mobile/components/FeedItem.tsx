@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -13,6 +13,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import Card from '@/components/ui/Card';
+import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
 interface FeedItemProps {
   item: FeedItemType;
@@ -21,10 +22,10 @@ interface FeedItemProps {
 export default function FeedItem({ item }: FeedItemProps) {
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  // Optimistic like state
-  const [liked, setLiked] = useState(false);
+  // Optimistic like state — initialise from server if available
+  const [liked, setLiked] = useState(item.is_liked ?? false);
   const [likesCount, setLikesCount] = useState(item.likes_count);
 
   async function handleLike() {
@@ -116,16 +117,6 @@ function formatType(type: string): string {
     challenge: 'Challenge', volunteer: 'Volunteer', review: 'Review',
   };
   return labels[type] ?? type;
-}
-
-function formatRelativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
 }
 
 function makeStyles(theme: Theme) {

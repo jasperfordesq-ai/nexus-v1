@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm, Controller, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -25,6 +25,7 @@ import { register as apiRegister, extractToken } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 
@@ -45,9 +46,10 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterScreen() {
   const { t } = useTranslation('auth');
+  const { setSession } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const {
     control,
@@ -80,6 +82,9 @@ export default function RegisterScreen() {
         storage.set(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token),
         storage.setJson(STORAGE_KEYS.USER_DATA, response.user),
       ]);
+
+      // Update in-memory auth state so isAuthenticated becomes true immediately
+      setSession(token, response.user);
 
       router.replace('/(tabs)/home');
     } catch (err) {
@@ -270,7 +275,7 @@ function makeStyles(theme: Theme) {
       paddingVertical: 12,
       fontSize: 16,
       color: theme.text,
-      backgroundColor: '#FAFAFA',
+      backgroundColor: theme.bg,
     },
     inputError: { borderColor: theme.error },
     fieldError: { color: theme.error, fontSize: 12, marginTop: 4, marginLeft: 4 },

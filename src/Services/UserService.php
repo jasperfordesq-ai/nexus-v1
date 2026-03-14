@@ -787,4 +787,52 @@ class UserService
             'has_more' => count($items) >= $limit,
         ];
     }
+
+    /**
+     * Get profile stats for sidebar widget (ProfileCardWidget)
+     */
+    public static function getProfileStats(int $userId, int $tenantId): array
+    {
+        // Count offers
+        $offers = Database::query(
+            "SELECT COUNT(*) as cnt FROM listings WHERE user_id = ? AND tenant_id = ? AND type = 'offer' AND (status IS NULL OR status = 'active')",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        // Count requests
+        $requests = Database::query(
+            "SELECT COUNT(*) as cnt FROM listings WHERE user_id = ? AND tenant_id = ? AND type = 'request' AND (status IS NULL OR status = 'active')",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        // Hours given (completed transactions where user is sender)
+        $given = Database::query(
+            "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE sender_id = ? AND tenant_id = ? AND status = 'completed'",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        // Hours received (completed transactions where user is receiver)
+        $received = Database::query(
+            "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE receiver_id = ? AND tenant_id = ? AND status = 'completed'",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        // Wallet balance
+        $wallet = Database::query(
+            "SELECT balance FROM wallets WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        $offersCount = (int)($offers['cnt'] ?? 0);
+        $requestsCount = (int)($requests['cnt'] ?? 0);
+
+        return [
+            'listings_count' => $offersCount + $requestsCount,
+            'given_count' => round((float)($given['total'] ?? 0), 1),
+            'received_count' => round((float)($received['total'] ?? 0), 1),
+            'offers_count' => $offersCount,
+            'requests_count' => $requestsCount,
+            'wallet_balance' => $wallet ? round((float)$wallet['balance'], 2) : 0,
+        ];
+    }
 }

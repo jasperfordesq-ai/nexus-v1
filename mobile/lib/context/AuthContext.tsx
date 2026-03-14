@@ -51,6 +51,8 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
+  /** Set the in-memory auth state directly (e.g. after registration saves tokens to storage). */
+  setSession: (token: string, user: AnyUser) => void;
   /** Patch the in-memory user after a profile update (avoids a full re-fetch). */
   refreshUser: (updated: AnyUser) => void;
   /** Display-ready name for the current user */
@@ -131,6 +133,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void registerForPushNotifications();
   }, []);
 
+  const setSession = useCallback((newToken: string, newUser: AnyUser) => {
+    setToken(newToken);
+    setUser(newUser);
+  }, []);
+
   const refreshUser = useCallback((updated: AnyUser) => {
     setUser(updated);
   }, []);
@@ -169,10 +176,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: !!token && !!user,
       login,
       logout,
+      setSession,
       refreshUser,
       displayName,
     }),
-    [user, token, isLoading, login, logout, refreshUser, displayName],
+    [user, token, isLoading, login, logout, setSession, refreshUser, displayName],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

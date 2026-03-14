@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   FlatList,
   View,
@@ -27,7 +27,8 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 export default function MembersScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
   const [search, setSearch] = useState('');
   const [committedSearch, setCommittedSearch] = useState('');
 
@@ -115,7 +116,7 @@ export default function MembersScreen() {
         data={items}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={Separator}
         onEndReached={hasMore ? loadMore : undefined}
         onEndReachedThreshold={0.3}
         refreshControl={

@@ -1,0 +1,36 @@
+{
+  "title": "Listings",
+  "searchPlaceholder": "Search listings\u2026",
+  "newListing": "Create new listing",
+  "empty": "No listings found.",
+  "type": "Type",
+  "offer": "Offer",
+  "request": "Request",
+  "offering": "Offering",
+  "requesting": "Requesting",
+  "titleLabel": "Title",
+  "description": "Description",
+  "descriptionPlaceholder": "Tell your community more\u2026",
+  "timeCredits": "Time credits (hours)",
+  "category": "Category",
+  "postOffer": "Post offer",
+  "postRequest": "Post request",
+  "offerPlaceholder": "e.g. Gardening help",
+  "requestPlaceholder": "e.g. Need a lift to hospital",
+  "validation": {
+    "titleRequired": "Please enter a title.",
+    "invalidCredits": "Please enter a valid number of time credits."
+  },
+  "createError": "Failed to create exchange.",
+  "detail": {
+    "invalidId": "Invalid exchange ID.",
+    "notFound": "Exchange not found.",
+    "goBack": "Go back",
+    "timeEstimate": "Time estimate",
+    "postedBy": "Posted by",
+    "requestService": "Request this service",
+    "offerHelp": "Offer to help",
+    "hours": "{{count}} hr",
+    "hours_other": "{{count}} hrs"
+  }
+}

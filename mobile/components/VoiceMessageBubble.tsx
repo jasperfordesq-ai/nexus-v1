@@ -8,6 +8,8 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { Audio, type AVPlaybackStatus } from 'expo-av';
 
+import { useTheme } from '@/lib/hooks/useTheme';
+
 interface VoiceMessageBubbleProps {
   audioUrl: string;
   durationMs?: number;
@@ -35,6 +37,7 @@ export default function VoiceMessageBubble({
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [positionMs, setPositionMs] = useState(0);
   const [totalMs, setTotalMs] = useState(durationMs ?? 0);
 
@@ -56,6 +59,7 @@ export default function VoiceMessageBubble({
   }, []);
 
   const handlePlayPause = useCallback(async () => {
+    setHasError(false);
     try {
       if (soundRef.current) {
         if (isPlaying) {
@@ -79,15 +83,19 @@ export default function VoiceMessageBubble({
       soundRef.current = sound;
       setIsPlaying(true);
     } catch {
+      setHasError(true);
       setIsPlaying(false);
     } finally {
       setIsLoading(false);
     }
   }, [audioUrl, isPlaying, onPlaybackStatusUpdate]);
 
+  const theme = useTheme();
+
   const iconColor = isOwn ? 'rgba(255,255,255,0.95)' : primaryColor;
   const timeColor = isOwn ? 'rgba(255,255,255,0.8)' : textColorSecondary;
   const labelColor = isOwn ? '#fff' : textColor;
+  const unfilledBarColor = isOwn ? 'rgba(255,255,255,0.35)' : theme.border;
 
   const progress = totalMs > 0 ? positionMs / totalMs : 0;
   const displayTime = isPlaying || positionMs > 0
@@ -127,7 +135,7 @@ export default function VoiceMessageBubble({
                   height: barHeight,
                   backgroundColor: filled
                     ? (isOwn ? 'rgba(255,255,255,0.95)' : primaryColor)
-                    : (isOwn ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.15)'),
+                    : unfilledBarColor,
                 },
               ]}
             />
@@ -136,8 +144,8 @@ export default function VoiceMessageBubble({
       </View>
 
       <Text style={[styles.duration, { color: timeColor }]}>{displayTime}</Text>
-      <Text style={[styles.label, { color: labelColor }]}>
-        Voice
+      <Text style={[styles.label, { color: hasError ? '#DC2626' : labelColor }]}>
+        {hasError ? 'Failed' : 'Voice'}
       </Text>
     </View>
   );

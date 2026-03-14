@@ -5,6 +5,7 @@
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { type Exchange } from '@/lib/api/exchanges';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -17,6 +18,7 @@ interface ExchangeCardProps {
 }
 
 export default function ExchangeCard({ exchange }: ExchangeCardProps) {
+  const { t } = useTranslation('exchanges');
   const primary = usePrimaryColor();
   const theme = useTheme();
 
@@ -42,7 +44,7 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
             ]}
           >
             <Text style={[styles.typeBadgeText, { color: theme.textSecondary }]}>
-              {exchange.type === 'offer' ? 'Offering' : 'Requesting'}
+              {exchange.type === 'offer' ? t('offering') : t('requesting')}
             </Text>
           </View>
           {hours > 0 && (
