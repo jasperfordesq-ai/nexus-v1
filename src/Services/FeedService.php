@@ -112,11 +112,9 @@ class FeedService
             }
         }
 
-        // Strip internal cursor fields from output
-        foreach ($items as &$item) {
-            unset($item['_activity_id'], $item['_activity_created_at']);
-        }
-        unset($item);
+        // Note: _activity_id and _activity_created_at are kept in items
+        // so the controller can recompute the cursor after EdgeRank reordering.
+        // The controller is responsible for stripping them before output.
 
         return [
             'items' => $items,
