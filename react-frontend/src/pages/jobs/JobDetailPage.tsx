@@ -661,11 +661,11 @@ export function JobDetailPage() {
                 <Briefcase className="w-5 h-5 text-indigo-400" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-semibold text-theme-primary">You posted this vacancy</p>
+                <p className="font-semibold text-theme-primary">{t('detail.owner_banner_title', 'You posted this vacancy')}</p>
                 <p className="text-sm text-theme-muted">
                   {vacancy.applications_count > 0
-                    ? `${vacancy.applications_count} applicant${vacancy.applications_count !== 1 ? 's' : ''} — scroll down to review`
-                    : 'No applicants yet — share this listing to get more visibility'}
+                    ? t('detail.owner_has_applicants', '{{count}} applicant(s) — scroll down to review', { count: vacancy.applications_count })
+                    : t('detail.owner_no_applicants', 'No applicants yet — share this listing to get more visibility')}
                 </p>
               </div>
             </div>
@@ -684,20 +684,36 @@ export function JobDetailPage() {
                 <Button size="sm" color="warning" variant="flat" onPress={async () => {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'closed' });
-                    if (res.success) { toast.success(t('vacancy_closed')); loadVacancy(); }
-                  } catch { /* silent fail */ }
+                    if (res.success) {
+                      toast.success(t('vacancy_closed', 'Vacancy closed'));
+                      loadVacancy();
+                    } else {
+                      toast.error(t('detail.status_update_error'));
+                    }
+                  } catch (err) {
+                    logError('Failed to close vacancy', err);
+                    toast.error(t('detail.status_update_error'));
+                  }
                 }}>
-                  Close Vacancy
+                  {t('detail.close_vacancy', 'Close Vacancy')}
                 </Button>
               )}
               {vacancy.status !== 'open' && (
                 <Button size="sm" color="success" variant="flat" onPress={async () => {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'open' });
-                    if (res.success) { toast.success(t('vacancy_reopened')); loadVacancy(); }
-                  } catch { /* silent fail */ }
+                    if (res.success) {
+                      toast.success(t('vacancy_reopened', 'Vacancy reopened'));
+                      loadVacancy();
+                    } else {
+                      toast.error(t('detail.status_update_error'));
+                    }
+                  } catch (err) {
+                    logError('Failed to reopen vacancy', err);
+                    toast.error(t('detail.status_update_error'));
+                  }
                 }}>
-                  Reopen
+                  {t('detail.reopen_vacancy', 'Reopen')}
                 </Button>
               )}
             </div>

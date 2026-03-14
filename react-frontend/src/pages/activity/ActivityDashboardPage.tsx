@@ -221,33 +221,8 @@ export function ActivityDashboardPage() {
   }, [t]);
 
   useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await api.get<DashboardData>('/v2/users/me/activity/dashboard');
-        if (!cancelled) {
-          if (response.success && response.data) {
-            setDashboard(response.data);
-          } else {
-            setError(t('error_load_failed'));
-          }
-        }
-      } catch (err) {
-        if (!cancelled) {
-          logError('Failed to load activity dashboard', err);
-          setError(t('error_load_failed_detail'));
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-    load();
-    return () => { cancelled = true; };
-  }, [t]);
+    void loadDashboard();
+  }, [loadDashboard]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -288,7 +263,14 @@ export function ActivityDashboardPage() {
 
   if (!dashboard) return null;
 
-  const { timeline, hours_summary, connection_stats, engagement, skills_breakdown, monthly_hours } = dashboard;
+  const {
+    timeline = [],
+    hours_summary = { hours_given: 0, hours_received: 0, transactions_given: 0, transactions_received: 0, net_balance: 0 },
+    connection_stats = { total_connections: 0, pending_requests: 0, groups_joined: 0 },
+    engagement = { posts_count: 0, comments_count: 0, likes_given: 0, likes_received: 0 },
+    skills_breakdown = { skills: [], offering_count: 0, requesting_count: 0 },
+    monthly_hours = [],
+  } = dashboard;
 
   return (
     <motion.div
@@ -424,7 +406,7 @@ export function ActivityDashboardPage() {
                   {t('net_balance')}
                 </span>
                 <span className={`font-semibold ${hours_summary.net_balance >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                  {hours_summary.net_balance >= 0 ? '+' : ''}{hours_summary.net_balance}h
+                  {hours_summary.net_balance >= 0 ? '+' : ''}{hours_summary.net_balance}{t('hours_suffix')}
                 </span>
               </div>
             </div>
@@ -441,6 +423,9 @@ export function ActivityDashboardPage() {
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                       {skill.is_offering && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('skill_offer')}</span>
+                      )}
+                      {skill.is_requesting && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-600 dark:text-blue-400">{t('skill_request')}</span>
                       )}
                       {skill.endorsements > 0 && (
                         <span className="text-[10px] text-indigo-500 font-semibold">×{skill.endorsements}</span>

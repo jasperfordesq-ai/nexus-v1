@@ -87,7 +87,7 @@ export function CreateListingPage() {
 
   async function loadCategories() {
     try {
-      const response = await api.get<Category[]>('/v2/categories');
+      const response = await api.get<Category[]>('/v2/categories?type=listing');
       if (response.success && response.data) {
         setCategories(response.data);
       }
@@ -120,7 +120,7 @@ export function CreateListingPage() {
       }
     } catch (error) {
       logError('Failed to load listing', error);
-      navigate(tenantPath('/listings'));
+      toast.error(t('form.load_error', 'Failed to load listing'));
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +193,8 @@ export function CreateListingPage() {
         }
       }
 
-      navigate(tenantPath('/listings'));
+      toast.success(isEditing ? t('form.update_success', 'Listing updated') : t('form.create_success', 'Listing created'));
+      navigate(tenantPath(listingId ? `/listings/${listingId}` : '/listings'));
     } catch (error) {
       logError('Failed to save listing', error);
       toast.error(t('form.save_error_title'), t('form.save_error_subtitle'));
@@ -433,7 +434,7 @@ export function CreateListingPage() {
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="flex-1 bg-linear-to-r from-indigo-500 to-purple-600 text-white"
               startContent={isEditing ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
               isLoading={isSubmitting}
             >

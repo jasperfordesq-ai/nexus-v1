@@ -82,5 +82,8 @@
   "conversation_archived": "Conversa arquivada",
   "conversation_archived_desc": "A conversa foi movida para o seu arquivo.",
   "archive_failed": "Falha ao arquivar conversa",
-  "messaging_restricted": "As suas mensagens foram restritas"
+  "messaging_restricted": "As suas mensagens foram restritas",
+  "conversation_load_failed": "Unable to load this conversation. It may have been deleted or you may not have access.",
+  "back_to_messages": "Back to Messages",
+  "messaging_restricted_contact": "If you believe this is an error, please contact your timebank coordinator."
 }

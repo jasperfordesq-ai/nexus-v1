@@ -45,6 +45,7 @@ export function NotificationsPage() {
   const { refreshCounts, markAsRead: contextMarkAsRead, markAllAsRead: contextMarkAllAsRead } = useNotifications();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<NotificationFilter>('all');
 
   useEffect(() => {
@@ -54,12 +55,16 @@ export function NotificationsPage() {
   async function loadNotifications() {
     try {
       setIsLoading(true);
+      setLoadError(null);
       const response = await api.get<Notification[]>('/v2/notifications?per_page=50');
       if (response.success && response.data) {
         setNotifications(response.data);
+      } else {
+        setLoadError(t('error_load'));
       }
     } catch (error) {
       logError('Failed to load notifications', error);
+      setLoadError(t('error_load'));
     } finally {
       setIsLoading(false);
     }
@@ -189,9 +194,24 @@ export function NotificationsPage() {
         </Button>
       </div>
 
+      {/* Load Error */}
+      {loadError && !isLoading && (
+        <GlassCard className="p-8 text-center">
+          <Bell className="w-12 h-12 text-amber-500 mx-auto mb-4 opacity-50" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title', 'Unable to load')}</h2>
+          <p className="text-theme-muted mb-4">{loadError}</p>
+          <Button
+            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+            onPress={loadNotifications}
+          >
+            {t('try_again', 'Try Again')}
+          </Button>
+        </GlassCard>
+      )}
+
       {/* Notifications List */}
-      {isLoading ? (
-        <div aria-label="Loading notifications" aria-busy="true" className="space-y-3">
+      {!loadError && isLoading ? (
+        <div aria-label={t('loading_aria')} aria-busy="true" className="space-y-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <GlassCard key={i} className="p-4">
               <div className="flex items-start gap-4">

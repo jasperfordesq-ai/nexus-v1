@@ -99,7 +99,7 @@ export function MessagesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   /**
    * Handle incoming new message from Pusher

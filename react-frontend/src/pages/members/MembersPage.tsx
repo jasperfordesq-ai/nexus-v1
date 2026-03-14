@@ -73,6 +73,7 @@ export function MembersPage() {
 
   // Refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const membersCountRef = useRef(0);
 
   // Debounce search input
   useEffect(() => {
@@ -90,6 +91,9 @@ export function MembersPage() {
       }
     };
   }, [searchQuery]);
+
+  // Keep ref in sync for offset calculation without stale closures
+  useEffect(() => { membersCountRef.current = members.length; }, [members.length]);
 
   // Persist view mode
   useEffect(() => {
@@ -138,8 +142,8 @@ export function MembersPage() {
       }
       params.set('limit', ITEMS_PER_PAGE.toString());
 
-      if (append && members.length > 0) {
-        params.set('offset', members.length.toString());
+      if (append && membersCountRef.current > 0) {
+        params.set('offset', membersCountRef.current.toString());
       }
 
       const response = await api.get<User[]>(`/v2/users?${params}`);
@@ -174,7 +178,7 @@ export function MembersPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, sortBy, members.length, toast]);
+  }, [debouncedQuery, sortBy, t, toast]);
 
   // Load more
   const loadMoreMembers = useCallback(() => {

@@ -56,12 +56,10 @@ import type { WalletBalance, Listing, Event, Group } from '@/types/api';
 
 interface GamificationProfile {
   level: number;
-  level_name: string;
   xp: number;
-  xp_for_next_level: number;
-  xp_progress_percent: number;
-  total_badges: number;
-  streak_days: number;
+  level_progress: number; // percentage 0-100
+  badges_count: number;
+  level_thresholds?: Record<number, number>;
 }
 
 interface FeedActivityItem {
@@ -163,7 +161,7 @@ export function DashboardPage() {
       // Core requests - always fetched
       const coreRequests = [
         api.get<WalletBalance>('/v2/wallet/balance').catch(() => null),
-        api.get<Listing[]>('/v2/listings?limit=5&sort=-created_at').catch(() => null),
+        api.get<Listing[]>('/v2/listings?per_page=5').catch(() => null),
         api.get<{ count: number }>('/v2/wallet/pending-count').catch(() => null),
       ];
 
@@ -183,21 +181,21 @@ export function DashboardPage() {
       if (hasFeedModule) {
         optionalRequests.push({
           key: 'activity',
-          promise: api.get<FeedActivityItem[]>('/v2/feed?limit=5').catch(() => null),
+          promise: api.get<FeedActivityItem[]>('/v2/feed?per_page=5').catch(() => null),
         });
       }
 
       if (hasListingsModule) {
         optionalRequests.push({
           key: 'suggested',
-          promise: api.get<Listing[]>('/v2/listings?limit=4&sort=-created_at').catch(() => null),
+          promise: api.get<Listing[]>('/v2/listings?per_page=4').catch(() => null),
         });
       }
 
       if (hasGroups) {
         optionalRequests.push({
           key: 'groups',
-          promise: api.get<Group[]>('/v2/groups?my_groups=1&limit=3').catch(() => null),
+          promise: api.get<Group[]>(`/v2/groups?user_id=${user?.id}&per_page=3`).catch(() => null),
         });
       }
 
@@ -212,7 +210,7 @@ export function DashboardPage() {
       if (hasEvents) {
         optionalRequests.push({
           key: 'events',
-          promise: api.get<Event[]>('/v2/events?filter=upcoming&limit=3').catch(() => null),
+          promise: api.get<Event[]>('/v2/events?when=upcoming&per_page=3').catch(() => null),
         });
       }
 
@@ -243,10 +241,9 @@ export function DashboardPage() {
       // Parse gamification
       let gamificationData: GamificationProfile | null = null;
       if (optionalResults.gamification) {
-        const gRes = optionalResults.gamification as { success?: boolean; data?: unknown };
+        const gRes = optionalResults.gamification as { success?: boolean; data?: GamificationProfile };
         if (gRes?.success && gRes.data) {
-          const gData = gRes.data as { data?: GamificationProfile };
-          gamificationData = gData.data ?? (gRes.data as unknown as GamificationProfile);
+          gamificationData = gRes.data;
         }
       }
 
@@ -286,16 +283,16 @@ export function DashboardPage() {
         }
       }
 
-      // Parse endorsements
+      // Parse endorsements — API returns { endorsements: [{skill_name, count, ...}], stats }
       let endorsementsData: EndorsementEntry[] = [];
       if (optionalResults.endorsements) {
         const eRes = optionalResults.endorsements as {
           success?: boolean;
-          data?: { endorsements?: Record<string, { count: number }> };
+          data?: { endorsements?: Array<{ skill_name: string; count: number }> };
         };
-        if (eRes?.success && eRes.data?.endorsements) {
-          endorsementsData = Object.entries(eRes.data.endorsements)
-            .map(([skill, info]) => ({ skill, count: info.count || 0 }))
+        if (eRes?.success && Array.isArray(eRes.data?.endorsements)) {
+          endorsementsData = eRes.data.endorsements
+            .map((e) => ({ skill: e.skill_name, count: Number(e.count) || 0 }))
             .filter((e) => e.count > 0)
             .sort((a, b) => b.count - a.count)
             .slice(0, 6);
@@ -936,7 +933,7 @@ export function DashboardPage() {
                           {t('gamification.level', { level: stats.gamification.level })}
                         </span>
                         <Chip size="sm" variant="flat" color="warning" className="text-xs">
-                          {stats.gamification.level_name}
+                          {stats.gamification.xp} XP
                         </Chip>
                       </div>
 
@@ -944,14 +941,14 @@ export function DashboardPage() {
                       <div>
                         <div className="flex justify-between text-xs sm:text-sm mb-1.5">
                           <span className="text-theme-muted">
-                            {stats.gamification.xp} / {stats.gamification.xp_for_next_level} XP
+                            {t('gamification.level', { level: stats.gamification.level })}
                           </span>
                           <span className="text-theme-primary font-medium">
-                            {Math.round(stats.gamification.xp_progress_percent)}%
+                            {Math.round(stats.gamification.level_progress)}%
                           </span>
                         </div>
                         <Progress
-                          value={Math.min(stats.gamification.xp_progress_percent, 100)}
+                          value={Math.min(stats.gamification.level_progress, 100)}
                           color="warning"
                           size="sm"
                           aria-label={t('gamification.xp_progress')}
@@ -960,14 +957,10 @@ export function DashboardPage() {
                       </div>
 
                       {/* Quick stats */}
-                      <div className="grid grid-cols-2 gap-3 pt-2">
-                        <div className="text-center p-2 rounded-lg bg-theme-elevated">
-                          <div className="text-lg font-bold text-theme-primary">{stats.gamification.total_badges}</div>
+                      <div className="flex justify-center pt-2">
+                        <div className="text-center p-2 rounded-lg bg-theme-elevated w-full">
+                          <div className="text-lg font-bold text-theme-primary">{stats.gamification.badges_count}</div>
                           <div className="text-xs text-theme-subtle">{t('gamification.badges')}</div>
-                        </div>
-                        <div className="text-center p-2 rounded-lg bg-theme-elevated">
-                          <div className="text-lg font-bold text-theme-primary">{t('gamification.streak_days', { count: stats.gamification.streak_days })}</div>
-                          <div className="text-xs text-theme-subtle">{t('gamification.streak')}</div>
                         </div>
                       </div>
 
@@ -1073,7 +1066,6 @@ interface PendingReview {
 function PendingReviewsCard() {
   const { tenantPath } = useTenant();
   const { t } = useTranslation('dashboard');
-  usePageTitle(t('meta.title'));
   const [pending, setPending] = useState<PendingReview[]>([]);
   const [loading, setLoading] = useState(true);
 

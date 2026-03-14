@@ -53,6 +53,9 @@ export default function NewsletterUnsubscribePage() {
         } else {
           setState('success');
         }
+      })
+      .catch(() => {
+        setState('error');
       });
    
   }, [token]);

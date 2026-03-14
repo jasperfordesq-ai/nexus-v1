@@ -74,11 +74,11 @@ interface Match {
 
 type SourceFilter = 'all' | 'listing' | 'job' | 'volunteering' | 'group';
 
-const SOURCE_CONFIG: Record<string, { icon: typeof ListChecks; label: string; color: string; path: string }> = {
-  listing: { icon: ListChecks, label: 'Listing', color: 'text-blue-400 bg-blue-400/10', path: '/listings' },
-  job: { icon: Briefcase, label: 'Job', color: 'text-amber-400 bg-amber-400/10', path: '/jobs' },
-  volunteering: { icon: Heart, label: 'Volunteering', color: 'text-rose-400 bg-rose-400/10', path: '/volunteering' },
-  group: { icon: Users, label: 'Group', color: 'text-emerald-400 bg-emerald-400/10', path: '/groups' },
+const SOURCE_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: string; path: string }> = {
+  listing: { icon: ListChecks, labelKey: 'source_listing', color: 'text-blue-400 bg-blue-400/10', path: '/listings' },
+  job: { icon: Briefcase, labelKey: 'source_job', color: 'text-amber-400 bg-amber-400/10', path: '/jobs' },
+  volunteering: { icon: Heart, labelKey: 'source_volunteering', color: 'text-rose-400 bg-rose-400/10', path: '/volunteering' },
+  group: { icon: Users, labelKey: 'source_group', color: 'text-emerald-400 bg-emerald-400/10', path: '/groups' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -86,11 +86,11 @@ const SOURCE_CONFIG: Record<string, { icon: typeof ListChecks; label: string; co
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MatchesPage() {
-  usePageTitle('Matches');
+  const { t } = useTranslation('matches');
+  usePageTitle(t('page_title'));
   useAuth(); // ensure authenticated
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const { t } = useTranslation('matches');
 
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,14 +119,13 @@ export function MatchesPage() {
 
     setLoading(false);
     setRefreshing(false);
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => { loadMatches(); }, [loadMatches]);
 
   // ─── Dismiss match ───
-  const dismissMatch = useCallback(async (match: Match, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const dismissMatch = useCallback(async (match: Match) => {
+
     if (match.source_type !== 'listing') return; // only listings support dismiss for now
 
     const listingId = match.source_id;
@@ -139,7 +138,7 @@ export function MatchesPage() {
       logError('MatchesPage.dismiss', err);
     }
     setDismissing((prev) => { const s = new Set(prev); s.delete(listingId); return s; });
-  }, [toast]);
+  }, [toast, t]);
 
   // ─── Filtered matches ───
   const filteredMatches = filter === 'all'
@@ -159,7 +158,7 @@ export function MatchesPage() {
   // ─── Render ───
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-      <Breadcrumbs items={[{ label: 'Dashboard', href: tenantPath('/dashboard') }, { label: 'Matches' }]} />
+      <Breadcrumbs items={[{ label: t('breadcrumb_dashboard'), href: tenantPath('/dashboard') }, { label: t('breadcrumb_matches') }]} />
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -168,10 +167,10 @@ export function MatchesPage() {
             <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
               <Sparkles className="w-6 h-6 text-indigo-400" />
             </div>
-            Your Matches
+            {t('heading')}
           </h1>
           <div className="flex items-center gap-2 mt-1">
-            <p className="text-theme-subtle">Discover connections across listings, jobs, volunteering, and groups</p>
+            <p className="text-theme-subtle">{t('subtitle')}</p>
             <AlgorithmLabel area="matching" />
           </div>
         </div>
@@ -182,7 +181,7 @@ export function MatchesPage() {
           isLoading={refreshing}
           size="sm"
         >
-          Refresh
+          {t('refresh')}
         </Button>
       </div>
 
@@ -191,26 +190,26 @@ export function MatchesPage() {
         <GlassCard className="p-4 text-center">
           <Target className="w-5 h-5 text-indigo-400 mx-auto mb-1" />
           <p className="text-2xl font-bold text-theme-primary">{totalMatches}</p>
-          <p className="text-xs text-theme-subtle">Total Matches</p>
+          <p className="text-xs text-theme-subtle">{t('stats_total_matches')}</p>
         </GlassCard>
         <GlassCard className="p-4 text-center">
           <TrendingUp className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
           <p className="text-2xl font-bold text-theme-primary">{avgScore}%</p>
-          <p className="text-xs text-theme-subtle">Avg Score</p>
+          <p className="text-xs text-theme-subtle">{t('stats_avg_score')}</p>
         </GlassCard>
         <GlassCard className="p-4 text-center">
           <Zap className="w-5 h-5 text-amber-400 mx-auto mb-1" />
           <p className="text-2xl font-bold text-theme-primary">
             {matches.filter((m) => m.match_score >= 80).length}
           </p>
-          <p className="text-xs text-theme-subtle">Hot Matches</p>
+          <p className="text-xs text-theme-subtle">{t('stats_hot_matches')}</p>
         </GlassCard>
         <GlassCard className="p-4 text-center">
           <Filter className="w-5 h-5 text-purple-400 mx-auto mb-1" />
           <p className="text-2xl font-bold text-theme-primary">
             {Object.keys(sourceTypeCounts).length}
           </p>
-          <p className="text-xs text-theme-subtle">Source Types</p>
+          <p className="text-xs text-theme-subtle">{t('stats_source_types')}</p>
         </GlassCard>
       </div>
 
@@ -229,7 +228,7 @@ export function MatchesPage() {
           title={
             <span className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
-              All ({totalMatches})
+              {t('filter_all')} ({totalMatches})
             </span>
           }
         />
@@ -243,7 +242,7 @@ export function MatchesPage() {
               title={
                 <span className="flex items-center gap-2">
                   <Icon className="w-4 h-4" />
-                  {config.label} ({count})
+                  {t(config.labelKey)} ({count})
                 </span>
               }
             />
@@ -259,12 +258,12 @@ export function MatchesPage() {
       ) : filteredMatches.length === 0 ? (
         <EmptyState
           icon={<Sparkles className="w-12 h-12" />}
-          title={filter === 'all' ? 'No matches yet' : `No ${filter} matches`}
-          description="Matches will appear here as the system finds connections for you across the platform."
+          title={filter === 'all' ? t('empty_title_all') : t('empty_title_filtered', { source: filter })}
+          description={t('empty_description')}
           action={
             <Link to={tenantPath('/listings')}>
               <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                Browse Listings
+                {t('browse_listings')}
               </Button>
             </Link>
           }
@@ -312,7 +311,7 @@ export function MatchesPage() {
                             {match.title}
                           </h3>
                           <Chip size="sm" variant="flat" className={config.color}>
-                            {config.label}
+                            {t(config.labelKey)}
                           </Chip>
                         </div>
 
@@ -329,9 +328,9 @@ export function MatchesPage() {
                             size="sm"
                             color={match.match_score >= 80 ? 'success' : match.match_score >= 60 ? 'warning' : 'default'}
                             className="max-w-[120px]"
-                            aria-label={`Match score: ${match.match_score}%`}
+                            aria-label={t('score_label', { score: match.match_score })}
                           />
-                          <span className="text-xs text-theme-subtle">{match.match_score}% match</span>
+                          <span className="text-xs text-theme-subtle">{t('score_percent', { score: match.match_score })}</span>
                         </div>
 
                         {/* Match reasons */}
@@ -344,7 +343,7 @@ export function MatchesPage() {
                             ))}
                             {match.reasons.length > 3 && (
                               <Chip size="sm" variant="flat" className="text-xs bg-theme-hover">
-                                +{match.reasons.length - 3} more
+                                {t('reasons_more', { count: match.reasons.length - 3 })}
                               </Chip>
                             )}
                           </div>
@@ -369,7 +368,7 @@ export function MatchesPage() {
 
                       {/* Actions */}
                       <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                        <Link to={tenantPath(detailPath)} aria-label="View match details">
+                        <Link to={tenantPath(detailPath)} aria-label={t('view_details')}>
                           <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-primary transition-colors mt-2" />
                         </Link>
                         {match.source_type === 'listing' && (
@@ -377,9 +376,9 @@ export function MatchesPage() {
                             isIconOnly
                             size="sm"
                             variant="light"
-                            aria-label="Not interested"
+                            aria-label={t('not_interested')}
                             isLoading={isDismissing}
-                            onPress={(e) => dismissMatch(match, e as unknown as React.MouseEvent)}
+                            onPress={() => dismissMatch(match)}
                             className="text-theme-subtle hover:text-danger opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <X className="w-4 h-4" />

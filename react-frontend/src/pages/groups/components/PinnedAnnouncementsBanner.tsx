@@ -13,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { Chip } from '@heroui/react';
 import { Megaphone } from 'lucide-react';
 import { api } from '@/lib/api';
+import { useTranslation } from 'react-i18next';
 
 interface PinnedAnnouncement {
   id: number;
@@ -28,6 +29,7 @@ interface PinnedAnnouncementsBannerProps {
 }
 
 export function PinnedAnnouncementsBanner({ groupId }: PinnedAnnouncementsBannerProps) {
+  const { t } = useTranslation('groups');
   const [pinned, setPinned] = useState<PinnedAnnouncement[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -64,7 +66,7 @@ export function PinnedAnnouncementsBanner({ groupId }: PinnedAnnouncementsBanner
             <p className="text-sm font-medium text-theme-primary">{announcement.title}</p>
             <p className="text-xs text-theme-subtle mt-0.5 line-clamp-2">{announcement.content}</p>
           </div>
-          <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">Pinned</Chip>
+          <Chip size="sm" variant="flat" color="primary" className="flex-shrink-0">{t('announcements.pinned', 'Pinned')}</Chip>
         </div>
       ))}
     </div>

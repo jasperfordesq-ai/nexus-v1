@@ -107,10 +107,13 @@ class EventService
             $sql .= " AND e.start_time >= NOW()";
         }
 
-        // Category filter
+        // Category filter (by ID or by name)
         if (!empty($filters['category_id'])) {
             $sql .= " AND e.category_id = ?";
             $params[] = (int)$filters['category_id'];
+        } elseif (!empty($filters['category'])) {
+            $sql .= " AND LOWER(c.name) = LOWER(?)";
+            $params[] = $filters['category'];
         }
 
         // Group filter

@@ -164,11 +164,11 @@ export function FederationOnboardingPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [settings, toast, navigate]);
+  }, [settings, toast, navigate, tenantPath, t]);
 
   const handleSkip = useCallback(() => {
     navigate(tenantPath('/federation'));
-  }, [navigate]);
+  }, [navigate, tenantPath]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Animation

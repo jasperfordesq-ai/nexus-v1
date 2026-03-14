@@ -306,9 +306,9 @@ export function JobAlertsPage() {
                     </div>
 
                     <p className="text-xs text-theme-subtle mt-2">
-                      Created {new Date(alert.created_at).toLocaleDateString()}
+                      {t('alerts.created_date', 'Created {{date}}', { date: new Date(alert.created_at).toLocaleDateString() })}
                       {alert.last_notified_at && (
-                        <> &middot; Last notification {new Date(alert.last_notified_at).toLocaleDateString()}</>
+                        <> &middot; {t('alerts.last_notified', 'Last notification {{date}}', { date: new Date(alert.last_notified_at).toLocaleDateString() })}</>
                       )}
                     </p>
                   </div>

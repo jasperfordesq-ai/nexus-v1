@@ -112,10 +112,10 @@ export function MessageInputArea({
           <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1">
             <p className="text-red-700 dark:text-red-300 text-sm font-medium">
-              Your messaging has been temporarily restricted.
+              {t('messaging_restricted_title')}
             </p>
             <p className="text-red-600/80 dark:text-red-400/80 text-xs mt-1">
-              If you believe this is an error, please contact your timebank coordinator.
+              {t('messaging_restricted_contact')}
             </p>
           </div>
         </div>

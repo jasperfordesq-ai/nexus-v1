@@ -89,7 +89,7 @@ export function KBArticlePage() {
   const [feedbackGiven, setFeedbackGiven] = useState<'helpful' | 'not_helpful' | null>(null);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
-  usePageTitle(article?.title || 'Knowledge Base');
+  usePageTitle(article?.title || t('title'));
 
   const loadArticle = useCallback(async () => {
     if (!id) return;
@@ -101,11 +101,11 @@ export function KBArticlePage() {
       if (response.success && response.data) {
         setArticle(response.data);
       } else {
-        setError('Article not found.');
+        setError(t('error.article_not_found'));
       }
     } catch (err) {
       logError('Failed to load KB article', err);
-      setError('Failed to load article. Please try again.');
+      setError(t('error.article_load_retry'));
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +158,7 @@ export function KBArticlePage() {
       <div className="space-y-6">
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to load article</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.article_title')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex gap-2 justify-center">
             <Link to={tenantPath('/kb')}>
@@ -167,7 +167,7 @@ export function KBArticlePage() {
                 className="bg-theme-elevated text-theme-primary"
                 startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               >
-                Back to Knowledge Base
+                {t('back_to_kb')}
               </Button>
             </Link>
             <Button
@@ -175,7 +175,7 @@ export function KBArticlePage() {
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadArticle}
             >
-              Try Again
+              {t("try_again")}
             </Button>
           </div>
         </GlassCard>
@@ -194,7 +194,7 @@ export function KBArticlePage() {
           className="hover:text-theme-primary transition-colors flex items-center gap-1"
         >
           <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
-          Knowledge Base
+          {t("title")}
         </Link>
         {article.category && (
           <>
@@ -235,11 +235,11 @@ export function KBArticlePage() {
               )}
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                Updated {formatRelativeTime(article.updated_at)}
+                {t("updated", { time: formatRelativeTime(article.updated_at) })}
               </span>
               <span className="flex items-center gap-1">
                 <Eye className="w-3 h-3" aria-hidden="true" />
-                {article.view_count} views
+                {t("views", { count: article.view_count })}
               </span>
             </div>
           </div>
@@ -271,7 +271,7 @@ export function KBArticlePage() {
             <div className="px-5 py-3 bg-theme-hover/30 border-b border-theme-default">
               <h2 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
                 <Folder className="w-4 h-4 text-blue-400" aria-hidden="true" />
-                Related Articles
+                {t("related_articles")}
                 <Chip size="sm" variant="flat" className="text-[10px] bg-theme-elevated text-theme-subtle">
                   {article.children.length}
                 </Chip>
@@ -314,13 +314,13 @@ export function KBArticlePage() {
             <div className="flex items-center justify-center gap-2">
               <CheckCircle className="w-5 h-5 text-emerald-400" aria-hidden="true" />
               <p className="text-sm text-theme-primary font-medium">
-                Thank you for your feedback!
+                {t('feedback_thanks')}
               </p>
             </div>
           ) : (
             <>
               <p className="text-sm text-theme-primary font-medium mb-3">
-                Was this article helpful?
+                {t('feedback.question')}
               </p>
               <div className="flex items-center justify-center gap-3">
                 <Button
@@ -330,7 +330,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(true)}
                   isLoading={isSubmittingFeedback}
                 >
-                  Yes ({article.helpful_count})
+                  {t('feedback.yes', { count: article.helpful_count })}
                 </Button>
                 <Button
                   variant="flat"
@@ -339,7 +339,7 @@ export function KBArticlePage() {
                   onPress={() => handleFeedback(false)}
                   isLoading={isSubmittingFeedback}
                 >
-                  No ({article.not_helpful_count})
+                  {t('feedback.no', { count: article.not_helpful_count })}
                 </Button>
               </div>
             </>
@@ -355,7 +355,7 @@ export function KBArticlePage() {
             className="bg-theme-elevated text-theme-muted"
             startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
           >
-            Back to Knowledge Base
+            {t('back_to_kb')}
           </Button>
         </Link>
       </div>

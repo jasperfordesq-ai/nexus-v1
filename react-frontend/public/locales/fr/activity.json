@@ -13,12 +13,16 @@
     "hours_given": "Hours Given",
     "hours_received": "Hours Received",
     "connections": "Connections",
-    "exchanges": "Exchanges"
+    "exchanges": "Exchanges",
+    "pending_requests": "Pending Requests",
+    "transactions_given": "Transactions Given",
+    "transactions_received": "Transactions Received"
   },
   "chart": {
     "given": "Given",
     "received": "Received",
-    "monthly_activity": "Monthly Activity"
+    "monthly_activity": "Monthly Activity",
+    "no_data": "No chart data available"
   },
   "recent_activity": "Recent Activity",
   "empty_title": "No recent activity",
@@ -29,5 +33,23 @@
   "likes_received_30d": "Likes Received (30d)",
   "net_balance": "Net Balance",
   "my_skills": "My Skills",
-  "skill_offer": "Offer"
+  "skill_offer": "Offer",
+  "loading": "Loading activity data...",
+  "refresh": "Refresh",
+  "comments_30d": "Comments (30d)",
+  "likes_given_30d": "Likes Given (30d)",
+  "hours_suffix": "h",
+  "skill_request": "Request",
+  "endorsements_count": "{{count}} endorsement",
+  "endorsements_count_plural": "{{count}} endorsements",
+  "activity_types": {
+    "exchange": "Exchange",
+    "listing": "Listing",
+    "connection": "Connection",
+    "event": "Event",
+    "message": "Message",
+    "review": "Review",
+    "post": "Post",
+    "default": "Activity"
+  }
 }

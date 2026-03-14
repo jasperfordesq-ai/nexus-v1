@@ -183,8 +183,13 @@ export function ConversationPage() {
 
     // Listen for new messages
     const unsubMessage = pusher.onNewMessage((event: NewMessageEvent) => {
+      // Backend may send from_user_id instead of sender_id; normalize
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const raw = event as any;
+      const senderId: number | undefined = event.sender_id || raw.from_user_id;
+
       // Only handle messages from the other user in this conversation
-      if (event.sender_id === otherUserId) {
+      if (senderId === otherUserId) {
         // Update last message ID
         lastMessageIdRef.current = event.id;
 
@@ -199,10 +204,10 @@ export function ConversationPage() {
 
           const newMsg: Message = {
             id: event.id,
-            body: event.body,
-            sender_id: event.sender_id,
+            body: event.body || raw.preview || '',
+            sender_id: senderId,
             is_own: false,
-            created_at: event.created_at,
+            created_at: event.created_at || new Date().toISOString(),
           };
 
           return {
@@ -210,6 +215,13 @@ export function ConversationPage() {
             messages: [...prev.messages, newMsg],
           };
         });
+
+        // Mark incoming message as read immediately (user is viewing this conversation)
+        if (id) {
+          api.put(`/v2/messages/${id}/read`).catch(() => {
+            // non-critical — will sync on next load
+          });
+        }
 
         // Scroll to bottom for new messages
         setTimeout(() => scrollToBottom(), 50);
@@ -317,6 +329,36 @@ export function ConversationPage() {
   useEffect(() => {
     loadConversation();
   }, [loadConversation]);
+
+  // Mark conversation as read when it loads and when new messages arrive
+  useEffect(() => {
+    if (!conversation?.messages?.length || !id || isNewConversationRoute) return;
+
+    // Find unread messages from the other user
+    const unreadMessages = conversation.messages.filter(
+      (msg) => msg.sender_id !== user?.id && !msg.is_read && !msg.read_at
+    );
+
+    if (unreadMessages.length === 0) return;
+
+    // Mark the conversation as read via the API
+    api.put(`/v2/messages/${id}/read`).catch((err) => {
+      logError('Failed to mark conversation as read', err);
+    });
+
+    // Update local state to reflect read status
+    setConversation((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        messages: prev.messages.map((msg) =>
+          msg.sender_id !== user?.id
+            ? { ...msg, is_read: true, read_at: new Date().toISOString() }
+            : msg
+        ),
+      };
+    });
+  }, [conversation?.messages?.length, id, isNewConversationRoute, user?.id]);
 
   // Fetch messaging restriction status (broker monitoring)
   const refreshRestrictionStatus = useCallback(() => {
@@ -1049,7 +1091,30 @@ export function ConversationPage() {
   }
 
   if (!conversation) {
-    return null;
+    return (
+      <div className="max-w-3xl mx-auto">
+        <GlassCard className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h3>
+          <p className="text-theme-muted mb-4">{t('conversation_load_failed')}</p>
+          <div className="flex gap-3 justify-center">
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-muted"
+              onPress={() => navigate(tenantPath('/messages'))}
+            >
+              {t('back_to_messages')}
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              onPress={() => loadConversation()}
+            >
+              {t('try_again')}
+            </Button>
+          </div>
+        </GlassCard>
+      </div>
+    );
   }
 
   const { meta, messages } = conversation;

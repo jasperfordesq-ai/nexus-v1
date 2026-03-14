@@ -13,6 +13,29 @@
   "empty_caught_up_desc": "You've read all your notifications",
   "mark_read_aria": "Mark as read",
   "delete_aria": "Delete notification",
+  "loading_aria": "Loading notifications",
+  "error_title": "Unable to load",
+  "error_load": "Something went wrong loading your notifications",
+  "try_again": "Try Again",
+  "flyout": {
+    "bell_aria": "Notifications",
+    "bell_unread_aria": "Notifications, {{count}} unread",
+    "unread_count": "unread",
+    "empty": "No notifications yet",
+    "view_all": "View all notifications",
+    "unread_dot_aria": "Unread"
+  },
+  "type": {
+    "message": "Message",
+    "listing": "Listing",
+    "transaction": "Transaction",
+    "connection": "Connection",
+    "event": "Event",
+    "group": "Group",
+    "achievement": "Achievement",
+    "system": "System",
+    "default": "Notification"
+  },
   "toast": {
     "mark_read_failed": "Failed to mark notification as read",
     "all_read": "All notifications marked as read",

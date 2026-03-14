@@ -155,7 +155,7 @@ export function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [toast, advancedFilters]);
 
   useEffect(() => {
     const urlQuery = searchParams.get('q');

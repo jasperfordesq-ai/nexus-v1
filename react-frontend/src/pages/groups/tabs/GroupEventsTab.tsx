@@ -108,7 +108,7 @@ export function GroupEventsTab({
                       )}
                       <span className="flex items-center gap-1">
                         <Users className="w-3 h-3" aria-hidden="true" />
-                        {event.attendees_count} {t('detail.attending')}
+                        {event.attendees_count ?? 0} {t('detail.attending')}
                       </span>
                     </div>
                   </div>

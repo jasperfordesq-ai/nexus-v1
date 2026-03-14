@@ -72,12 +72,12 @@ interface GoalCheckinModalProps {
 /* ───────────────────────── Mood Options ───────────────────────── */
 
 const MOODS = [
-  { value: 'great', label: 'Great', icon: Star, color: 'text-amber-400' },
-  { value: 'good', label: 'Good', icon: Smile, color: 'text-emerald-400' },
-  { value: 'okay', label: 'Okay', icon: Meh, color: 'text-blue-400' },
-  { value: 'struggling', label: 'Struggling', icon: Frown, color: 'text-orange-400' },
-  { value: 'motivated', label: 'Motivated', icon: Zap, color: 'text-purple-400' },
-  { value: 'grateful', label: 'Grateful', icon: Heart, color: 'text-rose-400' },
+  { value: 'great', labelKey: 'mood.great', icon: Star, color: 'text-amber-400' },
+  { value: 'good', labelKey: 'mood.good', icon: Smile, color: 'text-emerald-400' },
+  { value: 'okay', labelKey: 'mood.okay', icon: Meh, color: 'text-blue-400' },
+  { value: 'struggling', labelKey: 'mood.struggling', icon: Frown, color: 'text-orange-400' },
+  { value: 'motivated', labelKey: 'mood.motivated', icon: Zap, color: 'text-purple-400' },
+  { value: 'grateful', labelKey: 'mood.grateful', icon: Heart, color: 'text-rose-400' },
 ] as const;
 
 function getMoodIcon(mood: string) {
@@ -88,7 +88,7 @@ function getMoodIcon(mood: string) {
 }
 
 function getMoodLabel(mood: string): string {
-  return MOODS.find((m) => m.value === mood)?.label || mood;
+  return MOODS.find((m) => m.value === mood)?.labelKey || mood;
 }
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -320,7 +320,7 @@ export function GoalCheckinModal({
                         startContent={<Icon className={`w-4 h-4 ${isSelected ? 'text-white' : mood.color}`} aria-hidden="true" />}
                         onPress={() => setSelectedMood(isSelected ? null : mood.value)}
                       >
-                        {mood.label}
+                        {t(mood.labelKey)}
                       </Button>
                     );
                   })}
