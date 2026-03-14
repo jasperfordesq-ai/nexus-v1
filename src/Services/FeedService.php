@@ -63,12 +63,20 @@ class FeedService
         $subtype = $filters['subtype'] ?? null;
         $cursor = $filters['cursor'] ?? null;
 
-        // Decode cursor (activity_id encoded as base64)
+        // Decode cursor: base64("created_at|activity_id") for chronological pagination
+        // Also supports legacy format: base64("activity_id") for backwards compatibility
+        $cursorCreatedAt = null;
         $cursorActivityId = null;
         if ($cursor) {
             $decoded = base64_decode($cursor, true);
-            if ($decoded !== false && ctype_digit($decoded)) {
-                $cursorActivityId = (int)$decoded;
+            if ($decoded !== false) {
+                if (str_contains($decoded, '|')) {
+                    [$cursorCreatedAt, $cursorActivityIdStr] = explode('|', $decoded, 2);
+                    $cursorActivityId = ctype_digit($cursorActivityIdStr) ? (int)$cursorActivityIdStr : null;
+                } elseif (ctype_digit($decoded)) {
+                    // Legacy cursor: activity_id only
+                    $cursorActivityId = (int)$decoded;
+                }
             }
         }
 
@@ -85,7 +93,7 @@ class FeedService
 
         $items = self::loadFromFeedActivity(
             $userId, $tenantId, $limit + 1,
-            $cursorActivityId,
+            $cursorCreatedAt, $cursorActivityId,
             $sourceType, $profileUserId, $groupId, $subtype
         );
 
@@ -95,18 +103,18 @@ class FeedService
             array_pop($items);
         }
 
-        // Generate cursor from last item (activity_id based)
+        // Generate cursor from last item (created_at|activity_id for chronological order)
         $nextCursor = null;
         if ($hasMore && !empty($items)) {
             $lastItem = end($items);
-            if (isset($lastItem['_activity_id'])) {
-                $nextCursor = base64_encode((string)$lastItem['_activity_id']);
+            if (isset($lastItem['_activity_id'], $lastItem['_activity_created_at'])) {
+                $nextCursor = base64_encode($lastItem['_activity_created_at'] . '|' . $lastItem['_activity_id']);
             }
         }
 
-        // Strip internal _activity_id from output
+        // Strip internal cursor fields from output
         foreach ($items as &$item) {
-            unset($item['_activity_id']);
+            unset($item['_activity_id'], $item['_activity_created_at']);
         }
         unset($item);
 
@@ -126,6 +134,7 @@ class FeedService
         ?int $userId,
         int $tenantId,
         int $limit,
+        ?string $cursorCreatedAt,
         ?int $cursorActivityId,
         ?string $sourceType = null,
         ?int $profileUserId = null,
@@ -170,13 +179,19 @@ class FeedService
             $params[] = $subtype;
         }
 
-        // Cursor: paginate by activity_id
-        if ($cursorActivityId !== null) {
+        // Cursor: paginate by (created_at, id) tuple for correct chronological order
+        if ($cursorCreatedAt !== null && $cursorActivityId !== null) {
+            $sql .= " AND (fa.created_at < ? OR (fa.created_at = ? AND fa.id < ?))";
+            $params[] = $cursorCreatedAt;
+            $params[] = $cursorCreatedAt;
+            $params[] = $cursorActivityId;
+        } elseif ($cursorActivityId !== null) {
+            // Legacy cursor: fall back to id-only pagination
             $sql .= " AND fa.id < ?";
             $params[] = $cursorActivityId;
         }
 
-        $sql .= " ORDER BY fa.id DESC LIMIT {$limit}";
+        $sql .= " ORDER BY fa.created_at DESC, fa.id DESC LIMIT {$limit}";
 
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
@@ -224,9 +239,10 @@ class FeedService
         // Enrich with like status and poll data via existing batch methods
         $formatted = self::formatItems($items, $userId);
 
-        // Attach activity_id for cursor generation (stripped before output)
+        // Attach activity_id and created_at for cursor generation (stripped before output)
         foreach ($formatted as $i => &$fItem) {
             $fItem['_activity_id'] = (int)$rows[$i]['activity_id'];
+            $fItem['_activity_created_at'] = $rows[$i]['created_at'];
         }
         unset($fItem);
 
