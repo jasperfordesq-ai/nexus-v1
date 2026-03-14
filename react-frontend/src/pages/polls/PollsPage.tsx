@@ -65,7 +65,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 
@@ -703,7 +703,7 @@ export function PollsPage() {
   /* ── P4: Export CSV ── */
   const handleExport = async (pollId: number) => {
     try {
-      const response = await fetch(`/api/v2/polls/${pollId}/export`, {
+      const response = await fetch(`${API_BASE}/v2/polls/${pollId}/export`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('nexus_access_token')}`,
           'X-Tenant-ID': localStorage.getItem('nexus_tenant_id') || '',

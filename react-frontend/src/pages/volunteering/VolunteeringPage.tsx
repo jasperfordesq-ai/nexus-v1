@@ -679,6 +679,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
 
 function ApplicationsTab() {
   const { t } = useTranslation('community');
+  const toast = useToast();
   const { tenantPath } = useTenant();
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -737,10 +738,14 @@ function ApplicationsTab() {
     try {
       const response = await api.delete(`/v2/volunteering/applications/${applicationId}`);
       if (response.success) {
+        toast.success(t('volunteering.withdraw_success', 'Application withdrawn.'));
         loadApplications();
+      } else {
+        toast.error(response.error || t('volunteering.withdraw_failed', 'Failed to withdraw application.'));
       }
     } catch (err) {
       logError('Failed to withdraw application', err);
+      toast.error(t('volunteering.withdraw_failed', 'Failed to withdraw application.'));
     }
   };
 
@@ -917,6 +922,7 @@ function ApplicationsTab() {
 
 function HoursTab() {
   const { t } = useTranslation('community');
+  const toast = useToast();
   const [summary, setSummary] = useState<HoursSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -976,12 +982,16 @@ function HoursTab() {
       });
 
       if (response.success) {
+        toast.success(t('volunteering.hours_logged_success', 'Hours logged successfully!'));
         onClose();
         setLogForm({ organization_id: '', date: new Date().toISOString().split('T')[0], hours: '', description: '' });
         loadSummary();
+      } else {
+        toast.error(response.error || t('volunteering.hours_log_failed', 'Failed to log hours. Please try again.'));
       }
     } catch (err) {
       logError('Failed to log hours', err);
+      toast.error(t('volunteering.hours_log_failed', 'Failed to log hours. Please try again.'));
     } finally {
       setIsLogging(false);
     }

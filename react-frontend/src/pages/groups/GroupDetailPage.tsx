@@ -55,7 +55,7 @@ import {
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { ComposeHub } from '@/components/compose';
-import { LoadingScreen } from '@/components/feedback';
+import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -739,7 +739,7 @@ export function GroupDetailPage() {
       const response = await api.put(`/v2/groups/${id}`, {
         name: settingsName.trim(),
         description: settingsDescription.trim(),
-        is_private: settingsPrivate,
+        visibility: settingsPrivate ? 'private' : 'public',
         location: settingsLocation.trim(),
       });
       if (response.success) {
@@ -1176,7 +1176,7 @@ export function GroupDetailPage() {
           title={
             <span className="flex items-center gap-2">
               <FolderOpen className="w-4 h-4" aria-hidden="true" />
-              Files
+              {t('detail.tab_files', 'Files')}
             </span>
           }
         />
@@ -1185,7 +1185,7 @@ export function GroupDetailPage() {
           title={
             <span className="flex items-center gap-2">
               <Megaphone className="w-4 h-4" aria-hidden="true" />
-              Announcements
+              {t('detail.tab_announcements', 'Announcements')}
             </span>
           }
         />
@@ -1194,7 +1194,7 @@ export function GroupDetailPage() {
           title={
             <span className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" aria-hidden="true" />
-              Channels
+              {t('detail.tab_channels', 'Channels')}
             </span>
           }
         />
@@ -1203,7 +1203,7 @@ export function GroupDetailPage() {
           title={
             <span className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" aria-hidden="true" />
-              Tasks
+              {t('detail.tab_tasks', 'Tasks')}
             </span>
           }
         />
@@ -1302,21 +1302,57 @@ export function GroupDetailPage() {
           />
         )}
 
-        {activeTab === 'chatrooms' && userIsMember && (
+        {activeTab === 'chatrooms' && (userIsMember ? (
           <GroupChatroomsTab
             groupId={group.id}
             isGroupAdmin={userIsAdmin}
           />
-        )}
-
-        {activeTab === 'tasks' && userIsMember && (
+        ) : (
+          <GlassCard className="p-6">
+            <EmptyState
+              icon={<Lock className="w-12 h-12" aria-hidden="true" />}
+              title={t('detail.join_to_access_title', 'Members Only')}
+              description={t('detail.join_to_access_desc', 'Join this group to access this feature.')}
+              action={
+                isAuthenticated && (
+                  <Button
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    onPress={handleJoinLeave}
+                    isLoading={isJoining}
+                  >
+                    {t('detail.join_group')}
+                  </Button>
+                )
+              }
+            />
+          </GlassCard>
+        ))}
+        {activeTab === 'tasks' && (userIsMember ? (
           <GroupTasksTab
             groupId={group.id}
             isGroupAdmin={userIsAdmin}
             members={members}
           />
-        )}
-
+        ) : (
+          <GlassCard className="p-6">
+            <EmptyState
+              icon={<Lock className="w-12 h-12" aria-hidden="true" />}
+              title={t('detail.join_to_access_title', 'Members Only')}
+              description={t('detail.join_to_access_desc', 'Join this group to access this feature.')}
+              action={
+                isAuthenticated && (
+                  <Button
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    onPress={handleJoinLeave}
+                    isLoading={isJoining}
+                  >
+                    {t('detail.join_group')}
+                  </Button>
+                )
+              }
+            />
+          </GlassCard>
+        ))}
         {activeTab === 'subgroups' && hasSubGroups && (
           <GroupSubgroupsTab subGroups={group.sub_groups!} />
         )}

@@ -49,7 +49,7 @@ const TYPE_ICONS: Record<string, typeof Bell> = {
 };
 
 export function NotificationFlyout() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('notifications');
   const navigate = useNavigate();
   const { unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const { tenantPath } = useTenant();
@@ -140,10 +140,10 @@ export function NotificationFlyout() {
       <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[360px] max-w-[90vw]">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
           <h3 className="text-sm font-semibold text-theme-primary">
-            {t('nav.notifications', 'Notifications')}
+            {t('title')}
             {unreadCount > 0 && (
               <span className="ml-2 text-xs font-normal text-theme-subtle">
-                ({unreadCount} {t('notifications.unread', 'unread')})
+                ({unreadCount} {t('flyout.unread_count')})
               </span>
             )}
           </h3>
@@ -155,7 +155,7 @@ export function NotificationFlyout() {
               onPress={handleMarkAllRead}
             >
               <CheckCheck className="w-3.5 h-3.5" aria-hidden="true" />
-              {t('notifications.mark_all_read', 'Mark all read')}
+              {t('mark_all_read')}
             </Button>
           )}
         </div>
@@ -175,7 +175,7 @@ export function NotificationFlyout() {
           ) : notifications.length === 0 ? (
             <div className="py-8 text-center">
               <Bell className="w-8 h-8 mx-auto text-theme-subtle mb-2 opacity-40" />
-              <p className="text-sm text-theme-subtle">{t('notifications.empty', 'No notifications yet')}</p>
+              <p className="text-sm text-theme-subtle">{t('flyout.empty')}</p>
             </div>
           ) : (
             <div className="py-1">
@@ -205,7 +205,7 @@ export function NotificationFlyout() {
                       </p>
                     </div>
                     {isUnread && (
-                      <span className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0" aria-label="Unread" />
+                      <span className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0" aria-label={t('flyout.unread_dot_aria')} />
                     )}
                   </button>
                 );
@@ -221,7 +221,7 @@ export function NotificationFlyout() {
             className="text-sm text-indigo-500 dark:text-indigo-400 h-8 gap-1.5"
             onPress={handleViewAll}
           >
-            {t('notifications.view_all', 'View all notifications')}
+            {t('flyout.view_all')}
             <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
           </Button>
         </div>

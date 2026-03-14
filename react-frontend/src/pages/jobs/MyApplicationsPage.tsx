@@ -98,29 +98,10 @@ const STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'seconda
   withdrawn: 'default',
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  applied: 'Applied',
-  pending: 'Applied',
-  screening: 'Under Review',
-  reviewed: 'Reviewed',
-  interview: 'Interview',
-  offer: 'Offer Received',
-  accepted: 'Accepted',
-  rejected: 'Not Successful',
-  withdrawn: 'Withdrawn',
-};
-
 const TYPE_CHIP_COLORS: Record<string, 'primary' | 'success' | 'secondary'> = {
   paid: 'primary',
   volunteer: 'success',
   timebank: 'secondary',
-};
-
-const COMMITMENT_LABELS: Record<string, string> = {
-  full_time: 'Full-time',
-  part_time: 'Part-time',
-  flexible: 'Flexible',
-  one_off: 'One-off',
 };
 
 const ACTIVE_STATUSES = new Set(['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer']);
@@ -153,6 +134,7 @@ interface ApplicationCardProps {
 }
 
 function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCardProps) {
+  const { t } = useTranslation('jobs');
   const [messageExpanded, setMessageExpanded] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -171,15 +153,17 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
     if (daysUntilDeadline < 0) {
       deadlineLabel = (
         <span className='flex items-center gap-1 text-xs text-danger'>
-          <AlertTriangle size={12} />
-          Deadline passed
+          <AlertTriangle size={12} aria-hidden="true" />
+          {t('deadline_passed')}
         </span>
       );
     } else if (daysUntilDeadline < 7) {
       deadlineLabel = (
         <span className='flex items-center gap-1 text-xs text-warning font-medium'>
-          <AlertTriangle size={12} />
-          {daysUntilDeadline === 0 ? 'Deadline today' : `${daysUntilDeadline}d left`}
+          <AlertTriangle size={12} aria-hidden="true" />
+          {daysUntilDeadline === 0
+            ? t('my_applications.deadline_today', 'Deadline today')
+            : t('my_applications.days_left', '{{count}}d left', { count: daysUntilDeadline })}
         </span>
       );
     } else {
@@ -211,13 +195,13 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
               color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'}
               size='sm'
               variant='flat'>
-              {vacancy.type.charAt(0).toUpperCase() + vacancy.type.slice(1)}
+              {t(`type.${vacancy.type}`)}
             </Chip>
             <Chip
               color={STATUS_COLORS[application.status] ?? 'default'}
               size='sm'
               variant='flat'>
-              {STATUS_LABELS[application.status] ?? application.status}
+              {t(`application_status.${application.status}`, { defaultValue: application.status })}
             </Chip>
           </div>
         </div>
@@ -226,12 +210,12 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
         <div className='flex flex-wrap items-center gap-3 mb-3 text-xs text-theme-muted'>
           <span className='flex items-center gap-1'>
             <Clock size={12} />
-            {COMMITMENT_LABELS[vacancy.commitment] ?? vacancy.commitment}
+            {t(`commitment.${vacancy.commitment}`)}
           </span>
           {vacancy.is_remote ? (
             <span className='flex items-center gap-1'>
-              <Wifi size={12} />
-              Remote
+              <Wifi size={12} aria-hidden="true" />
+              {t('remote')}
             </span>
           ) : vacancy.location ? (
             <span className='flex items-center gap-1'>
@@ -244,9 +228,9 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
 
         {/* Dates row */}
         <div className='flex flex-wrap gap-3 mb-3 text-xs text-theme-muted'>
-          <span>Applied: {appliedDate.toLocaleDateString()}</span>
+          <span>{t('my_applications.applied_date', 'Applied: {{date}}', { date: appliedDate.toLocaleDateString() })}</span>
           {datesAreDifferent && (
-            <span>Updated: {updatedDate.toLocaleDateString()}</span>
+            <span>{t('my_applications.updated_date', 'Updated: {{date}}', { date: updatedDate.toLocaleDateString() })}</span>
           )}
         </div>
 
@@ -260,7 +244,9 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
               className="flex items-center gap-1 text-xs text-theme-muted hover:text-theme-primary transition-colors mb-1 h-auto p-0 min-w-0"
               startContent={messageExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             >
-              {messageExpanded ? 'Hide cover message' : 'Show cover message'}
+              {messageExpanded
+                ? t('my_applications.hide_cover_message', 'Hide cover message')
+                : t('my_applications.show_cover_message', 'Show cover message')}
             </Button>
             <AnimatePresence initial={false}>
               {messageExpanded && (
@@ -307,7 +293,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
                   .finally(() => setHistoryLoading(false));
               }
             }}>
-            History
+            {t('history.title')}
           </Button>
           {isActive && (
             <Button
@@ -315,7 +301,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
               color='danger'
               variant='flat'
               onPress={() => onWithdraw(application)}>
-              Withdraw
+              {t('my_applications.withdraw', 'Withdraw')}
             </Button>
           )}
         </div>
@@ -331,26 +317,26 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
               transition={{ duration: 0.2 }}
               className='overflow-hidden'>
               <div className='mt-3 pt-3 border-t border-divider'>
-                <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-2'>Status History</p>
+                <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-2'>{t('history.status_history', 'Status History')}</p>
                 {historyLoading && <div className='flex justify-center py-3'><Spinner size='sm' /></div>}
                 {!historyLoading && history.length === 0 && (
-                  <p className='text-xs text-default-400'>No history available.</p>
+                  <p className='text-xs text-default-400'>{t('history.empty')}</p>
                 )}
                 {!historyLoading && history.length > 0 && (
                   <ol className='space-y-2'>
                     {history.map((entry) => (
                       <li key={entry.id} className='flex gap-2 text-xs'>
-                        <span className='shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-primary/60 mt-1.5' />
+                        <span className='shrink-0 w-1.5 h-1.5 rounded-full bg-primary/60 mt-1.5' />
                         <div className='min-w-0'>
                           <span className='text-default-600'>
                             {entry.from_status
-                              ? <>{STATUS_LABELS[entry.from_status] ?? entry.from_status} → {STATUS_LABELS[entry.to_status] ?? entry.to_status}</>
-                              : <>Application submitted</>}
+                              ? <>{t(`application_status.${entry.from_status}`, { defaultValue: entry.from_status })} → {t(`application_status.${entry.to_status}`, { defaultValue: entry.to_status })}</>
+                              : <>{t('history.initial')}</>}
                           </span>
                           {entry.notes && <span className='text-default-400 italic ml-1'>— {entry.notes}</span>}
                           <div className='text-default-400'>
                             {new Date(entry.changed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                            {entry.changed_by_name && <span className='ml-1'>by {entry.changed_by_name}</span>}
+                            {entry.changed_by_name && <span className='ml-1'>{t('history.by', 'by {{name}}', { name: entry.changed_by_name })}</span>}
                           </div>
                         </div>
                       </li>
@@ -391,11 +377,11 @@ function ApplicationSkeleton() {
 // ---------------------------------------------------------------------------
 
 export function MyApplicationsPage() {
-  usePageTitle('My Applications');
+  const { t } = useTranslation('jobs');
+  usePageTitle(t('my_applications.title'));
   useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const { t } = useTranslation('jobs');
 
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -433,7 +419,7 @@ export function MyApplicationsPage() {
 
       try {
         const params = new URLSearchParams();
-        params.set('limit', String(ITEMS_PER_PAGE));
+        params.set('per_page', String(ITEMS_PER_PAGE));
         const status = tabToStatus(activeTab);
         if (status) params.set('status', status);
         if (append && cursorRef.current) params.set('cursor', cursorRef.current);
@@ -446,13 +432,13 @@ export function MyApplicationsPage() {
           setHasMore(data.has_more);
           setApplications((prev) => (append ? [...prev, ...data.items] : data.items));
         } else {
-          const msg = (res as { error?: string }).error ?? 'Failed to load applications';
+          const msg = (res as { error?: string }).error ?? t('my_applications.load_error', 'Failed to load applications');
           if (!append) setError(msg);
           toast.error(msg);
         }
       } catch (err) {
         logError('MyApplicationsPage', err);
-        const msg = 'Something went wrong. Please try again.';
+        const msg = t('something_wrong', 'Something went wrong. Please try again.');
         if (!append) setError(msg);
         toast.error(msg);
       } finally {
@@ -460,7 +446,7 @@ export function MyApplicationsPage() {
         setIsLoadingMore(false);
       }
     },
-    [activeTab, toast],  
+    [activeTab, toast, t],
   );
 
   useEffect(() => {
@@ -489,7 +475,7 @@ export function MyApplicationsPage() {
         setApplications([]);
         loadApplications();
       } else {
-        toast.error((res as { error?: string }).error ?? 'Failed to withdraw application.');
+        toast.error((res as { error?: string }).error ?? t('my_applications.withdraw_error', 'Failed to withdraw application.'));
       }
     } catch (err) {
       logError('MyApplicationsPage.confirmWithdraw', err);
@@ -504,11 +490,11 @@ export function MyApplicationsPage() {
       {/* Page header */}
       <div className='mb-6'>
         <h1 className='text-2xl font-bold text-theme-primary flex items-center gap-2'>
-          <Briefcase size={24} />
-          My Applications
+          <Briefcase size={24} aria-hidden="true" />
+          {t('my_applications.title')}
         </h1>
         <p className='text-sm text-theme-muted mt-1'>
-          Track the status of your job and volunteer applications.
+          {t('my_applications.subtitle', 'Track the status of your job and volunteer applications.')}
         </p>
       </div>
 
@@ -518,12 +504,12 @@ export function MyApplicationsPage() {
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as FilterTab)}
           variant='underlined'
-          aria-label='Application filter'
+          aria-label={t('my_applications.filter_aria', 'Application filter')}
           classNames={{ tab: 'text-theme-muted data-[selected=true]:text-theme-primary' }}>
-          <Tab key='all' title='All' />
-          <Tab key='active' title='Active' />
-          <Tab key='accepted' title='Accepted' />
-          <Tab key='rejected' title='Rejected' />
+          <Tab key='all' title={t('my_applications.tab_all', 'All')} />
+          <Tab key='active' title={t('my_applications.tab_active', 'Active')} />
+          <Tab key='accepted' title={t('my_applications.tab_accepted', 'Accepted')} />
+          <Tab key='rejected' title={t('my_applications.tab_rejected', 'Rejected')} />
         </Tabs>
       </div>
 
@@ -541,7 +527,7 @@ export function MyApplicationsPage() {
         <GlassCard className='p-8 text-center'>
           <p className='text-danger mb-4'>{error}</p>
           <Button color='primary' variant='flat' onPress={() => loadApplications()}>
-            Retry
+            {t('try_again', 'Retry')}
           </Button>
         </GlassCard>
       )}
@@ -551,15 +537,15 @@ export function MyApplicationsPage() {
         <GlassCard className='p-12 text-center'>
           <Briefcase size={48} className='mx-auto mb-4 text-theme-muted/50' />
           <h3 className='text-lg font-semibold text-theme-primary mb-2'>
-            No applications yet
+            {t('my_applications.empty_title', 'No applications yet')}
           </h3>
           <p className='text-sm text-theme-muted mb-6'>
             {activeTab === 'all'
-              ? "You haven't applied to any positions yet."
-              : `No ${activeTab} applications found.`}
+              ? t('my_applications.empty_all', "You haven't applied to any positions yet.")
+              : t('my_applications.empty_filtered', 'No {{filter}} applications found.', { filter: t(`my_applications.tab_${activeTab}`) })}
           </p>
           <Button as={Link} to={tenantPath('/jobs')} color='primary' variant='flat'>
-            Browse Jobs
+            {t('my_applications.browse_jobs', 'Browse Jobs')}
           </Button>
         </GlassCard>
       )}
@@ -590,7 +576,7 @@ export function MyApplicationsPage() {
                 color='primary'
                 isLoading={isLoadingMore}
                 onPress={() => loadApplications(true)}>
-                Load more
+                {t('load_more')}
               </Button>
             </div>
           )}
@@ -600,20 +586,20 @@ export function MyApplicationsPage() {
       {/* Withdraw confirmation modal */}
       <Modal isOpen={isWithdrawOpen} onClose={closeWithdraw} size='sm'>
         <ModalContent>
-          <ModalHeader>Withdraw Application</ModalHeader>
+          <ModalHeader>{t('my_applications.withdraw_title', 'Withdraw Application')}</ModalHeader>
           <ModalBody>
             <p className='text-sm text-theme-secondary'>
-              Are you sure you want to withdraw your application for{' '}
-              <span className='font-semibold'>{withdrawTarget?.vacancy.title}</span>?
-              This action cannot be undone.
+              {t('my_applications.withdraw_confirm', 'Are you sure you want to withdraw your application for {{title}}? This action cannot be undone.', {
+                title: withdrawTarget?.vacancy.title ?? '',
+              })}
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant='flat' onPress={closeWithdraw} isDisabled={isWithdrawing}>
-              Cancel
+              {t('apply.cancel')}
             </Button>
             <Button color='danger' onPress={confirmWithdraw} isLoading={isWithdrawing}>
-              Withdraw
+              {t('my_applications.withdraw', 'Withdraw')}
             </Button>
           </ModalFooter>
         </ModalContent>

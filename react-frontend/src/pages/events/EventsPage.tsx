@@ -128,10 +128,7 @@ export function EventsPage() {
         params.set('cursor', nextCursorRef.current);
       }
       if (selectedCategory && selectedCategory !== 'all') {
-        const categoryInt = parseInt(selectedCategory);
-        if (!isNaN(categoryInt)) {
-          params.set('category_id', String(categoryInt));
-        }
+        params.set('category', selectedCategory);
       }
 
       const response = await api.get<Event[]>(`/v2/events?${params}`);

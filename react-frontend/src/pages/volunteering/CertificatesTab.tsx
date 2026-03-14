@@ -86,10 +86,10 @@ export function CertificatesTab() {
         toastSuccess('Certificate generated!');
         load();
       } else {
-        const message =
-          (response as { error?: { message?: string } }).error?.message ??
-          'No verified volunteer hours found. Hours must be approved before generating a certificate.';
-        toastError(message);
+        toastError(
+          response.error ||
+          'No verified volunteer hours found. Hours must be approved before generating a certificate.'
+        );
       }
     } catch (err) {
       logError('Failed to generate certificate', err);

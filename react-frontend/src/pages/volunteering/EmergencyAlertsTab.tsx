@@ -29,6 +29,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { useToast } from '@/contexts';
 
 interface EmergencyAlert {
   id: number;
@@ -56,6 +57,7 @@ interface EmergencyAlert {
 }
 
 export function EmergencyAlertsTab() {
+  const toast = useToast();
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -93,10 +95,14 @@ export function EmergencyAlertsTab() {
       setRespondingTo(alertId);
       const result = await api.put(`/v2/volunteering/emergency-alerts/${alertId}`, { response });
       if (result.success) {
+        toast.success(response === 'accepted' ? 'Alert accepted.' : 'Alert declined.');
         load();
+      } else {
+        toast.error(result.error || 'Failed to respond to alert.');
       }
     } catch (err) {
       logError('Failed to respond to alert', err);
+      toast.error('Failed to respond to alert. Please try again.');
     } finally {
       setRespondingTo(null);
     }

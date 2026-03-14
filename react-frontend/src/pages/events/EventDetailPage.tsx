@@ -115,7 +115,7 @@ export function EventDetailPage() {
       setError(null);
       const [eventRes, attendeesRes] = await Promise.all([
         api.get<Event>(`/v2/events/${id}`),
-        api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?limit=50`).catch(() => ({ success: true, data: [] })),
+        api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?per_page=50`).catch(() => ({ success: true, data: [] })),
       ]);
 
       if (eventRes.success && eventRes.data) {
@@ -150,7 +150,7 @@ export function EventDetailPage() {
     async function fetchSeriesEvents() {
       setIsLoadingSeriesEvents(true);
       try {
-        const res = await api.get<Event[]>(`/v2/events?series_id=${event!.series!.id}&limit=5`);
+        const res = await api.get<Event[]>(`/v2/events?series_id=${event!.series!.id}&per_page=5`);
         if (!cancelled && res.success && res.data) {
           // Filter out the current event
           setSeriesEvents(

@@ -40,6 +40,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { useToast } from '@/contexts';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -78,6 +79,7 @@ interface GroupReservation {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function GroupSignUpTab() {
+  const toast = useToast();
   const [reservations, setReservations] = useState<GroupReservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +138,7 @@ export function GroupSignUpTab() {
       );
 
       if (response.success) {
+        toast.success('Member added to the group.');
         onClose();
         setNewMemberEmail('');
         load();

@@ -18,5 +18,28 @@
     "all_read": "Toutes les notifications marquées comme lues",
     "mark_all_failed": "Impossible de tout marquer comme lu",
     "delete_failed": "Impossible de supprimer la notification"
+  },
+  "loading_aria": "Loading notifications",
+  "error_title": "Unable to load",
+  "error_load": "Something went wrong loading your notifications",
+  "try_again": "Try Again",
+  "flyout": {
+    "bell_aria": "Notifications",
+    "bell_unread_aria": "Notifications, {{count}} unread",
+    "unread_count": "unread",
+    "empty": "No notifications yet",
+    "view_all": "View all notifications",
+    "unread_dot_aria": "Unread"
+  },
+  "type": {
+    "message": "Message",
+    "listing": "Listing",
+    "transaction": "Transaction",
+    "connection": "Connection",
+    "event": "Event",
+    "group": "Group",
+    "achievement": "Achievement",
+    "system": "System",
+    "default": "Notification"
   }
 }

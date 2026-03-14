@@ -63,7 +63,7 @@ export function ForgotPasswordPage() {
             </p>
             <div className="flex flex-col gap-3">
               <Button
-                onClick={() => setIsSubmitted(false)}
+                onPress={() => setIsSubmitted(false)}
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
               >

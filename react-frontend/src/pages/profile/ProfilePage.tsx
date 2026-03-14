@@ -300,7 +300,7 @@ export function ProfilePage() {
 
     try {
       setIsLoadingReviews(true);
-      const response = await api.get<Review[]>(`/v2/reviews/user/${profileId}?per_page=100`);
+      const response = await api.get<Review[]>(`/v2/reviews/user/${profileId}?per_page=50`);
 
       if (response.success && response.data) {
         setReviews(response.data);
@@ -614,6 +614,8 @@ export function ProfilePage() {
                         onPress={() => {
                           api.get<{ balance: number }>('/v2/wallet/balance').then((res) => {
                             if (res.success && res.data) setCurrentBalance(res.data.balance);
+                          }).catch((err) => {
+                            logError('Failed to load wallet balance', err);
                           });
                           setIsTransferModalOpen(true);
                         }}

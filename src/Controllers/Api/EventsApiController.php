@@ -56,7 +56,8 @@ class EventsApiController extends BaseApiController
      *
      * Query Parameters:
      * - when: 'upcoming' (default) or 'past'
-     * - category_id: int
+     * - category_id: int (filter by category ID)
+     * - category: string (filter by category name, e.g. 'workshop', 'social')
      * - group_id: int
      * - user_id: int (filter by organizer)
      * - q: string (search term)
@@ -78,6 +79,8 @@ class EventsApiController extends BaseApiController
 
         if ($this->query('category_id')) {
             $filters['category_id'] = $this->queryInt('category_id');
+        } elseif ($this->query('category')) {
+            $filters['category'] = $this->query('category');
         }
 
         if ($this->query('group_id')) {
@@ -157,6 +160,8 @@ class EventsApiController extends BaseApiController
 
         if ($this->query('category_id')) {
             $filters['category_id'] = $this->queryInt('category_id');
+        } elseif ($this->query('category')) {
+            $filters['category'] = $this->query('category');
         }
 
         $result = EventService::getNearby($lat, $lon, $filters);

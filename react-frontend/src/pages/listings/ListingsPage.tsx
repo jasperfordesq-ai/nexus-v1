@@ -109,7 +109,7 @@ export function ListingsPage() {
 
   const loadCategories = useCallback(async () => {
     try {
-      const response = await api.get<Category[]>('/v2/categories');
+      const response = await api.get<Category[]>('/v2/categories?type=listing');
       if (response.success && response.data) {
         setCategories(response.data);
       }
@@ -402,7 +402,7 @@ export function ListingsPage() {
               <Button
                 variant="flat"
                 className="bg-theme-elevated text-theme-primary"
-                onClick={() => loadListings()}
+                onPress={() => loadListings()}
                 isLoading={isLoading}
               >
                 {t('load_more')}
@@ -431,9 +431,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   const avatarSrc = resolveAvatarUrl(listing.author_avatar || listing.user?.avatar);
   const isFavorited = listing.is_favorited === true;
 
-  function handleSaveClick(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
+  function handleSaveClick() {
     if (onToggleSave && !isSaving) {
       onToggleSave(listing.id, isFavorited);
     }
@@ -496,7 +494,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                   isIconOnly
                   size="sm"
                   variant="flat"
-                  onClick={handleSaveClick}
+                  onPress={handleSaveClick}
                   isDisabled={isSaving}
                   aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
                   className="p-1 rounded transition-colors hover:bg-theme-hover min-w-0 w-auto h-auto"
@@ -547,7 +545,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               isIconOnly
               size="sm"
               variant="flat"
-              onClick={handleSaveClick}
+              onPress={handleSaveClick}
               isDisabled={isSaving}
               aria-label={isFavorited ? t('unsave_listing', 'Unsave listing') : t('save_listing', 'Save listing')}
               className="ml-auto p-1 rounded transition-colors hover:bg-theme-hover min-w-0 w-auto h-auto"

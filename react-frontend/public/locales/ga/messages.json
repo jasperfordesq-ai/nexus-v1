@@ -82,5 +82,8 @@
   "conversation_archived": "Comhrá cartlannaithe",
   "conversation_archived_desc": "Aistríodh an comhrá go dtí do chartlann.",
   "archive_failed": "Theip ar chartlannú an chomhrá",
-  "messaging_restricted": "Tá do theachtaireachtaí srianta"
+  "messaging_restricted": "Tá do theachtaireachtaí srianta",
+  "conversation_load_failed": "Unable to load this conversation. It may have been deleted or you may not have access.",
+  "back_to_messages": "Back to Messages",
+  "messaging_restricted_contact": "If you believe this is an error, please contact your timebank coordinator."
 }

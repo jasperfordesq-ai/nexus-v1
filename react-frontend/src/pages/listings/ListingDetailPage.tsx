@@ -210,7 +210,7 @@ export function ListingDetailPage() {
         description={error || t('not_found_fallback')}
         action={
           <Link to={tenantPath('/listings')}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
               {t('browse')}
             </Button>
           </Link>
@@ -289,7 +289,7 @@ export function ListingDetailPage() {
                 variant="flat"
                 className="bg-red-500/10 text-red-400"
                 startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
-                onClick={handleDelete}
+                onPress={handleDelete}
                 isLoading={isDeleting}
               >
                 {t('detail_delete')}
@@ -455,7 +455,7 @@ export function ListingDetailPage() {
               ) : (
                 <Link to={tenantPath(`/listings/${listing.id}/request-exchange`)} className="flex-1 sm:flex-none">
                   <Button
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                    className="w-full bg-linear-to-r from-emerald-500 to-teal-600 text-white"
                     startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
                   >
                     {t('detail_request_exchange')}
@@ -465,7 +465,7 @@ export function ListingDetailPage() {
             ) : (
               <Link to={tenantPath(`/messages?to=${listing.user_id}&listing=${listing.id}`)} className="flex-1 sm:flex-none">
                 <Button
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="w-full bg-linear-to-r from-indigo-500 to-purple-600 text-white"
                   startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('detail_send_message')}
@@ -476,7 +476,7 @@ export function ListingDetailPage() {
               variant="flat"
               className={`flex-1 sm:flex-none ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<Heart className={`w-4 h-4 ${social.isLiked ? 'fill-current' : ''}`} aria-hidden="true" />}
-              onClick={() => void social.toggleLike()}
+              onPress={() => void social.toggleLike()}
               isDisabled={social.isLiking}
             >
               {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked', 'Liked') : t('detail_like', 'Like')}
@@ -485,7 +485,7 @@ export function ListingDetailPage() {
               variant="flat"
               className={`flex-1 sm:flex-none ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-              onClick={toggleComments}
+              onPress={toggleComments}
             >
               {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments', 'Comments')}
             </Button>
@@ -493,7 +493,7 @@ export function ListingDetailPage() {
               variant="flat"
               className={`flex-1 sm:flex-none ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Bookmark className="w-4 h-4" aria-hidden="true" />}
-              onClick={() => void handleSave()}
+              onPress={() => void handleSave()}
               isDisabled={isSaving}
             >
               {isSaved ? t('detail_saved') : t('detail_save')}

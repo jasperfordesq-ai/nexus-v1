@@ -63,8 +63,8 @@ interface KBArticle {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function KnowledgeBasePage() {
-  const { t } = useTranslation('public');
-  usePageTitle(t('kb.title', 'Knowledge Base'));
+  const { t } = useTranslation('kb');
+  usePageTitle(t('title'));
   const { tenantPath } = useTenant();
 
   const [articles, setArticles] = useState<KBArticle[]>([]);
@@ -83,11 +83,11 @@ export function KnowledgeBasePage() {
       if (response.success && response.data) {
         setArticles(Array.isArray(response.data) ? response.data : []);
       } else {
-        setError('Failed to load knowledge base articles.');
+        setError(t('error.load_articles'));
       }
     } catch (err) {
       logError('Failed to load KB articles', err);
-      setError('Failed to load articles. Please try again.');
+      setError(t('error.load_retry'));
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +127,7 @@ export function KnowledgeBasePage() {
 
   // Group articles by category
   const groupedArticles = (searchResults || articles).reduce<Record<string, KBArticle[]>>((acc, article) => {
-    const cat = article.category || 'General';
+    const cat = article.category || t('general_category');
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(article);
     return acc;
@@ -151,19 +151,19 @@ export function KnowledgeBasePage() {
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <BookOpen className="w-7 h-7 text-blue-400" aria-hidden="true" />
-          {t('kb.title', 'Knowledge Base')}
+          {t('title')}
         </h1>
-        <p className="text-theme-muted mt-1">{t('kb.description', 'Find answers, guides, and helpful resources')}</p>
+        <p className="text-theme-muted mt-1">{t('description')}</p>
       </div>
 
       {/* Search */}
       <div className="max-w-xl">
         <Input
-          placeholder={t('kb.search_placeholder', 'Search the knowledge base...')}
+          placeholder={t('search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
-          aria-label={t('kb.search_placeholder', 'Search the knowledge base')}
+          aria-label={t('search_placeholder')}
           endContent={isSearching ? <Spinner size="sm" /> : undefined}
           classNames={{
             input: 'bg-transparent text-theme-primary',
@@ -185,7 +185,7 @@ export function KnowledgeBasePage() {
               setSearchResults(null);
             }}
           >
-            {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} for &ldquo;{searchQuery}&rdquo;
+            {t('search_results', { count: searchResults.length, query: searchQuery })}
           </Chip>
         </div>
       )}
@@ -194,14 +194,14 @@ export function KnowledgeBasePage() {
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary mb-2">Unable to load</h2>
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.title')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadArticles}
           >
-            Try Again
+            {t('try_again')}
           </Button>
         </GlassCard>
       )}
@@ -224,8 +224,8 @@ export function KnowledgeBasePage() {
           ) : displayArticles.length === 0 ? (
             <EmptyState
               icon={<BookOpen className="w-12 h-12" aria-hidden="true" />}
-              title="No articles found"
-              description={searchQuery ? 'Try a different search term.' : 'No knowledge base articles have been published yet.'}
+              title={t('empty.title')}
+              description={searchQuery ? t('empty.search_description') : t('empty.no_articles')}
             />
           ) : (
             <motion.div
@@ -280,7 +280,7 @@ export function KnowledgeBasePage() {
                               {(article.children_count ?? 0) > 0 && (
                                 <span className="flex items-center gap-1">
                                   <Folder className="w-3 h-3" aria-hidden="true" />
-                                  {article.children_count} sub-articles
+                                  {t('sub_articles', { count: article.children_count })}
                                 </span>
                               )}
                             </div>

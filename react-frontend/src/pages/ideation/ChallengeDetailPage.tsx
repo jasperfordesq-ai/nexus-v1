@@ -154,7 +154,7 @@ interface ChallengeOutcome {
 
 interface Campaign {
   id: number;
-  name: string;
+  title: string;
 }
 
 type SortMode = 'votes' | 'newest';
@@ -775,7 +775,7 @@ export function ChallengeDetailPage() {
     abandoned: 'danger',
   };
 
-  // Feature gate
+  // Feature gate — checked before loading/error to avoid useless rendering
   if (!hasFeature('ideation_challenges')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
@@ -1548,7 +1548,7 @@ export function ChallengeDetailPage() {
               >
                 {campaigns.map((c) => (
                   <SelectItem key={String(c.id)}>
-                    {c.name}
+                    {c.title}
                   </SelectItem>
                 ))}
               </Select>

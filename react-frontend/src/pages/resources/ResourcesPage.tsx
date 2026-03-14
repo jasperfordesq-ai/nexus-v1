@@ -462,6 +462,22 @@ export function ResourcesPage() {
     }
   };
 
+  // Authenticated download handler - opens download in new window with proper URL
+  async function handleDownload(resourceId: number, _title: string) {
+    try {
+      // Use window.open with the API URL - cookies handle auth, no token needed
+      const downloadUrl = `${API_BASE}/v2/resources/${resourceId}/download`;
+      window.open(downloadUrl, '_blank');
+      // Optimistically increment local download count
+      setResources((prev) =>
+        prev.map((r) => r.id === resourceId ? { ...r, downloads: r.downloads + 1 } : r)
+      );
+    } catch (err) {
+      logError('Failed to download resource', err);
+      toast.error(t('resources.download_failed', 'Download failed'));
+    }
+  }
+
   const categoryColorMap: Record<string, string> = {
     blue: 'bg-blue-500/10 text-blue-500',
     gray: 'bg-gray-500/10 text-gray-500',
@@ -758,19 +774,15 @@ export function ResourcesPage() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <a
-                          href={`${API_BASE}/v2/resources/${resource.id}/download`}
-                          className="flex-shrink-0"
-                        >
                           <Button
                             size="sm"
                             variant="flat"
                             className="bg-theme-elevated text-theme-muted"
                             startContent={<Download className="w-3.5 h-3.5" aria-hidden="true" />}
+                            onPress={() => handleDownload(resource.id, resource.title)}
                           >
                             {t('resources.download', 'Download')}
                           </Button>
-                        </a>
                         {(user?.id === resource.uploader.id || isAdmin) && (
                           <Button
                             isIconOnly

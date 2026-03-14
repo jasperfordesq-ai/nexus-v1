@@ -79,11 +79,11 @@ export function JobAnalyticsPage() {
       if (response.success && response.data) {
         setAnalytics(response.data);
       } else {
-        setError(response.error || 'Failed to load analytics');
+        setError(response.error || t('analytics.load_error', 'Failed to load analytics'));
       }
     } catch (err) {
       logError('Failed to load job analytics', err);
-      setError('Failed to load analytics');
+      setError(t('analytics.load_error', 'Failed to load analytics'));
     } finally {
       setIsLoading(false);
     }

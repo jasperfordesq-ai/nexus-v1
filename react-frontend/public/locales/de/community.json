@@ -93,7 +93,15 @@
     "feature_not_available_desc": "Die Freiwilligenarbeitsfunktion ist für diese Gemeinschaft nicht aktiviert.",
     "applied_success": "Erfolgreich beworben!",
     "apply_error": "Bewerbung fehlgeschlagen",
-    "view_details": "Details anzeigen"
+    "view_details": "Details anzeigen",
+    "tab_hours_review": "Hours Review",
+    "withdraw_success": "Application withdrawn.",
+    "withdraw_failed": "Failed to withdraw application.",
+    "hours_logged_success": "Hours logged successfully!",
+    "hours_log_failed": "Failed to log hours. Please try again.",
+    "organisers_note": "Organiser's note:",
+    "date_range_sr": "Opportunity date range",
+    "loading": "Loading..."
   },
   "credentials": {
     "heading": "Nachweisüberprüfung",
@@ -131,7 +139,12 @@
     "file_too_large": "Dateigrösse muss unter 10 MB liegen.",
     "invalid_file_type": "Bitte laden Sie eine PDF- oder Bilddatei hoch (JPG, PNG, WebP).",
     "upload_failed": "Nachweis konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
-    "upload_error": "Beim Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+    "upload_error": "Beim Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "credential_type_label": "Credential Type",
+    "credential_type_placeholder": "Select credential type",
+    "document_label": "Document",
+    "expiry_date_label": "Expiry Date (optional)",
+    "expiry_date_placeholder": "Leave blank if no expiry"
   },
   "swaps": {
     "heading": "Schichttausch",
@@ -208,7 +221,14 @@
     "score_good": "Gut",
     "score_fair": "Befriedigend",
     "score_needs_attention": "Benötigt Aufmerksamkeit",
-    "score_critical": "Kritisch"
+    "score_critical": "Kritisch",
+    "note_label": "Add a note (optional)",
+    "note_placeholder": "How's your energy level? Anything on your mind?",
+    "tip_breaks": "Take regular breaks between volunteer shifts",
+    "tip_boundaries": "Set boundaries on your availability",
+    "tip_connect": "Connect with fellow volunteers for support",
+    "tip_celebrate": "Celebrate your impact -- every hour counts",
+    "tip_reduce": "Consider reducing frequency if feeling overwhelmed"
   },
   "organisations": {
     "page_title": "Organisationen",
@@ -294,5 +314,71 @@
     "cover_message_placeholder": "Erzählen Sie der Organisation, warum Sie sich freiwillig engagieren möchten...",
     "cancel": "Abbrechen",
     "submit_application": "Bewerbung absenden"
+  },
+  "emergency_alerts": {
+    "heading": "Emergency Alerts",
+    "pending_count": "{{count}} pending",
+    "refresh": "Refresh",
+    "try_again": "Try Again",
+    "no_alerts_title": "No emergency alerts",
+    "no_alerts_desc": "You don't have any emergency shift requests at the moment.",
+    "load_failed": "Failed to load alerts",
+    "load_error": "Unable to load alerts.",
+    "priority_critical": "CRITICAL",
+    "priority_urgent": "URGENT",
+    "priority_normal": "NORMAL",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "from_coordinator": "From {{name}}",
+    "expires": "Expires {{date}}"
+  },
+  "group_signups": {
+    "heading": "Group Sign-ups",
+    "refresh": "Refresh",
+    "try_again": "Try Again",
+    "no_signups_title": "No group sign-ups",
+    "no_signups_desc": "You are not part of any group shift reservations yet. Group sign-ups let you volunteer together with friends or team members.",
+    "load_failed": "Failed to load group reservations.",
+    "load_error": "Unable to load group reservations. Please try again.",
+    "leader": "Leader",
+    "members": "Members",
+    "created": "Created",
+    "add_member": "Add Member",
+    "add_member_heading": "Add Group Member",
+    "add_member_desc": "Enter the email address of the person you would like to add to this group reservation. They will receive an invitation to join.",
+    "email_label": "Email Address",
+    "email_placeholder": "member@example.com",
+    "cancel": "Cancel",
+    "add_member_failed": "Failed to add member. They may already be in the group or the email is invalid.",
+    "add_member_error": "Unable to add member. Please check the email and try again."
+  },
+  "recommended_shifts": {
+    "heading": "Recommended for You",
+    "refresh": "Refresh",
+    "try_again": "Try Again",
+    "no_recommendations_title": "No recommendations yet",
+    "no_recommendations_desc": "Add skills to your profile to get personalized shift recommendations.",
+    "match_score": "{{score}}% match",
+    "load_failed": "Failed to load recommendations",
+    "load_error": "Unable to load recommendations. Please try again."
+  },
+  "certificates_tab": {
+    "heading": "Impact Certificates",
+    "generate": "Generate Certificate",
+    "description": "Certificates include all of your approved volunteer hours across every organization.",
+    "try_again": "Try Again",
+    "no_certificates_title": "No certificates yet",
+    "no_certificates_desc": "Generate a certificate to showcase your volunteer hours.",
+    "verified_hours": "{{count}} Verified Hours",
+    "generated": "Generated",
+    "download": "Download",
+    "verify": "Verify",
+    "generated_success": "Certificate generated!",
+    "no_verified_hours": "No verified volunteer hours found. Hours must be approved before generating a certificate.",
+    "generate_failed": "Failed to generate certificate. Please try again.",
+    "load_failed": "Failed to load certificates",
+    "load_error": "Unable to load certificates."
   }
 }

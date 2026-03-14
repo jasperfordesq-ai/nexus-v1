@@ -297,7 +297,7 @@ export function IdeaDetailPage() {
     try {
       await api.delete(`/v2/ideation-ideas/${id}`);
       toast.success(t('toast.idea_deleted'));
-      navigate(tenantPath(`/ideation/${challengeId}`));
+      navigate(tenantPath(`/ideation/${challengeId ?? idea?.challenge_id}`));
     } catch (err) {
       logError('Failed to delete idea', err);
       toast.error(t('toast.error_generic'));
@@ -401,7 +401,7 @@ export function IdeaDetailPage() {
         variant="light"
         startContent={<ArrowLeft className="w-4 h-4" />}
         className="mb-4 -ml-2"
-        onPress={() => navigate(tenantPath(`/ideation/${challengeId}`))}
+        onPress={() => navigate(tenantPath(`/ideation/${challengeId ?? idea?.challenge_id}`))}
       >
         {t('idea_detail.back_to_challenge')}
       </Button>
