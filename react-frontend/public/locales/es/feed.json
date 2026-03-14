@@ -21,7 +21,10 @@
     "listings": "Anuncios",
     "events": "Eventos",
     "polls": "Encuestas",
-    "goals": "Metas"
+    "goals": "Metas",
+    "jobs": "Jobs",
+    "challenges": "Challenges",
+    "volunteering": "Volunteering"
   },
   "report": {
     "title": "Reportar Publicación",
@@ -237,5 +240,86 @@
     "view_all": "Ver todos los hashtags",
     "post_count": "{{count}} publicación",
     "post_count_plural": "{{count}} publicaciones"
+  },
+  "sidebar": {
+    "profile": {
+      "listings": "Listings",
+      "given": "Given",
+      "received": "Received",
+      "offers": "Offers",
+      "requests": "Requests"
+    },
+    "friends": {
+      "title": "Friends",
+      "see_all": "See All",
+      "online": "Online now",
+      "active_today": "Active today"
+    },
+    "pulse": {
+      "title": "Community Pulse",
+      "members": "Members",
+      "listings": "Listings",
+      "events": "Events",
+      "groups": "Groups"
+    },
+    "suggested": {
+      "title": "Suggested For You",
+      "see_all": "See All",
+      "by": "by {{name}}"
+    },
+    "categories": {
+      "title": "Top Categories",
+      "all_listings": "All Listings"
+    },
+    "people": {
+      "title": "People You May Know",
+      "see_all": "See All",
+      "view": "View"
+    },
+    "events": {
+      "title": "Upcoming Events",
+      "see_all": "See All"
+    },
+    "groups": {
+      "title": "Popular Groups",
+      "see_all": "See All",
+      "members": "{{count}} members"
+    },
+    "actions": {
+      "title": "Quick Actions",
+      "create_listing": "Create New Listing",
+      "create_listing_desc": "Share your skills with the community",
+      "host_event": "Host Event",
+      "create_poll": "Create Poll",
+      "set_goal": "Set Goal",
+      "groups": "Groups"
+    }
+  },
+  "mode": {
+    "for_you": "For You",
+    "recent": "Recent"
+  },
+  "location": {
+    "global": "Global",
+    "nearby": "Near Me",
+    "radius": "{{km}} km",
+    "add_location": "Add location in profile"
+  },
+  "subfilter": {
+    "all": "All",
+    "offers": "Offers",
+    "requests": "Requests"
+  },
+  "stories": {
+    "add": "Add Story"
+  },
+  "fab": {
+    "create": "Create post"
+  },
+  "video": {
+    "select": "Add Video",
+    "too_large": "Video must be smaller than {{size}}MB",
+    "invalid_type": "Invalid video format. Supported: MP4, WebM, MOV",
+    "remove": "Remove video"
   }
 }

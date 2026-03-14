@@ -67,6 +67,9 @@ class SocialApiController extends BaseApiController
 
         $userLimit = $this->queryInt('per_page', 20, 1, 100);
 
+        $sort = $this->query('sort') ?: 'ranking'; // 'ranking' (EdgeRank) or 'recent' (chronological)
+        $useRanking = FeedRankingService::isEnabled() && $sort !== 'recent';
+
         $filters = [
             // When EdgeRank is enabled, fetch a 4× window so geo-local content
             // from slightly older posts can surface above fresh-but-distant posts.
@@ -94,7 +97,7 @@ class SocialApiController extends BaseApiController
         // Apply EdgeRank over the wider fetch window, then trim to the page the user requested.
         // This lets geo-boosted local content beat fresh-but-distant content that dominates
         // the raw recency-ordered list.
-        if (FeedRankingService::isEnabled() && !empty($result['items'])) {
+        if ($useRanking && !empty($result['items'])) {
             $result['items'] = FeedRankingService::rankFeedItems($result['items'], $userId);
             $result['items'] = array_slice($result['items'], 0, $userLimit);
         }
