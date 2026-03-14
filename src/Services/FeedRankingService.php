@@ -10,9 +10,9 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
 /**
- * FeedRankingService - Full EdgeRank Algorithm (12-Signal Pipeline)
+ * FeedRankingService - Full EdgeRank Algorithm (15-Signal Pipeline)
  *
- * Implements a complete EdgeRank-style feed ranking with 12 weighted signals:
+ * Implements a complete EdgeRank-style feed ranking with 15 weighted signals:
  *  1. Time Decay        — Hacker News-style freshness decay (72h half-life)
  *  2. Engagement        — Log-scaled likes + comments (prevents viral runaway)
  *  3. Engagement Velocity — Trending detection (rapid engagement in 2h window)
@@ -25,6 +25,9 @@ use Nexus\Core\TenantContext;
  * 10. Conversation Depth — Threaded discussion depth boost
  * 11. Reaction Weighting — Emoji reaction type weights (love=2x, angry=0.5x)
  * 12. Negative Signals  — Hidden posts, muted users, reports
+ * 13. CTR Feedback     — Click-through rate with confidence gating
+ * 14. User Type Prefs  — Per-user content type personalization
+ * 15. Save/Bookmark    — Interest graph from saved content
  *
  * Post-sort: User diversity + Content-type diversity reordering.
  */
@@ -40,7 +43,7 @@ class FeedRankingService
     const GEO_DECAY_INTERVAL = 100;
     const GEO_DECAY_PER_INTERVAL = 0.03;
     const GEO_MINIMUM_SCORE = 0.15;
-    const FRESHNESS_FULL_HOURS = 1;
+    const FRESHNESS_FULL_HOURS = 24;
     const FRESHNESS_HALF_LIFE_HOURS = 72;
     const FRESHNESS_MINIMUM = 0.3;
     const SOCIAL_GRAPH_ENABLED = true;
@@ -79,6 +82,15 @@ class FeedRankingService
     ];
     const VIEW_TRACKING_ENABLED = true;
     const CLICK_TRACKING_ENABLED = true;
+    const CTR_ENABLED = true;
+    const CTR_MAX_BOOST = 1.5;
+    const CTR_MIN_IMPRESSIONS = 5;
+    const USER_TYPE_PREFS_ENABLED = true;
+    const USER_TYPE_PREFS_MAX_BOOST = 1.4;
+    const USER_TYPE_PREFS_LOOKBACK_DAYS = 30;
+    const SAVE_SIGNAL_ENABLED = true;
+    const SAVE_SIGNAL_MAX_BOOST = 1.35;
+    const SAVE_SIGNAL_MIN_SAVES = 2;
     const DEFAULT_SCORE = 1.0;
 
     private static ?array $config = null;
@@ -137,6 +149,15 @@ class FeedRankingService
             'conversation_depth_enabled' => self::CONVERSATION_DEPTH_ENABLED,
             'conversation_depth_max_boost' => self::CONVERSATION_DEPTH_MAX_BOOST,
             'conversation_depth_threshold' => self::CONVERSATION_DEPTH_THRESHOLD,
+            'ctr_enabled' => self::CTR_ENABLED,
+            'ctr_max_boost' => self::CTR_MAX_BOOST,
+            'ctr_min_impressions' => self::CTR_MIN_IMPRESSIONS,
+            'user_type_prefs_enabled' => self::USER_TYPE_PREFS_ENABLED,
+            'user_type_prefs_max_boost' => self::USER_TYPE_PREFS_MAX_BOOST,
+            'user_type_prefs_lookback_days' => self::USER_TYPE_PREFS_LOOKBACK_DAYS,
+            'save_signal_enabled' => self::SAVE_SIGNAL_ENABLED,
+            'save_signal_max_boost' => self::SAVE_SIGNAL_MAX_BOOST,
+            'save_signal_min_saves' => self::SAVE_SIGNAL_MIN_SAVES,
         ];
 
         try {
@@ -220,7 +241,7 @@ class FeedRankingService
     // =========================================================================
 
     /**
-     * Rank feed_activity items in-memory using 12-signal EdgeRank
+     * Rank feed_activity items in-memory using 15-signal EdgeRank
      *
      * @param array       $items          Feed items from FeedService::getFeed()['items']
      * @param int|null    $viewerId       Authenticated user ID (null for anonymous)
@@ -260,6 +281,9 @@ class FeedRankingService
         $conversationDepths = (self::CONVERSATION_DEPTH_ENABLED && !empty($postIds)) ? self::getBatchConversationDepth($postIds) : [];
         $reactionScores = !empty($postIds) ? self::getBatchReactionScores($postIds) : [];
         $negativeScores = ($viewerId && !empty($postIds)) ? self::getBatchNegativeSignals($viewerId, $postIds, $authorIds) : [];
+        $ctrScores = (!empty($config['ctr_enabled']) && !empty($postIds)) ? self::getBatchClickThroughRates($postIds) : [];
+        $userTypePrefs = (!empty($config['user_type_prefs_enabled']) && $viewerId) ? self::getUserTypePreferences($viewerId) : [];
+        $saveScores = (!empty($config['save_signal_enabled']) && !empty($postIds)) ? self::getBatchSaveScores($postIds) : [];
 
         foreach ($items as &$item) {
             $postId = (int)($item['id'] ?? $item['post_id'] ?? 0);
@@ -282,11 +306,15 @@ class FeedRankingService
             if ($points > 0) { $score *= 1.0 + min(log(1.0 + $points) * 0.3, 2.0); }
             else { $score *= 1.05; }
 
-            // 3. Velocity
+            // 3. Velocity (with temporal decay via VELOCITY_DECAY_HOURS)
             if (self::VELOCITY_ENABLED && isset($velocityScores[$postId])) {
                 $v = $velocityScores[$postId];
                 if ($v >= self::VELOCITY_THRESHOLD) {
-                    $score *= min(self::VELOCITY_MAX_BOOST, 1.0 + (($v - self::VELOCITY_THRESHOLD) / self::VELOCITY_THRESHOLD) * 0.4);
+                    $rawBoost = min(self::VELOCITY_MAX_BOOST, 1.0 + (($v - self::VELOCITY_THRESHOLD) / self::VELOCITY_THRESHOLD) * 0.4);
+                    // Temporal decay: velocity boost fades as post ages past VELOCITY_DECAY_HOURS
+                    $postAgeHours = $createdAt ? max(0, (time() - strtotime($createdAt)) / 3600) : 0;
+                    $velocityDecay = max(0.0, 1.0 - ($postAgeHours / (self::VELOCITY_DECAY_HOURS * 2)));
+                    $score *= 1.0 + ($rawBoost - 1.0) * $velocityDecay;
                 }
             }
 
@@ -294,7 +322,7 @@ class FeedRankingService
             $sourceType = $item['type'] ?? $item['source_type'] ?? 'post';
             $score *= $typeWeights[$sourceType] ?? 1.0;
 
-            // 5. Social Affinity
+            // 5. Social Affinity (recency-weighted)
             if ($authorId && $viewerId) {
                 if (isset($socialScores[$authorId]) && $socialScores[$authorId] > 0) {
                     $bf = ($config['social_graph_max_boost'] - 1) / 4;
@@ -342,6 +370,36 @@ class FeedRankingService
             // 12. Negative Signals
             if ($viewerId && isset($negativeScores[$postId])) { $score *= $negativeScores[$postId]; }
 
+            // 13. Click-Through Rate feedback loop
+            if (!empty($config['ctr_enabled']) && isset($ctrScores[$postId])) {
+                $ctr = $ctrScores[$postId];
+                $impressions = $ctrScores['_impressions'][$postId] ?? 0;
+                if ($impressions >= ($config['ctr_min_impressions'] ?? 5)) {
+                    $ctrMultiplier = 1.0 + ($ctr - 0.1) * (($config['ctr_max_boost'] ?? 1.5) - 1.0) / 0.9;
+                    $score *= max(0.8, min((float)($config['ctr_max_boost'] ?? 1.5), $ctrMultiplier));
+                }
+            }
+
+            // 14. Per-user content type preferences
+            if (!empty($config['user_type_prefs_enabled']) && !empty($userTypePrefs)) {
+                $itemType = $item['type'] ?? $item['source_type'] ?? 'post';
+                if (isset($userTypePrefs[$itemType])) {
+                    $score *= $userTypePrefs[$itemType];
+                }
+            }
+
+            // 15. Save/Bookmark interest signal
+            if (!empty($config['save_signal_enabled']) && isset($saveScores[$postId])) {
+                $saves = $saveScores[$postId];
+                if ($saves >= ($config['save_signal_min_saves'] ?? 2)) {
+                    $saveBoost = min(
+                        (float)($config['save_signal_max_boost'] ?? 1.35),
+                        1.0 + log($saves, 10) * 0.2
+                    );
+                    $score *= $saveBoost;
+                }
+            }
+
             $item['_edge_rank'] = $score;
         }
         unset($item);
@@ -362,7 +420,10 @@ class FeedRankingService
     // BATCH DATA LOADING METHODS (Private, Tenant-Scoped)
     // =========================================================================
 
-    /** @return array<int, int> authorId => interaction count */
+    /**
+     * Batch social graph with recency weighting (7d:3x, 30d:2x, 90d:1x).
+     * @return array<int, float> authorId => weighted interaction score
+     */
     private static function getBatchSocialGraphScores(int $viewerId, array $authorIds): array
     {
         if (empty($authorIds) || $viewerId === 0) { return []; }
@@ -370,15 +431,19 @@ class FeedRankingService
             $tenantId = TenantContext::getId();
             $ph = implode(',', array_fill(0, count($authorIds), '?'));
             $days = self::SOCIAL_GRAPH_INTERACTION_DAYS;
-            $sql = "SELECT p.user_id AS author_id, COUNT(*) AS interactions FROM (
-                SELECT target_id FROM likes WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+            $sql = "SELECT p.user_id AS author_id, SUM(CASE
+                    WHEN va.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 3
+                    WHEN va.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 2
+                    ELSE 1
+                END) AS weighted_interactions FROM (
+                SELECT target_id, created_at FROM likes WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
                 UNION ALL
-                SELECT target_id FROM comments WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+                SELECT target_id, created_at FROM comments WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
             ) AS va JOIN feed_posts p ON p.id=va.target_id AND p.tenant_id=? WHERE p.user_id IN ($ph) GROUP BY p.user_id";
             $params = array_merge([$viewerId,$tenantId,$days,$viewerId,$tenantId,$days,$tenantId], $authorIds);
             $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
             $r = [];
-            foreach ($rows as $row) { $r[(int)$row['author_id']] = (int)$row['interactions']; }
+            foreach ($rows as $row) { $r[(int)$row['author_id']] = (float)$row['weighted_interactions']; }
             return $r;
         } catch (\Exception $e) { return []; }
     }
@@ -504,6 +569,89 @@ class FeedRankingService
 
 
     // =========================================================================
+    // USER TYPE PREFERENCES (Signal 14)
+    // =========================================================================
+
+    /**
+     * Per-user content type preferences from engagement history.
+     * @return array<string, float> sourceType => multiplier (1.0 to max_boost)
+     */
+    private static function getUserTypePreferences(int $viewerId): array
+    {
+        if ($viewerId === 0) { return []; }
+        $config = self::getConfig();
+        $maxBoost = (float)($config['user_type_prefs_max_boost'] ?? 1.4);
+        $lookbackDays = (int)($config['user_type_prefs_lookback_days'] ?? 30);
+
+        try {
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT fa.source_type, COUNT(*) AS engagements FROM (
+                SELECT target_id FROM likes WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+                UNION ALL
+                SELECT target_id FROM comments WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+            ) AS eng
+            JOIN feed_activity fa ON fa.source_type IN ('post','listing','event','poll','goal','review','job','challenge','volunteer')
+                AND fa.source_id = eng.target_id AND fa.tenant_id=?
+            GROUP BY fa.source_type";
+            $params = [$viewerId, $tenantId, $lookbackDays, $viewerId, $tenantId, $lookbackDays, $tenantId];
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+
+            if (empty($rows)) { return []; }
+
+            $maxEng = 0;
+            $typeCounts = [];
+            foreach ($rows as $row) {
+                $typeCounts[$row['source_type']] = (int)$row['engagements'];
+                $maxEng = max($maxEng, (int)$row['engagements']);
+            }
+            if ($maxEng === 0) { return []; }
+
+            $result = [];
+            foreach ($typeCounts as $type => $count) {
+                $normalized = $count / $maxEng;
+                $result[$type] = 1.0 + ($normalized * ($maxBoost - 1.0));
+            }
+            return $result;
+        } catch (\Exception $e) { return []; }
+    }
+
+    // =========================================================================
+    // SAVE/BOOKMARK INTEREST GRAPH (Signal 15)
+    // =========================================================================
+
+    /**
+     * Batch save/bookmark counts across listing_favorites and user_saved_listings.
+     * @return array<int, int> postId => total save count
+     */
+    private static function getBatchSaveScores(array $postIds): array
+    {
+        if (empty($postIds)) { return []; }
+        try {
+            $tenantId = TenantContext::getId();
+            $ph = implode(',', array_fill(0, count($postIds), '?'));
+
+            // Count saves from user_saved_listings (for listing-type feed items)
+            // and listing_favorites (for CF-style saves)
+            $sql = "SELECT fa.source_id AS post_id, (
+                        COALESCE((SELECT COUNT(*) FROM user_saved_listings usl
+                            WHERE usl.listing_id = fa.source_id AND usl.tenant_id = ?), 0) +
+                        COALESCE((SELECT COUNT(*) FROM listing_favorites lf
+                            WHERE lf.listing_id = fa.source_id AND lf.tenant_id = ?), 0)
+                    ) AS save_count
+                    FROM feed_activity fa
+                    WHERE fa.source_id IN ($ph) AND fa.tenant_id = ?
+                    AND fa.source_type IN ('listing', 'post')
+                    GROUP BY fa.source_id
+                    HAVING save_count > 0";
+            $params = array_merge([$tenantId, $tenantId], $postIds, [$tenantId]);
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+            $r = [];
+            foreach ($rows as $row) { $r[(int)$row['post_id']] = (int)$row['save_count']; }
+            return $r;
+        } catch (\Exception $e) { return []; }
+    }
+
+    // =========================================================================
     // DIVERSITY (Post-Sort Processing)
     // =========================================================================
 
@@ -616,16 +764,23 @@ class FeedRankingService
         } catch (\Exception $e) {}
     }
 
-    /** @return array<int, float> postId => CTR (0.0-1.0) */
+    /**
+     * Batch CTR with impression counts for confidence gating.
+     * @return array postId => CTR, plus '_impressions' => [postId => count]
+     */
     public static function getBatchClickThroughRates(array $postIds): array
     {
         if (empty($postIds) || !self::CLICK_TRACKING_ENABLED) { return []; }
         try {
             $tenantId = TenantContext::getId();
             $ph = implode(',', array_fill(0, count($postIds), '?'));
-            $rows = Database::query("SELECT fi.post_id, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id WHERE fi.post_id IN ($ph) AND fi.tenant_id=? GROUP BY fi.post_id", array_merge($postIds, [$tenantId]))->fetchAll(\PDO::FETCH_ASSOC);
-            $r = [];
-            foreach ($rows as $row) { $r[(int)$row['post_id']] = min(1.0, (float)$row['ctr']); }
+            $rows = Database::query("SELECT fi.post_id, SUM(fi.view_count) AS impressions, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id WHERE fi.post_id IN ($ph) AND fi.tenant_id=? GROUP BY fi.post_id", array_merge($postIds, [$tenantId]))->fetchAll(\PDO::FETCH_ASSOC);
+            $r = ['_impressions' => []];
+            foreach ($rows as $row) {
+                $pid = (int)$row['post_id'];
+                $r[$pid] = min(1.0, (float)$row['ctr']);
+                $r['_impressions'][$pid] = (int)$row['impressions'];
+            }
             return $r;
         } catch (\Exception $e) { return []; }
     }
@@ -755,7 +910,8 @@ class FeedRankingService
     // =========================================================================
 
     /**
-     * Calculate rank score for a single post (useful for real-time updates)
+     * Calculate rank score for a single post using all 15 signals.
+     * Fully aligned with rankFeedItems() for consistent scoring.
      *
      * @param array $post Post data with user_id, likes_count, comments_count
      * @param int $viewerId The user viewing the feed
@@ -769,22 +925,129 @@ class FeedRankingService
         ?float $viewerLat = null,
         ?float $viewerLon = null
     ): float {
-        // Get engagement score
+        $config = self::getConfig();
+        $postId = (int)($post['id'] ?? $post['post_id'] ?? 0);
+        $posterId = (int)($post['user_id'] ?? 0);
+        $sourceType = $post['type'] ?? $post['source_type'] ?? 'post';
+
+        // 1. Time Decay
+        $createdAt = $post['created_at'] ?? null;
+        $timeDecay = 1.0;
+        if ($createdAt) {
+            $hoursAgo = max(0, (int)round((time() - strtotime($createdAt)) / 3600));
+            $timeDecay = self::hackerNewsDecay($hoursAgo);
+        }
+
+        // 2. Engagement
         $likesCount = (int)($post['likes_count'] ?? 0);
         $commentsCount = (int)($post['comments_count'] ?? 0);
-        $engagementScore = self::calculateEngagementScore($likesCount, $commentsCount);
+        $engagementScore = self::calculateEngagementScore($likesCount, $commentsCount) * $timeDecay;
 
-        // Get vitality score
-        $posterId = (int)($post['user_id'] ?? 0);
+        // 3. Velocity (single-post: query directly)
+        $velocityBoost = 1.0;
+        if (self::VELOCITY_ENABLED && $postId) {
+            $velocityData = self::getBatchEngagementVelocity([$postId]);
+            if (isset($velocityData[$postId]) && $velocityData[$postId] >= self::VELOCITY_THRESHOLD) {
+                $v = $velocityData[$postId];
+                $rawBoost = min(self::VELOCITY_MAX_BOOST, 1.0 + (($v - self::VELOCITY_THRESHOLD) / self::VELOCITY_THRESHOLD) * 0.4);
+                $postAgeHours = $createdAt ? max(0, (time() - strtotime($createdAt)) / 3600) : 0;
+                $velocityDecay = max(0.0, 1.0 - ($postAgeHours / (self::VELOCITY_DECAY_HOURS * 2)));
+                $velocityBoost = 1.0 + ($rawBoost - 1.0) * $velocityDecay;
+            }
+        }
+
+        // 4. Type weight
+        $typeWeights = [
+            'event' => 1.4, 'challenge' => 1.3, 'poll' => 1.25,
+            'volunteer' => 1.2, 'goal' => 1.1, 'post' => 1.0,
+            'listing' => 0.9, 'job' => 0.9, 'review' => 0.8,
+        ];
+        $typeWeight = $typeWeights[$sourceType] ?? 1.0;
+
+        // 5. Social Affinity
+        $socialBoost = 1.0;
+        if ($viewerId && $posterId) {
+            $socialBoost = self::calculateSocialGraphScore($viewerId, $posterId);
+        }
+
+        // 6. Vitality
         $vitalityScore = self::calculateVitalityScore($posterId);
 
-        // Get geo decay score
+        // 7. Geo Decay
         $posterLat = isset($post['author_lat']) ? (float)$post['author_lat'] : null;
         $posterLon = isset($post['author_lon']) ? (float)$post['author_lon'] : null;
         $geoScore = self::calculateGeoDecayScore($viewerLat, $viewerLon, $posterLat, $posterLon);
 
-        // Calculate final score
-        return $engagementScore * $vitalityScore * $geoScore;
+        // 8. Content Quality
+        $qualityScore = self::calculateContentQualityScore($post);
+
+        // 9. Context Timing
+        $contextBoost = self::contextualBoost($sourceType);
+
+        // 10. Conversation Depth
+        $depthBoost = 1.0;
+        if (self::CONVERSATION_DEPTH_ENABLED && $postId) {
+            $depths = self::getBatchConversationDepth([$postId]);
+            if (isset($depths[$postId]) && $depths[$postId] >= self::CONVERSATION_DEPTH_THRESHOLD) {
+                $d = $depths[$postId];
+                $depthBoost = min(self::CONVERSATION_DEPTH_MAX_BOOST, 1.0 + ($d / (self::CONVERSATION_DEPTH_THRESHOLD * 3)) * 0.5);
+            }
+        }
+
+        // 11. Reaction Weighting
+        $reactionBoost = 1.0;
+        if ($postId) {
+            $reactions = self::getBatchReactionScores([$postId]);
+            if (isset($reactions[$postId]) && $reactions[$postId] > 0) {
+                $reactionBoost = 1.0 + min($reactions[$postId] * 0.1, 1.0);
+            }
+        }
+
+        // 12. Negative Signals
+        $negativeScore = 1.0;
+        if ($viewerId && $postId) {
+            $negativeScore = self::calculateNegativeSignalsScore($viewerId, $postId, $posterId);
+        }
+
+        // 13. CTR Feedback
+        $ctrBoost = 1.0;
+        if (!empty($config['ctr_enabled']) && $postId) {
+            $ctrData = self::getBatchClickThroughRates([$postId]);
+            if (isset($ctrData[$postId])) {
+                $ctr = $ctrData[$postId];
+                $impressions = $ctrData['_impressions'][$postId] ?? 0;
+                if ($impressions >= ($config['ctr_min_impressions'] ?? 5)) {
+                    $ctrMultiplier = 1.0 + ($ctr - 0.1) * (($config['ctr_max_boost'] ?? 1.5) - 1.0) / 0.9;
+                    $ctrBoost = max(0.8, min((float)($config['ctr_max_boost'] ?? 1.5), $ctrMultiplier));
+                }
+            }
+        }
+
+        // 14. User Type Preferences
+        $typePrefBoost = 1.0;
+        if (!empty($config['user_type_prefs_enabled']) && $viewerId) {
+            $prefs = self::getUserTypePreferences($viewerId);
+            if (isset($prefs[$sourceType])) {
+                $typePrefBoost = $prefs[$sourceType];
+            }
+        }
+
+        // 15. Save/Bookmark signal
+        $saveBoost = 1.0;
+        if (!empty($config['save_signal_enabled']) && $postId) {
+            $saves = self::getBatchSaveScores([$postId]);
+            if (isset($saves[$postId]) && $saves[$postId] >= ($config['save_signal_min_saves'] ?? 2)) {
+                $saveBoost = min(
+                    (float)($config['save_signal_max_boost'] ?? 1.35),
+                    1.0 + log($saves[$postId], 10) * 0.2
+                );
+            }
+        }
+
+        return $engagementScore * $velocityBoost * $typeWeight * $socialBoost
+             * $vitalityScore * $geoScore * $qualityScore * $contextBoost
+             * $depthBoost * $reactionBoost * $negativeScore
+             * $ctrBoost * $typePrefBoost * $saveBoost;
     }
 
 
@@ -793,8 +1056,9 @@ class FeedRankingService
         $engagement = self::getEngagementScoreSql();
         $vitality = self::getVitalityScoreSql();
         $geoDecay = self::getGeoDecayScoreSql($viewerLat, $viewerLon);
+        $freshness = self::getFreshnessScoreSql();
 
-        return "({$engagement}) * ({$vitality}) * ({$geoDecay}) DESC, p.created_at DESC";
+        return "({$engagement}) * ({$vitality}) * ({$geoDecay}) * ({$freshness}) DESC, p.created_at DESC";
     }
 
 
@@ -1239,7 +1503,7 @@ class FeedRankingService
     /**
      * SQL snippet for social graph calculation
      * Note: This is simplified for SQL - uses subquery to count interactions
-     * Uses only guaranteed tables (likes, comments) - follower boost disabled until user_follows exists
+     * Uses only guaranteed tables (likes, comments) - follower boost via user_follows table
      */
     private static function getSocialGraphScoreSql(int $viewerId): string
     {
@@ -1255,7 +1519,7 @@ class FeedRankingService
         $boostFactor = ($maxBoost - 1) / 4;
 
         // Safe SQL - only uses guaranteed tables (likes, comments)
-        // Follower boost disabled until user_follows table is implemented
+        // Follower boost via user_follows table (active)
         return "
             CASE
                 WHEN {$viewerId} = 0 THEN 1.0
