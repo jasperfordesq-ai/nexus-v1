@@ -177,7 +177,8 @@
     "schedule_label": "Schedule post",
     "schedule_set": "Scheduled for {{date}}",
     "schedule_clear": "Clear schedule",
-    "groups_loading": "Loading groups..."
+    "groups_loading": "Loading groups...",
+    "create_post": "Create post"
   },
   "card": {
     "edited": "edited",
@@ -265,7 +266,9 @@
     "suggested": {
       "title": "Suggested For You",
       "see_all": "See All",
-      "by": "by {{name}}"
+      "by": "by {{name}}",
+      "request": "Request",
+      "offer": "Offer"
     },
     "categories": {
       "title": "Top Categories",
@@ -297,7 +300,8 @@
   },
   "mode": {
     "for_you": "For You",
-    "recent": "Recent"
+    "recent": "Recent",
+    "label": "Feed mode"
   },
   "location": {
     "global": "Global",

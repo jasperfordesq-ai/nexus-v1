@@ -177,7 +177,8 @@
     "schedule_label": "Sceideal postáil",
     "schedule_set": "Sceidealaithe do {{date}}",
     "schedule_clear": "Glan sceideal",
-    "groups_loading": "Ag luchtú grúpaí..."
+    "groups_loading": "Ag luchtú grúpaí...",
+    "create_post": "Cruthaigh postáil"
   },
   "card": {
     "edited": "curtha in eagar",
@@ -265,7 +266,9 @@
     "suggested": {
       "title": "Suggested For You",
       "see_all": "See All",
-      "by": "by {{name}}"
+      "by": "by {{name}}",
+      "request": "Iarratas",
+      "offer": "Tairiscint"
     },
     "categories": {
       "title": "Top Categories",
@@ -297,7 +300,8 @@
   },
   "mode": {
     "for_you": "For You",
-    "recent": "Recent"
+    "recent": "Recent",
+    "label": "Mód beatha"
   },
   "location": {
     "global": "Global",

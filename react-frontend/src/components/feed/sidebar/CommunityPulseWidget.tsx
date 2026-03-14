@@ -32,7 +32,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
     {
       icon: Users,
       count: stats.members,
-      label: t('sidebar.members', 'Members'),
+      label: t('sidebar.pulse.members', 'Members'),
       path: '/members',
       color: 'text-indigo-500',
       bg: 'bg-indigo-500/10',
@@ -40,7 +40,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
     {
       icon: Tag,
       count: stats.listings,
-      label: t('sidebar.listings', 'Listings'),
+      label: t('sidebar.pulse.listings', 'Listings'),
       path: '/listings',
       color: 'text-emerald-500',
       bg: 'bg-emerald-500/10',
@@ -48,7 +48,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
     {
       icon: CalendarDays,
       count: stats.events,
-      label: t('sidebar.events', 'Events'),
+      label: t('sidebar.pulse.events', 'Events'),
       path: '/events',
       color: 'text-pink-500',
       bg: 'bg-pink-500/10',
@@ -56,7 +56,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
     {
       icon: UsersRound,
       count: stats.groups,
-      label: t('sidebar.groups', 'Groups'),
+      label: t('sidebar.pulse.groups', 'Groups'),
       path: '/groups',
       color: 'text-amber-500',
       bg: 'bg-amber-500/10',
@@ -68,7 +68,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
       <div className="flex items-center gap-2 mb-3">
         <HeartPulse className="w-4 h-4 text-pink-500" aria-hidden="true" />
         <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-          {t('sidebar.community_pulse', 'Community Pulse')}
+          {t('sidebar.pulse.title', 'Community Pulse')}
         </h3>
       </div>
 
@@ -81,7 +81,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
           >
             <item.icon className={`w-4 h-4 ${item.color}`} aria-hidden="true" />
             <p className={`text-sm font-bold ${item.color}`}>
-              {item.count.toLocaleString()}
+              {(item.count ?? 0).toLocaleString()}
             </p>
             <p className="text-[10px] text-[var(--text-muted)]">{item.label}</p>
           </Link>

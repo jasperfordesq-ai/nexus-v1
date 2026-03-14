@@ -44,6 +44,7 @@ class FeedService
      * @param array $filters [
      *   'type' => 'all' (default), 'posts', 'listings', 'events', 'polls', 'goals',
      *            'jobs', 'challenges', 'volunteering',
+     *   'subtype' => string|null ('offer' or 'request' — filters listings by listing_type in metadata),
      *   'user_id' => int (for user profile feed),
      *   'group_id' => int (for group feed),
      *   'cursor' => string,
@@ -59,6 +60,7 @@ class FeedService
         $type = $filters['type'] ?? 'all';
         $profileUserId = $filters['user_id'] ?? null;
         $groupId = $filters['group_id'] ?? null;
+        $subtype = $filters['subtype'] ?? null;
         $cursor = $filters['cursor'] ?? null;
 
         // Decode cursor (activity_id encoded as base64)
@@ -84,7 +86,7 @@ class FeedService
         $items = self::loadFromFeedActivity(
             $userId, $tenantId, $limit + 1,
             $cursorActivityId,
-            $sourceType, $profileUserId, $groupId
+            $sourceType, $profileUserId, $groupId, $subtype
         );
 
         // Check if there are more items
@@ -127,7 +129,8 @@ class FeedService
         ?int $cursorActivityId,
         ?string $sourceType = null,
         ?int $profileUserId = null,
-        ?int $groupId = null
+        ?int $groupId = null,
+        ?string $subtype = null
     ): array {
         $db = Database::getConnection();
 
@@ -159,6 +162,12 @@ class FeedService
         if ($groupId !== null) {
             $sql .= " AND fa.group_id = ?";
             $params[] = $groupId;
+        }
+
+        // Subtype filter (e.g. offer/request for listings)
+        if ($subtype !== null) {
+            $sql .= " AND JSON_UNQUOTE(JSON_EXTRACT(fa.metadata, '$.listing_type')) = ?";
+            $params[] = $subtype;
         }
 
         // Cursor: paginate by activity_id
@@ -202,6 +211,8 @@ class FeedService
                 // Challenge metadata
                 'submission_deadline' => $meta['submission_deadline'] ?? null,
                 'ideas_count' => isset($meta['ideas_count']) ? (int)$meta['ideas_count'] : null,
+                // Listing metadata
+                'listing_type' => $meta['listing_type'] ?? null,
                 // Volunteer metadata
                 'credits_offered' => isset($meta['credits_offered']) ? (int)$meta['credits_offered'] : null,
                 'organization' => $meta['organization'] ?? null,

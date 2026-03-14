@@ -13,7 +13,7 @@
  * Uses V2 API: POST /api/v2/feed/polls, POST /api/v2/feed/polls/{id}/vote
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, Component, type ReactNode, type ErrorInfo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -84,6 +84,19 @@ function FeedSkeleton() {
       </div>
     </GlassCard>
   );
+}
+
+/* ───────────────────────── Sidebar Error Boundary ───────────────────────── */
+
+
+class SidebarErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: Error, info: ErrorInfo) { logError('Sidebar crash', { error, info }); }
+  render() {
+    if (this.state.hasError) return null; // Silently hide broken sidebar
+    return this.props.children;
+  }
 }
 
 /* ───────────────────────── Main Component ───────────────────────── */
@@ -181,18 +194,23 @@ export function FeedPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- t excluded intentionally (stable after namespace load)
   }, [filter, feedMode, subFilter]);
 
+  // Track previous filter to detect filter changes and auto-reset subFilter
+  const prevFilterRef = useRef(filter);
   useEffect(() => {
+    // If the main filter changed, reset subFilter first
+    if (prevFilterRef.current !== filter) {
+      prevFilterRef.current = filter;
+      setSubFilter(null);
+      // The state update above will trigger this effect again with subFilter=null
+      return;
+    }
     cursorRef.current = undefined;
     setPendingPostCount(0);
     loadFeed();
   }, [filter, feedMode, subFilter, loadFeed]);
-
-  // Reset sub-filter when main filter changes
-  useEffect(() => {
-    setSubFilter(null);
-  }, [filter]);
 
   /* ───────── Real-time feed subscription ───────── */
 
@@ -213,7 +231,10 @@ export function FeedPage() {
         (filter === 'listings' && incoming.type === 'listing') ||
         (filter === 'events' && incoming.type === 'event') ||
         (filter === 'polls' && incoming.type === 'poll') ||
-        (filter === 'goals' && incoming.type === 'goal');
+        (filter === 'goals' && incoming.type === 'goal') ||
+        (filter === 'jobs' && incoming.type === 'job') ||
+        (filter === 'challenges' && incoming.type === 'challenge') ||
+        (filter === 'volunteering' && incoming.type === 'volunteer');
 
       if (!matchesFilter) return;
 
@@ -688,8 +709,10 @@ export function FeedPage() {
       </div>
 
       {/* Right Sidebar — Full widget panel (hidden on mobile) */}
-      <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-24 self-start">
-        <FeedSidebar />
+      <aside className="hidden lg:block w-72 flex-shrink-0">
+        <SidebarErrorBoundary>
+          <FeedSidebar />
+        </SidebarErrorBoundary>
       </aside>
     </div>
 

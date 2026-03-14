@@ -177,7 +177,8 @@
     "schedule_label": "Programma post",
     "schedule_set": "Programmato per il {{date}}",
     "schedule_clear": "Annulla programmazione",
-    "groups_loading": "Caricamento gruppi..."
+    "groups_loading": "Caricamento gruppi...",
+    "create_post": "Crea post"
   },
   "card": {
     "edited": "modificato",
@@ -265,7 +266,9 @@
     "suggested": {
       "title": "Suggested For You",
       "see_all": "See All",
-      "by": "by {{name}}"
+      "by": "by {{name}}",
+      "request": "Richiesta",
+      "offer": "Offerta"
     },
     "categories": {
       "title": "Top Categories",
@@ -297,7 +300,8 @@
   },
   "mode": {
     "for_you": "For You",
-    "recent": "Recent"
+    "recent": "Recent",
+    "label": "Modalità feed"
   },
   "location": {
     "global": "Global",
