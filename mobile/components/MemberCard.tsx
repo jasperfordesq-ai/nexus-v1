@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 
@@ -19,7 +20,7 @@ interface MemberCardProps {
 export default function MemberCard({ member }: MemberCardProps) {
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const displayName = member.name?.trim() ||
     [member.first_name, member.last_name].filter(Boolean).join(' ') ||
@@ -30,6 +31,8 @@ export default function MemberCard({ member }: MemberCardProps) {
       style={styles.wrapper}
       activeOpacity={0.85}
       onPress={() => router.push({ pathname: '/(modals)/member-profile', params: { id: String(member.id) } })}
+      accessibilityRole="button"
+      accessibilityLabel={displayName}
     >
       <Card style={styles.card}>
         <View style={styles.row}>

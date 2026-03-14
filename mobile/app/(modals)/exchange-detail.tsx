@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,6 +13,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { getExchange } from '@/lib/api/exchanges';
 import { useApi } from '@/lib/hooks/useApi';
@@ -22,16 +24,31 @@ import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function ExchangeDetailModal() {
+  const { t } = useTranslation('exchanges');
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { user: currentUser } = useAuth();
 
+  const exchangeId = Number(id);
+  const safeExchangeId = isNaN(exchangeId) || exchangeId <= 0 ? 0 : exchangeId;
+
   const { data, isLoading, error } = useApi(
-    () => getExchange(Number(id)),
-    [id],
+    () => getExchange(safeExchangeId),
+    [safeExchangeId],
   );
+
+  if (isNaN(exchangeId) || exchangeId <= 0) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={[styles.backLink, { color: primary }]}>{t('detail.goBack')}</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   const exchange = data?.data;
 
@@ -40,9 +57,9 @@ export default function ExchangeDetailModal() {
   if (error || !exchange) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{error ?? 'Exchange not found.'}</Text>
+        <Text style={styles.errorText}>{error ?? t('detail.notFound')}</Text>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={[styles.backLink, { color: primary }]}>Go back</Text>
+          <Text style={[styles.backLink, { color: primary }]}>{t('detail.goBack')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -54,7 +71,7 @@ export default function ExchangeDetailModal() {
         {/* Type badge */}
         <View style={[styles.typeBadge, exchange.type === 'offer' ? styles.offerBadge : styles.requestBadge]}>
           <Text style={styles.typeBadgeText}>
-            {exchange.type === 'offer' ? 'Offering' : 'Requesting'}
+            {exchange.type === 'offer' ? t('offering') : t('requesting')}
           </Text>
         </View>
 
@@ -64,7 +81,7 @@ export default function ExchangeDetailModal() {
         {/* Time estimate */}
         {(exchange.hours_estimate ?? 0) > 0 && (
           <View style={[styles.creditsCard, { borderColor: primary }]}>
-            <Text style={styles.creditsLabel}>Time estimate</Text>
+            <Text style={styles.creditsLabel}>{t('detail.timeEstimate')}</Text>
             <Text style={[styles.creditsValue, { color: primary }]}>
               {exchange.hours_estimate} hr{exchange.hours_estimate !== 1 ? 's' : ''}
             </Text>
@@ -75,12 +92,12 @@ export default function ExchangeDetailModal() {
         <View style={styles.postedBy}>
           <Avatar uri={exchange.user.avatar_url} name={exchange.user.name} size={40} />
           <View style={styles.postedByText}>
-            <Text style={styles.postedByLabel}>Posted by</Text>
+            <Text style={styles.postedByLabel}>{t('detail.postedBy')}</Text>
             <Text style={styles.postedByName}>{exchange.user.name}</Text>
           </View>
         </View>
 
-        {/* Action — hidden if you are the poster */}
+        {/* Action -- hidden if you are the poster */}
         {currentUser?.id !== exchange.user.id && (
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: primary }]}
@@ -93,7 +110,7 @@ export default function ExchangeDetailModal() {
             }
           >
             <Text style={styles.actionButtonText}>
-              {exchange.type === 'offer' ? 'Request this service' : 'Offer to help'}
+              {exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')}
             </Text>
           </TouchableOpacity>
         )}

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,6 +17,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import { Link } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -39,7 +40,7 @@ export default function LoginScreen() {
   const { login: authLogin } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const {
     control,
@@ -154,6 +155,14 @@ export default function LoginScreen() {
               <Text style={styles.buttonText}>{t('login.submit')}</Text>
             )}
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://app.project-nexus.ie/forgot-password')}
+            style={styles.forgotPasswordBtn}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.forgotPassword}>Forgot password?</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Register link */}
@@ -214,7 +223,7 @@ function makeStyles(theme: Theme) {
       paddingVertical: 12,
       fontSize: 16,
       color: theme.text,
-      backgroundColor: '#FAFAFA',
+      backgroundColor: theme.bg,
     },
     inputError: {
       borderColor: theme.error,
@@ -233,6 +242,8 @@ function makeStyles(theme: Theme) {
     },
     buttonDisabled: { opacity: 0.6 },
     buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    forgotPasswordBtn: { alignSelf: 'center', marginTop: 14 },
+    forgotPassword: { color: theme.textSecondary, fontSize: 13, fontWeight: '500' },
     footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 32 },
     footerText: { color: theme.textSecondary, fontSize: 14 },
     link: { fontSize: 14, fontWeight: '600' },

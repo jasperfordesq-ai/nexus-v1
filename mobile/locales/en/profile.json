@@ -1,0 +1,32 @@
+{
+  "timeBalance": "Time balance",
+  "about": "About",
+  "viewWallet": "View wallet",
+  "editProfile": "Edit profile",
+  "browseMembers": "Browse Members",
+  "settings": "Settings",
+  "signOut": "Sign out",
+  "signOutConfirmTitle": "Sign out",
+  "signOutConfirmMessage": "Are you sure you want to sign out?",
+  "changePhoto": "Change profile photo",
+  "permissionNeeded": "Permission needed",
+  "permissionMessage": "Please allow access to your photo library to change your avatar.",
+  "uploadFailed": "Upload failed",
+  "uploadFailedMessage": "Could not update your avatar. Please try again.",
+  "edit": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "aboutYou": "About you",
+    "aboutPlaceholder": "Tell the community about yourself...",
+    "location": "Location",
+    "locationPlaceholder": "e.g. New York, USA",
+    "phoneOptional": "Phone (optional)",
+    "phonePlaceholder": "+1 555 123 4567",
+    "saving": "Saving\u2026",
+    "saveChanges": "Save changes",
+    "saved": "Saved",
+    "savedMessage": "Your profile has been updated.",
+    "saveError": "Could not save profile.",
+    "firstNameRequired": "First name is required."
+  }
+}

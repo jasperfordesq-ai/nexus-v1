@@ -15,6 +15,7 @@ import { AuthProvider, useAuthContext } from '@/lib/context/AuthContext';
 import { TenantProvider } from '@/lib/context/TenantContext';
 import { RealtimeProvider } from '@/lib/context/RealtimeContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { navigateToLink } from '@/lib/utils/navigateToLink';
 import * as Sentry from '@sentry/react-native';
 
 Sentry.init({
@@ -47,33 +48,6 @@ function RootLayout() {
 }
 
 export default Sentry.wrap(RootLayout);
-
-/**
- * Maps a web-format deep-link (e.g. /messages/123) to the appropriate
- * mobile screen. Shared by foreground notification taps and background taps.
- */
-function navigateToLink(link: string): void {
-  const match = link.match(/^\/([^/]+)(?:\/(\d+))?/);
-  if (!match) return;
-  const [, section, id] = match;
-  switch (section) {
-    case 'exchanges':
-      if (id) router.push({ pathname: '/(modals)/exchange-detail', params: { id } });
-      break;
-    case 'events':
-      if (id) router.push({ pathname: '/(modals)/event-detail', params: { id } });
-      break;
-    case 'members':
-      if (id) router.push({ pathname: '/(modals)/member-profile', params: { id } });
-      break;
-    case 'messages':
-      if (id) router.push({ pathname: '/(modals)/thread', params: { id } });
-      else router.push('/(tabs)/messages');
-      break;
-    default:
-      break;
-  }
-}
 
 /**
  * Handles the redirect logic after auth state resolves.

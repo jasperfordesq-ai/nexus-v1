@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useMemo, useCallback } from 'react';
 import {
   FlatList,
   View,
@@ -14,6 +15,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { getConversations, type Conversation } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
@@ -21,12 +24,15 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import { ConversationSkeleton } from '@/components/ui/Skeleton';
+import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
 export default function MessagesScreen() {
+  const { t } = useTranslation('messages');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { data, isLoading, error, refresh } = useApi(() => getConversations());
+  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
 
   const conversations = data?.data ?? [];
 
@@ -55,7 +61,7 @@ export default function MessagesScreen() {
             </Text>
             {lastMsg && (
               <Text style={styles.time}>
-                {formatRelativeTime(lastMsg.created_at)}
+                {formatRelativeTime(lastMsg.created_at, true)}
               </Text>
             )}
           </View>
@@ -63,7 +69,7 @@ export default function MessagesScreen() {
             <Text style={styles.lastMessage} numberOfLines={1}>
               {lastMsg
                 ? `${lastMsg.is_own ? 'You: ' : ''}${lastMsg.body}`
-                : 'No messages yet'}
+                : t('thread.noMessages')}
             </Text>
             {item.unread_count > 0 && (
               <View style={[styles.badge, { backgroundColor: primary }]}>
@@ -79,12 +85,15 @@ export default function MessagesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Messages</Text>
+        <Text style={styles.title}>{t('title')}</Text>
         <TouchableOpacity
           style={[styles.composeButton, { backgroundColor: primary }]}
-          onPress={() => router.push('/(modals)/members')}
+          onPress={() => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/(modals)/members');
+          }}
           activeOpacity={0.8}
-          accessibilityLabel="New message"
+          accessibilityLabel={t('newMessage')}
         >
           <Ionicons name="create-outline" size={18} color="#fff" />
         </TouchableOpacity>
@@ -94,7 +103,7 @@ export default function MessagesScreen() {
         data={conversations}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderConversation}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={Separator}
         refreshControl={
           <RefreshControl refreshing={isLoading && conversations.length > 0} onRefresh={refresh} />
         }
@@ -109,10 +118,13 @@ export default function MessagesScreen() {
           ) : error ? (
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
+                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>No messages yet. Start a conversation!</Text>
+              <Text style={styles.emptyText}>{t('empty.title')}</Text>
             </View>
           )
         }
@@ -120,16 +132,6 @@ export default function MessagesScreen() {
       />
     </SafeAreaView>
   );
-}
-
-function formatRelativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return 'now';
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  return `${Math.floor(hours / 24)}d`;
 }
 
 function makeStyles(theme: Theme) {
@@ -177,7 +179,8 @@ function makeStyles(theme: Theme) {
     badgeText: { color: '#fff', fontSize: 11, fontWeight: '600' },
     separator: { height: 1, backgroundColor: theme.borderSubtle, marginLeft: 76 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
+    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center' },
   });
 }

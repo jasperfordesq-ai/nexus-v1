@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   FlatList,
   View,
@@ -14,7 +14,8 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import { router } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import {
   getNotifications,
@@ -27,11 +28,14 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { navigateToLink } from '@/lib/utils/navigateToLink';
 
 export default function NotificationsScreen() {
+  const { t } = useTranslation('notifications');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
   const [markingAll, setMarkingAll] = useState(false);
 
   const { data, isLoading, error, refresh } = useApi(() => getNotifications());
@@ -42,9 +46,10 @@ export default function NotificationsScreen() {
     setMarkingAll(true);
     try {
       await markAllRead();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refresh();
     } catch {
-      Alert.alert('Error', 'Could not mark notifications as read.');
+      Alert.alert('Error', t('markError'));
     } finally {
       setMarkingAll(false);
     }
@@ -55,6 +60,7 @@ export default function NotificationsScreen() {
       <TouchableOpacity
         style={[styles.row, !item.is_read && styles.rowUnread]}
         onPress={() => {
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           void markRead(item.id).then(() => refresh());
           navigateToLink(item.link);
         }}
@@ -72,7 +78,7 @@ export default function NotificationsScreen() {
         <View style={styles.content}>
           {item.title && <Text style={styles.title} numberOfLines={1}>{item.title}</Text>}
           <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
-          <Text style={styles.time}>{formatRelativeTime(item.created_at)}</Text>
+          <Text style={styles.time}>{formatRelativeTime(item.created_at, t)}</Text>
         </View>
 
         {!item.is_read && <View style={[styles.unreadDot, { backgroundColor: primary }]} />}
@@ -85,7 +91,7 @@ export default function NotificationsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.heading}>Notifications</Text>
+          <Text style={styles.heading}>{t('title')}</Text>
           {unreadCount > 0 && (
             <View style={[styles.badge, { backgroundColor: primary }]}>
               <Text style={styles.badgeText}>{unreadCount}</Text>
@@ -95,7 +101,7 @@ export default function NotificationsScreen() {
         {unreadCount > 0 && (
           <TouchableOpacity onPress={handleMarkAll} disabled={markingAll}>
             <Text style={[styles.markAll, { color: primary }]}>
-              {markingAll ? 'Marking…' : 'Mark all read'}
+              {markingAll ? t('marking') : t('markAllRead')}
             </Text>
           </TouchableOpacity>
         )}
@@ -105,7 +111,7 @@ export default function NotificationsScreen() {
         data={notifications}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={Separator}
         refreshControl={
           <RefreshControl refreshing={isLoading && notifications.length > 0} onRefresh={refresh} />
         }
@@ -115,10 +121,13 @@ export default function NotificationsScreen() {
           ) : error ? (
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
+                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>You&apos;re all caught up!</Text>
+              <Text style={styles.emptyText}>{t('allCaughtUp')}</Text>
             </View>
           )
         }
@@ -138,38 +147,10 @@ function categoryColor(category: string, fallback: string): string {
   }
 }
 
-/**
- * Maps a web-format deep-link (e.g. /exchanges/123) to the appropriate
- * mobile screen and navigates to it.
- */
-function navigateToLink(link: string | null): void {
-  if (!link) return;
-  const match = link.match(/^\/([^/]+)(?:\/(\d+))?/);
-  if (!match) return;
-  const [, section, id] = match;
-  switch (section) {
-    case 'exchanges':
-      if (id) router.push({ pathname: '/(modals)/exchange-detail', params: { id } });
-      break;
-    case 'events':
-      if (id) router.push({ pathname: '/(modals)/event-detail', params: { id } });
-      break;
-    case 'members':
-      if (id) router.push({ pathname: '/(modals)/member-profile', params: { id } });
-      break;
-    case 'messages':
-      if (id) router.push({ pathname: '/(modals)/thread', params: { id } });
-      else router.push('/(tabs)/messages');
-      break;
-    default:
-      break;
-  }
-}
-
-function formatRelativeTime(iso: string): string {
+function formatRelativeTime(iso: string, t: (key: string) => string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return 'just now';
+  if (minutes < 1) return t('justNow');
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours}h ago`;
@@ -234,7 +215,8 @@ function makeStyles(theme: Theme) {
     },
     separator: { height: 1, backgroundColor: theme.borderSubtle },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
+    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
   });
 }

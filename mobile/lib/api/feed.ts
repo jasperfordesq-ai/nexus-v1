@@ -26,6 +26,7 @@ export interface FeedItem {
   user_id: number;
   author_name: string;
   author_avatar: string | null;
+  is_liked?: boolean;
   likes_count: number;
   comments_count: number;
   created_at: string;

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ export default function Input({ label, error, style, ...rest }: InputProps) {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [focused, setFocused] = useState(false);
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   return (
     <View style={styles.wrapper}>

@@ -62,6 +62,14 @@ export async function updateAvatar(uri: string): Promise<{ data: { avatar_url: s
     body: formData,
   });
 
-  if (!response.ok) throw new Error('Avatar upload failed');
+  if (!response.ok) {
+    let message = 'Avatar upload failed';
+    try {
+      const errBody = await response.json() as { message?: string };
+      if (errBody?.message) message = errBody.message;
+    } catch { /* response may not be JSON */ }
+    if (response.status === 413) message = 'Image is too large. Please choose a smaller photo.';
+    throw new Error(message);
+  }
   return response.json() as Promise<{ data: { avatar_url: string } }>;
 }

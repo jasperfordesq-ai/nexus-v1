@@ -64,7 +64,7 @@ class WalletFeaturesApiController extends BaseApiController
         $this->requireAuth();
 
         if (!TenantContext::hasFeature('wallet')) {
-            $this->error('Wallet is not enabled', 400);
+            $this->jsonResponse(['data' => ['balance' => 0, 'enabled' => false]]);
             return;
         }
 
@@ -82,7 +82,7 @@ class WalletFeaturesApiController extends BaseApiController
         $this->requireAuth();
 
         if (!TenantContext::hasFeature('wallet')) {
-            $this->error('Wallet is not enabled', 400);
+            $this->jsonResponse(['data' => ['balance' => 0, 'enabled' => false]]);
             return;
         }
 
@@ -109,7 +109,7 @@ class WalletFeaturesApiController extends BaseApiController
         $this->verifyCsrf();
 
         if (!TenantContext::hasFeature('wallet')) {
-            $this->error('Wallet is not enabled', 400);
+            $this->jsonResponse(['data' => ['balance' => 0, 'enabled' => false]]);
             return;
         }
 
@@ -149,7 +149,7 @@ class WalletFeaturesApiController extends BaseApiController
         $this->verifyCsrf();
 
         if (!TenantContext::hasFeature('wallet')) {
-            $this->error('Wallet is not enabled', 400);
+            $this->jsonResponse(['data' => ['balance' => 0, 'enabled' => false]]);
             return;
         }
 
@@ -194,7 +194,7 @@ class WalletFeaturesApiController extends BaseApiController
         $this->verifyCsrf();
 
         if (!TenantContext::hasFeature('wallet')) {
-            $this->error('Wallet is not enabled', 400);
+            $this->jsonResponse(['data' => ['balance' => 0, 'enabled' => false]]);
             return;
         }
 
@@ -234,7 +234,7 @@ class WalletFeaturesApiController extends BaseApiController
         $this->requireAuth();
 
         if (!TenantContext::hasFeature('wallet')) {
-            $this->error('Wallet is not enabled', 400);
+            $this->jsonResponse(['data' => ['balance' => 0, 'enabled' => false]]);
             return;
         }
 

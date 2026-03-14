@@ -106,6 +106,7 @@ $router->add('POST', '/api/app/log', 'Nexus\Controllers\Api\AppController@log');
 
 // Pusher Realtime API (WebSocket authentication)
 $router->add('POST', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
+$router->add('GET', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
 $router->add('GET', '/api/pusher/config', 'Nexus\Controllers\Api\PusherAuthController@config');
 // SECURITY: Debug endpoint removed - exposed sensitive configuration
 

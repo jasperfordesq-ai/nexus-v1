@@ -13,6 +13,12 @@ import enAuth from '../locales/en/auth.json';
 import enMessages from '../locales/en/messages.json';
 import enHome from '../locales/en/home.json';
 import enMembers from '../locales/en/members.json';
+import enExchanges from '../locales/en/exchanges.json';
+import enEvents from '../locales/en/events.json';
+import enNotifications from '../locales/en/notifications.json';
+import enSettings from '../locales/en/settings.json';
+import enWallet from '../locales/en/wallet.json';
+import enProfile from '../locales/en/profile.json';
 
 // --- Irish (Gaeilge) ---
 import gaCommon from '../locales/ga/common.json';
@@ -65,7 +71,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, auth: enAuth, messages: enMessages, home: enHome, members: enMembers },
+      en: { common: enCommon, auth: enAuth, messages: enMessages, home: enHome, members: enMembers, exchanges: enExchanges, events: enEvents, notifications: enNotifications, settings: enSettings, wallet: enWallet, profile: enProfile },
       ga: { common: gaCommon, auth: gaAuth, messages: gaMessages, home: gaHome, members: gaMembers },
       de: { common: deCommon, auth: deAuth, messages: deMessages, home: deHome, members: deMembers },
       fr: { common: frCommon, auth: frAuth, messages: frMessages, home: frHome, members: frMembers },
@@ -76,7 +82,7 @@ i18n
     lng: detectedLanguage,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'messages', 'home', 'members'],
+    ns: ['common', 'auth', 'messages', 'home', 'members', 'exchanges', 'events', 'notifications', 'settings', 'wallet', 'profile'],
     interpolation: {
       escapeValue: false, // React Native handles XSS
     },

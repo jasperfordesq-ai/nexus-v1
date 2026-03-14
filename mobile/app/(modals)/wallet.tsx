@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -20,7 +21,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { getWalletBalance, getWalletTransactions, type TransactionItem } from '@/lib/api/wallet';
 import Avatar from '@/components/ui/Avatar';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// Helpers
 
 function formatDate(iso: string): string {
   try {
@@ -34,7 +35,7 @@ function formatDate(iso: string): string {
   }
 }
 
-// ─── Transaction Row ─────────────────────────────────────────────────────────
+// Transaction Row
 
 function TransactionRow({
   item,
@@ -48,8 +49,7 @@ function TransactionRow({
   styles: ReturnType<typeof makeStyles>;
 }) {
   const isCredit = item.type === 'credit';
-  const sign = isCredit ? '+' : '−';
-  // Green for credit, red (theme.error) for debit — both are transaction status colours
+  const sign = isCredit ? '+' : '\u2212';
   const amountColor = isCredit ? theme.success : theme.error;
 
   return (
@@ -86,12 +86,14 @@ function TransactionRow({
   );
 }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
+// Screen
 
 export default function WalletModal() {
+  const { t } = useTranslation('wallet');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const {
@@ -115,12 +117,10 @@ export default function WalletModal() {
     setIsRefreshing(true);
     refreshBalance();
     refreshTx();
-    // Give the hooks a tick to re-start their fetch
     await new Promise<void>((resolve) => setTimeout(resolve, 400));
     setIsRefreshing(false);
   }, [refreshBalance, refreshTx]);
 
-  // ── Balance header ──────────────────────────────────────────────────────────
   const ListHeader = (
     <View style={[styles.balanceCard, { borderColor: primary }]}>
       {balanceLoading && balance === null ? (
@@ -128,21 +128,20 @@ export default function WalletModal() {
       ) : (
         <>
           <Text style={[styles.balanceValue, { color: primary }]}>
-            {balance !== null ? balance.toFixed(1) : '—'}
+            {balance !== null ? balance.toFixed(1) : '\u2014'}
           </Text>
-          <Text style={styles.balanceLabel}>Time credits</Text>
+          <Text style={styles.balanceLabel}>{t('timeCredits')}</Text>
         </>
       )}
     </View>
   );
 
-  // ── Empty / error state ─────────────────────────────────────────────────────
   const ListEmpty = txLoading ? null : (
     <View style={styles.emptyWrap}>
       {txError ? (
         <Text style={styles.errorText}>{txError}</Text>
       ) : (
-        <Text style={styles.emptyText}>No transactions yet.</Text>
+        <Text style={styles.emptyText}>{t('noTransactions')}</Text>
       )}
     </View>
   );
@@ -157,7 +156,7 @@ export default function WalletModal() {
         )}
         ListHeaderComponent={ListHeader}
         ListEmptyComponent={ListEmpty}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={Separator}
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl
@@ -172,14 +171,10 @@ export default function WalletModal() {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
 function makeStyles(theme: Theme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: theme.bg },
     listContent: { paddingHorizontal: 16, paddingBottom: 32 },
-
-    // Balance card
     balanceCard: {
       borderWidth: 2,
       borderRadius: 16,
@@ -192,8 +187,6 @@ function makeStyles(theme: Theme) {
     },
     balanceValue: { fontSize: 48, fontWeight: '700', lineHeight: 56 },
     balanceLabel: { fontSize: 14, color: theme.textSecondary, marginTop: 4 },
-
-    // Transaction rows
     row: {
       flexDirection: 'row',
       alignItems: 'flex-start',
@@ -216,10 +209,7 @@ function makeStyles(theme: Theme) {
       marginTop: 4,
     },
     statusText: { fontSize: 10, fontWeight: '600', textTransform: 'capitalize' },
-
     separator: { height: 8 },
-
-    // Empty / error
     emptyWrap: { paddingTop: 48, alignItems: 'center' },
     emptyText: { fontSize: 14, color: theme.textMuted },
     errorText: { fontSize: 14, color: theme.error, textAlign: 'center' },

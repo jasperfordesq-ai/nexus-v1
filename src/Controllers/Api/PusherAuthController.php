@@ -34,8 +34,8 @@ class PusherAuthController extends BaseApiController
                 $this->jsonResponse(['error' => 'Unauthorized'], 401);
             }
 
-            $socketId = $_POST['socket_id'] ?? null;
-            $channelName = $_POST['channel_name'] ?? null;
+            $socketId = $_REQUEST['socket_id'] ?? null;
+            $channelName = $_REQUEST['channel_name'] ?? null;
 
             if (empty($socketId) || empty($channelName)) {
                 $this->jsonResponse(['error' => 'Missing socket_id or channel_name'], 400);

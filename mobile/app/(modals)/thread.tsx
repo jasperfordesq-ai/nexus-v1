@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import {
   SafeAreaView,
   ActivityIndicator,
   RefreshControl,
+  Keyboard,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
@@ -23,7 +25,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
-import { getThread, sendMessage, type Message } from '@/lib/api/messages';
+import { getThread, getOrCreateThread, sendMessage, type Message } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -31,28 +33,49 @@ import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import Avatar from '@/components/ui/Avatar';
 import VoiceMessageBubble from '@/components/VoiceMessageBubble';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import OfflineBanner from '@/components/OfflineBanner';
 
 export default function ThreadScreen() {
   const { t } = useTranslation('messages');
-  const { id, name } = useLocalSearchParams<{ id: string; name: string }>();
+  // `id` = other user's ID (used by conversation list — existing conversation)
+  // `recipientId` = other user's ID (used by member-profile / exchange-detail — may be new conversation)
+  // Both refer to the other user's ID; `recipientId` signals "this might be a new conversation".
+  const { id, recipientId, name } = useLocalSearchParams<{
+    id: string;
+    recipientId: string;
+    name: string;
+  }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const navigation = useNavigation();
 
-  const conversationId = Number(id);
+  // Prefer recipientId (new conversation mode) over id (existing conversation mode)
+  const otherUserId = Number(recipientId || id);
+  const isNewConversation = !!recipientId;
+  const safeConversationId = isNaN(otherUserId) || otherUserId <= 0 ? 0 : otherUserId;
 
   const { subscribeToMessages } = useRealtimeContext();
 
+  // Use getOrCreateThread for new conversations (handles 404 gracefully),
+  // plain getThread for existing conversations opened from the inbox.
   const { data, isLoading, error, refresh } = useApi(
-    () => getThread(conversationId),
-    [conversationId],
+    () => isNewConversation ? getOrCreateThread(safeConversationId) : getThread(safeConversationId),
+    [safeConversationId, isNewConversation],
   );
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const flatListRef = useRef<FlatList<Message>>(null);
+
+  if (isNaN(otherUserId) || otherUserId <= 0) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>Invalid conversation.</Text>
+      </SafeAreaView>
+    );
+  }
 
   // Set the header title to the other user's name
   useEffect(() => {
@@ -71,28 +94,32 @@ export default function ThreadScreen() {
 
   // Live incoming messages via Pusher
   useEffect(() => {
-    if (!conversationId) return;
-    return subscribeToMessages(conversationId, (incoming) => {
+    if (!safeConversationId) return;
+    return subscribeToMessages(safeConversationId, (incoming) => {
       setMessages((prev) => {
         if (prev.some((m) => m.id === incoming.id)) return prev; // already present
         return [incoming, ...prev]; // prepend (FlatList inverted = newest first)
       });
     });
-  }, [conversationId, subscribeToMessages]);
+  }, [safeConversationId, subscribeToMessages]);
 
-  // Derive the other user's ID from the first non-own message's sender
-  const otherUserId: number | null = (() => {
+  // The recipient's user ID — we already have it from nav params.
+  // Also check API metadata as a secondary source.
+  const resolvedRecipientId: number | null = (() => {
+    // Primary: from navigation params (always available)
+    if (safeConversationId > 0) return safeConversationId;
+    // Fallback: API metadata
     const thread = data as (typeof data & { meta?: { conversation?: { other_user?: { id?: number } } } }) | undefined;
     const metaId = thread?.meta?.conversation?.other_user?.id;
     if (metaId) return metaId;
-    // Fallback: pick sender id from any incoming message
+    // Last resort: pick sender id from any incoming message
     const incoming = data?.data?.find((m) => !m.is_own);
     return incoming?.sender.id ?? null;
   })();
 
   const handleSend = useCallback(async () => {
     const body = inputText.trim();
-    if (!body || isSending || otherUserId === null) return;
+    if (!body || isSending || resolvedRecipientId === null) return;
 
     // Optimistic append
     const optimistic: Message = {
@@ -108,10 +135,11 @@ export default function ThreadScreen() {
     };
     setMessages((prev) => [optimistic, ...prev]);
     setInputText('');
+    Keyboard.dismiss();
     setIsSending(true);
 
     try {
-      const res = await sendMessage(otherUserId, body);
+      const res = await sendMessage(resolvedRecipientId, body);
       // Replace optimistic with server-confirmed message.
       // If Pusher already delivered it, drop the optimistic instead of duplicating.
       setMessages((prev) => {
@@ -125,10 +153,12 @@ export default function ThreadScreen() {
       // Remove optimistic message on failure and restore input
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
       setInputText(body);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Send failed', 'Message could not be sent. Please try again.');
     } finally {
       setIsSending(false);
     }
-  }, [inputText, isSending, otherUserId]);
+  }, [inputText, isSending, resolvedRecipientId]);
 
   function renderMessage({ item }: { item: Message }) {
     const isOwn = item.is_own;
@@ -161,7 +191,7 @@ export default function ThreadScreen() {
                 color={isOwn ? 'rgba(255,255,255,0.9)' : theme.textSecondary}
               />
               <Text style={[styles.voiceLabel, isOwn ? styles.bubbleTextOwn : styles.bubbleTextOther]}>
-                Voice message
+                {t('thread.voiceMessage')}
               </Text>
             </View>
           ) : (
@@ -188,13 +218,17 @@ export default function ThreadScreen() {
   if (error && !data) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>Could not load messages. Please try again.</Text>
+        <Text style={styles.errorText}>{t('thread.loadError')}</Text>
+        <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
+          <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>Retry</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
+      <OfflineBanner />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -237,7 +271,7 @@ export default function ThreadScreen() {
             {isSending ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <Text style={styles.sendButtonText}>Send</Text>
+              <Text style={styles.sendButtonText}>{t('thread.send')}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -256,7 +290,8 @@ function makeStyles(theme: Theme) {
     flex: { flex: 1 },
     container: { flex: 1, backgroundColor: theme.surface },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
+    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
 
     listContent: { paddingHorizontal: 12, paddingVertical: 12 },
 

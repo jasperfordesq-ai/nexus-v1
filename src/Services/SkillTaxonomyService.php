@@ -52,6 +52,12 @@ class SkillTaxonomyService
 
         $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
 
+        // Auto-seed defaults if no categories exist for this tenant
+        if (empty($rows)) {
+            self::seedDefaults($tenantId);
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+        }
+
         return self::buildTree($rows);
     }
 

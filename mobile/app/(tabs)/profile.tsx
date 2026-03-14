@@ -11,6 +11,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,29 +20,47 @@ import {
   requestMediaLibraryPermissionsAsync,
   MediaTypeOptions,
 } from 'expo-image-picker';
-import { useState } from 'react';
+import * as Haptics from 'expo-haptics';
+import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { type User } from '@/lib/api/auth';
 import { updateAvatar } from '@/lib/api/profile';
+import { api } from '@/lib/api/client';
+import { API_V2 } from '@/lib/constants';
 import Avatar from '@/components/ui/Avatar';
 import { ProfileSkeleton } from '@/components/ui/Skeleton';
 
 export default function ProfileScreen() {
+  const { t } = useTranslation('profile');
   const { user, displayName, logout, refreshUser } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [uploading, setUploading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    try {
+      const res = await api.get<{ data: User }>(`${API_V2}/users/me`);
+      refreshUser(res.data);
+    } catch {
+      // Non-critical
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   async function pickAndUploadAvatar() {
     const { status } = await requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert(
-        'Permission needed',
-        'Please allow access to your photo library to change your avatar.',
+        t('permissionNeeded'),
+        t('permissionMessage'),
       );
       return;
     }
@@ -62,20 +81,23 @@ export default function ProfileScreen() {
       if (user) {
         refreshUser({ ...user, avatar_url: response.data.avatar_url });
       }
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
-      Alert.alert('Upload failed', 'Could not update your avatar. Please try again.');
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('uploadFailed'), t('uploadFailedMessage'));
     } finally {
       setUploading(false);
     }
   }
 
   function confirmLogout() {
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     Alert.alert(
-      'Sign out',
-      'Are you sure you want to sign out?',
+      t('signOutConfirmTitle'),
+      t('signOutConfirmMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign out', style: 'destructive', onPress: () => void logout() },
+        { text: t('common:buttons.cancel'), style: 'cancel' },
+        { text: t('signOut'), style: 'destructive', onPress: () => void logout() },
       ],
     );
   }
@@ -94,7 +116,16 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={primary}
+          />
+        }
+      >
         {/* Avatar + name */}
         <View style={styles.avatarSection}>
           <TouchableOpacity
@@ -102,7 +133,7 @@ export default function ProfileScreen() {
             activeOpacity={0.8}
             disabled={uploading}
             style={styles.avatarWrapper}
-            accessibilityLabel="Change profile photo"
+            accessibilityLabel={t('changePhoto')}
             accessibilityRole="button"
           >
             <Avatar uri={user.avatar_url} name={displayName} size={88} />
@@ -117,7 +148,7 @@ export default function ProfileScreen() {
         {/* Time balance card — only shown once full profile loads */}
         {balance !== null && (
           <View style={[styles.balanceCard, { borderColor: primary }]}>
-            <Text style={styles.balanceLabel}>Time balance</Text>
+            <Text style={styles.balanceLabel}>{t('timeBalance')}</Text>
             <Text style={[styles.balanceValue, { color: primary }]}>
               {balance.toFixed(1)} hrs
             </Text>
@@ -127,7 +158,7 @@ export default function ProfileScreen() {
         {/* Bio */}
         {bio && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About</Text>
+            <Text style={styles.sectionTitle}>{t('about')}</Text>
             <Text style={styles.bio}>{bio}</Text>
           </View>
         )}
@@ -136,34 +167,46 @@ export default function ProfileScreen() {
         <View style={styles.actions}>
           <TouchableOpacity
             style={[styles.actionButton, { borderColor: primary }]}
-            onPress={() => router.push('/(modals)/wallet')}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/(modals)/wallet');
+            }}
             activeOpacity={0.7}
           >
-            <Text style={[styles.actionButtonText, { color: primary }]}>View wallet</Text>
+            <Text style={[styles.actionButtonText, { color: primary }]}>{t('viewWallet')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionButton, { borderColor: theme.border }]}
-            onPress={() => router.push('/(modals)/edit-profile')}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/(modals)/edit-profile');
+            }}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionButtonText}>Edit profile</Text>
+            <Text style={styles.actionButtonText}>{t('editProfile')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionButton, { borderColor: theme.border }]}
-            onPress={() => router.push('/(modals)/members')}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/(modals)/members');
+            }}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionButtonText}>Browse Members</Text>
+            <Text style={styles.actionButtonText}>{t('browseMembers')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionButton, { borderColor: theme.border }]}
-            onPress={() => router.push('/(modals)/settings')}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/(modals)/settings');
+            }}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionButtonText}>Settings</Text>
+            <Text style={styles.actionButtonText}>{t('settings')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -171,7 +214,7 @@ export default function ProfileScreen() {
             onPress={confirmLogout}
             activeOpacity={0.7}
           >
-            <Text style={styles.logoutText}>Sign out</Text>
+            <Text style={styles.logoutText}>{t('signOut')}</Text>
           </TouchableOpacity>
         </View>
 

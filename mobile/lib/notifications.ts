@@ -18,6 +18,7 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 
 import { api } from '@/lib/api/client';
 
@@ -72,6 +73,7 @@ export async function registerForPushNotifications(): Promise<void> {
         name: 'default',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
+        // Brand color — tenant-specific theming not available at notification channel setup time
         lightColor: '#006FEE',
       });
     }
@@ -88,7 +90,9 @@ export async function registerForPushNotifications(): Promise<void> {
       return;
     }
 
-    const tokenData = await Notifications.getExpoPushTokenAsync();
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig?.extra?.eas?.projectId,
+    });
 
     await api.post<void>('/api/push/register-device', {
       token: tokenData.data,
@@ -106,7 +110,9 @@ export async function registerForPushNotifications(): Promise<void> {
 export async function unregisterPushNotifications(): Promise<void> {
   try {
     if (!Device.isDevice) return;
-    const tokenData = await Notifications.getExpoPushTokenAsync();
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: Constants.expoConfig?.extra?.eas?.projectId,
+    });
     await api.post<void>('/api/push/unregister-device', { token: tokenData.data });
   } catch {
     // Best effort on logout

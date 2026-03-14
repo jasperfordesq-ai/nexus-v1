@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,11 +12,13 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import MemberCard from '@/components/MemberCard';
@@ -34,18 +36,19 @@ function extractMembersPage(response: MemberListResponse) {
 
 export default function MembersScreen() {
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
 
   const fetchMembers = useCallback(
-    (cursor: string | null) => getMembers(cursor ? Number(cursor) : 0, search || undefined),
-    [search],
+    (cursor: string | null) => getMembers(cursor ? Number(cursor) : 0, debouncedSearch || undefined),
+    [debouncedSearch],
   );
 
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
     usePaginatedApi<Member, MemberListResponse>(fetchMembers, extractMembersPage);
 
-  // Re-fetch from the start whenever the search term changes.
+  // Re-fetch from the start whenever the debounced search term changes.
   const isFirstRender = useRef(true);
   useEffect(() => {
     if (isFirstRender.current) {
@@ -53,9 +56,9 @@ export default function MembersScreen() {
       return;
     }
     refresh();
-    // refresh is stable relative to search changes; we want this to fire on search change only.
+    // refresh is stable relative to search changes; we want this to fire on debounced search change only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  }, [debouncedSearch]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -92,6 +95,9 @@ export default function MembersScreen() {
           ) : error ? (
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
+                <Text style={{ color: theme.text, fontWeight: '600', fontSize: 15 }}>Retry</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.centered}>
@@ -136,7 +142,8 @@ function makeStyles(theme: Theme) {
     searchInput: { flex: 1, paddingVertical: 10, fontSize: 15, color: theme.text },
     list: { paddingBottom: 24 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
+    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
     footer: { paddingVertical: 16, alignItems: 'center' },
   });

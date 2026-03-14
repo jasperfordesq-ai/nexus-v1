@@ -674,7 +674,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
             </div>
 
             {last_message && (
-              <p className={`text-sm truncate ${unread_count > 0 ? 'text-theme-muted' : 'text-theme-subtle'}`}>
+              <p className={`text-sm line-clamp-1 ${unread_count > 0 ? 'text-theme-muted' : 'text-theme-subtle'}`}>
                 {last_message.body || last_message.content}
               </p>
             )}
@@ -722,7 +722,7 @@ function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversat
           </div>
 
           {last_message && (
-            <p className="text-sm truncate text-theme-subtle">
+            <p className="text-sm line-clamp-1 text-theme-subtle">
               {last_message.body || last_message.content}
             </p>
           )}

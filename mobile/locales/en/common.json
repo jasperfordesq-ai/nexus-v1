@@ -17,6 +17,18 @@
     "unauthorized": "Your session has expired. Please log in again.",
     "notFound": "Not found."
   },
+  "labels": {
+    "timeBalance": "Time balance",
+    "about": "About",
+    "viewWallet": "View wallet",
+    "editProfile": "Edit profile",
+    "browseMembers": "Browse Members",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "signOutConfirmTitle": "Sign out",
+    "signOutConfirmMessage": "Are you sure you want to sign out?"
+  },
+  "offline": "No internet connection",
   "loading": "Loading…",
   "noResults": "No results found.",
   "yes": "Yes",

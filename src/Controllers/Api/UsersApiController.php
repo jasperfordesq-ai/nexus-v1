@@ -811,4 +811,18 @@ class UsersApiController extends BaseApiController
             'language' => $language
         ]);
     }
+
+    /**
+     * GET /api/v2/me/stats
+     *
+     * Get the authenticated user's profile statistics for sidebar widget.
+     */
+    public function stats(): void
+    {
+        $userId = $this->getUserId();
+        $tenantId = TenantContext::getId();
+
+        $stats = UserService::getProfileStats($userId, $tenantId);
+        $this->respondWithData($stats);
+    }
 }

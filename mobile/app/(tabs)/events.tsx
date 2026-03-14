@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { getEvents, type Event, type EventsResponse } from '@/lib/api/events';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
@@ -24,9 +26,10 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { EventCardSkeleton } from '@/components/ui/Skeleton';
 
 export default function EventsScreen() {
+  const { t } = useTranslation('events');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [when, setWhen] = useState<'upcoming' | 'past'>('upcoming');
 
   const fetcher = useCallback(
@@ -75,7 +78,7 @@ export default function EventsScreen() {
             activeOpacity={0.8}
           >
             <Text style={[styles.tabText, when === tab && { color: primary, fontWeight: '700' }]}>
-              {tab === 'upcoming' ? 'Upcoming' : 'Past'}
+              {t(tab)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -83,9 +86,9 @@ export default function EventsScreen() {
 
       {error ? (
         <View style={styles.center}>
-          <Text style={styles.errorText}>Could not load events.</Text>
+          <Text style={styles.errorText}>{t('loadError')}</Text>
           <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-            <Text style={{ color: primary }}>Retry</Text>
+            <Text style={{ color: primary }}>{t('common:buttons.retry')}</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -97,6 +100,7 @@ export default function EventsScreen() {
               event={item}
               primary={primary}
               theme={theme}
+              t={t}
               onPress={() =>
                 router.push({ pathname: '/(modals)/event-detail', params: { id: String(item.id) } })
               }
@@ -116,7 +120,7 @@ export default function EventsScreen() {
               </>
             ) : (
               <View style={styles.center}>
-                <Text style={styles.emptyText}>No {when} events.</Text>
+                <Text style={styles.emptyText}>{t('noEvents', { when: t(when).toLowerCase() })}</Text>
               </View>
             )
           }
@@ -132,21 +136,32 @@ function EventCard({
   event,
   primary,
   theme,
+  t,
   onPress,
 }: {
   event: Event;
   primary: string;
   theme: Theme;
+  t: (key: string, options?: Record<string, unknown>) => string;
   onPress: () => void;
 }) {
-  const cardStyles = makeStyles(theme);
+  const cardStyles = useMemo(() => makeStyles(theme), [theme]);
   const start = new Date(event.start_date);
   const month = start.toLocaleString('default', { month: 'short' });
   const day = start.getDate();
   const time = start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <TouchableOpacity style={cardStyles.card} onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity
+      style={cardStyles.card}
+      onPress={() => {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
+      activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={event.title}
+    >
       {/* Date badge */}
       <View style={[cardStyles.dateBadge, { backgroundColor: primary + '15' }]}>
         <Text style={[cardStyles.dateMonth, { color: primary }]}>{month}</Text>
@@ -165,13 +180,13 @@ function EventCard({
           <View style={cardStyles.metaRow}>
             <Ionicons name={event.is_online ? 'videocam-outline' : 'location-outline'} size={13} color={theme.textMuted} />
             <Text style={cardStyles.metaText} numberOfLines={1}>
-              {event.is_online ? 'Online' : event.location}
+              {event.is_online ? t('online') : event.location}
             </Text>
           </View>
         ) : event.is_online ? (
           <View style={cardStyles.metaRow}>
             <Ionicons name="videocam-outline" size={13} color={theme.textMuted} />
-            <Text style={cardStyles.metaText}>Online</Text>
+            <Text style={cardStyles.metaText}>{t('online')}</Text>
           </View>
         ) : null}
 
@@ -179,7 +194,7 @@ function EventCard({
         <View style={cardStyles.footerRow}>
           <View style={cardStyles.rsvpPill}>
             <Ionicons name="people-outline" size={12} color={theme.textSecondary} />
-            <Text style={cardStyles.rsvpText}>{event.rsvp_counts.going} going</Text>
+            <Text style={cardStyles.rsvpText}>{t('goingCount', { count: event.rsvp_counts.going })}</Text>
           </View>
 
           {event.category && (
@@ -192,7 +207,7 @@ function EventCard({
 
           {event.user_rsvp === 'going' && (
             <View style={[cardStyles.rsvpBadge, { backgroundColor: primary + '20' }]}>
-              <Text style={[cardStyles.rsvpBadgeText, { color: primary }]}>Going</Text>
+              <Text style={[cardStyles.rsvpBadgeText, { color: primary }]}>{t('going')}</Text>
             </View>
           )}
         </View>

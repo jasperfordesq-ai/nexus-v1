@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { router } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 
 import { updateProfile, type UpdateProfilePayload } from '@/lib/api/profile';
 import { type User } from '@/lib/api/auth';
@@ -25,11 +26,12 @@ import { STORAGE_KEYS } from '@/lib/constants';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import OfflineBanner from '@/components/OfflineBanner';
 
 export default function EditProfileScreen() {
   const { user, refreshUser } = useAuth();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const fullUser = user as User | null;
 
@@ -62,10 +64,12 @@ export default function EditProfileScreen() {
       await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
       refreshUser(response.data);
 
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Saved', 'Your profile has been updated.', [
         { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (err: unknown) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       const msg = err instanceof Error ? err.message : 'Could not save profile.';
       Alert.alert('Error', msg);
     } finally {
@@ -80,6 +84,7 @@ export default function EditProfileScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <OfflineBanner />
           <View style={styles.fieldGroup}>
             <Text style={styles.label}>First name</Text>
             <Input

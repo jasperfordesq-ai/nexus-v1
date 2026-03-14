@@ -45,6 +45,13 @@ export function useRealtimeContext(): RealtimeContextValue {
   return useContext(RealtimeContext);
 }
 
+/** Validate incoming Pusher payload shape at runtime. */
+function isMessagePayload(data: unknown): data is { conversation_id: number; message: Message } {
+  if (typeof data !== 'object' || data === null) return false;
+  const obj = data as Record<string, unknown>;
+  return typeof obj.conversation_id === 'number' && typeof obj.message === 'object' && obj.message !== null;
+}
+
 export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthContext();
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -73,7 +80,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     api
-      .get<PusherConfig>('/api/pusher/config')
+      .get<PusherConfig>(`${API_V2}/pusher/config`)
       .then((config) => {
         if (!mounted) return;
         if (!config.enabled || !config.key) return;
@@ -89,14 +96,12 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
         // Bump the unread badge and notify any open thread screens
         ch.bind('new-message', (rawPayload: unknown) => {
-          const payload = rawPayload as { conversation_id?: number; message?: Message };
           if (!mounted) return;
           setUnreadMessages((prev) => prev + 1);
-          // Deliver to any thread that's subscribed for this conversation
-          if (payload?.conversation_id && payload?.message) {
+          if (isMessagePayload(rawPayload)) {
             messageListenersRef.current
-              .get(payload.conversation_id)
-              ?.forEach((handler) => handler(payload.message!));
+              .get(rawPayload.conversation_id)
+              ?.forEach((handler) => handler(rawPayload.message));
           }
         });
       })

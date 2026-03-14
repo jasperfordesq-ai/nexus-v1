@@ -12,7 +12,8 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useLocalSearchParams, useNavigation, router } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getMember } from '@/lib/api/members';
 import { useApi } from '@/lib/hooks/useApi';
@@ -32,7 +33,6 @@ interface MemberProfile {
   skills: string[];
   joined_at: string;
   last_active_at: string | null;
-  // Profile-specific fields (may be absent on older API versions — treated as optional)
   total_hours_given?: number;
   total_hours_received?: number;
   rating?: number | null;
@@ -40,17 +40,19 @@ interface MemberProfile {
 }
 
 export default function MemberProfileScreen() {
+  const { t } = useTranslation('members');
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const navigation = useNavigation();
 
   const memberId = Number(id);
+  const safeMemberId = isNaN(memberId) || memberId <= 0 ? 0 : memberId;
 
   const { data, isLoading, error } = useApi(
-    () => getMember(memberId),
-    [memberId],
+    () => getMember(safeMemberId),
+    [safeMemberId],
   );
 
   const member = data?.data as MemberProfile | undefined;
@@ -60,6 +62,17 @@ export default function MemberProfileScreen() {
       navigation.setOptions({ title: member.name });
     }
   }, [member?.name, navigation]);
+
+  if (isNaN(memberId) || memberId <= 0) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>{t('common:errors.notFound')}</Text>
+        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
+          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('common:buttons.back')}</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   if (isLoading && !data) {
     return (
@@ -72,9 +85,9 @@ export default function MemberProfileScreen() {
   if (error || !member) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>Could not load member profile. Please try again.</Text>
+        <Text style={styles.errorText}>{t('profile.loadError')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>Go back</Text>
+          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('common:buttons.back')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -92,7 +105,7 @@ export default function MemberProfileScreen() {
             <Text style={styles.name}>{member.name}</Text>
             {member.is_verified && (
               <View style={styles.verifiedBadge}>
-                <Text style={styles.verifiedText}>✓ Verified</Text>
+                <Text style={styles.verifiedText}>{t('profile.verified')}</Text>
               </View>
             )}
           </View>
@@ -106,7 +119,7 @@ export default function MemberProfileScreen() {
           )}
 
           {member.location && (
-            <Text style={styles.location}>📍 {member.location}</Text>
+            <Text style={styles.location}>{member.location}</Text>
           )}
         </View>
 
@@ -116,21 +129,21 @@ export default function MemberProfileScreen() {
             <Text style={[styles.statValue, { color: primary }]}>
               {(member.total_hours_given ?? member.time_balance).toFixed(0)}
             </Text>
-            <Text style={styles.statLabel}>Hours Given</Text>
+            <Text style={styles.statLabel}>{t('profile.hoursGiven')}</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={[styles.statValue, { color: primary }]}>
               {(member.total_hours_received ?? 0).toFixed(0)}
             </Text>
-            <Text style={styles.statLabel}>Hours Received</Text>
+            <Text style={styles.statLabel}>{t('profile.hoursReceived')}</Text>
           </View>
         </View>
 
         {/* Skills */}
         {member.skills.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Skills</Text>
+            <Text style={styles.sectionTitle}>{t('profile.skills')}</Text>
             <View style={styles.skillsWrap}>
               {member.skills.map((skill) => (
                 <View key={skill} style={[styles.skillChip, { borderColor: primary }]}>
@@ -143,12 +156,12 @@ export default function MemberProfileScreen() {
 
         {/* Member since */}
         <Text style={styles.joinedText}>
-          Member since {formatDate(member.joined_at)}
+          {t('profile.memberSince', { date: formatDate(member.joined_at) })}
         </Text>
 
       </ScrollView>
 
-      {/* Send message CTA — placeholder until start-conversation endpoint is available */}
+      {/* Send message CTA */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.messageButton, { backgroundColor: primary }]}
@@ -160,7 +173,7 @@ export default function MemberProfileScreen() {
             })
           }
         >
-          <Text style={styles.messageButtonText}>Send Message</Text>
+          <Text style={styles.messageButtonText}>{t('profile.sendMessage')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -179,9 +192,7 @@ function makeStyles(theme: Theme) {
     container: { flex: 1, backgroundColor: theme.surface },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
     errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
-
     scroll: { paddingBottom: 24 },
-
     heroSection: {
       alignItems: 'center',
       paddingTop: 24,
@@ -189,10 +200,8 @@ function makeStyles(theme: Theme) {
       paddingBottom: 16,
       gap: 8,
     },
-
     identityRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'center' },
     name: { fontSize: 22, fontWeight: '700', color: theme.text, textAlign: 'center' },
-
     verifiedBadge: {
       backgroundColor: theme.successBg,
       borderRadius: 12,
@@ -200,9 +209,7 @@ function makeStyles(theme: Theme) {
       paddingVertical: 3,
     },
     verifiedText: { color: theme.success, fontSize: 12, fontWeight: '600' },
-
     rating: { fontSize: 16, color: theme.warning, fontWeight: '600' },
-
     bio: {
       fontSize: 14,
       color: theme.textSecondary,
@@ -210,7 +217,6 @@ function makeStyles(theme: Theme) {
       lineHeight: 20,
     },
     location: { fontSize: 13, color: theme.textMuted },
-
     statsRow: {
       flexDirection: 'row',
       marginHorizontal: 24,
@@ -225,7 +231,6 @@ function makeStyles(theme: Theme) {
     statDivider: { width: 1, backgroundColor: theme.border },
     statValue: { fontSize: 24, fontWeight: '700' },
     statLabel: { fontSize: 12, color: theme.textMuted, marginTop: 2 },
-
     section: { paddingHorizontal: 24, marginBottom: 16 },
     sectionTitle: { fontSize: 15, fontWeight: '600', color: theme.text, marginBottom: 10 },
     skillsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -236,14 +241,12 @@ function makeStyles(theme: Theme) {
       paddingVertical: 4,
     },
     skillText: { fontSize: 13, fontWeight: '500' },
-
     joinedText: {
       fontSize: 12,
       color: theme.textMuted,
       textAlign: 'center',
       paddingHorizontal: 24,
     },
-
     footer: {
       padding: 16,
       borderTopWidth: 1,

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -17,8 +17,11 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
+import { useTranslation } from 'react-i18next';
 import { getExchanges, type Exchange, type ExchangeListResponse } from '@/lib/api/exchanges';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -37,23 +40,25 @@ function extractExchangePage(response: ExchangeListResponse) {
 }
 
 export default function ExchangesScreen() {
+  const { t } = useTranslation('exchanges');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
 
   // Build a stable fetch function that includes the current search term and
   // decodes the page number from the cursor string.
   const fetchExchanges = useCallback(
-    (cursor: string | null) => getExchanges(cursor, search ? { search } : undefined),
-    // Re-create (and therefore reset pagination) whenever the search term changes.
-    [search],
+    (cursor: string | null) => getExchanges(cursor, debouncedSearch ? { search: debouncedSearch } : undefined),
+    // Re-create (and therefore reset pagination) whenever the debounced search term changes.
+    [debouncedSearch],
   );
 
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
     usePaginatedApi<Exchange, ExchangeListResponse>(fetchExchanges, extractExchangePage);
 
-  // Re-fetch from the start whenever the search term changes.
+  // Re-fetch from the start whenever the debounced search term changes.
   const isFirstRender = useRef(true);
   useEffect(() => {
     if (isFirstRender.current) {
@@ -62,17 +67,22 @@ export default function ExchangesScreen() {
     }
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
+  }, [debouncedSearch]);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Listings</Text>
+        <Text style={styles.title}>{t('title')}</Text>
         <TouchableOpacity
           style={[styles.newButton, { backgroundColor: primary }]}
-          onPress={() => router.push('/(modals)/new-exchange')}
+          onPress={() => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/(modals)/new-exchange');
+          }}
           activeOpacity={0.8}
+          accessibilityLabel={t('newListing')}
+          accessibilityRole="button"
         >
           <Ionicons name="add" size={20} color="#fff" />
         </TouchableOpacity>
@@ -85,7 +95,7 @@ export default function ExchangesScreen() {
           style={styles.searchInput}
           value={search}
           onChangeText={setSearch}
-          placeholder="Search listings…"
+          placeholder={t('searchPlaceholder')}
           placeholderTextColor={theme.textMuted}
           returnKeyType="search"
           clearButtonMode="while-editing"
@@ -113,10 +123,13 @@ export default function ExchangesScreen() {
           ) : error ? (
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
+                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>No listings found.</Text>
+              <Text style={styles.emptyText}>{t('empty')}</Text>
             </View>
           )
         }
@@ -167,7 +180,8 @@ function makeStyles(theme: Theme) {
     searchInput: { flex: 1, paddingVertical: 10, fontSize: 15, color: theme.text },
     list: { paddingBottom: 24 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
+    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
+    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
     emptyText: { color: theme.textMuted, fontSize: 14, textAlign: 'center' },
     footer: { paddingVertical: 16, alignItems: 'center' },
   });

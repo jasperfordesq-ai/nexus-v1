@@ -5,43 +5,34 @@
 
 import { StyleSheet, Text, View } from 'react-native';
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 /**
- * Renders a sticky yellow warning banner when the device has no connectivity.
- *
- * Place this component at the top of a screen's layout (inside SafeAreaView,
- * before the main content) — it renders nothing when the user is online.
- *
- * Example:
- *   <SafeAreaView style={styles.container}>
- *     <OfflineBanner />
- *     <FlatList ... />
- *   </SafeAreaView>
+ * Renders a sticky warning banner when the device has no connectivity.
+ * Respects light/dark theme.
  */
 export default function OfflineBanner() {
   const { isOnline } = useNetworkStatus();
+  const theme = useTheme();
 
   if (isOnline) return null;
 
   return (
-    <View style={styles.banner}>
-      <Text style={styles.text}>⚠ No internet connection</Text>
+    <View style={[styles.banner, { backgroundColor: theme.warning + '18', borderBottomColor: theme.warning }]}>
+      <Text style={[styles.text, { color: theme.warning }]}>No internet connection</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   banner: {
-    backgroundColor: '#FEF3C7',
     borderBottomWidth: 1,
-    borderBottomColor: '#F59E0B',
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
     zIndex: 100,
   },
   text: {
-    color: '#92400E',
     fontSize: 13,
     fontWeight: '600',
   },

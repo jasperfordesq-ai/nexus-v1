@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useMemo } from 'react';
 import { View, type ViewProps, StyleSheet } from 'react-native';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 
@@ -12,7 +13,7 @@ interface CardProps extends ViewProps {
 
 export default function Card({ children, style, ...rest }: CardProps) {
   const theme = useTheme();
-  const styles = makeStyles(theme);
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   return (
     <View style={[styles.card, style]} {...rest}>

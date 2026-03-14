@@ -4,7 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import * as Sentry from '@sentry/react-native';
+
+import { useTheme } from '@/lib/hooks/useTheme';
+import { usePrimaryColor } from '@/lib/hooks/useTenant';
 
 interface Props {
   children: React.ReactNode;
@@ -14,6 +18,49 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+}
+
+/** Functional fallback UI that can use hooks for theme-aware colors. */
+function ErrorFallback({ onReset }: { onReset: () => void }) {
+  const theme = useTheme();
+  const primary = usePrimaryColor();
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        backgroundColor: theme.bg,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: '600',
+          color: theme.text,
+          marginBottom: 16,
+          textAlign: 'center',
+        }}
+      >
+        Something went wrong
+      </Text>
+      <TouchableOpacity
+        style={{
+          paddingVertical: 10,
+          paddingHorizontal: 24,
+          backgroundColor: primary,
+          borderRadius: 8,
+        }}
+        onPress={onReset}
+        accessibilityRole="button"
+        accessibilityLabel="Try again"
+      >
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>Try again</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 export default class ErrorBoundary extends React.Component<Props, State> {
@@ -29,6 +76,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
     // Log to an error reporting service in the future
     console.error('[ErrorBoundary] Caught error:', error, info.componentStack);
+    Sentry.captureException(error, { extra: { componentStack: info.componentStack } });
   }
 
   handleReset = (): void => {
@@ -41,44 +89,9 @@ export default class ErrorBoundary extends React.Component<Props, State> {
         return this.props.fallback;
       }
 
-      return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Something went wrong</Text>
-          <TouchableOpacity style={styles.button} onPress={this.handleReset}>
-            <Text style={styles.buttonText}>Try again</Text>
-          </TouchableOpacity>
-        </View>
-      );
+      return <ErrorFallback onReset={this.handleReset} />;
     }
 
     return this.props.children;
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  button: {
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    backgroundColor: '#6366F1',
-    borderRadius: 8,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
-  },
-});
