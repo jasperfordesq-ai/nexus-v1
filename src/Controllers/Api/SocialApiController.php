@@ -102,9 +102,32 @@ class SocialApiController extends BaseApiController
         // This lets geo-boosted local content beat fresh-but-distant content that dominates
         // the raw recency-ordered list.
         if ($useRanking && !empty($result['items'])) {
-            $result['items'] = FeedRankingService::rankFeedItems($result['items'], $userId);
-            $result['items'] = array_slice($result['items'], 0, $userLimit);
+            $tz = $this->query('tz') ?: null;
+            $ranked = FeedRankingService::rankFeedItems($result['items'], $userId, $tz);
+            $result['items'] = array_slice($ranked, 0, $userLimit);
+            $result['has_more'] = count($ranked) > $userLimit || $result['has_more'];
+
+            // Recompute cursor from the oldest item actually returned (by activity timestamp).
+            // Without this, the cursor would point to the end of the 4x SQL window,
+            // causing items between $userLimit and 4x*$userLimit to be skipped forever.
+            if ($result['has_more'] && !empty($result['items'])) {
+                $oldest = $result['items'][0];
+                foreach ($result['items'] as $ri) {
+                    if (($ri['_activity_created_at'] ?? '') < ($oldest['_activity_created_at'] ?? '')) {
+                        $oldest = $ri;
+                    }
+                }
+                if (isset($oldest['_activity_created_at'], $oldest['_activity_id'])) {
+                    $result['cursor'] = base64_encode($oldest['_activity_created_at'] . '|' . $oldest['_activity_id']);
+                }
+            }
         }
+
+        // Strip internal cursor fields before sending response
+        foreach ($result['items'] as &$item) {
+            unset($item['_activity_id'], $item['_activity_created_at']);
+        }
+        unset($item);
 
         $this->respondWithCollection(
             $result['items'],
@@ -384,6 +407,36 @@ class SocialApiController extends BaseApiController
         }
 
         $this->respondWithData(['deleted' => true, 'id' => $id]);
+    }
+
+    // ============================================
+    // FEED TRACKING (EdgeRank Analytics)
+    // ============================================
+
+    /**
+     * Record a feed impression (post was viewed)
+     * POST /api/v2/feed/posts/{id}/impression
+     */
+    public function recordImpression(int $id): void
+    {
+        $userId = $this->getUserId();
+        if ($userId && $id > 0) {
+            FeedRankingService::recordImpression($id, $userId);
+        }
+        $this->respondWithData(['recorded' => true]);
+    }
+
+    /**
+     * Record a feed click (post was clicked/expanded)
+     * POST /api/v2/feed/posts/{id}/click
+     */
+    public function recordClick(int $id): void
+    {
+        $userId = $this->getUserId();
+        if ($userId && $id > 0) {
+            FeedRankingService::recordClick($id, $userId);
+        }
+        $this->respondWithData(['recorded' => true]);
     }
 
     // ============================================

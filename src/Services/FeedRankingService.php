@@ -10,97 +10,92 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
 /**
- * FeedRankingService - Modified EdgeRank Algorithm
+ * FeedRankingService - Full EdgeRank Algorithm (12-Signal Pipeline)
  *
- * Calculates a rank_score for feed posts based on three weighted factors:
- * 1. Engagement Weight: (Likes * 1) + (Comments * 5)
- * 2. Creator Vitality: Multiplier (0.0-1.0) based on poster's recent activity
- * 3. Geospatial Linear Decay: Distance-based score reduction
+ * Implements a complete EdgeRank-style feed ranking with 12 weighted signals:
+ *  1. Time Decay        — Hacker News-style freshness decay (72h half-life)
+ *  2. Engagement        — Log-scaled likes + comments (prevents viral runaway)
+ *  3. Engagement Velocity — Trending detection (rapid engagement in 2h window)
+ *  4. Content Type      — Community actions rank above passive content
+ *  5. Social Affinity   — Interaction-based relationship scoring
+ *  6. Creator Vitality  — Poster's recent activity level
+ *  7. Geo Decay         — Haversine distance-based decay
+ *  8. Content Quality   — Images, video, hashtags, @mentions, length
+ *  9. Context Timing    — Time-of-day / day-of-week boosts (viewer timezone)
+ * 10. Conversation Depth — Threaded discussion depth boost
+ * 11. Reaction Weighting — Emoji reaction type weights (love=2x, angry=0.5x)
+ * 12. Negative Signals  — Hidden posts, muted users, reports
  *
- * Final Score = Engagement * Vitality * GeoDecay
- *
- * Configuration is loaded from tenant settings (admin/feed-algorithm).
+ * Post-sort: User diversity + Content-type diversity reordering.
  */
 class FeedRankingService
 {
-    // =========================================================================
-    // DEFAULT CONFIGURATION (Fallback if tenant config not set)
-    // =========================================================================
-
-    // Engagement weights
     const LIKE_WEIGHT = 1;
     const COMMENT_WEIGHT = 5;
-    const SHARE_WEIGHT = 8;                 // Shares are high-intent engagement
-
-    // Creator Vitality thresholds (days since last activity)
-    const VITALITY_FULL_THRESHOLD = 7;      // Active within 7 days = 1.0
-    const VITALITY_DECAY_THRESHOLD = 30;    // Beyond 30 days = 0.5 (minimum)
+    const SHARE_WEIGHT = 8;
+    const VITALITY_FULL_THRESHOLD = 7;
+    const VITALITY_DECAY_THRESHOLD = 30;
     const VITALITY_MINIMUM = 0.5;
-
-    // Geospatial decay parameters (in kilometers)
-    // Graduated global decay: <50km=1.0, ~500km≈0.87, ~2000km≈0.45, >8000km=0.15
-    // Uses 100km intervals so nearby countries score noticeably better than intercontinental.
-    const GEO_FULL_SCORE_RADIUS = 50;       // < 50km = 100% score (same region)
-    const GEO_DECAY_PER_INTERVAL = 0.03;    // 3% reduction per 100km interval
-    const GEO_DECAY_INTERVAL = 100;         // Every 100km beyond threshold
-    const GEO_MINIMUM_SCORE = 0.15;         // Minimum 15% (intercontinental always gets some signal)
-
-    // Content Freshness Decay parameters (in hours)
-    const FRESHNESS_FULL_HOURS = 24;        // Posts < 24 hours = 100% freshness
-    const FRESHNESS_HALF_LIFE_HOURS = 72;   // Half-life: 72 hours (3 days)
-    const FRESHNESS_MINIMUM = 0.3;          // Minimum 30% (old posts still show)
-
-    // Social Graph parameters
-    const SOCIAL_GRAPH_ENABLED = true;      // Enable social graph boosting
-    const SOCIAL_GRAPH_MAX_BOOST = 2.0;     // Max 2x boost for close connections
-    const SOCIAL_GRAPH_INTERACTION_DAYS = 90; // Look back 90 days for interactions
-    const SOCIAL_GRAPH_FOLLOWER_BOOST = 1.5; // Boost for users you follow
-
-    // Negative Signals parameters
-    const NEGATIVE_SIGNALS_ENABLED = true;  // Enable negative signal downranking
-    const HIDE_PENALTY = 0.0;               // Hidden posts = 0 (completely hidden)
-    const MUTE_PENALTY = 0.1;               // Muted users = 10% visibility
-    const BLOCK_PENALTY = 0.0;              // Blocked users = 0 (completely hidden)
-    const REPORT_PENALTY_PER = 0.15;        // 15% reduction per report
-
-    // Content Quality parameters
-    const QUALITY_ENABLED = true;           // Enable content quality scoring
-    const QUALITY_IMAGE_BOOST = 1.3;        // 30% boost for posts with images
-    const QUALITY_LINK_BOOST = 1.1;         // 10% boost for posts with links
-    const QUALITY_LENGTH_MIN = 50;          // Minimum chars for length bonus
-    const QUALITY_LENGTH_BONUS = 1.2;       // 20% boost for substantial posts
-    const QUALITY_VIDEO_BOOST = 1.4;        // 40% boost for video URLs
-    const QUALITY_HASHTAG_BOOST = 1.1;      // 10% boost for posts with hashtags
-    const QUALITY_MENTION_BOOST = 1.15;     // 15% boost for @mentions
-
-    // Content Diversity parameters
-    const DIVERSITY_ENABLED = true;         // Enable content diversity
-    const DIVERSITY_MAX_CONSECUTIVE = 2;    // Max posts from same user in sequence
-    const DIVERSITY_PENALTY = 0.5;          // 50% penalty for exceeding limit
-    const DIVERSITY_TYPE_ENABLED = true;    // Enable content-type diversity
-    const DIVERSITY_TYPE_MAX_CONSECUTIVE = 3; // Max same content-type in sequence
-
-    // Default score when calculations can't be performed
+    const GEO_FULL_SCORE_RADIUS = 50;
+    const GEO_DECAY_INTERVAL = 100;
+    const GEO_DECAY_PER_INTERVAL = 0.03;
+    const GEO_MINIMUM_SCORE = 0.15;
+    const FRESHNESS_FULL_HOURS = 1;
+    const FRESHNESS_HALF_LIFE_HOURS = 72;
+    const FRESHNESS_MINIMUM = 0.3;
+    const SOCIAL_GRAPH_ENABLED = true;
+    const SOCIAL_GRAPH_MAX_BOOST = 2.0;
+    const SOCIAL_GRAPH_INTERACTION_DAYS = 90;
+    const SOCIAL_GRAPH_FOLLOWER_BOOST = 1.5;
+    const NEGATIVE_SIGNALS_ENABLED = true;
+    const HIDE_PENALTY = 0.0;
+    const MUTE_PENALTY = 0.1;
+    const BLOCK_PENALTY = 0.0;
+    const REPORT_PENALTY_PER = 0.15;
+    const QUALITY_ENABLED = true;
+    const QUALITY_IMAGE_BOOST = 1.3;
+    const QUALITY_LINK_BOOST = 1.1;
+    const QUALITY_LENGTH_MIN = 50;
+    const QUALITY_LENGTH_BONUS = 1.2;
+    const QUALITY_VIDEO_BOOST = 1.4;
+    const QUALITY_HASHTAG_BOOST = 1.1;
+    const QUALITY_MENTION_BOOST = 1.15;
+    const DIVERSITY_ENABLED = true;
+    const DIVERSITY_MAX_CONSECUTIVE = 2;
+    const DIVERSITY_PENALTY = 0.5;
+    const DIVERSITY_TYPE_ENABLED = true;
+    const DIVERSITY_TYPE_MAX_CONSECUTIVE = 3;
+    const VELOCITY_ENABLED = true;
+    const VELOCITY_WINDOW_HOURS = 2;
+    const VELOCITY_THRESHOLD = 3;
+    const VELOCITY_MAX_BOOST = 1.8;
+    const VELOCITY_DECAY_HOURS = 6;
+    const CONVERSATION_DEPTH_ENABLED = true;
+    const CONVERSATION_DEPTH_MAX_BOOST = 1.5;
+    const CONVERSATION_DEPTH_THRESHOLD = 3;
+    const REACTION_WEIGHTS = [
+        'love' => 2.0, 'celebrate' => 1.8, 'insightful' => 1.5,
+        'like' => 1.0, 'curious' => 0.8, 'sad' => 0.6, 'angry' => 0.5,
+    ];
+    const VIEW_TRACKING_ENABLED = true;
+    const CLICK_TRACKING_ENABLED = true;
     const DEFAULT_SCORE = 1.0;
 
-    // Cached configuration
     private static ?array $config = null;
+    /** @var array<int, int> */
+    private static array $mutedUserSet = [];
 
-    /**
-     * Get configuration from tenant settings, with fallback to constants
-     */
+
+
     public static function getConfig(): array
     {
         if (self::$config !== null) {
             return self::$config;
         }
 
-        // Default values from constants
-        // EdgeRank is enabled — wired into FeedService::getFeed() via rankFeedItems()
         $defaults = [
             'enabled' => true,
-            'like_weight' => self::LIKE_WEIGHT,
-            'comment_weight' => self::COMMENT_WEIGHT,
+            'like_weight' => self::LIKE_WEIGHT, 'comment_weight' => self::COMMENT_WEIGHT,
             'share_weight' => self::SHARE_WEIGHT,
             'vitality_full_days' => self::VITALITY_FULL_THRESHOLD,
             'vitality_decay_days' => self::VITALITY_DECAY_THRESHOLD,
@@ -109,23 +104,18 @@ class FeedRankingService
             'geo_decay_interval' => self::GEO_DECAY_INTERVAL,
             'geo_decay_rate' => self::GEO_DECAY_PER_INTERVAL,
             'geo_minimum' => self::GEO_MINIMUM_SCORE,
-            // Content Freshness Decay
             'freshness_enabled' => true,
             'freshness_full_hours' => self::FRESHNESS_FULL_HOURS,
             'freshness_half_life' => self::FRESHNESS_HALF_LIFE_HOURS,
             'freshness_minimum' => self::FRESHNESS_MINIMUM,
-            // Social Graph
+            'freshness_gravity' => 1.0,
             'social_graph_enabled' => self::SOCIAL_GRAPH_ENABLED,
             'social_graph_max_boost' => self::SOCIAL_GRAPH_MAX_BOOST,
             'social_graph_lookback_days' => self::SOCIAL_GRAPH_INTERACTION_DAYS,
             'social_graph_follower_boost' => self::SOCIAL_GRAPH_FOLLOWER_BOOST,
-            // Negative Signals
             'negative_signals_enabled' => self::NEGATIVE_SIGNALS_ENABLED,
-            'hide_penalty' => self::HIDE_PENALTY,
-            'mute_penalty' => self::MUTE_PENALTY,
-            'block_penalty' => self::BLOCK_PENALTY,
-            'report_penalty_per' => self::REPORT_PENALTY_PER,
-            // Content Quality
+            'hide_penalty' => self::HIDE_PENALTY, 'mute_penalty' => self::MUTE_PENALTY,
+            'block_penalty' => self::BLOCK_PENALTY, 'report_penalty_per' => self::REPORT_PENALTY_PER,
             'quality_enabled' => self::QUALITY_ENABLED,
             'quality_image_boost' => self::QUALITY_IMAGE_BOOST,
             'quality_link_boost' => self::QUALITY_LINK_BOOST,
@@ -134,36 +124,77 @@ class FeedRankingService
             'quality_video_boost' => self::QUALITY_VIDEO_BOOST,
             'quality_hashtag_boost' => self::QUALITY_HASHTAG_BOOST,
             'quality_mention_boost' => self::QUALITY_MENTION_BOOST,
-            // Content Diversity
             'diversity_enabled' => self::DIVERSITY_ENABLED,
             'diversity_max_consecutive' => self::DIVERSITY_MAX_CONSECUTIVE,
             'diversity_penalty' => self::DIVERSITY_PENALTY,
             'diversity_type_enabled' => self::DIVERSITY_TYPE_ENABLED,
             'diversity_type_max_consecutive' => self::DIVERSITY_TYPE_MAX_CONSECUTIVE,
+            'velocity_enabled' => self::VELOCITY_ENABLED,
+            'velocity_window_hours' => self::VELOCITY_WINDOW_HOURS,
+            'velocity_threshold' => self::VELOCITY_THRESHOLD,
+            'velocity_max_boost' => self::VELOCITY_MAX_BOOST,
+            'velocity_decay_hours' => self::VELOCITY_DECAY_HOURS,
+            'conversation_depth_enabled' => self::CONVERSATION_DEPTH_ENABLED,
+            'conversation_depth_max_boost' => self::CONVERSATION_DEPTH_MAX_BOOST,
+            'conversation_depth_threshold' => self::CONVERSATION_DEPTH_THRESHOLD,
         ];
 
         try {
-            // Try to load tenant configuration
             $tenantId = TenantContext::getId();
-            $configJson = Database::query(
-                "SELECT configuration FROM tenants WHERE id = ?",
-                [$tenantId]
-            )->fetchColumn();
-
+            $configJson = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetchColumn();
             if ($configJson) {
                 $configArr = json_decode($configJson, true);
                 if (is_array($configArr) && isset($configArr['feed_algorithm'])) {
                     self::$config = array_merge($defaults, $configArr['feed_algorithm']);
+                    self::validateConfig();
                     return self::$config;
                 }
             }
-        } catch (\Exception $e) {
-            // Silently fall back to defaults
-        }
+        } catch (\Exception $e) {}
 
         self::$config = $defaults;
+        self::validateConfig();
         return self::$config;
     }
+
+    /**
+     * Validate config values are within reasonable bounds
+     */
+    private static function validateConfig(): void
+    {
+        $c = &self::$config;
+
+        // Weights must be non-negative
+        $c['like_weight'] = max(0, (float)$c['like_weight']);
+        $c['comment_weight'] = max(0, (float)$c['comment_weight']);
+        $c['share_weight'] = max(0, (float)$c['share_weight']);
+
+        // Vitality bounds
+        $c['vitality_full_days'] = max(1, (int)$c['vitality_full_days']);
+        $c['vitality_decay_days'] = max($c['vitality_full_days'] + 1, (int)$c['vitality_decay_days']);
+        $c['vitality_minimum'] = max(0.0, min(1.0, (float)$c['vitality_minimum']));
+
+        // Geo bounds
+        $c['geo_full_radius'] = max(0, (float)$c['geo_full_radius']);
+        $c['geo_decay_interval'] = max(1, (float)$c['geo_decay_interval']);
+        $c['geo_decay_rate'] = max(0.0, min(1.0, (float)$c['geo_decay_rate']));
+        $c['geo_minimum'] = max(0.0, min(1.0, (float)$c['geo_minimum']));
+
+        // Freshness bounds
+        $c['freshness_half_life'] = max(1, (float)$c['freshness_half_life']);
+        $c['freshness_minimum'] = max(0.0, min(1.0, (float)$c['freshness_minimum']));
+        $c['freshness_gravity'] = max(0.1, min(3.0, (float)($c['freshness_gravity'] ?? 1.0)));
+
+        // Social graph bounds
+        $c['social_graph_max_boost'] = max(1.0, min(5.0, (float)$c['social_graph_max_boost']));
+        $c['social_graph_lookback_days'] = max(1, (int)$c['social_graph_lookback_days']);
+
+        // Quality boost bounds (>= 1.0, max 3.0)
+        foreach (['quality_image_boost', 'quality_link_boost', 'quality_length_bonus', 'quality_video_boost', 'quality_hashtag_boost', 'quality_mention_boost'] as $key) {
+            $c[$key] = max(1.0, min(3.0, (float)$c[$key]));
+        }
+    }
+
 
     /**
      * Check if the algorithm is enabled
@@ -180,216 +211,443 @@ class FeedRankingService
     public static function clearCache(): void
     {
         self::$config = null;
+        self::$mutedUserSet = [];
     }
+
 
     // =========================================================================
     // MAIN PUBLIC METHODS
     // =========================================================================
 
     /**
-     * Rank feed_activity items in-memory using EdgeRank
+     * Rank feed_activity items in-memory using 12-signal EdgeRank
      *
-     * Designed for use with FeedService::getFeed() results. Applies page-level
-     * ranking — cursor pagination continues to work correctly since the cursor
-     * is set chronologically by the SQL layer before this method is called.
-     *
-     * Score = time_decay × log_engagement × type_weight × affinity × quality
-     *
-     * @param array    $items    Feed items from FeedService::getFeed()['items']
-     * @param int|null $viewerId Authenticated user ID (null for anonymous)
-     * @return array Re-ranked items (same shape, no internal fields added)
+     * @param array       $items          Feed items from FeedService::getFeed()['items']
+     * @param int|null    $viewerId       Authenticated user ID (null for anonymous)
+     * @param string|null $viewerTimezone IANA timezone, null = UTC
+     * @return array Re-ranked items
      */
-    public static function rankFeedItems(array $items, ?int $viewerId = null): array
+    public static function rankFeedItems(array $items, ?int $viewerId = null, ?string $viewerTimezone = null): array
     {
         if (!self::isEnabled() || count($items) < 2) {
             return $items;
         }
 
         $config = self::getConfig();
-
-        // Content type weights — community actions rank above passive content
         $typeWeights = [
-            'event'      => 1.4,
-            'challenge'  => 1.3,
-            'poll'       => 1.25,
-            'volunteer'  => 1.2,
-            'goal'       => 1.1,
-            'post'       => 1.0,
-            'listing'    => 0.9,
-            'job'        => 0.9,
-            'review'     => 0.8,
+            'event' => 1.4, 'challenge' => 1.3, 'poll' => 1.25,
+            'volunteer' => 1.2, 'goal' => 1.1, 'post' => 1.0,
+            'listing' => 0.9, 'job' => 0.9, 'review' => 0.8,
         ];
 
-        // Batch-load viewer's social connections for affinity scoring
+        $authorIds = array_unique(array_filter(array_map(static fn($i) => (int)($i['user_id'] ?? 0), $items)));
+        $postIds = array_unique(array_filter(array_map(static fn($i) => (int)($i['id'] ?? $i['post_id'] ?? 0), $items)));
+
         $connectedSet = [];
+        $socialScores = [];
         if ($viewerId) {
             $connectedIds = self::getViewerConnectedUserIds($viewerId);
             $connectedSet = array_flip($connectedIds);
+            if (!empty($authorIds)) { $socialScores = self::getBatchSocialGraphScores($viewerId, $authorIds); }
         }
 
-        // Batch-load viewer coordinates for geo decay scoring
-        $viewerLat = null;
-        $viewerLon = null;
-        if ($viewerId) {
-            [$viewerLat, $viewerLon] = self::getUserCoordinates($viewerId);
-        }
+        $viewerLat = null; $viewerLon = null;
+        if ($viewerId) { [$viewerLat, $viewerLon] = self::getUserCoordinates($viewerId); }
 
-        // Batch-load author coordinates for all unique authors in feed
-        $authorCoords = [];
-        $authorIds = array_unique(array_filter(array_map(
-            static fn($i) => (int)($i['user_id'] ?? 0), $items
-        )));
-        if (!empty($authorIds)) {
-            $authorCoords = self::getBatchUserCoordinates($authorIds);
-        }
+        $authorCoords = !empty($authorIds) ? self::getBatchUserCoordinates($authorIds) : [];
+        $vitalityScores = !empty($authorIds) ? self::getBatchVitalityScores($authorIds) : [];
+        $velocityScores = (self::VELOCITY_ENABLED && !empty($postIds)) ? self::getBatchEngagementVelocity($postIds) : [];
+        $conversationDepths = (self::CONVERSATION_DEPTH_ENABLED && !empty($postIds)) ? self::getBatchConversationDepth($postIds) : [];
+        $reactionScores = !empty($postIds) ? self::getBatchReactionScores($postIds) : [];
+        $negativeScores = ($viewerId && !empty($postIds)) ? self::getBatchNegativeSignals($viewerId, $postIds, $authorIds) : [];
 
         foreach ($items as &$item) {
+            $postId = (int)($item['id'] ?? $item['post_id'] ?? 0);
+            $authorId = (int)($item['user_id'] ?? 0);
             $score = 1.0;
 
-            // 1. Hacker News time decay — fresh content scores highest
+            if ($authorId && self::isAuthorMuted($authorId)) { $item['_edge_rank'] = 0.0; continue; }
+
+            // 1. Time Decay
             $createdAt = $item['created_at'] ?? null;
             if ($createdAt) {
                 $hoursAgo = max(0, (int)round((time() - strtotime($createdAt)) / 3600));
-                $score   *= self::hackerNewsDecay($hoursAgo);
+                $score *= self::hackerNewsDecay($hoursAgo);
             }
 
-            // 2. Engagement boost — logarithmic to prevent viral runaway.
-            // Zero-engagement posts get a small cold-start boost (0.05) so they compete
-            // against older posts with minimal engagement rather than scoring identical.
-            $likes    = (int)($item['likes_count'] ?? 0);
+            // 2. Engagement
+            $likes = (int)($item['likes_count'] ?? 0);
             $comments = (int)($item['comments_count'] ?? 0);
-            $points   = ($likes * $config['like_weight']) + ($comments * $config['comment_weight']);
-            if ($points > 0) {
-                // cap at log(1001) * 0.3 ≈ 2.07 to prevent one viral post dominating
-                $score *= 1.0 + min(log(1.0 + $points) * 0.3, 2.0);
-            } else {
-                // Cold-start: brand-new posts with no engagement yet
-                $score *= 1.05;
+            $points = ($likes * $config['like_weight']) + ($comments * $config['comment_weight']);
+            if ($points > 0) { $score *= 1.0 + min(log(1.0 + $points) * 0.3, 2.0); }
+            else { $score *= 1.05; }
+
+            // 3. Velocity
+            if (self::VELOCITY_ENABLED && isset($velocityScores[$postId])) {
+                $v = $velocityScores[$postId];
+                if ($v >= self::VELOCITY_THRESHOLD) {
+                    $score *= min(self::VELOCITY_MAX_BOOST, 1.0 + (($v - self::VELOCITY_THRESHOLD) / self::VELOCITY_THRESHOLD) * 0.4);
+                }
             }
 
-            // 3. Content type weight
+            // 4. Type weight
             $sourceType = $item['type'] ?? $item['source_type'] ?? 'post';
-            $score     *= $typeWeights[$sourceType] ?? 1.0;
+            $score *= $typeWeights[$sourceType] ?? 1.0;
 
-            // 4. Social graph affinity — connected users get a boost
-            $authorId = (int)($item['user_id'] ?? 0);
-            if ($authorId && isset($connectedSet[$authorId])) {
-                $score *= (float)$config['social_graph_follower_boost'];
+            // 5. Social Affinity
+            if ($authorId && $viewerId) {
+                if (isset($socialScores[$authorId]) && $socialScores[$authorId] > 0) {
+                    $bf = ($config['social_graph_max_boost'] - 1) / 4;
+                    $score *= min($config['social_graph_max_boost'], 1.0 + (log($socialScores[$authorId] + 1, 2) * $bf));
+                } elseif (isset($connectedSet[$authorId])) {
+                    $score *= (float)$config['social_graph_follower_boost'];
+                }
             }
 
-            // 5. Geo decay — penalise content from far-away authors
+            // 6. Vitality
+            if ($authorId && isset($vitalityScores[$authorId])) { $score *= $vitalityScores[$authorId]; }
+
+            // 7. Geo Decay
             if ($viewerLat !== null && $authorId && isset($authorCoords[$authorId])) {
-                [$authorLat, $authorLon] = $authorCoords[$authorId];
-                $score *= self::calculateGeoDecayScore($viewerLat, $viewerLon, $authorLat, $authorLon);
+                [$aLat, $aLon] = $authorCoords[$authorId];
+                $score *= self::calculateGeoDecayScore($viewerLat, $viewerLon, $aLat, $aLon);
             }
 
-            // 6. Content quality signals
+            // 8. Quality
             if ($config['quality_enabled']) {
-                if (!empty($item['image_url'])) {
-                    $score *= (float)$config['quality_image_boost'];
-                }
-                if (strlen((string)($item['content'] ?? '')) >= $config['quality_length_min']) {
-                    $score *= (float)$config['quality_length_bonus'];
+                $ic = (string)($item['content'] ?? '');
+                if (!empty($item['image_url'])) { $score *= (float)$config['quality_image_boost']; }
+                if (preg_match('/(?:youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com)/i', $ic)) { $score *= (float)$config['quality_video_boost']; }
+                if (strpos($ic, '#') !== false) { $score *= (float)$config['quality_hashtag_boost']; }
+                if (strpos($ic, '@') !== false) { $score *= (float)$config['quality_mention_boost']; }
+                if (strlen($ic) >= $config['quality_length_min']) { $score *= (float)$config['quality_length_bonus']; }
+            }
+
+            // 9. Context Timing
+            $score *= self::contextualBoost($sourceType, $viewerTimezone);
+
+            // 10. Conversation Depth
+            if (self::CONVERSATION_DEPTH_ENABLED && isset($conversationDepths[$postId])) {
+                $d = $conversationDepths[$postId];
+                if ($d >= self::CONVERSATION_DEPTH_THRESHOLD) {
+                    $score *= min(self::CONVERSATION_DEPTH_MAX_BOOST, 1.0 + ($d / (self::CONVERSATION_DEPTH_THRESHOLD * 3)) * 0.5);
                 }
             }
 
-            // 7. Context-aware boost — time-of-day and day-of-week signals
-            // Boosts content types that perform better at certain times/days.
-            $score *= self::contextualBoost($sourceType);
+            // 11. Reaction Weighting
+            if (isset($reactionScores[$postId]) && $reactionScores[$postId] > 0) {
+                $score *= 1.0 + min($reactionScores[$postId] * 0.1, 1.0);
+            }
+
+            // 12. Negative Signals
+            if ($viewerId && isset($negativeScores[$postId])) { $score *= $negativeScores[$postId]; }
 
             $item['_edge_rank'] = $score;
         }
         unset($item);
 
         usort($items, static function (array $a, array $b): int {
-            return $b['_edge_rank'] <=> $a['_edge_rank'];
+            return ($b['_edge_rank'] ?? 0) <=> ($a['_edge_rank'] ?? 0);
         });
 
-        foreach ($items as &$item) {
-            unset($item['_edge_rank']);
-        }
-        unset($item);
+        $items = self::applyDiversityInPlace($items, self::getDiversityConfig());
 
+        foreach ($items as &$item) { unset($item['_edge_rank']); }
+        unset($item);
         return $items;
     }
 
-    /**
-     * Context-aware boost based on time-of-day and day-of-week.
-     *
-     * Certain content types perform better at specific times:
-     * - Events: boosted on Monday morning (planning week) and Friday afternoon
-     * - Volunteering: boosted weekends when people have free time
-     * - Jobs: boosted Monday–Wednesday mornings (job-seeking behaviour)
-     * - Social posts: boosted evenings (7–10pm) across all days
-     *
-     * Multiplier range: 0.90–1.20 to stay subtle.
-     */
-    private static function contextualBoost(string $sourceType): float
+
+    // =========================================================================
+    // BATCH DATA LOADING METHODS (Private, Tenant-Scoped)
+    // =========================================================================
+
+    /** @return array<int, int> authorId => interaction count */
+    private static function getBatchSocialGraphScores(int $viewerId, array $authorIds): array
     {
-        $hour = (int)date('G');      // 0–23 server UTC; close enough for population-level signals
-        $dow  = (int)date('N');      // 1=Monday … 7=Sunday
+        if (empty($authorIds) || $viewerId === 0) { return []; }
+        try {
+            $tenantId = TenantContext::getId();
+            $ph = implode(',', array_fill(0, count($authorIds), '?'));
+            $days = self::SOCIAL_GRAPH_INTERACTION_DAYS;
+            $sql = "SELECT p.user_id AS author_id, COUNT(*) AS interactions FROM (
+                SELECT target_id FROM likes WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+                UNION ALL
+                SELECT target_id FROM comments WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+            ) AS va JOIN feed_posts p ON p.id=va.target_id AND p.tenant_id=? WHERE p.user_id IN ($ph) GROUP BY p.user_id";
+            $params = array_merge([$viewerId,$tenantId,$days,$viewerId,$tenantId,$days,$tenantId], $authorIds);
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+            $r = [];
+            foreach ($rows as $row) { $r[(int)$row['author_id']] = (int)$row['interactions']; }
+            return $r;
+        } catch (\Exception $e) { return []; }
+    }
 
-        $isWeekend  = $dow >= 6;
-        $isWeekday  = !$isWeekend;
-        $isMorning  = $hour >= 7  && $hour < 12;
-        $isEvening  = $hour >= 19 && $hour < 22;
-        $isMonday   = $dow === 1;
-        $isFriday   = $dow === 5;
+    /** @return array<int, float> userId => vitality (0.5-1.0) */
+    private static function getBatchVitalityScores(array $userIds): array
+    {
+        if (empty($userIds)) { return []; }
+        try {
+            $tenantId = TenantContext::getId();
+            $ph = implode(',', array_fill(0, count($userIds), '?'));
+            $sql = "SELECT user_id, MAX(created_at) AS last_active FROM (
+                SELECT user_id, MAX(created_at) AS created_at FROM activity_log WHERE user_id IN ($ph) AND tenant_id=? AND action IN ('login','post_created','comment_added','like_added') GROUP BY user_id
+                UNION ALL
+                SELECT user_id, MAX(created_at) AS created_at FROM feed_posts WHERE user_id IN ($ph) AND tenant_id=? GROUP BY user_id
+            ) AS combined GROUP BY user_id";
+            $params = array_merge($userIds, [$tenantId], $userIds, [$tenantId]);
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+            $r = [];
+            foreach ($rows as $row) { $r[(int)$row['user_id']] = self::computeVitalityFromDays(self::getDaysSinceDate($row['last_active'])); }
+            $config = self::getConfig();
+            foreach ($userIds as $uid) { if (!isset($r[$uid])) { $r[$uid] = (float)$config['vitality_minimum']; } }
+            return $r;
+        } catch (\Exception $e) { return []; }
+    }
 
+    /** @return array<int, int> postId => recent interaction count */
+    private static function getBatchEngagementVelocity(array $postIds): array
+    {
+        if (empty($postIds)) { return []; }
+        try {
+            $tenantId = TenantContext::getId();
+            $ph = implode(',', array_fill(0, count($postIds), '?'));
+            $hrs = self::VELOCITY_WINDOW_HOURS;
+            $sql = "SELECT target_id AS post_id, COUNT(*) AS velocity FROM (
+                SELECT target_id FROM likes WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? HOUR)
+                UNION ALL
+                SELECT target_id FROM comments WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? HOUR)
+            ) AS recent GROUP BY target_id";
+            $params = array_merge($postIds, [$tenantId,$hrs], $postIds, [$tenantId,$hrs]);
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+            $r = [];
+            foreach ($rows as $row) { $r[(int)$row['post_id']] = (int)$row['velocity']; }
+            return $r;
+        } catch (\Exception $e) { return []; }
+    }
+
+    /** @return array<int, int> postId => reply count */
+    private static function getBatchConversationDepth(array $postIds): array
+    {
+        if (empty($postIds)) { return []; }
+        try {
+            $tenantId = TenantContext::getId();
+            $ph = implode(',', array_fill(0, count($postIds), '?'));
+            $sql = "SELECT target_id AS post_id, COUNT(*) AS depth FROM comments WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? AND parent_id IS NOT NULL GROUP BY target_id";
+            $params = array_merge($postIds, [$tenantId]);
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+            $r = [];
+            foreach ($rows as $row) { $r[(int)$row['post_id']] = (int)$row['depth']; }
+            return $r;
+        } catch (\Exception $e) { return []; }
+    }
+
+    /** @return array<int, float> postId => weighted reaction score */
+    private static function getBatchReactionScores(array $postIds): array
+    {
+        if (empty($postIds)) { return []; }
+        try {
+            $tenantId = TenantContext::getId();
+            $ph = implode(',', array_fill(0, count($postIds), '?'));
+            $sql = "SELECT target_id AS post_id, reaction_type, COUNT(*) AS cnt FROM reactions WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? GROUP BY target_id, reaction_type";
+            $params = array_merge($postIds, [$tenantId]);
+            $rows = Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
+            $r = [];
+            foreach ($rows as $row) {
+                $pid = (int)$row['post_id'];
+                $type = strtolower($row['reaction_type'] ?? 'like');
+                $weight = self::REACTION_WEIGHTS[$type] ?? 1.0;
+                $r[$pid] = ($r[$pid] ?? 0) + ($weight * (int)$row['cnt']);
+            }
+            return $r;
+        } catch (\Exception $e) { return []; }
+    }
+
+    /**
+     * Batch negative signals. Also populates self::$mutedUserSet.
+     * @return array<int, float> postId => multiplier (0.0-1.0)
+     */
+    private static function getBatchNegativeSignals(int $viewerId, array $postIds, array $authorIds): array
+    {
+        $config = self::getConfig();
+        if (empty($config['negative_signals_enabled']) || $viewerId === 0) { return []; }
+        $result = [];
+        $tenantId = TenantContext::getId();
+        self::$mutedUserSet = [];
+        try {
+            if (!empty($postIds)) {
+                $ph = implode(',', array_fill(0, count($postIds), '?'));
+                $rows = Database::query("SELECT post_id FROM feed_hidden WHERE user_id=? AND tenant_id=? AND post_id IN ($ph)", array_merge([$viewerId,$tenantId], $postIds))->fetchAll(\PDO::FETCH_COLUMN);
+                foreach ($rows as $hid) { $result[(int)$hid] = (float)$config['hide_penalty']; }
+            }
+            if (!empty($authorIds)) {
+                $ph = implode(',', array_fill(0, count($authorIds), '?'));
+                $rows = Database::query("SELECT muted_user_id FROM feed_muted_users WHERE user_id=? AND tenant_id=? AND muted_user_id IN ($ph)", array_merge([$viewerId,$tenantId], $authorIds))->fetchAll(\PDO::FETCH_COLUMN);
+                foreach ($rows as $mid) { self::$mutedUserSet[(int)$mid] = 1; }
+            }
+            if (!empty($postIds)) {
+                $ph = implode(',', array_fill(0, count($postIds), '?'));
+                $rows = Database::query("SELECT target_id, COUNT(*) AS report_count FROM reports WHERE target_type='post' AND target_id IN ($ph) AND tenant_id=? GROUP BY target_id", array_merge($postIds, [$tenantId]))->fetchAll(\PDO::FETCH_ASSOC);
+                foreach ($rows as $row) {
+                    $pid = (int)$row['target_id'];
+                    if (!isset($result[$pid])) { $result[$pid] = max(0.1, 1.0 - (int)$row['report_count'] * (float)$config['report_penalty_per']); }
+                }
+            }
+        } catch (\Exception $e) {}
+        return $result;
+    }
+
+    private static function isAuthorMuted(int $authorId): bool
+    {
+        return isset(self::$mutedUserSet[$authorId]);
+    }
+
+
+    // =========================================================================
+    // DIVERSITY (Post-Sort Processing)
+    // =========================================================================
+
+    private static function applyDiversityInPlace(array $items, array $config): array
+    {
+        if (empty($items)) { return $items; }
+        $userDiv = !empty($config['enabled']);
+        $typeDiv = !empty($config['type_enabled']);
+        if (!$userDiv && !$typeDiv) { return $items; }
+        $maxUser = $config['max_consecutive'] ?? 2;
+        $maxType = $config['type_max_consecutive'] ?? 3;
+        $result = []; $deferred = [];
+
+        foreach ($items as $item) {
+            $userId = (int)($item['user_id'] ?? 0);
+            $cType = $item['type'] ?? $item['content_type'] ?? 'post';
+            $shouldDefer = false;
+            if ($userDiv && $userId > 0) {
+                $c = 0;
+                for ($i = count($result)-1; $i >= 0 && $i >= count($result)-$maxUser; $i--) {
+                    if ((int)($result[$i]['user_id'] ?? 0) === $userId) { $c++; } else { break; }
+                }
+                if ($c >= $maxUser) { $shouldDefer = true; }
+            }
+            if (!$shouldDefer && $typeDiv) {
+                $c = 0;
+                for ($i = count($result)-1; $i >= 0 && $i >= count($result)-$maxType; $i--) {
+                    if (($result[$i]['type'] ?? $result[$i]['content_type'] ?? 'post') === $cType) { $c++; } else { break; }
+                }
+                if ($c >= $maxType) { $shouldDefer = true; }
+            }
+            if ($shouldDefer) { $deferred[] = $item; } else { $result[] = $item; }
+        }
+
+        foreach ($deferred as $di) {
+            $dUid = (int)($di['user_id'] ?? 0);
+            $dType = $di['type'] ?? $di['content_type'] ?? 'post';
+            $ins = false;
+            for ($i = 0; $i < count($result); $i++) {
+                $ok = true;
+                if ($userDiv && $dUid > 0) {
+                    for ($j = max(0,$i-$maxUser+1); $j < min(count($result),$i+$maxUser); $j++) {
+                        if ((int)($result[$j]['user_id'] ?? 0) === $dUid) { $ok = false; break; }
+                    }
+                }
+                if ($ok && $typeDiv) {
+                    for ($j = max(0,$i-$maxType+1); $j < min(count($result),$i+$maxType); $j++) {
+                        if (($result[$j]['type'] ?? $result[$j]['content_type'] ?? 'post') === $dType) { $ok = false; break; }
+                    }
+                }
+                if ($ok) { array_splice($result, $i, 0, [$di]); $ins = true; break; }
+            }
+            if (!$ins) { $result[] = $di; }
+        }
+        return $result;
+    }
+
+
+    // =========================================================================
+    // CONTEXT TIMING
+    // =========================================================================
+
+    private static function contextualBoost(string $sourceType, ?string $viewerTimezone = null): float
+    {
+        try {
+            $tz = $viewerTimezone ? new \DateTimeZone($viewerTimezone) : new \DateTimeZone('UTC');
+            $now = new \DateTime('now', $tz);
+            $hour = (int)$now->format('G');
+            $dow  = (int)$now->format('N');
+        } catch (\Exception $e) {
+            $hour = (int)date('G');
+            $dow  = (int)date('N');
+        }
+        $isWeekend = $dow >= 6; $isWeekday = !$isWeekend;
+        $isMorning = $hour >= 7 && $hour < 12; $isEvening = $hour >= 19 && $hour < 22;
         switch ($sourceType) {
             case 'event':
-                // People plan their week on Monday morning, browse on Friday
-                if ($isMonday && $isMorning) return 1.20;
-                if ($isFriday && $hour >= 14) return 1.15;
+                if ($dow === 1 && $isMorning) return 1.20;
+                if ($dow === 5 && $hour >= 14) return 1.15;
                 return 1.0;
-
-            case 'volunteer':
-                // Volunteering sign-ups spike on weekends
-                if ($isWeekend) return 1.18;
-                return 1.0;
-
-            case 'job':
-                // Job browsing peaks Mon–Wed mornings
-                if ($isWeekday && $isMorning && $dow <= 3) return 1.15;
-                return 1.0;
-
-            case 'post':
-            case 'poll':
-                // Social content peaks in evenings
+            case 'volunteer': return $isWeekend ? 1.18 : 1.0;
+            case 'job': return ($isWeekday && $isMorning && $dow <= 3) ? 1.15 : 1.0;
+            case 'post': case 'poll':
                 if ($isEvening) return 1.12;
-                // Suppress slightly during dead hours (2–6am)
                 if ($hour >= 2 && $hour < 6) return 0.90;
                 return 1.0;
-
-            case 'listing':
-                // Listings browsed weekend mornings
-                if ($isWeekend && $isMorning) return 1.10;
-                return 1.0;
-
-            default:
-                return 1.0;
+            case 'listing': return ($isWeekend && $isMorning) ? 1.10 : 1.0;
+            default: return 1.0;
         }
     }
 
-    /**
-     * Hacker News-style time decay factor
-     *
-     * Formula: 1 / (1 + hoursAgo/halfLife)^gravity
-     * Returns a value between freshness_minimum and 1.0.
-     * Fresh items (0h) → 1.0; at halfLife hours → ~0.5; old items → minimum.
-     *
-     * References: https://news.ycombinator.com/item?id=1781417
-     */
+
+    // =========================================================================
+    // TRACKING METHODS
+    // =========================================================================
+
+    public static function recordImpression(int $postId, int $userId): void
+    {
+        if (!self::VIEW_TRACKING_ENABLED || $userId === 0 || $postId === 0) { return; }
+        try {
+            Database::query("INSERT INTO feed_impressions (post_id,user_id,tenant_id,created_at) VALUES (?,?,?,NOW()) ON DUPLICATE KEY UPDATE view_count=view_count+1,updated_at=NOW()", [$postId, $userId, TenantContext::getId()]);
+        } catch (\Exception $e) {}
+    }
+
+    public static function recordClick(int $postId, int $userId): void
+    {
+        if (!self::CLICK_TRACKING_ENABLED || $userId === 0 || $postId === 0) { return; }
+        try {
+            Database::query("INSERT INTO feed_clicks (post_id,user_id,tenant_id,created_at) VALUES (?,?,?,NOW()) ON DUPLICATE KEY UPDATE click_count=click_count+1,updated_at=NOW()", [$postId, $userId, TenantContext::getId()]);
+        } catch (\Exception $e) {}
+    }
+
+    /** @return array<int, float> postId => CTR (0.0-1.0) */
+    public static function getBatchClickThroughRates(array $postIds): array
+    {
+        if (empty($postIds) || !self::CLICK_TRACKING_ENABLED) { return []; }
+        try {
+            $tenantId = TenantContext::getId();
+            $ph = implode(',', array_fill(0, count($postIds), '?'));
+            $rows = Database::query("SELECT fi.post_id, COALESCE(SUM(fc.click_count),0)/GREATEST(SUM(fi.view_count),1) AS ctr FROM feed_impressions fi LEFT JOIN feed_clicks fc ON fc.post_id=fi.post_id AND fc.tenant_id=fi.tenant_id WHERE fi.post_id IN ($ph) AND fi.tenant_id=? GROUP BY fi.post_id", array_merge($postIds, [$tenantId]))->fetchAll(\PDO::FETCH_ASSOC);
+            $r = [];
+            foreach ($rows as $row) { $r[(int)$row['post_id']] = min(1.0, (float)$row['ctr']); }
+            return $r;
+        } catch (\Exception $e) { return []; }
+    }
+
+
+    // =========================================================================
+    // HACKER NEWS DECAY
+    // =========================================================================
+
     private static function hackerNewsDecay(int $hoursAgo): float
     {
-        $config   = self::getConfig();
-        $halfLife = max(1.0, (float)$config['freshness_half_life']); // default 72h
-        $gravity  = 1.8; // HN gravity constant
-
+        $config = self::getConfig();
+        $halfLife = max(1.0, (float)$config['freshness_half_life']);
+        $gravity = (float)($config['freshness_gravity'] ?? 1.0);
         $decay = 1.0 / pow(1.0 + $hoursAgo / $halfLife, $gravity);
-
         return max((float)$config['freshness_minimum'], $decay);
     }
+
+
+    // =========================================================================
+    // COORDINATE HELPERS
+    // =========================================================================
 
     /**
      * Get lat/lon for a single user. Returns [lat, lon] or [null, null].
@@ -443,6 +701,7 @@ class FeedRankingService
 
             return $result;
         } catch (\Exception $e) {
+            error_log("FeedRankingService::getBatchUserCoordinates error: " . $e->getMessage());
             return [];
         }
     }
@@ -467,125 +726,33 @@ class FeedRankingService
 
             return array_map('intval', $rows);
         } catch (\Exception $e) {
+            error_log("FeedRankingService::getViewerConnectedUserIds error: " . $e->getMessage());
             return [];
         }
     }
 
-    /**
-     * Build a ranked feed SQL query that calculates Total_Score
-     * Returns the SQL and parameters to be used with existing WHERE clauses
-     *
-     * @param int $viewerId The user viewing the feed
-     * @param float|null $viewerLat Viewer's latitude (null if unknown)
-     * @param float|null $viewerLon Viewer's longitude (null if unknown)
-     * @param array $existingWhereConditions Additional WHERE conditions as strings
-     * @param array $existingParams Parameters for existing WHERE conditions
-     * @return array ['sql' => string, 'params' => array]
-     */
-    public static function buildRankedFeedQuery(
-        int $viewerId,
-        ?float $viewerLat = null,
-        ?float $viewerLon = null,
-        array $existingWhereConditions = [],
-        array $existingParams = []
-    ): array {
-        $tenantId = TenantContext::getId();
-        $config = self::getConfig();
 
-        // Build the score calculation SQL components
-        $engagementSql = self::getEngagementScoreSql();
-        $vitalitySql = self::getVitalityScoreSql();
-        $geoDecaySql = self::getGeoDecayScoreSql($viewerLat, $viewerLon);
-        $freshnessSql = self::getFreshnessScoreSql();
-        $socialGraphSql = self::getSocialGraphScoreSql($viewerId);
-        $negativeSignalsSql = self::getNegativeSignalsScoreSql($viewerId);
-        $qualitySql = self::getContentQualityScoreSql();
-
-        // Combine into Total_Score calculation
-        // Formula: Engagement × Vitality × GeoDecay × Freshness × SocialGraph × NegativeSignals × Quality
-        $totalScoreSql = "({$engagementSql}) * ({$vitalitySql}) * ({$geoDecaySql}) * ({$freshnessSql}) * ({$socialGraphSql}) * ({$negativeSignalsSql}) * ({$qualitySql})";
-
-        // Check if feed_posts has group_id column (for backwards compatibility with older databases)
-        $hasGroupIdColumn = false;
+    public static function getViewerCoordinates(int $viewerId): array
+    {
         try {
-            $columnCheck = Database::query("SHOW COLUMNS FROM feed_posts LIKE 'group_id'")->fetch();
-            $hasGroupIdColumn = !empty($columnCheck);
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT latitude, longitude FROM users WHERE id = ? AND tenant_id = ?";
+            $result = Database::query($sql, [$viewerId, $tenantId])->fetch();
+
+            return [
+                'lat' => $result['latitude'] ?? null,
+                'lon' => $result['longitude'] ?? null
+            ];
         } catch (\Exception $e) {
-            $hasGroupIdColumn = false;
+            return ['lat' => null, 'lon' => null];
         }
-
-        // Build group context SQL based on column availability
-        $groupSelectCols = $hasGroupIdColumn
-            ? "g.id as group_id, g.name as group_name, g.image_url as group_image, g.location as group_location,"
-            : "NULL as group_id, NULL as group_name, NULL as group_image, NULL as group_location,";
-        $groupJoin = $hasGroupIdColumn ? "LEFT JOIN `groups` g ON p.group_id = g.id" : "";
-
-        // Build the complete query
-        $sql = "
-            SELECT
-                p.*,
-                u.name as author_name,
-                u.avatar_url as author_avatar,
-                u.latitude as author_lat,
-                u.longitude as author_lon,
-                u.location as author_location,
-
-                -- Group context (for posts made in groups)
-                {$groupSelectCols}
-
-                -- Engagement Score Component
-                ({$engagementSql}) as engagement_score,
-
-                -- Creator Vitality Component
-                ({$vitalitySql}) as vitality_score,
-
-                -- Geospatial Decay Component
-                ({$geoDecaySql}) as geo_score,
-
-                -- Content Freshness Component
-                ({$freshnessSql}) as freshness_score,
-
-                -- Social Graph Component
-                ({$socialGraphSql}) as social_score,
-
-                -- Negative Signals Component
-                ({$negativeSignalsSql}) as negative_signals_score,
-
-                -- Content Quality Component
-                ({$qualitySql}) as quality_score,
-
-                -- Final Calculated Score
-                ({$totalScoreSql}) as rank_score,
-
-                -- Supporting data
-                (SELECT COUNT(*) FROM likes WHERE user_id = ? AND target_type = 'post' AND target_id = p.id) as is_liked,
-                (SELECT COUNT(*) FROM likes WHERE target_type = 'post' AND target_id = p.id) as likes_count,
-                (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count
-
-            FROM feed_posts p
-            JOIN users u ON p.user_id = u.id
-            {$groupJoin}
-            WHERE p.tenant_id = ?
-        ";
-
-        $params = [$viewerId, $tenantId];
-
-        // Add any existing WHERE conditions
-        if (!empty($existingWhereConditions)) {
-            foreach ($existingWhereConditions as $condition) {
-                $sql .= " AND ({$condition})";
-            }
-            $params = array_merge($params, $existingParams);
-        }
-
-        // Order by rank_score descending
-        $sql .= " ORDER BY rank_score DESC, p.created_at DESC";
-
-        return [
-            'sql' => $sql,
-            'params' => $params
-        ];
     }
+
+
+
+    // =========================================================================
+    // SINGLE-POST SCORING
+    // =========================================================================
 
     /**
      * Calculate rank score for a single post (useful for real-time updates)
@@ -620,14 +787,7 @@ class FeedRankingService
         return $engagementScore * $vitalityScore * $geoScore;
     }
 
-    /**
-     * Get a simplified SQL snippet for ranking that can be added to existing queries
-     * Use this when you need to add ranking to an existing complex query
-     *
-     * @param float|null $viewerLat
-     * @param float|null $viewerLon
-     * @return string SQL snippet for ORDER BY clause
-     */
+
     public static function getRankingOrderBySql(?float $viewerLat = null, ?float $viewerLon = null): string
     {
         $engagement = self::getEngagementScoreSql();
@@ -636,6 +796,7 @@ class FeedRankingService
 
         return "({$engagement}) * ({$vitality}) * ({$geoDecay}) DESC, p.created_at DESC";
     }
+
 
     // =========================================================================
     // ENGAGEMENT WEIGHT CALCULATION
@@ -673,6 +834,7 @@ class FeedRankingService
             )
         ";
     }
+
 
     // =========================================================================
     // CREATOR VITALITY CALCULATION
@@ -735,16 +897,16 @@ class FeedRankingService
             // First try activity_log table (if login events are logged)
             $sql = "SELECT MAX(created_at) as last_activity
                     FROM activity_log
-                    WHERE user_id = ? AND action IN ('login', 'post_created', 'comment_added', 'like_added')";
-            $result = Database::query($sql, [$userId])->fetch();
+                    WHERE user_id = ? AND tenant_id = ? AND action IN ('login', 'post_created', 'comment_added', 'like_added')";
+            $result = Database::query($sql, [$userId, TenantContext::getId()])->fetch();
 
             if ($result && $result['last_activity']) {
                 return $result['last_activity'];
             }
 
             // Fallback: Check for recent posts
-            $sql = "SELECT MAX(created_at) as last_activity FROM feed_posts WHERE user_id = ?";
-            $result = Database::query($sql, [$userId])->fetch();
+            $sql = "SELECT MAX(created_at) as last_activity FROM feed_posts WHERE user_id = ? AND tenant_id = ?";
+            $result = Database::query($sql, [$userId, TenantContext::getId()])->fetch();
 
             if ($result && $result['last_activity']) {
                 return $result['last_activity'];
@@ -781,27 +943,28 @@ class FeedRankingService
             CASE
                 -- Get days since last activity
                 WHEN DATEDIFF(NOW(), COALESCE(
-                    (SELECT MAX(created_at) FROM activity_log WHERE user_id = p.user_id AND action IN ('login', 'post_created')),
-                    (SELECT MAX(created_at) FROM feed_posts WHERE user_id = p.user_id),
+                    (SELECT MAX(created_at) FROM activity_log WHERE user_id = p.user_id AND tenant_id = p.tenant_id AND action IN ('login', 'post_created')),
+                    (SELECT MAX(created_at) FROM feed_posts WHERE user_id = p.user_id AND tenant_id = p.tenant_id),
                     u.created_at
                 )) <= {$fullThreshold} THEN 1.0
 
                 WHEN DATEDIFF(NOW(), COALESCE(
-                    (SELECT MAX(created_at) FROM activity_log WHERE user_id = p.user_id AND action IN ('login', 'post_created')),
-                    (SELECT MAX(created_at) FROM feed_posts WHERE user_id = p.user_id),
+                    (SELECT MAX(created_at) FROM activity_log WHERE user_id = p.user_id AND tenant_id = p.tenant_id AND action IN ('login', 'post_created')),
+                    (SELECT MAX(created_at) FROM feed_posts WHERE user_id = p.user_id AND tenant_id = p.tenant_id),
                     u.created_at
                 )) >= {$decayThreshold} THEN {$minimum}
 
                 ELSE 1.0 - (
                     (DATEDIFF(NOW(), COALESCE(
-                        (SELECT MAX(created_at) FROM activity_log WHERE user_id = p.user_id AND action IN ('login', 'post_created')),
-                        (SELECT MAX(created_at) FROM feed_posts WHERE user_id = p.user_id),
+                        (SELECT MAX(created_at) FROM activity_log WHERE user_id = p.user_id AND tenant_id = p.tenant_id AND action IN ('login', 'post_created')),
+                        (SELECT MAX(created_at) FROM feed_posts WHERE user_id = p.user_id AND tenant_id = p.tenant_id),
                         u.created_at
                     )) - {$fullThreshold}) / {$decayRange} * {$scoreRange}
                 )
             END
         ";
     }
+
 
     // =========================================================================
     // GEOSPATIAL LINEAR DECAY CALCULATION
@@ -926,6 +1089,7 @@ class FeedRankingService
         ";
     }
 
+
     // =========================================================================
     // CONTENT FRESHNESS DECAY CALCULATION
     // =========================================================================
@@ -996,6 +1160,7 @@ class FeedRankingService
         ";
     }
 
+
     // =========================================================================
     // SOCIAL GRAPH CALCULATION
     // =========================================================================
@@ -1028,6 +1193,7 @@ class FeedRankingService
                         SELECT COUNT(*) FROM likes l
                         JOIN feed_posts p ON l.target_type = 'post' AND l.target_id = p.id
                         WHERE l.user_id = ? AND p.user_id = ?
+                        AND l.tenant_id = ? AND p.tenant_id = ?
                         AND l.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
                     ) +
                     (
@@ -1035,6 +1201,7 @@ class FeedRankingService
                         SELECT COUNT(*) FROM comments c
                         JOIN feed_posts p ON c.target_type = 'post' AND c.target_id = p.id
                         WHERE c.user_id = ? AND p.user_id = ?
+                        AND c.tenant_id = ? AND p.tenant_id = ?
                         AND c.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
                     ) +
                     (
@@ -1043,9 +1210,10 @@ class FeedRankingService
                     ) as interaction_count
             ";
 
+            $tenantId = TenantContext::getId();
             $result = Database::query($sql, [
-                $viewerId, $posterId, $lookbackDays,
-                $viewerId, $posterId, $lookbackDays
+                $viewerId, $posterId, $tenantId, $tenantId, $lookbackDays,
+                $viewerId, $posterId, $tenantId, $tenantId, $lookbackDays
             ])->fetch();
 
             $interactions = (int)($result['interaction_count'] ?? 0);
@@ -1083,6 +1251,7 @@ class FeedRankingService
 
         $maxBoost = (float)$config['social_graph_max_boost'];
         $lookbackDays = (int)$config['social_graph_lookback_days'];
+        $tenantId = TenantContext::getId();
         $boostFactor = ($maxBoost - 1) / 4;
 
         // Safe SQL - only uses guaranteed tables (likes, comments)
@@ -1098,13 +1267,15 @@ class FeedRankingService
                                 SELECT COUNT(*) FROM likes l2
                                 WHERE l2.user_id = {$viewerId}
                                 AND l2.target_type = 'post'
-                                AND l2.target_id IN (SELECT id FROM feed_posts WHERE user_id = p.user_id)
+                                AND l2.tenant_id = {$tenantId}
+                                AND l2.target_id IN (SELECT id FROM feed_posts WHERE user_id = p.user_id AND tenant_id = {$tenantId})
                                 AND l2.created_at >= DATE_SUB(NOW(), INTERVAL {$lookbackDays} DAY)
                             ), 0) + COALESCE((
                                 SELECT COUNT(*) FROM comments c2
                                 WHERE c2.user_id = {$viewerId}
                                 AND c2.target_type = 'post'
-                                AND c2.target_id IN (SELECT id FROM feed_posts WHERE user_id = p.user_id)
+                                AND c2.tenant_id = {$tenantId}
+                                AND c2.target_id IN (SELECT id FROM feed_posts WHERE user_id = p.user_id AND tenant_id = {$tenantId})
                                 AND c2.created_at >= DATE_SUB(NOW(), INTERVAL {$lookbackDays} DAY)
                             ), 0)) * {$boostFactor}
                         )
@@ -1113,77 +1284,32 @@ class FeedRankingService
         ";
     }
 
+
     // =========================================================================
     // NEGATIVE SIGNALS CALCULATION
     // =========================================================================
 
-    /**
-     * Calculate negative signals score based on user actions
-     * Considers: hidden posts, muted users, reports
-     *
-     * @param int $viewerId The viewing user
-     * @return float Multiplier (0.0 to 1.0, lower = more penalized)
-     */
     public static function calculateNegativeSignalsScore(int $viewerId, int $postId, int $posterId): float
     {
         $config = self::getConfig();
-
-        if (empty($config['negative_signals_enabled']) || $viewerId === 0) {
-            return self::DEFAULT_SCORE;
-        }
-
+        if (empty($config['negative_signals_enabled']) || $viewerId === 0) { return self::DEFAULT_SCORE; }
         try {
-            // Check if viewer has hidden this specific post
-            $hiddenPost = Database::query(
-                "SELECT 1 FROM user_hidden_posts WHERE user_id = ? AND post_id = ? LIMIT 1",
-                [$viewerId, $postId]
-            )->fetch();
-
-            if ($hiddenPost) {
-                return $config['hide_penalty']; // Usually 0 = completely hidden
-            }
-
-            // Check if viewer has muted this user
-            $mutedUser = Database::query(
-                "SELECT 1 FROM user_muted_users WHERE user_id = ? AND muted_user_id = ? LIMIT 1",
-                [$viewerId, $posterId]
-            )->fetch();
-
-            if ($mutedUser) {
-                return $config['mute_penalty']; // Usually 0.1 = barely visible
-            }
-
-            // Check report count for the post
-            $reportCount = Database::query(
-                "SELECT COUNT(*) as cnt FROM reports WHERE target_type = 'post' AND target_id = ?",
-                [$postId]
-            )->fetchColumn();
-
-            if ($reportCount > 0) {
-                $penalty = $reportCount * $config['report_penalty_per'];
-                return max(0.1, 1.0 - $penalty); // Don't go below 10%
-            }
-
+            $tenantId = TenantContext::getId();
+            $h = Database::query("SELECT 1 FROM feed_hidden WHERE user_id=? AND post_id=? AND tenant_id=? LIMIT 1", [$viewerId,$postId,$tenantId])->fetch();
+            if ($h) { return $config['hide_penalty']; }
+            $m = Database::query("SELECT 1 FROM feed_muted_users WHERE user_id=? AND muted_user_id=? AND tenant_id=? LIMIT 1", [$viewerId,$posterId,$tenantId])->fetch();
+            if ($m) { return $config['mute_penalty']; }
+            $rc = Database::query("SELECT COUNT(*) as cnt FROM reports WHERE target_type='post' AND target_id=? AND tenant_id=?", [$postId,$tenantId])->fetchColumn();
+            if ($rc > 0) { return max(0.1, 1.0 - $rc * $config['report_penalty_per']); }
             return self::DEFAULT_SCORE;
-
-        } catch (\Exception $e) {
-            // Tables might not exist yet - silently return default
-            return self::DEFAULT_SCORE;
-        }
+        } catch (\Exception $e) { return self::DEFAULT_SCORE; }
     }
 
-    /**
-     * SQL snippet for negative signals calculation
-     *
-     * Returns 1.0 (no penalty) as default - the tables need to exist for this to work.
-     * The actual filtering happens in PHP via calculateNegativeSignalsScore() for safety.
-     */
     private static function getNegativeSignalsScoreSql(int $viewerId): string
     {
-        // Return safe default - negative signals filtering is done in PHP
-        // to avoid SQL errors when tables don't exist
         return (string)self::DEFAULT_SCORE;
     }
+
 
     // =========================================================================
     // CONTENT QUALITY CALCULATION
@@ -1216,6 +1342,21 @@ class FeedRankingService
         // Boost for posts with links
         if (preg_match('/https?:\/\/[^\s]+/', $content)) {
             $score *= $config['quality_link_boost'];
+        }
+
+        // Boost for posts with video URLs
+        if (preg_match('/(?:youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com)/i', $content)) {
+            $score *= $config['quality_video_boost'];
+        }
+
+        // Boost for posts with hashtags
+        if (strpos($content, '#') !== false) {
+            $score *= $config['quality_hashtag_boost'];
+        }
+
+        // Boost for posts with @mentions
+        if (strpos($content, '@') !== false) {
+            $score *= $config['quality_mention_boost'];
         }
 
         // Boost for substantial content length
@@ -1285,87 +1426,16 @@ class FeedRankingService
         ";
     }
 
+
     // =========================================================================
-    // CONTENT DIVERSITY (Post-Query Processing)
+    // CONTENT DIVERSITY (Legacy Public Methods)
     // =========================================================================
 
-    /**
-     * Apply content diversity to a list of feed items
-     * Prevents too many consecutive posts from the same user
-     *
-     * This is applied AFTER the main query to reorder/penalize items
-     *
-     * @param array $feedItems Array of feed items with user_id
-     * @return array Reordered feed items with diversity applied
-     */
     public static function applyContentDiversity(array $feedItems): array
     {
-        $config = self::getConfig();
-
-        if (empty($config['diversity_enabled']) || empty($feedItems)) {
-            return $feedItems;
-        }
-
-        $maxConsecutive = $config['diversity_max_consecutive'];
-        $penalty = $config['diversity_penalty'];
-
-        $result = [];
-        $userConsecutiveCounts = [];
-        $deferred = [];
-
-        foreach ($feedItems as $item) {
-            $userId = $item['user_id'] ?? 0;
-
-            // Count consecutive posts from this user in result
-            $consecutiveCount = 0;
-            for ($i = count($result) - 1; $i >= 0 && $i >= count($result) - $maxConsecutive; $i--) {
-                if (($result[$i]['user_id'] ?? 0) === $userId) {
-                    $consecutiveCount++;
-                } else {
-                    break;
-                }
-            }
-
-            // If we've hit the limit, defer this item
-            if ($consecutiveCount >= $maxConsecutive) {
-                $item['_diversity_deferred'] = true;
-                $item['rank_score'] = ($item['rank_score'] ?? 1) * $penalty;
-                $deferred[] = $item;
-            } else {
-                $result[] = $item;
-            }
-        }
-
-        // Interleave deferred items back into the feed
-        foreach ($deferred as $deferredItem) {
-            // Find the best position to insert (after some non-same-user posts)
-            $inserted = false;
-            for ($i = 0; $i < count($result); $i++) {
-                $canInsert = true;
-                // Check if inserting here would create consecutive issues
-                for ($j = max(0, $i - $maxConsecutive + 1); $j < min(count($result), $i + $maxConsecutive); $j++) {
-                    if (($result[$j]['user_id'] ?? 0) === ($deferredItem['user_id'] ?? 0)) {
-                        $canInsert = false;
-                        break;
-                    }
-                }
-                if ($canInsert && ($deferredItem['rank_score'] ?? 0) >= ($result[$i]['rank_score'] ?? 0) * $penalty) {
-                    array_splice($result, $i, 0, [$deferredItem]);
-                    $inserted = true;
-                    break;
-                }
-            }
-            if (!$inserted) {
-                $result[] = $deferredItem; // Add at end if no good position
-            }
-        }
-
-        return $result;
+        return self::applyDiversityInPlace($feedItems, self::getDiversityConfig());
     }
 
-    /**
-     * Get diversity configuration for client-side use
-     */
     public static function getDiversityConfig(): array
     {
         $config = self::getConfig();
@@ -1378,80 +1448,13 @@ class FeedRankingService
         ];
     }
 
-    /**
-     * Apply content-TYPE diversity to a list of feed items
-     * Prevents too many consecutive items of the same content type (post/event/listing)
-     *
-     * This is applied AFTER user diversity to ensure type mixing
-     *
-     * @param array $feedItems Array of feed items with 'type' or 'content_type' key
-     * @return array Reordered feed items with type diversity applied
-     */
     public static function applyContentTypeDiversity(array $feedItems): array
     {
-        $config = self::getConfig();
-
-        if (empty($config['diversity_type_enabled']) || empty($feedItems)) {
-            return $feedItems;
-        }
-
-        $maxConsecutive = $config['diversity_type_max_consecutive'] ?? 3;
-
-        $result = [];
-        $deferred = [];
-
-        foreach ($feedItems as $item) {
-            // Determine content type - could be 'type', 'content_type', or inferred
-            $contentType = $item['type'] ?? $item['content_type'] ?? 'post';
-
-            // Count consecutive items of same type in result
-            $consecutiveCount = 0;
-            for ($i = count($result) - 1; $i >= 0 && $i >= count($result) - $maxConsecutive; $i--) {
-                $prevType = $result[$i]['type'] ?? $result[$i]['content_type'] ?? 'post';
-                if ($prevType === $contentType) {
-                    $consecutiveCount++;
-                } else {
-                    break;
-                }
-            }
-
-            // If we've hit the limit, defer this item
-            if ($consecutiveCount >= $maxConsecutive) {
-                $item['_type_diversity_deferred'] = true;
-                $deferred[] = $item;
-            } else {
-                $result[] = $item;
-            }
-        }
-
-        // Interleave deferred items back into the feed
-        foreach ($deferred as $deferredItem) {
-            $deferredType = $deferredItem['type'] ?? $deferredItem['content_type'] ?? 'post';
-            $inserted = false;
-
-            for ($i = 0; $i < count($result); $i++) {
-                $canInsert = true;
-                // Check if inserting here would create consecutive issues
-                for ($j = max(0, $i - $maxConsecutive + 1); $j < min(count($result), $i + $maxConsecutive); $j++) {
-                    $checkType = $result[$j]['type'] ?? $result[$j]['content_type'] ?? 'post';
-                    if ($checkType === $deferredType) {
-                        $canInsert = false;
-                        break;
-                    }
-                }
-                if ($canInsert) {
-                    array_splice($result, $i, 0, [$deferredItem]);
-                    $inserted = true;
-                    break;
-                }
-            }
-            if (!$inserted) {
-                $result[] = $deferredItem; // Add at end if no good position
-            }
-        }
-
-        return $result;
+        $config = self::getDiversityConfig();
+        $config['enabled'] = false;
+        return self::applyDiversityInPlace($feedItems, $config);
     }
+
 
     // =========================================================================
     // UTILITY METHODS
@@ -1471,26 +1474,6 @@ class FeedRankingService
             return 999; // Return high number to indicate very old/invalid
         }
     }
-
-    /**
-     * Get viewer's coordinates from session or database
-     */
-    public static function getViewerCoordinates(int $viewerId): array
-    {
-        try {
-            $tenantId = TenantContext::getId();
-            $sql = "SELECT latitude, longitude FROM users WHERE id = ? AND tenant_id = ?";
-            $result = Database::query($sql, [$viewerId, $tenantId])->fetch();
-
-            return [
-                'lat' => $result['latitude'] ?? null,
-                'lon' => $result['longitude'] ?? null
-            ];
-        } catch (\Exception $e) {
-            return ['lat' => null, 'lon' => null];
-        }
-    }
-
     // =========================================================================
     // RECOMMENDATION CONTEXT BADGES
     // =========================================================================
@@ -1670,4 +1653,5 @@ class FeedRankingService
             'total_score' => $engagementScore * $vitalityScore * $geoScore
         ];
     }
+
 }
