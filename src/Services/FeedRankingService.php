@@ -268,7 +268,7 @@ class FeedRankingService
             }
 
             // 3. Content type weight
-            $sourceType = $item['source_type'] ?? 'post';
+            $sourceType = $item['type'] ?? $item['source_type'] ?? 'post';
             $score     *= $typeWeights[$sourceType] ?? 1.0;
 
             // 4. Social graph affinity — connected users get a boost

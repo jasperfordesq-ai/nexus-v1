@@ -119,7 +119,7 @@ export function FeedPage() {
   const [pendingPostCount, setPendingPostCount] = useState(0);
 
   // Feed mode: EdgeRank vs chronological
-  const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>('ranking');
+  const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>('recent');
   // Sub-filter (e.g. listings -> offers/requests)
   const [subFilter, setSubFilter] = useState<string | null>(null);
   // Stories friends
