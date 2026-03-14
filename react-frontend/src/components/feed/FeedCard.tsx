@@ -54,6 +54,7 @@ import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
+import { useFeedTracking } from '@/hooks/useFeedTracking';
 import type { FeedItem, FeedComment, PollData } from './types';
 import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import { FeedContentRenderer } from './FeedContentRenderer';
@@ -250,6 +251,7 @@ const FeedCard = React.memo(function FeedCard({
   const config = typeConfig[item.type];
   const detailPath = getItemDetailPath(item);
   const detailLabel = getItemDetailLabel(item);
+  const { ref: trackingRef, recordClick } = useFeedTracking(item.id, isAuthenticated);
 
   // Load poll data lazily ONLY when the item is a poll, poll_data was NOT
   // provided inline, and we haven't already loaded or started loading it.
@@ -340,7 +342,7 @@ const FeedCard = React.memo(function FeedCard({
   };
 
   return (
-    <GlassCard hoverable className="overflow-hidden group">
+    <GlassCard ref={trackingRef} hoverable className="overflow-hidden group">
       {/* Type accent bar */}
       {config.label && (
         <div className={`h-0.5 bg-gradient-to-r ${config.gradient}`} />
@@ -369,7 +371,7 @@ const FeedCard = React.memo(function FeedCard({
                 </Link>
                 {config.label && (
                   detailPath ? (
-                    <Link to={tenantPath(detailPath)}>
+                    <Link to={tenantPath(detailPath)} onClick={recordClick}>
                       <Chip
                         size="sm"
                         variant="flat"

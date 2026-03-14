@@ -27,6 +27,8 @@ $router->add('POST', '/api/v2/feed/posts/{id}/hide', 'Nexus\Controllers\Api\Soci
 $router->add('POST', '/api/v2/feed/posts/{id}/report', 'Nexus\Controllers\Api\SocialApiController@reportPostV2');
 $router->add('POST', '/api/v2/feed/posts/{id}/delete', 'Nexus\Controllers\Api\SocialApiController@deletePostV2');
 $router->add('POST', '/api/v2/feed/users/{id}/mute', 'Nexus\Controllers\Api\SocialApiController@muteUserV2');
+$router->add('POST', '/api/v2/feed/posts/{id}/impression', 'Nexus\Controllers\Api\SocialApiController@recordImpression');
+$router->add('POST', '/api/v2/feed/posts/{id}/click', 'Nexus\Controllers\Api\SocialApiController@recordClick');
 
 // ============================================
 // API V2 - FEED SIDEBAR & COMMUNITY STATS
