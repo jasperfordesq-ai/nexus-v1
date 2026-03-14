@@ -116,7 +116,7 @@ class Listing
                 "title" => $title,
                 "content" => $description,
                 "image_url" => $imageUrl,
-                "metadata" => ["location" => $location],
+                "metadata" => ["location" => $location, "listing_type" => $type],
                 "created_at" => date("Y-m-d H:i:s"),
             ]);
         } catch (\Exception $e) {

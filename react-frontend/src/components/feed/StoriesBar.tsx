@@ -85,7 +85,7 @@ export function StoriesBar({ friends }: StoriesBarProps) {
               className="text-xs truncate w-full text-center"
               style={{ color: 'var(--text-primary)' }}
             >
-              {truncateName(friend.name.split(' ')[0])}
+              {truncateName((friend.name || '').split(' ')[0])}
             </span>
           </Link>
         ))}

@@ -39,14 +39,14 @@ export function PeopleYouMayKnowWidget({ members }: PeopleYouMayKnowWidgetProps)
         <div className="flex items-center gap-2">
           <UserPlus className="w-4 h-4 text-indigo-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('sidebar.people_you_may_know', 'People You May Know')}
+            {t('sidebar.people.title', 'People You May Know')}
           </h3>
         </div>
         <Link
           to={tenantPath('/members')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('sidebar.see_all', 'See All')}
+          {t('sidebar.people.see_all', 'See All')}
         </Link>
       </div>
 
@@ -86,7 +86,7 @@ export function PeopleYouMayKnowWidget({ members }: PeopleYouMayKnowWidgetProps)
               variant="flat"
               className="text-xs text-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20 flex-shrink-0"
             >
-              {t('sidebar.view', 'View')}
+              {t('sidebar.people.view', 'View')}
             </Button>
           </div>
         ))}

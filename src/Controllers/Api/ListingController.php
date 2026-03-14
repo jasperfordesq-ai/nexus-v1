@@ -91,6 +91,7 @@ class ListingController extends BaseApiController
                 FeedActivityService::recordActivity($tenantId, $userId, 'listing', $listingId, [
                     'title' => $title,
                     'content' => $description,
+                    'metadata' => ['listing_type' => $type],
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             } catch (\Exception $fe) {

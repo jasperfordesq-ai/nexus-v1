@@ -198,6 +198,7 @@ class OnboardingService
                 FeedActivityService::recordActivity($tenantId, $userId, 'listing', $listingId, [
                     'title' => $title,
                     'content' => $description,
+                    'metadata' => ['listing_type' => 'offer'],
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             } catch (\Exception $e) {
@@ -230,6 +231,7 @@ class OnboardingService
                 FeedActivityService::recordActivity($tenantId, $userId, 'listing', $listingId, [
                     'title' => $title,
                     'content' => $description,
+                    'metadata' => ['listing_type' => 'request'],
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             } catch (\Exception $e) {

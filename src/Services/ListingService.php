@@ -486,7 +486,7 @@ class ListingService
                     'title' => trim($data['title']),
                     'content' => trim($data['description']),
                     'image_url' => $data['image_url'] ?? null,
-                    'metadata' => ['location' => $location],
+                    'metadata' => ['location' => $location, 'listing_type' => $data['type'] ?? 'offer'],
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             } catch (\Exception $e) {

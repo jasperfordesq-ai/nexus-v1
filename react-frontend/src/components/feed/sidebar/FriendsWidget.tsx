@@ -40,14 +40,14 @@ export function FriendsWidget({ friends }: FriendsWidgetProps) {
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-indigo-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('sidebar.friends', 'Friends')}
+            {t('sidebar.friends.title', 'Friends')}
           </h3>
         </div>
         <Link
           to={tenantPath('/connections')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('sidebar.see_all', 'See All')}
+          {t('sidebar.friends.see_all', 'See All')}
         </Link>
       </div>
 

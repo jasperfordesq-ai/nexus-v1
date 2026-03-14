@@ -47,14 +47,14 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
         <div className="flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-pink-500" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
-            {t('sidebar.upcoming_events', 'Upcoming Events')}
+            {t('sidebar.events.title', 'Upcoming Events')}
           </h3>
         </div>
         <Link
           to={tenantPath('/events')}
           className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
         >
-          {t('sidebar.see_all', 'See All')}
+          {t('sidebar.events.see_all', 'See All')}
         </Link>
       </div>
 

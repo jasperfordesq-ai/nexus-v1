@@ -88,6 +88,10 @@ class SocialApiController extends BaseApiController
             $filters['group_id'] = $this->queryInt('group_id');
         }
 
+        if ($this->query('subtype')) {
+            $filters['subtype'] = $this->query('subtype');
+        }
+
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }

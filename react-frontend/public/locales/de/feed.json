@@ -177,7 +177,8 @@
     "schedule_label": "Beitrag planen",
     "schedule_set": "Geplant für {{date}}",
     "schedule_clear": "Planung aufheben",
-    "groups_loading": "Gruppen werden geladen..."
+    "groups_loading": "Gruppen werden geladen...",
+    "create_post": "Beitrag erstellen"
   },
   "card": {
     "edited": "bearbeitet",
@@ -265,7 +266,9 @@
     "suggested": {
       "title": "Suggested For You",
       "see_all": "See All",
-      "by": "by {{name}}"
+      "by": "by {{name}}",
+      "request": "Anfrage",
+      "offer": "Angebot"
     },
     "categories": {
       "title": "Top Categories",
@@ -297,7 +300,8 @@
   },
   "mode": {
     "for_you": "For You",
-    "recent": "Recent"
+    "recent": "Recent",
+    "label": "Feed-Modus"
   },
   "location": {
     "global": "Global",

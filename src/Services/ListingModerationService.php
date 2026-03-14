@@ -158,7 +158,7 @@ class ListingModerationService
         // Record in feed_activity now that listing is active
         try {
             $full = Database::query(
-                "SELECT description, image_url, location FROM listings WHERE id = ? AND tenant_id = ?",
+                "SELECT description, image_url, location, type FROM listings WHERE id = ? AND tenant_id = ?",
                 [$listingId, $tenantId]
             )->fetch(\PDO::FETCH_ASSOC);
             if ($full) {
@@ -166,7 +166,7 @@ class ListingModerationService
                     'title' => $listing['title'],
                     'content' => $full['description'],
                     'image_url' => $full['image_url'],
-                    'metadata' => ['location' => $full['location']],
+                    'metadata' => ['location' => $full['location'], 'listing_type' => $full['type'] ?? 'offer'],
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             }
