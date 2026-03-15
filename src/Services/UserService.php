@@ -817,9 +817,9 @@ class UserService
             [$userId, $tenantId]
         )->fetch(\PDO::FETCH_ASSOC);
 
-        // Wallet balance
+        // Wallet balance (stored on users table)
         $wallet = Database::query(
-            "SELECT balance FROM wallets WHERE user_id = ? AND tenant_id = ?",
+            "SELECT balance FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         )->fetch(\PDO::FETCH_ASSOC);
 
