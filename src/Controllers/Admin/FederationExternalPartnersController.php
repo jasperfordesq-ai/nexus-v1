@@ -68,7 +68,7 @@ class FederationExternalPartnersController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -78,14 +78,14 @@ class FederationExternalPartnersController
 
         if (empty($name) || empty($baseUrl)) {
             $_SESSION['flash_error'] = 'Name and Base URL are required.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
             if (!defined('TESTING')) { exit; }
         }
 
         // Validate URL format
         if (!filter_var($baseUrl, FILTER_VALIDATE_URL)) {
             $_SESSION['flash_error'] = 'Please enter a valid URL.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -108,11 +108,11 @@ class FederationExternalPartnersController
         if ($result['success']) {
             $_SESSION['flash_success'] = 'External partner added successfully. Test the connection to verify it works.';
             session_write_close();
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $result['id']);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $result['id']);
         } else {
             $_SESSION['flash_error'] = $result['error'];
             session_write_close();
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/create');
         }
         if (!defined('TESTING')) { exit; }
     }
@@ -130,7 +130,7 @@ class FederationExternalPartnersController
 
         if (!$partner) {
             $_SESSION['flash_error'] = 'Partner not found.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -160,7 +160,7 @@ class FederationExternalPartnersController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
             if (!defined('TESTING')) { exit; }
         }
 
@@ -170,7 +170,7 @@ class FederationExternalPartnersController
 
         if (empty($name) || empty($baseUrl)) {
             $_SESSION['flash_error'] = 'Name and Base URL are required.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
             if (!defined('TESTING')) { exit; }
         }
 
@@ -197,7 +197,7 @@ class FederationExternalPartnersController
         }
 
         session_write_close();
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
         if (!defined('TESTING')) { exit; }
     }
 
@@ -217,7 +217,7 @@ class FederationExternalPartnersController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
             if (!defined('TESTING')) { exit; }
         }
 
@@ -232,7 +232,7 @@ class FederationExternalPartnersController
         }
 
         session_write_close();
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
         if (!defined('TESTING')) { exit; }
     }
 
@@ -251,7 +251,7 @@ class FederationExternalPartnersController
 
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -264,7 +264,7 @@ class FederationExternalPartnersController
         }
 
         session_write_close();
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
         if (!defined('TESTING')) { exit; }
     }
 
@@ -283,7 +283,7 @@ class FederationExternalPartnersController
 
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -296,7 +296,7 @@ class FederationExternalPartnersController
         }
 
         session_write_close();
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners/' . $id);
         if (!defined('TESTING')) { exit; }
     }
 
@@ -315,7 +315,7 @@ class FederationExternalPartnersController
 
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -328,7 +328,7 @@ class FederationExternalPartnersController
         }
 
         session_write_close();
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/external-partners');
         if (!defined('TESTING')) { exit; }
     }
 }

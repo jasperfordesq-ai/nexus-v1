@@ -133,7 +133,7 @@ class LegalDocumentsController
         if (!empty($errors)) {
             $_SESSION['form_errors'] = $errors;
             $_SESSION['form_data'] = $data;
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/legal-documents/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/legal-documents/create');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -146,7 +146,7 @@ class LegalDocumentsController
             if (!defined('TESTING')) { exit; }
         } catch (\Exception $e) {
             $_SESSION['flash_error'] = 'Failed to create document: ' . $e->getMessage();
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/legal-documents/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/legal-documents/create');
             if (!defined('TESTING')) { exit; }
         }
     }
