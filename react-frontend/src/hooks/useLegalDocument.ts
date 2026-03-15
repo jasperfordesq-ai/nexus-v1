@@ -65,7 +65,7 @@ export function useLegalDocument(type: LegalDocumentType) {
       return;
     }
 
-    api.get<LegalDocument | null>(`/v2/legal/${type}`)
+    api.get<LegalDocument | null>(`/v2/legal/${type}`, { skipAuth: true })
       .then((res) => {
         if (res.success && res.data && typeof res.data === 'object' && 'id' in res.data && 'content' in res.data) {
           setDocument(res.data as LegalDocument);

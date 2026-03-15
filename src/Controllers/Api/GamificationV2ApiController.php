@@ -312,11 +312,19 @@ class GamificationV2ApiController extends BaseApiController
                 }
             }
 
+            // Total eligible members (not just the returned top-N slice)
+            $totalNexus = (int)(Database::query(
+                "SELECT COUNT(*) AS cnt FROM nexus_score_cache n
+                 JOIN users u ON u.id = n.user_id
+                 WHERE n.tenant_id = ? AND u.tenant_id = ? AND u.is_approved = 1",
+                [$tenantId, $tenantId]
+            )->fetch()['cnt'] ?? 0);
+
             $this->respondWithData($leaderboard, [
                 'period'        => $period,
                 'type'          => $type,
                 'your_position' => $currentUserPosition,
-                'total_entries' => count($leaderboard),
+                'total_entries' => $totalNexus,
             ]);
             return;
         }
@@ -378,11 +386,17 @@ class GamificationV2ApiController extends BaseApiController
             $currentUserPosition = (int)($positionResult['position'] ?? 0) ?: null;
         }
 
+        // Total eligible members for this tenant (not just the returned top-N slice)
+        $totalMembers = (int)(Database::query(
+            "SELECT COUNT(*) AS cnt FROM users WHERE tenant_id = ? AND is_approved = 1 AND show_on_leaderboard = 1",
+            [$tenantId]
+        )->fetch()['cnt'] ?? 0);
+
         $this->respondWithData($leaderboard, [
             'period'        => $period,
             'type'          => $type,
             'your_position' => $currentUserPosition,
-            'total_entries' => count($leaderboard),
+            'total_entries' => $totalMembers,
         ]);
     }
 

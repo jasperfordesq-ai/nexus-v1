@@ -970,6 +970,7 @@ class AdminCrmApiController extends BaseApiController
         // 5. Notes added
         if (!$type || $type === 'note_added') {
             try {
+                Database::query("SELECT 1 FROM member_notes LIMIT 1");
                 $unions[] = "SELECT 'note_added' as activity_type, mn.user_id, u.name as user_name, u.avatar_url as user_avatar,
                              CONCAT('Note added by ', a.name, ': ', LEFT(mn.content, 80)) as description, NULL as metadata, mn.created_at
                              FROM member_notes mn

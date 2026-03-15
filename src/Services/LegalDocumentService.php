@@ -54,7 +54,7 @@ class LegalDocumentService
         $tenantId = TenantContext::getId();
 
         $stmt = Database::query(
-            "SELECT ld.*, ldv.version_number, ldv.content, ldv.effective_date, ldv.summary_of_changes
+            "SELECT ld.*, ld.document_type as type, ldv.version_number, ldv.content, ldv.effective_date, ldv.summary_of_changes
              FROM legal_documents ld
              LEFT JOIN legal_document_versions ldv ON ld.current_version_id = ldv.id
              WHERE ld.tenant_id = ? AND ld.document_type = ? AND ld.is_active = 1",
@@ -70,7 +70,7 @@ class LegalDocumentService
     public static function getById(int $id): ?array
     {
         $stmt = Database::query(
-            "SELECT ld.*, ldv.version_number, ldv.content, ldv.effective_date, ldv.summary_of_changes
+            "SELECT ld.*, ld.document_type as type, ldv.version_number, ldv.content, ldv.effective_date, ldv.summary_of_changes
              FROM legal_documents ld
              LEFT JOIN legal_document_versions ldv ON ld.current_version_id = ldv.id
              WHERE ld.id = ?",
@@ -88,7 +88,7 @@ class LegalDocumentService
         $tenantId = $tenantId ?? TenantContext::getId();
 
         $stmt = Database::query(
-            "SELECT ld.*, ldv.version_number, ldv.effective_date,
+            "SELECT ld.*, ld.document_type as type, ldv.version_number, ldv.effective_date,
                     (SELECT COUNT(*) FROM legal_document_versions WHERE document_id = ld.id) as version_count
              FROM legal_documents ld
              LEFT JOIN legal_document_versions ldv ON ld.current_version_id = ldv.id

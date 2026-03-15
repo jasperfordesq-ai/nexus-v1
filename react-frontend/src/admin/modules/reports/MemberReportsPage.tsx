@@ -255,7 +255,7 @@ export function MemberReportsPage() {
                 <TableCell className="text-sm text-success font-medium">{m.hours_given?.toFixed(1) ?? '0.0'}</TableCell>
                 <TableCell className="text-sm text-warning font-medium">{m.hours_received?.toFixed(1) ?? '0.0'}</TableCell>
                 <TableCell className="text-sm text-default-500">
-                  {new Date(m.joined_at).toLocaleDateString()}
+                  {m.joined_at ? new Date(m.joined_at).toLocaleDateString() : '---'}
                 </TableCell>
               </TableRow>
             ))}
@@ -382,28 +382,28 @@ export function MemberReportsPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Login Rate (30d)"
-            value={metrics ? `${(metrics.login_rate * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? `${(Number(metrics.login_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Users}
             color="primary"
             loading={loading}
           />
           <StatCard
             label="Trading Rate"
-            value={metrics ? `${(metrics.trading_rate * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? `${(Number(metrics.trading_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={TrendingUp}
             color="success"
             loading={loading}
           />
           <StatCard
             label="Listing Rate"
-            value={metrics ? `${(metrics.listing_rate * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? `${(Number(metrics.listing_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={BarChart3}
             color="warning"
             loading={loading}
           />
           <StatCard
             label="Messaging Rate"
-            value={metrics ? `${(metrics.messaging_rate * 100).toFixed(1)}%` : '\u2014'}
+            value={metrics ? `${(Number(metrics.messaging_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Activity}
             color="secondary"
             loading={loading}
@@ -543,7 +543,7 @@ export function MemberReportsPage() {
                 </TableCell>
                 <TableCell className="text-sm">{m.transaction_count}</TableCell>
                 <TableCell className="text-sm text-default-500">
-                  {new Date(m.joined_at).toLocaleDateString()}
+                  {m.joined_at ? new Date(m.joined_at).toLocaleDateString() : '---'}
                 </TableCell>
               </TableRow>
             ))}

@@ -101,10 +101,10 @@ export default function GroupRanking() {
                     <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary"
-                        style={{ width: `${Math.min(100, group.engagement_score ?? 0)}%` }}
+                        style={{ width: `${Math.min(100, Number(group.engagement_score ?? 0))}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm">{(group.engagement_score ?? 0).toFixed(0)}</span>
+                    <span className="text-sm">{Number(group.engagement_score ?? 0).toFixed(0)}</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -112,14 +112,14 @@ export default function GroupRanking() {
                     <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-success"
-                        style={{ width: `${Math.min(100, group.geographic_diversity ?? 0)}%` }}
+                        style={{ width: `${Math.min(100, Number(group.geographic_diversity ?? 0))}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm">{(group.geographic_diversity ?? 0).toFixed(0)}</span>
+                    <span className="text-sm">{Number(group.geographic_diversity ?? 0).toFixed(0)}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-bold text-primary">{(group.ranking_score ?? 0).toFixed(0)}</span>
+                  <span className="font-bold text-primary">{Number(group.ranking_score ?? 0).toFixed(0)}</span>
                 </TableCell>
                 <TableCell>
                   <Switch

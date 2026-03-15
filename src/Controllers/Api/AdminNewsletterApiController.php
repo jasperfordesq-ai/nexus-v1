@@ -286,7 +286,23 @@ class AdminNewsletterApiController extends BaseApiController
                     [$tenantId]
                 );
                 $subscribers = $stmt->fetchAll() ?: [];
-                $this->respondWithPaginatedCollection($subscribers, count($subscribers), 1, 100);
+                $total = count($subscribers);
+                $this->jsonResponse([
+                    'data' => $subscribers,
+                    'meta' => [
+                        'page' => 1,
+                        'per_page' => 100,
+                        'total' => $total,
+                        'total_pages' => 1,
+                        'has_more' => false,
+                    ],
+                    'stats' => [
+                        'total' => $total,
+                        'active' => $total,
+                        'pending' => 0,
+                        'unsubscribed' => 0,
+                    ],
+                ]);
             } catch (\Exception $e) {
                 $this->respondWithPaginatedCollection([], 0, 1, 20);
             }

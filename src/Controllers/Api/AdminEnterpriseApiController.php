@@ -1018,7 +1018,7 @@ class AdminEnterpriseApiController extends BaseApiController
 
         try {
             $stmt = Database::query(
-                "SELECT * FROM legal_documents WHERE id = ? AND tenant_id = ?",
+                "SELECT *, document_type as type FROM legal_documents WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
             $doc = $stmt->fetch();
