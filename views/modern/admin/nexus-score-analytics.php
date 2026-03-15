@@ -14,15 +14,14 @@ $averageScore = $analyticsData['average_score'] ?? 0;
 $medianScore = $analyticsData['median_score'] ?? 0;
 $tierDistribution = $analyticsData['tier_distribution'] ?? [];
 $categoryStats = $categoryStats ?? [];
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Score Analytics | Admin Dashboard</title>
-    <link rel="stylesheet" href="/assets/css/admin-gold-standard.css">
+// Admin header configuration
+$adminPageTitle = 'Nexus Score Analytics';
+$adminPageSubtitle = 'Community Insights';
+$adminPageIcon = 'fa-chart-line';
+
+require __DIR__ . '/partials/admin-header.php';
+?>
     <style>
         .analytics-container {
             padding: 2rem;
@@ -586,5 +585,4 @@ $categoryStats = $categoryStats ?? [];
         });
     });
     </script>
-</body>
-</html>
+<?php require __DIR__ . "/partials/admin-footer.php"; ?>

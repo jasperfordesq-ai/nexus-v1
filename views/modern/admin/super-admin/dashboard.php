@@ -177,7 +177,7 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                                 </td>
                                 <td style="text-align: right;">
                                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                        <a href="/super-admin/tenant/edit?id=<?= $t['id'] ?>" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm">
+                                        <a href="<?= $basePath ?>/super-admin/tenant/edit?id=<?= $t['id'] ?>" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm">
                                             <i class="fa-solid fa-cog"></i> Configure
                                         </a>
                                         <a href="<?= $basePath ?>/<?= htmlspecialchars($t['slug']) ?>" target="_blank" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm" style="opacity: 0.7;">
@@ -215,6 +215,7 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
             </div>
             <div class="super-admin-card-body">
                 <form action="<?= $basePath ?>/super-admin/tenant/create" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                     <!-- Instance Details -->
                     <div style="background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(147, 51, 234, 0.2); border-radius: 10px; padding: 20px; margin-bottom: 20px;">
                         <h4 style="margin: 0 0 16px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #c084fc; font-weight: 700;">Instance Details</h4>

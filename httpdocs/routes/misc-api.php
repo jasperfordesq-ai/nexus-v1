@@ -473,7 +473,7 @@ $router->add('POST', '/admin-legacy/volunteering/approve', 'Nexus\Controllers\Ad
 $router->add('POST', '/admin-legacy/volunteering/decline', 'Nexus\Controllers\Admin\VolunteeringController@decline');
 $router->add('POST', '/admin-legacy/volunteering/delete', 'Nexus\Controllers\Admin\VolunteeringController@deleteOrg');
 $router->add('GET', '/admin-legacy/categories/edit', function () {
-    header('Location: /admin-legacy/categories');
+    header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/categories');
     exit;
 }); // Fallback
 $router->add('GET', '/admin-legacy/categories/edit/{id}', 'Nexus\Controllers\Admin\CategoryController@edit');
@@ -484,7 +484,7 @@ $router->add('GET', '/admin-legacy/attributes', 'Nexus\Controllers\Admin\Attribu
 $router->add('GET', '/admin-legacy/attributes/create', 'Nexus\Controllers\Admin\AttributeController@create');
 $router->add('POST', '/admin-legacy/attributes/store', 'Nexus\Controllers\Admin\AttributeController@store');
 $router->add('GET', '/admin-legacy/attributes/edit', function () {
-    header('Location: /admin-legacy/attributes');
+    header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/attributes');
     exit;
 }); // Fallback
 $router->add('GET', '/admin-legacy/attributes/edit/{id}', 'Nexus\Controllers\Admin\AttributeController@edit');
@@ -591,7 +591,7 @@ $router->add('GET', '/admin-legacy/users', 'Nexus\Controllers\Admin\UserControll
 $router->add('GET', '/admin-legacy/users/create', 'Nexus\Controllers\Admin\UserController@create');
 $router->add('POST', '/admin-legacy/users/store', 'Nexus\Controllers\Admin\UserController@store');
 $router->add('GET', '/admin-legacy/users/edit', function () {
-    header('Location: /admin-legacy/users');
+    header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/users');
     exit;
 }); // Fallback
 $router->add('GET', '/admin-legacy/users/edit/{id}', 'Nexus\Controllers\Admin\UserController@edit');

@@ -64,7 +64,7 @@ describe('useAppUpdate', () => {
       vi.advanceTimersByTime(3000);
     });
 
-    expect(mockApiPost).toHaveBeenCalledWith('/api/app/check-version', {
+    expect(mockApiPost).toHaveBeenCalledWith('/app/check-version', {
       version: '1.1',
       platform: 'android',
     });

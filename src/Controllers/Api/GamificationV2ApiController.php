@@ -337,7 +337,8 @@ class GamificationV2ApiController extends BaseApiController
             $serviceType,
             $servicePeriod,
             $limit,
-            true // include current user's row even if outside top N
+            true, // include current user's row even if outside top N
+            $userId // pass Bearer token userId � don't rely on $_SESSION
         );
 
         // ── Format to match the shape the React frontend expects ──────────────
@@ -358,7 +359,8 @@ class GamificationV2ApiController extends BaseApiController
                 'xp'             => $xp,
                 'level'          => (int)($entry['level'] ?? 1),
                 'score'          => $score,
-                'is_current_user' => (bool)($entry['is_current_user'] ?? false),
+                // Use controller's $userId (Bearer token) � session is null in API context
+                'is_current_user' => ((int)$entry['user_id'] === $userId),
             ];
         }
 
@@ -378,7 +380,7 @@ class GamificationV2ApiController extends BaseApiController
             $positionResult = Database::query(
                 "SELECT COUNT(*) + 1 AS position
                  FROM users
-                 WHERE tenant_id = ? AND is_approved = 1 AND xp > (
+                 WHERE tenant_id = ? AND is_approved = 1 AND COALESCE(show_on_leaderboard, 1) = 1 AND xp > (
                      SELECT COALESCE(xp, 0) FROM users WHERE id = ?
                  )",
                 [$tenantId, $userId]

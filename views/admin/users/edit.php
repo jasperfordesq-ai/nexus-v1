@@ -1,2 +1,3 @@
 <?php
-require dirname(__DIR__, 3) . '/views/modern/admin-legacy/users/edit.php';
+// Legacy admin view shim — dispatches to modern admin with correct header
+require __DIR__ . '/../../modern/admin/users/edit.php';

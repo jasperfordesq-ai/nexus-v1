@@ -34,7 +34,7 @@ class LeaderboardService
     /**
      * Get leaderboard data
      */
-    public static function getLeaderboard($type, $period = 'all_time', $limit = 10, $includeCurrentUser = true)
+    public static function getLeaderboard($type, $period = 'all_time', $limit = 10, $includeCurrentUser = true, $currentUserId = null)
     {
         if (!array_key_exists($type, self::LEADERBOARD_TYPES)) {
             return [];
@@ -42,7 +42,11 @@ class LeaderboardService
 
         try {
             $tenantId = TenantContext::getId();
-            $currentUserId = $_SESSION['user_id'] ?? null;
+            // Accept explicit $currentUserId (from API Bearer token auth);
+            // fall back to session for legacy PHP admin views.
+            if ($currentUserId === null) {
+                $currentUserId = $_SESSION['user_id'] ?? null;
+            }
 
             // Build query based on type
             $query = self::buildLeaderboardQuery($type, $period, $tenantId, $limit);
@@ -272,7 +276,7 @@ class LeaderboardService
 
             // Get user details
             $user = Database::query(
-                "SELECT id as user_id, name, first_name, last_name, avatar_url FROM users WHERE id = ? AND tenant_id = ?",
+                "SELECT id as user_id, name, first_name, last_name, avatar_url FROM users WHERE id = ? AND tenant_id = ? AND COALESCE(show_on_leaderboard, 1) = 1",
                 [$userId, $tenantId]
             )->fetch();
 
@@ -394,7 +398,7 @@ class LeaderboardService
                     'sql' => "SELECT COUNT(DISTINCT us.user_id) as rank
                               FROM user_streaks us
                               JOIN users u ON us.user_id = u.id
-                              WHERE u.tenant_id = ? AND us.streak_type = 'login' AND us.current_streak > ?",
+                              WHERE u.tenant_id = ? AND u.is_approved = 1 AND COALESCE(u.show_on_leaderboard, 1) = 1 AND us.streak_type = 'login' AND us.current_streak > ?",
                     'params' => [$tenantId, $userScore]
                 ];
 

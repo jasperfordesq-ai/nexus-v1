@@ -38,7 +38,7 @@ $error = $error ?? '';
         <p class="subtitle">Admin login</p>
 
         <?php if ($error): ?>
-            <div class="error"><?= $error ?></div>
+            <div class="error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" action="<?= htmlspecialchars($basePath) ?>/login">

@@ -96,6 +96,7 @@ function SeasonCard() {
   const toast = useToast();
   const [season, setSeason] = useState<CurrentSeason | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [seasonError, setSeasonError] = useState(false);
   const [showAllSeasons, setShowAllSeasons] = useState(false);
   const [allSeasons, setAllSeasons] = useState<Season[]>([]);
   const [loadingAllSeasons, setLoadingAllSeasons] = useState(false);
@@ -103,12 +104,14 @@ function SeasonCard() {
   const loadCurrentSeason = useCallback(async () => {
     try {
       setIsLoading(true);
+      setSeasonError(false);
       const res = await api.get<CurrentSeason>('/v2/gamification/seasons/current');
       if (res.success && res.data) {
         setSeason(res.data as unknown as CurrentSeason);
       }
     } catch (err) {
       logError('Failed to load current season', err);
+      setSeasonError(true);
     } finally {
       setIsLoading(false);
     }
@@ -154,6 +157,23 @@ function SeasonCard() {
           <Skeleton className="rounded-lg">
             <div className="h-3 rounded-lg bg-default-200 w-1/4" />
           </Skeleton>
+        </div>
+      </GlassCard>
+    );
+  }
+
+  if (seasonError) {
+    return (
+      <GlassCard className="p-5">
+        <div className="flex items-center gap-3 text-amber-500">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-theme-primary">{t('leaderboard.season.unavailable', 'Season data unavailable')}</p>
+            <p className="text-xs text-theme-muted mt-0.5">{t('leaderboard.season.unavailable_desc', 'Could not load season information. Rankings below are still available.')}</p>
+          </div>
+          <Button size="sm" variant="light" onPress={loadCurrentSeason}>
+            <RefreshCw className="w-4 h-4" aria-hidden="true" />
+          </Button>
         </div>
       </GlassCard>
     );
@@ -489,21 +509,29 @@ export function LeaderboardPage() {
       {/* Season Section */}
       <SeasonCard />
 
-      {/* Your Position Banner */}
-      {meta?.your_position && (
-        <GlassCard className="p-4 border-l-4 border-indigo-500">
-          <div className="flex items-center gap-3">
-            <Star className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-            <span className="text-theme-primary font-medium">
-              {t('leaderboard.your_rank', {
-                position: meta.your_position,
-                total: Math.max(meta.total_entries, meta.your_position),
-              })}
-              {' '}({periodLabels[period]} &middot; {typeLabels[type]})
-            </span>
-          </div>
-        </GlassCard>
-      )}
+      {/* Your Position Banner — prefer the entry-based position from the visible
+          list over the meta fallback, which can disagree if the backend's fallback
+          rank query uses different filters. */}
+      {(() => {
+        const myEntry = entries.find((e) => e.is_current_user);
+        const displayPosition = myEntry?.position ?? meta?.your_position;
+        const displayTotal = meta?.total_entries ?? entries.length;
+        if (!displayPosition) return null;
+        return (
+          <GlassCard className="p-4 border-l-4 border-indigo-500">
+            <div className="flex items-center gap-3">
+              <Star className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+              <span className="text-theme-primary font-medium">
+                {t('leaderboard.your_rank', {
+                  position: displayPosition,
+                  total: Math.max(displayTotal, displayPosition),
+                })}
+                {' '}({periodLabels[period]} &middot; {typeLabels[type]})
+              </span>
+            </div>
+          </GlassCard>
+        );
+      })()}
 
       {/* Error State */}
       {error && !isLoading && (

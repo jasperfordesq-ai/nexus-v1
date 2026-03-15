@@ -1,3 +1,3 @@
 <?php
-// Dispatcher
-require dirname(__DIR__, 3) . '/modern/admin-legacy/legal-documents/versions/compare-select.php';
+// Legacy admin view shim — dispatches to modern admin with correct header
+require __DIR__ . '/../../../modern/admin/legal-documents/versions/compare-select.php';

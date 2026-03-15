@@ -110,15 +110,15 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
 
 <!-- Filter Tabs -->
 <div style="display: flex; gap: 8px; margin-bottom: 1.5rem;">
-    <a href="/super-admin/users" class="super-admin-btn <?= $filter === 'all' ? 'super-admin-btn-primary' : 'super-admin-btn-secondary' ?> super-admin-btn-sm">
+    <a href="<?= $basePath ?>/super-admin/users" class="super-admin-btn <?= $filter === 'all' ? 'super-admin-btn-primary' : 'super-admin-btn-secondary' ?> super-admin-btn-sm">
         <i class="fa-solid fa-users"></i>
         All Users (<?= $totalUsers ?>)
     </a>
-    <a href="/super-admin/users?filter=pending" class="super-admin-btn <?= $filter === 'pending' ? 'super-admin-btn-primary' : 'super-admin-btn-secondary' ?> super-admin-btn-sm">
+    <a href="<?= $basePath ?>/super-admin/users?filter=pending" class="super-admin-btn <?= $filter === 'pending' ? 'super-admin-btn-primary' : 'super-admin-btn-secondary' ?> super-admin-btn-sm">
         <i class="fa-solid fa-clock"></i>
         Pending (<?= $pendingUsers ?>)
     </a>
-    <a href="/super-admin/users?filter=admins" class="super-admin-btn <?= $filter === 'admins' ? 'super-admin-btn-primary' : 'super-admin-btn-secondary' ?> super-admin-btn-sm">
+    <a href="<?= $basePath ?>/super-admin/users?filter=admins" class="super-admin-btn <?= $filter === 'admins' ? 'super-admin-btn-primary' : 'super-admin-btn-secondary' ?> super-admin-btn-sm">
         <i class="fa-solid fa-shield"></i>
         Admins (<?= $adminUsers ?>)
     </a>
@@ -217,7 +217,8 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                         <td style="text-align: right;">
                             <div style="display: flex; gap: 6px; justify-content: flex-end;">
                                 <?php if (empty($u['is_approved'])): ?>
-                                <form action="/super-admin/users/approve" method="POST" style="margin: 0;">
+                                <form action="<?= $basePath ?>/super-admin/users/<?= $u['id'] ?>/update" method="POST" style="margin: 0;">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                     <button type="submit" class="super-admin-btn super-admin-btn-sm" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; padding: 4px 10px;">
                                         <i class="fa-solid fa-check"></i> Approve
@@ -227,7 +228,8 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                                 <a href="<?= $basePath ?>/admin-legacy/users/edit/<?= $u['id'] ?>" class="super-admin-btn super-admin-btn-secondary super-admin-btn-sm" style="padding: 4px 10px; text-decoration: none;">
                                     <i class="fa-solid fa-pen"></i> Edit
                                 </a>
-                                <form action="/super-admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.');" style="margin: 0;">
+                                <form action="<?= $basePath ?>/super-admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.');" style="margin: 0;">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                     <button type="submit" class="super-admin-btn super-admin-btn-danger super-admin-btn-sm" style="padding: 4px 10px;">
                                         <i class="fa-solid fa-trash"></i>

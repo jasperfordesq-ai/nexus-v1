@@ -42,7 +42,7 @@ require __DIR__ . '/../partials/admin-header.php';
     </div>
 </div>
 
-<form method="POST" action="/admin-legacy/federation/external-partners/store" class="create-partner-form">
+<form method="POST" action="<?= $basePath ?>/admin-legacy/federation/external-partners/store" class="create-partner-form">
     <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
 
     <div class="form-section">
@@ -137,7 +137,7 @@ require __DIR__ . '/../partials/admin-header.php';
         <button type="submit" class="btn btn-primary">
             <i class="fa-solid fa-plus"></i> Add Partner
         </button>
-        <a href="/admin-legacy/federation/external-partners" class="btn btn-secondary">
+        <a href="<?= $basePath ?>/admin-legacy/federation/external-partners" class="btn btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Cancel
         </a>
     </div>

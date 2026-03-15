@@ -152,7 +152,12 @@ class RolesController
             return;
         }
 
-        View::render('admin/enterprise/roles/show');
+        View::render('admin/enterprise/roles/show', [
+            'role' => $role,
+            'permissions' => $permissions,
+            'users' => $users,
+            'userCount' => $userCount
+        ]);
     }
 
     /**
@@ -255,7 +260,9 @@ class RolesController
             return;
         }
 
-        View::render('admin/enterprise/roles/edit');
+        View::render('admin/enterprise/roles/edit', [
+            'role' => $role
+        ]);
     }
 
     /**

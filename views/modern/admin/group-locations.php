@@ -258,6 +258,7 @@ require __DIR__ . '/partials/admin-header.php';
             <p class="admin-card-subtitle"><?= count($canAutoMap) ?> groups ready for automatic location assignment</p>
         </div>
         <form method="POST" style="margin-left: auto;">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
             <input type="hidden" name="action" value="update_all">
             <button type="submit" class="admin-btn admin-btn-primary" onclick="return confirm('Update all <?= count($canAutoMap) ?> groups with suggested locations?')">
                 <i class="fa-solid fa-bolt"></i>
@@ -324,6 +325,7 @@ require __DIR__ . '/partials/admin-header.php';
                     <?php foreach ($needsManual as $group): ?>
                     <tr>
                         <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                             <input type="hidden" name="action" value="update_single">
                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                             <td><strong style="color: #fff;"><?= htmlspecialchars($group['name']) ?></strong></td>

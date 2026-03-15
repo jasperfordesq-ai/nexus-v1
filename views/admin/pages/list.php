@@ -44,7 +44,7 @@ $isSocial = false;
                             <td><?= $page['menu_order'] ?></td>
                             <td>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/builder?id=<?= $page['id'] ?>" class="htb-btn htb-btn-sm">Edit</a>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/page/<?= $page['slug'] ?>" target="_blank" class="htb-btn htb-btn-sm htb-btn-secondary">View</a>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/page/<?= htmlspecialchars($page['slug']) ?>" target="_blank" class="htb-btn htb-btn-sm htb-btn-secondary">View</a>
                                 <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages/delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
                                     <input type="hidden" name="id" value="<?= $page['id'] ?>">
                                     <button type="submit" class="htb-btn htb-btn-sm" style="background:var(--del-color, #ef4444); padding:4px 8px; font-size:0.8rem;">Del</button>
