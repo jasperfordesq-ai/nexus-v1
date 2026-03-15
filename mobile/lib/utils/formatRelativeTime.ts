@@ -6,6 +6,9 @@
 /**
  * Converts an ISO date string to a human-readable relative time string.
  *
+ * NOTE: Returns English-only strings. Callers needing full localization should
+ * use i18n `t()` with date formatting instead of this utility.
+ *
  * @param iso - ISO 8601 date string
  * @param short - If true, returns compact format (e.g. "5m") instead of "5m ago"
  */

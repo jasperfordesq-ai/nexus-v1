@@ -142,11 +142,11 @@ export default function MemberProfileScreen() {
         </View>
 
         {/* Skills */}
-        {member.skills.length > 0 && (
+        {member.skills?.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('profile.skills')}</Text>
             <View style={styles.skillsWrap}>
-              {member.skills.map((skill) => (
+              {member.skills?.map((skill) => (
                 <View key={skill} style={[styles.skillChip, { borderColor: primary }]}>
                   <Text style={[styles.skillText, { color: primary }]}>{skill}</Text>
                 </View>
@@ -170,7 +170,7 @@ export default function MemberProfileScreen() {
           onPress={() =>
             router.push({
               pathname: '/(modals)/thread',
-              params: { id: String(member.id), name: member.name },
+              params: { recipientId: String(member.id), name: member.name },
             })
           }
         >

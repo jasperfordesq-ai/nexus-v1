@@ -94,6 +94,7 @@ export default function MessagesScreen() {
           }}
           activeOpacity={0.8}
           accessibilityLabel={t('newMessage')}
+          accessibilityRole="button"
         >
           <Ionicons name="create-outline" size={18} color="#fff" />
         </TouchableOpacity>

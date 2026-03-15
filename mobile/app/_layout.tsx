@@ -20,7 +20,8 @@ import * as Sentry from '@sentry/react-native';
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? '',
-  tracesSampleRate: 1.0,
+  // Sample 10% of traces in production to reduce Sentry quota usage
+  tracesSampleRate: 0.1,
   enabled: !!process.env.EXPO_PUBLIC_SENTRY_DSN,
 });
 
@@ -67,8 +68,7 @@ function RootNavigator() {
 
   // Handle taps on push notifications received while app was backgrounded/killed
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const subscription = (Notifications as any).addNotificationResponseReceivedListener((response: any) => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data as { link?: string } | undefined;
       if (data?.link) navigateToLink(data.link);
     });
@@ -82,11 +82,11 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="(modals)/new-exchange"
-        options={{ presentation: 'modal', headerShown: true, title: 'New Exchange' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/exchange-detail"
-        options={{ presentation: 'modal', headerShown: true, title: 'Exchange' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/thread"
@@ -98,31 +98,31 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/notifications"
-        options={{ presentation: 'modal', headerShown: true, title: 'Notifications' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/wallet"
-        options={{ presentation: 'modal', headerShown: true, title: 'Wallet' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/settings"
-        options={{ presentation: 'modal', headerShown: true, title: 'Settings' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/edit-profile"
-        options={{ presentation: 'modal', headerShown: true, title: 'Edit Profile' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/event-detail"
-        options={{ presentation: 'modal', headerShown: true, title: 'Event' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/members"
-        options={{ presentation: 'modal', headerShown: true, title: 'Members' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
       <Stack.Screen
         name="(modals)/change-password"
-        options={{ presentation: 'modal', headerShown: true, title: 'Change Password' }}
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
     </Stack>
   );

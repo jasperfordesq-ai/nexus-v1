@@ -157,6 +157,30 @@ export function EventCardSkeleton(): React.JSX.Element {
 }
 
 // ---------------------------------------------------------------------------
+// ExchangeCardSkeleton
+// ---------------------------------------------------------------------------
+
+export function ExchangeCardSkeleton(): React.JSX.Element {
+  const opacity = useShimmerAnimation();
+  const theme = useTheme();
+  const boxBg = theme.border;
+
+  return (
+    <View style={[styles.exchangeCard, { backgroundColor: theme.surface }]}>
+      {/* Title */}
+      <Animated.View style={[{ backgroundColor: boxBg }, { width: '75%', height: 16, borderRadius: 6, opacity }]} />
+      {/* Description line */}
+      <Animated.View style={[{ backgroundColor: boxBg }, { width: '100%', height: 12, borderRadius: 6, opacity }]} />
+      {/* Meta row: type + credits */}
+      <View style={styles.row}>
+        <Animated.View style={[{ backgroundColor: boxBg }, { width: 60, height: 12, borderRadius: 6, opacity }]} />
+        <Animated.View style={[{ backgroundColor: boxBg }, { width: 40, height: 12, borderRadius: 6, opacity }]} />
+      </View>
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // ProfileSkeleton
 // ---------------------------------------------------------------------------
 
@@ -254,6 +278,20 @@ const styles = StyleSheet.create({
   eventContent: {
     flex: 1,
     gap: 8,
+  },
+
+  // ExchangeCardSkeleton
+  exchangeCard: {
+    borderRadius: 14,
+    padding: 14,
+    marginHorizontal: 16,
+    marginVertical: 6,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   // ProfileSkeleton

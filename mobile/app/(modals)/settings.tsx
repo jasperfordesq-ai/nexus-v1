@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import Constants from 'expo-constants';
@@ -46,9 +46,14 @@ function savePrefs(prefs: Partial<NotificationPrefs>): Promise<void> {
 
 export default function SettingsScreen() {
   const { t } = useTranslation('settings');
+  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('title') });
+  }, [navigation, t]);
   const { data, isLoading } = useApi(() => getPrefs());
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const [saving, setSaving] = useState(false);

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   FlatList,
   View,
@@ -14,7 +14,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTranslation } from 'react-i18next';
@@ -28,9 +28,14 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MembersScreen() {
   const { t } = useTranslation('members');
+  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('title') });
+  }, [navigation, t]);
   const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
   const [search, setSearch] = useState('');
   const [committedSearch, setCommittedSearch] = useState('');

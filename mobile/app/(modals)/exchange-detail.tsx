@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { getExchange } from '@/lib/api/exchanges';
@@ -25,11 +25,16 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function ExchangeDetailModal() {
   const { t } = useTranslation('exchanges');
+  const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { user: currentUser } = useAuth();
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('detail.title') });
+  }, [navigation, t]);
 
   const exchangeId = Number(id);
   const safeExchangeId = isNaN(exchangeId) || exchangeId <= 0 ? 0 : exchangeId;
@@ -106,7 +111,7 @@ export default function ExchangeDetailModal() {
             onPress={() =>
               router.push({
                 pathname: '/(modals)/thread',
-                params: { id: String(exchange.user.id), name: exchange.user.name },
+                params: { recipientId: String(exchange.user.id), name: exchange.user.name },
               })
             }
           >

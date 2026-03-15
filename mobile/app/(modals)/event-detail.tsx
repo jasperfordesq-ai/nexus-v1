@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import {
   Alert,
   Linking,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
@@ -28,10 +28,15 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function EventDetailScreen() {
   const { t } = useTranslation('events');
+  const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('detail.title') });
+  }, [navigation, t]);
 
   const eventId = Number(id);
   const safeEventId = isNaN(eventId) || eventId <= 0 ? 0 : eventId;

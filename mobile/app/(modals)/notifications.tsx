@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   FlatList,
   View,
@@ -15,6 +15,7 @@ import {
   Alert,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { useNavigation } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -33,9 +34,14 @@ import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
 export default function NotificationsScreen() {
   const { t } = useTranslation('notifications');
+  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('title') });
+  }, [navigation, t]);
   const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
   const [markingAll, setMarkingAll] = useState(false);
 
@@ -62,7 +68,7 @@ export default function NotificationsScreen() {
         style={[styles.row, !item.is_read && styles.rowUnread]}
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          void markRead(item.id).then(() => refresh());
+          void markRead(item.id).then(() => refresh()).catch(console.warn);
           navigateToLink(item.link);
         }}
         activeOpacity={0.7}

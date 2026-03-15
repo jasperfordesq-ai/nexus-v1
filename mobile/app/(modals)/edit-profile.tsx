@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import {
   Platform,
   TouchableOpacity,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
@@ -32,9 +32,14 @@ import OfflineBanner from '@/components/OfflineBanner';
 
 export default function EditProfileScreen() {
   const { t } = useTranslation('profile');
+  const navigation = useNavigation();
   const { user, refreshUser } = useAuth();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('edit.title') });
+  }, [navigation, t]);
 
   const fullUser = user as User | null;
 

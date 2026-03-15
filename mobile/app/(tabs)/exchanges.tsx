@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -28,7 +28,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import ExchangeCard from '@/components/ExchangeCard';
 import OfflineBanner from '@/components/OfflineBanner';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { EventCardSkeleton } from '@/components/ui/Skeleton';
+import { ExchangeCardSkeleton } from '@/components/ui/Skeleton';
 
 /** Extractor for cursor-based ExchangeListResponse. */
 function extractExchangePage(response: ExchangeListResponse) {
@@ -56,18 +56,7 @@ export default function ExchangesScreen() {
   );
 
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
-    usePaginatedApi<Exchange, ExchangeListResponse>(fetchExchanges, extractExchangePage);
-
-  // Re-fetch from the start whenever the debounced search term changes.
-  const isFirstRender = useRef(true);
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch]);
+    usePaginatedApi<Exchange, ExchangeListResponse>(fetchExchanges, extractExchangePage, [debouncedSearch]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -117,9 +106,9 @@ export default function ExchangesScreen() {
         ListEmptyComponent={
           isLoading ? (
             <>
-              <EventCardSkeleton />
-              <EventCardSkeleton />
-              <EventCardSkeleton />
+              <ExchangeCardSkeleton />
+              <ExchangeCardSkeleton />
+              <ExchangeCardSkeleton />
             </>
           ) : error ? (
             <View style={styles.centered}>

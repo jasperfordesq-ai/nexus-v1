@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -49,19 +49,7 @@ export default function MembersScreen() {
   );
 
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
-    usePaginatedApi<Member, MemberListResponse>(fetchMembers, extractMembersPage);
-
-  // Re-fetch from the start whenever the debounced search term changes.
-  const isFirstRender = useRef(true);
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    refresh();
-    // refresh is stable relative to search changes; we want this to fire on debounced search change only.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch]);
+    usePaginatedApi<Member, MemberListResponse>(fetchMembers, extractMembersPage, [debouncedSearch]);
 
   return (
     <SafeAreaView style={styles.container}>

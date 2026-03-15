@@ -52,6 +52,8 @@ Notifications.setNotificationHandler({
       shouldShowAlert: !isDataOnly,
       shouldPlaySound: !isDataOnly,
       shouldSetBadge: true,
+      shouldShowBanner: !isDataOnly,
+      shouldShowList: !isDataOnly,
     };
   },
 });
@@ -91,7 +93,6 @@ export async function registerForPushNotifications(): Promise<void> {
     }
 
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
-    // @ts-expect-error -- expo-notifications types may not include projectId in all SDK versions, but runtime accepts it
     const tokenData = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
 
     await api.post<void>('/api/push/register-device', {
@@ -113,7 +114,6 @@ export async function unregisterPushNotifications(): Promise<void> {
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') return;
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
-    // @ts-expect-error -- expo-notifications types may not include projectId in all SDK versions, but runtime accepts it
     const tokenData = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
     await api.post<void>('/api/push/unregister-device', { token: tokenData.data });
   } catch {
