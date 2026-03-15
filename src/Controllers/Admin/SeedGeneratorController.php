@@ -7,6 +7,7 @@
 namespace Nexus\Controllers\Admin;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 use Nexus\Core\View;
 
 class SeedGeneratorController
