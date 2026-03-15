@@ -1,0 +1,215 @@
+/**
+ * Design Tokens - Admin Gold Standard
+ *
+ * Provides CSS custom properties consumed by admin-gold-standard.css,
+ * admin-sidebar.css, admin-settings.css, admin-menu-builder.css, and
+ * admin-menu-index.css.
+ *
+ * This file MUST load before any admin stylesheet that references these
+ * tokens (see admin-header.php).
+ */
+
+:root {
+  /* Primary / Indigo */
+  --color-primary-200: #a5b4fc;
+  --color-primary-300: #818cf8;
+  --color-primary-400: #6366f1;
+  --color-primary-500: #4f46e5;
+  --color-primary-600: #4338ca;
+  --color-primary-700: #3730a3;
+
+  /* Slate */
+  --color-slate-100: #f1f5f9;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  /* Gray */
+  --color-gray-100: #f3f4f6;
+  --color-gray-800: #1f2937;
+
+  /* White */
+  --color-white: #ffffff;
+
+  /* Semantic */
+  --color-danger: #ef4444;
+  --color-danger-400: #f87171;
+  --color-success: #22c55e;
+  --color-success-500: #22c55e;
+  --color-warning: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-info: #3b82f6;
+
+  /* Red */
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-600: #dc2626;
+
+  /* Green */
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-emerald-600: #059669;
+
+  /* Blue */
+  --color-blue-300: #93c5fd;
+
+  /* Cyan */
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+
+  /* Purple */
+  --color-purple-300: #d8b4fe;
+  --color-purple-400-alt: #a855f7;
+  --color-purple-500: #a855f7;
+
+  /* Amber / Orange / Yellow */
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-600: #d97706;
+  --color-orange-300: #fdba74;
+  --color-pink-500: #ec4899;
+
+  /* Black alphas */
+  --color-black-alpha-30: rgba(0, 0, 0, 0.30);
+  --color-black-alpha-60: rgba(0, 0, 0, 0.60);
+
+  /* White alphas */
+  --color-white-alpha-5:  rgba(255, 255, 255, 0.05);
+  --color-white-alpha-10: rgba(255, 255, 255, 0.10);
+  --color-white-alpha-15: rgba(255, 255, 255, 0.15);
+  --color-white-alpha-40: rgba(255, 255, 255, 0.40);
+  --color-white-alpha-50: rgba(255, 255, 255, 0.50);
+  --color-white-alpha-60: rgba(255, 255, 255, 0.60);
+  --color-white-alpha-80: rgba(255, 255, 255, 0.80);
+  --color-white-alpha-85: rgba(255, 255, 255, 0.85);
+
+  /* Slate alphas */
+  --color-slate-500-alpha-20: rgba(100, 116, 139, 0.20);
+  --color-slate-700-alpha-50: rgba(51, 65, 85, 0.50);
+  --color-slate-900-alpha-40: rgba(15, 23, 42, 0.40);
+  --color-slate-900-alpha-50: rgba(15, 23, 42, 0.50);
+  --color-slate-900-alpha-60: rgba(15, 23, 42, 0.60);
+  --color-slate-900-alpha-75: rgba(15, 23, 42, 0.75);
+  --color-slate-900-alpha-85: rgba(15, 23, 42, 0.85);
+  --color-slate-900-alpha-95: rgba(15, 23, 42, 0.95);
+  --color-slate-950-alpha-85: rgba(2, 6, 23, 0.85);
+  --color-slate-alpha-50:     rgba(100, 116, 139, 0.50);
+
+  /* Indigo alphas */
+  --color-indigo-alpha-3:  rgba(99, 102, 241, 0.03);
+  --color-indigo-alpha-5:  rgba(99, 102, 241, 0.05);
+  --color-indigo-alpha-8:  rgba(99, 102, 241, 0.08);
+  --color-indigo-alpha-10: rgba(99, 102, 241, 0.10);
+  --color-indigo-alpha-15: rgba(99, 102, 241, 0.15);
+  --color-indigo-alpha-20: rgba(99, 102, 241, 0.20);
+  --color-indigo-alpha-25: rgba(99, 102, 241, 0.25);
+  --color-indigo-alpha-30: rgba(99, 102, 241, 0.30);
+  --color-indigo-alpha-40: rgba(99, 102, 241, 0.40);
+  --color-indigo-alpha-50: rgba(99, 102, 241, 0.50);
+  --color-indigo-alpha-60: rgba(99, 102, 241, 0.60);
+
+  /* Red alphas */
+  --color-red-alpha-15: rgba(239, 68, 68, 0.15);
+  --color-red-alpha-25: rgba(239, 68, 68, 0.25);
+  --color-red-alpha-30: rgba(239, 68, 68, 0.30);
+  --color-red-alpha-40: rgba(239, 68, 68, 0.40);
+  --color-red-alpha-50: rgba(239, 68, 68, 0.50);
+
+  /* Green / Emerald alphas */
+  --color-green-500-alpha-20: rgba(34, 197, 94, 0.20);
+  --color-green-500-alpha-40: rgba(34, 197, 94, 0.40);
+  --color-emerald-alpha-30:   rgba(16, 185, 129, 0.30);
+  --color-emerald-alpha-50:   rgba(16, 185, 129, 0.50);
+
+  /* Amber / Orange / Yellow alphas */
+  --color-amber-500-alpha-15:  rgba(245, 158, 11, 0.15);
+  --color-amber-500-alpha-20:  rgba(245, 158, 11, 0.20);
+  --color-amber-500-alpha-30:  rgba(245, 158, 11, 0.30);
+  --color-amber-500-alpha-40:  rgba(245, 158, 11, 0.40);
+  --color-amber-alpha-40:      rgba(245, 158, 11, 0.40);
+  --color-orange-400-alpha-15: rgba(251, 146, 60, 0.15);
+  --color-orange-400-alpha-30: rgba(251, 146, 60, 0.30);
+  --color-orange-600-alpha-12: rgba(234, 88, 12, 0.12);
+  --color-orange-600-alpha-15: rgba(234, 88, 12, 0.15);
+  --color-yellow-400-alpha-15: rgba(250, 204, 21, 0.15);
+  --color-yellow-400-alpha-30: rgba(250, 204, 21, 0.30);
+
+  /* Cyan alphas */
+  --color-cyan-400-alpha-15: rgba(34, 211, 238, 0.15);
+  --color-cyan-400-alpha-30: rgba(34, 211, 238, 0.30);
+  --color-cyan-alpha-8:      rgba(34, 211, 238, 0.08);
+
+  /* Blue alphas */
+  --color-blue-alpha-15: rgba(59, 130, 246, 0.15);
+  --color-blue-alpha-30: rgba(59, 130, 246, 0.30);
+
+  /* Violet alphas */
+  --color-violet-alpha-8:  rgba(139, 92, 246, 0.08);
+  --color-violet-alpha-15: rgba(139, 92, 246, 0.15);
+  --color-violet-alpha-20: rgba(139, 92, 246, 0.20);
+  --color-violet-alpha-30: rgba(139, 92, 246, 0.30);
+  --color-violet-alpha-40: rgba(139, 92, 246, 0.40);
+  --color-violet-alpha-60: rgba(139, 92, 246, 0.60);
+
+  /* Purple alphas */
+  --color-purple-600-alpha-30: rgba(147, 51, 234, 0.30);
+  --color-purple-600-alpha-40: rgba(147, 51, 234, 0.40);
+  --color-pink-alpha-40:       rgba(236, 72, 153, 0.40);
+
+  /* =====================================================================
+     EFFECT TOKENS  (glass / glow / overlay helpers)
+     ===================================================================== */
+
+  --effect-white-5:  rgba(255, 255, 255, 0.05);
+  --effect-white-40: rgba(255, 255, 255, 0.40);
+  --effect-white-50: rgba(255, 255, 255, 0.50);
+  --effect-white-60: rgba(255, 255, 255, 0.60);
+  --effect-white-70: rgba(255, 255, 255, 0.70);
+  --effect-white-80: rgba(255, 255, 255, 0.80);
+  --effect-white-85: rgba(255, 255, 255, 0.85);
+  --effect-white-90: rgba(255, 255, 255, 0.90);
+
+  --effect-black-20: rgba(0, 0, 0, 0.20);
+  --effect-black-30: rgba(0, 0, 0, 0.30);
+  --effect-black-40: rgba(0, 0, 0, 0.40);
+  --effect-black-50: rgba(0, 0, 0, 0.50);
+  --effect-black-60: rgba(0, 0, 0, 0.60);
+  --effect-black-70: rgba(0, 0, 0, 0.70);
+
+  --effect-slate-60: rgba(100, 116, 139, 0.60);
+
+  --effect-primary-8:  rgba(99, 102, 241, 0.08);
+  --effect-primary-10: rgba(99, 102, 241, 0.10);
+  --effect-primary-15: rgba(99, 102, 241, 0.15);
+  --effect-primary-20: rgba(99, 102, 241, 0.20);
+  --effect-primary-25: rgba(99, 102, 241, 0.25);
+  --effect-primary-30: rgba(99, 102, 241, 0.30);
+  --effect-primary-35: rgba(99, 102, 241, 0.35);
+  --effect-primary-40: rgba(99, 102, 241, 0.40);
+  --effect-primary-50: rgba(99, 102, 241, 0.50);
+
+  --effect-cyan-15: rgba(34, 211, 238, 0.15);
+  --effect-cyan-30: rgba(34, 211, 238, 0.30);
+  --effect-cyan-40: rgba(34, 211, 238, 0.40);
+
+  --effect-purple-10: rgba(147, 51, 234, 0.10);
+  --effect-purple-30: rgba(147, 51, 234, 0.30);
+  --effect-purple-40: rgba(147, 51, 234, 0.40);
+
+  --effect-emerald-15: rgba(16, 185, 129, 0.15);
+  --effect-emerald-25: rgba(16, 185, 129, 0.25);
+  --effect-emerald-30: rgba(16, 185, 129, 0.30);
+  --effect-emerald-40: rgba(16, 185, 129, 0.40);
+
+  --effect-red-15: rgba(239, 68, 68, 0.15);
+  --effect-red-20: rgba(239, 68, 68, 0.20);
+  --effect-red-30: rgba(239, 68, 68, 0.30);
+  --effect-red-40: rgba(239, 68, 68, 0.40);
+
+  --effect-amber-15: rgba(245, 158, 11, 0.15);
+  --effect-amber-20: rgba(245, 158, 11, 0.20);
+  --effect-amber-30: rgba(245, 158, 11, 0.30);
+}

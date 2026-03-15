@@ -34,8 +34,11 @@ class PusherAuthController extends BaseApiController
                 $this->jsonResponse(['error' => 'Unauthorized'], 401);
             }
 
-            $socketId = $_REQUEST['socket_id'] ?? null;
-            $channelName = $_REQUEST['channel_name'] ?? null;
+            // Support both form-encoded ($_REQUEST) and JSON body input.
+            // The React frontend sends JSON via api.post() (custom authorizer).
+            $input = $this->getAllInput();
+            $socketId = $input['socket_id'] ?? $_REQUEST['socket_id'] ?? null;
+            $channelName = $input['channel_name'] ?? $_REQUEST['channel_name'] ?? null;
 
             if (empty($socketId) || empty($channelName)) {
                 $this->jsonResponse(['error' => 'Missing socket_id or channel_name'], 400);
