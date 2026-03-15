@@ -18,7 +18,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
 import Pusher, { type Channel } from 'pusher-js';
 import { useAuth } from './AuthContext';
-import { api, tokenManager } from '@/lib/api';
+import { api, tokenManager, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 interface PusherConfig {
@@ -128,7 +128,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
     const pusher = new Pusher(config.key, {
       cluster: config.cluster,
-      authEndpoint: config.authEndpoint,
+      authEndpoint: `${API_BASE}/pusher/auth`,
       auth: {
         headers: {
           Authorization: `Bearer ${accessToken}`,

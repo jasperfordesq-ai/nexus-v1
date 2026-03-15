@@ -54,6 +54,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';
 import { useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -365,7 +366,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                   />
                 )}
                 <Avatar
-                  src={app.user.avatar_url || undefined}
+                  src={resolveAvatarUrl(app.user.avatar_url) || undefined}
                   name={app.user.name}
                   size="md"
                   className="flex-shrink-0"

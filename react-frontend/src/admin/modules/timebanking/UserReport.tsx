@@ -18,6 +18,7 @@ import {
 import { Users, ArrowLeft, Download, PlusCircle } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { UserFinancialReport as UserFinancialReportType } from '../../api/types';
@@ -142,7 +143,7 @@ export function UserReport() {
         render: (user) => (
           <div className="flex items-center gap-3">
             <Avatar
-              src={user.avatar_url || undefined}
+              src={resolveAvatarUrl(user.avatar_url) || undefined}
               name={user.name}
               size="sm"
               showFallback

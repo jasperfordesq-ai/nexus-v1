@@ -49,6 +49,7 @@ import { EmptyState, LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -412,7 +413,7 @@ export function OrganisationDetailPage() {
                   <Link to={tenantPath(`/profile/${review.author.id}`)}>
                     <Avatar
                       name={review.author.name}
-                      src={review.author.avatar ?? undefined}
+                      src={resolveAvatarUrl(review.author.avatar) || undefined}
                       size="sm"
                     />
                   </Link>

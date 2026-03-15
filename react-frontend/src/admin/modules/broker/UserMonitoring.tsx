@@ -30,6 +30,7 @@ import {
 import { ArrowLeft, Eye, MessageCircleOff, UserPlus, UserMinus, X, Search } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminBroker, adminUsers } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
 import type { MonitoredUser, AdminUser } from '../../api/types';
@@ -379,7 +380,7 @@ export function UserMonitoring() {
             {selectedUser ? (
               <div className="flex items-center gap-3 rounded-lg border border-divider p-3">
                 <Avatar
-                  src={selectedUser.avatar_url ?? selectedUser.avatar ?? undefined}
+                  src={resolveAvatarUrl(selectedUser.avatar_url ?? selectedUser.avatar) || undefined}
                   name={selectedUser.name}
                   size="sm"
                 />
@@ -440,7 +441,7 @@ export function UserMonitoring() {
                         }}
                       >
                         <Avatar
-                          src={user.avatar_url ?? user.avatar ?? undefined}
+                          src={resolveAvatarUrl(user.avatar_url ?? user.avatar) || undefined}
                           name={user.name}
                           size="sm"
                           className="shrink-0"
