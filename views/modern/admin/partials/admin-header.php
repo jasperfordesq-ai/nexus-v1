@@ -66,6 +66,8 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
     <link rel="stylesheet" href="/assets/css/admin/federation-external-partners.css?v=<?= time() ?>">
     <!-- Broker Controls -->
     <link rel="stylesheet" href="/assets/css/admin/broker-controls.css?v=<?= time() ?>">
+    <!-- Legacy Admin Content Styles (cards, buttons, forms, modals extracted from old header) -->
+    <link rel="stylesheet" href="/assets/css/admin-legacy-compat.css?v=<?= time() ?>">
 </head>
 <body class="admin-page">
 <div class="admin-gold-wrapper">

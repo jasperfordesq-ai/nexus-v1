@@ -14,16 +14,18 @@ $averageScore = $analyticsData['average_score'] ?? 0;
 $medianScore = $analyticsData['median_score'] ?? 0;
 $tierDistribution = $analyticsData['tier_distribution'] ?? [];
 $categoryStats = $categoryStats ?? [];
+
+use Nexus\Core\TenantContext;
+
+$basePath = TenantContext::getBasePath();
+$adminPageTitle = 'Nexus Score Analytics';
+$adminPageSubtitle = 'Scoring Insights';
+$adminPageIcon = 'fa-chart-line';
+
+require __DIR__ . '/partials/admin-header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Score Analytics | Admin Dashboard</title>
-    <link rel="stylesheet" href="/assets/css/admin-gold-standard.css">
-    <style>
+<style>
         .analytics-container {
             padding: 2rem;
             max-width: 1600px;
@@ -364,8 +366,6 @@ $categoryStats = $categoryStats ?? [];
             }
         }
     </style>
-</head>
-<body>
     <div class="analytics-container">
         <!-- Page Header -->
         <div class="page-header">
@@ -586,5 +586,5 @@ $categoryStats = $categoryStats ?? [];
         });
     });
     </script>
-</body>
-</html>
+
+<?php require __DIR__ . '/partials/admin-footer.php'; ?>

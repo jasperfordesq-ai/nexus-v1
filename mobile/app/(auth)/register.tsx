@@ -28,6 +28,7 @@ import { storage } from '@/lib/storage';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { registerForPushNotifications } from '@/lib/notifications';
 
 function makeRegisterSchema(t: (key: string) => string) {
   return z
@@ -97,6 +98,9 @@ export default function RegisterScreen() {
       setSession(token, response.user);
 
       router.replace('/(tabs)/home');
+
+      // Register device for push notifications (non-blocking, best-effort)
+      void registerForPushNotifications();
     } catch (err) {
       if (err instanceof ApiResponseError) {
         setGlobalError(err.message);

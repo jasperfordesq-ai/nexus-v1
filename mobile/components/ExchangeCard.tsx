@@ -25,7 +25,7 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
   const styles = useMemo(() => makeStyles(theme), [theme]);
 
   function openDetail() {
-    router.push({ pathname: '/(modals)/exchange-detail', params: { id: exchange.id } });
+    router.push({ pathname: '/(modals)/exchange-detail', params: { id: String(exchange.id) } });
   }
 
   const hours = exchange.hours_estimate ?? 0;

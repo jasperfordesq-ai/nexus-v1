@@ -28,7 +28,7 @@ export const DARK = {
   border: '#2C2C2E',
   borderSubtle: '#2C2C2E',
   text: '#F2F2F7',
-  textSecondary: '#EBEBF5',
+  textSecondary: '#98989F',
   textMuted: '#636366',
   error: '#FF453A',
   errorBg: '#2D1B1B',
