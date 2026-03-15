@@ -315,13 +315,21 @@ class MemberRankingService
         }
 
         // Build score SQL components
-        $activitySql = self::getActivityScoreSql();
-        $contributionSql = self::getContributionScoreSql();
+        $activitySql = self::getActivityScoreSql($tenantId);
+        $contributionSql = self::getContributionScoreSql($tenantId);
         $reputationSql = self::getReputationScoreSql();
         $geoSql = self::getGeoScoreSql($viewerCoords['lat'], $viewerCoords['lon']);
 
-        // Total score calculation
-        $totalScoreSql = "({$activitySql}) * ({$contributionSql}) * ({$reputationSql}) * ({$geoSql})";
+        // Weighted additive total score -- matches rankMembers() formula
+        // Connectivity (0.15) and Complementary (0.10) default to neutral (1.0 * weight)
+        $totalScoreSql = "(
+            0.20 * ({$activitySql})
+            + 0.20 * ({$contributionSql})
+            + 0.20 * ({$reputationSql})
+            + 0.15 * ({$geoSql})
+            + 0.15 * 1.0
+            + 0.10 * 1.0
+        )";
 
         $sql = "
             SELECT
@@ -347,12 +355,12 @@ class MemberRankingService
                 END as display_name,
 
                 -- Listing counts
-                (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer') as offer_count,
-                (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request') as request_count,
+                (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND tenant_id = u.tenant_id AND status = 'active' AND type = 'offer') as offer_count,
+                (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND tenant_id = u.tenant_id AND status = 'active' AND type = 'request') as request_count,
 
                 -- Transaction stats
-                (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed') as hours_given,
-                (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed') as hours_received,
+                (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND tenant_id = u.tenant_id AND status = 'completed') as hours_given,
+                (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND tenant_id = u.tenant_id AND status = 'completed') as hours_received,
 
                 -- Score components
                 ({$activitySql}) as activity_score,
@@ -365,8 +373,7 @@ class MemberRankingService
 
             FROM users u
             WHERE u.tenant_id = ?
-              AND u.avatar_url IS NOT NULL
-              AND LENGTH(u.avatar_url) > 0
+              AND u.status = 'active'
         ";
 
         // The two extra $tenantId values are for the last_active_at subqueries in SELECT
@@ -398,11 +405,11 @@ class MemberRankingService
         }
 
         if (!empty($filters['has_offers'])) {
-            $sql .= " AND EXISTS (SELECT 1 FROM listings WHERE user_id = u.id AND type = 'offer' AND status = 'active')";
+            $sql .= " AND EXISTS (SELECT 1 FROM listings WHERE user_id = u.id AND tenant_id = u.tenant_id AND type = 'offer' AND status = 'active')";
         }
 
         if (!empty($filters['has_requests'])) {
-            $sql .= " AND EXISTS (SELECT 1 FROM listings WHERE user_id = u.id AND type = 'request' AND status = 'active')";
+            $sql .= " AND EXISTS (SELECT 1 FROM listings WHERE user_id = u.id AND tenant_id = u.tenant_id AND type = 'request' AND status = 'active')";
         }
 
         // Order by community_rank, then by last_active_at as tiebreaker
@@ -437,10 +444,14 @@ class MemberRankingService
         $query = self::buildRankedQuery($userId, ['limit' => $limit * 3]);
         $members = Database::query($query['sql'], $query['params'])->fetchAll(\PDO::FETCH_ASSOC);
 
+        // Batch load all member listings in 1 query instead of N+1
+        $memberIds = array_column($members, 'id');
+        $allMemberListings = self::getBatchUserListings($memberIds);
+
         // Apply complementary skills scoring
         $suggestions = [];
         foreach ($members as $member) {
-            $memberListings = self::getUserListingTypes($member['id']);
+            $memberListings = $allMemberListings[$member['id']] ?? [];
             $complementaryScore = self::calculateComplementaryScore($viewerListings, $memberListings);
 
             $member['community_rank'] = ($member['community_rank'] ?? 1) * $complementaryScore;
@@ -468,8 +479,6 @@ class MemberRankingService
         $tenantId = TenantContext::getId();
 
         try {
-            // Simple query for recently active members
-            // Uses created_at as fallback if last_login_at column doesn't exist yet
             $sql = "
                 SELECT
                     u.id,
@@ -479,7 +488,11 @@ class MemberRankingService
                     u.profile_type,
                     u.avatar_url,
                     u.location,
-                    u.created_at as last_login_at,
+                    COALESCE(
+                        (SELECT MAX(created_at) FROM feed_activity WHERE user_id = u.id AND tenant_id = ?),
+                        (SELECT MAX(created_at) FROM transactions WHERE (sender_id = u.id OR receiver_id = u.id) AND tenant_id = ?),
+                        u.created_at
+                    ) AS last_active_at,
                     CASE
                         WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL
                         THEN u.organization_name
@@ -487,16 +500,17 @@ class MemberRankingService
                     END as display_name
                 FROM users u
                 WHERE u.tenant_id = ?
+                  AND u.status = 'active'
             ";
 
-            $params = [$tenantId];
+            $params = [$tenantId, $tenantId, $tenantId];
 
             if ($viewerId) {
                 $sql .= " AND u.id != ?";
                 $params[] = $viewerId;
             }
 
-            $sql .= " ORDER BY u.created_at DESC LIMIT ?";
+            $sql .= " ORDER BY last_active_at DESC LIMIT ?";
             $params[] = $limit;
 
             return Database::query($sql, $params)->fetchAll(\PDO::FETCH_ASSOC);
@@ -508,26 +522,6 @@ class MemberRankingService
     // =========================================================================
     // SCORE CALCULATION METHODS
     // =========================================================================
-
-    /**
-     * Calculate all score components for a member
-     */
-    private static function calculateMemberScores(
-        array $member,
-        ?int $viewerId,
-        array $viewerCoords,
-        array $viewerListings,
-        array $viewerGroups
-    ): array {
-        return [
-            'activity' => self::calculateActivityScore($member),
-            'contribution' => self::calculateContributionScore($member),
-            'reputation' => self::calculateReputationScore($member),
-            'connectivity' => self::calculateConnectivityScore($member, $viewerId, $viewerGroups),
-            'proximity' => self::calculateProximityScore($member, $viewerCoords),
-            'complementary' => self::calculateComplementaryScoreForMember($member['id'], $viewerListings),
-        ];
-    }
 
     /**
      * Calculate activity score
@@ -689,47 +683,6 @@ class MemberRankingService
     }
 
     /**
-     * Calculate connectivity score (relationship with viewer)
-     */
-    private static function calculateConnectivityScore(
-        array $member,
-        ?int $viewerId,
-        array $viewerGroups
-    ): float {
-        if (!$viewerId) {
-            return 1.0;
-        }
-
-        $config = self::getConfig();
-        $score = 1.0;
-
-        // Check shared groups
-        $memberGroups = self::getUserGroups($member['id']);
-        $sharedGroups = array_intersect($viewerGroups, $memberGroups);
-
-        if (count($sharedGroups) > 0) {
-            $score *= $config['connectivity_shared_group'];
-        }
-
-        // Check past interactions (transactions, messages)
-        try {
-            $hasInteraction = Database::query(
-                "SELECT 1 FROM transactions
-                 WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
-                 LIMIT 1",
-                [$viewerId, $member['id'], $member['id'], $viewerId]
-            )->fetch();
-
-            if ($hasInteraction) {
-                $score *= $config['connectivity_past_interaction'];
-            }
-        } catch (\Exception $e) {
-        }
-
-        return $score;
-    }
-
-    /**
      * Calculate proximity score
      */
     private static function calculateProximityScore(array $member, array $viewerCoords): float
@@ -749,15 +702,6 @@ class MemberRankingService
             $memberLat,
             $memberLon
         );
-    }
-
-    /**
-     * Calculate complementary skills score
-     */
-    private static function calculateComplementaryScoreForMember(int $memberId, array $viewerListings): float
-    {
-        $memberListings = self::getUserListingTypes($memberId);
-        return self::calculateComplementaryScore($viewerListings, $memberListings);
     }
 
     /**
@@ -821,18 +765,34 @@ class MemberRankingService
      * SQL snippet for activity score
      * Uses created_at for now (last_login_at may not exist yet)
      */
-    private static function getActivityScoreSql(): string
+    private static function getActivityScoreSql(int $tenantId = 0): string
     {
         $config = self::getConfig();
         $minimum = (float)$config['activity_minimum'];
 
-        // Use created_at until last_login_at column is added via migration
+        if ($tenantId <= 0) {
+            try {
+                $tenantId = TenantContext::getId();
+            } catch (\Exception $e) {
+                $tenantId = 0;
+            }
+        }
+
+        // Build a last_active_at subquery scoped by tenant
+        $lastActiveSql = "COALESCE(
+            (SELECT MAX(created_at) FROM feed_activity WHERE user_id = u.id AND tenant_id = {$tenantId}),
+            (SELECT MAX(created_at) FROM transactions WHERE (sender_id = u.id OR receiver_id = u.id) AND tenant_id = {$tenantId}),
+            u.created_at
+        )";
+
+        $decayRate = (1.0 - $minimum) / 23;
+
         return "
             CASE
-                WHEN u.created_at IS NULL THEN {$minimum}
-                WHEN DATEDIFF(NOW(), u.created_at) <= 7 THEN 1.0
-                WHEN DATEDIFF(NOW(), u.created_at) >= 30 THEN {$minimum}
-                ELSE 1.0 - ((DATEDIFF(NOW(), u.created_at) - 7) * " . ((1.0 - $minimum) / 23) . ")
+                WHEN ({$lastActiveSql}) IS NULL THEN {$minimum}
+                WHEN DATEDIFF(NOW(), ({$lastActiveSql})) <= 7 THEN 1.0
+                WHEN DATEDIFF(NOW(), ({$lastActiveSql})) >= 30 THEN {$minimum}
+                ELSE 1.0 - ((DATEDIFF(NOW(), ({$lastActiveSql})) - 7) * {$decayRate})
             END
         ";
     }
@@ -845,7 +805,7 @@ class MemberRankingService
      *   - 6–12 months:     0.5×
      *   - Older:           0.25×
      */
-    private static function getContributionScoreSql(): string
+    private static function getContributionScoreSql(int $tenantId = 0): string
     {
         return "
             LEAST(1.0,
@@ -859,11 +819,11 @@ class MemberRankingService
                         END
                     ), 0)
                     FROM listings
-                    WHERE user_id = u.id AND status = 'active'
+                    WHERE user_id = u.id AND tenant_id = u.tenant_id AND status = 'active'
                 ) * 0.05)
                 + CASE
-                    WHEN (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed') >
-                         (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed')
+                    WHEN (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND tenant_id = u.tenant_id AND status = 'completed') >
+                         (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND tenant_id = u.tenant_id AND status = 'completed')
                     THEN 0.15
                     ELSE 0
                 END
@@ -918,9 +878,10 @@ class MemberRankingService
     private static function getUserListingTypes(int $userId): array
     {
         try {
+            $tenantId = TenantContext::getId();
             return Database::query(
-                "SELECT id, type, category_id FROM listings WHERE user_id = ? AND status = 'active'",
-                [$userId]
+                "SELECT id, type, category_id FROM listings WHERE user_id = ? AND tenant_id = ? AND status = 'active'",
+                [$userId, $tenantId]
             )->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             return [];
@@ -933,9 +894,12 @@ class MemberRankingService
     private static function getUserGroups(int $userId): array
     {
         try {
+            $tenantId = TenantContext::getId();
             return Database::query(
-                "SELECT group_id FROM group_members WHERE user_id = ?",
-                [$userId]
+                "SELECT gm.group_id FROM group_members gm
+                 INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ?
+                 WHERE gm.user_id = ?",
+                [$tenantId, $userId]
             )->fetchAll(\PDO::FETCH_COLUMN);
         } catch (\Exception $e) {
             return [];
@@ -953,10 +917,13 @@ class MemberRankingService
         }
 
         try {
+            $tenantId = TenantContext::getId();
             $placeholders = implode(',', array_fill(0, count($userIds), '?'));
             $rows = Database::query(
-                "SELECT user_id, group_id FROM group_members WHERE user_id IN ({$placeholders})",
-                $userIds
+                "SELECT gm.user_id, gm.group_id FROM group_members gm
+                 INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ?
+                 WHERE gm.user_id IN ({$placeholders})",
+                array_merge([$tenantId], $userIds)
             )->fetchAll(\PDO::FETCH_ASSOC);
 
             $result = [];
@@ -984,10 +951,11 @@ class MemberRankingService
         }
 
         try {
+            $tenantId = TenantContext::getId();
             $placeholders = implode(',', array_fill(0, count($userIds), '?'));
             $rows = Database::query(
-                "SELECT user_id, id, type, category_id FROM listings WHERE user_id IN ({$placeholders}) AND status = 'active'",
-                $userIds
+                "SELECT user_id, id, type, category_id FROM listings WHERE user_id IN ({$placeholders}) AND tenant_id = ? AND status = 'active'",
+                array_merge($userIds, [$tenantId])
             )->fetchAll(\PDO::FETCH_ASSOC);
 
             $result = [];
@@ -1019,15 +987,17 @@ class MemberRankingService
         }
 
         try {
+            $tenantId = TenantContext::getId();
             $placeholders = implode(',', array_fill(0, count($memberIds), '?'));
             // Find all transactions where viewer was sender/receiver with any of these members
             $rows = Database::query(
                 "SELECT DISTINCT
                     CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as member_id
                  FROM transactions
-                 WHERE (sender_id = ? AND receiver_id IN ({$placeholders}))
-                    OR (receiver_id = ? AND sender_id IN ({$placeholders}))",
-                array_merge([$viewerId, $viewerId], $memberIds, [$viewerId], $memberIds)
+                 WHERE tenant_id = ?
+                   AND ((sender_id = ? AND receiver_id IN ({$placeholders}))
+                    OR (receiver_id = ? AND sender_id IN ({$placeholders})))",
+                array_merge([$viewerId, $tenantId, $viewerId], $memberIds, [$viewerId], $memberIds)
             )->fetchAll(\PDO::FETCH_COLUMN);
 
             return array_flip($rows); // Convert to keyed array for O(1) lookup
@@ -1099,15 +1069,21 @@ class MemberRankingService
     public static function debugMemberScore(int $memberId, ?int $viewerId = null): array
     {
         try {
+            $tenantId = TenantContext::getId();
             $member = Database::query(
                 "SELECT u.*,
-                    (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer') as offer_count,
-                    (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request') as request_count,
-                    (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed') as hours_given,
-                    (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed') as hours_received
+                    COALESCE(
+                        (SELECT MAX(created_at) FROM feed_activity WHERE user_id = u.id AND tenant_id = ?),
+                        (SELECT MAX(created_at) FROM transactions WHERE (sender_id = u.id OR receiver_id = u.id) AND tenant_id = ?),
+                        u.created_at
+                    ) AS last_active_at,
+                    (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND tenant_id = u.tenant_id AND status = 'active' AND type = 'offer') as offer_count,
+                    (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND tenant_id = u.tenant_id AND status = 'active' AND type = 'request') as request_count,
+                    (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND tenant_id = u.tenant_id AND status = 'completed') as hours_given,
+                    (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND tenant_id = u.tenant_id AND status = 'completed') as hours_received
                  FROM users u
-                 WHERE u.id = ?",
-                [$memberId]
+                 WHERE u.id = ? AND u.tenant_id = ?",
+                [$tenantId, $tenantId, $memberId, $tenantId]
             )->fetch(\PDO::FETCH_ASSOC);
 
             if (!$member) {
@@ -1117,28 +1093,49 @@ class MemberRankingService
             $viewerCoords = ['lat' => null, 'lon' => null];
             $viewerListings = [];
             $viewerGroups = [];
+            $memberGroups = self::getUserGroups($memberId);
+            $memberListings = self::getUserListingTypes($memberId);
+            $hasInteraction = false;
 
             if ($viewerId) {
                 $viewerCoords = RankingService::getViewerCoordinates($viewerId);
                 $viewerListings = self::getUserListingTypes($viewerId);
                 $viewerGroups = self::getUserGroups($viewerId);
+                $interactions = self::getBatchViewerInteractions($viewerId, [$memberId]);
+                $hasInteraction = isset($interactions[$memberId]);
             }
 
-            $scores = self::calculateMemberScores(
+            $scores = self::calculateMemberScoresOptimized(
                 $member,
                 $viewerId,
                 $viewerCoords,
                 $viewerListings,
-                $viewerGroups
+                $viewerGroups,
+                $memberGroups,
+                $memberListings,
+                $hasInteraction
             );
 
-            $finalScore = array_product($scores);
+            // Weighted additive - consistent with rankMembers()
+            $weights = [
+                'activity'      => 0.20,
+                'contribution'  => 0.20,
+                'reputation'    => 0.20,
+                'connectivity'  => 0.15,
+                'proximity'     => 0.15,
+                'complementary' => 0.10,
+            ];
+            $finalScore = 0.0;
+            foreach ($weights as $component => $weight) {
+                $finalScore += ($scores[$component] ?? 0.5) * $weight;
+            }
 
             return [
                 'member_id' => $memberId,
                 'display_name' => $member['first_name'] . ' ' . $member['last_name'],
                 'scores' => $scores,
                 'final_score' => $finalScore,
+                'weights' => $weights,
                 'config' => self::getConfig()
             ];
         } catch (\Exception $e) {
