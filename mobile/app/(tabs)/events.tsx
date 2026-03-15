@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -53,18 +53,7 @@ export default function EventsScreen() {
     refresh,
     loadMore,
     error,
-  } = usePaginatedApi<Event, EventsResponse>(fetcher, extractEventsPage);
-
-  // Re-fetch when the tab filter changes.
-  // Skip the initial mount (usePaginatedApi already fetches on mount).
-  const isFirstMount = useRef(true);
-  useEffect(() => {
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      return;
-    }
-    refresh();
-  }, [when]); // eslint-disable-line react-hooks/exhaustive-deps
+  } = usePaginatedApi<Event, EventsResponse>(fetcher, extractEventsPage, [when]);
 
   function handleTabChange(tab: 'upcoming' | 'past') {
     if (tab !== when) setWhen(tab);

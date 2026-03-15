@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -14,7 +14,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
@@ -28,9 +28,14 @@ import OfflineBanner from '@/components/OfflineBanner';
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation('settings');
+  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('password.title') });
+  }, [navigation, t]);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');

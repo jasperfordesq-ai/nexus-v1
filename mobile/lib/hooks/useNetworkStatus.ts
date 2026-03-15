@@ -25,7 +25,6 @@ export interface NetworkStatus {
  * returns to the foreground (AppState → 'active').
  *
  * Rationale for not using @react-native-community/netinfo:
- *  - That package is not in package.json and requires a native rebuild.
  *  - A real HTTP ping is more reliable than the OS-level reachability flag
  *    because it confirms actual backend connectivity, not just local network.
  *

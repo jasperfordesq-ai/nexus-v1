@@ -71,6 +71,8 @@ export default function ThreadScreen() {
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const flatListRef = useRef<FlatList<Message>>(null);
+  const inputTextRef = useRef(inputText);
+  inputTextRef.current = inputText;
 
   // Set the header title to the other user's name
   useEffect(() => {
@@ -123,7 +125,7 @@ export default function ThreadScreen() {
   })();
 
   const handleSend = useCallback(async () => {
-    const body = inputText.trim();
+    const body = inputTextRef.current.trim();
     if (!body || isSending || resolvedRecipientId === null) return;
 
     // Optimistic append
@@ -163,7 +165,7 @@ export default function ThreadScreen() {
     } finally {
       setIsSending(false);
     }
-  }, [inputText, isSending, resolvedRecipientId]);
+  }, [isSending, resolvedRecipientId]);
 
   function renderMessage({ item }: { item: Message }) {
     const isOwn = item.is_own;

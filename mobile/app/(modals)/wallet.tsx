@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigation } from 'expo-router';
 import {
   View,
   Text,
@@ -90,9 +91,14 @@ function TransactionRow({
 
 export default function WalletModal() {
   const { t } = useTranslation('wallet');
+  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: t('title') });
+  }, [navigation, t]);
   const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
