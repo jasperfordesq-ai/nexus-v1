@@ -48,7 +48,7 @@ export default function MemberCard({ member }: MemberCardProps) {
           </View>
           <View style={styles.stat}>
             <Text style={[styles.statValue, { color: primary }]}>
-              {member.total_hours_given.toFixed(0)}
+              {(member.total_hours_given ?? 0).toFixed(0)}
             </Text>
             <Text style={styles.statLabel}>{t('hrsGiven')}</Text>
           </View>

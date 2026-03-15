@@ -3,15 +3,18 @@
  * Seed Generator - Verification Dashboard
  * Proves generator can see database and is 100% safe
  */
+
+use Nexus\Core\TenantContext;
+
+$basePath = TenantContext::getBasePath();
+$adminPageTitle = 'Seed Generator Verification';
+$adminPageSubtitle = 'Database Safety Check';
+$adminPageIcon = 'fa-seedling';
+
+require __DIR__ . '/../../modern/admin/partials/admin-header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seed Generator Verification | Nexus Admin</title>
-    <link rel="stylesheet" href="/assets/css/admin-gold-standard.css">
-    <style>
+
+<style>
         body {
             margin: 0;
             padding: 20px;
@@ -233,10 +236,6 @@
             margin: 16px 0;
         }
     </style>
-</head>
-<body>
-
-<?php require __DIR__ . '/../../layouts/admin-header.php'; ?>
 
 <div class="verification-container">
 
@@ -576,5 +575,4 @@ public function <?= htmlspecialchars($method) ?>()
 console.log('Seed Generator Verification Report:', <?= json_encode($verification, JSON_PRETTY_PRINT) ?>);
 </script>
 
-</body>
-</html>
+<?php require __DIR__ . '/../../modern/admin/partials/admin-footer.php'; ?>

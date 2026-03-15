@@ -8,16 +8,14 @@ use Nexus\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 
-// Page config for enterprise header
-$enterprisePageTitle = 'Create GDPR Request';
-$enterprisePageSubtitle = 'Data Subject Request';
-$enterprisePageIcon = 'fa-file-circle-plus';
-$enterpriseSection = 'gdpr';
-$enterpriseSubpage = 'requests';
+// Page config for admin header
+$adminPageTitle = 'Create GDPR Request';
+$adminPageSubtitle = 'Data Subject Request';
+$adminPageIcon = 'fa-file-circle-plus';
 
 $requestTypes = $requestTypes ?? ['access', 'erasure', 'rectification', 'restriction', 'portability', 'objection'];
 
-require dirname(__DIR__) . '/partials/enterprise-header.php';
+require dirname(__DIR__, 2) . '/partials/admin-header.php';
 ?>
 
 <!-- Page Header -->
@@ -412,4 +410,4 @@ document.getElementById('user_search').addEventListener('input', function(e) {
 });
 </script>
 
-<?php require dirname(__DIR__) . '/partials/enterprise-footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/partials/admin-footer.php'; ?>
