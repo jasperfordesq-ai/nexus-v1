@@ -8,7 +8,7 @@ $adminPageTitle = 'All Deliverables';
 $adminPageSubtitle = 'Deliverability Tracking';
 $adminPageIcon = 'fa-list';
 
-require dirname(__DIR__) . '/partials/admin-header.php';
+require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-header.php';
 
 $deliverables = $deliverables ?? [];
 $totalCount = $totalCount ?? 0;
@@ -310,4 +310,4 @@ $users = $users ?? [];
     </div>
 </div>
 
-<?php require dirname(__DIR__) . '/partials/admin-footer.php'; ?>
+<?php require dirname(dirname(dirname(__DIR__))) . '/layouts/admin-footer.php'; ?>

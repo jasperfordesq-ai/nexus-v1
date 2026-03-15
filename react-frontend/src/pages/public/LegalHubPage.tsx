@@ -28,6 +28,7 @@ import {
   Hexagon,
   AlertTriangle,
   ExternalLink,
+  Building,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -113,7 +114,7 @@ const legalDocumentDefs = [
 export function LegalHubPage() {
   const { t } = useTranslation('legal');
   usePageTitle(t('hub.page_title'));
-  const { branding, tenantPath } = useTenant();
+  const { branding, tenantPath, tenant } = useTenant();
 
   return (
     <motion.div
@@ -134,6 +135,27 @@ export function LegalHubPage() {
           {t('hub.subtitle')}
         </p>
       </motion.div>
+
+      {/* Tenant Legal Entity Info */}
+      {tenant?.config?.footer_text && (
+        <motion.div variants={itemVariants}>
+          <GlassCard className="p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 shrink-0">
+                <Building className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-theme-primary mb-1">
+                  {branding.name}
+                </h2>
+                <p className="text-sm text-theme-muted whitespace-pre-line">
+                  {tenant.config.footer_text}
+                </p>
+              </div>
+            </div>
+          </GlassCard>
+        </motion.div>
+      )}
 
       {/* GDPR Commitment Banner */}
       <motion.div variants={itemVariants}>

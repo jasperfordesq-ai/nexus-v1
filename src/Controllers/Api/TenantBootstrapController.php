@@ -214,7 +214,7 @@ class TenantBootstrapController extends BaseApiController
         $data['seo'] = $this->buildSeoData($tenant);
 
         // Public configuration (footer, etc.)
-        $publicConfig = $this->buildPublicConfig($config);
+        $publicConfig = $this->buildPublicConfig($config, (int) $tenant["id"]);
         if (!empty($publicConfig)) {
             $data['config'] = $publicConfig;
         }
@@ -418,17 +418,34 @@ class TenantBootstrapController extends BaseApiController
      *
      * IMPORTANT: Only include configuration that is safe for public display
      */
-    private function buildPublicConfig(?array $config): array
+    private function buildPublicConfig(?array $config, int $tenantId = 0): array
     {
-        if ($config === null) {
-            return [];
-        }
-
         $publicConfig = [];
 
-        // Footer text (charity registration, etc.)
-        if (!empty($config['footer_text'])) {
-            $publicConfig['footer_text'] = $config['footer_text'];
+        // Footer text: check tenant_settings (React admin) first, then configuration JSON (legacy PHP admin)
+        $footerText = '';
+        if ($tenantId > 0) {
+            try {
+                $row = Database::query(
+                    "SELECT setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key = 'general.footer_text'",
+                    [$tenantId]
+                )->fetch();
+                if ($row && !empty($row['setting_value'])) {
+                    $footerText = $row['setting_value'];
+                }
+            } catch (\Exception $e) {
+                // tenant_settings table may not exist yet
+            }
+        }
+        if (empty($footerText) && $config !== null && !empty($config['footer_text'])) {
+            $footerText = $config['footer_text'];
+        }
+        if (!empty($footerText)) {
+            $publicConfig['footer_text'] = $footerText;
+        }
+
+        if ($config === null) {
+            return $publicConfig;
         }
 
         // Module-specific configuration (public only)

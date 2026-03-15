@@ -737,8 +737,23 @@ class GamificationV2ApiController extends BaseApiController
         try {
             $data = LeaderboardSeasonService::getSeasonWithUserData($userId);
 
+            // Return empty season data if no season is available (table missing or no active season)
+            if ($data === null) {
+                $this->respondWithData([
+                    'season' => null,
+                    'user_rank' => null,
+                    'user_data' => null,
+                    'leaderboard' => [],
+                    'rewards' => null,
+                    'days_remaining' => 0,
+                    'is_ending_soon' => false,
+                ]);
+                return;
+            }
+
             $this->respondWithData($data);
         } catch (\Throwable $e) {
+            error_log('[GamificationV2] currentSeason error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             $this->respondWithError(
                 ApiErrorCodes::SERVER_INTERNAL_ERROR,
                 'Failed to load current season',

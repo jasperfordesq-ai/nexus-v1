@@ -143,51 +143,44 @@ export function Footer({ children, copyright }: FooterProps) {
               </div>
             ) : null}
 
-            {/* Bottom Bar */}
+            {/* Tenant Copyright */}
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-theme-subtle">{footerText}</p>
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="light"
-                  size="sm"
-                  onPress={resetConsent}
-                  className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
-                  aria-label="Cookie settings"
-                  startContent={<Cookie className="w-3 h-3" aria-hidden="true" />}
-                >
-                  {t('footer.cookie_settings')}
-                </Button>
-                <span className="text-theme-subtle/30">|</span>
-                <a
-                  href="https://github.com/jasperfordesq-ai/nexus-v1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
-                >
-                  {t('footer.built_on_nexus')}
-                </a>
-                <span className="text-theme-subtle/30">|</span>
-                <span className="text-[10px] text-theme-subtle">
-                  {t('footer.agpl_notice', 'AGPL-3.0 — Copyright \u00A9 2024\u2013{{year}} Jasper Ford', { year })}
-                </span>
-                <span className="text-theme-subtle/30">&middot;</span>
-                <Link
-                  to={tenantPath('/platform/terms')}
-                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
-                >
-                  {t('footer.terms')}
-                </Link>
-                <span className="text-theme-subtle/30">&middot;</span>
-                <Link
-                  to={tenantPath('/platform/privacy')}
-                  className="text-xs text-theme-subtle hover:text-theme-primary transition-colors"
-                >
-                  {t('footer.privacy')}
-                </Link>
-                <span className="text-[10px] text-theme-subtle/50 font-mono" title={`Built ${__BUILD_TIME__}`}>
-                  {__BUILD_COMMIT__}
-                </span>
-              </div>
+              <Button
+                variant="light"
+                size="sm"
+                onPress={resetConsent}
+                className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
+                aria-label="Cookie settings"
+                startContent={<Cookie className="w-3 h-3" aria-hidden="true" />}
+              >
+                {t('footer.cookie_settings')}
+              </Button>
+            </div>
+
+            {/* Platform Attribution */}
+            <div className="pt-4 flex items-center justify-center gap-2 text-[11px] text-theme-subtle/60">
+              <a
+                href="https://github.com/jasperfordesq-ai/nexus-v1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-theme-primary transition-colors"
+              >
+                Project NEXUS
+              </a>
+              <span>&middot;</span>
+              <span>AGPL-3.0 &copy; 2024&ndash;{year} Jasper Ford</span>
+              <span>&middot;</span>
+              <Link to={tenantPath('/platform/terms')} className="hover:text-theme-primary transition-colors">
+                {t('footer.terms')}
+              </Link>
+              <span>&middot;</span>
+              <Link to={tenantPath('/platform/privacy')} className="hover:text-theme-primary transition-colors">
+                {t('footer.privacy')}
+              </Link>
+              <span className="font-mono text-[10px] text-theme-subtle/40" title={`Built ${__BUILD_TIME__}`}>
+                {__BUILD_COMMIT__}
+              </span>
             </div>
           </div>
         )}
