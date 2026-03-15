@@ -50,6 +50,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { api } from '@/lib/api';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { StatCard, PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
@@ -441,7 +442,7 @@ export function InactiveMembersPage() {
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Avatar size="sm" src={m.avatar_url ?? undefined} name={m.name} />
+                  <Avatar size="sm" src={resolveAvatarUrl(m.avatar_url) || undefined} name={m.name} />
                   <div>
                     <p className="text-sm font-medium">{m.name}</p>
                     <p className="text-xs text-default-400">{m.email}</p>

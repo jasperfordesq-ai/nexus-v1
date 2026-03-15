@@ -15,6 +15,7 @@ import { Briefcase, Star, StarOff, Trash2, Eye, RefreshCw, ChevronDown, ChevronU
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
 
 interface Job { id: number; title: string; organization_name?: string; poster_name?: string; type?: string; applications_count: number; views_count: number; is_featured: boolean; status: string; deadline?: string; created_at: string; }
@@ -41,7 +42,7 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
   return (
     <Card className='mb-3'><CardBody className='gap-3 p-4'>
       <div className='flex items-start gap-3'>
-        <Avatar src={application.applicant.avatar_url} name={application.applicant.name} size='sm' className='shrink-0 mt-0.5' />
+        <Avatar src={resolveAvatarUrl(application.applicant.avatar_url) || undefined} name={application.applicant.name} size='sm' className='shrink-0 mt-0.5' />
         <div className='flex-1 min-w-0'>
           <div className='flex items-center gap-2 flex-wrap'>
             <span className='font-medium text-sm text-foreground truncate'>{application.applicant.name}</span>

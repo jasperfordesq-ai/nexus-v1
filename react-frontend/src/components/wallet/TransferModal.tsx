@@ -25,6 +25,7 @@ import {
 } from '@heroui/react';
 import { X, Send, Search, User, AlertCircle } from 'lucide-react';
 import { api } from '@/lib/api';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { CategorySelect } from './CategorySelect';
 import type { WalletUserSearchResult, Transaction } from '@/types/api';
@@ -282,7 +283,7 @@ export function TransferModal({
                   // Selected recipient display
                   <div className="flex items-center gap-3 bg-theme-elevated rounded-lg p-3">
                     <Avatar
-                      src={formData.recipient.avatar || undefined}
+                      src={resolveAvatarUrl(formData.recipient.avatar) || undefined}
                       name={`${formData.recipient.first_name} ${formData.recipient.last_name}`}
                       size="sm"
                       className="flex-shrink-0"
@@ -361,7 +362,7 @@ export function TransferModal({
                               className="w-full flex items-center gap-3 p-3 hover:bg-theme-hover transition-colors text-left h-auto min-w-0 justify-start rounded-none"
                             >
                               <Avatar
-                                src={user.avatar || undefined}
+                                src={resolveAvatarUrl(user.avatar) || undefined}
                                 name={`${user.first_name} ${user.last_name}`}
                                 size="sm"
                               />

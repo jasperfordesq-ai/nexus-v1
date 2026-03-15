@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
@@ -484,7 +485,7 @@ export function UserEdit() {
           <Card>
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-4">
-                <Avatar src={user.avatar_url || user.avatar || undefined} name={user.name} size="lg" />
+                <Avatar src={resolveAvatarUrl(user.avatar_url || user.avatar) || undefined} name={user.name} size="lg" />
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">{user.name}</h3>
                   <p className="text-sm text-default-500">{user.email}</p>

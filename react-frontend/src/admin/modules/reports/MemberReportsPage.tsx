@@ -61,6 +61,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 
@@ -236,7 +237,7 @@ export function MemberReportsPage() {
               <TableRow key={m.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Avatar size="sm" src={m.avatar_url ?? undefined} name={m.name} />
+                    <Avatar size="sm" src={resolveAvatarUrl(m.avatar_url) || undefined} name={m.name} />
                     <div>
                       <p className="text-sm font-medium">{m.name}</p>
                       <p className="text-xs text-default-400">{m.email}</p>
@@ -484,7 +485,7 @@ export function MemberReportsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Avatar size="sm" src={c.avatar_url ?? undefined} name={c.name} />
+                      <Avatar size="sm" src={resolveAvatarUrl(c.avatar_url) || undefined} name={c.name} />
                       <span className="font-medium text-foreground">{c.name}</span>
                     </div>
                   </TableCell>
@@ -524,7 +525,7 @@ export function MemberReportsPage() {
               <TableRow key={m.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Avatar size="sm" src={m.avatar_url ?? undefined} name={m.name} />
+                    <Avatar size="sm" src={resolveAvatarUrl(m.avatar_url) || undefined} name={m.name} />
                     <div>
                       <p className="text-sm font-medium">{m.name}</p>
                       <p className="text-xs text-default-400">{m.email}</p>

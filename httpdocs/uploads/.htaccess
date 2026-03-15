@@ -1,0 +1,20 @@
+# Block directory listing
+Options -Indexes
+
+# Redirect bare directory access to home page (instead of 403 error)
+# Only redirect if the request is for a directory AND not a real file
+DirectoryIndex disabled
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^.*$ / [R=301,L]
+
+# Allow direct file access for images, videos, and documents (Apache 2.4 syntax)
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|mp4|mov|avi|apk)$">
+    Require all granted
+</FilesMatch>
+
+# Force download for certain file types
+<FilesMatch "\.(pdf|doc|docx|apk)$">
+    Header set Content-Disposition "attachment"
+</FilesMatch>

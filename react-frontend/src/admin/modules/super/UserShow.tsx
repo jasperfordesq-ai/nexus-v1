@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
@@ -224,7 +225,7 @@ export function UserShow() {
               <div className="flex items-start gap-4">
                 <Avatar
                   name={user.name}
-                  src={user.avatar || undefined}
+                  src={resolveAvatarUrl(user.avatar) || undefined}
                   size="lg"
                   className="shrink-0"
                 />

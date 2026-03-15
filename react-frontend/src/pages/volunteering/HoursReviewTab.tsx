@@ -10,6 +10,7 @@ import { GlassCard } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 
 import { useTranslation } from 'react-i18next';
 interface HourLogUser {
@@ -191,7 +192,7 @@ export function HoursReviewTab() {
         return (
           <GlassCard key={entry.id} className="flex flex-col sm:flex-row sm:items-start gap-4 p-4">
             <Avatar
-              src={entry.user.avatar_url ?? undefined}
+              src={resolveAvatarUrl(entry.user.avatar_url) || undefined}
               name={entry.user.name}
               size="md"
               className="shrink-0"

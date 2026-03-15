@@ -49,6 +49,7 @@ import {
 } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminVetting, adminUsers } from '../../api/adminApi';
 import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { VettingRecord, VettingStats } from '../../api/types';
@@ -466,7 +467,7 @@ export function VettingRecords() {
       render: (item) => (
         <div className="flex items-center gap-2">
           <Avatar
-            src={item.avatar_url || undefined}
+            src={resolveAvatarUrl(item.avatar_url) || undefined}
             name={`${item.first_name} ${item.last_name}`}
             size="sm"
             className="shrink-0"
@@ -979,7 +980,7 @@ export function VettingRecords() {
             <ModalBody className="gap-4">
               <div className="flex items-center gap-2 p-3 rounded-lg border border-default-200 bg-default-50">
                 <Avatar
-                  src={editItem.avatar_url || undefined}
+                  src={resolveAvatarUrl(editItem.avatar_url) || undefined}
                   name={`${editItem.first_name} ${editItem.last_name}`}
                   size="sm"
                 />
@@ -1136,7 +1137,7 @@ export function VettingRecords() {
             <ModalBody>
               <div className="flex items-center gap-3 mb-4">
                 <Avatar
-                  src={viewItem.avatar_url || undefined}
+                  src={resolveAvatarUrl(viewItem.avatar_url) || undefined}
                   name={`${viewItem.first_name} ${viewItem.last_name}`}
                   size="lg"
                 />

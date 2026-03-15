@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, useTenant } from '@/contexts';
 import { Button, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 import { ArrowLeft, Bell, LogOut, Menu, User } from 'lucide-react';
+import { resolveAvatarUrl } from '@/lib/helpers';
 
 interface AdminHeaderProps {
   sidebarCollapsed: boolean;
@@ -76,7 +77,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
           <DropdownTrigger>
             <Button variant="light" className="flex items-center gap-2 px-2 py-1 h-auto min-w-0">
               <Avatar
-                src={user?.avatar_url || user?.avatar || undefined}
+                src={resolveAvatarUrl(user?.avatar_url || user?.avatar) || undefined}
                 name={user?.name || 'Admin'}
                 size="sm"
                 className="h-8 w-8"

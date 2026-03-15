@@ -41,6 +41,7 @@ import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -313,7 +314,7 @@ export function GroupSignUpTab() {
                             <Avatar
                               key={member.id}
                               name={member.name}
-                              src={member.avatar_url ?? undefined}
+                              src={resolveAvatarUrl(member.avatar_url) || undefined}
                               size="sm"
                             />
                           ))}

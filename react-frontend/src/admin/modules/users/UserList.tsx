@@ -50,6 +50,7 @@ import {
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminUsers } from '../../api/adminApi';
 import { DataTable, StatusBadge, PageHeader, ConfirmModal, type Column } from '../../components';
 import type { AdminUser, UserListParams } from '../../api/types';
@@ -309,7 +310,7 @@ export function UserList() {
       render: (user) => (
         <div className="flex items-center gap-3">
           <Avatar
-            src={user.avatar_url || user.avatar || undefined}
+            src={resolveAvatarUrl(user.avatar_url || user.avatar) || undefined}
             name={user.name}
             size="sm"
           />
