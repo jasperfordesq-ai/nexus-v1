@@ -211,7 +211,7 @@ function SeasonCard() {
               </div>
             </div>
             <Progress
-              value={season.user_data.progress_percentage}
+              value={season.user_data.progress_percentage ?? 0}
               classNames={{
                 indicator: 'bg-gradient-to-r from-purple-500 to-pink-500',
                 track: 'bg-theme-hover',
@@ -220,7 +220,7 @@ function SeasonCard() {
               aria-label={t('leaderboard.season.progress_aria')}
             />
             <p className="text-xs text-theme-subtle mt-1">
-              {t('leaderboard.season.xp_earned', { xp: season.user_data.xp_earned.toLocaleString() })}
+              {t('leaderboard.season.xp_earned', { xp: (season.user_data.xp_earned ?? 0).toLocaleString() })}
             </p>
           </div>
         )}

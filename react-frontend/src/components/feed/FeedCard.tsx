@@ -511,6 +511,7 @@ const FeedCard = React.memo(function FeedCard({
                   alt={`${config.label ?? 'Post'} image by ${author.name}`}
                   className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
                   loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               </Link>
             ) : (
