@@ -97,7 +97,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys/create');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -111,7 +111,7 @@ class FederationApiKeysController
         // Validate
         if (empty($name)) {
             $_SESSION['flash_error'] = 'API key name is required.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys/create');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys/create');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -177,7 +177,7 @@ class FederationApiKeysController
         // Ensure session data is written before redirect
         session_write_close();
 
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
         if (!defined('TESTING')) { exit; }
     }
 
@@ -202,7 +202,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -248,7 +248,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -262,7 +262,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -278,7 +278,7 @@ class FederationApiKeysController
         );
 
         $_SESSION['flash_success'] = 'API key suspended.';
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
         if (!defined('TESTING')) { exit; }
     }
 
@@ -293,7 +293,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -306,7 +306,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -322,7 +322,7 @@ class FederationApiKeysController
         );
 
         $_SESSION['flash_success'] = 'API key reactivated.';
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
         if (!defined('TESTING')) { exit; }
     }
 
@@ -337,7 +337,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -350,7 +350,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -367,7 +367,7 @@ class FederationApiKeysController
         );
 
         $_SESSION['flash_success'] = 'API key permanently revoked.';
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
         if (!defined('TESTING')) { exit; }
     }
 
@@ -387,7 +387,7 @@ class FederationApiKeysController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -400,7 +400,7 @@ class FederationApiKeysController
 
         if (!$apiKey) {
             $_SESSION['flash_error'] = 'API key not found.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -430,7 +430,7 @@ class FederationApiKeysController
         // Ensure session data is written before redirect
         session_write_close();
 
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/api-keys');
         if (!defined('TESTING')) { exit; }
     }
 }

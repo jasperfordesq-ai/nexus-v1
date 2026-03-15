@@ -31,14 +31,14 @@ class FederationImportController
         // Validate CSRF
         if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
             $_SESSION['flash_error'] = 'Invalid request. Please try again.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/data');
             if (!defined('TESTING')) { exit; }
         }
 
         // Check file upload
         if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['flash_error'] = 'Please select a valid CSV file to upload.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/data');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -49,7 +49,7 @@ class FederationImportController
         $mimeType = $finfo->file($file['tmp_name']);
         if (!in_array($mimeType, ['text/csv', 'text/plain', 'application/csv'])) {
             $_SESSION['flash_error'] = 'Invalid file type. Please upload a CSV file.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/data');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -57,7 +57,7 @@ class FederationImportController
         $handle = fopen($file['tmp_name'], 'r');
         if (!$handle) {
             $_SESSION['flash_error'] = 'Could not read the uploaded file.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/data');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -71,7 +71,7 @@ class FederationImportController
         if (!$headers) {
             fclose($handle);
             $_SESSION['flash_error'] = 'CSV file is empty or invalid.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/data');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -87,7 +87,7 @@ class FederationImportController
         if ($emailCol === false && $usernameCol === false) {
             fclose($handle);
             $_SESSION['flash_error'] = 'CSV must contain either "email" or "username" column.';
-            header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/data');
+            header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/data');
             if (!defined('TESTING')) { exit; }
         }
 
@@ -259,7 +259,7 @@ class FederationImportController
         $_SESSION['import_results'] = $results;
         $_SESSION['flash_success'] = "Import complete: {$results['enrolled']} users enrolled in federation.";
 
-        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/federation/data');
+        header('Location: ' . TenantContext::getBasePath() . '/admin-legacy/federation/data');
         if (!defined('TESTING')) { exit; }
     }
 

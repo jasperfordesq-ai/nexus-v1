@@ -226,7 +226,7 @@ class AdminController
 
         Database::query(
             "UPDATE users SET first_name = ?, last_name = ?, email = ?, role = ?, is_approved = ?, location = ?, phone = ? WHERE id = ? AND tenant_id = ?",
-            [$firstName, $lastName, $email, $role, $status, $location, $phone, $id, NexusCoreTenantContext::getId()]
+            [$firstName, $lastName, $email, $role, $status, $location, $phone, $id, TenantContext::getId()]
         );
 
         header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/admin-legacy/users');
