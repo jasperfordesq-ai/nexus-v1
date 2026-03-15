@@ -191,6 +191,8 @@ const styles = StyleSheet.create({
   feedCard: {
     borderRadius: 14,
     padding: 14,
+    marginHorizontal: 16,
+    marginVertical: 6,
     gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

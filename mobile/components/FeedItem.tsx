@@ -8,6 +8,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
+import { useTranslation } from 'react-i18next';
+
 import { toggleLike, type FeedItem as FeedItemType } from '@/lib/api/feed';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -20,6 +22,7 @@ interface FeedItemProps {
 }
 
 export default function FeedItem({ item }: FeedItemProps) {
+  const { t } = useTranslation('home');
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -59,7 +62,7 @@ export default function FeedItem({ item }: FeedItemProps) {
           </View>
           {/* Type badge */}
           <View style={styles.typeBadge}>
-            <Text style={styles.typeBadgeText}>{formatType(item.type)}</Text>
+            <Text style={styles.typeBadgeText}>{t(`feedTypes.${item.type}`, { defaultValue: item.type })}</Text>
           </View>
         </View>
 
@@ -83,7 +86,7 @@ export default function FeedItem({ item }: FeedItemProps) {
             style={styles.actionBtn}
             onPress={handleLike}
             activeOpacity={0.7}
-            accessibilityLabel={liked ? 'Unlike' : 'Like'}
+            accessibilityLabel={liked ? t('feedTypes.unlike') : t('feedTypes.like')}
             accessibilityRole="button"
           >
             <Ionicons
@@ -108,15 +111,6 @@ export default function FeedItem({ item }: FeedItemProps) {
       </Card>
     </View>
   );
-}
-
-function formatType(type: string): string {
-  const labels: Record<string, string> = {
-    post: 'Post', listing: 'Exchange', event: 'Event',
-    poll: 'Poll', goal: 'Goal', job: 'Job',
-    challenge: 'Challenge', volunteer: 'Volunteer', review: 'Review',
-  };
-  return labels[type] ?? type;
 }
 
 function makeStyles(theme: Theme) {

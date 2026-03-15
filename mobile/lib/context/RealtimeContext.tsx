@@ -111,6 +111,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       if (channelRef.current) {
         channelRef.current.unbind_all();
+        getRealtimeClient()?.unsubscribe(channelRef.current.name);
         channelRef.current = null;
       }
     };

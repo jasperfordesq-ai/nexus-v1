@@ -60,6 +60,8 @@
     "job": "Job",
     "challenge": "Challenge",
     "volunteer": "Volunteer",
-    "review": "Review"
+    "review": "Review",
+    "unlike": "Unlike",
+    "like": "Like"
   }
 }

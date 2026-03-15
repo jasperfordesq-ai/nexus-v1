@@ -18,6 +18,8 @@ import {
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
+import { useTranslation } from 'react-i18next';
+
 import { updateProfile, type UpdateProfilePayload } from '@/lib/api/profile';
 import { type User } from '@/lib/api/auth';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -29,6 +31,7 @@ import Button from '@/components/ui/Button';
 import OfflineBanner from '@/components/OfflineBanner';
 
 export default function EditProfileScreen() {
+  const { t } = useTranslation('profile');
   const { user, refreshUser } = useAuth();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -44,7 +47,7 @@ export default function EditProfileScreen() {
 
   async function handleSave() {
     if (!firstName.trim()) {
-      Alert.alert('Validation', 'First name is required.');
+      Alert.alert(t('edit.validation'), t('edit.firstNameRequired'));
       return;
     }
 
@@ -65,13 +68,13 @@ export default function EditProfileScreen() {
       refreshUser(response.data);
 
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Saved', 'Your profile has been updated.', [
-        { text: 'OK', onPress: () => router.back() },
+      Alert.alert(t('edit.saved'), t('edit.savedMessage'), [
+        { text: t('common:buttons.done'), onPress: () => router.back() },
       ]);
     } catch (err: unknown) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      const msg = err instanceof Error ? err.message : 'Could not save profile.';
-      Alert.alert('Error', msg);
+      const msg = err instanceof Error ? err.message : t('edit.saveError');
+      Alert.alert(t('common:errors.generic'), msg);
     } finally {
       setSaving(false);
     }
@@ -86,31 +89,31 @@ export default function EditProfileScreen() {
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <OfflineBanner />
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>First name</Text>
+            <Text style={styles.label}>{t('edit.firstName')}</Text>
             <Input
               value={firstName}
               onChangeText={setFirstName}
-              placeholder="First name"
+              placeholder={t('edit.firstName')}
               autoCapitalize="words"
             />
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Last name</Text>
+            <Text style={styles.label}>{t('edit.lastName')}</Text>
             <Input
               value={lastName}
               onChangeText={setLastName}
-              placeholder="Last name"
+              placeholder={t('edit.lastName')}
               autoCapitalize="words"
             />
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>About you</Text>
+            <Text style={styles.label}>{t('edit.aboutYou')}</Text>
             <Input
               value={bio}
               onChangeText={setBio}
-              placeholder="Tell the community about yourself..."
+              placeholder={t('edit.aboutPlaceholder')}
               multiline
               numberOfLines={4}
               style={styles.bioInput}
@@ -118,21 +121,21 @@ export default function EditProfileScreen() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Location</Text>
+            <Text style={styles.label}>{t('edit.location')}</Text>
             <Input
               value={location}
               onChangeText={setLocation}
-              placeholder="e.g. New York, USA"
+              placeholder={t('edit.locationPlaceholder')}
               autoCapitalize="words"
             />
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Phone (optional)</Text>
+            <Text style={styles.label}>{t('edit.phoneOptional')}</Text>
             <Input
               value={phone}
               onChangeText={setPhone}
-              placeholder="+1 555 123 4567"
+              placeholder={t('edit.phonePlaceholder')}
               keyboardType="phone-pad"
             />
           </View>
@@ -142,7 +145,7 @@ export default function EditProfileScreen() {
             disabled={saving}
             style={styles.saveBtn}
           >
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? t('edit.saving') : t('edit.saveChanges')}
           </Button>
 
           <TouchableOpacity
@@ -151,7 +154,7 @@ export default function EditProfileScreen() {
             disabled={saving}
             activeOpacity={0.7}
           >
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={styles.cancelText}>{t('edit.cancel')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

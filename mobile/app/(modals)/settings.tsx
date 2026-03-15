@@ -17,6 +17,9 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+import Constants from 'expo-constants';
+import { useTranslation } from 'react-i18next';
+
 import { api } from '@/lib/api/client';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -42,6 +45,7 @@ function savePrefs(prefs: Partial<NotificationPrefs>): Promise<void> {
 }
 
 export default function SettingsScreen() {
+  const { t } = useTranslation('settings');
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -62,7 +66,7 @@ export default function SettingsScreen() {
     } catch {
       // Revert
       setPrefs(current);
-      Alert.alert('Error', 'Could not save setting. Please try again.');
+      Alert.alert(t('common:errors.generic'), t('saveError'));
     } finally {
       setSaving(false);
     }
@@ -72,9 +76,9 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
 
-        <Section title="Push Notifications" styles={styles}>
+        <Section title={t('pushNotifications')} styles={styles}>
           <SettingRow
-            label="New messages"
+            label={t('push.messages')}
             value={current?.push_messages ?? true}
             onToggle={() => void toggle('push_messages')}
             primary={primary}
@@ -83,7 +87,7 @@ export default function SettingsScreen() {
             styles={styles}
           />
           <SettingRow
-            label="Time credit transactions"
+            label={t('push.transactions')}
             value={current?.push_transactions ?? true}
             onToggle={() => void toggle('push_transactions')}
             primary={primary}
@@ -92,7 +96,7 @@ export default function SettingsScreen() {
             styles={styles}
           />
           <SettingRow
-            label="Social activity"
+            label={t('push.social')}
             value={current?.push_social ?? true}
             onToggle={() => void toggle('push_social')}
             primary={primary}
@@ -102,9 +106,9 @@ export default function SettingsScreen() {
           />
         </Section>
 
-        <Section title="Email Notifications" styles={styles}>
+        <Section title={t('emailNotifications')} styles={styles}>
           <SettingRow
-            label="Messages"
+            label={t('email.messages')}
             value={current?.email_messages ?? true}
             onToggle={() => void toggle('email_messages')}
             primary={primary}
@@ -113,7 +117,7 @@ export default function SettingsScreen() {
             styles={styles}
           />
           <SettingRow
-            label="Connections"
+            label={t('email.connections')}
             value={current?.email_connections ?? true}
             onToggle={() => void toggle('email_connections')}
             primary={primary}
@@ -122,7 +126,7 @@ export default function SettingsScreen() {
             styles={styles}
           />
           <SettingRow
-            label="Time credit transactions"
+            label={t('email.transactions')}
             value={current?.email_transactions ?? true}
             onToggle={() => void toggle('email_transactions')}
             primary={primary}
@@ -131,7 +135,7 @@ export default function SettingsScreen() {
             styles={styles}
           />
           <SettingRow
-            label="Reviews"
+            label={t('email.reviews')}
             value={current?.email_reviews ?? true}
             onToggle={() => void toggle('email_reviews')}
             primary={primary}
@@ -141,26 +145,26 @@ export default function SettingsScreen() {
           />
         </Section>
 
-        <Section title="About" styles={styles}>
+        <Section title={t('about')} styles={styles}>
           <View style={styles.aboutRow}>
-            <Text style={styles.aboutLabel}>Version</Text>
-            <Text style={styles.aboutValue}>1.0.0</Text>
+            <Text style={styles.aboutLabel}>{t('version')}</Text>
+            <Text style={styles.aboutValue}>{Constants.expoConfig?.version ?? '1.0.0'}</Text>
           </View>
           <View style={styles.aboutRow}>
-            <Text style={styles.aboutLabel}>License</Text>
+            <Text style={styles.aboutLabel}>{t('license')}</Text>
             <Text style={styles.aboutValue}>AGPL-3.0-or-later</Text>
           </View>
         </Section>
 
-        <Section title="Security" styles={styles}>
+        <Section title={t('security')} styles={styles}>
           <TouchableOpacity
             style={styles.settingRow}
             activeOpacity={0.7}
             onPress={() => router.push('/(modals)/change-password')}
-            accessibilityLabel="Change Password"
+            accessibilityLabel={t('changePassword')}
             accessibilityRole="button"
           >
-            <Text style={styles.settingLabel}>Change Password</Text>
+            <Text style={styles.settingLabel}>{t('changePassword')}</Text>
             <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
           </TouchableOpacity>
         </Section>

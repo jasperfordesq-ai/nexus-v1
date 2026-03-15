@@ -29,5 +29,6 @@
     "title": "No members found",
     "subtitle": "Try adjusting your search or filters"
   },
-  "loading": "Loading members…"
+  "loading": "Loading members…",
+  "hrsGiven": "hrs given"
 }

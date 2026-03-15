@@ -16,6 +16,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 
+import { useTranslation } from 'react-i18next';
+
 import { listTenants, type TenantListItem } from '@/lib/api/tenant';
 import { useApi } from '@/lib/hooks/useApi';
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -29,6 +31,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
  * Navigated to from: login screen "Not your timebank?" link
  */
 export default function SelectTenantScreen() {
+  const { t } = useTranslation('auth');
   const { setTenantSlug, tenantSlug } = useTenant();
   const primary = usePrimaryColor();
   const { data, isLoading, error } = useApi(() => listTenants());
@@ -46,8 +49,8 @@ export default function SelectTenantScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Select your timebank</Text>
-        <Text style={styles.subtitle}>Choose the community you belong to</Text>
+        <Text style={styles.title}>{t('selectTenant.title')}</Text>
+        <Text style={styles.subtitle}>{t('selectTenant.subtitle')}</Text>
       </View>
 
       {isLoading && (
@@ -88,6 +91,13 @@ export default function SelectTenantScreen() {
           </TouchableOpacity>
         )}
         ItemSeparatorComponent={Separator}
+        ListEmptyComponent={
+          !isLoading && !error ? (
+            <View style={styles.centered}>
+              <Text style={styles.emptyText}>{t('selectTenant.empty')}</Text>
+            </View>
+          ) : null
+        }
         contentContainerStyle={styles.list}
       />
     </SafeAreaView>
@@ -102,6 +112,7 @@ function makeStyles(theme: Theme, primary: string) {
     subtitle: { fontSize: 14, color: theme.textSecondary, marginTop: 4 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
     errorText: { color: theme.error, fontSize: 14 },
+    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
     list: { paddingHorizontal: 16 },
     tenantRow: {
       flexDirection: 'row',

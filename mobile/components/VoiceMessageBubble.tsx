@@ -8,6 +8,8 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { Audio, type AVPlaybackStatus } from 'expo-av';
 
+import { useTranslation } from 'react-i18next';
+
 import { useTheme } from '@/lib/hooks/useTheme';
 
 interface VoiceMessageBubbleProps {
@@ -34,6 +36,7 @@ export default function VoiceMessageBubble({
   textColor,
   textColorSecondary,
 }: VoiceMessageBubbleProps) {
+  const { t } = useTranslation('messages');
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -108,7 +111,7 @@ export default function VoiceMessageBubble({
         onPress={handlePlayPause}
         disabled={isLoading}
         style={[styles.playButton, { borderColor: iconColor }]}
-        accessibilityLabel={isPlaying ? 'Pause voice message' : 'Play voice message'}
+        accessibilityLabel={isPlaying ? t('voice.pause') : t('voice.play')}
       >
         {isLoading ? (
           <ActivityIndicator size="small" color={iconColor} />
@@ -145,7 +148,7 @@ export default function VoiceMessageBubble({
 
       <Text style={[styles.duration, { color: timeColor }]}>{displayTime}</Text>
       <Text style={[styles.label, { color: hasError ? '#DC2626' : labelColor }]}>
-        {hasError ? 'Failed' : 'Voice'}
+        {hasError ? t('voice.failed') : t('voice.label')}
       </Text>
     </View>
   );

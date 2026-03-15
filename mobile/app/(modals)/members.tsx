@@ -17,6 +17,8 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+import { useTranslation } from 'react-i18next';
+
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -25,6 +27,7 @@ import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MembersScreen() {
+  const { t } = useTranslation('members');
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -95,7 +98,7 @@ export default function MembersScreen() {
         <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search members…"
+          placeholder={t('search.placeholder')}
           placeholderTextColor={theme.textMuted}
           value={search}
           onChangeText={setSearch}
@@ -104,6 +107,7 @@ export default function MembersScreen() {
           clearButtonMode="never"
           autoCorrect={false}
           autoCapitalize="none"
+          accessibilityLabel="Search members"
         />
         {search.length > 0 && (
           <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -135,7 +139,7 @@ export default function MembersScreen() {
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>No members found.</Text>
+              <Text style={styles.emptyText}>{t('empty.title')}</Text>
             </View>
           )
         }

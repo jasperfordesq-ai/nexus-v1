@@ -61,7 +61,7 @@ export function UpdateAvailableBanner() {
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed top-0 left-0 right-0 z-[70] overflow-hidden"
+          className="fixed top-0 left-0 right-0 z-[9999] overflow-hidden"
           style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           role="status"
         >
