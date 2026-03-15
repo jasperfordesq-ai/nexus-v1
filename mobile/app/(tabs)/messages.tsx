@@ -68,7 +68,7 @@ export default function MessagesScreen() {
           <View style={styles.rowFooter}>
             <Text style={styles.lastMessage} numberOfLines={1}>
               {lastMsg
-                ? `${lastMsg.is_own ? 'You: ' : ''}${lastMsg.body}`
+                ? `${lastMsg.is_own ? t('thread.you') : ''}${lastMsg.body}`
                 : t('thread.noMessages')}
             </Text>
             {item.unread_count > 0 && (

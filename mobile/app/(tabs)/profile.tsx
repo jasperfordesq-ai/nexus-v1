@@ -150,7 +150,7 @@ export default function ProfileScreen() {
           <View style={[styles.balanceCard, { borderColor: primary }]}>
             <Text style={styles.balanceLabel}>{t('timeBalance')}</Text>
             <Text style={[styles.balanceValue, { color: primary }]}>
-              {balance.toFixed(1)} hrs
+              {balance.toFixed(1)} {t('hrs')}
             </Text>
           </View>
         )}

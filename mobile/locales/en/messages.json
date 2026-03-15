@@ -6,10 +6,16 @@
     "loadingHistory": "Loading messages…",
     "noMessages": "No messages yet. Say hello!",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "invalidConversation": "Invalid conversation.",
+    "loadError": "Could not load conversation.",
+    "voiceMessage": "Voice message",
+    "sendFailed": "Message could not be sent. Please try again.",
+    "you": "You: "
   },
   "voice": {
-    "label": "Voice message",
+    "label": "Voice",
+    "failed": "Failed",
     "play": "Play",
     "pause": "Pause",
     "recording": "Recording…",

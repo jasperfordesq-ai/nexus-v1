@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+import { useTranslation } from 'react-i18next';
+
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
@@ -35,6 +37,7 @@ function extractMembersPage(response: MemberListResponse) {
 }
 
 export default function MembersScreen() {
+  const { t } = useTranslation('members');
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [search, setSearch] = useState('');
@@ -63,7 +66,7 @@ export default function MembersScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Members</Text>
+        <Text style={styles.title}>{t('title')}</Text>
       </View>
 
       {/* Search bar */}
@@ -73,10 +76,11 @@ export default function MembersScreen() {
           style={styles.searchInput}
           value={search}
           onChangeText={setSearch}
-          placeholder="Search members…"
+          placeholder={t('search.placeholder')}
           placeholderTextColor={theme.textMuted}
           returnKeyType="search"
           clearButtonMode="while-editing"
+          accessibilityLabel="Search members"
         />
       </View>
 
@@ -96,12 +100,12 @@ export default function MembersScreen() {
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: theme.text, fontWeight: '600', fontSize: 15 }}>Retry</Text>
+                <Text style={{ color: theme.text, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>No members found.</Text>
+              <Text style={styles.emptyText}>{t('empty.title')}</Text>
             </View>
           )
         }

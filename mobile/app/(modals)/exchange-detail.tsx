@@ -37,6 +37,7 @@ export default function ExchangeDetailModal() {
   const { data, isLoading, error } = useApi(
     () => getExchange(safeExchangeId),
     [safeExchangeId],
+    { enabled: safeExchangeId > 0 },
   );
 
   if (isNaN(exchangeId) || exchangeId <= 0) {

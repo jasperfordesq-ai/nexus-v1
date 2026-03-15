@@ -22,11 +22,14 @@
     "locationPlaceholder": "e.g. New York, USA",
     "phoneOptional": "Phone (optional)",
     "phonePlaceholder": "+1 555 123 4567",
-    "saving": "Saving\u2026",
+    "saving": "Saving…",
     "saveChanges": "Save changes",
+    "cancel": "Cancel",
     "saved": "Saved",
     "savedMessage": "Your profile has been updated.",
     "saveError": "Could not save profile.",
-    "firstNameRequired": "First name is required."
-  }
+    "firstNameRequired": "First name is required.",
+    "validation": "Validation"
+  },
+  "hrs": "hrs"
 }

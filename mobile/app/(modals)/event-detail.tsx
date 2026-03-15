@@ -36,7 +36,7 @@ export default function EventDetailScreen() {
   const eventId = Number(id);
   const safeEventId = isNaN(eventId) || eventId <= 0 ? 0 : eventId;
 
-  const { data, isLoading } = useApi(() => getEvent(safeEventId), [safeEventId]);
+  const { data, isLoading } = useApi(() => getEvent(safeEventId), [safeEventId], { enabled: safeEventId > 0 });
 
   const event = data?.data ?? null;
 
@@ -165,7 +165,7 @@ export default function EventDetailScreen() {
             selected={currentRsvp === 'going'}
             primary={primary}
             theme={theme}
-            disabled={updating || event.is_full && currentRsvp !== 'going'}
+            disabled={updating || (event.is_full && currentRsvp !== 'going')}
             onPress={() => void handleRsvp('going')}
           />
           <RsvpButton

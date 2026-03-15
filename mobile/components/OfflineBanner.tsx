@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
 import { useTheme } from '@/lib/hooks/useTheme';
 
@@ -12,6 +13,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
  * Respects light/dark theme.
  */
 export default function OfflineBanner() {
+  const { t } = useTranslation('common');
   const { isOnline } = useNetworkStatus();
   const theme = useTheme();
 
@@ -19,7 +21,7 @@ export default function OfflineBanner() {
 
   return (
     <View style={[styles.banner, { backgroundColor: theme.warning + '18', borderBottomColor: theme.warning }]}>
-      <Text style={[styles.text, { color: theme.warning }]}>No internet connection</Text>
+      <Text style={[styles.text, { color: theme.warning }]}>{t('offline')}</Text>
     </View>
   );
 }

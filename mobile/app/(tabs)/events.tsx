@@ -25,6 +25,14 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { EventCardSkeleton } from '@/components/ui/Skeleton';
 
+function extractEventsPage(r: EventsResponse) {
+  return {
+    items: r.data,
+    cursor: r.meta.cursor,
+    hasMore: r.meta.has_more,
+  };
+}
+
 export default function EventsScreen() {
   const { t } = useTranslation('events');
   const primary = usePrimaryColor();
@@ -45,11 +53,7 @@ export default function EventsScreen() {
     refresh,
     loadMore,
     error,
-  } = usePaginatedApi<Event, EventsResponse>(fetcher, (r) => ({
-    items: r.data,
-    cursor: r.meta.cursor,
-    hasMore: r.meta.has_more,
-  }));
+  } = usePaginatedApi<Event, EventsResponse>(fetcher, extractEventsPage);
 
   // Re-fetch when the tab filter changes.
   // Skip the initial mount (usePaginatedApi already fetches on mount).
@@ -101,6 +105,7 @@ export default function EventsScreen() {
               primary={primary}
               theme={theme}
               t={t}
+              cardStyles={styles}
               onPress={() =>
                 router.push({ pathname: '/(modals)/event-detail', params: { id: String(item.id) } })
               }
@@ -132,20 +137,23 @@ export default function EventsScreen() {
   );
 }
 
+type Styles = ReturnType<typeof makeStyles>;
+
 function EventCard({
   event,
   primary,
   theme,
   t,
+  cardStyles,
   onPress,
 }: {
   event: Event;
   primary: string;
   theme: Theme;
   t: (key: string, options?: Record<string, unknown>) => string;
+  cardStyles: Styles;
   onPress: () => void;
 }) {
-  const cardStyles = useMemo(() => makeStyles(theme), [theme]);
   const start = new Date(event.start_date);
   const month = start.toLocaleString('default', { month: 'short' });
   const day = start.getDate();

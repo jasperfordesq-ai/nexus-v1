@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -113,12 +113,17 @@ export default function WalletModal() {
   const transactions = txData?.data ?? [];
   const isLoading = balanceLoading || txLoading;
 
-  const handleRefresh = useCallback(async () => {
+  // Turn off manual refresh indicator once both API calls finish
+  useEffect(() => {
+    if (isRefreshing && !balanceLoading && !txLoading) {
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing, balanceLoading, txLoading]);
+
+  const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     refreshBalance();
     refreshTx();
-    await new Promise<void>((resolve) => setTimeout(resolve, 400));
-    setIsRefreshing(false);
   }, [refreshBalance, refreshTx]);
 
   const ListHeader = (

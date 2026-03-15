@@ -57,11 +57,14 @@ export default function ThreadScreen() {
 
   const { subscribeToMessages } = useRealtimeContext();
 
+  const isValidId = !isNaN(otherUserId) && otherUserId > 0;
+
   // Use getOrCreateThread for new conversations (handles 404 gracefully),
   // plain getThread for existing conversations opened from the inbox.
   const { data, isLoading, error, refresh } = useApi(
     () => isNewConversation ? getOrCreateThread(safeConversationId) : getThread(safeConversationId),
     [safeConversationId, isNewConversation],
+    { enabled: isValidId },
   );
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -69,39 +72,41 @@ export default function ThreadScreen() {
   const [isSending, setIsSending] = useState(false);
   const flatListRef = useRef<FlatList<Message>>(null);
 
-  if (isNaN(otherUserId) || otherUserId <= 0) {
-    return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>Invalid conversation.</Text>
-      </SafeAreaView>
-    );
-  }
-
   // Set the header title to the other user's name
   useEffect(() => {
+    if (!isValidId) return;
     if (name) {
       navigation.setOptions({ title: name });
     }
-  }, [name, navigation]);
+  }, [name, navigation, isValidId]);
 
   // Populate messages from API response
   useEffect(() => {
+    if (!isValidId) return;
     if (data?.data) {
       // API returns oldest-first; FlatList is inverted so we reverse for display
       setMessages([...data.data].reverse());
     }
-  }, [data]);
+  }, [data, isValidId]);
 
   // Live incoming messages via Pusher
   useEffect(() => {
-    if (!safeConversationId) return;
+    if (!isValidId || !safeConversationId) return;
     return subscribeToMessages(safeConversationId, (incoming) => {
       setMessages((prev) => {
         if (prev.some((m) => m.id === incoming.id)) return prev; // already present
         return [incoming, ...prev]; // prepend (FlatList inverted = newest first)
       });
     });
-  }, [safeConversationId, subscribeToMessages]);
+  }, [safeConversationId, subscribeToMessages, isValidId]);
+
+  if (!isValidId) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>{t('thread.invalidConversation')}</Text>
+      </SafeAreaView>
+    );
+  }
 
   // The recipient's user ID — we already have it from nav params.
   // Also check API metadata as a secondary source.
@@ -154,7 +159,7 @@ export default function ThreadScreen() {
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
       setInputText(body);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('Send failed', 'Message could not be sent. Please try again.');
+      Alert.alert(t('errors.sendFailed'), t('thread.sendFailed'));
     } finally {
       setIsSending(false);
     }
@@ -220,7 +225,7 @@ export default function ThreadScreen() {
       <SafeAreaView style={styles.centered}>
         <Text style={styles.errorText}>{t('thread.loadError')}</Text>
         <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-          <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>Retry</Text>
+          <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );

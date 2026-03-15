@@ -29,6 +29,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { navigateToLink } from '@/lib/utils/navigateToLink';
+import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
 export default function NotificationsScreen() {
   const { t } = useTranslation('notifications');
@@ -78,7 +79,11 @@ export default function NotificationsScreen() {
         <View style={styles.content}>
           {item.title && <Text style={styles.title} numberOfLines={1}>{item.title}</Text>}
           <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
-          <Text style={styles.time}>{formatRelativeTime(item.created_at, t)}</Text>
+          <Text style={styles.time}>
+            {(Date.now() - new Date(item.created_at).getTime()) < 60_000
+              ? t('justNow')
+              : formatRelativeTime(item.created_at)}
+          </Text>
         </View>
 
         {!item.is_read && <View style={[styles.unreadDot, { backgroundColor: primary }]} />}
@@ -99,7 +104,7 @@ export default function NotificationsScreen() {
           )}
         </View>
         {unreadCount > 0 && (
-          <TouchableOpacity onPress={handleMarkAll} disabled={markingAll}>
+          <TouchableOpacity onPress={() => void handleMarkAll()} disabled={markingAll}>
             <Text style={[styles.markAll, { color: primary }]}>
               {markingAll ? t('marking') : t('markAllRead')}
             </Text>
@@ -145,18 +150,6 @@ function categoryColor(category: string, fallback: string): string {
     case 'system':      return '#F59E0B';
     default:            return fallback;
   }
-}
-
-function formatRelativeTime(iso: string, t: (key: string) => string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return t('justNow');
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
 }
 
 function makeStyles(theme: Theme) {

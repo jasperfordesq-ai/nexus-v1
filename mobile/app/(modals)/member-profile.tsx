@@ -53,6 +53,7 @@ export default function MemberProfileScreen() {
   const { data, isLoading, error } = useApi(
     () => getMember(safeMemberId),
     [safeMemberId],
+    { enabled: safeMemberId > 0 },
   );
 
   const member = data?.data as MemberProfile | undefined;

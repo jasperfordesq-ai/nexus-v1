@@ -29,20 +29,28 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 
-const registerSchema = z
-  .object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().default(''),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    passwordConfirm: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((d) => d.password === d.passwordConfirm, {
-    message: 'Passwords do not match',
-    path: ['passwordConfirm'],
-  });
+function makeRegisterSchema(t: (key: string) => string) {
+  return z
+    .object({
+      firstName: z.string().min(1, t('errors.firstNameRequired')),
+      lastName: z.string().default(''),
+      email: z.string().email(t('errors.validEmail')),
+      password: z.string().min(8, t('errors.weakPassword')),
+      passwordConfirm: z.string().min(1, t('errors.confirmPasswordRequired')),
+    })
+    .refine((d) => d.password === d.passwordConfirm, {
+      message: t('errors.passwordMismatch'),
+      path: ['passwordConfirm'],
+    });
+}
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
+type RegisterFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
+};
 
 export default function RegisterScreen() {
   const { t } = useTranslation('auth');
@@ -50,6 +58,8 @@ export default function RegisterScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  const registerSchema = useMemo(() => makeRegisterSchema(t), [t]);
 
   const {
     control,
@@ -91,7 +101,7 @@ export default function RegisterScreen() {
       if (err instanceof ApiResponseError) {
         setGlobalError(err.message);
       } else {
-        setGlobalError('Unable to register. Please try again.');
+        setGlobalError(t('errors.unableToRegister'));
       }
     } finally {
       setIsLoading(false);

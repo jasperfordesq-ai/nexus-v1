@@ -7,6 +7,8 @@ import { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 
+import { useTranslation } from 'react-i18next';
+
 import { type Member } from '@/lib/api/members';
 import Avatar from '@/components/ui/Avatar';
 import Card from '@/components/ui/Card';
@@ -18,6 +20,7 @@ interface MemberCardProps {
 }
 
 export default function MemberCard({ member }: MemberCardProps) {
+  const { t } = useTranslation('members');
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -47,7 +50,7 @@ export default function MemberCard({ member }: MemberCardProps) {
             <Text style={[styles.statValue, { color: primary }]}>
               {member.total_hours_given.toFixed(0)}
             </Text>
-            <Text style={styles.statLabel}>hrs given</Text>
+            <Text style={styles.statLabel}>{t('hrsGiven')}</Text>
           </View>
         </View>
       </Card>

@@ -28,12 +28,14 @@ import { ApiResponseError } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
+function makeLoginSchema(t: (key: string) => string) {
+  return z.object({
+    email: z.string().email(t('errors.validEmail')),
+    password: z.string().min(1, t('errors.passwordRequired')),
+  });
+}
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = { email: string; password: string };
 
 export default function LoginScreen() {
   const { t } = useTranslation('auth');
@@ -41,6 +43,8 @@ export default function LoginScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
+
+  const loginSchema = useMemo(() => makeLoginSchema(t), [t]);
 
   const {
     control,
@@ -65,7 +69,7 @@ export default function LoginScreen() {
       if (err instanceof ApiResponseError) {
         setGlobalError(err.message);
       } else {
-        setGlobalError('Unable to sign in. Please try again.');
+        setGlobalError(t('errors.unableToSignIn'));
       }
     } finally {
       setIsLoading(false);
@@ -161,23 +165,23 @@ export default function LoginScreen() {
             style={styles.forgotPasswordBtn}
             activeOpacity={0.7}
           >
-            <Text style={styles.forgotPassword}>Forgot password?</Text>
+            <Text style={styles.forgotPassword}>{t('login.forgotPassword')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Register link */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don&apos;t have an account? </Text>
+          <Text style={styles.footerText}>{t('login.noAccount')} </Text>
           <Link href="/(auth)/register" style={[styles.link, { color: primary }]}>
-            Register
+            {t('register.submit')}
           </Link>
         </View>
 
         {/* Tenant switcher */}
         <View style={[styles.footer, { marginTop: 12 }]}>
-          <Text style={styles.footerText}>Wrong timebank? </Text>
+          <Text style={styles.footerText}>{t('wrongTimebank')} </Text>
           <Link href="/(auth)/select-tenant" style={[styles.link, { color: primary }]}>
-            Switch community
+            {t('switchCommunity')}
           </Link>
         </View>
       </ScrollView>

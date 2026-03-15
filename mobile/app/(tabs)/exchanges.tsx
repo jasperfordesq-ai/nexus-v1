@@ -99,6 +99,7 @@ export default function ExchangesScreen() {
           placeholderTextColor={theme.textMuted}
           returnKeyType="search"
           clearButtonMode="while-editing"
+          accessibilityLabel={t('searchPlaceholder')}
         />
       </View>
 

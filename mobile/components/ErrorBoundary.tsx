@@ -6,6 +6,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useTheme } from '@/lib/hooks/useTheme';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -22,6 +23,7 @@ interface State {
 
 /** Functional fallback UI that can use hooks for theme-aware colors. */
 function ErrorFallback({ onReset }: { onReset: () => void }) {
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const primary = usePrimaryColor();
 
@@ -44,7 +46,7 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
           textAlign: 'center',
         }}
       >
-        Something went wrong
+        {t('errors.generic')}
       </Text>
       <TouchableOpacity
         style={{
@@ -55,14 +57,19 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
         }}
         onPress={onReset}
         accessibilityRole="button"
-        accessibilityLabel="Try again"
+        accessibilityLabel={t('buttons.retry')}
       >
-        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>Try again</Text>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>{t('buttons.retry')}</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
+/**
+ * Class-based error boundary — React hooks (including useTranslation) cannot
+ * be used in class components. The ErrorFallback functional component above
+ * handles i18n. The class itself uses no user-visible strings.
+ */
 export default class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);

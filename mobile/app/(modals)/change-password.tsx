@@ -17,6 +17,8 @@ import {
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 
+import { useTranslation } from 'react-i18next';
+
 import { updatePassword } from '@/lib/api/profile';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -25,6 +27,7 @@ import Button from '@/components/ui/Button';
 import OfflineBanner from '@/components/OfflineBanner';
 
 export default function ChangePasswordScreen() {
+  const { t } = useTranslation('settings');
   const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -36,19 +39,19 @@ export default function ChangePasswordScreen() {
 
   async function handleSubmit() {
     if (!currentPassword.trim()) {
-      Alert.alert('Validation error', 'Please enter your current password.');
+      Alert.alert(t('password.validation.currentRequired'));
       return;
     }
     if (!newPassword.trim()) {
-      Alert.alert('Validation error', 'Please enter a new password.');
+      Alert.alert(t('password.validation.newRequired'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      Alert.alert('Validation error', 'New password and confirmation do not match.');
+      Alert.alert(t('password.validation.mismatch'));
       return;
     }
     if (newPassword.length < 8) {
-      Alert.alert('Validation error', 'New password must be at least 8 characters.');
+      Alert.alert(t('password.validation.tooShort'));
       return;
     }
 
@@ -60,14 +63,14 @@ export default function ChangePasswordScreen() {
         new_password_confirmation: confirmPassword,
       });
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Password changed', 'Your password has been updated successfully.', [
-        { text: 'OK', onPress: () => router.back() },
+      Alert.alert(t('password.success'), t('password.successMessage'), [
+        { text: t('common:buttons.done'), onPress: () => router.back() },
       ]);
     } catch (err: unknown) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       const message =
-        err instanceof Error ? err.message : 'Could not change password. Please try again.';
-      Alert.alert('Error', message);
+        err instanceof Error ? err.message : t('password.changeError');
+      Alert.alert(t('common:errors.generic'), message);
     } finally {
       setIsLoading(false);
     }
@@ -86,13 +89,13 @@ export default function ChangePasswordScreen() {
         >
           <OfflineBanner />
           <Text style={styles.hint}>
-            Enter your current password, then choose a new one.
+            {t('password.hint')}
           </Text>
 
           <View style={styles.form}>
             <Input
-              label="Current password"
-              placeholder="Enter current password"
+              label={t('password.currentLabel')}
+              placeholder={t('password.currentPlaceholder')}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -100,8 +103,8 @@ export default function ChangePasswordScreen() {
               onChangeText={setCurrentPassword}
             />
             <Input
-              label="New password"
-              placeholder="Enter new password"
+              label={t('password.newLabel')}
+              placeholder={t('password.newPlaceholder')}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -109,8 +112,8 @@ export default function ChangePasswordScreen() {
               onChangeText={setNewPassword}
             />
             <Input
-              label="Confirm new password"
-              placeholder="Re-enter new password"
+              label={t('password.confirmLabel')}
+              placeholder={t('password.confirmPlaceholder')}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -126,7 +129,7 @@ export default function ChangePasswordScreen() {
             color={primary}
             style={styles.saveButton}
           >
-            Save password
+            {t('password.save')}
           </Button>
         </ScrollView>
       </KeyboardAvoidingView>
