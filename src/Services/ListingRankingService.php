@@ -57,7 +57,6 @@ class ListingRankingService
     const FRESHNESS_FULL_DAYS = 7;            // Full freshness for 7 days
     const FRESHNESS_HALF_LIFE_DAYS = 30;      // Half-life of 30 days
     const FRESHNESS_MINIMUM = 0.3;            // Minimum 30%
-    const FRESHNESS_EDIT_BOOST_DAYS = 3;      // Recent edit gives boost for 3 days
 
     // Engagement weights
     const ENGAGEMENT_VIEW_WEIGHT = 0.1;       // Each view adds 0.1
@@ -70,7 +69,6 @@ class ListingRankingService
     const QUALITY_HAS_IMAGE_BOOST = 1.3;
     const QUALITY_HAS_LOCATION_BOOST = 1.2;
     const QUALITY_VERIFIED_OWNER_BOOST = 1.4;
-    const QUALITY_HIGH_RESPONSE_RATE_BOOST = 1.2; // >80% response rate
 
     // Reciprocity parameters
     const RECIPROCITY_ENABLED = true;
@@ -98,7 +96,6 @@ class ListingRankingService
             'freshness_full_days' => self::FRESHNESS_FULL_DAYS,
             'freshness_half_life_days' => self::FRESHNESS_HALF_LIFE_DAYS,
             'freshness_minimum' => self::FRESHNESS_MINIMUM,
-            'freshness_edit_boost_days' => self::FRESHNESS_EDIT_BOOST_DAYS,
             // Engagement
             'engagement_view_weight' => self::ENGAGEMENT_VIEW_WEIGHT,
             'engagement_inquiry_weight' => self::ENGAGEMENT_INQUIRY_WEIGHT,
@@ -109,7 +106,6 @@ class ListingRankingService
             'quality_image_boost' => self::QUALITY_HAS_IMAGE_BOOST,
             'quality_location_boost' => self::QUALITY_HAS_LOCATION_BOOST,
             'quality_verified_boost' => self::QUALITY_VERIFIED_OWNER_BOOST,
-            'quality_response_boost' => self::QUALITY_HIGH_RESPONSE_RATE_BOOST,
             // Reciprocity
             'reciprocity_enabled' => self::RECIPROCITY_ENABLED,
             'reciprocity_match_boost' => self::RECIPROCITY_MATCH_BOOST,
@@ -314,7 +310,7 @@ class ListingRankingService
 
             FROM listings l
             JOIN users u ON l.user_id = u.id
-            LEFT JOIN categories c ON l.category_id = c.id
+            LEFT JOIN categories c ON l.category_id = c.id AND c.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
             AND l.status = 'active'
         ";
@@ -380,10 +376,7 @@ class ListingRankingService
      */
     public static function getRecommendedListings(int $userId, int $limit = 10): array
     {
-        $tenantId = TenantContext::getId();
-        $userInterests = self::getUserInterests($userId);
         $userListings = self::getUserListings($userId);
-        $viewerCoords = RankingService::getViewerCoordinates($userId);
 
         // Get the user's listing types to find complementary listings
         $userOfferCategories = [];
@@ -403,18 +396,19 @@ class ListingRankingService
         $listings = Database::query($query['sql'], $query['params'])->fetchAll(\PDO::FETCH_ASSOC);
 
         // Apply reciprocity scoring
+        $config = self::getConfig();
         $recommendations = [];
         foreach ($listings as $listing) {
             $reciprocityBoost = 1.0;
 
             // Boost requests in categories the user offers
             if ($listing['type'] === 'request' && in_array($listing['category_id'], $userOfferCategories)) {
-                $reciprocityBoost = self::getConfig()['reciprocity_match_boost'];
+                $reciprocityBoost = $config['reciprocity_match_boost'];
             }
 
             // Boost offers in categories the user requests
             if ($listing['type'] === 'offer' && in_array($listing['category_id'], $userRequestCategories)) {
-                $reciprocityBoost = self::getConfig()['reciprocity_match_boost'];
+                $reciprocityBoost = $config['reciprocity_match_boost'];
             }
 
             $listing['match_rank'] = ($listing['match_rank'] ?? 1) * $reciprocityBoost;
@@ -445,8 +439,6 @@ class ListingRankingService
         array $viewerListings,
         ?string $searchTerm
     ): array {
-        $config = self::getConfig();
-
         return [
             'relevance' => self::calculateRelevanceScore($listing, $viewerInterests, $searchTerm),
             'freshness' => self::calculateFreshnessScore($listing),
@@ -475,13 +467,13 @@ class ListingRankingService
 
         // Search term match
         if ($searchTerm) {
-            $title = strtolower($listing['title'] ?? '');
-            $description = strtolower($listing['description'] ?? '');
-            $search = strtolower($searchTerm);
+            $title = mb_strtolower($listing['title'] ?? '');
+            $description = mb_strtolower($listing['description'] ?? '');
+            $search = mb_strtolower($searchTerm);
 
-            if (strpos($title, $search) !== false) {
+            if (mb_strpos($title, $search) !== false) {
                 $score *= $config['relevance_search_boost'];
-            } elseif (strpos($description, $search) !== false) {
+            } elseif (mb_strpos($description, $search) !== false) {
                 $score *= ($config['relevance_search_boost'] * 0.7);
             }
         }
@@ -572,15 +564,33 @@ class ListingRankingService
             return 1.0;
         }
 
+        if ($viewerCoords['lat'] === null || $viewerCoords['lon'] === null) {
+            return 1.0;
+        }
+
         $listingLat = $listing['latitude'] ?? $listing['owner_lat'] ?? null;
         $listingLon = $listing['longitude'] ?? $listing['owner_lon'] ?? null;
 
-        return RankingService::calculateGeoScore(
+        if ($listingLat === null || $listingLon === null) {
+            return 1.0;
+        }
+
+        $distance = RankingService::calculateDistance(
             $viewerCoords['lat'],
             $viewerCoords['lon'],
-            $listingLat ? (float)$listingLat : null,
-            $listingLon ? (float)$listingLon : null
+            (float)$listingLat,
+            (float)$listingLon
         );
+
+        // Use MatchRank-specific geo config (wider radius, gentler decay than feed)
+        if ($distance <= $config['geo_full_radius_km']) {
+            return 1.0;
+        }
+
+        $distanceBeyond = $distance - $config['geo_full_radius_km'];
+        $decay = $distanceBeyond * $config['geo_decay_per_km'];
+
+        return max(0.1, 1.0 - $decay);
     }
 
     /**
@@ -805,21 +815,6 @@ class ListingRankingService
     // =========================================================================
     // HELPER METHODS
     // =========================================================================
-
-    /**
-     * Get viewer's profile data
-     */
-    private static function getViewerData(int $userId): ?array
-    {
-        try {
-            return Database::query(
-                "SELECT * FROM users WHERE id = ? AND tenant_id = ?",
-                [$userId, TenantContext::getId()]
-            )->fetch(\PDO::FETCH_ASSOC);
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
 
     /**
      * Get user's interest categories (from their activity and preferences)

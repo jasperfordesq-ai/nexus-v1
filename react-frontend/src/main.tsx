@@ -30,20 +30,25 @@ if (import.meta.env.PROD) {
     const updateSW = registerSW({
       immediate: true,
       onNeedRefresh() {
+        // Store the updateSW function BEFORE dispatching the event —
+        // if a listener calls handleUpdate() synchronously, updateSW must exist.
+        (window as NexusWindow).__nexus_updateSW = updateSW;
+        // Set a flag so the banner can detect updates that fired before React mounted
+        (window as NexusWindow).__nexus_updatePending = true;
         // Dispatch a custom event so the React app can show an update banner.
         // The banner lets the user choose when to reload — never interrupt them.
         window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
-        // Store the updateSW function globally so the banner can call it
-        
-        (window as NexusWindow).__nexus_updateSW = updateSW;
-        // Set a flag so the banner can detect updates that fired before React mounted
-        
-        (window as NexusWindow).__nexus_updatePending = true;
       },
       onOfflineReady() {
         console.info('[NEXUS] App ready for offline use');
       },
     });
+
+    // Periodically check for SW updates (every 30 min) so long-lived sessions
+    // (mobile PWA kept open for hours) eventually see the update banner.
+    setInterval(() => {
+      updateSW();
+    }, 30 * 60 * 1000);
   });
 }
 

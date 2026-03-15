@@ -43,36 +43,34 @@ export function UpdateAvailableBanner() {
   function handleUpdate() {
     setUpdating(true);
 
-    // Call the updateSW function stored by main.tsx to activate the new SW + reload
+    // Call the updateSW function stored by main.tsx to activate the new SW + reload.
+    // The 3s timeout is a hard safety net — if *anything* hangs (postMessage lost,
+    // controllerchange never fires, Promise stuck), we always reload.
     const updateSW = (window as NexusWindow).__nexus_updateSW;
     if (typeof updateSW === 'function') {
-      // updateSW(true) tells the waiting SW to skipWaiting + reload.
-      // If it fails silently (stale SW ref, postMessage fails), fall back to hard reload.
-      // The 2s timeout ensures the page always reloads even if the SW mechanism hangs.
-      const reloadTimeout = setTimeout(() => window.location.reload(), 2000);
+      const reloadTimeout = setTimeout(() => window.location.reload(), 3000);
       try {
         const result = updateSW(true);
-        // updateSW may return a Promise in vite-plugin-pwa v1.x
         if (result && typeof (result as Promise<void>).then === 'function') {
           (result as Promise<void>).then(
             () => {
-              // SW activated successfully — vite-plugin-pwa handles the reload.
-              // Clear fallback timeout since the reload is already in progress.
+              // SW activated — but vite-plugin-pwa may not auto-reload (relies on
+              // controllerchange which can miss). Give it 500ms, then force reload.
               clearTimeout(reloadTimeout);
+              setTimeout(() => window.location.reload(), 500);
             },
             () => {
-              // Promise rejected — skip waiting failed, hard reload instead
               clearTimeout(reloadTimeout);
               window.location.reload();
             }
           );
         }
+        // If updateSW returned void (not a Promise), the 3s timeout handles it.
       } catch {
         clearTimeout(reloadTimeout);
         window.location.reload();
       }
     } else {
-      // No updateSW function available — just reload to pick up new assets
       window.location.reload();
     }
   }
