@@ -186,7 +186,11 @@ export function FeedPage() {
         setHasMore(response.meta?.has_more ?? false);
         cursorRef.current = response.meta?.cursor ?? undefined;
       } else {
-        if (!append) setError(t('error_load'));
+        if (!append) {
+          setError(response.code === 'SESSION_EXPIRED'
+            ? t('session_expired', 'Your session has expired. Please log in again.')
+            : t('error_load'));
+        }
       }
     } catch (err) {
       logError('Failed to load feed', err);

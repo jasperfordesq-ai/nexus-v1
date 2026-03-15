@@ -625,7 +625,7 @@ const FeedCard = React.memo(function FeedCard({
           <div className="mb-3">
             <Link
               to={tenantPath(detailPath)}
-              className={`flex items-center justify-center gap-2 w-full py-2 px-4 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.gradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
+              className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.gradient || 'from-[var(--color-primary)]/10 to-[var(--color-primary)]/5'} text-[var(--text-primary)] hover:opacity-80 border border-[var(--border-default)] hover:border-[var(--color-primary)]/30`}
             >
               {config.icon}
               {detailLabel}

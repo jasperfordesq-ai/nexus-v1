@@ -339,7 +339,9 @@ export function LeaderboardPage() {
         setEntries(Array.isArray(response.data) ? response.data : []);
         setMeta((response.meta as unknown as LeaderboardMeta) ?? null);
       } else {
-        setError('Failed to load leaderboard.');
+        setError(response.code === 'SESSION_EXPIRED'
+          ? t('leaderboard.session_expired', 'Your session has expired. Please log in again.')
+          : t('leaderboard.load_error', 'Failed to load leaderboard.'));
       }
     } catch (err) {
       logError('Failed to load leaderboard', err);
@@ -493,7 +495,10 @@ export function LeaderboardPage() {
           <div className="flex items-center gap-3">
             <Star className="w-5 h-5 text-indigo-400" aria-hidden="true" />
             <span className="text-theme-primary font-medium">
-              {t('leaderboard.your_rank', { position: meta.your_position, total: meta.total_entries })}
+              {t('leaderboard.your_rank', {
+                position: meta.your_position,
+                total: Math.max(meta.total_entries, meta.your_position),
+              })}
               {' '}({periodLabels[period]} &middot; {typeLabels[type]})
             </span>
           </div>

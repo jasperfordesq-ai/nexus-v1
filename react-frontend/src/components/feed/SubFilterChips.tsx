@@ -39,7 +39,7 @@ export function SubFilterChips({ filter, subFilter, onSubFilterChange }: SubFilt
   if (!options) return null;
 
   return (
-    <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+    <div className="flex items-center gap-1.5 flex-wrap">
       {options.map((option) => {
         const isActive = subFilter === option.key;
 

@@ -71,7 +71,9 @@ export function WalletPage() {
       if (balanceRes.success && balanceRes.data) {
         setBalance(balanceRes.data);
       } else {
-        setError(t('error.load_balance'));
+        setError(balanceRes.code === 'SESSION_EXPIRED'
+          ? t('error.session_expired', 'Your session has expired. Please log in again.')
+          : t('error.load_balance'));
         return;
       }
       if (transactionsRes.success && transactionsRes.data) {
