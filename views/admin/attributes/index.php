@@ -1,4 +1,3 @@
 <?php
-// Dispatcher: /admin-legacy/attributes -> /modern/admin-legacy/attributes/index
-
-require dirname(__DIR__, 3) . '/views/modern/admin-legacy/attributes/index.php';
+// Legacy admin view shim — dispatches to modern admin with correct header
+require __DIR__ . '/../../modern/admin/attributes/index.php';

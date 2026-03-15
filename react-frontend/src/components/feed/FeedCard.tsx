@@ -630,7 +630,7 @@ const FeedCard = React.memo(function FeedCard({
             >
               {config.icon}
               {detailLabel}
-              <ArrowRight className="w-3.5 h-3.5 ml-auto" aria-hidden="true" />
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
           </div>
         )}

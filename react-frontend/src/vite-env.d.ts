@@ -23,6 +23,6 @@ declare const __BUILD_TIME__: string;
 
 // Global window extensions for PWA service worker update
 interface NexusWindow extends Window {
-  __nexus_updateSW?: (reloadPage?: boolean) => void;
+  __nexus_updateSW?: (reloadPage?: boolean) => void | Promise<void>;
   __nexus_updatePending?: boolean;
 }

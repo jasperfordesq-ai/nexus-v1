@@ -314,7 +314,7 @@
         // Load previous JSON if available
         <?php if (!empty($page['content_json'])): ?>
             try {
-                editor.loadProjectData(<?= $page['content_json'] ?>);
+                editor.loadProjectData(<?= $page['content_json'] ? json_encode(json_decode($page['content_json'], true), JSON_HEX_TAG | JSON_HEX_AMP) : '{}' ?>);
             } catch (e) {
                 console.error('Load Error', e);
             }

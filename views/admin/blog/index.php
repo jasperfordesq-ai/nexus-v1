@@ -46,7 +46,7 @@ $layout = 'default';
                         <td style="padding: 15px; text-align: right;">
                             <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/edit/<?= $post['id'] ?>" class="nexus-btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">Edit</a>
                             <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/builder/<?= $post['id'] ?>" class="nexus-btn-primary" style="padding: 6px 12px; font-size: 0.8rem; margin-left:5px;">Builder</a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog/<?= $post['slug'] ?>" target="_blank" class="nexus-link" style="margin-left: 10px; font-size: 0.8rem;">View</a>
+                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog/<?= htmlspecialchars($post['slug']) ?>" target="_blank" class="nexus-link" style="margin-left: 10px; font-size: 0.8rem;">View</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

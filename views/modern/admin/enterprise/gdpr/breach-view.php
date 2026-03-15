@@ -264,7 +264,7 @@ require dirname(__DIR__, 2) . '/partials/admin-header.php';
 </style>
 
 <?php
-require dirname(__DIR__, 4) . '/layouts/admin-page-header.php';
+// Note: admin-header.php already included at top of file (line 16)
 ?>
 
 <div class="breach-detail-container">

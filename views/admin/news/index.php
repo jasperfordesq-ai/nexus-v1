@@ -1,5 +1,3 @@
 <?php
-// Dispatcher: /admin-legacy/news -> /modern/admin-legacy/blog/index
-// Note: 'News' is an alias for 'Blog' in this architecture
-
-require dirname(__DIR__, 3) . '/views/modern/admin-legacy/blog/index.php';
+// Legacy admin view shim — dispatches to modern admin blog
+require __DIR__ . '/../../modern/admin/blog/index.php';

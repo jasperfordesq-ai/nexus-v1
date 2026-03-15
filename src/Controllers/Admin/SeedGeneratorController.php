@@ -416,7 +416,7 @@ class SeedGeneratorController
             $_SESSION['flash_error'] = "Error generating script: " . $e->getMessage();
         }
 
-        header('Location: /admin-legacy/seed-generator');
+        header('Location: ' . NexusCoreTenantContext::getBasePath() . '/admin-legacy/seed-generator');
         if (!defined('TESTING')) { exit; }
     }
 

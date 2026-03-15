@@ -82,7 +82,7 @@ $adminModules = [
         'items' => [
             ['label' => 'Overview', 'url' => '/admin-legacy/seo', 'icon' => 'fa-chart-line'],
             ['label' => 'Audit', 'url' => '/admin-legacy/seo/audit', 'icon' => 'fa-clipboard-check'],
-            ['label' => 'Bulk Edit', 'url' => '/admin-legacy/seo/bulk-edit', 'icon' => 'fa-pen-to-square'],
+            ['label' => 'Bulk Edit', 'url' => '/admin-legacy/seo/bulk/listing', 'icon' => 'fa-pen-to-square'],
             ['label' => 'Redirects', 'url' => '/admin-legacy/seo/redirects', 'icon' => 'fa-arrow-right-arrow-left'],
         ],
     ],

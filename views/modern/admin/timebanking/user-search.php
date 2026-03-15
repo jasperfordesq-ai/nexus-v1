@@ -536,7 +536,7 @@ async function performSearch(query) {
     searchResults.innerHTML = '<div class="search-loading"><i class="fa-solid fa-spinner fa-spin"></i> Searching...</div>';
 
     try {
-        const response = await fetch('<?= $basePath ?>/api/admin-legacy/users/search?q=' + encodeURIComponent(query));
+        const response = await fetch('<?= $basePath ?>/api/admin/users/search?q=' + encodeURIComponent(query));
         const data = await response.json();
 
         if (!data.success || !data.users || data.users.length === 0) {

@@ -580,8 +580,8 @@ class AdminGroupsApiController extends BaseApiController
 
             // Delete memberships first, then the group
             Database::query(
-                "DELETE FROM group_members WHERE group_id = ?",
-                [$id]
+                "DELETE FROM group_members WHERE group_id = ? AND tenant_id = ?",
+                [$id, $groupTenantId]
             );
 
             Database::query(

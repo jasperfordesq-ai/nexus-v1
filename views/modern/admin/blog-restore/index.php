@@ -378,10 +378,10 @@ require __DIR__ . '/../partials/admin-header.php';
         </p>
 
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <a href="/admin-legacy/blog-restore/export?tenant=<?= $tenantId ?>&status=all" class="btn btn-primary">
+            <a href="<?= $basePath ?>/admin-legacy/blog-restore/export?tenant=<?= $tenantId ?>&status=all" class="btn btn-primary">
                 📥 Export All Posts
             </a>
-            <a href="/admin-legacy/blog-restore/export?tenant=<?= $tenantId ?>&status=published" class="btn btn-secondary">
+            <a href="<?= $basePath ?>/admin-legacy/blog-restore/export?tenant=<?= $tenantId ?>&status=published" class="btn btn-secondary">
                 📥 Export Published Only
             </a>
         </div>
@@ -554,7 +554,7 @@ function executeImport() {
                 <button class="btn btn-primary" onclick="location.reload()">
                     🔄 Refresh Page
                 </button>
-                <a href="/admin-legacy/news" class="btn btn-secondary">
+                <a href="<?= $basePath ?>/admin-legacy/news" class="btn btn-secondary">
                     📝 View Blog Posts
                 </a>
             </div>`;

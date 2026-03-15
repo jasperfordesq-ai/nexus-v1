@@ -42,6 +42,7 @@ class PusherAuthController extends BaseApiController
 
             if (empty($socketId) || empty($channelName)) {
                 $this->jsonResponse(['error' => 'Missing socket_id or channel_name'], 400);
+                return;
             }
 
             // Handle presence channels
@@ -64,6 +65,7 @@ class PusherAuthController extends BaseApiController
 
             // Public channels don't need auth
             $this->jsonResponse(['error' => 'Invalid channel type'], 400);
+            return;
         } catch (\Throwable $e) {
             error_log('[PusherAuth] Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
             $this->jsonResponse(['error' => 'Server error'], 500);

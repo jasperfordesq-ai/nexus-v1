@@ -30,6 +30,7 @@ class AiAdminContentController extends BaseAiController
      */
     public function generateNewsletter(): void
     {
+        $this->requireAdmin();
         $userId = $this->getUserId();
 
         if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
@@ -87,6 +88,7 @@ class AiAdminContentController extends BaseAiController
      */
     public function generateBlog(): void
     {
+        $this->requireAdmin();
         $userId = $this->getUserId();
 
         if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
@@ -140,6 +142,7 @@ class AiAdminContentController extends BaseAiController
      */
     public function generatePage(): void
     {
+        $this->requireAdmin();
         $userId = $this->getUserId();
 
         if (!AIServiceFactory::isFeatureEnabled('content_generation')) {

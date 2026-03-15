@@ -109,7 +109,8 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                 </div>
             </div>
             <div class="super-admin-card-body">
-                <form action="/super-admin/tenant/update" method="POST">
+                <form action="<?= $basePath ?>/super-admin/tenants/<?= $tenant['id'] ?>/update" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                     <input type="hidden" name="id" value="<?= $tenant['id'] ?>">
 
                     <!-- Identity Section -->
@@ -367,7 +368,8 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                                 <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5);"><?= htmlspecialchars($a['email']) ?></div>
                             </div>
                         </div>
-                        <form action="/super-admin/admin/delete" method="POST" onsubmit="return confirm('Revoke admin access for this user?');" style="margin: 0;">
+                        <form action="<?= $basePath ?>/super-admin/admin/delete" method="POST" onsubmit="return confirm('Revoke admin access for this user?');" style="margin: 0;">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                             <input type="hidden" name="tenant_id" value="<?= $tenant['id'] ?>">
                             <input type="hidden" name="admin_id" value="<?= $a['id'] ?>">
                             <button type="submit" class="super-admin-btn super-admin-btn-danger super-admin-btn-sm" style="padding: 4px 8px;">
@@ -388,7 +390,8 @@ require dirname(__DIR__) . '/partials/super-admin-header.php';
                     <h5 style="margin: 0 0 12px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #34d399; font-weight: 700;">
                         <i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Grant Access
                     </h5>
-                    <form action="/super-admin/admin/add" method="POST">
+                    <form action="<?= $basePath ?>/super-admin/admin/add" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                         <input type="hidden" name="tenant_id" value="<?= $tenant['id'] ?>">
                         <div class="super-admin-form-group" style="margin-bottom: 8px;">
                             <input type="text" name="name" class="super-admin-input" placeholder="Full Name" required style="font-size: 0.85rem; padding: 8px 10px;">

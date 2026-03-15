@@ -477,7 +477,7 @@ function regenerateMinifiedCSS() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value
+            'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value
         }
     })
     .then(function(response) { return response.json(); })
@@ -520,7 +520,7 @@ function testGmailConnection() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value
+            'X-CSRF-Token': document.querySelector('input[name="csrf_token"]').value
         }
     })
     .then(function(response) { return response.json(); })
