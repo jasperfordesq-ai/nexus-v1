@@ -317,14 +317,20 @@ export function CreateListingPage() {
               errorMessage={errors.category_id}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
               popoverProps={{
-                placement: 'bottom-start',
+                placement: 'bottom',
                 shouldFlip: false,
                 shouldBlockScroll: true,
+                offset: 4,
+                containerPadding: 8,
+              }}
+              listboxProps={{
+                className: 'max-h-60 overflow-y-auto',
               }}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 value: 'text-theme-primary',
                 label: 'text-theme-muted',
+                popoverContent: 'bg-theme-elevated border border-theme-default shadow-lg',
               }}
             >
               {categories.map((cat) => (
