@@ -157,6 +157,7 @@ class ListingRankingService
     public static function clearCache(): void
     {
         self::$config = null;
+        self::$ownerListingsCache = [];
     }
 
     // =========================================================================
@@ -180,16 +181,17 @@ class ListingRankingService
             return $listings;
         }
 
+        // Clear per-pass caches
+        self::$ownerListingsCache = [];
+
         $config = self::getConfig();
 
         // Get viewer data if logged in
-        $viewerData = null;
         $viewerCoords = ['lat' => null, 'lon' => null];
         $viewerInterests = [];
         $viewerListings = [];
 
         if ($viewerId) {
-            $viewerData = self::getViewerData($viewerId);
             $viewerCoords = RankingService::getViewerCoordinates($viewerId);
             $viewerInterests = self::getUserInterests($viewerId);
             $viewerListings = self::getUserListings($viewerId);
@@ -613,6 +615,9 @@ class ListingRankingService
         return $score;
     }
 
+    // Cache for owner listings during a ranking pass (avoids N+1 queries)
+    private static array $ownerListingsCache = [];
+
     /**
      * Calculate reciprocity score
      *
@@ -660,7 +665,11 @@ class ListingRankingService
         // matching the viewer's listings (reverse direction — mutual exchange check)
         $needMatchesOffer = false;
         if ($offerMatchesNeed && $listingOwnerId) {
-            $ownerListings = self::getUserListings($listingOwnerId);
+            // Use cached owner listings to avoid N+1 queries
+            if (!isset(self::$ownerListingsCache[$listingOwnerId])) {
+                self::$ownerListingsCache[$listingOwnerId] = self::getUserListings($listingOwnerId);
+            }
+            $ownerListings = self::$ownerListingsCache[$listingOwnerId];
             foreach ($viewerListings as $viewerListing) {
                 $viewerType     = $viewerListing['type'] ?? '';
                 $viewerCategory = $viewerListing['category_id'] ?? null;
@@ -710,13 +719,13 @@ class ListingRankingService
         $halfLife = (float)$config['freshness_half_life_days'];
         $minimum = (float)$config['freshness_minimum'];
 
-        // Use created_at only (safer, always exists)
+        // Use most recent of created_at / updated_at to match PHP-side logic
         return "
             CASE
-                WHEN DATEDIFF(NOW(), l.created_at) <= {$fullDays} THEN 1.0
+                WHEN DATEDIFF(NOW(), COALESCE(l.updated_at, l.created_at)) <= {$fullDays} THEN 1.0
                 ELSE GREATEST(
                     {$minimum},
-                    EXP(-0.693 * (DATEDIFF(NOW(), l.created_at) - {$fullDays}) / {$halfLife})
+                    EXP(-0.693 * (DATEDIFF(NOW(), COALESCE(l.updated_at, l.created_at)) - {$fullDays}) / {$halfLife})
                 )
             END
         ";
@@ -820,8 +829,8 @@ class ListingRankingService
         try {
             // Get categories from user's own listings
             $ownCategories = Database::query(
-                "SELECT DISTINCT category_id FROM listings WHERE user_id = ? AND category_id IS NOT NULL",
-                [$userId]
+                "SELECT DISTINCT category_id FROM listings WHERE user_id = ? AND tenant_id = ? AND category_id IS NOT NULL",
+                [$userId, TenantContext::getId()]
             )->fetchAll(\PDO::FETCH_COLUMN);
 
             // Get categories from listings they've viewed/contacted (if tracking exists)
@@ -839,8 +848,8 @@ class ListingRankingService
     {
         try {
             return Database::query(
-                "SELECT listing_id FROM listing_favorites WHERE user_id = ?",
-                [$userId]
+                "SELECT lf.listing_id FROM listing_favorites lf JOIN listings l ON lf.listing_id = l.id WHERE lf.user_id = ? AND l.tenant_id = ?",
+                [$userId, TenantContext::getId()]
             )->fetchAll(\PDO::FETCH_COLUMN);
         } catch (\Exception $e) {
             return [];
@@ -854,8 +863,8 @@ class ListingRankingService
     {
         try {
             return Database::query(
-                "SELECT id, type, category_id FROM listings WHERE user_id = ? AND status = 'active'",
-                [$userId]
+                "SELECT id, type, category_id FROM listings WHERE user_id = ? AND tenant_id = ? AND status = 'active'",
+                [$userId, TenantContext::getId()]
             )->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             return [];
@@ -876,8 +885,8 @@ class ListingRankingService
                 "SELECT l.*, u.latitude as owner_lat, u.longitude as owner_lon
                  FROM listings l
                  JOIN users u ON l.user_id = u.id
-                 WHERE l.id = ?",
-                [$listingId]
+                 WHERE l.id = ? AND l.tenant_id = ?",
+                [$listingId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
 
             if (!$listing) {

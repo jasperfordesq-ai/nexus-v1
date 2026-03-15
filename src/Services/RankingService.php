@@ -348,9 +348,9 @@ class RankingService
                     COALESCE(SUM(CASE WHEN action IN ('comment_added', 'reply_added') THEN 1 ELSE 0 END), 0) as comments,
                     COALESCE(SUM(CASE WHEN action IN ('transaction_completed', 'exchange_completed') THEN 1 ELSE 0 END), 0) as transactions
                  FROM activity_log
-                 WHERE user_id = ?
+                 WHERE user_id = ? AND tenant_id = ?
                  AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)",
-                [$userId, $lookbackDays]
+                [$userId, TenantContext::getId(), $lookbackDays]
             )->fetch(\PDO::FETCH_ASSOC);
 
             if (!$activities) {
@@ -442,8 +442,9 @@ class RankingService
                     COUNT(CASE WHEN rating >= 4 THEN 1 END) as positive_ratings
                  FROM transactions
                  WHERE (sender_id = ? OR receiver_id = ?)
+                 AND tenant_id = ?
                  AND status = 'completed'",
-                [$userId, $userId]
+                [$userId, $userId, TenantContext::getId()]
             )->fetch(\PDO::FETCH_ASSOC);
 
             if (!$stats || $stats['total_transactions'] == 0) {
