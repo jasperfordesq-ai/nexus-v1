@@ -107,16 +107,21 @@ class LeaderboardSeasonService
      */
     public static function getSeasonLeaderboard($seasonId, $limit = 50)
     {
-        // Get rankings from season_rankings table
-        $rankings = Database::query(
-            "SELECT sr.*, u.first_name, u.last_name, u.photo, u.level
-             FROM season_rankings sr
-             JOIN users u ON sr.user_id = u.id
-             WHERE sr.season_id = ?
-             ORDER BY sr.season_xp DESC
-             LIMIT ?",
-            [$seasonId, $limit]
-        )->fetchAll();
+        // Check if season_rankings table exists before querying
+        $tableCheck = Database::query("SHOW TABLES LIKE 'season_rankings'")->fetch();
+
+        $rankings = [];
+        if ($tableCheck) {
+            $rankings = Database::query(
+                "SELECT sr.*, u.first_name, u.last_name, u.photo, u.level
+                 FROM season_rankings sr
+                 JOIN users u ON sr.user_id = u.id
+                 WHERE sr.season_id = ?
+                 ORDER BY sr.season_xp DESC
+                 LIMIT ?",
+                [$seasonId, $limit]
+            )->fetchAll();
+        }
 
         // If no rankings yet, calculate from XP earned during season
         if (empty($rankings)) {
@@ -168,11 +173,15 @@ class LeaderboardSeasonService
             return null;
         }
 
-        // Check season_rankings table first
-        $ranking = Database::query(
-            "SELECT * FROM season_rankings WHERE season_id = ? AND user_id = ?",
-            [$seasonId, $userId]
-        )->fetch();
+        // Check season_rankings table first (guard against missing table)
+        $tableCheck = Database::query("SHOW TABLES LIKE 'season_rankings'")->fetch();
+        $ranking = null;
+        if ($tableCheck) {
+            $ranking = Database::query(
+                "SELECT * FROM season_rankings WHERE season_id = ? AND user_id = ?",
+                [$seasonId, $userId]
+            )->fetch();
+        }
 
         if ($ranking) {
             // Calculate position

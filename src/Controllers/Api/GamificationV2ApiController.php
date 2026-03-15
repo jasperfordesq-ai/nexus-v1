@@ -300,7 +300,7 @@ class GamificationV2ApiController extends BaseApiController
                     'xp'              => (int)($row['xp'] ?? 0),
                     'level'           => (int)($row['level'] ?? 1),
                     'score'           => (float)$row['total_score'],
-                    'is_current_user' => ((int)$row['user_id'] === $userId),
+                    'is_current_user' => ((int)$row['user_id'] === (int)$userId),
                 ];
             }
 
@@ -360,7 +360,7 @@ class GamificationV2ApiController extends BaseApiController
                 'level'          => (int)($entry['level'] ?? 1),
                 'score'          => $score,
                 // Use controller's $userId (Bearer token) — session is null in API context
-                'is_current_user' => ((int)$entry['user_id'] === $userId),
+                'is_current_user' => ((int)$entry['user_id'] === (int)$userId),
             ];
         }
 
@@ -390,7 +390,7 @@ class GamificationV2ApiController extends BaseApiController
 
         // Total eligible members for this tenant (not just the returned top-N slice)
         $totalMembers = (int)(Database::query(
-            "SELECT COUNT(*) AS cnt FROM users WHERE tenant_id = ? AND is_approved = 1 AND show_on_leaderboard = 1",
+            "SELECT COUNT(*) AS cnt FROM users WHERE tenant_id = ? AND is_approved = 1 AND COALESCE(show_on_leaderboard, 1) = 1",
             [$tenantId]
         )->fetch()['cnt'] ?? 0);
 
