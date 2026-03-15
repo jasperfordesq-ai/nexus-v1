@@ -318,6 +318,13 @@ class LeaderboardSeasonService
         $now = time();
         $daysRemaining = max(0, ceil(($endDate - $now) / 86400));
 
+        // Count total participants (users with XP > 0 in this tenant)
+        $tenantId = TenantContext::getId();
+        $totalParticipants = Database::query(
+            "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1 AND COALESCE(xp, 0) > 0",
+            [$tenantId]
+        )->fetch();
+
         return [
             'season' => $season,
             'user_rank' => $userRank,
@@ -329,7 +336,8 @@ class LeaderboardSeasonService
             'leaderboard' => $leaderboard,
             'rewards' => $rewards,
             'days_remaining' => $daysRemaining,
-            'is_ending_soon' => $daysRemaining <= 7
+            'is_ending_soon' => $daysRemaining <= 7,
+            'total_participants' => (int)($totalParticipants['cnt'] ?? 0)
         ];
     }
 }

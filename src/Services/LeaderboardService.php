@@ -389,7 +389,7 @@ class LeaderboardService
         switch ($type) {
             case 'xp':
                 return [
-                    'sql' => "SELECT COUNT(*) as rank FROM users WHERE tenant_id = ? AND is_approved = 1 AND COALESCE(xp, 0) > ?",
+                    'sql' => "SELECT COUNT(*) as rank FROM users WHERE tenant_id = ? AND is_approved = 1 AND COALESCE(show_on_leaderboard, 1) = 1 AND COALESCE(xp, 0) > ?",
                     'params' => [$tenantId, $userScore]
                 ];
 

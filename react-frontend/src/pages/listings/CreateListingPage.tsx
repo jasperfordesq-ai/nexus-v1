@@ -317,8 +317,9 @@ export function CreateListingPage() {
               errorMessage={errors.category_id}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
               popoverProps={{
-                placement: 'bottom',
-                shouldBlockScroll: false,
+                placement: 'bottom-start',
+                shouldFlip: false,
+                shouldBlockScroll: true,
               }}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
