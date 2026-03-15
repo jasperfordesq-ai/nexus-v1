@@ -84,6 +84,16 @@ class MemberRankingService
     const COMPLEMENTARY_MATCH_BOOST = 1.15;
     const COMPLEMENTARY_MUTUAL_BOOST = 1.3;     // Both can help each other
 
+    // CommunityRank component weights (must sum to 1.0)
+    const SCORE_WEIGHTS = [
+        'activity'      => 0.20,
+        'contribution'  => 0.20,
+        'reputation'    => 0.20,
+        'connectivity'  => 0.15,
+        'proximity'     => 0.15,
+        'complementary' => 0.10,
+    ];
+
     // Cached configuration
     private static ?array $config = null;
 
@@ -246,16 +256,8 @@ class MemberRankingService
 
             // Calculate final score — weighted additive sum so one weak signal
             // cannot destroy the entire ranking (replaces old multiplicative formula).
-            $weights = [
-                'activity'      => 0.20,
-                'contribution'  => 0.20,
-                'reputation'    => 0.20,
-                'connectivity'  => 0.15,
-                'proximity'     => 0.15,
-                'complementary' => 0.10,
-            ];
             $finalScore = 0.0;
-            foreach ($weights as $component => $weight) {
+            foreach (self::SCORE_WEIGHTS as $component => $weight) {
                 $finalScore += ($scores[$component] ?? 0.5) * $weight;
             }
 
@@ -316,11 +318,11 @@ class MemberRankingService
 
         // Build score SQL components
         $activitySql = self::getActivityScoreSql($tenantId);
-        $contributionSql = self::getContributionScoreSql($tenantId);
+        $contributionSql = self::getContributionScoreSql();
         $reputationSql = self::getReputationScoreSql();
         $geoSql = self::getGeoScoreSql($viewerCoords['lat'], $viewerCoords['lon']);
 
-        // Weighted additive total score -- matches rankMembers() formula
+        // Weighted additive total score -- mirrors SCORE_WEIGHTS constant
         // Connectivity (0.15) and Complementary (0.10) default to neutral (1.0 * weight)
         $totalScoreSql = "(
             0.20 * ({$activitySql})
@@ -763,7 +765,7 @@ class MemberRankingService
 
     /**
      * SQL snippet for activity score
-     * Uses created_at for now (last_login_at may not exist yet)
+     * Uses last_active_at derived from feed_activity/transactions with created_at fallback
      */
     private static function getActivityScoreSql(int $tenantId = 0): string
     {
@@ -805,7 +807,7 @@ class MemberRankingService
      *   - 6–12 months:     0.5×
      *   - Older:           0.25×
      */
-    private static function getContributionScoreSql(int $tenantId = 0): string
+    private static function getContributionScoreSql(): string
     {
         return "
             LEAST(1.0,
@@ -1117,16 +1119,8 @@ class MemberRankingService
             );
 
             // Weighted additive - consistent with rankMembers()
-            $weights = [
-                'activity'      => 0.20,
-                'contribution'  => 0.20,
-                'reputation'    => 0.20,
-                'connectivity'  => 0.15,
-                'proximity'     => 0.15,
-                'complementary' => 0.10,
-            ];
             $finalScore = 0.0;
-            foreach ($weights as $component => $weight) {
+            foreach (self::SCORE_WEIGHTS as $component => $weight) {
                 $finalScore += ($scores[$component] ?? 0.5) * $weight;
             }
 
