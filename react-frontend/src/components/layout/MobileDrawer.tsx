@@ -463,6 +463,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                         <Shield className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('user_menu.admin_panel')}
                       </Button>
+                      {user?.email === 'jasper.ford.esq@gmail.com' && (
                       <Button
                         variant="light"
                         size="sm"
@@ -472,6 +473,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                         <LayoutDashboard className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('user_menu.legacy_admin')}
                       </Button>
+                      )}
                     </>
                   )}
                 </div>

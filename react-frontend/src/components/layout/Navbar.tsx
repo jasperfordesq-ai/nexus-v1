@@ -376,6 +376,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     <Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                     <span className="hidden md:inline">{t('user_menu.admin_panel')}</span>
                   </Button>
+                  {user?.email === 'jasper.ford.esq@gmail.com' && (
                   <Button
                     variant="light"
                     size="sm"
@@ -386,6 +387,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     <LayoutDashboard className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                     <span className="hidden md:inline">{t('user_menu.legacy_admin')}</span>
                   </Button>
+                  )}
                 </>
               )}
               {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>}
