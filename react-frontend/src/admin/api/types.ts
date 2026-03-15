@@ -1490,6 +1490,7 @@ export interface AdminSettingsResponse {
     email_verification: string | null;
     admin_approval: string | null;
     maintenance_mode: string | null;
+    footer_text: string | null;
   };
 }
 

@@ -108,6 +108,9 @@ function SeasonCard() {
       const res = await api.get<CurrentSeason>('/v2/gamification/seasons/current');
       if (res.success && res.data) {
         setSeason(res.data as unknown as CurrentSeason);
+      } else if (!res.success) {
+        logError('Failed to load current season', res.error);
+        setSeasonError(true);
       }
     } catch (err) {
       logError('Failed to load current season', err);

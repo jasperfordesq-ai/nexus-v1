@@ -316,6 +316,10 @@ export function CreateListingPage() {
               isInvalid={!!errors.category_id}
               errorMessage={errors.category_id}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
+              popoverProps={{
+                placement: 'bottom',
+                shouldBlockScroll: false,
+              }}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 value: 'text-theme-primary',

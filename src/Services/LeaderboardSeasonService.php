@@ -19,14 +19,25 @@ class LeaderboardSeasonService
         $tenantId = TenantContext::getId();
         $now = date('Y-m-d H:i:s');
 
-        $season = Database::query(
-            "SELECT * FROM leaderboard_seasons
-             WHERE tenant_id = ? AND start_date <= ? AND end_date >= ? AND status = 'active'
-             ORDER BY start_date DESC LIMIT 1",
-            [$tenantId, $now, $now]
-        )->fetch();
+        try {
+            // Check if the table exists first
+            $tableCheck = Database::query("SHOW TABLES LIKE 'leaderboard_seasons'")->fetch();
+            if (!$tableCheck) {
+                return null;
+            }
 
-        return $season;
+            $season = Database::query(
+                "SELECT * FROM leaderboard_seasons
+                 WHERE tenant_id = ? AND start_date <= ? AND end_date >= ? AND status = 'active'
+                 ORDER BY start_date DESC LIMIT 1",
+                [$tenantId, $now, $now]
+            )->fetch();
+
+            return $season;
+        } catch (\Throwable $e) {
+            error_log('[LeaderboardSeason] getCurrentSeason error: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -37,8 +48,16 @@ class LeaderboardSeasonService
         $season = self::getCurrentSeason();
 
         if (!$season) {
-            // Auto-create a monthly season
-            $season = self::createMonthlySeason();
+            try {
+                // Auto-create a monthly season (only if table exists)
+                $tableCheck = Database::query("SHOW TABLES LIKE 'leaderboard_seasons'")->fetch();
+                if ($tableCheck) {
+                    $season = self::createMonthlySeason();
+                }
+            } catch (\Throwable $e) {
+                error_log('[LeaderboardSeason] getOrCreateCurrentSeason error: ' . $e->getMessage());
+                return null;
+            }
         }
 
         return $season;

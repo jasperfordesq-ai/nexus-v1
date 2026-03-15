@@ -695,10 +695,12 @@ export async function checkBackendHealth(): Promise<{
  */
 export async function fetchCsrfToken(): Promise<string | null> {
   try {
-    const response = await api.get<{ token: string }>('/csrf-token', { skipCsrf: true });
-    if (response.success && response.data?.token) {
-      tokenManager.setCsrfToken(response.data.token);
-      return response.data.token;
+    const response = await api.get<{ csrf_token: string }>('/csrf-token', { skipCsrf: true });
+    // Backend returns { data: { csrf_token: "..." } }, unwrapped to { csrf_token: "..." }
+    const token = response.data?.csrf_token;
+    if (response.success && token) {
+      tokenManager.setCsrfToken(token);
+      return token;
     }
     return null;
   } catch {

@@ -17,11 +17,7 @@ $enterpriseSubpage = 'requests';
 
 $requestTypes = $requestTypes ?? ['access', 'erasure', 'rectification', 'restriction', 'portability', 'objection'];
 
-// Admin header configuration
- = 'Create GDPR Request';
- = 'Data Protection';
- = 'fa-file-circle-plus';
-require dirname(__DIR__, 2) . '/partials/admin-header.php';
+require dirname(__DIR__) . '/partials/enterprise-header.php';
 ?>
 
 <!-- Page Header -->
@@ -416,4 +412,4 @@ document.getElementById('user_search').addEventListener('input', function(e) {
 });
 </script>
 
-<?php require dirname(__DIR__, 2) . '/partials/admin-footer.php'; ?>
+<?php require dirname(__DIR__) . '/partials/enterprise-footer.php'; ?>

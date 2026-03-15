@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner } from '@heroui/react';
-import { Settings, Save, ShieldCheck } from 'lucide-react';
+import { Settings, Save, ShieldCheck, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
@@ -28,6 +28,7 @@ interface SettingsForm {
   email_verification: boolean; // general.email_verification
   admin_approval: boolean;    // general.admin_approval
   maintenance_mode: boolean;  // general.maintenance_mode
+  footer_text: string;        // general.footer_text (charity number, legal name, etc.)
 }
 
 const DEFAULT_SETTINGS: SettingsForm = {
@@ -39,6 +40,7 @@ const DEFAULT_SETTINGS: SettingsForm = {
   email_verification: true,
   admin_approval: false,
   maintenance_mode: false,
+  footer_text: '',
 };
 
 export function AdminSettings() {
@@ -69,6 +71,7 @@ export function AdminSettings() {
           email_verification: settings.email_verification === 'true',
           admin_approval: settings.admin_approval === 'true',
           maintenance_mode: settings.maintenance_mode === 'true',
+          footer_text: (settings.footer_text as string) ?? '',
         });
       }
     } catch {
@@ -94,6 +97,7 @@ export function AdminSettings() {
         email_verification: String(form.email_verification),
         admin_approval: String(form.admin_approval),
         maintenance_mode: String(form.maintenance_mode),
+        footer_text: form.footer_text,
       });
 
       if (res.success) {
@@ -163,6 +167,25 @@ export function AdminSettings() {
               variant="bordered"
               value={form.contact_phone}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_phone: val }))}
+            />
+          </CardBody>
+        </Card>
+
+        <Card shadow="sm">
+          <CardHeader>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Scale size={20} /> Branding &amp; Legal
+            </h3>
+          </CardHeader>
+          <CardBody className="gap-4">
+            <Textarea
+              label="Footer / Legal Text"
+              description="Displayed in the site footer and Legal Hub. Include your charity number, legal name, or any registration info."
+              placeholder="e.g. hOUR Timebank CLG. Registered Charity No. 20204862. Company No. 705275."
+              variant="bordered"
+              minRows={2}
+              value={form.footer_text}
+              onValueChange={(val) => setForm(prev => ({ ...prev, footer_text: val }))}
             />
           </CardBody>
         </Card>
