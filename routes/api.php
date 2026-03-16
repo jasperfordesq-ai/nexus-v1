@@ -78,6 +78,15 @@ Route::post('/v2/events/{id}/image', [\Nexus\Controllers\Api\EventsApiController
 // Source: httpdocs/routes/listings.php
 // Note: /api/v2/categories closure stays in legacy router
 // ============================================
+// FUTURE: When ready to use new Laravel controllers, replace:
+//   [\Nexus\Controllers\Api\ListingsApiController::class, 'index']
+// with:
+//   [App\Http\Controllers\Api\ListingsController::class, 'index']
+//
+// The new ListingsController uses constructor DI (App\Services\ListingService),
+// returns JsonResponse from every method, and handles validation via
+// Laravel's ValidationException. See ListingsController.php for the
+// reference implementation pattern to follow for all other controllers.
 Route::get('/v2/listings', [\Nexus\Controllers\Api\ListingsApiController::class, 'index']);
 Route::get('/v2/listings/nearby', [\Nexus\Controllers\Api\ListingsApiController::class, 'nearby']);
 Route::get('/v2/listings/saved', [\Nexus\Controllers\Api\ListingsApiController::class, 'getSavedListings']);
