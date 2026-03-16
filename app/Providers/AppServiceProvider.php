@@ -119,6 +119,156 @@ use App\Services\EventNotificationService;
 use App\Services\EventReminderService;
 use App\Services\DailyRewardService;
 use App\Services\XPShopService;
+use App\Services\AbuseDetectionService;
+use App\Services\AchievementAnalyticsService;
+use App\Services\AchievementCampaignService;
+use App\Services\AchievementUnlockablesService;
+use App\Services\AdminBadgeCountService;
+use App\Services\BadgeCollectionService;
+use App\Services\BalanceAlertService;
+use App\Services\BrokerControlConfigService;
+use App\Services\BrokerMessageVisibilityService;
+use App\Services\CSSSanitizer;
+use App\Services\CampaignService;
+use App\Services\ChallengeCategoryService;
+use App\Services\ChallengeOutcomeService;
+use App\Services\ChallengeTagService;
+use App\Services\ChallengeTemplateService;
+use App\Services\CollaborativeFilteringService;
+use App\Services\CommunityFundService;
+use App\Services\CommunityProjectService;
+use App\Services\ContextualMessageService;
+use App\Services\CookieInventoryService;
+use App\Services\CrossModuleMatchingService;
+use App\Services\DeliverabilityTrackingService;
+use App\Services\DigestService;
+use App\Services\EmailMonitorService;
+use App\Services\EmailTemplateBuilder;
+use App\Services\EmailTemplateService;
+use App\Services\EmbeddingService;
+use App\Services\FCMPushService;
+use App\Services\FederatedConnectionService;
+use App\Services\FederatedGroupService;
+use App\Services\FederatedMessageService;
+use App\Services\FederatedTransactionService;
+use App\Services\FederationActivityService;
+use App\Services\FederationAuditService;
+use App\Services\FederationCreditService;
+use App\Services\FederationDirectoryService;
+use App\Services\FederationEmailService;
+use App\Services\FederationExternalApiClient;
+use App\Services\FederationExternalPartnerService;
+use App\Services\FederationFeatureService;
+use App\Services\FederationGateway;
+use App\Services\FederationJwtService;
+use App\Services\FederationNeighborhoodService;
+use App\Services\FederationPartnershipService;
+use App\Services\FederationRealtimeService;
+use App\Services\FederationSearchService;
+use App\Services\FederationUserService;
+use App\Services\GamificationEmailService;
+use App\Services\GamificationRealtimeService;
+use App\Services\GeocodingService;
+use App\Services\GoalCheckinService;
+use App\Services\GoalProgressService;
+use App\Services\GoalReminderService;
+use App\Services\GoalTemplateService;
+use App\Services\GroupAchievementService;
+use App\Services\GroupAnnouncementService;
+use App\Services\GroupApprovalWorkflowService;
+use App\Services\GroupAssignmentService;
+use App\Services\GroupAuditService;
+use App\Services\GroupChatroomService;
+use App\Services\GroupConfigurationService;
+use App\Services\GroupEventService;
+use App\Services\GroupExchangeService;
+use App\Services\GroupFeatureToggleService;
+use App\Services\GroupFileService;
+use App\Services\GroupModerationService;
+use App\Services\GroupNotificationService;
+use App\Services\GroupPermissionManager;
+use App\Services\GroupPolicyRepository;
+use App\Services\GroupRecommendationEngine;
+use App\Services\GroupReportingService;
+use App\Services\GuardianConsentService;
+use App\Services\HoursReportService;
+use App\Services\HtmlSanitizer;
+use App\Services\IdeaMediaService;
+use App\Services\IdeaTeamConversionService;
+use App\Services\ImpactReportingService;
+use App\Services\InactiveMemberService;
+use App\Services\InsuranceCertificateService;
+use App\Services\ListingExpiryReminderService;
+use App\Services\ListingExpiryService;
+use App\Services\ListingRankingService;
+use App\Services\ListingRiskTagService;
+use App\Services\ListingSkillTagService;
+use App\Services\MailchimpService;
+use App\Services\MatchApprovalWorkflowService;
+use App\Services\MatchDigestService;
+use App\Services\MatchLearningService;
+use App\Services\MatchNotificationService;
+use App\Services\MatchingService;
+use App\Services\MemberReportService;
+use App\Services\MemberVerificationBadgeService;
+use App\Services\NewsletterTemplates;
+use App\Services\NotificationDispatcher;
+use App\Services\OptimizedGroupQueries;
+use App\Services\OrgNotificationService;
+use App\Services\PayPlanService;
+use App\Services\PerformanceMonitorService;
+use App\Services\PersonalizedSearchService;
+use App\Services\PollExportService;
+use App\Services\PollRankingService;
+use App\Services\PredictiveStaffingService;
+use App\Services\ProgressNotificationService;
+use App\Services\PusherService;
+use App\Services\RecurringShiftService;
+use App\Services\RedisCache;
+use App\Services\ReportExportService;
+use App\Services\ResourceCategoryService;
+use App\Services\ResourceOrderService;
+use App\Services\SafeguardingService;
+use App\Services\SavedSearchService;
+use App\Services\SchemaService;
+use App\Services\SearchAnalyzerService;
+use App\Services\SearchLogService;
+use App\Services\SentryService;
+use App\Services\ShiftGroupReservationService;
+use App\Services\ShiftSwapService;
+use App\Services\ShiftWaitlistService;
+use App\Services\SmartGroupMatchingService;
+use App\Services\SmartGroupRankingService;
+use App\Services\SmartMatchingAnalyticsService;
+use App\Services\SmartMatchingEngine;
+use App\Services\SmartSegmentSuggestionService;
+use App\Services\SocialAuthService;
+use App\Services\SocialGamificationService;
+use App\Services\SocialNotificationService;
+use App\Services\SocialValueService;
+use App\Services\SuperAdminAuditService;
+use App\Services\TeamDocumentService;
+use App\Services\TeamTaskService;
+use App\Services\TenantFeatureConfig;
+use App\Services\TenantHierarchyService;
+use App\Services\TenantSettingsService;
+use App\Services\TenantVisibilityService;
+use App\Services\TotpService;
+use App\Services\TwoFactorChallengeManager;
+use App\Services\UnifiedSearchService;
+use App\Services\UploadService;
+use App\Services\UserInsightsService;
+use App\Services\VettingService;
+use App\Services\VolunteerCertificateService;
+use App\Services\VolunteerDonationService;
+use App\Services\VolunteerEmergencyAlertService;
+use App\Services\VolunteerExpenseService;
+use App\Services\VolunteerFormService;
+use App\Services\VolunteerWellbeingService;
+use App\Services\WebAuthnChallengeStore;
+use App\Services\WebPushService;
+use App\Services\WebhookDispatchService;
+use App\Services\AI\AIServiceFactory;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -497,6 +647,608 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(XPShopService::class, function ($app) {
             return new XPShopService();
+        });
+
+        // --- Batch 6 services (150) --- Full coverage DI wrappers ---
+
+        $this->app->singleton(AbuseDetectionService::class, function ($app) {
+            return new AbuseDetectionService();
+        });
+
+        $this->app->singleton(AchievementAnalyticsService::class, function ($app) {
+            return new AchievementAnalyticsService();
+        });
+
+        $this->app->singleton(AchievementCampaignService::class, function ($app) {
+            return new AchievementCampaignService();
+        });
+
+        $this->app->singleton(AchievementUnlockablesService::class, function ($app) {
+            return new AchievementUnlockablesService();
+        });
+
+        $this->app->singleton(AdminBadgeCountService::class, function ($app) {
+            return new AdminBadgeCountService();
+        });
+
+        $this->app->singleton(BadgeCollectionService::class, function ($app) {
+            return new BadgeCollectionService();
+        });
+
+        $this->app->singleton(BalanceAlertService::class, function ($app) {
+            return new BalanceAlertService();
+        });
+
+        $this->app->singleton(BrokerControlConfigService::class, function ($app) {
+            return new BrokerControlConfigService();
+        });
+
+        $this->app->singleton(BrokerMessageVisibilityService::class, function ($app) {
+            return new BrokerMessageVisibilityService();
+        });
+
+        $this->app->singleton(CSSSanitizer::class, function ($app) {
+            return new CSSSanitizer();
+        });
+
+        $this->app->singleton(CampaignService::class, function ($app) {
+            return new CampaignService();
+        });
+
+        $this->app->singleton(ChallengeCategoryService::class, function ($app) {
+            return new ChallengeCategoryService();
+        });
+
+        $this->app->singleton(ChallengeOutcomeService::class, function ($app) {
+            return new ChallengeOutcomeService();
+        });
+
+        $this->app->singleton(ChallengeTagService::class, function ($app) {
+            return new ChallengeTagService();
+        });
+
+        $this->app->singleton(ChallengeTemplateService::class, function ($app) {
+            return new ChallengeTemplateService();
+        });
+
+        $this->app->singleton(CollaborativeFilteringService::class, function ($app) {
+            return new CollaborativeFilteringService();
+        });
+
+        $this->app->singleton(CommunityFundService::class, function ($app) {
+            return new CommunityFundService();
+        });
+
+        $this->app->singleton(CommunityProjectService::class, function ($app) {
+            return new CommunityProjectService();
+        });
+
+        $this->app->singleton(ContextualMessageService::class, function ($app) {
+            return new ContextualMessageService();
+        });
+
+        $this->app->singleton(CookieInventoryService::class, function ($app) {
+            return new CookieInventoryService();
+        });
+
+        $this->app->singleton(CrossModuleMatchingService::class, function ($app) {
+            return new CrossModuleMatchingService();
+        });
+
+        $this->app->singleton(DeliverabilityTrackingService::class, function ($app) {
+            return new DeliverabilityTrackingService();
+        });
+
+        $this->app->singleton(DigestService::class, function ($app) {
+            return new DigestService();
+        });
+
+        $this->app->singleton(EmailMonitorService::class, function ($app) {
+            return new EmailMonitorService();
+        });
+
+        $this->app->singleton(EmailTemplateBuilder::class, function ($app) {
+            return new EmailTemplateBuilder();
+        });
+
+        $this->app->singleton(EmailTemplateService::class, function ($app) {
+            return new EmailTemplateService();
+        });
+
+        $this->app->singleton(EmbeddingService::class, function ($app) {
+            return new EmbeddingService();
+        });
+
+        $this->app->singleton(FCMPushService::class, function ($app) {
+            return new FCMPushService();
+        });
+
+        $this->app->singleton(FederatedConnectionService::class, function ($app) {
+            return new FederatedConnectionService();
+        });
+
+        $this->app->singleton(FederatedGroupService::class, function ($app) {
+            return new FederatedGroupService();
+        });
+
+        $this->app->singleton(FederatedMessageService::class, function ($app) {
+            return new FederatedMessageService();
+        });
+
+        $this->app->singleton(FederatedTransactionService::class, function ($app) {
+            return new FederatedTransactionService();
+        });
+
+        $this->app->singleton(FederationActivityService::class, function ($app) {
+            return new FederationActivityService();
+        });
+
+        $this->app->singleton(FederationAuditService::class, function ($app) {
+            return new FederationAuditService();
+        });
+
+        $this->app->singleton(FederationCreditService::class, function ($app) {
+            return new FederationCreditService();
+        });
+
+        $this->app->singleton(FederationDirectoryService::class, function ($app) {
+            return new FederationDirectoryService();
+        });
+
+        $this->app->singleton(FederationEmailService::class, function ($app) {
+            return new FederationEmailService();
+        });
+
+        $this->app->singleton(FederationExternalApiClient::class, function ($app) {
+            return new FederationExternalApiClient();
+        });
+
+        $this->app->singleton(FederationExternalPartnerService::class, function ($app) {
+            return new FederationExternalPartnerService();
+        });
+
+        $this->app->singleton(FederationFeatureService::class, function ($app) {
+            return new FederationFeatureService();
+        });
+
+        $this->app->singleton(FederationGateway::class, function ($app) {
+            return new FederationGateway();
+        });
+
+        $this->app->singleton(FederationJwtService::class, function ($app) {
+            return new FederationJwtService();
+        });
+
+        $this->app->singleton(FederationNeighborhoodService::class, function ($app) {
+            return new FederationNeighborhoodService();
+        });
+
+        $this->app->singleton(FederationPartnershipService::class, function ($app) {
+            return new FederationPartnershipService();
+        });
+
+        $this->app->singleton(FederationRealtimeService::class, function ($app) {
+            return new FederationRealtimeService();
+        });
+
+        $this->app->singleton(FederationSearchService::class, function ($app) {
+            return new FederationSearchService();
+        });
+
+        $this->app->singleton(FederationUserService::class, function ($app) {
+            return new FederationUserService();
+        });
+
+        $this->app->singleton(GamificationEmailService::class, function ($app) {
+            return new GamificationEmailService();
+        });
+
+        $this->app->singleton(GamificationRealtimeService::class, function ($app) {
+            return new GamificationRealtimeService();
+        });
+
+        $this->app->singleton(GeocodingService::class, function ($app) {
+            return new GeocodingService();
+        });
+
+        $this->app->singleton(GoalCheckinService::class, function ($app) {
+            return new GoalCheckinService();
+        });
+
+        $this->app->singleton(GoalProgressService::class, function ($app) {
+            return new GoalProgressService();
+        });
+
+        $this->app->singleton(GoalReminderService::class, function ($app) {
+            return new GoalReminderService();
+        });
+
+        $this->app->singleton(GoalTemplateService::class, function ($app) {
+            return new GoalTemplateService();
+        });
+
+        $this->app->singleton(GroupAchievementService::class, function ($app) {
+            return new GroupAchievementService();
+        });
+
+        $this->app->singleton(GroupAnnouncementService::class, function ($app) {
+            return new GroupAnnouncementService();
+        });
+
+        $this->app->singleton(GroupApprovalWorkflowService::class, function ($app) {
+            return new GroupApprovalWorkflowService();
+        });
+
+        $this->app->singleton(GroupAssignmentService::class, function ($app) {
+            return new GroupAssignmentService();
+        });
+
+        $this->app->singleton(GroupAuditService::class, function ($app) {
+            return new GroupAuditService();
+        });
+
+        $this->app->singleton(GroupChatroomService::class, function ($app) {
+            return new GroupChatroomService();
+        });
+
+        $this->app->singleton(GroupConfigurationService::class, function ($app) {
+            return new GroupConfigurationService();
+        });
+
+        $this->app->singleton(GroupEventService::class, function ($app) {
+            return new GroupEventService();
+        });
+
+        $this->app->singleton(GroupExchangeService::class, function ($app) {
+            return new GroupExchangeService();
+        });
+
+        $this->app->singleton(GroupFeatureToggleService::class, function ($app) {
+            return new GroupFeatureToggleService();
+        });
+
+        $this->app->singleton(GroupFileService::class, function ($app) {
+            return new GroupFileService();
+        });
+
+        $this->app->singleton(GroupModerationService::class, function ($app) {
+            return new GroupModerationService();
+        });
+
+        $this->app->singleton(GroupNotificationService::class, function ($app) {
+            return new GroupNotificationService();
+        });
+
+        $this->app->singleton(GroupPermissionManager::class, function ($app) {
+            return new GroupPermissionManager();
+        });
+
+        $this->app->singleton(GroupPolicyRepository::class, function ($app) {
+            return new GroupPolicyRepository();
+        });
+
+        $this->app->singleton(GroupRecommendationEngine::class, function ($app) {
+            return new GroupRecommendationEngine();
+        });
+
+        $this->app->singleton(GroupReportingService::class, function ($app) {
+            return new GroupReportingService();
+        });
+
+        $this->app->singleton(GuardianConsentService::class, function ($app) {
+            return new GuardianConsentService();
+        });
+
+        $this->app->singleton(HoursReportService::class, function ($app) {
+            return new HoursReportService();
+        });
+
+        $this->app->singleton(HtmlSanitizer::class, function ($app) {
+            return new HtmlSanitizer();
+        });
+
+        $this->app->singleton(IdeaMediaService::class, function ($app) {
+            return new IdeaMediaService();
+        });
+
+        $this->app->singleton(IdeaTeamConversionService::class, function ($app) {
+            return new IdeaTeamConversionService();
+        });
+
+        $this->app->singleton(ImpactReportingService::class, function ($app) {
+            return new ImpactReportingService();
+        });
+
+        $this->app->singleton(InactiveMemberService::class, function ($app) {
+            return new InactiveMemberService();
+        });
+
+        $this->app->singleton(InsuranceCertificateService::class, function ($app) {
+            return new InsuranceCertificateService();
+        });
+
+        $this->app->singleton(ListingExpiryReminderService::class, function ($app) {
+            return new ListingExpiryReminderService();
+        });
+
+        $this->app->singleton(ListingExpiryService::class, function ($app) {
+            return new ListingExpiryService();
+        });
+
+        $this->app->singleton(ListingRankingService::class, function ($app) {
+            return new ListingRankingService();
+        });
+
+        $this->app->singleton(ListingRiskTagService::class, function ($app) {
+            return new ListingRiskTagService();
+        });
+
+        $this->app->singleton(ListingSkillTagService::class, function ($app) {
+            return new ListingSkillTagService();
+        });
+
+        $this->app->singleton(MailchimpService::class, function ($app) {
+            return new MailchimpService();
+        });
+
+        $this->app->singleton(MatchApprovalWorkflowService::class, function ($app) {
+            return new MatchApprovalWorkflowService();
+        });
+
+        $this->app->singleton(MatchDigestService::class, function ($app) {
+            return new MatchDigestService();
+        });
+
+        $this->app->singleton(MatchLearningService::class, function ($app) {
+            return new MatchLearningService();
+        });
+
+        $this->app->singleton(MatchNotificationService::class, function ($app) {
+            return new MatchNotificationService();
+        });
+
+        $this->app->singleton(MatchingService::class, function ($app) {
+            return new MatchingService();
+        });
+
+        $this->app->singleton(MemberReportService::class, function ($app) {
+            return new MemberReportService();
+        });
+
+        $this->app->singleton(MemberVerificationBadgeService::class, function ($app) {
+            return new MemberVerificationBadgeService();
+        });
+
+        $this->app->singleton(NewsletterTemplates::class, function ($app) {
+            return new NewsletterTemplates();
+        });
+
+        $this->app->singleton(NotificationDispatcher::class, function ($app) {
+            return new NotificationDispatcher();
+        });
+
+        $this->app->singleton(OptimizedGroupQueries::class, function ($app) {
+            return new OptimizedGroupQueries();
+        });
+
+        $this->app->singleton(OrgNotificationService::class, function ($app) {
+            return new OrgNotificationService();
+        });
+
+        $this->app->singleton(PayPlanService::class, function ($app) {
+            return new PayPlanService();
+        });
+
+        $this->app->singleton(PerformanceMonitorService::class, function ($app) {
+            return new PerformanceMonitorService();
+        });
+
+        $this->app->singleton(PersonalizedSearchService::class, function ($app) {
+            return new PersonalizedSearchService();
+        });
+
+        $this->app->singleton(PollExportService::class, function ($app) {
+            return new PollExportService();
+        });
+
+        $this->app->singleton(PollRankingService::class, function ($app) {
+            return new PollRankingService();
+        });
+
+        $this->app->singleton(PredictiveStaffingService::class, function ($app) {
+            return new PredictiveStaffingService();
+        });
+
+        $this->app->singleton(ProgressNotificationService::class, function ($app) {
+            return new ProgressNotificationService();
+        });
+
+        $this->app->singleton(PusherService::class, function ($app) {
+            return new PusherService();
+        });
+
+        $this->app->singleton(RecurringShiftService::class, function ($app) {
+            return new RecurringShiftService();
+        });
+
+        $this->app->singleton(RedisCache::class, function ($app) {
+            return new RedisCache();
+        });
+
+        $this->app->singleton(ReportExportService::class, function ($app) {
+            return new ReportExportService();
+        });
+
+        $this->app->singleton(ResourceCategoryService::class, function ($app) {
+            return new ResourceCategoryService();
+        });
+
+        $this->app->singleton(ResourceOrderService::class, function ($app) {
+            return new ResourceOrderService();
+        });
+
+        $this->app->singleton(SafeguardingService::class, function ($app) {
+            return new SafeguardingService();
+        });
+
+        $this->app->singleton(SavedSearchService::class, function ($app) {
+            return new SavedSearchService();
+        });
+
+        $this->app->singleton(SchemaService::class, function ($app) {
+            return new SchemaService();
+        });
+
+        $this->app->singleton(SearchAnalyzerService::class, function ($app) {
+            return new SearchAnalyzerService();
+        });
+
+        $this->app->singleton(SearchLogService::class, function ($app) {
+            return new SearchLogService();
+        });
+
+        $this->app->singleton(SentryService::class, function ($app) {
+            return new SentryService();
+        });
+
+        $this->app->singleton(ShiftGroupReservationService::class, function ($app) {
+            return new ShiftGroupReservationService();
+        });
+
+        $this->app->singleton(ShiftSwapService::class, function ($app) {
+            return new ShiftSwapService();
+        });
+
+        $this->app->singleton(ShiftWaitlistService::class, function ($app) {
+            return new ShiftWaitlistService();
+        });
+
+        $this->app->singleton(SmartGroupMatchingService::class, function ($app) {
+            return new SmartGroupMatchingService();
+        });
+
+        $this->app->singleton(SmartGroupRankingService::class, function ($app) {
+            return new SmartGroupRankingService();
+        });
+
+        $this->app->singleton(SmartMatchingAnalyticsService::class, function ($app) {
+            return new SmartMatchingAnalyticsService();
+        });
+
+        $this->app->singleton(SmartMatchingEngine::class, function ($app) {
+            return new SmartMatchingEngine();
+        });
+
+        $this->app->singleton(SmartSegmentSuggestionService::class, function ($app) {
+            return new SmartSegmentSuggestionService();
+        });
+
+        $this->app->singleton(SocialAuthService::class, function ($app) {
+            return new SocialAuthService();
+        });
+
+        $this->app->singleton(SocialGamificationService::class, function ($app) {
+            return new SocialGamificationService();
+        });
+
+        $this->app->singleton(SocialNotificationService::class, function ($app) {
+            return new SocialNotificationService();
+        });
+
+        $this->app->singleton(SocialValueService::class, function ($app) {
+            return new SocialValueService();
+        });
+
+        $this->app->singleton(SuperAdminAuditService::class, function ($app) {
+            return new SuperAdminAuditService();
+        });
+
+        $this->app->singleton(TeamDocumentService::class, function ($app) {
+            return new TeamDocumentService();
+        });
+
+        $this->app->singleton(TeamTaskService::class, function ($app) {
+            return new TeamTaskService();
+        });
+
+        $this->app->singleton(TenantFeatureConfig::class, function ($app) {
+            return new TenantFeatureConfig();
+        });
+
+        $this->app->singleton(TenantHierarchyService::class, function ($app) {
+            return new TenantHierarchyService();
+        });
+
+        $this->app->singleton(TenantSettingsService::class, function ($app) {
+            return new TenantSettingsService();
+        });
+
+        $this->app->singleton(TenantVisibilityService::class, function ($app) {
+            return new TenantVisibilityService();
+        });
+
+        $this->app->singleton(TotpService::class, function ($app) {
+            return new TotpService();
+        });
+
+        $this->app->singleton(TwoFactorChallengeManager::class, function ($app) {
+            return new TwoFactorChallengeManager();
+        });
+
+        $this->app->singleton(UnifiedSearchService::class, function ($app) {
+            return new UnifiedSearchService();
+        });
+
+        $this->app->singleton(UploadService::class, function ($app) {
+            return new UploadService();
+        });
+
+        $this->app->singleton(UserInsightsService::class, function ($app) {
+            return new UserInsightsService();
+        });
+
+        $this->app->singleton(VettingService::class, function ($app) {
+            return new VettingService();
+        });
+
+        $this->app->singleton(VolunteerCertificateService::class, function ($app) {
+            return new VolunteerCertificateService();
+        });
+
+        $this->app->singleton(VolunteerDonationService::class, function ($app) {
+            return new VolunteerDonationService();
+        });
+
+        $this->app->singleton(VolunteerEmergencyAlertService::class, function ($app) {
+            return new VolunteerEmergencyAlertService();
+        });
+
+        $this->app->singleton(VolunteerExpenseService::class, function ($app) {
+            return new VolunteerExpenseService();
+        });
+
+        $this->app->singleton(VolunteerFormService::class, function ($app) {
+            return new VolunteerFormService();
+        });
+
+        $this->app->singleton(VolunteerWellbeingService::class, function ($app) {
+            return new VolunteerWellbeingService();
+        });
+
+        $this->app->singleton(WebAuthnChallengeStore::class, function ($app) {
+            return new WebAuthnChallengeStore();
+        });
+
+        $this->app->singleton(WebPushService::class, function ($app) {
+            return new WebPushService();
+        });
+
+        $this->app->singleton(WebhookDispatchService::class, function ($app) {
+            return new WebhookDispatchService();
+        });
+
+        $this->app->singleton(AIServiceFactory::class, function ($app) {
+            return new AIServiceFactory();
         });
     }
 
