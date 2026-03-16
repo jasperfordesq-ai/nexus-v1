@@ -19,6 +19,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// ==========================================================================
+// Phase 5 wiring: Delegation controllers (App\Http\Controllers\Api\*)
+// replace legacy Nexus controllers where method signatures match exactly.
+// Each delegation controller wraps the legacy controller via ob_start(),
+// so responses are identical. Routes NOT yet swapped have a mismatch in
+// method names between the delegation controller and the route definition.
+// ==========================================================================
+
 // Health check -- confirms Laravel routing is operational
 Route::get('/laravel/health', function () {
     return response()->json([
@@ -129,13 +137,13 @@ Route::post('/v2/messages/conversations/{id}/restore', [\Nexus\Controllers\Api\M
 // ============================================
 Route::get('/v2/groups', [\Nexus\Controllers\Api\GroupsApiController::class, 'index']);
 Route::post('/v2/groups', [\Nexus\Controllers\Api\GroupsApiController::class, 'store']);
-Route::get('/v2/groups/recommendations', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'index']);
-Route::post('/v2/groups/recommendations/track', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'track']);
-Route::get('/v2/groups/recommendations/metrics', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'metrics']);
+Route::get('/v2/groups/recommendations', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
+Route::post('/v2/groups/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
+Route::get('/v2/groups/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
 Route::get('/v2/groups/{id}', [\Nexus\Controllers\Api\GroupsApiController::class, 'show']);
 Route::put('/v2/groups/{id}', [\Nexus\Controllers\Api\GroupsApiController::class, 'update']);
 Route::delete('/v2/groups/{id}', [\Nexus\Controllers\Api\GroupsApiController::class, 'destroy']);
-Route::get('/v2/groups/{id}/similar', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'similar']);
+Route::get('/v2/groups/{id}/similar', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
 Route::post('/v2/groups/{id}/join', [\Nexus\Controllers\Api\GroupsApiController::class, 'join']);
 Route::delete('/v2/groups/{id}/membership', [\Nexus\Controllers\Api\GroupsApiController::class, 'leave']);
 Route::get('/v2/groups/{id}/members', [\Nexus\Controllers\Api\GroupsApiController::class, 'members']);
@@ -181,58 +189,58 @@ Route::get('/v2/users/me/consent', [\Nexus\Controllers\Api\UsersApiController::c
 Route::put('/v2/users/me/consent', [\Nexus\Controllers\Api\UsersApiController::class, 'updateConsent']);
 Route::post('/v2/users/me/gdpr-request', [\Nexus\Controllers\Api\UsersApiController::class, 'createGdprRequest']);
 Route::get('/v2/users/me/sessions', [\Nexus\Controllers\Api\UsersApiController::class, 'sessions']);
-Route::get('/v2/users/me/match-preferences', [\Nexus\Controllers\Api\MatchPreferencesApiController::class, 'show']);
-Route::put('/v2/users/me/match-preferences', [\Nexus\Controllers\Api\MatchPreferencesApiController::class, 'update']);
+Route::get('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'show']);
+Route::put('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'update']);
 Route::get('/v2/users/me/insurance', [\Nexus\Controllers\Api\UserInsuranceApiController::class, 'list']);
 Route::post('/v2/users/me/insurance', [\Nexus\Controllers\Api\UserInsuranceApiController::class, 'upload']);
 Route::get('/v2/users/{id}', [\Nexus\Controllers\Api\UsersApiController::class, 'show']);
 Route::get('/v2/users/{id}/listings', [\Nexus\Controllers\Api\UsersApiController::class, 'listings']);
 Route::get('/v2/members/nearby', [\Nexus\Controllers\Api\UsersApiController::class, 'nearby']);
 // Skills
-Route::get('/v2/skills/categories', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getCategories']);
-Route::get('/v2/skills/search', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'search']);
-Route::get('/v2/skills/members', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getMembersWithSkill']);
+Route::get('/v2/skills/categories', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getCategories']);
+Route::get('/v2/skills/search', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'search']);
+Route::get('/v2/skills/members', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getMembersWithSkill']);
 Route::get('/v2/skills/categories/{id}', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getCategoryById']);
 Route::post('/v2/skills/categories', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'createCategory']);
 Route::put('/v2/skills/categories/{id}', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'updateCategory']);
 Route::delete('/v2/skills/categories/{id}', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'deleteCategory']);
-Route::get('/v2/users/me/skills', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getMySkills']);
-Route::post('/v2/users/me/skills', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'addSkill']);
+Route::get('/v2/users/me/skills', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'getMySkills']);
+Route::post('/v2/users/me/skills', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'addSkill']);
 Route::put('/v2/users/me/skills/{id}', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'updateSkill']);
-Route::delete('/v2/users/me/skills/{id}', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'removeSkill']);
+Route::delete('/v2/users/me/skills/{id}', [\App\Http\Controllers\Api\SkillTaxonomyController::class, 'removeSkill']);
 Route::get('/v2/users/{id}/skills', [\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getUserSkills']);
 // Availability
-Route::get('/v2/users/me/availability', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'getMyAvailability']);
-Route::put('/v2/users/me/availability', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'setBulkAvailability']);
-Route::put('/v2/users/me/availability/{day}', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'setDayAvailability']);
-Route::post('/v2/users/me/availability/date', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'addSpecificDate']);
-Route::delete('/v2/users/me/availability/{id}', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'deleteSlot']);
-Route::get('/v2/users/{id}/availability', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'getUserAvailability']);
+Route::get('/v2/users/me/availability', [\App\Http\Controllers\Api\MemberAvailabilityController::class, 'getMyAvailability']);
+Route::put('/v2/users/me/availability', [\App\Http\Controllers\Api\MemberAvailabilityController::class, 'setBulkAvailability']);
+Route::put('/v2/users/me/availability/{day}', [\App\Http\Controllers\Api\MemberAvailabilityController::class, 'setDayAvailability']);
+Route::post('/v2/users/me/availability/date', [\App\Http\Controllers\Api\MemberAvailabilityController::class, 'addSpecificDate']);
+Route::delete('/v2/users/me/availability/{id}', [\App\Http\Controllers\Api\MemberAvailabilityController::class, 'deleteSlot']);
+Route::get('/v2/users/{id}/availability', [\App\Http\Controllers\Api\MemberAvailabilityController::class, 'getUserAvailability']);
 Route::get('/v2/members/availability/compatible', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'findCompatibleTimes']);
 Route::get('/v2/members/availability/available', [\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'getAvailableMembers']);
 // Endorsements
-Route::post('/v2/members/{id}/endorse', [\Nexus\Controllers\Api\EndorsementApiController::class, 'endorse']);
-Route::delete('/v2/members/{id}/endorse', [\Nexus\Controllers\Api\EndorsementApiController::class, 'removeEndorsement']);
-Route::get('/v2/members/{id}/endorsements', [\Nexus\Controllers\Api\EndorsementApiController::class, 'getEndorsements']);
-Route::get('/v2/members/top-endorsed', [\Nexus\Controllers\Api\EndorsementApiController::class, 'getTopEndorsed']);
+Route::post('/v2/members/{id}/endorse', [\App\Http\Controllers\Api\EndorsementController::class, 'endorse']);
+Route::delete('/v2/members/{id}/endorse', [\App\Http\Controllers\Api\EndorsementController::class, 'removeEndorsement']);
+Route::get('/v2/members/{id}/endorsements', [\App\Http\Controllers\Api\EndorsementController::class, 'getEndorsements']);
+Route::get('/v2/members/top-endorsed', [\App\Http\Controllers\Api\EndorsementController::class, 'getTopEndorsed']);
 // Activity Dashboard
-Route::get('/v2/users/me/activity/dashboard', [\Nexus\Controllers\Api\MemberActivityApiController::class, 'getDashboard']);
-Route::get('/v2/users/me/activity/timeline', [\Nexus\Controllers\Api\MemberActivityApiController::class, 'getTimeline']);
-Route::get('/v2/users/me/activity/hours', [\Nexus\Controllers\Api\MemberActivityApiController::class, 'getHours']);
-Route::get('/v2/users/me/activity/monthly', [\Nexus\Controllers\Api\MemberActivityApiController::class, 'getMonthlyHours']);
-Route::get('/v2/users/{id}/activity/dashboard', [\Nexus\Controllers\Api\MemberActivityApiController::class, 'getPublicDashboard']);
+Route::get('/v2/users/me/activity/dashboard', [\App\Http\Controllers\Api\MemberActivityController::class, 'getDashboard']);
+Route::get('/v2/users/me/activity/timeline', [\App\Http\Controllers\Api\MemberActivityController::class, 'getTimeline']);
+Route::get('/v2/users/me/activity/hours', [\App\Http\Controllers\Api\MemberActivityController::class, 'getHours']);
+Route::get('/v2/users/me/activity/monthly', [\App\Http\Controllers\Api\MemberActivityController::class, 'getMonthlyHours']);
+Route::get('/v2/users/{id}/activity/dashboard', [\App\Http\Controllers\Api\MemberActivityController::class, 'getPublicDashboard']);
 // Verification Badges
-Route::get('/v2/users/{id}/verification-badges', [\Nexus\Controllers\Api\MemberVerificationBadgeApiController::class, 'getUserBadges']);
-Route::post('/v2/admin/users/{id}/badges', [\Nexus\Controllers\Api\MemberVerificationBadgeApiController::class, 'grantBadge']);
-Route::delete('/v2/admin/users/{id}/badges/{type}', [\Nexus\Controllers\Api\MemberVerificationBadgeApiController::class, 'revokeBadge']);
-Route::get('/v2/admin/users/{id}/badges', [\Nexus\Controllers\Api\MemberVerificationBadgeApiController::class, 'getAdminBadgeList']);
+Route::get('/v2/users/{id}/verification-badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getUserBadges']);
+Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'grantBadge']);
+Route::delete('/v2/admin/users/{id}/badges/{type}', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'revokeBadge']);
+Route::get('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getAdminBadgeList']);
 // Sub-Accounts
-Route::get('/v2/users/me/sub-accounts', [\Nexus\Controllers\Api\SubAccountApiController::class, 'getChildAccounts']);
-Route::get('/v2/users/me/parent-accounts', [\Nexus\Controllers\Api\SubAccountApiController::class, 'getParentAccounts']);
-Route::post('/v2/users/me/sub-accounts', [\Nexus\Controllers\Api\SubAccountApiController::class, 'requestRelationship']);
-Route::put('/v2/users/me/sub-accounts/{id}/approve', [\Nexus\Controllers\Api\SubAccountApiController::class, 'approveRelationship']);
+Route::get('/v2/users/me/sub-accounts', [\App\Http\Controllers\Api\SubAccountController::class, 'getChildAccounts']);
+Route::get('/v2/users/me/parent-accounts', [\App\Http\Controllers\Api\SubAccountController::class, 'getParentAccounts']);
+Route::post('/v2/users/me/sub-accounts', [\App\Http\Controllers\Api\SubAccountController::class, 'requestRelationship']);
+Route::put('/v2/users/me/sub-accounts/{id}/approve', [\App\Http\Controllers\Api\SubAccountController::class, 'approveRelationship']);
 Route::put('/v2/users/me/sub-accounts/{id}/permissions', [\Nexus\Controllers\Api\SubAccountApiController::class, 'updatePermissions']);
-Route::delete('/v2/users/me/sub-accounts/{id}', [\Nexus\Controllers\Api\SubAccountApiController::class, 'revokeRelationship']);
+Route::delete('/v2/users/me/sub-accounts/{id}', [\App\Http\Controllers\Api\SubAccountController::class, 'revokeRelationship']);
 Route::get('/v2/users/me/sub-accounts/{childId}/activity', [\Nexus\Controllers\Api\SubAccountApiController::class, 'getChildActivity']);
 
 // ============================================
@@ -428,21 +436,21 @@ Route::post('/v2/comments', [\Nexus\Controllers\Api\CommentsV2ApiController::cla
 Route::put('/v2/comments/{id}', [\Nexus\Controllers\Api\CommentsV2ApiController::class, 'update']);
 Route::delete('/v2/comments/{id}', [\Nexus\Controllers\Api\CommentsV2ApiController::class, 'destroy']);
 Route::post('/v2/comments/{id}/reactions', [\Nexus\Controllers\Api\CommentsV2ApiController::class, 'reactions']);
-Route::get('/v2/blog', [\Nexus\Controllers\Api\BlogPublicApiController::class, 'index']);
-Route::get('/v2/blog/categories', [\Nexus\Controllers\Api\BlogPublicApiController::class, 'categories']);
-Route::get('/v2/blog/{slug}', [\Nexus\Controllers\Api\BlogPublicApiController::class, 'show']);
+Route::get('/v2/blog', [\App\Http\Controllers\Api\BlogPublicController::class, 'index']);
+Route::get('/v2/blog/categories', [\App\Http\Controllers\Api\BlogPublicController::class, 'categories']);
+Route::get('/v2/blog/{slug}', [\App\Http\Controllers\Api\BlogPublicController::class, 'show']);
 Route::get('/v2/help/faqs', [\Nexus\Controllers\Api\HelpApiController::class, 'getFaqs']);
-Route::get('/v2/pages/{slug}', [\Nexus\Controllers\Api\PagesPublicApiController::class, 'show']);
-Route::get('/v2/resources', [\Nexus\Controllers\Api\ResourcesPublicApiController::class, 'index']);
-Route::get('/v2/resources/categories', [\Nexus\Controllers\Api\ResourcesPublicApiController::class, 'categories']);
-Route::get('/v2/resources/categories/tree', [\Nexus\Controllers\Api\ResourceCategoriesApiController::class, 'tree']);
-Route::post('/v2/resources/categories', [\Nexus\Controllers\Api\ResourceCategoriesApiController::class, 'store']);
-Route::put('/v2/resources/categories/{id}', [\Nexus\Controllers\Api\ResourceCategoriesApiController::class, 'update']);
-Route::delete('/v2/resources/categories/{id}', [\Nexus\Controllers\Api\ResourceCategoriesApiController::class, 'destroy']);
-Route::put('/v2/resources/reorder', [\Nexus\Controllers\Api\ResourceCategoriesApiController::class, 'reorder']);
-Route::post('/v2/resources', [\Nexus\Controllers\Api\ResourcesPublicApiController::class, 'store']);
-Route::get('/v2/resources/{id}/download', [\Nexus\Controllers\Api\ResourcesPublicApiController::class, 'download']);
-Route::delete('/v2/resources/{id}', [\Nexus\Controllers\Api\ResourcesPublicApiController::class, 'destroy']);
+Route::get('/v2/pages/{slug}', [\App\Http\Controllers\Api\PagesPublicController::class, 'show']);
+Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index']);
+Route::get('/v2/resources/categories', [\App\Http\Controllers\Api\ResourcePublicController::class, 'categories']);
+Route::get('/v2/resources/categories/tree', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'tree']);
+Route::post('/v2/resources/categories', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'store']);
+Route::put('/v2/resources/categories/{id}', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'update']);
+Route::delete('/v2/resources/categories/{id}', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'destroy']);
+Route::put('/v2/resources/reorder', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'reorder']);
+Route::post('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'store']);
+Route::get('/v2/resources/{id}/download', [\App\Http\Controllers\Api\ResourcePublicController::class, 'download']);
+Route::delete('/v2/resources/{id}', [\App\Http\Controllers\Api\ResourcePublicController::class, 'destroy']);
 Route::get('/v2/kb', [\Nexus\Controllers\Api\KnowledgeBaseApiController::class, 'index']);
 Route::get('/v2/kb/search', [\Nexus\Controllers\Api\KnowledgeBaseApiController::class, 'search']);
 Route::post('/v2/kb', [\Nexus\Controllers\Api\KnowledgeBaseApiController::class, 'store']);
@@ -1052,18 +1060,18 @@ Route::post('/ai/generate/bio', [\Nexus\Controllers\Api\Ai\AiContentController::
 Route::post('/ai/generate/newsletter', [\Nexus\Controllers\Api\Ai\AiAdminContentController::class, 'generateNewsletter']);
 Route::post('/ai/generate/blog', [\Nexus\Controllers\Api\Ai\AiAdminContentController::class, 'generateBlog']);
 Route::post('/ai/generate/page', [\Nexus\Controllers\Api\Ai\AiAdminContentController::class, 'generatePage']);
-Route::get('/menus', [\Nexus\Controllers\Api\MenuApiController::class, 'index']);
-Route::get('/menus/config', [\Nexus\Controllers\Api\MenuApiController::class, 'config']);
-Route::get('/menus/mobile', [\Nexus\Controllers\Api\MenuApiController::class, 'mobile']);
-Route::get('/menus/{slug}', [\Nexus\Controllers\Api\MenuApiController::class, 'show']);
-Route::post('/menus/clear-cache', [\Nexus\Controllers\Api\MenuApiController::class, 'clearCache']);
+Route::get('/menus', [\App\Http\Controllers\Api\MenuController::class, 'index']);
+Route::get('/menus/config', [\App\Http\Controllers\Api\MenuController::class, 'config']);
+Route::get('/menus/mobile', [\App\Http\Controllers\Api\MenuController::class, 'mobile']);
+Route::get('/menus/{slug}', [\App\Http\Controllers\Api\MenuController::class, 'show']);
+Route::post('/menus/clear-cache', [\App\Http\Controllers\Api\MenuController::class, 'clearCache']);
 Route::post('/v2/contact', [\Nexus\Controllers\ContactController::class, 'apiSubmit']);
 Route::post('/help/feedback', [\Nexus\Controllers\HelpController::class, 'feedback']);
 Route::get('/groups/{id}/analytics', [\Nexus\Controllers\GroupAnalyticsController::class, 'apiData']);
-Route::get('/recommendations/groups', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'index']);
-Route::post('/recommendations/track', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'track']);
-Route::get('/recommendations/metrics', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'metrics']);
-Route::get('/recommendations/similar/{id}', [\Nexus\Controllers\Api\GroupRecommendationController::class, 'similar']);
+Route::get('/recommendations/groups', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
+Route::post('/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
+Route::get('/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
+Route::get('/recommendations/similar/{id}', [\App\Http\Controllers\Api\GroupRecommendController::class, 'similar']);
 Route::post('/notifications/settings', [\Nexus\Controllers\UserPreferenceController::class, 'updateSettings']);
 Route::get('/leaderboard', [\Nexus\Controllers\LeaderboardController::class, 'api']);
 Route::get('/leaderboard/widget', [\Nexus\Controllers\LeaderboardController::class, 'widget']);
@@ -1108,18 +1116,18 @@ Route::get('/v2/admin/community-analytics/export', [\Nexus\Controllers\Api\Admin
 Route::get('/v2/admin/community-analytics/geography', [\Nexus\Controllers\Api\AdminCommunityAnalyticsApiController::class, 'geography']);
 Route::get('/v2/admin/impact-report', [\Nexus\Controllers\Api\AdminImpactReportApiController::class, 'index']);
 Route::put('/v2/admin/impact-report/config', [\Nexus\Controllers\Api\AdminImpactReportApiController::class, 'updateConfig']);
-Route::get('/v2/onboarding/status', [\Nexus\Controllers\Api\OnboardingApiController::class, 'status']);
-Route::get('/v2/onboarding/categories', [\Nexus\Controllers\Api\OnboardingApiController::class, 'categories']);
-Route::post('/v2/onboarding/complete', [\Nexus\Controllers\Api\OnboardingApiController::class, 'complete']);
-Route::get('/v2/group-exchanges', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'index']);
-Route::post('/v2/group-exchanges', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'store']);
-Route::get('/v2/group-exchanges/{id}', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'show']);
-Route::put('/v2/group-exchanges/{id}', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'update']);
-Route::delete('/v2/group-exchanges/{id}', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'destroy']);
+Route::get('/v2/onboarding/status', [\App\Http\Controllers\Api\OnboardingController::class, 'status']);
+Route::get('/v2/onboarding/categories', [\App\Http\Controllers\Api\OnboardingController::class, 'categories']);
+Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete']);
+Route::get('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'index']);
+Route::post('/v2/group-exchanges', [\App\Http\Controllers\Api\GroupExchangeController::class, 'store']);
+Route::get('/v2/group-exchanges/{id}', [\App\Http\Controllers\Api\GroupExchangeController::class, 'show']);
+Route::put('/v2/group-exchanges/{id}', [\App\Http\Controllers\Api\GroupExchangeController::class, 'update']);
+Route::delete('/v2/group-exchanges/{id}', [\App\Http\Controllers\Api\GroupExchangeController::class, 'destroy']);
 Route::post('/v2/group-exchanges/{id}/participants', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'addParticipant']);
 Route::delete('/v2/group-exchanges/{id}/participants/{userId}', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'removeParticipant']);
-Route::post('/v2/group-exchanges/{id}/confirm', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'confirm']);
-Route::post('/v2/group-exchanges/{id}/complete', [\Nexus\Controllers\Api\GroupExchangesApiController::class, 'complete']);
+Route::post('/v2/group-exchanges/{id}/confirm', [\App\Http\Controllers\Api\GroupExchangeController::class, 'confirm']);
+Route::post('/v2/group-exchanges/{id}/complete', [\App\Http\Controllers\Api\GroupExchangeController::class, 'complete']);
 Route::get('/v2/wallet/statement', [\Nexus\Controllers\Api\WalletFeaturesApiController::class, 'statement']);
 Route::get('/v2/wallet/categories', [\Nexus\Controllers\Api\WalletFeaturesApiController::class, 'listCategories']);
 Route::post('/v2/wallet/categories', [\Nexus\Controllers\Api\WalletFeaturesApiController::class, 'createCategory']);
