@@ -429,4 +429,514 @@ class SafeguardingService
             error_log("SafeguardingService::notifyGuardians error: " . $e->getMessage());
         }
     }
+    // =========================================================================
+    // SAFEGUARDING TRAINING
+    // =========================================================================
+
+    /**
+     * Record a training completion for a user
+     *
+     * @param int $userId
+     * @param array $data [training_type, training_name, provider, completed_at, expires_at, certificate_url, notes]
+     * @return array The created record
+     */
+    public static function recordTraining(int $userId, array $data): array
+    {
+        $tenantId = TenantContext::getId();
+
+        // Validate training_type ENUM
+        $validTrainingTypes = ['children_first', 'vulnerable_adults', 'first_aid', 'manual_handling', 'other'];
+        $trainingType = $data['training_type'] ?? '';
+        if (!in_array($trainingType, $validTrainingTypes, true)) {
+            throw new \InvalidArgumentException(
+                "Invalid training_type '{$trainingType}'. Must be one of: " . implode(', ', $validTrainingTypes)
+            );
+        }
+
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare(
+                "INSERT INTO vol_safeguarding_training
+                    (user_id, tenant_id, training_type, training_name, provider,
+                     completed_at, expires_at, certificate_url, notes, status, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW(), NOW())"
+            );
+            $stmt->execute([
+                $userId,
+                $tenantId,
+                $data['training_type'] ?? '',
+                $data['training_name'] ?? '',
+                $data['provider'] ?? null,
+                $data['completed_at'] ?? date('Y-m-d'),
+                $data['expires_at'] ?? null,
+                $data['certificate_url'] ?? null,
+                $data['notes'] ?? null,
+            ]);
+
+            $id = (int)$db->lastInsertId();
+
+            $record = Database::query(
+                "SELECT * FROM vol_safeguarding_training WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            return $record ?: [];
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::recordTraining error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Verify a training record (admin/DLP approval)
+     */
+    public static function verifyTraining(int $id, int $verifierId, ?string $notes = null, ?string $certificateUrl = null): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $sql = "UPDATE vol_safeguarding_training
+                    SET status = 'verified', verified_by = ?, verified_at = NOW(), updated_at = NOW()";
+            $params = [$verifierId];
+
+            if ($notes !== null) {
+                $sql .= ", notes = ?";
+                $params[] = $notes;
+            }
+            if ($certificateUrl !== null) {
+                $sql .= ", certificate_url = ?";
+                $params[] = $certificateUrl;
+            }
+
+            $sql .= " WHERE id = ? AND tenant_id = ?";
+            $params[] = $id;
+            $params[] = $tenantId;
+
+            Database::query($sql, $params);
+            return true;
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::verifyTraining error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Reject a training record
+     */
+    public static function rejectTraining(int $id, int $verifierId, ?string $notes = null): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $sql = "UPDATE vol_safeguarding_training
+                    SET status = 'rejected', verified_by = ?, verified_at = NOW(), updated_at = NOW()";
+            $params = [$verifierId];
+
+            if ($notes !== null) {
+                $sql .= ", notes = ?";
+                $params[] = $notes;
+            }
+
+            $sql .= " WHERE id = ? AND tenant_id = ?";
+            $params[] = $id;
+            $params[] = $tenantId;
+
+            Database::query($sql, $params);
+            return true;
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::rejectTraining error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get all training records for a user
+     */
+    public static function getTrainingForUser(int $userId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            return Database::query(
+                "SELECT st.*, v.name as verified_by_name
+                 FROM vol_safeguarding_training st
+                 LEFT JOIN users v ON st.verified_by = v.id
+                 WHERE st.user_id = ? AND st.tenant_id = ?
+                 ORDER BY st.completed_at DESC",
+                [$userId, $tenantId]
+            )->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::getTrainingForUser error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get training records for admin view with pagination and filters
+     *
+     * @param array $filters [status, training_type, user_id, page, per_page]
+     * @return array ['items' => [], 'total' => int, 'page' => int, 'per_page' => int]
+     */
+    public static function getTrainingForAdmin(array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+        $page = max(1, (int)($filters['page'] ?? 1));
+        $perPage = min(100, max(1, (int)($filters['per_page'] ?? 20)));
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $where = "st.tenant_id = ?";
+            $params = [$tenantId];
+
+            if (!empty($filters['status'])) {
+                $where .= " AND st.status = ?";
+                $params[] = $filters['status'];
+            }
+            if (!empty($filters['training_type'])) {
+                $where .= " AND st.training_type = ?";
+                $params[] = $filters['training_type'];
+            }
+            if (!empty($filters['user_id'])) {
+                $where .= " AND st.user_id = ?";
+                $params[] = (int)$filters['user_id'];
+            }
+
+            $total = (int)Database::query(
+                "SELECT COUNT(*) FROM vol_safeguarding_training st WHERE {$where}",
+                $params
+            )->fetchColumn();
+
+            $items = Database::query(
+                "SELECT st.*, u.name as user_name, u.avatar_url as user_avatar,
+                        v.name as verified_by_name
+                 FROM vol_safeguarding_training st
+                 JOIN users u ON st.user_id = u.id
+                 LEFT JOIN users v ON st.verified_by = v.id
+                 WHERE {$where}
+                 ORDER BY st.created_at DESC
+                 LIMIT {$perPage} OFFSET {$offset}",
+                $params
+            )->fetchAll(\PDO::FETCH_ASSOC);
+
+            return [
+                'items' => $items,
+                'total' => $total,
+                'page' => $page,
+                'per_page' => $perPage,
+            ];
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::getTrainingForAdmin error: " . $e->getMessage());
+            return ['items' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage];
+        }
+    }
+
+    /**
+     * Check if a user has valid (verified, not expired) training of a given type
+     */
+    public static function checkTrainingCompliance(int $userId, string $trainingType): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $count = (int)Database::query(
+                "SELECT COUNT(*) FROM vol_safeguarding_training
+                 WHERE user_id = ? AND tenant_id = ? AND training_type = ?
+                   AND status = 'verified'
+                   AND (expires_at IS NULL OR expires_at > NOW())",
+                [$userId, $tenantId, $trainingType]
+            )->fetchColumn();
+
+            return $count > 0;
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::checkTrainingCompliance error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // =========================================================================
+    // SAFEGUARDING INCIDENTS
+    // =========================================================================
+
+    /**
+     * Report a safeguarding incident
+     *
+     * @param int $reportedBy User ID of reporter
+     * @param array $data [title, description, severity, incident_type, incident_date, involved_user_id, organization_id, shift_id, category]
+     * @return array The created incident record
+     */
+    public static function reportIncident(int $reportedBy, array $data): array
+    {
+        $tenantId = TenantContext::getId();
+
+        // Validate severity ENUM
+        $validSeverities = ['low', 'medium', 'high', 'critical'];
+        $severity = $data['severity'] ?? 'medium';
+        if (!in_array($severity, $validSeverities, true)) {
+            throw new \InvalidArgumentException(
+                "Invalid severity '{$severity}'. Must be one of: " . implode(', ', $validSeverities)
+            );
+        }
+
+        // Validate incident_type ENUM
+        $validIncidentTypes = ['concern', 'allegation', 'disclosure', 'near_miss', 'other'];
+        $incidentType = $data['incident_type'] ?? 'other';
+        if (!in_array($incidentType, $validIncidentTypes, true)) {
+            throw new \InvalidArgumentException(
+                "Invalid incident_type '{$incidentType}'. Must be one of: " . implode(', ', $validIncidentTypes)
+            );
+        }
+
+        try {
+            $db = Database::getConnection();
+            $stmt = $db->prepare(
+                "INSERT INTO vol_safeguarding_incidents
+                    (tenant_id, reported_by, title, description, severity, incident_type, incident_date,
+                     involved_user_id, organization_id, shift_id, category, status, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', NOW(), NOW())"
+            );
+            $stmt->execute([
+                $tenantId,
+                $reportedBy,
+                $data['title'] ?? '',
+                $data['description'] ?? '',
+                $severity,
+                $incidentType,
+                $data['incident_date'] ?? date('Y-m-d'),
+                $data['involved_user_id'] ?? null,
+                $data['organization_id'] ?? null,
+                $data['shift_id'] ?? null,
+                $data['category'] ?? 'general',
+            ]);
+
+            $id = (int)$db->lastInsertId();
+
+            // Notify DLP if incident is linked to an organization
+            if (!empty($data['organization_id'])) {
+                $dlpInfo = self::getDlpForOrg((int)$data['organization_id']);
+                if ($dlpInfo && !empty($dlpInfo['dlp_user_id'])) {
+                    Notification::create(
+                        (int)$dlpInfo['dlp_user_id'],
+                        'A safeguarding incident has been reported for your organization. Please review.',
+                        '/admin/safeguarding/incidents/' . $id,
+                        'safeguarding_incident'
+                    );
+                }
+                if ($dlpInfo && !empty($dlpInfo['deputy_dlp_user_id'])) {
+                    Notification::create(
+                        (int)$dlpInfo['deputy_dlp_user_id'],
+                        'A safeguarding incident has been reported for your organization. Please review.',
+                        '/admin/safeguarding/incidents/' . $id,
+                        'safeguarding_incident'
+                    );
+                }
+            }
+
+            $record = Database::query(
+                "SELECT * FROM vol_safeguarding_incidents WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            return $record ?: [];
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::reportIncident error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Update a safeguarding incident
+     *
+     * @param int $id Incident ID
+     * @param array $data [status, action_taken, resolution_notes, assigned_to, severity]
+     */
+    public static function updateIncident(int $id, array $data): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $sets = [];
+            $params = [];
+
+            $allowedFields = ['status', 'action_taken', 'resolution_notes', 'assigned_to', 'severity'];
+            foreach ($allowedFields as $field) {
+                if (array_key_exists($field, $data)) {
+                    $sets[] = "{$field} = ?";
+                    $params[] = $data[$field];
+                }
+            }
+
+            if (empty($sets)) {
+                return false;
+            }
+
+            // If resolving, set resolved_at
+            if (isset($data['status']) && in_array($data['status'], ['resolved', 'closed'])) {
+                $sets[] = "resolved_at = NOW()";
+            }
+
+            $sets[] = "updated_at = NOW()";
+            $params[] = $id;
+            $params[] = $tenantId;
+
+            $sql = "UPDATE vol_safeguarding_incidents SET " . implode(', ', $sets)
+                 . " WHERE id = ? AND tenant_id = ?";
+
+            Database::query($sql, $params);
+            return true;
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::updateIncident error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get safeguarding incidents with filters and pagination
+     *
+     * @param array $filters [status, severity, organization_id, shift_id, page, per_page]
+     * @return array ['items' => [], 'total' => int, 'page' => int, 'per_page' => int]
+     */
+    public static function getIncidents(array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+        $page = max(1, (int)($filters['page'] ?? 1));
+        $perPage = min(100, max(1, (int)($filters['per_page'] ?? 20)));
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $where = "si.tenant_id = ?";
+            $params = [$tenantId];
+
+            if (!empty($filters['status'])) {
+                $where .= " AND si.status = ?";
+                $params[] = $filters['status'];
+            }
+            if (!empty($filters['severity'])) {
+                $where .= " AND si.severity = ?";
+                $params[] = $filters['severity'];
+            }
+            if (!empty($filters['organization_id'])) {
+                $where .= " AND si.organization_id = ?";
+                $params[] = (int)$filters['organization_id'];
+            }
+            if (!empty($filters['shift_id'])) {
+                $where .= " AND si.shift_id = ?";
+                $params[] = (int)$filters['shift_id'];
+            }
+            if (!empty($filters['reported_by'])) {
+                $where .= " AND si.reported_by = ?";
+                $params[] = (int)$filters['reported_by'];
+            }
+
+            $total = (int)Database::query(
+                "SELECT COUNT(*) FROM vol_safeguarding_incidents si WHERE {$where}",
+                $params
+            )->fetchColumn();
+
+            $items = Database::query(
+                "SELECT si.*, u.name as reported_by_name, u.avatar_url as reported_by_avatar,
+                        iu.name as involved_user_name,
+                        org.name as organization_name,
+                        au.name as assigned_to_name
+                 FROM vol_safeguarding_incidents si
+                 JOIN users u ON si.reported_by = u.id
+                 LEFT JOIN users iu ON si.involved_user_id = iu.id
+                 LEFT JOIN vol_organizations org ON si.organization_id = org.id
+                 LEFT JOIN users au ON si.assigned_to = au.id
+                 WHERE {$where}
+                 ORDER BY si.created_at DESC
+                 LIMIT {$perPage} OFFSET {$offset}",
+                $params
+            )->fetchAll(\PDO::FETCH_ASSOC);
+
+            return [
+                'items' => $items,
+                'total' => $total,
+                'page' => $page,
+                'per_page' => $perPage,
+            ];
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::getIncidents error: " . $e->getMessage());
+            return ['items' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage];
+        }
+    }
+
+    /**
+     * Get a single safeguarding incident by ID
+     */
+    public static function getIncident(int $id): ?array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $record = Database::query(
+                "SELECT si.*, u.name as reported_by_name, u.avatar_url as reported_by_avatar,
+                        iu.name as involved_user_name, iu.avatar_url as involved_user_avatar,
+                        org.name as organization_name,
+                        au.name as assigned_to_name
+                 FROM vol_safeguarding_incidents si
+                 JOIN users u ON si.reported_by = u.id
+                 LEFT JOIN users iu ON si.involved_user_id = iu.id
+                 LEFT JOIN vol_organizations org ON si.organization_id = org.id
+                 LEFT JOIN users au ON si.assigned_to = au.id
+                 WHERE si.id = ? AND si.tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            return $record ?: null;
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::getIncident error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    // =========================================================================
+    // DESIGNATED LIAISON PERSON (DLP)
+    // =========================================================================
+
+    /**
+     * Assign a DLP and optional deputy to an organization
+     */
+    public static function assignDlp(int $organizationId, int $dlpUserId, ?int $deputyDlpUserId = null): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            Database::query(
+                "UPDATE vol_organizations
+                 SET dlp_user_id = ?, deputy_dlp_user_id = ?, updated_at = NOW()
+                 WHERE id = ? AND tenant_id = ?",
+                [$dlpUserId, $deputyDlpUserId, $organizationId, $tenantId]
+            );
+            return true;
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::assignDlp error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get DLP and deputy info for an organization
+     */
+    public static function getDlpForOrg(int $organizationId): ?array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $record = Database::query(
+                "SELECT org.dlp_user_id, org.deputy_dlp_user_id,
+                        dlp.name as dlp_name, dlp.email as dlp_email, dlp.avatar_url as dlp_avatar,
+                        ddlp.name as deputy_dlp_name, ddlp.email as deputy_dlp_email, ddlp.avatar_url as deputy_dlp_avatar
+                 FROM vol_organizations org
+                 LEFT JOIN users dlp ON org.dlp_user_id = dlp.id
+                 LEFT JOIN users ddlp ON org.deputy_dlp_user_id = ddlp.id
+                 WHERE org.id = ? AND org.tenant_id = ?",
+                [$organizationId, $tenantId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            return $record ?: null;
+        } catch (\Exception $e) {
+            error_log("SafeguardingService::getDlpForOrg error: " . $e->getMessage());
+            return null;
+        }
+    }
 }

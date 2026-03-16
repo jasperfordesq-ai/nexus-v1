@@ -229,8 +229,8 @@ export default function CreateOpportunityPage() {
             <Select
               label={t('volunteering.form_org_label')}
               placeholder={t('volunteering.form_org_placeholder')}
-              selectedKeys={formData.organization_id ? [formData.organization_id] : []}
-              onChange={(e) => updateField('organization_id', e.target.value)}
+              selectedKeys={formData.organization_id ? new Set([formData.organization_id]) : new Set()}
+              onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) updateField('organization_id', val); }}
               isInvalid={!!errors.organization_id}
               errorMessage={errors.organization_id}
               startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
