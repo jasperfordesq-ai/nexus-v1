@@ -516,7 +516,33 @@ if (file_exists($pageBuilderBlocks)) {
     require_once $pageBuilderBlocks;
 }
 
-// 5. LOAD ROUTES (Standard desktop routing)
+// 5. LARAVEL BRIDGE — Try Laravel routes first, fall through to legacy if unmatched
+// During migration, Laravel handles converted routes while legacy handles the rest.
+$laravelBootstrap = $baseDir . '/bootstrap/app.php';
+if (file_exists($laravelBootstrap)) {
+    try {
+        $laravelApp = require_once $laravelBootstrap;
+        $laravelKernel = $laravelApp->make(\Illuminate\Contracts\Http\Kernel::class);
+        $laravelRequest = \Illuminate\Http\Request::capture();
+
+        // Let Laravel handle the request — if it returns 404, fall through to legacy
+        $laravelResponse = $laravelKernel->handle($laravelRequest);
+
+        if ($laravelResponse->getStatusCode() !== 404) {
+            // Laravel matched a route — send the response and exit
+            $laravelResponse->send();
+            $laravelKernel->terminate($laravelRequest, $laravelResponse);
+            exit;
+        }
+        // 404 = no Laravel route matched — fall through to legacy router
+    } catch (\Throwable $e) {
+        // Laravel bootstrap failed — log and fall through to legacy
+        error_log('[Laravel Bridge] Error: ' . $e->getMessage());
+    }
+}
+
+// 5b. LOAD LEGACY ROUTES (Standard desktop routing)
+// Any request not matched by Laravel falls through here
 $routesFile = __DIR__ . '/routes.php';
 if (file_exists($routesFile)) {
     require_once $routesFile;

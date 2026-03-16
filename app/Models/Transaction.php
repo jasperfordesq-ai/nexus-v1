@@ -1,0 +1,59 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Models;
+
+use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Transaction extends Model
+{
+    use HasTenantScope;
+
+    protected $table = 'transactions';
+
+    protected $fillable = [
+        'tenant_id', 'sender_id', 'receiver_id', 'amount', 'description',
+        'status', 'source_match_id', 'deleted_for_sender', 'deleted_for_receiver',
+    ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'deleted_for_sender' => 'boolean',
+        'deleted_for_receiver' => 'boolean',
+    ];
+
+    public function sender(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function receiver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    public function listing(): BelongsTo
+    {
+        return $this->belongsTo(Listing::class);
+    }
+
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->where('status', 'completed');
+    }
+
+    public function scopeForUser(Builder $query, int $userId): Builder
+    {
+        return $query->where(function ($q) use ($userId) {
+            $q->where('sender_id', $userId)->where('deleted_for_sender', false);
+        })->orWhere(function ($q) use ($userId) {
+            $q->where('receiver_id', $userId)->where('deleted_for_receiver', false);
+        });
+    }
+}

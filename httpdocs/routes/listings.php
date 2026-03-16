@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+// MIGRATED TO LARAVEL — see routes/api.php
 // ============================================
 // LISTINGS API v2 - RESTful CRUD
 // Full API for mobile/SPA with standardized responses
@@ -29,17 +30,17 @@ $router->add('GET', '/api/v2/categories', function () {
     }
 });
 
-$router->add('GET', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@index');
-$router->add('GET', '/api/v2/listings/nearby', 'Nexus\Controllers\Api\ListingsApiController@nearby');
-$router->add('GET', '/api/v2/listings/saved', 'Nexus\Controllers\Api\ListingsApiController@getSavedListings');
-$router->add('GET', '/api/v2/listings/featured', 'Nexus\Controllers\Api\ListingsApiController@featured');
-$router->add('GET', '/api/v2/listings/tags/popular', 'Nexus\Controllers\Api\ListingsApiController@popularTags');
-$router->add('GET', '/api/v2/listings/tags/autocomplete', 'Nexus\Controllers\Api\ListingsApiController@autocompleteTags');
-$router->add('POST', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@store');
-$router->add('GET', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@show');
-$router->add('PUT', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@update');
-$router->add('DELETE', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@destroy');
-$router->add('POST', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@saveListing');
-$router->add('DELETE', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@unsaveListing');
-$router->add('POST', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\ListingsApiController@uploadImage');
-$router->add('DELETE', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\ListingsApiController@deleteImage');
+// $router->add('GET', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@index');
+// $router->add('GET', '/api/v2/listings/nearby', 'Nexus\Controllers\Api\ListingsApiController@nearby');
+// $router->add('GET', '/api/v2/listings/saved', 'Nexus\Controllers\Api\ListingsApiController@getSavedListings');
+// $router->add('GET', '/api/v2/listings/featured', 'Nexus\Controllers\Api\ListingsApiController@featured');
+// $router->add('GET', '/api/v2/listings/tags/popular', 'Nexus\Controllers\Api\ListingsApiController@popularTags');
+// $router->add('GET', '/api/v2/listings/tags/autocomplete', 'Nexus\Controllers\Api\ListingsApiController@autocompleteTags');
+// $router->add('POST', '/api/v2/listings', 'Nexus\Controllers\Api\ListingsApiController@store');
+// $router->add('GET', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@show');
+// $router->add('PUT', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@update');
+// $router->add('DELETE', '/api/v2/listings/{id}', 'Nexus\Controllers\Api\ListingsApiController@destroy');
+// $router->add('POST', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@saveListing');
+// $router->add('DELETE', '/api/v2/listings/{id}/save', 'Nexus\Controllers\Api\ListingsApiController@unsaveListing');
+// $router->add('POST', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\ListingsApiController@uploadImage');
+// $router->add('DELETE', '/api/v2/listings/{id}/image', 'Nexus\Controllers\Api\ListingsApiController@deleteImage');

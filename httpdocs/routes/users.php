@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+// MIGRATED TO LARAVEL — see routes/api.php
 // ============================================
 // API V2 - USERS (RESTful User/Profile Management)
 // ============================================
@@ -166,91 +167,91 @@ $router->add('GET', '/api/v2/users', function () {
     echo json_encode(['error' => 'Internal server error']);
   }
 });
-$router->add('GET', '/api/v2/me/stats', 'Nexus\Controllers\Api\UsersApiController@stats');
-$router->add('GET', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@me');
-$router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@update');
-$router->add('GET', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@getPreferences');
-$router->add('PUT', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@updatePreferences');
-$router->add('PUT', '/api/v2/users/me/theme', 'Nexus\Controllers\Api\UsersApiController@updateTheme');
-$router->add('PUT', '/api/v2/users/me/language', 'Nexus\Controllers\Api\UsersApiController@updateLanguage');
-$router->add('POST', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiController@updateAvatar');
-$router->add('POST', '/api/v2/users/me/password', 'Nexus\Controllers\Api\UsersApiController@updatePassword');
-$router->add('DELETE', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@deleteAccount');
-$router->add('GET', '/api/v2/users/me/listings', 'Nexus\Controllers\Api\UsersApiController@myListings'); // Must be before {id}/listings
-$router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
-$router->add('PUT', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@updateNotificationPreferences');
-$router->add('GET', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@getConsent');
-$router->add('PUT', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@updateConsent');
-$router->add('POST', '/api/v2/users/me/gdpr-request', 'Nexus\Controllers\Api\UsersApiController@createGdprRequest');
-$router->add('GET', '/api/v2/users/me/sessions', 'Nexus\Controllers\Api\UsersApiController@sessions');
-$router->add('GET', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@show');
-$router->add('PUT', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@update');
-$router->add('GET', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@list');
-$router->add('POST', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@upload');
-$router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiController@show');
-$router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
-$router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiController@nearby');
+// $router->add('GET', '/api/v2/me/stats', 'Nexus\Controllers\Api\UsersApiController@stats');
+// $router->add('GET', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@me');
+// $router->add('PUT', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@update');
+// $router->add('GET', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@getPreferences');
+// $router->add('PUT', '/api/v2/users/me/preferences', 'Nexus\Controllers\Api\UsersApiController@updatePreferences');
+// $router->add('PUT', '/api/v2/users/me/theme', 'Nexus\Controllers\Api\UsersApiController@updateTheme');
+// $router->add('PUT', '/api/v2/users/me/language', 'Nexus\Controllers\Api\UsersApiController@updateLanguage');
+// $router->add('POST', '/api/v2/users/me/avatar', 'Nexus\Controllers\Api\UsersApiController@updateAvatar');
+// $router->add('POST', '/api/v2/users/me/password', 'Nexus\Controllers\Api\UsersApiController@updatePassword');
+// $router->add('DELETE', '/api/v2/users/me', 'Nexus\Controllers\Api\UsersApiController@deleteAccount');
+// $router->add('GET', '/api/v2/users/me/listings', 'Nexus\Controllers\Api\UsersApiController@myListings'); // Must be before {id}/listings
+// $router->add('GET', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@notificationPreferences');
+// $router->add('PUT', '/api/v2/users/me/notifications', 'Nexus\Controllers\Api\UsersApiController@updateNotificationPreferences');
+// $router->add('GET', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@getConsent');
+// $router->add('PUT', '/api/v2/users/me/consent', 'Nexus\Controllers\Api\UsersApiController@updateConsent');
+// $router->add('POST', '/api/v2/users/me/gdpr-request', 'Nexus\Controllers\Api\UsersApiController@createGdprRequest');
+// $router->add('GET', '/api/v2/users/me/sessions', 'Nexus\Controllers\Api\UsersApiController@sessions');
+// $router->add('GET', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@show');
+// $router->add('PUT', '/api/v2/users/me/match-preferences', 'Nexus\Controllers\Api\MatchPreferencesApiController@update');
+// $router->add('GET', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@list');
+// $router->add('POST', '/api/v2/users/me/insurance', 'Nexus\Controllers\Api\UserInsuranceApiController@upload');
+// $router->add('GET', '/api/v2/users/{id}', 'Nexus\Controllers\Api\UsersApiController@show');
+// $router->add('GET', '/api/v2/users/{id}/listings', 'Nexus\Controllers\Api\UsersApiController@listings');
+// $router->add('GET', '/api/v2/members/nearby', 'Nexus\Controllers\Api\UsersApiController@nearby');
 
 // ============================================
 // API V2 - SKILLS TAXONOMY (M1)
 // ============================================
-$router->add('GET', '/api/v2/skills/categories', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getCategories');
-$router->add('GET', '/api/v2/skills/search', 'Nexus\Controllers\Api\SkillTaxonomyApiController@search');
-$router->add('GET', '/api/v2/skills/members', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getMembersWithSkill');
-$router->add('GET', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getCategoryById');
-$router->add('POST', '/api/v2/skills/categories', 'Nexus\Controllers\Api\SkillTaxonomyApiController@createCategory');
-$router->add('PUT', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@updateCategory');
-$router->add('DELETE', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@deleteCategory');
-$router->add('GET', '/api/v2/users/me/skills', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getMySkills');
-$router->add('POST', '/api/v2/users/me/skills', 'Nexus\Controllers\Api\SkillTaxonomyApiController@addSkill');
-$router->add('PUT', '/api/v2/users/me/skills/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@updateSkill');
-$router->add('DELETE', '/api/v2/users/me/skills/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@removeSkill');
-$router->add('GET', '/api/v2/users/{id}/skills', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getUserSkills');
+// $router->add('GET', '/api/v2/skills/categories', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getCategories');
+// $router->add('GET', '/api/v2/skills/search', 'Nexus\Controllers\Api\SkillTaxonomyApiController@search');
+// $router->add('GET', '/api/v2/skills/members', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getMembersWithSkill');
+// $router->add('GET', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getCategoryById');
+// $router->add('POST', '/api/v2/skills/categories', 'Nexus\Controllers\Api\SkillTaxonomyApiController@createCategory');
+// $router->add('PUT', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@updateCategory');
+// $router->add('DELETE', '/api/v2/skills/categories/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@deleteCategory');
+// $router->add('GET', '/api/v2/users/me/skills', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getMySkills');
+// $router->add('POST', '/api/v2/users/me/skills', 'Nexus\Controllers\Api\SkillTaxonomyApiController@addSkill');
+// $router->add('PUT', '/api/v2/users/me/skills/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@updateSkill');
+// $router->add('DELETE', '/api/v2/users/me/skills/{id}', 'Nexus\Controllers\Api\SkillTaxonomyApiController@removeSkill');
+// $router->add('GET', '/api/v2/users/{id}/skills', 'Nexus\Controllers\Api\SkillTaxonomyApiController@getUserSkills');
 
 // ============================================
 // API V2 - MEMBER AVAILABILITY (M2)
 // ============================================
-$router->add('GET', '/api/v2/users/me/availability', 'Nexus\Controllers\Api\MemberAvailabilityApiController@getMyAvailability');
-$router->add('PUT', '/api/v2/users/me/availability', 'Nexus\Controllers\Api\MemberAvailabilityApiController@setBulkAvailability');
-$router->add('PUT', '/api/v2/users/me/availability/{day}', 'Nexus\Controllers\Api\MemberAvailabilityApiController@setDayAvailability');
-$router->add('POST', '/api/v2/users/me/availability/date', 'Nexus\Controllers\Api\MemberAvailabilityApiController@addSpecificDate');
-$router->add('DELETE', '/api/v2/users/me/availability/{id}', 'Nexus\Controllers\Api\MemberAvailabilityApiController@deleteSlot');
-$router->add('GET', '/api/v2/users/{id}/availability', 'Nexus\Controllers\Api\MemberAvailabilityApiController@getUserAvailability');
-$router->add('GET', '/api/v2/members/availability/compatible', 'Nexus\Controllers\Api\MemberAvailabilityApiController@findCompatibleTimes');
-$router->add('GET', '/api/v2/members/availability/available', 'Nexus\Controllers\Api\MemberAvailabilityApiController@getAvailableMembers');
+// $router->add('GET', '/api/v2/users/me/availability', 'Nexus\Controllers\Api\MemberAvailabilityApiController@getMyAvailability');
+// $router->add('PUT', '/api/v2/users/me/availability', 'Nexus\Controllers\Api\MemberAvailabilityApiController@setBulkAvailability');
+// $router->add('PUT', '/api/v2/users/me/availability/{day}', 'Nexus\Controllers\Api\MemberAvailabilityApiController@setDayAvailability');
+// $router->add('POST', '/api/v2/users/me/availability/date', 'Nexus\Controllers\Api\MemberAvailabilityApiController@addSpecificDate');
+// $router->add('DELETE', '/api/v2/users/me/availability/{id}', 'Nexus\Controllers\Api\MemberAvailabilityApiController@deleteSlot');
+// $router->add('GET', '/api/v2/users/{id}/availability', 'Nexus\Controllers\Api\MemberAvailabilityApiController@getUserAvailability');
+// $router->add('GET', '/api/v2/members/availability/compatible', 'Nexus\Controllers\Api\MemberAvailabilityApiController@findCompatibleTimes');
+// $router->add('GET', '/api/v2/members/availability/available', 'Nexus\Controllers\Api\MemberAvailabilityApiController@getAvailableMembers');
 
 // ============================================
 // API V2 - ENDORSEMENTS (M3)
 // ============================================
-$router->add('POST', '/api/v2/members/{id}/endorse', 'Nexus\Controllers\Api\EndorsementApiController@endorse');
-$router->add('DELETE', '/api/v2/members/{id}/endorse', 'Nexus\Controllers\Api\EndorsementApiController@removeEndorsement');
-$router->add('GET', '/api/v2/members/{id}/endorsements', 'Nexus\Controllers\Api\EndorsementApiController@getEndorsements');
-$router->add('GET', '/api/v2/members/top-endorsed', 'Nexus\Controllers\Api\EndorsementApiController@getTopEndorsed');
+// $router->add('POST', '/api/v2/members/{id}/endorse', 'Nexus\Controllers\Api\EndorsementApiController@endorse');
+// $router->add('DELETE', '/api/v2/members/{id}/endorse', 'Nexus\Controllers\Api\EndorsementApiController@removeEndorsement');
+// $router->add('GET', '/api/v2/members/{id}/endorsements', 'Nexus\Controllers\Api\EndorsementApiController@getEndorsements');
+// $router->add('GET', '/api/v2/members/top-endorsed', 'Nexus\Controllers\Api\EndorsementApiController@getTopEndorsed');
 
 // ============================================
 // API V2 - ACTIVITY DASHBOARD (M4)
 // ============================================
-$router->add('GET', '/api/v2/users/me/activity/dashboard', 'Nexus\Controllers\Api\MemberActivityApiController@getDashboard');
-$router->add('GET', '/api/v2/users/me/activity/timeline', 'Nexus\Controllers\Api\MemberActivityApiController@getTimeline');
-$router->add('GET', '/api/v2/users/me/activity/hours', 'Nexus\Controllers\Api\MemberActivityApiController@getHours');
-$router->add('GET', '/api/v2/users/me/activity/monthly', 'Nexus\Controllers\Api\MemberActivityApiController@getMonthlyHours');
-$router->add('GET', '/api/v2/users/{id}/activity/dashboard', 'Nexus\Controllers\Api\MemberActivityApiController@getPublicDashboard');
+// $router->add('GET', '/api/v2/users/me/activity/dashboard', 'Nexus\Controllers\Api\MemberActivityApiController@getDashboard');
+// $router->add('GET', '/api/v2/users/me/activity/timeline', 'Nexus\Controllers\Api\MemberActivityApiController@getTimeline');
+// $router->add('GET', '/api/v2/users/me/activity/hours', 'Nexus\Controllers\Api\MemberActivityApiController@getHours');
+// $router->add('GET', '/api/v2/users/me/activity/monthly', 'Nexus\Controllers\Api\MemberActivityApiController@getMonthlyHours');
+// $router->add('GET', '/api/v2/users/{id}/activity/dashboard', 'Nexus\Controllers\Api\MemberActivityApiController@getPublicDashboard');
 
 // ============================================
 // API V2 - VERIFICATION BADGES (M5)
 // ============================================
-$router->add('GET', '/api/v2/users/{id}/verification-badges', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@getUserBadges');
-$router->add('POST', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@grantBadge');
-$router->add('DELETE', '/api/v2/admin/users/{id}/badges/{type}', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@revokeBadge');
-$router->add('GET', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@getAdminBadgeList');
+// $router->add('GET', '/api/v2/users/{id}/verification-badges', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@getUserBadges');
+// $router->add('POST', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@grantBadge');
+// $router->add('DELETE', '/api/v2/admin/users/{id}/badges/{type}', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@revokeBadge');
+// $router->add('GET', '/api/v2/admin/users/{id}/badges', 'Nexus\Controllers\Api\MemberVerificationBadgeApiController@getAdminBadgeList');
 
 // ============================================
 // API V2 - SUB-ACCOUNTS / FAMILY (M6)
 // ============================================
-$router->add('GET', '/api/v2/users/me/sub-accounts', 'Nexus\Controllers\Api\SubAccountApiController@getChildAccounts');
-$router->add('GET', '/api/v2/users/me/parent-accounts', 'Nexus\Controllers\Api\SubAccountApiController@getParentAccounts');
-$router->add('POST', '/api/v2/users/me/sub-accounts', 'Nexus\Controllers\Api\SubAccountApiController@requestRelationship');
-$router->add('PUT', '/api/v2/users/me/sub-accounts/{id}/approve', 'Nexus\Controllers\Api\SubAccountApiController@approveRelationship');
-$router->add('PUT', '/api/v2/users/me/sub-accounts/{id}/permissions', 'Nexus\Controllers\Api\SubAccountApiController@updatePermissions');
-$router->add('DELETE', '/api/v2/users/me/sub-accounts/{id}', 'Nexus\Controllers\Api\SubAccountApiController@revokeRelationship');
-$router->add('GET', '/api/v2/users/me/sub-accounts/{childId}/activity', 'Nexus\Controllers\Api\SubAccountApiController@getChildActivity');
+// $router->add('GET', '/api/v2/users/me/sub-accounts', 'Nexus\Controllers\Api\SubAccountApiController@getChildAccounts');
+// $router->add('GET', '/api/v2/users/me/parent-accounts', 'Nexus\Controllers\Api\SubAccountApiController@getParentAccounts');
+// $router->add('POST', '/api/v2/users/me/sub-accounts', 'Nexus\Controllers\Api\SubAccountApiController@requestRelationship');
+// $router->add('PUT', '/api/v2/users/me/sub-accounts/{id}/approve', 'Nexus\Controllers\Api\SubAccountApiController@approveRelationship');
+// $router->add('PUT', '/api/v2/users/me/sub-accounts/{id}/permissions', 'Nexus\Controllers\Api\SubAccountApiController@updatePermissions');
+// $router->add('DELETE', '/api/v2/users/me/sub-accounts/{id}', 'Nexus\Controllers\Api\SubAccountApiController@revokeRelationship');
+// $router->add('GET', '/api/v2/users/me/sub-accounts/{childId}/activity', 'Nexus\Controllers\Api\SubAccountApiController@getChildActivity');
