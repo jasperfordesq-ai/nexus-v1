@@ -99,4 +99,30 @@ class ConnectionsController extends BaseApiController
 
         return $this->noContent();
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function pendingCounts(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ConnectionsApiController::class, 'pendingCounts');
+    }
+
+
+    public function status($userId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ConnectionsApiController::class, 'status', [$userId]);
+    }
+
 }

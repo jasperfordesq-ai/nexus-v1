@@ -137,4 +137,144 @@ class EventsController extends BaseApiController
 
         return $this->noContent();
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function nearby(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'nearby');
+    }
+
+
+    public function rsvp($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'rsvp', [$id]);
+    }
+
+
+    public function removeRsvp($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'removeRsvp', [$id]);
+    }
+
+
+    public function attendees($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'attendees', [$id]);
+    }
+
+
+    public function checkIn($id, $attendeeId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'checkIn', [$id, $attendeeId]);
+    }
+
+
+    public function cancel($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'cancel', [$id]);
+    }
+
+
+    public function waitlist($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'waitlist', [$id]);
+    }
+
+
+    public function leaveWaitlist($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'leaveWaitlist', [$id]);
+    }
+
+
+    public function uploadImage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'uploadImage', [$id]);
+    }
+
+
+    public function createRecurring(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'createRecurring');
+    }
+
+
+    public function listSeries(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'listSeries');
+    }
+
+
+    public function createSeries(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'createSeries');
+    }
+
+
+    public function showSeries($seriesId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'showSeries', [$seriesId]);
+    }
+
+
+    public function updateRecurring($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'updateRecurring', [$id]);
+    }
+
+
+    public function joinWaitlist($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'joinWaitlist', [$id]);
+    }
+
+
+    public function getReminders($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'getReminders', [$id]);
+    }
+
+
+    public function updateReminders($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'updateReminders', [$id]);
+    }
+
+
+    public function getAttendance($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'getAttendance', [$id]);
+    }
+
+
+    public function markAttendance($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'markAttendance', [$id]);
+    }
+
+
+    public function bulkMarkAttendance($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'bulkMarkAttendance', [$id]);
+    }
+
+
+    public function linkToSeries($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'linkToSeries', [$id]);
+    }
+
 }

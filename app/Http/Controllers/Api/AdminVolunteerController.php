@@ -88,4 +88,54 @@ class AdminVolunteerController extends BaseApiController
 
         return $this->respondWithData(['id' => $id, 'verified' => true]);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function index(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'index');
+    }
+
+
+    public function approvals(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'approvals');
+    }
+
+
+    public function organizations(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'organizations');
+    }
+
+
+    public function approveApplication($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'approveApplication', [$id]);
+    }
+
+
+    public function declineApplication($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'declineApplication', [$id]);
+    }
+
+
+    public function sendShiftReminders(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'sendShiftReminders');
+    }
+
 }

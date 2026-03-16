@@ -73,4 +73,10 @@ class AdminTimebankingController extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\Api\AdminTimebankingApiController::class, 'userStatement');
     }
+
+    public function userSearchApi(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Admin\TimebankingController::class, 'userSearchApi');
+    }
+
 }

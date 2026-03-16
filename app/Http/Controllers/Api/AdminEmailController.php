@@ -83,4 +83,54 @@ class AdminEmailController extends BaseApiController
 
         return $this->respondWithData(['sent_to' => $to]);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function status(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'status');
+    }
+
+
+    public function test(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'test');
+    }
+
+
+    public function testGmail(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'testGmail');
+    }
+
+
+    public function getConfig(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'getConfig');
+    }
+
+
+    public function updateConfig(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'updateConfig');
+    }
+
+
+    public function testProvider(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'testProvider');
+    }
+
 }

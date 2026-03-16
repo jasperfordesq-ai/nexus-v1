@@ -67,4 +67,54 @@ class LegalController extends BaseApiController
 
         return $this->respondWithData(['message' => 'All legal documents accepted']);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function apiCompareVersions(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\LegalDocumentController::class, 'apiCompareVersions');
+    }
+
+
+    public function apiGetVersion($versionId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\LegalDocumentController::class, 'apiGetVersion', [$versionId]);
+    }
+
+
+    public function apiGetVersions($type): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\LegalDocumentController::class, 'apiGetVersions', [$type]);
+    }
+
+
+    public function apiGetDocument($type): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\LegalDocumentController::class, 'apiGetDocument', [$type]);
+    }
+
+
+    public function accept(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\LegalDocumentController::class, 'accept');
+    }
+
+
+    public function status(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\LegalDocumentController::class, 'status');
+    }
+
 }

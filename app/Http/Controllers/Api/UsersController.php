@@ -69,4 +69,126 @@ class UsersController extends BaseApiController
         return $this->respondWithData($results);
     }
 
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function stats(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'stats');
+    }
+
+
+    public function getPreferences(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'getPreferences');
+    }
+
+
+    public function updatePreferences(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updatePreferences');
+    }
+
+
+    public function updateTheme(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updateTheme');
+    }
+
+
+    public function updateLanguage(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updateLanguage');
+    }
+
+
+    public function updateAvatar(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updateAvatar');
+    }
+
+
+    public function updatePassword(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updatePassword');
+    }
+
+
+    public function deleteAccount(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'deleteAccount');
+    }
+
+
+    public function myListings(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'myListings');
+    }
+
+
+    public function notificationPreferences(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'notificationPreferences');
+    }
+
+
+    public function updateNotificationPreferences(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updateNotificationPreferences');
+    }
+
+
+    public function getConsent(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'getConsent');
+    }
+
+
+    public function updateConsent(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updateConsent');
+    }
+
+
+    public function createGdprRequest(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'createGdprRequest');
+    }
+
+
+    public function sessions(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'sessions');
+    }
+
+
+    public function listings($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'listings', [$id]);
+    }
+
+
+    public function nearby(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'nearby');
+    }
+
+
+    public function updateSettings(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\UserPreferenceController::class, 'updateSettings');
+    }
+
 }

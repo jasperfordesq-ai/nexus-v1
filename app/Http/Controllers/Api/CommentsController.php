@@ -76,4 +76,23 @@ class CommentsController extends BaseApiController
 
         return $this->noContent();
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+    /** POST /api/v2/comments/{id}/reactions */
+    public function reactions($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CommentsV2ApiController::class, 'reactions', [$id]);
+    }
 }

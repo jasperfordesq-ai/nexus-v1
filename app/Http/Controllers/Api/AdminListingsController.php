@@ -96,4 +96,78 @@ class AdminListingsController extends BaseApiController
 
         return $this->respondWithData($stats);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function index(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'index');
+    }
+
+
+    public function moderationQueue(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'moderationQueue');
+    }
+
+
+    public function moderationStats(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'moderationStats');
+    }
+
+
+    public function show($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'show', [$id]);
+    }
+
+
+    public function destroy($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'destroy', [$id]);
+    }
+
+
+    public function feature($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'feature', [$id]);
+    }
+
+
+    public function unfeature($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'unfeature', [$id]);
+    }
+
+
+    public function searchAnalytics(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'searchAnalytics');
+    }
+
+
+    public function searchTrending(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'searchTrending');
+    }
+
+
+    public function searchZeroResults(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'searchZeroResults');
+    }
+
 }

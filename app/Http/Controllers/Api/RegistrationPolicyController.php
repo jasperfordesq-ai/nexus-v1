@@ -189,4 +189,78 @@ class RegistrationPolicyController extends BaseApiController
 
         return response()->json($data);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function listSessions(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'listSessions');
+    }
+
+
+    public function getAuditLog(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'getAuditLog');
+    }
+
+
+    public function adminApproveVerification($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'adminApproveVerification', [$id]);
+    }
+
+
+    public function adminRejectVerification($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'adminRejectVerification', [$id]);
+    }
+
+
+    public function listProviderCredentials(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'listProviderCredentials');
+    }
+
+
+    public function saveProviderCredentials($slug): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'saveProviderCredentials', [$slug]);
+    }
+
+
+    public function deleteProviderCredentials($slug): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'deleteProviderCredentials', [$slug]);
+    }
+
+
+    public function listInviteCodes(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'listInviteCodes');
+    }
+
+
+    public function generateInviteCodes(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'generateInviteCodes');
+    }
+
+
+    public function deactivateInviteCode($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\RegistrationPolicyApiController::class, 'deactivateInviteCode', [$id]);
+    }
+
 }

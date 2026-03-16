@@ -130,4 +130,132 @@ class AdminCrmController extends BaseApiController
 
         return $this->respondWithData($notes);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function dashboard(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'dashboard');
+    }
+
+
+    public function funnel(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'funnel');
+    }
+
+
+    public function listAdmins(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'listAdmins');
+    }
+
+
+    public function listNotes(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'listNotes');
+    }
+
+
+    public function createNote(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'createNote');
+    }
+
+
+    public function updateNote($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'updateNote', [$id]);
+    }
+
+
+    public function deleteNote($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'deleteNote', [$id]);
+    }
+
+
+    public function listTasks(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'listTasks');
+    }
+
+
+    public function createTask(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'createTask');
+    }
+
+
+    public function updateTask($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'updateTask', [$id]);
+    }
+
+
+    public function deleteTask($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'deleteTask', [$id]);
+    }
+
+
+    public function listTags(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'listTags');
+    }
+
+
+    public function addTag(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'addTag');
+    }
+
+
+    public function bulkRemoveTag(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'bulkRemoveTag');
+    }
+
+
+    public function removeTag($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'removeTag', [$id]);
+    }
+
+
+    public function timeline(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'timeline');
+    }
+
+
+    public function exportNotes(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'exportNotes');
+    }
+
+
+    public function exportTasks(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'exportTasks');
+    }
+
+
+    public function exportDashboard(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminCrmApiController::class, 'exportDashboard');
+    }
+
 }

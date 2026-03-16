@@ -119,4 +119,114 @@ class GroupsController extends BaseApiController
 
         return $this->respondWithData($result);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function update($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'update', [$id]);
+    }
+
+
+    public function destroy($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'destroy', [$id]);
+    }
+
+
+    public function members($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'members', [$id]);
+    }
+
+
+    public function updateMember($id, $userId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'updateMember', [$id, $userId]);
+    }
+
+
+    public function removeMember($id, $userId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'removeMember', [$id, $userId]);
+    }
+
+
+    public function pendingRequests($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'pendingRequests', [$id]);
+    }
+
+
+    public function handleRequest($id, $userId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'handleRequest', [$id, $userId]);
+    }
+
+
+    public function discussions($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'discussions', [$id]);
+    }
+
+
+    public function createDiscussion($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'createDiscussion', [$id]);
+    }
+
+
+    public function discussionMessages($id, $discussionId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'discussionMessages', [$id, $discussionId]);
+    }
+
+
+    public function postToDiscussion($id, $discussionId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'postToDiscussion', [$id, $discussionId]);
+    }
+
+
+    public function uploadImage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'uploadImage', [$id]);
+    }
+
+
+    public function announcements($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'announcements', [$id]);
+    }
+
+
+    public function createAnnouncement($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'createAnnouncement', [$id]);
+    }
+
+
+    public function updateAnnouncement($id, $announcementId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'updateAnnouncement', [$id, $announcementId]);
+    }
+
+
+    public function deleteAnnouncement($id, $announcementId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'deleteAnnouncement', [$id, $announcementId]);
+    }
+
 }

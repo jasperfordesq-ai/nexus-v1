@@ -151,4 +151,10 @@ class FederationV2Controller extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\Api\FederationV2ApiController::class, 'removeConnection', [$id]);
     }
+
+    /** GET /api/v2/federation/connections/status/{userId}/{tenantId} */
+    public function connectionStatus($userId, $tenantId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationV2ApiController::class, 'connectionStatus', [$userId, $tenantId]);
+    }
 }

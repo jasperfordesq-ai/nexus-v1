@@ -228,4 +228,96 @@ class ListingsController extends BaseApiController
 
         return $this->noContent();
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function nearby(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'nearby');
+    }
+
+
+    public function getSavedListings(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'getSavedListings');
+    }
+
+
+    public function featured(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'featured');
+    }
+
+
+    public function popularTags(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'popularTags');
+    }
+
+
+    public function autocompleteTags(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'autocompleteTags');
+    }
+
+
+    public function saveListing($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'saveListing', [$id]);
+    }
+
+
+    public function unsaveListing($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'unsaveListing', [$id]);
+    }
+
+
+    public function uploadImage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'uploadImage', [$id]);
+    }
+
+
+    public function deleteImage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'deleteImage', [$id]);
+    }
+
+
+    public function renew($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'renew', [$id]);
+    }
+
+
+    public function analytics($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'analytics', [$id]);
+    }
+
+
+    public function setSkillTags($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'setSkillTags', [$id]);
+    }
+
+
+    public function delete(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\ListingController::class, 'delete');
+    }
+
 }
