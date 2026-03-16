@@ -74,6 +74,21 @@ use App\Services\FeedSidebarService;
 use App\Services\FeedSocialService;
 use App\Services\GroupRecommendationService;
 use App\Services\ExchangeService;
+use App\Services\ContentModerationService;
+use App\Services\EmailService;
+use App\Services\CronJobService;
+use App\Services\AdminSettingsService;
+use App\Services\AdminListingsService;
+use App\Services\AdminUsersService;
+use App\Services\OrgWalletService;
+use App\Services\DeliverableService;
+use App\Services\BrokerService;
+use App\Services\FederationService;
+use App\Services\ChallengeService;
+use App\Services\BadgeService;
+use App\Services\AiChatService;
+use App\Services\RealtimeService;
+use App\Services\SeoService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -268,6 +283,68 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(ExchangeService::class, function ($app) {
             return new ExchangeService();
+        });
+
+        // --- Batch 4 services (15) — Admin/Specialized ---
+
+        $this->app->singleton(ContentModerationService::class, function ($app) {
+            return new ContentModerationService();
+        });
+
+        $this->app->singleton(EmailService::class, function ($app) {
+            return new EmailService();
+        });
+
+        $this->app->singleton(CronJobService::class, function ($app) {
+            return new CronJobService();
+        });
+
+        $this->app->singleton(AdminSettingsService::class, function ($app) {
+            return new AdminSettingsService();
+        });
+
+        $this->app->singleton(AdminListingsService::class, function ($app) {
+            return new AdminListingsService();
+        });
+
+        $this->app->singleton(AdminUsersService::class, function ($app) {
+            return new AdminUsersService(new User());
+        });
+
+        $this->app->singleton(OrgWalletService::class, function ($app) {
+            return new OrgWalletService();
+        });
+
+        $this->app->singleton(DeliverableService::class, function ($app) {
+            return new DeliverableService();
+        });
+
+        $this->app->singleton(BrokerService::class, function ($app) {
+            return new BrokerService();
+        });
+
+        $this->app->singleton(FederationService::class, function ($app) {
+            return new FederationService();
+        });
+
+        $this->app->singleton(ChallengeService::class, function ($app) {
+            return new ChallengeService();
+        });
+
+        $this->app->singleton(BadgeService::class, function ($app) {
+            return new BadgeService(new UserBadge());
+        });
+
+        $this->app->singleton(AiChatService::class, function ($app) {
+            return new AiChatService();
+        });
+
+        $this->app->singleton(RealtimeService::class, function ($app) {
+            return new RealtimeService();
+        });
+
+        $this->app->singleton(SeoService::class, function ($app) {
+            return new SeoService();
         });
     }
 
