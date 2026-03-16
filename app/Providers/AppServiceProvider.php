@@ -54,6 +54,26 @@ use App\Services\TenantService;
 use App\Services\VolunteerService;
 use App\Services\UserService;
 use App\Services\WalletService;
+use App\Services\AuthService;
+use App\Services\RegistrationService;
+use App\Services\TokenService;
+use App\Services\PushNotificationService;
+use App\Services\ImageUploadService;
+use App\Services\CookieConsentService;
+use App\Services\LegalDocumentService;
+use App\Services\IdeationChallengeService;
+use App\Services\JobVacancyService;
+use App\Services\SkillTaxonomyService;
+use App\Services\MemberAvailabilityService;
+use App\Services\EndorsementService;
+use App\Services\MemberActivityService;
+use App\Services\SubAccountService;
+use App\Services\KnowledgeBaseService;
+use App\Services\MetricsService;
+use App\Services\FeedSidebarService;
+use App\Services\FeedSocialService;
+use App\Services\GroupRecommendationService;
+use App\Services\ExchangeService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -166,6 +186,88 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(MemberRankingService::class, function ($app) {
             return new MemberRankingService(new User());
+        });
+
+        // --- Batch 3 services (20) ---
+
+        $this->app->singleton(AuthService::class, function ($app) {
+            return new AuthService(new User());
+        });
+
+        $this->app->singleton(RegistrationService::class, function ($app) {
+            return new RegistrationService(new User());
+        });
+
+        $this->app->singleton(TokenService::class, function ($app) {
+            return new TokenService(new User());
+        });
+
+        $this->app->singleton(PushNotificationService::class, function ($app) {
+            return new PushNotificationService();
+        });
+
+        $this->app->singleton(ImageUploadService::class, function ($app) {
+            return new ImageUploadService();
+        });
+
+        $this->app->singleton(CookieConsentService::class, function ($app) {
+            return new CookieConsentService();
+        });
+
+        $this->app->singleton(LegalDocumentService::class, function ($app) {
+            return new LegalDocumentService();
+        });
+
+        $this->app->singleton(IdeationChallengeService::class, function ($app) {
+            return new IdeationChallengeService();
+        });
+
+        $this->app->singleton(JobVacancyService::class, function ($app) {
+            return new JobVacancyService();
+        });
+
+        $this->app->singleton(SkillTaxonomyService::class, function ($app) {
+            return new SkillTaxonomyService();
+        });
+
+        $this->app->singleton(MemberAvailabilityService::class, function ($app) {
+            return new MemberAvailabilityService();
+        });
+
+        $this->app->singleton(EndorsementService::class, function ($app) {
+            return new EndorsementService();
+        });
+
+        $this->app->singleton(MemberActivityService::class, function ($app) {
+            return new MemberActivityService();
+        });
+
+        $this->app->singleton(SubAccountService::class, function ($app) {
+            return new SubAccountService();
+        });
+
+        $this->app->singleton(KnowledgeBaseService::class, function ($app) {
+            return new KnowledgeBaseService();
+        });
+
+        $this->app->singleton(MetricsService::class, function ($app) {
+            return new MetricsService();
+        });
+
+        $this->app->singleton(FeedSidebarService::class, function ($app) {
+            return new FeedSidebarService();
+        });
+
+        $this->app->singleton(FeedSocialService::class, function ($app) {
+            return new FeedSocialService();
+        });
+
+        $this->app->singleton(GroupRecommendationService::class, function ($app) {
+            return new GroupRecommendationService();
+        });
+
+        $this->app->singleton(ExchangeService::class, function ($app) {
+            return new ExchangeService();
         });
     }
 
