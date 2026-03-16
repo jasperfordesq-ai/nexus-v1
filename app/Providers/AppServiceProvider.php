@@ -89,6 +89,36 @@ use App\Services\BadgeService;
 use App\Services\AiChatService;
 use App\Services\RealtimeService;
 use App\Services\SeoService;
+use App\Services\LeaderboardService;
+use App\Services\LeaderboardSeasonService;
+use App\Services\OnboardingService;
+use App\Services\RankingService;
+use App\Services\StreakService;
+use App\Services\NexusScoreService;
+use App\Services\NexusScoreCacheService;
+use App\Services\RateLimitService;
+use App\Services\ReferralService;
+use App\Services\FeedActivityService;
+use App\Services\FeedRankingService;
+use App\Services\PostSharingService;
+use App\Services\HashtagService;
+use App\Services\ExchangeRatingService;
+use App\Services\ExchangeWorkflowService;
+use App\Services\CreditDonationService;
+use App\Services\StartingBalanceService;
+use App\Services\TransactionCategoryService;
+use App\Services\TransactionExportService;
+use App\Services\TransactionLimitService;
+use App\Services\ListingAnalyticsService;
+use App\Services\ListingModerationService;
+use App\Services\ListingFeaturedService;
+use App\Services\VolunteerCheckInService;
+use App\Services\VolunteerMatchingService;
+use App\Services\VolunteerReminderService;
+use App\Services\EventNotificationService;
+use App\Services\EventReminderService;
+use App\Services\DailyRewardService;
+use App\Services\XPShopService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -345,6 +375,128 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(SeoService::class, function ($app) {
             return new SeoService();
+        });
+
+        // --- Batch 5 services (30) — Legacy DI wrappers ---
+
+        $this->app->singleton(LeaderboardService::class, function ($app) {
+            return new LeaderboardService();
+        });
+
+        $this->app->singleton(LeaderboardSeasonService::class, function ($app) {
+            return new LeaderboardSeasonService();
+        });
+
+        $this->app->singleton(OnboardingService::class, function ($app) {
+            return new OnboardingService();
+        });
+
+        $this->app->singleton(RankingService::class, function ($app) {
+            return new RankingService();
+        });
+
+        $this->app->singleton(StreakService::class, function ($app) {
+            return new StreakService();
+        });
+
+        $this->app->singleton(NexusScoreService::class, function ($app) {
+            return new NexusScoreService();
+        });
+
+        $this->app->singleton(NexusScoreCacheService::class, function ($app) {
+            return new NexusScoreCacheService();
+        });
+
+        $this->app->singleton(RateLimitService::class, function ($app) {
+            return new RateLimitService();
+        });
+
+        $this->app->singleton(ReferralService::class, function ($app) {
+            return new ReferralService();
+        });
+
+        $this->app->singleton(FeedActivityService::class, function ($app) {
+            return new FeedActivityService();
+        });
+
+        $this->app->singleton(FeedRankingService::class, function ($app) {
+            return new FeedRankingService();
+        });
+
+        $this->app->singleton(PostSharingService::class, function ($app) {
+            return new PostSharingService();
+        });
+
+        $this->app->singleton(HashtagService::class, function ($app) {
+            return new HashtagService();
+        });
+
+        $this->app->singleton(ExchangeRatingService::class, function ($app) {
+            return new ExchangeRatingService();
+        });
+
+        $this->app->singleton(ExchangeWorkflowService::class, function ($app) {
+            return new ExchangeWorkflowService();
+        });
+
+        $this->app->singleton(CreditDonationService::class, function ($app) {
+            return new CreditDonationService();
+        });
+
+        $this->app->singleton(StartingBalanceService::class, function ($app) {
+            return new StartingBalanceService();
+        });
+
+        $this->app->singleton(TransactionCategoryService::class, function ($app) {
+            return new TransactionCategoryService();
+        });
+
+        $this->app->singleton(TransactionExportService::class, function ($app) {
+            return new TransactionExportService();
+        });
+
+        $this->app->singleton(TransactionLimitService::class, function ($app) {
+            return new TransactionLimitService();
+        });
+
+        $this->app->singleton(ListingAnalyticsService::class, function ($app) {
+            return new ListingAnalyticsService();
+        });
+
+        $this->app->singleton(ListingModerationService::class, function ($app) {
+            return new ListingModerationService();
+        });
+
+        $this->app->singleton(ListingFeaturedService::class, function ($app) {
+            return new ListingFeaturedService();
+        });
+
+        $this->app->singleton(VolunteerCheckInService::class, function ($app) {
+            return new VolunteerCheckInService();
+        });
+
+        $this->app->singleton(VolunteerMatchingService::class, function ($app) {
+            return new VolunteerMatchingService();
+        });
+
+        $this->app->singleton(VolunteerReminderService::class, function ($app) {
+            return new VolunteerReminderService();
+        });
+
+        $this->app->singleton(EventNotificationService::class, function ($app) {
+            return new EventNotificationService();
+        });
+
+        $this->app->singleton(EventReminderService::class, function ($app) {
+            return new EventReminderService();
+        });
+
+        $this->app->singleton(DailyRewardService::class, function ($app) {
+            return new DailyRewardService();
+        });
+
+        $this->app->singleton(XPShopService::class, function ($app) {
+            return new XPShopService();
         });
     }
 
