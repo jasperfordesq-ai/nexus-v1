@@ -21,7 +21,7 @@ use Nexus\Core\TenantContext;
  *
  * 2. FRESHNESS SCORE
  *    - Newer listings get boost (gentler decay than feed)
- *    - Reactivation boost for recently edited listings
+ *    - Edited listings use most recent date for decay
  *
  * 3. ENGAGEMENT SCORE
  *    - View count
@@ -33,8 +33,6 @@ use Nexus\Core\TenantContext;
  *
  * 5. QUALITY SCORE
  *    - Listing completeness (description, images)
- *    - Owner profile quality
- *    - Owner response rate
  *    - Owner verified status
  *
  * 6. RECIPROCITY SCORE (Unique to MatchRank)
@@ -180,8 +178,6 @@ class ListingRankingService
         // Clear per-pass caches
         self::$ownerListingsCache = [];
 
-        $config = self::getConfig();
-
         // Get viewer data if logged in
         $viewerCoords = ['lat' => null, 'lon' => null];
         $viewerInterests = [];
@@ -313,6 +309,7 @@ class ListingRankingService
             LEFT JOIN categories c ON l.category_id = c.id AND c.tenant_id = l.tenant_id
             WHERE l.tenant_id = ?
             AND l.status = 'active'
+            AND u.status != 'banned'
         ";
 
         $params = [$tenantId];
@@ -342,7 +339,8 @@ class ListingRankingService
 
         if (!empty($filters['search'])) {
             $sql .= " AND (l.title LIKE ? OR l.description LIKE ?)";
-            $searchTerm = '%' . $filters['search'] . '%';
+            $escaped = str_replace(['%', '_'], ['\%', '\_'], $filters['search']);
+            $searchTerm = '%' . $escaped . '%';
             $params[] = $searchTerm;
             $params[] = $searchTerm;
         }
@@ -756,7 +754,7 @@ class ListingRankingService
         $minimum  = (float)$config['engagement_minimum'];
 
         return "
-            GREATEST({$minimum},
+            LEAST(2.0, GREATEST({$minimum},
                 1.0 + (
                     (10.0 * 0.5 + (
                         COALESCE(l.view_count, 0) * {$viewW} +
@@ -765,7 +763,7 @@ class ListingRankingService
                     )) /
                     (10.0 + COALESCE(l.view_count, 0) + COALESCE(l.contact_count, 0) + COALESCE(l.save_count, 0))
                 )
-            )
+            ))
         ";
     }
 
@@ -800,13 +798,26 @@ class ListingRankingService
             return '1.0';
         }
 
+        $fullRadius = (float)$config['geo_full_radius_km'];
+        $decayRate  = (float)$config['geo_decay_per_km'];
+
+        // Reuse shared Haversine formula, apply MatchRank-specific radius/decay
+        $distL = RankingService::getDistanceSql($viewerLat, $viewerLon, 'latitude', 'longitude', 'l');
+        $distU = RankingService::getDistanceSql($viewerLat, $viewerLon, 'latitude', 'longitude', 'u');
+
         // Use listing coordinates first, fall back to owner coordinates
         return "
             CASE
                 WHEN l.latitude IS NOT NULL AND l.longitude IS NOT NULL THEN
-                    " . RankingService::getGeoScoreSql($viewerLat, $viewerLon, 'latitude', 'longitude', 'l') . "
+                    CASE
+                        WHEN {$distL} <= {$fullRadius} THEN 1.0
+                        ELSE GREATEST(0.1, 1.0 - (({$distL} - {$fullRadius}) * {$decayRate}))
+                    END
                 WHEN u.latitude IS NOT NULL AND u.longitude IS NOT NULL THEN
-                    " . RankingService::getGeoScoreSql($viewerLat, $viewerLon, 'latitude', 'longitude', 'u') . "
+                    CASE
+                        WHEN {$distU} <= {$fullRadius} THEN 1.0
+                        ELSE GREATEST(0.1, 1.0 - (({$distU} - {$fullRadius}) * {$decayRate}))
+                    END
                 ELSE 1.0
             END
         ";

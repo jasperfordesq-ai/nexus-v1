@@ -322,15 +322,16 @@ class MemberRankingService
         $reputationSql = self::getReputationScoreSql();
         $geoSql = self::getGeoScoreSql($viewerCoords['lat'], $viewerCoords['lon']);
 
-        // Weighted additive total score -- mirrors SCORE_WEIGHTS constant
-        // Connectivity (0.15) and Complementary (0.10) default to neutral (1.0 * weight)
+        // Weighted additive total score -- built from SCORE_WEIGHTS constant
+        // Connectivity and Complementary default to neutral (1.0) in SQL path
+        $w = self::SCORE_WEIGHTS;
         $totalScoreSql = "(
-            0.20 * ({$activitySql})
-            + 0.20 * ({$contributionSql})
-            + 0.20 * ({$reputationSql})
-            + 0.15 * ({$geoSql})
-            + 0.15 * 1.0
-            + 0.10 * 1.0
+            {$w['activity']} * ({$activitySql})
+            + {$w['contribution']} * ({$contributionSql})
+            + {$w['reputation']} * ({$reputationSql})
+            + {$w['proximity']} * ({$geoSql})
+            + {$w['connectivity']} * 1.0
+            + {$w['complementary']} * 1.0
         )";
 
         $sql = "
@@ -1129,7 +1130,7 @@ class MemberRankingService
                 'display_name' => $member['first_name'] . ' ' . $member['last_name'],
                 'scores' => $scores,
                 'final_score' => $finalScore,
-                'weights' => $weights,
+                'weights' => self::SCORE_WEIGHTS,
                 'config' => self::getConfig()
             ];
         } catch (\Exception $e) {

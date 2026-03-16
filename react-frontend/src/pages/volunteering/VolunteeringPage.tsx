@@ -197,8 +197,7 @@ export function VolunteeringPage() {
           )}
           <Link to={tenantPath('/organisations')}>
             <Button
-              variant="flat"
-              className="bg-theme-elevated text-theme-muted"
+              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
             >
               {t('volunteering.browse_organisations')}
