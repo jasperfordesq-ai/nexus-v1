@@ -41,8 +41,8 @@ Route::get('/laravel/health', function () {
 // MIGRATED ROUTES — Tenant Bootstrap
 // Source: httpdocs/routes/tenant-bootstrap.php
 // ============================================
-Route::get('/v2/tenant/bootstrap', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'bootstrap']);
-Route::get('/v2/tenants', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'list']);
+Route::get('/v2/tenant/bootstrap', [\Nexus\Controllers\Api\TenantBootstrapController::class, 'bootstrap']);
+Route::get('/v2/tenants', [\Nexus\Controllers\Api\TenantBootstrapController::class, 'list']);
 Route::get('/v2/platform/stats', [\Nexus\Controllers\Api\TenantBootstrapController::class, 'platformStats']);
 Route::get('/v2/config/algorithms', [\Nexus\Controllers\Api\AdminConfigApiController::class, 'getAlgorithmInfo']);
 
@@ -282,13 +282,13 @@ Route::get('/v2/feed/hashtags/trending', [\Nexus\Controllers\Api\FeedSocialApiCo
 Route::get('/v2/feed/hashtags/search', [\Nexus\Controllers\Api\FeedSocialApiController::class, 'searchHashtags']);
 Route::get('/v2/feed/hashtags/{tag}', [\Nexus\Controllers\Api\FeedSocialApiController::class, 'getHashtagPosts']);
 // Notifications
-Route::get('/v2/notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'index']);
-Route::get('/v2/notifications/counts', [\App\Http\Controllers\Api\NotificationsController::class, 'counts']);
-Route::post('/v2/notifications/read-all', [\App\Http\Controllers\Api\NotificationsController::class, 'markAllRead']);
+Route::get('/v2/notifications', [\Nexus\Controllers\Api\NotificationsApiController::class, 'index']);
+Route::get('/v2/notifications/counts', [\Nexus\Controllers\Api\NotificationsApiController::class, 'counts']);
+Route::post('/v2/notifications/read-all', [\Nexus\Controllers\Api\NotificationsApiController::class, 'markAllRead']);
 Route::delete('/v2/notifications', [\Nexus\Controllers\Api\NotificationsApiController::class, 'destroyAll']);
-Route::get('/v2/notifications/{id}', [\App\Http\Controllers\Api\NotificationsController::class, 'show']);
+Route::get('/v2/notifications/{id}', [\Nexus\Controllers\Api\NotificationsApiController::class, 'show']);
 Route::post('/v2/notifications/{id}/read', [\Nexus\Controllers\Api\NotificationsApiController::class, 'markRead']);
-Route::delete('/v2/notifications/{id}', [\App\Http\Controllers\Api\NotificationsController::class, 'destroy']);
+Route::delete('/v2/notifications/{id}', [\Nexus\Controllers\Api\NotificationsApiController::class, 'destroy']);
 // Reviews
 Route::get('/v2/reviews/pending', [\Nexus\Controllers\Api\ReviewsApiController::class, 'pending']);
 Route::get('/v2/reviews/user/{userId}', [\Nexus\Controllers\Api\ReviewsApiController::class, 'userReviews']);
@@ -299,7 +299,7 @@ Route::get('/v2/reviews/{id}', [\Nexus\Controllers\Api\ReviewsApiController::cla
 Route::post('/v2/reviews', [\Nexus\Controllers\Api\ReviewsApiController::class, 'store']);
 Route::delete('/v2/reviews/{id}', [\Nexus\Controllers\Api\ReviewsApiController::class, 'destroy']);
 // Search
-Route::get('/v2/search', [\App\Http\Controllers\Api\SearchController::class, 'index']);
+Route::get('/v2/search', [\Nexus\Controllers\Api\SearchApiController::class, 'index']);
 Route::get('/v2/search/suggestions', [\Nexus\Controllers\Api\SearchApiController::class, 'suggestions']);
 Route::get('/v2/search/saved', [\Nexus\Controllers\Api\SearchApiController::class, 'savedSearches']);
 Route::post('/v2/search/saved', [\Nexus\Controllers\Api\SearchApiController::class, 'saveSearch']);
@@ -307,8 +307,8 @@ Route::delete('/v2/search/saved/{id}', [\Nexus\Controllers\Api\SearchApiControll
 Route::post('/v2/search/saved/{id}/run', [\Nexus\Controllers\Api\SearchApiController::class, 'runSavedSearch']);
 Route::get('/v2/search/trending', [\Nexus\Controllers\Api\SearchApiController::class, 'trending']);
 // Metrics
-Route::post('/v2/metrics', [\App\Http\Controllers\Api\MetricsController::class, 'store']);
-Route::get('/v2/metrics/summary', [\App\Http\Controllers\Api\MetricsController::class, 'summary']);
+Route::post('/v2/metrics', [\Nexus\Controllers\Api\MetricsApiController::class, 'store']);
+Route::get('/v2/metrics/summary', [\Nexus\Controllers\Api\MetricsApiController::class, 'summary']);
 // Polls
 Route::get('/v2/polls', [\Nexus\Controllers\Api\PollsApiController::class, 'index']);
 Route::post('/v2/polls', [\Nexus\Controllers\Api\PollsApiController::class, 'store']);
@@ -982,10 +982,10 @@ Route::post('/social/mention-search', [\Nexus\Controllers\Api\SocialApiControlle
 Route::post('/social/feed', [\Nexus\Controllers\Api\SocialApiController::class, 'feed']);
 Route::post('/social/create-post', [\Nexus\Controllers\Api\SocialApiController::class, 'createPost']);
 Route::post('/upload', [\Nexus\Controllers\Api\UploadController::class, 'store']);
-Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
-Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
-Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
-Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushController::class, 'unsubscribe']);
+Route::get('/push/vapid-key', [\Nexus\Controllers\Api\PushApiController::class, 'vapidKey']);
+Route::get('/push/vapid-public-key', [\Nexus\Controllers\Api\PushApiController::class, 'vapidKey']);
+Route::post('/push/subscribe', [\Nexus\Controllers\Api\PushApiController::class, 'subscribe']);
+Route::post('/push/unsubscribe', [\Nexus\Controllers\Api\PushApiController::class, 'unsubscribe']);
 Route::post('/push/send', [\Nexus\Controllers\Api\PushApiController::class, 'send']);
 Route::get('/push/status', [\Nexus\Controllers\Api\PushApiController::class, 'status']);
 Route::post('/push/register-device', [\Nexus\Controllers\Api\PushApiController::class, 'registerDevice']);
@@ -994,9 +994,9 @@ Route::post('/auth/heartbeat', [\Nexus\Controllers\Api\AuthController::class, 'h
 Route::get('/auth/check-session', [\Nexus\Controllers\Api\AuthController::class, 'checkSession']);
 Route::post('/auth/refresh-session', [\Nexus\Controllers\Api\AuthController::class, 'refreshSession']);
 Route::post('/auth/restore-session', [\Nexus\Controllers\Api\AuthController::class, 'restoreSession']);
-Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
-Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
-Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
+Route::post('/auth/login', [\Nexus\Controllers\Api\AuthController::class, 'login']);
+Route::post('/auth/logout', [\Nexus\Controllers\Api\AuthController::class, 'logout']);
+Route::post('/auth/refresh-token', [\Nexus\Controllers\Api\AuthController::class, 'refreshToken']);
 Route::post('/auth/validate-token', [\Nexus\Controllers\Api\AuthController::class, 'validateToken']);
 Route::get('/auth/validate-token', [\Nexus\Controllers\Api\AuthController::class, 'validateToken']);
 Route::post('/auth/revoke', [\Nexus\Controllers\Api\AuthController::class, 'revokeToken']);
@@ -1006,7 +1006,7 @@ Route::get('/auth/admin-session', [\Nexus\Controllers\Api\AuthController::class,
 Route::get('/auth/csrf-token', [\Nexus\Controllers\Api\AuthController::class, 'getCsrfToken']);
 Route::get('/v2/csrf-token', [\Nexus\Controllers\Api\AuthController::class, 'getCsrfToken']);
 Route::get('/csrf-token', [\Nexus\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
+Route::post('/v2/auth/register', [\Nexus\Controllers\Api\RegistrationApiController::class, 'register']);
 Route::get('/v2/auth/verification-status', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getVerificationStatus']);
 Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification']);
 Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode']);
