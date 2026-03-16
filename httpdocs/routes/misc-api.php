@@ -4,128 +4,129 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 // ============================================
+// MIGRATED TO LARAVEL — see routes/api.php
 // MASTER PLATFORM SOCIAL MEDIA MODULE API (Legacy V1)
 // Unified social interactions for ALL layouts
 // ============================================
-$router->add('GET', '/api/social/test', 'Nexus\Controllers\Api\SocialApiController@test');
-$router->add('POST', '/api/social/like', 'Nexus\Controllers\Api\SocialApiController@like');
-$router->add('POST', '/api/social/likers', 'Nexus\Controllers\Api\SocialApiController@likers');
-$router->add('POST', '/api/social/comments', 'Nexus\Controllers\Api\SocialApiController@comments');
-$router->add('POST', '/api/social/share', 'Nexus\Controllers\Api\SocialApiController@share');
-$router->add('POST', '/api/social/delete', 'Nexus\Controllers\Api\SocialApiController@delete');
-$router->add('POST', '/api/social/reaction', 'Nexus\Controllers\Api\SocialApiController@reaction');
-$router->add('POST', '/api/social/reply', 'Nexus\Controllers\Api\SocialApiController@reply');
-$router->add('POST', '/api/social/edit-comment', 'Nexus\Controllers\Api\SocialApiController@editComment');
-$router->add('POST', '/api/social/delete-comment', 'Nexus\Controllers\Api\SocialApiController@deleteComment');
-$router->add('POST', '/api/social/mention-search', 'Nexus\Controllers\Api\SocialApiController@mentionSearch');
-$router->add('POST', '/api/social/feed', 'Nexus\Controllers\Api\SocialApiController@feed');
-$router->add('POST', '/api/social/create-post', 'Nexus\Controllers\Api\SocialApiController@createPost');
+// $router->add('GET', '/api/social/test', 'Nexus\Controllers\Api\SocialApiController@test');
+// $router->add('POST', '/api/social/like', 'Nexus\Controllers\Api\SocialApiController@like');
+// $router->add('POST', '/api/social/likers', 'Nexus\Controllers\Api\SocialApiController@likers');
+// $router->add('POST', '/api/social/comments', 'Nexus\Controllers\Api\SocialApiController@comments');
+// $router->add('POST', '/api/social/share', 'Nexus\Controllers\Api\SocialApiController@share');
+// $router->add('POST', '/api/social/delete', 'Nexus\Controllers\Api\SocialApiController@delete');
+// $router->add('POST', '/api/social/reaction', 'Nexus\Controllers\Api\SocialApiController@reaction');
+// $router->add('POST', '/api/social/reply', 'Nexus\Controllers\Api\SocialApiController@reply');
+// $router->add('POST', '/api/social/edit-comment', 'Nexus\Controllers\Api\SocialApiController@editComment');
+// $router->add('POST', '/api/social/delete-comment', 'Nexus\Controllers\Api\SocialApiController@deleteComment');
+// $router->add('POST', '/api/social/mention-search', 'Nexus\Controllers\Api\SocialApiController@mentionSearch');
+// $router->add('POST', '/api/social/feed', 'Nexus\Controllers\Api\SocialApiController@feed');
+// $router->add('POST', '/api/social/create-post', 'Nexus\Controllers\Api\SocialApiController@createPost');
 
 // Asset Upload API (for Page Builder, Newsletter Editor, etc.)
-$router->add('POST', '/api/upload', 'Nexus\Controllers\Api\UploadController@store');
+// $router->add('POST', '/api/upload', 'Nexus\Controllers\Api\UploadController@store');
 
 // Push Notifications API (Web Push / PWA)
-$router->add('GET', '/api/push/vapid-key', 'Nexus\Controllers\Api\PushApiController@vapidKey');
-$router->add('GET', '/api/push/vapid-public-key', 'Nexus\Controllers\Api\PushApiController@vapidKey'); // Legacy alias
-$router->add('POST', '/api/push/subscribe', 'Nexus\Controllers\Api\PushApiController@subscribe');
-$router->add('POST', '/api/push/unsubscribe', 'Nexus\Controllers\Api\PushApiController@unsubscribe');
-$router->add('POST', '/api/push/send', 'Nexus\Controllers\Api\PushApiController@send');
-$router->add('GET', '/api/push/status', 'Nexus\Controllers\Api\PushApiController@status');
+// $router->add('GET', '/api/push/vapid-key', 'Nexus\Controllers\Api\PushApiController@vapidKey');
+// $router->add('GET', '/api/push/vapid-public-key', 'Nexus\Controllers\Api\PushApiController@vapidKey'); // Legacy alias
+// $router->add('POST', '/api/push/subscribe', 'Nexus\Controllers\Api\PushApiController@subscribe');
+// $router->add('POST', '/api/push/unsubscribe', 'Nexus\Controllers\Api\PushApiController@unsubscribe');
+// $router->add('POST', '/api/push/send', 'Nexus\Controllers\Api\PushApiController@send');
+// $router->add('GET', '/api/push/status', 'Nexus\Controllers\Api\PushApiController@status');
 
 // Native Push Notifications API (FCM for Android/Capacitor app)
-$router->add('POST', '/api/push/register-device', 'Nexus\Controllers\Api\PushApiController@registerDevice');
-$router->add('POST', '/api/push/unregister-device', 'Nexus\Controllers\Api\PushApiController@unregisterDevice');
+// $router->add('POST', '/api/push/register-device', 'Nexus\Controllers\Api\PushApiController@registerDevice');
+// $router->add('POST', '/api/push/unregister-device', 'Nexus\Controllers\Api\PushApiController@unregisterDevice');
 
 // Session/Auth API (for mobile app session management)
-$router->add('POST', '/api/auth/heartbeat', 'Nexus\Controllers\Api\AuthController@heartbeat');
-$router->add('GET', '/api/auth/check-session', 'Nexus\Controllers\Api\AuthController@checkSession');
-$router->add('POST', '/api/auth/refresh-session', 'Nexus\Controllers\Api\AuthController@refreshSession');
-$router->add('POST', '/api/auth/restore-session', 'Nexus\Controllers\Api\AuthController@restoreSession');
+// $router->add('POST', '/api/auth/heartbeat', 'Nexus\Controllers\Api\AuthController@heartbeat');
+// $router->add('GET', '/api/auth/check-session', 'Nexus\Controllers\Api\AuthController@checkSession');
+// $router->add('POST', '/api/auth/refresh-session', 'Nexus\Controllers\Api\AuthController@refreshSession');
+// $router->add('POST', '/api/auth/restore-session', 'Nexus\Controllers\Api\AuthController@restoreSession');
 
 // Token-based Auth API (for mobile apps - more reliable than session cookies)
-$router->add('POST', '/api/auth/login', 'Nexus\Controllers\Api\AuthController@login');
-$router->add('POST', '/api/auth/logout', 'Nexus\Controllers\Api\AuthController@logout');
-$router->add('POST', '/api/auth/refresh-token', 'Nexus\Controllers\Api\AuthController@refreshToken');
-$router->add('POST', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
-$router->add('GET', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
+// $router->add('POST', '/api/auth/login', 'Nexus\Controllers\Api\AuthController@login');
+// $router->add('POST', '/api/auth/logout', 'Nexus\Controllers\Api\AuthController@logout');
+// $router->add('POST', '/api/auth/refresh-token', 'Nexus\Controllers\Api\AuthController@refreshToken');
+// $router->add('POST', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
+// $router->add('GET', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
 
 // Token Revocation API (for logout-everywhere functionality)
-$router->add('POST', '/api/auth/revoke', 'Nexus\Controllers\Api\AuthController@revokeToken');
-$router->add('POST', '/api/auth/revoke-all', 'Nexus\Controllers\Api\AuthController@revokeAllTokens');
+// $router->add('POST', '/api/auth/revoke', 'Nexus\Controllers\Api\AuthController@revokeToken');
+// $router->add('POST', '/api/auth/revoke-all', 'Nexus\Controllers\Api\AuthController@revokeAllTokens');
 
 // JWT-to-Session bridge for legacy admin access from React frontend
 // POST preferred (token in body); GET kept as deprecated fallback
-$router->add('POST', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthController@adminSession');
-$router->add('GET', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthController@adminSession');
+// $router->add('POST', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthController@adminSession');
+// $router->add('GET', '/api/auth/admin-session', 'Nexus\Controllers\Api\AuthController@adminSession');
 
 // CSRF Token API (for SPAs using session auth - Bearer clients don't need this)
-$router->add('GET', '/api/auth/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken');
-$router->add('GET', '/api/v2/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken'); // V2 alias
-$router->add('GET', '/api/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken'); // SPA alias (used by React fetchCsrfToken)
+// $router->add('GET', '/api/auth/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken');
+// $router->add('GET', '/api/v2/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken'); // V2 alias
+// $router->add('GET', '/api/csrf-token', 'Nexus\Controllers\Api\AuthController@getCsrfToken'); // SPA alias (used by React fetchCsrfToken)
 
 // V2 Registration API (returns tokens immediately, field-level errors)
-$router->add('POST', '/api/v2/auth/register', 'Nexus\Controllers\Api\RegistrationApiController@register');
+// $router->add('POST', '/api/v2/auth/register', 'Nexus\Controllers\Api\RegistrationApiController@register');
 
 // Identity Verification API (user-facing)
-$router->add('GET', '/api/v2/auth/verification-status', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getVerificationStatus');
-$router->add('POST', '/api/v2/auth/start-verification', 'Nexus\Controllers\Api\RegistrationPolicyApiController@startVerification');
-$router->add('POST', '/api/v2/auth/validate-invite', 'Nexus\Controllers\Api\RegistrationPolicyApiController@validateInviteCode');
-$router->add('GET', '/api/v2/auth/registration-info', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getRegistrationInfo');
+// $router->add('GET', '/api/v2/auth/verification-status', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getVerificationStatus');
+// $router->add('POST', '/api/v2/auth/start-verification', 'Nexus\Controllers\Api\RegistrationPolicyApiController@startVerification');
+// $router->add('POST', '/api/v2/auth/validate-invite', 'Nexus\Controllers\Api\RegistrationPolicyApiController@validateInviteCode');
+// $router->add('GET', '/api/v2/auth/registration-info', 'Nexus\Controllers\Api\RegistrationPolicyApiController@getRegistrationInfo');
 
 // Identity Verification Webhooks (provider callbacks — no auth, signature-verified)
-$router->add('POST', '/api/v2/webhooks/identity/{provider_slug}', 'Nexus\Controllers\Api\IdentityWebhookController@handleWebhook');
+// $router->add('POST', '/api/v2/webhooks/identity/{provider_slug}', 'Nexus\Controllers\Api\IdentityWebhookController@handleWebhook');
 
 // OpenAPI Documentation (accessible without auth)
-$router->add('GET', '/api/docs', 'Nexus\Controllers\Api\OpenApiController@ui');
-$router->add('GET', '/api/docs/openapi.json', 'Nexus\Controllers\Api\OpenApiController@json');
-$router->add('GET', '/api/docs/openapi.yaml', 'Nexus\Controllers\Api\OpenApiController@yaml');
+// $router->add('GET', '/api/docs', 'Nexus\Controllers\Api\OpenApiController@ui');
+// $router->add('GET', '/api/docs/openapi.json', 'Nexus\Controllers\Api\OpenApiController@json');
+// $router->add('GET', '/api/docs/openapi.yaml', 'Nexus\Controllers\Api\OpenApiController@yaml');
 
 // Password Reset API (stateless, v2 response format)
-$router->add('POST', '/api/auth/forgot-password', 'Nexus\Controllers\Api\PasswordResetApiController@forgotPassword');
-$router->add('POST', '/api/auth/reset-password', 'Nexus\Controllers\Api\PasswordResetApiController@resetPassword');
+// $router->add('POST', '/api/auth/forgot-password', 'Nexus\Controllers\Api\PasswordResetApiController@forgotPassword');
+// $router->add('POST', '/api/auth/reset-password', 'Nexus\Controllers\Api\PasswordResetApiController@resetPassword');
 
 // Email Verification API (stateless, v2 response format)
-$router->add('POST', '/api/auth/verify-email', 'Nexus\Controllers\Api\EmailVerificationApiController@verifyEmail');
-$router->add('POST', '/api/auth/resend-verification', 'Nexus\Controllers\Api\EmailVerificationApiController@resendVerification');
-$router->add('POST', '/api/auth/resend-verification-by-email', 'Nexus\Controllers\Api\EmailVerificationApiController@resendVerificationByEmail');
+// $router->add('POST', '/api/auth/verify-email', 'Nexus\Controllers\Api\EmailVerificationApiController@verifyEmail');
+// $router->add('POST', '/api/auth/resend-verification', 'Nexus\Controllers\Api\EmailVerificationApiController@resendVerification');
+// $router->add('POST', '/api/auth/resend-verification-by-email', 'Nexus\Controllers\Api\EmailVerificationApiController@resendVerificationByEmail');
 
 // TOTP 2FA API (Legacy V1)
-$router->add('POST', '/api/totp/verify', 'Nexus\Controllers\Api\TotpApiController@verify');
-$router->add('GET', '/api/totp/status', 'Nexus\Controllers\Api\TotpApiController@status');
+// $router->add('POST', '/api/totp/verify', 'Nexus\Controllers\Api\TotpApiController@verify');
+// $router->add('GET', '/api/totp/status', 'Nexus\Controllers\Api\TotpApiController@status');
 
 // TOTP 2FA API (V2 - Bearer token compatible, used by React SPA)
-$router->add('GET', '/api/v2/auth/2fa/status', 'Nexus\Controllers\Api\TwoFactorApiController@status');
-$router->add('POST', '/api/v2/auth/2fa/setup', 'Nexus\Controllers\Api\TwoFactorApiController@setup');
-$router->add('POST', '/api/v2/auth/2fa/verify', 'Nexus\Controllers\Api\TwoFactorApiController@verify');
-$router->add('POST', '/api/v2/auth/2fa/disable', 'Nexus\Controllers\Api\TwoFactorApiController@disable');
+// $router->add('GET', '/api/v2/auth/2fa/status', 'Nexus\Controllers\Api\TwoFactorApiController@status');
+// $router->add('POST', '/api/v2/auth/2fa/setup', 'Nexus\Controllers\Api\TwoFactorApiController@setup');
+// $router->add('POST', '/api/v2/auth/2fa/verify', 'Nexus\Controllers\Api\TwoFactorApiController@verify');
+// $router->add('POST', '/api/v2/auth/2fa/disable', 'Nexus\Controllers\Api\TwoFactorApiController@disable');
 
 // Mobile App API (version checking, updates)
-$router->add('POST', '/api/app/check-version', 'Nexus\Controllers\Api\AppController@checkVersion');
-$router->add('GET', '/api/app/version', 'Nexus\Controllers\Api\AppController@version');
-$router->add('POST', '/api/app/log', 'Nexus\Controllers\Api\AppController@log');
+// $router->add('POST', '/api/app/check-version', 'Nexus\Controllers\Api\AppController@checkVersion');
+// $router->add('GET', '/api/app/version', 'Nexus\Controllers\Api\AppController@version');
+// $router->add('POST', '/api/app/log', 'Nexus\Controllers\Api\AppController@log');
 
 // Pusher Realtime API (WebSocket authentication)
-$router->add('POST', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
-$router->add('GET', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
-$router->add('GET', '/api/pusher/config', 'Nexus\Controllers\Api\PusherAuthController@config');
+// $router->add('POST', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
+// $router->add('GET', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
+// $router->add('GET', '/api/pusher/config', 'Nexus\Controllers\Api\PusherAuthController@config');
 // SECURITY: Debug endpoint removed - exposed sensitive configuration
 
 // WebAuthn Biometric Auth API (Primary endpoints - used by nexus-native.js)
-$router->add('POST', '/api/webauthn/register-challenge', 'Nexus\Controllers\Api\WebAuthnApiController@registerChallenge');
-$router->add('POST', '/api/webauthn/register-verify', 'Nexus\Controllers\Api\WebAuthnApiController@registerVerify');
-$router->add('POST', '/api/webauthn/auth-challenge', 'Nexus\Controllers\Api\WebAuthnApiController@authChallenge');
-$router->add('POST', '/api/webauthn/auth-verify', 'Nexus\Controllers\Api\WebAuthnApiController@authVerify');
-$router->add('POST', '/api/webauthn/remove', 'Nexus\Controllers\Api\WebAuthnApiController@remove');
-$router->add('POST', '/api/webauthn/rename', 'Nexus\Controllers\Api\WebAuthnApiController@rename');
-$router->add('POST', '/api/webauthn/remove-all', 'Nexus\Controllers\Api\WebAuthnApiController@removeAll'); // SECURITY: Changed to POST only
-$router->add('GET', '/api/webauthn/credentials', 'Nexus\Controllers\Api\WebAuthnApiController@credentials');
-$router->add('GET', '/api/webauthn/status', 'Nexus\Controllers\Api\WebAuthnApiController@status'); // Status endpoint
+// $router->add('POST', '/api/webauthn/register-challenge', 'Nexus\Controllers\Api\WebAuthnApiController@registerChallenge');
+// $router->add('POST', '/api/webauthn/register-verify', 'Nexus\Controllers\Api\WebAuthnApiController@registerVerify');
+// $router->add('POST', '/api/webauthn/auth-challenge', 'Nexus\Controllers\Api\WebAuthnApiController@authChallenge');
+// $router->add('POST', '/api/webauthn/auth-verify', 'Nexus\Controllers\Api\WebAuthnApiController@authVerify');
+// $router->add('POST', '/api/webauthn/remove', 'Nexus\Controllers\Api\WebAuthnApiController@remove');
+// $router->add('POST', '/api/webauthn/rename', 'Nexus\Controllers\Api\WebAuthnApiController@rename');
+// $router->add('POST', '/api/webauthn/remove-all', 'Nexus\Controllers\Api\WebAuthnApiController@removeAll'); // SECURITY: Changed to POST only
+// $router->add('GET', '/api/webauthn/credentials', 'Nexus\Controllers\Api\WebAuthnApiController@credentials');
+// $router->add('GET', '/api/webauthn/status', 'Nexus\Controllers\Api\WebAuthnApiController@status'); // Status endpoint
 
 // WebAuthn Aliases
-$router->add('POST', '/api/webauthn/register/options', 'Nexus\Controllers\Api\WebAuthnApiController@registerChallenge');
-$router->add('POST', '/api/webauthn/register/verify', 'Nexus\Controllers\Api\WebAuthnApiController@registerVerify');
-$router->add('POST', '/api/webauthn/login/options', 'Nexus\Controllers\Api\WebAuthnApiController@authChallenge');
-$router->add('POST', '/api/webauthn/login/verify', 'Nexus\Controllers\Api\WebAuthnApiController@authVerify');
+// $router->add('POST', '/api/webauthn/register/options', 'Nexus\Controllers\Api\WebAuthnApiController@registerChallenge');
+// $router->add('POST', '/api/webauthn/register/verify', 'Nexus\Controllers\Api\WebAuthnApiController@registerVerify');
+// $router->add('POST', '/api/webauthn/login/options', 'Nexus\Controllers\Api\WebAuthnApiController@authChallenge');
+// $router->add('POST', '/api/webauthn/login/verify', 'Nexus\Controllers\Api\WebAuthnApiController@authVerify');
 
 // ============================================
 // AI ASSISTANT API
@@ -133,74 +134,74 @@ $router->add('POST', '/api/webauthn/login/verify', 'Nexus\Controllers\Api\WebAut
 // ============================================
 
 // AI Chat & Conversations
-$router->add('POST', '/api/ai/chat', 'Nexus\Controllers\Api\Ai\AiChatController@chat');
-$router->add('POST', '/api/ai/chat/stream', 'Nexus\Controllers\Api\Ai\AiChatController@streamChat');
-$router->add('GET', '/api/ai/conversations', 'Nexus\Controllers\Api\Ai\AiChatController@listConversations');
-$router->add('GET', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\Ai\AiChatController@getConversation');
-$router->add('POST', '/api/ai/conversations', 'Nexus\Controllers\Api\Ai\AiChatController@createConversation');
-$router->add('DELETE', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\Ai\AiChatController@deleteConversation');
+// $router->add('POST', '/api/ai/chat', 'Nexus\Controllers\Api\Ai\AiChatController@chat');
+// $router->add('POST', '/api/ai/chat/stream', 'Nexus\Controllers\Api\Ai\AiChatController@streamChat');
+// $router->add('GET', '/api/ai/conversations', 'Nexus\Controllers\Api\Ai\AiChatController@listConversations');
+// $router->add('GET', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\Ai\AiChatController@getConversation');
+// $router->add('POST', '/api/ai/conversations', 'Nexus\Controllers\Api\Ai\AiChatController@createConversation');
+// $router->add('DELETE', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\Ai\AiChatController@deleteConversation');
 
 // AI Provider & Limits
-$router->add('GET', '/api/ai/providers', 'Nexus\Controllers\Api\Ai\AiProviderController@getProviders');
-$router->add('GET', '/api/ai/limits', 'Nexus\Controllers\Api\Ai\AiProviderController@getLimits');
-$router->add('POST', '/api/ai/test-provider', 'Nexus\Controllers\Api\Ai\AiProviderController@testProvider');
+// $router->add('GET', '/api/ai/providers', 'Nexus\Controllers\Api\Ai\AiProviderController@getProviders');
+// $router->add('GET', '/api/ai/limits', 'Nexus\Controllers\Api\Ai\AiProviderController@getLimits');
+// $router->add('POST', '/api/ai/test-provider', 'Nexus\Controllers\Api\Ai\AiProviderController@testProvider');
 
 // AI User Content Generation
-$router->add('POST', '/api/ai/generate/listing', 'Nexus\Controllers\Api\Ai\AiContentController@generateListing');
-$router->add('POST', '/api/ai/generate/event', 'Nexus\Controllers\Api\Ai\AiContentController@generateEvent');
-$router->add('POST', '/api/ai/generate/message', 'Nexus\Controllers\Api\Ai\AiContentController@generateMessage');
-$router->add('POST', '/api/ai/generate/bio', 'Nexus\Controllers\Api\Ai\AiContentController@generateBio');
+// $router->add('POST', '/api/ai/generate/listing', 'Nexus\Controllers\Api\Ai\AiContentController@generateListing');
+// $router->add('POST', '/api/ai/generate/event', 'Nexus\Controllers\Api\Ai\AiContentController@generateEvent');
+// $router->add('POST', '/api/ai/generate/message', 'Nexus\Controllers\Api\Ai\AiContentController@generateMessage');
+// $router->add('POST', '/api/ai/generate/bio', 'Nexus\Controllers\Api\Ai\AiContentController@generateBio');
 
 // AI Admin Content Generation
-$router->add('POST', '/api/ai/generate/newsletter', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generateNewsletter');
-$router->add('POST', '/api/ai/generate/blog', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generateBlog');
-$router->add('POST', '/api/ai/generate/page', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generatePage');
+// $router->add('POST', '/api/ai/generate/newsletter', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generateNewsletter');
+// $router->add('POST', '/api/ai/generate/blog', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generateBlog');
+// $router->add('POST', '/api/ai/generate/page', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generatePage');
 
 // Menu API (for mobile apps)
-$router->add('GET', '/api/menus', 'Nexus\Controllers\Api\MenuApiController@index');
-$router->add('GET', '/api/menus/config', 'Nexus\Controllers\Api\MenuApiController@config');
-$router->add('GET', '/api/menus/mobile', 'Nexus\Controllers\Api\MenuApiController@mobile');
-$router->add('GET', '/api/menus/{slug}', 'Nexus\Controllers\Api\MenuApiController@show');
-$router->add('POST', '/api/menus/clear-cache', 'Nexus\Controllers\Api\MenuApiController@clearCache');
+// $router->add('GET', '/api/menus', 'Nexus\Controllers\Api\MenuApiController@index');
+// $router->add('GET', '/api/menus/config', 'Nexus\Controllers\Api\MenuApiController@config');
+// $router->add('GET', '/api/menus/mobile', 'Nexus\Controllers\Api\MenuApiController@mobile');
+// $router->add('GET', '/api/menus/{slug}', 'Nexus\Controllers\Api\MenuApiController@show');
+// $router->add('POST', '/api/menus/clear-cache', 'Nexus\Controllers\Api\MenuApiController@clearCache');
 
-$router->add('POST', '/api/v2/contact', 'Nexus\Controllers\ContactController@apiSubmit');
-$router->add('POST', '/api/help/feedback', 'Nexus\Controllers\HelpController@feedback');
+// $router->add('POST', '/api/v2/contact', 'Nexus\Controllers\ContactController@apiSubmit');
+// $router->add('POST', '/api/help/feedback', 'Nexus\Controllers\HelpController@feedback');
 $router->add('GET', '/sitemap.xml', 'Nexus\Controllers\SitemapController@index');
 $router->add('GET', '/robots.txt', 'Nexus\Controllers\RobotsController@index');
 
-$router->add('GET', '/api/groups/{id}/analytics', 'Nexus\Controllers\GroupAnalyticsController@apiData');
+// $router->add('GET', '/api/groups/{id}/analytics', 'Nexus\Controllers\GroupAnalyticsController@apiData');
 
 // Group Recommendations (Discovery Engine)
-$router->add('GET', '/api/recommendations/groups', 'Nexus\Controllers\Api\GroupRecommendationController@index');
-$router->add('POST', '/api/recommendations/track', 'Nexus\Controllers\Api\GroupRecommendationController@track');
-$router->add('GET', '/api/recommendations/metrics', 'Nexus\Controllers\Api\GroupRecommendationController@metrics');
-$router->add('GET', '/api/recommendations/similar/{id}', 'Nexus\Controllers\Api\GroupRecommendationController@similar');
-$router->add('POST', '/api/notifications/settings', 'Nexus\Controllers\UserPreferenceController@updateSettings'); // Smart Settings API
+// $router->add('GET', '/api/recommendations/groups', 'Nexus\Controllers\Api\GroupRecommendationController@index');
+// $router->add('POST', '/api/recommendations/track', 'Nexus\Controllers\Api\GroupRecommendationController@track');
+// $router->add('GET', '/api/recommendations/metrics', 'Nexus\Controllers\Api\GroupRecommendationController@metrics');
+// $router->add('GET', '/api/recommendations/similar/{id}', 'Nexus\Controllers\Api\GroupRecommendationController@similar');
+// $router->add('POST', '/api/notifications/settings', 'Nexus\Controllers\UserPreferenceController@updateSettings'); // Smart Settings API
 // Consolidated API routes
 //$router->add('GET', '/api/notifications', 'Nexus\Controllers\NotificationController@index'); // Handled by CoreApiController
 //$router->add('POST', '/api/notifications/read', 'Nexus\Controllers\NotificationController@markRead'); // Handled by CoreApiController
-$router->add('GET', '/api/leaderboard', 'Nexus\Controllers\LeaderboardController@api');
-$router->add('GET', '/api/leaderboard/widget', 'Nexus\Controllers\LeaderboardController@widget');
-$router->add('GET', '/api/streaks', 'Nexus\Controllers\LeaderboardController@streaks');
+// $router->add('GET', '/api/leaderboard', 'Nexus\Controllers\LeaderboardController@api');
+// $router->add('GET', '/api/leaderboard/widget', 'Nexus\Controllers\LeaderboardController@widget');
+// $router->add('GET', '/api/streaks', 'Nexus\Controllers\LeaderboardController@streaks');
 
 // Achievements API
-$router->add('GET', '/api/achievements', 'Nexus\Controllers\AchievementsController@api');
-$router->add('GET', '/api/achievements/progress', 'Nexus\Controllers\AchievementsController@progress');
+// $router->add('GET', '/api/achievements', 'Nexus\Controllers\AchievementsController@api');
+// $router->add('GET', '/api/achievements/progress', 'Nexus\Controllers\AchievementsController@progress');
 
 // Gamification API Endpoints
-$router->add('POST', '/api/daily-reward/check', 'Nexus\Controllers\Api\GamificationApiController@checkDailyReward');
-$router->add('GET', '/api/daily-reward/status', 'Nexus\Controllers\Api\GamificationApiController@getDailyStatus');
-$router->add('GET', '/api/gamification/challenges', 'Nexus\Controllers\Api\GamificationApiController@getChallenges');
-$router->add('GET', '/api/gamification/collections', 'Nexus\Controllers\Api\GamificationApiController@getCollections');
-$router->add('GET', '/api/gamification/shop', 'Nexus\Controllers\Api\GamificationApiController@getShopItems');
-$router->add('POST', '/api/gamification/shop/purchase', 'Nexus\Controllers\Api\GamificationApiController@purchaseItem');
-$router->add('GET', '/api/gamification/summary', 'Nexus\Controllers\Api\GamificationApiController@getSummary');
-$router->add('POST', '/api/gamification/showcase', 'Nexus\Controllers\Api\GamificationApiController@updateShowcase');
-$router->add('GET', '/api/gamification/showcased', 'Nexus\Controllers\Api\GamificationApiController@getShowcasedBadges');
-$router->add('GET', '/api/gamification/share', 'Nexus\Controllers\Api\GamificationApiController@shareAchievement');
-$router->add('GET', '/api/gamification/seasons', 'Nexus\Controllers\Api\GamificationApiController@getSeasons');
-$router->add('GET', '/api/gamification/seasons/current', 'Nexus\Controllers\Api\GamificationApiController@getCurrentSeason');
-$router->add('POST', '/api/shop/purchase', 'Nexus\Controllers\Api\GamificationApiController@purchaseItem');
+// $router->add('POST', '/api/daily-reward/check', 'Nexus\Controllers\Api\GamificationApiController@checkDailyReward');
+// $router->add('GET', '/api/daily-reward/status', 'Nexus\Controllers\Api\GamificationApiController@getDailyStatus');
+// $router->add('GET', '/api/gamification/challenges', 'Nexus\Controllers\Api\GamificationApiController@getChallenges');
+// $router->add('GET', '/api/gamification/collections', 'Nexus\Controllers\Api\GamificationApiController@getCollections');
+// $router->add('GET', '/api/gamification/shop', 'Nexus\Controllers\Api\GamificationApiController@getShopItems');
+// $router->add('POST', '/api/gamification/shop/purchase', 'Nexus\Controllers\Api\GamificationApiController@purchaseItem');
+// $router->add('GET', '/api/gamification/summary', 'Nexus\Controllers\Api\GamificationApiController@getSummary');
+// $router->add('POST', '/api/gamification/showcase', 'Nexus\Controllers\Api\GamificationApiController@updateShowcase');
+// $router->add('GET', '/api/gamification/showcased', 'Nexus\Controllers\Api\GamificationApiController@getShowcasedBadges');
+// $router->add('GET', '/api/gamification/share', 'Nexus\Controllers\Api\GamificationApiController@shareAchievement');
+// $router->add('GET', '/api/gamification/seasons', 'Nexus\Controllers\Api\GamificationApiController@getSeasons');
+// $router->add('GET', '/api/gamification/seasons/current', 'Nexus\Controllers\Api\GamificationApiController@getCurrentSeason');
+// $router->add('POST', '/api/shop/purchase', 'Nexus\Controllers\Api\GamificationApiController@purchaseItem');
 $router->add('GET', '/profile/edit', function () {
     $base = \Nexus\Core\TenantContext::getBasePath();
     header("Location: {$base}/settings?section=profile");
@@ -263,7 +264,7 @@ $router->add('GET', '/admin-legacy/seed-generator/test', 'Nexus\Controllers\Admi
 
 $router->add('GET', '/wallet/insights', 'Nexus\Controllers\InsightsController@index');
 $router->add('GET', '/insights', 'Nexus\Controllers\InsightsController@index'); // Alias
-$router->add('GET', '/api/insights', 'Nexus\Controllers\InsightsController@apiInsights');
+// $router->add('GET', '/api/insights', 'Nexus\Controllers\InsightsController@apiInsights');
 
 $router->add('GET', '/organizations/{id}/wallet', 'Nexus\Controllers\OrgWalletController@index');
 $router->add('POST', '/organizations/{id}/wallet/deposit', 'Nexus\Controllers\OrgWalletController@deposit');
@@ -281,8 +282,8 @@ $router->add('POST', '/organizations/{id}/members/role', 'Nexus\Controllers\OrgW
 $router->add('POST', '/organizations/{id}/members/remove', 'Nexus\Controllers\OrgWalletController@removeMember');
 $router->add('POST', '/organizations/{id}/members/request', 'Nexus\Controllers\OrgWalletController@requestMembership');
 $router->add('POST', '/organizations/{id}/members/transfer-ownership', 'Nexus\Controllers\OrgWalletController@transferOwnership');
-$router->add('GET', '/api/organizations/{id}/members', 'Nexus\Controllers\OrgWalletController@apiMembers');
-$router->add('GET', '/api/organizations/{id}/wallet/balance', 'Nexus\Controllers\OrgWalletController@apiBalance');
+// $router->add('GET', '/api/organizations/{id}/members', 'Nexus\Controllers\OrgWalletController@apiMembers');
+// $router->add('GET', '/api/organizations/{id}/wallet/balance', 'Nexus\Controllers\OrgWalletController@apiBalance');
 
 // Export endpoints
 $router->add('GET', '/organizations/{id}/wallet/export', 'Nexus\Controllers\OrgWalletController@exportTransactions');
@@ -303,24 +304,24 @@ $router->add('GET', '/feed', function() {
 });
 $router->add('GET', '/post/{id}', 'Nexus\Controllers\FeedController@show');
 $router->add('POST', '/feed/store', 'Nexus\Controllers\FeedController@store');
-$router->add('POST', '/api/feed/hide', 'Nexus\Controllers\FeedController@hidePost');
-$router->add('POST', '/api/feed/mute', 'Nexus\Controllers\FeedController@muteUser');
-$router->add('POST', '/api/feed/report', 'Nexus\Controllers\FeedController@reportPost');
+// $router->add('POST', '/api/feed/hide', 'Nexus\Controllers\FeedController@hidePost');
+// $router->add('POST', '/api/feed/mute', 'Nexus\Controllers\FeedController@muteUser');
+// $router->add('POST', '/api/feed/report', 'Nexus\Controllers\FeedController@reportPost');
 
 $router->add('GET', '/messages', 'Nexus\Controllers\MessageController@index');
 $router->add('GET', '/messages/new', 'Nexus\Controllers\MessageController@newMessage'); // New message / user search
 $router->add('GET', '/messages/create', 'Nexus\Controllers\MessageController@create');
 $router->add('GET', '/messages/compose', 'Nexus\Controllers\MessageController@create'); // Alias for create
 $router->add('POST', '/messages/store', 'Nexus\Controllers\MessageController@store');
-$router->add('POST', '/api/messages/voice', 'Nexus\Controllers\Api\VoiceMessageController@store'); // Voice message upload
-$router->add('POST', '/api/messages/send', 'Nexus\Controllers\Api\CoreApiController@sendMessage'); // Send message via AJAX
-$router->add('POST', '/api/messages/typing', 'Nexus\Controllers\Api\CoreApiController@typing'); // Typing indicator
-$router->add('GET', '/api/messages/poll', 'Nexus\Controllers\Api\CoreApiController@pollMessages'); // Real-time polling fallback
-$router->add('GET', '/api/messages/unread-count', 'Nexus\Controllers\Api\CoreApiController@unreadMessagesCount'); // Unread message count
-$router->add('POST', '/api/messages/delete', 'Nexus\Controllers\MessageController@deleteMessage'); // Delete single message
-$router->add('POST', '/api/messages/delete-conversation', 'Nexus\Controllers\MessageController@deleteConversation'); // Delete entire conversation
-$router->add('POST', '/api/messages/reaction', 'Nexus\Controllers\MessageController@toggleReaction'); // Add/remove reaction
-$router->add('GET', '/api/messages/reactions-batch', 'Nexus\Controllers\MessageController@getReactionsBatch'); // Get reactions for multiple messages
+// $router->add('POST', '/api/messages/voice', 'Nexus\Controllers\Api\VoiceMessageController@store'); // Voice message upload
+// $router->add('POST', '/api/messages/send', 'Nexus\Controllers\Api\CoreApiController@sendMessage'); // Send message via AJAX
+// $router->add('POST', '/api/messages/typing', 'Nexus\Controllers\Api\CoreApiController@typing'); // Typing indicator
+// $router->add('GET', '/api/messages/poll', 'Nexus\Controllers\Api\CoreApiController@pollMessages'); // Real-time polling fallback
+// $router->add('GET', '/api/messages/unread-count', 'Nexus\Controllers\Api\CoreApiController@unreadMessagesCount'); // Unread message count
+// $router->add('POST', '/api/messages/delete', 'Nexus\Controllers\MessageController@deleteMessage'); // Delete single message
+// $router->add('POST', '/api/messages/delete-conversation', 'Nexus\Controllers\MessageController@deleteConversation'); // Delete entire conversation
+// $router->add('POST', '/api/messages/reaction', 'Nexus\Controllers\MessageController@toggleReaction'); // Add/remove reaction
+// $router->add('GET', '/api/messages/reactions-batch', 'Nexus\Controllers\MessageController@getReactionsBatch'); // Get reactions for multiple messages
 $router->add('GET', '/messages/thread/{id}', 'Nexus\Controllers\MessageController@show'); // Thread view (alternate URL)
 $router->add('GET', '/messages/{id}', 'Nexus\Controllers\MessageController@show');
 // NOTE: Reply handled via /messages/store with receiver_id
@@ -684,7 +685,7 @@ $router->add('POST', '/admin-legacy/timebanking/org-members/update-role', 'Nexus
 $router->add('POST', '/admin-legacy/timebanking/org-members/remove', 'Nexus\Controllers\Admin\TimebankingController@removeOrgMember');
 $router->add('GET', '/admin-legacy/timebanking/create-org', 'Nexus\Controllers\Admin\TimebankingController@createOrgForm');
 $router->add('POST', '/admin-legacy/timebanking/create-org', 'Nexus\Controllers\Admin\TimebankingController@createOrg');
-$router->add('GET', '/api/admin/users/search', 'Nexus\Controllers\Admin\TimebankingController@userSearchApi');
+// $router->add('GET', '/api/admin/users/search', 'Nexus\Controllers\Admin\TimebankingController@userSearchApi');
 
 // Admin Campaigns
 $router->add('GET', '/admin-legacy/gamification/campaigns', 'Nexus\Controllers\Admin\GamificationController@campaigns');
@@ -821,7 +822,7 @@ $router->add('GET', '/newsletter/unsubscribe/confirm', 'Nexus\Controllers\Newsle
 $router->add('POST', '/newsletter/unsubscribe/confirm', 'Nexus\Controllers\NewsletterSubscriptionController@oneClickUnsubscribe');
 
 // V2 JSON API for newsletter unsubscribe (called from the React frontend unsubscribe page)
-$router->add('POST', '/api/v2/newsletter/unsubscribe', 'Nexus\Controllers\Api\NewsletterApiController@unsubscribe');
+// $router->add('POST', '/api/v2/newsletter/unsubscribe', 'Nexus\Controllers\Api\NewsletterApiController@unsubscribe');
 
 $router->add('GET', '/newsletter/track/open/{newsletterId}/{trackingToken}', 'Nexus\Controllers\NewsletterTrackingController@trackOpen');
 $router->add('GET', '/newsletter/track/click/{newsletterId}/{linkId}/{trackingToken}', 'Nexus\Controllers\NewsletterTrackingController@trackClick');
@@ -928,9 +929,9 @@ $router->add('POST', '/admin-legacy/api/users/{userId}/permissions', 'Nexus\Cont
 $router->add('DELETE', '/admin-legacy/api/users/{userId}/permissions/{permissionId}', 'Nexus\Controllers\Admin\PermissionApiController@revokePermissionFromUser');
 $router->add('GET', '/admin-legacy/api/audit/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getAuditLog');
 $router->add('GET', '/admin-legacy/api/stats/permissions', 'Nexus\Controllers\Admin\PermissionApiController@getPermissionStats');
-$router->add('POST', '/api/gdpr/consent', 'Nexus\Controllers\Api\GdprApiController@updateConsent');
-$router->add('POST', '/api/gdpr/request', 'Nexus\Controllers\Api\GdprApiController@createRequest');
-$router->add('POST', '/api/gdpr/delete-account', 'Nexus\Controllers\Api\GdprApiController@deleteAccount');
+// $router->add('POST', '/api/gdpr/consent', 'Nexus\Controllers\Api\GdprApiController@updateConsent');
+// $router->add('POST', '/api/gdpr/request', 'Nexus\Controllers\Api\GdprApiController@createRequest');
+// $router->add('POST', '/api/gdpr/delete-account', 'Nexus\Controllers\Api\GdprApiController@deleteAccount');
 
 $router->add('GET', '/cron/daily-digest', 'Nexus\Controllers\CronController@dailyDigest');
 $router->add('GET', '/cron/weekly-digest', 'Nexus\Controllers\CronController@weeklyDigest');
@@ -960,214 +961,304 @@ $router->add('GET', '/cron/purge-verification-sessions', 'Nexus\Controllers\Cron
 // Maintenance
 $router->add('GET', '/cron/cleanup', 'Nexus\Controllers\CronController@cleanup');
 
+// Volunteer Reminders & Expiry
+$router->add('GET', '/cron/volunteer-pre-shift-reminders', 'Nexus\Controllers\CronController@volunteerPreShiftReminders');
+$router->add('GET', '/cron/volunteer-post-shift-feedback', 'Nexus\Controllers\CronController@volunteerPostShiftFeedback');
+$router->add('GET', '/cron/volunteer-lapsed-nudge', 'Nexus\Controllers\CronController@volunteerLapsedNudge');
+$router->add('GET', '/cron/volunteer-expiry-warnings', 'Nexus\Controllers\CronController@volunteerExpiryWarnings');
+$router->add('GET', '/cron/volunteer-expire-consents', 'Nexus\Controllers\CronController@volunteerExpireConsents');
+$router->add('GET', '/cron/retry-failed-webhooks', 'Nexus\Controllers\CronController@retryFailedWebhooks');
+
 // Master Cron (runs all tasks based on schedule)
 $router->add('GET', '/cron/run-all', 'Nexus\Controllers\CronController@runAll');
 
-$router->add('GET', '/api/v2/admin/community-analytics', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@index');
-$router->add('GET', '/api/v2/admin/community-analytics/export', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@export');
-$router->add('GET', '/api/v2/admin/community-analytics/geography', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@geography');
+// $router->add('GET', '/api/v2/admin/community-analytics', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@index');
+// $router->add('GET', '/api/v2/admin/community-analytics/export', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@export');
+// $router->add('GET', '/api/v2/admin/community-analytics/geography', 'Nexus\Controllers\Api\AdminCommunityAnalyticsApiController@geography');
 
 // ============================================
 // API V2 - IMPACT REPORTING (Admin)
 // ============================================
-$router->add('GET', '/api/v2/admin/impact-report', 'Nexus\Controllers\Api\AdminImpactReportApiController@index');
-$router->add('PUT', '/api/v2/admin/impact-report/config', 'Nexus\Controllers\Api\AdminImpactReportApiController@updateConfig');
+// $router->add('GET', '/api/v2/admin/impact-report', 'Nexus\Controllers\Api\AdminImpactReportApiController@index');
+// $router->add('PUT', '/api/v2/admin/impact-report/config', 'Nexus\Controllers\Api\AdminImpactReportApiController@updateConfig');
 
 // ============================================
 // API V2 - ONBOARDING (Authenticated users)
 // ============================================
-$router->add('GET', '/api/v2/onboarding/status', 'Nexus\Controllers\Api\OnboardingApiController@status');
-$router->add('GET', '/api/v2/onboarding/categories', 'Nexus\Controllers\Api\OnboardingApiController@categories');
-$router->add('POST', '/api/v2/onboarding/complete', 'Nexus\Controllers\Api\OnboardingApiController@complete');
+// $router->add('GET', '/api/v2/onboarding/status', 'Nexus\Controllers\Api\OnboardingApiController@status');
+// $router->add('GET', '/api/v2/onboarding/categories', 'Nexus\Controllers\Api\OnboardingApiController@categories');
+// $router->add('POST', '/api/v2/onboarding/complete', 'Nexus\Controllers\Api\OnboardingApiController@complete');
 
 // ============================================
 // API V2 - GROUP EXCHANGES (Authenticated users)
 // ============================================
-$router->add('GET', '/api/v2/group-exchanges', 'Nexus\Controllers\Api\GroupExchangesApiController@index');
-$router->add('POST', '/api/v2/group-exchanges', 'Nexus\Controllers\Api\GroupExchangesApiController@store');
-$router->add('GET', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@show');
-$router->add('PUT', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@update');
-$router->add('DELETE', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@destroy');
-$router->add('POST', '/api/v2/group-exchanges/{id}/participants', 'Nexus\Controllers\Api\GroupExchangesApiController@addParticipant');
-$router->add('DELETE', '/api/v2/group-exchanges/{id}/participants/{userId}', 'Nexus\Controllers\Api\GroupExchangesApiController@removeParticipant');
-$router->add('POST', '/api/v2/group-exchanges/{id}/confirm', 'Nexus\Controllers\Api\GroupExchangesApiController@confirm');
-$router->add('POST', '/api/v2/group-exchanges/{id}/complete', 'Nexus\Controllers\Api\GroupExchangesApiController@complete');
+// $router->add('GET', '/api/v2/group-exchanges', 'Nexus\Controllers\Api\GroupExchangesApiController@index');
+// $router->add('POST', '/api/v2/group-exchanges', 'Nexus\Controllers\Api\GroupExchangesApiController@store');
+// $router->add('GET', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@show');
+// $router->add('PUT', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@update');
+// $router->add('DELETE', '/api/v2/group-exchanges/{id}', 'Nexus\Controllers\Api\GroupExchangesApiController@destroy');
+// $router->add('POST', '/api/v2/group-exchanges/{id}/participants', 'Nexus\Controllers\Api\GroupExchangesApiController@addParticipant');
+// $router->add('DELETE', '/api/v2/group-exchanges/{id}/participants/{userId}', 'Nexus\Controllers\Api\GroupExchangesApiController@removeParticipant');
+// $router->add('POST', '/api/v2/group-exchanges/{id}/confirm', 'Nexus\Controllers\Api\GroupExchangesApiController@confirm');
+// $router->add('POST', '/api/v2/group-exchanges/{id}/complete', 'Nexus\Controllers\Api\GroupExchangesApiController@complete');
 
 // ============================================
 // API V2 - WALLET FEATURES (New endpoints)
 // ============================================
-$router->add('GET', '/api/v2/wallet/statement', 'Nexus\Controllers\Api\WalletFeaturesApiController@statement');
-$router->add('GET', '/api/v2/wallet/categories', 'Nexus\Controllers\Api\WalletFeaturesApiController@listCategories');
-$router->add('POST', '/api/v2/wallet/categories', 'Nexus\Controllers\Api\WalletFeaturesApiController@createCategory');
-$router->add('PUT', '/api/v2/wallet/categories/{id}', 'Nexus\Controllers\Api\WalletFeaturesApiController@updateCategory');
-$router->add('DELETE', '/api/v2/wallet/categories/{id}', 'Nexus\Controllers\Api\WalletFeaturesApiController@deleteCategory');
-$router->add('GET', '/api/v2/wallet/community-fund', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundBalance');
-$router->add('GET', '/api/v2/wallet/community-fund/transactions', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundTransactions');
-$router->add('POST', '/api/v2/wallet/community-fund/deposit', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundDeposit');
-$router->add('POST', '/api/v2/wallet/community-fund/withdraw', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundWithdraw');
-$router->add('POST', '/api/v2/wallet/community-fund/donate', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundDonate');
-$router->add('POST', '/api/v2/wallet/donate', 'Nexus\Controllers\Api\WalletFeaturesApiController@donate');
-$router->add('GET', '/api/v2/wallet/donations', 'Nexus\Controllers\Api\WalletFeaturesApiController@donationHistory');
-$router->add('GET', '/api/v2/wallet/starting-balance', 'Nexus\Controllers\Api\WalletFeaturesApiController@getStartingBalance');
-$router->add('PUT', '/api/v2/wallet/starting-balance', 'Nexus\Controllers\Api\WalletFeaturesApiController@setStartingBalance');
-$router->add('POST', '/api/v2/exchanges/{id}/rate', 'Nexus\Controllers\Api\WalletFeaturesApiController@rateExchange');
-$router->add('GET', '/api/v2/exchanges/{id}/ratings', 'Nexus\Controllers\Api\WalletFeaturesApiController@exchangeRatings');
-$router->add('GET', '/api/v2/users/{id}/rating', 'Nexus\Controllers\Api\WalletFeaturesApiController@userRating');
+// $router->add('GET', '/api/v2/wallet/statement', 'Nexus\Controllers\Api\WalletFeaturesApiController@statement');
+// $router->add('GET', '/api/v2/wallet/categories', 'Nexus\Controllers\Api\WalletFeaturesApiController@listCategories');
+// $router->add('POST', '/api/v2/wallet/categories', 'Nexus\Controllers\Api\WalletFeaturesApiController@createCategory');
+// $router->add('PUT', '/api/v2/wallet/categories/{id}', 'Nexus\Controllers\Api\WalletFeaturesApiController@updateCategory');
+// $router->add('DELETE', '/api/v2/wallet/categories/{id}', 'Nexus\Controllers\Api\WalletFeaturesApiController@deleteCategory');
+// $router->add('GET', '/api/v2/wallet/community-fund', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundBalance');
+// $router->add('GET', '/api/v2/wallet/community-fund/transactions', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundTransactions');
+// $router->add('POST', '/api/v2/wallet/community-fund/deposit', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundDeposit');
+// $router->add('POST', '/api/v2/wallet/community-fund/withdraw', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundWithdraw');
+// $router->add('POST', '/api/v2/wallet/community-fund/donate', 'Nexus\Controllers\Api\WalletFeaturesApiController@communityFundDonate');
+// $router->add('POST', '/api/v2/wallet/donate', 'Nexus\Controllers\Api\WalletFeaturesApiController@donate');
+// $router->add('GET', '/api/v2/wallet/donations', 'Nexus\Controllers\Api\WalletFeaturesApiController@donationHistory');
+// $router->add('GET', '/api/v2/wallet/starting-balance', 'Nexus\Controllers\Api\WalletFeaturesApiController@getStartingBalance');
+// $router->add('PUT', '/api/v2/wallet/starting-balance', 'Nexus\Controllers\Api\WalletFeaturesApiController@setStartingBalance');
+// $router->add('POST', '/api/v2/exchanges/{id}/rate', 'Nexus\Controllers\Api\WalletFeaturesApiController@rateExchange');
+// $router->add('GET', '/api/v2/exchanges/{id}/ratings', 'Nexus\Controllers\Api\WalletFeaturesApiController@exchangeRatings');
+// $router->add('GET', '/api/v2/users/{id}/rating', 'Nexus\Controllers\Api\WalletFeaturesApiController@userRating');
 
 // ============================================
 // API V2 - EVENT FEATURES (New endpoints)
 // ============================================
-$router->add('POST', '/api/v2/events/recurring', 'Nexus\Controllers\Api\EventsApiController@createRecurring');
-$router->add('GET', '/api/v2/events/series', 'Nexus\Controllers\Api\EventsApiController@listSeries');
-$router->add('POST', '/api/v2/events/series', 'Nexus\Controllers\Api\EventsApiController@createSeries');
-$router->add('GET', '/api/v2/events/series/{seriesId}', 'Nexus\Controllers\Api\EventsApiController@showSeries');
-$router->add('PUT', '/api/v2/events/{id}/recurring', 'Nexus\Controllers\Api\EventsApiController@updateRecurring');
-$router->add('POST', '/api/v2/events/{id}/cancel', 'Nexus\Controllers\Api\EventsApiController@cancel');
-$router->add('GET', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@waitlist');
-$router->add('POST', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@joinWaitlist');
-$router->add('DELETE', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@leaveWaitlist');
-$router->add('GET', '/api/v2/events/{id}/reminders', 'Nexus\Controllers\Api\EventsApiController@getReminders');
-$router->add('PUT', '/api/v2/events/{id}/reminders', 'Nexus\Controllers\Api\EventsApiController@updateReminders');
-$router->add('GET', '/api/v2/events/{id}/attendance', 'Nexus\Controllers\Api\EventsApiController@getAttendance');
-$router->add('POST', '/api/v2/events/{id}/attendance', 'Nexus\Controllers\Api\EventsApiController@markAttendance');
-$router->add('POST', '/api/v2/events/{id}/attendance/bulk', 'Nexus\Controllers\Api\EventsApiController@bulkMarkAttendance');
-$router->add('POST', '/api/v2/events/{id}/series', 'Nexus\Controllers\Api\EventsApiController@linkToSeries');
+// $router->add('POST', '/api/v2/events/recurring', 'Nexus\Controllers\Api\EventsApiController@createRecurring');
+// $router->add('GET', '/api/v2/events/series', 'Nexus\Controllers\Api\EventsApiController@listSeries');
+// $router->add('POST', '/api/v2/events/series', 'Nexus\Controllers\Api\EventsApiController@createSeries');
+// $router->add('GET', '/api/v2/events/series/{seriesId}', 'Nexus\Controllers\Api\EventsApiController@showSeries');
+// $router->add('PUT', '/api/v2/events/{id}/recurring', 'Nexus\Controllers\Api\EventsApiController@updateRecurring');
+// $router->add('POST', '/api/v2/events/{id}/cancel', 'Nexus\Controllers\Api\EventsApiController@cancel');
+// $router->add('GET', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@waitlist');
+// $router->add('POST', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@joinWaitlist');
+// $router->add('DELETE', '/api/v2/events/{id}/waitlist', 'Nexus\Controllers\Api\EventsApiController@leaveWaitlist');
+// $router->add('GET', '/api/v2/events/{id}/reminders', 'Nexus\Controllers\Api\EventsApiController@getReminders');
+// $router->add('PUT', '/api/v2/events/{id}/reminders', 'Nexus\Controllers\Api\EventsApiController@updateReminders');
+// $router->add('GET', '/api/v2/events/{id}/attendance', 'Nexus\Controllers\Api\EventsApiController@getAttendance');
+// $router->add('POST', '/api/v2/events/{id}/attendance', 'Nexus\Controllers\Api\EventsApiController@markAttendance');
+// $router->add('POST', '/api/v2/events/{id}/attendance/bulk', 'Nexus\Controllers\Api\EventsApiController@bulkMarkAttendance');
+// $router->add('POST', '/api/v2/events/{id}/series', 'Nexus\Controllers\Api\EventsApiController@linkToSeries');
 
 // ============================================
 // API V2 - VOLUNTEERING FEATURES (New endpoints)
 // ============================================
-$router->add('GET', '/api/v2/volunteering/recommended-shifts', 'Nexus\Controllers\Api\VolunteerApiController@recommendedShifts');
-$router->add('GET', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@myCertificates');
-$router->add('POST', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@generateCertificate');
-$router->add('GET', '/api/v2/volunteering/certificates/verify/{code}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCertificate');
-$router->add('GET', '/api/v2/volunteering/certificates/{code}/html', 'Nexus\Controllers\Api\VolunteerApiController@certificateHtml');
+// $router->add('GET', '/api/v2/volunteering/recommended-shifts', 'Nexus\Controllers\Api\VolunteerApiController@recommendedShifts');
+// $router->add('GET', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@myCertificates');
+// $router->add('POST', '/api/v2/volunteering/certificates', 'Nexus\Controllers\Api\VolunteerApiController@generateCertificate');
+// $router->add('GET', '/api/v2/volunteering/certificates/verify/{code}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCertificate');
+// $router->add('GET', '/api/v2/volunteering/certificates/{code}/html', 'Nexus\Controllers\Api\VolunteerApiController@certificateHtml');
 // Credential verification (separate from impact certificates)
-$router->add('GET', '/api/v2/volunteering/credentials', 'Nexus\Controllers\Api\VolunteerApiController@myCredentials');
-$router->add('POST', '/api/v2/volunteering/credentials', 'Nexus\Controllers\Api\VolunteerApiController@uploadCredential');
-$router->add('DELETE', '/api/v2/volunteering/credentials/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteCredential');
-$router->add('GET', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@myEmergencyAlerts');
-$router->add('POST', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@createEmergencyAlert');
-$router->add('PUT', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondToEmergencyAlert');
-$router->add('DELETE', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelEmergencyAlert');
-$router->add('GET', '/api/v2/volunteering/wellbeing', 'Nexus\Controllers\Api\VolunteerApiController@wellbeingDashboard');
-$router->add('POST', '/api/v2/volunteering/wellbeing/checkin', 'Nexus\Controllers\Api\VolunteerApiController@wellbeingCheckin');
-$router->add('GET', '/api/v2/volunteering/wellbeing/my-status', 'Nexus\Controllers\Api\VolunteerApiController@myWellbeingStatus');
-$router->add('GET', '/api/v2/volunteering/swaps', 'Nexus\Controllers\Api\VolunteerApiController@getSwapRequests');
-$router->add('POST', '/api/v2/volunteering/swaps', 'Nexus\Controllers\Api\VolunteerApiController@requestSwap');
-$router->add('PUT', '/api/v2/volunteering/swaps/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondToSwap');
-$router->add('DELETE', '/api/v2/volunteering/swaps/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelSwap');
-$router->add('GET', '/api/v2/volunteering/my-waitlists', 'Nexus\Controllers\Api\VolunteerApiController@myWaitlists');
-$router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@joinWaitlist');
-$router->add('DELETE', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@leaveWaitlist');
-$router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist/promote', 'Nexus\Controllers\Api\VolunteerApiController@promoteFromWaitlist');
-$router->add('GET', '/api/v2/volunteering/group-reservations', 'Nexus\Controllers\Api\VolunteerApiController@myGroupReservations');
-$router->add('POST', '/api/v2/volunteering/shifts/{id}/group-reserve', 'Nexus\Controllers\Api\VolunteerApiController@groupReserve');
-$router->add('POST', '/api/v2/volunteering/group-reservations/{id}/members', 'Nexus\Controllers\Api\VolunteerApiController@addGroupMember');
-$router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}/members/{userId}', 'Nexus\Controllers\Api\VolunteerApiController@removeGroupMember');
-$router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelGroupReservation');
-$router->add('GET', '/api/v2/volunteering/shifts/{id}/checkin', 'Nexus\Controllers\Api\VolunteerApiController@getCheckIn');
-$router->add('POST', '/api/v2/volunteering/checkin/verify/{token}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCheckIn');
-$router->add('POST', '/api/v2/volunteering/checkin/checkout/{token}', 'Nexus\Controllers\Api\VolunteerApiController@checkOut');
-$router->add('GET', '/api/v2/volunteering/shifts/{id}/checkins', 'Nexus\Controllers\Api\VolunteerApiController@shiftCheckIns');
+// $router->add('GET', '/api/v2/volunteering/credentials', 'Nexus\Controllers\Api\VolunteerApiController@myCredentials');
+// $router->add('POST', '/api/v2/volunteering/credentials', 'Nexus\Controllers\Api\VolunteerApiController@uploadCredential');
+// $router->add('DELETE', '/api/v2/volunteering/credentials/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteCredential');
+// $router->add('GET', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@myEmergencyAlerts');
+// $router->add('POST', '/api/v2/volunteering/emergency-alerts', 'Nexus\Controllers\Api\VolunteerApiController@createEmergencyAlert');
+// $router->add('PUT', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondToEmergencyAlert');
+// $router->add('DELETE', '/api/v2/volunteering/emergency-alerts/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelEmergencyAlert');
+// $router->add('GET', '/api/v2/volunteering/wellbeing', 'Nexus\Controllers\Api\VolunteerApiController@wellbeingDashboard');
+// $router->add('POST', '/api/v2/volunteering/wellbeing/checkin', 'Nexus\Controllers\Api\VolunteerApiController@wellbeingCheckin');
+// $router->add('GET', '/api/v2/volunteering/wellbeing/my-status', 'Nexus\Controllers\Api\VolunteerApiController@myWellbeingStatus');
+// $router->add('GET', '/api/v2/volunteering/swaps', 'Nexus\Controllers\Api\VolunteerApiController@getSwapRequests');
+// $router->add('POST', '/api/v2/volunteering/swaps', 'Nexus\Controllers\Api\VolunteerApiController@requestSwap');
+// $router->add('PUT', '/api/v2/volunteering/swaps/{id}', 'Nexus\Controllers\Api\VolunteerApiController@respondToSwap');
+// $router->add('DELETE', '/api/v2/volunteering/swaps/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelSwap');
+// $router->add('GET', '/api/v2/volunteering/my-waitlists', 'Nexus\Controllers\Api\VolunteerApiController@myWaitlists');
+// $router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@joinWaitlist');
+// $router->add('DELETE', '/api/v2/volunteering/shifts/{id}/waitlist', 'Nexus\Controllers\Api\VolunteerApiController@leaveWaitlist');
+// $router->add('POST', '/api/v2/volunteering/shifts/{id}/waitlist/promote', 'Nexus\Controllers\Api\VolunteerApiController@promoteFromWaitlist');
+// $router->add('GET', '/api/v2/volunteering/group-reservations', 'Nexus\Controllers\Api\VolunteerApiController@myGroupReservations');
+// $router->add('POST', '/api/v2/volunteering/shifts/{id}/group-reserve', 'Nexus\Controllers\Api\VolunteerApiController@groupReserve');
+// $router->add('POST', '/api/v2/volunteering/group-reservations/{id}/members', 'Nexus\Controllers\Api\VolunteerApiController@addGroupMember');
+// $router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}/members/{userId}', 'Nexus\Controllers\Api\VolunteerApiController@removeGroupMember');
+// $router->add('DELETE', '/api/v2/volunteering/group-reservations/{id}', 'Nexus\Controllers\Api\VolunteerApiController@cancelGroupReservation');
+// $router->add('GET', '/api/v2/volunteering/shifts/{id}/checkin', 'Nexus\Controllers\Api\VolunteerApiController@getCheckIn');
+// $router->add('POST', '/api/v2/volunteering/checkin/verify/{token}', 'Nexus\Controllers\Api\VolunteerApiController@verifyCheckIn');
+// $router->add('POST', '/api/v2/volunteering/checkin/checkout/{token}', 'Nexus\Controllers\Api\VolunteerApiController@checkOut');
+// $router->add('GET', '/api/v2/volunteering/shifts/{id}/checkins', 'Nexus\Controllers\Api\VolunteerApiController@shiftCheckIns');
 
 // V8: Recurring shift patterns
-$router->add('GET', '/api/v2/volunteering/opportunities/{id}/recurring-patterns', 'Nexus\Controllers\Api\VolunteerApiController@recurringPatterns');
-$router->add('POST', '/api/v2/volunteering/opportunities/{id}/recurring-patterns', 'Nexus\Controllers\Api\VolunteerApiController@createRecurringPattern');
-$router->add('PUT', '/api/v2/volunteering/recurring-patterns/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateRecurringPattern');
-$router->add('DELETE', '/api/v2/volunteering/recurring-patterns/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteRecurringPattern');
+// $router->add('GET', '/api/v2/volunteering/opportunities/{id}/recurring-patterns', 'Nexus\Controllers\Api\VolunteerApiController@recurringPatterns');
+// $router->add('POST', '/api/v2/volunteering/opportunities/{id}/recurring-patterns', 'Nexus\Controllers\Api\VolunteerApiController@createRecurringPattern');
+// $router->add('PUT', '/api/v2/volunteering/recurring-patterns/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateRecurringPattern');
+// $router->add('DELETE', '/api/v2/volunteering/recurring-patterns/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteRecurringPattern');
+
+// V11: Expense Reimbursement
+// $router->add('GET', '/api/v2/volunteering/expenses', 'Nexus\Controllers\Api\VolunteerApiController@myExpenses');
+// $router->add('POST', '/api/v2/volunteering/expenses', 'Nexus\Controllers\Api\VolunteerApiController@submitExpense');
+// $router->add('GET', '/api/v2/volunteering/expenses/{id}', 'Nexus\Controllers\Api\VolunteerApiController@getExpense');
+
+// V12: Guardian Consent
+// $router->add('GET', '/api/v2/volunteering/guardian-consents', 'Nexus\Controllers\Api\VolunteerApiController@myGuardianConsents');
+// $router->add('POST', '/api/v2/volunteering/guardian-consents', 'Nexus\Controllers\Api\VolunteerApiController@requestGuardianConsent');
+// $router->add('GET', '/api/v2/volunteering/guardian-consents/verify/{token}', 'Nexus\Controllers\Api\VolunteerApiController@verifyGuardianConsent');
+// $router->add('DELETE', '/api/v2/volunteering/guardian-consents/{id}', 'Nexus\Controllers\Api\VolunteerApiController@withdrawGuardianConsent');
+
+// V13: Safeguarding Training & Incidents
+// $router->add('GET', '/api/v2/volunteering/training', 'Nexus\Controllers\Api\VolunteerApiController@myTraining');
+// $router->add('POST', '/api/v2/volunteering/training', 'Nexus\Controllers\Api\VolunteerApiController@recordTraining');
+// $router->add('POST', '/api/v2/volunteering/incidents', 'Nexus\Controllers\Api\VolunteerApiController@reportIncident');
+// $router->add('GET', '/api/v2/volunteering/incidents', 'Nexus\Controllers\Api\VolunteerApiController@getIncidents');
+// $router->add('GET', '/api/v2/volunteering/incidents/{id}', 'Nexus\Controllers\Api\VolunteerApiController@getIncident');
+
+// V14: Custom Forms & Accessibility
+// $router->add('GET', '/api/v2/volunteering/custom-fields', 'Nexus\Controllers\Api\VolunteerApiController@getCustomFields');
+// $router->add('GET', '/api/v2/volunteering/accessibility-needs', 'Nexus\Controllers\Api\VolunteerApiController@myAccessibilityNeeds');
+// $router->add('PUT', '/api/v2/volunteering/accessibility-needs', 'Nexus\Controllers\Api\VolunteerApiController@updateAccessibilityNeeds');
+
+// V15: Community Projects
+// $router->add('GET', '/api/v2/volunteering/community-projects', 'Nexus\Controllers\Api\VolunteerApiController@getCommunityProjects');
+// $router->add('POST', '/api/v2/volunteering/community-projects', 'Nexus\Controllers\Api\VolunteerApiController@proposeCommunityProject');
+// $router->add('GET', '/api/v2/volunteering/community-projects/{id}', 'Nexus\Controllers\Api\VolunteerApiController@getCommunityProject');
+// $router->add('PUT', '/api/v2/volunteering/community-projects/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateCommunityProject');
+// $router->add('POST', '/api/v2/volunteering/community-projects/{id}/support', 'Nexus\Controllers\Api\VolunteerApiController@supportCommunityProject');
+// $router->add('DELETE', '/api/v2/volunteering/community-projects/{id}/support', 'Nexus\Controllers\Api\VolunteerApiController@unsupportCommunityProject');
+
+// V16: Donations
+// $router->add('GET', '/api/v2/volunteering/donations', 'Nexus\Controllers\Api\VolunteerApiController@getDonations');
+// $router->add('POST', '/api/v2/volunteering/donations', 'Nexus\Controllers\Api\VolunteerApiController@createDonation');
+// $router->add('GET', '/api/v2/volunteering/giving-days', 'Nexus\Controllers\Api\VolunteerApiController@getGivingDays');
+// $router->add('GET', '/api/v2/volunteering/giving-days/{id}/stats', 'Nexus\Controllers\Api\VolunteerApiController@getGivingDayStats');
+
+// V11: Admin Expense Routes
+// $router->add('GET', '/api/v2/admin/volunteering/expenses', 'Nexus\Controllers\Api\VolunteerApiController@adminExpenses');
+// $router->add('PUT', '/api/v2/admin/volunteering/expenses/{id}', 'Nexus\Controllers\Api\VolunteerApiController@reviewExpense');
+// $router->add('GET', '/api/v2/admin/volunteering/expenses/export', 'Nexus\Controllers\Api\VolunteerApiController@exportExpenses');
+// $router->add('GET', '/api/v2/admin/volunteering/expenses/policies', 'Nexus\Controllers\Api\VolunteerApiController@getExpensePolicies');
+// $router->add('PUT', '/api/v2/admin/volunteering/expenses/policies', 'Nexus\Controllers\Api\VolunteerApiController@updateExpensePolicy');
+
+// V12: Admin Guardian Consent Routes
+// $router->add('GET', '/api/v2/admin/volunteering/guardian-consents', 'Nexus\Controllers\Api\VolunteerApiController@adminGuardianConsents');
+
+// V13: Admin Safeguarding Routes
+// $router->add('GET', '/api/v2/admin/volunteering/training', 'Nexus\Controllers\Api\VolunteerApiController@adminTraining');
+// $router->add('PUT', '/api/v2/admin/volunteering/training/{id}/verify', 'Nexus\Controllers\Api\VolunteerApiController@verifyTraining');
+// $router->add('PUT', '/api/v2/admin/volunteering/training/{id}/reject', 'Nexus\Controllers\Api\VolunteerApiController@rejectTraining');
+// $router->add('GET', '/api/v2/admin/volunteering/incidents', 'Nexus\Controllers\Api\VolunteerApiController@adminIncidents');
+// $router->add('PUT', '/api/v2/admin/volunteering/incidents/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateIncident');
+// $router->add('PUT', '/api/v2/admin/volunteering/organizations/{id}/dlp', 'Nexus\Controllers\Api\VolunteerApiController@assignDlp');
+
+// V14: Admin Custom Fields Routes
+// $router->add('GET', '/api/v2/admin/volunteering/custom-fields', 'Nexus\Controllers\Api\VolunteerApiController@adminCustomFields');
+// $router->add('POST', '/api/v2/admin/volunteering/custom-fields', 'Nexus\Controllers\Api\VolunteerApiController@createCustomField');
+// $router->add('PUT', '/api/v2/admin/volunteering/custom-fields/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateCustomField');
+// $router->add('DELETE', '/api/v2/admin/volunteering/custom-fields/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteCustomField');
+
+// V15: Admin Community Project Routes
+// $router->add('PUT', '/api/v2/admin/volunteering/community-projects/{id}/review', 'Nexus\Controllers\Api\VolunteerApiController@reviewCommunityProject');
+
+// V16: Admin Giving Day & Donation Routes
+// $router->add('GET', '/api/v2/admin/volunteering/giving-days', 'Nexus\Controllers\Api\VolunteerApiController@adminGivingDays');
+// $router->add('POST', '/api/v2/admin/volunteering/giving-days', 'Nexus\Controllers\Api\VolunteerApiController@createGivingDay');
+// $router->add('PUT', '/api/v2/admin/volunteering/giving-days/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateGivingDay');
+// $router->add('GET', '/api/v2/admin/volunteering/donations/export', 'Nexus\Controllers\Api\VolunteerApiController@exportDonations');
+
+// Admin Webhook Routes
+// $router->add('GET', '/api/v2/admin/volunteering/webhooks', 'Nexus\Controllers\Api\VolunteerApiController@getWebhooks');
+// $router->add('POST', '/api/v2/admin/volunteering/webhooks', 'Nexus\Controllers\Api\VolunteerApiController@createWebhook');
+// $router->add('PUT', '/api/v2/admin/volunteering/webhooks/{id}', 'Nexus\Controllers\Api\VolunteerApiController@updateWebhook');
+// $router->add('DELETE', '/api/v2/admin/volunteering/webhooks/{id}', 'Nexus\Controllers\Api\VolunteerApiController@deleteWebhook');
+// $router->add('POST', '/api/v2/admin/volunteering/webhooks/{id}/test', 'Nexus\Controllers\Api\VolunteerApiController@testWebhook');
+// $router->add('GET', '/api/v2/admin/volunteering/webhooks/{id}/logs', 'Nexus\Controllers\Api\VolunteerApiController@getWebhookLogs');
+
+// Admin Reminder Settings Routes
+// $router->add('GET', '/api/v2/admin/volunteering/reminder-settings', 'Nexus\Controllers\Api\VolunteerApiController@getReminderSettings');
+// $router->add('PUT', '/api/v2/admin/volunteering/reminder-settings', 'Nexus\Controllers\Api\VolunteerApiController@updateReminderSettings');
 
 // ============================================
 // API V2 - IDEATION FEATURES (New endpoints)
 // ============================================
-$router->add('GET', '/api/v2/ideation-categories', 'Nexus\Controllers\Api\IdeationChallengesApiController@listCategories');
-$router->add('POST', '/api/v2/ideation-categories', 'Nexus\Controllers\Api\IdeationChallengesApiController@createCategory');
-$router->add('PUT', '/api/v2/ideation-categories/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateCategory');
-$router->add('DELETE', '/api/v2/ideation-categories/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteCategory');
-$router->add('GET', '/api/v2/ideation-tags/popular', 'Nexus\Controllers\Api\IdeationChallengesApiController@popularTags');
-$router->add('GET', '/api/v2/ideation-tags', 'Nexus\Controllers\Api\IdeationChallengesApiController@listTags');
-$router->add('POST', '/api/v2/ideation-tags', 'Nexus\Controllers\Api\IdeationChallengesApiController@createTag');
-$router->add('DELETE', '/api/v2/ideation-tags/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteTag');
-$router->add('GET', '/api/v2/ideation-ideas/{id}/media', 'Nexus\Controllers\Api\IdeationChallengesApiController@listIdeaMedia');
-$router->add('POST', '/api/v2/ideation-ideas/{id}/media', 'Nexus\Controllers\Api\IdeationChallengesApiController@addIdeaMedia');
-$router->add('DELETE', '/api/v2/ideation-media/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteIdeaMedia');
-$router->add('GET', '/api/v2/ideation-campaigns', 'Nexus\Controllers\Api\IdeationChallengesApiController@listCampaigns');
-$router->add('GET', '/api/v2/ideation-campaigns/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showCampaign');
-$router->add('POST', '/api/v2/ideation-campaigns', 'Nexus\Controllers\Api\IdeationChallengesApiController@createCampaign');
-$router->add('PUT', '/api/v2/ideation-campaigns/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateCampaign');
-$router->add('DELETE', '/api/v2/ideation-campaigns/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteCampaign');
-$router->add('POST', '/api/v2/ideation-campaigns/{id}/challenges', 'Nexus\Controllers\Api\IdeationChallengesApiController@linkChallengeToCampaign');
-$router->add('DELETE', '/api/v2/ideation-campaigns/{id}/challenges/{challengeId}', 'Nexus\Controllers\Api\IdeationChallengesApiController@unlinkChallengeFromCampaign');
-$router->add('GET', '/api/v2/ideation-templates', 'Nexus\Controllers\Api\IdeationChallengesApiController@listTemplates');
-$router->add('GET', '/api/v2/ideation-templates/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showTemplate');
-$router->add('POST', '/api/v2/ideation-templates', 'Nexus\Controllers\Api\IdeationChallengesApiController@createTemplate');
-$router->add('PUT', '/api/v2/ideation-templates/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateTemplate');
-$router->add('DELETE', '/api/v2/ideation-templates/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteTemplate');
-$router->add('GET', '/api/v2/ideation-templates/{id}/data', 'Nexus\Controllers\Api\IdeationChallengesApiController@getTemplateData');
-$router->add('GET', '/api/v2/ideation-challenges/{id}/outcome', 'Nexus\Controllers\Api\IdeationChallengesApiController@getOutcome');
-$router->add('PUT', '/api/v2/ideation-challenges/{id}/outcome', 'Nexus\Controllers\Api\IdeationChallengesApiController@upsertOutcome');
-$router->add('GET', '/api/v2/ideation-outcomes/dashboard', 'Nexus\Controllers\Api\IdeationChallengesApiController@outcomesDashboard');
-$router->add('GET', '/api/v2/ideation-challenges/{id}/team-links', 'Nexus\Controllers\Api\IdeationChallengesApiController@getTeamLinks');
-$router->add('GET', '/api/v2/groups/{id}/chatrooms', 'Nexus\Controllers\Api\IdeationChallengesApiController@listChatrooms');
-$router->add('POST', '/api/v2/groups/{id}/chatrooms', 'Nexus\Controllers\Api\IdeationChallengesApiController@createChatroom');
-$router->add('DELETE', '/api/v2/group-chatrooms/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteChatroom');
-$router->add('GET', '/api/v2/group-chatrooms/{id}/messages', 'Nexus\Controllers\Api\IdeationChallengesApiController@chatroomMessages');
-$router->add('POST', '/api/v2/group-chatrooms/{id}/messages', 'Nexus\Controllers\Api\IdeationChallengesApiController@postChatroomMessage');
-$router->add('DELETE', '/api/v2/group-chatroom-messages/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteChatroomMessage');
-$router->add('GET', '/api/v2/groups/{id}/tasks', 'Nexus\Controllers\Api\IdeationChallengesApiController@listTasks');
-$router->add('POST', '/api/v2/groups/{id}/tasks', 'Nexus\Controllers\Api\IdeationChallengesApiController@createTask');
-$router->add('GET', '/api/v2/team-tasks/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showTask');
-$router->add('PUT', '/api/v2/team-tasks/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateTask');
-$router->add('DELETE', '/api/v2/team-tasks/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteTask');
-$router->add('GET', '/api/v2/groups/{id}/task-stats', 'Nexus\Controllers\Api\IdeationChallengesApiController@taskStats');
-$router->add('GET', '/api/v2/groups/{id}/documents', 'Nexus\Controllers\Api\IdeationChallengesApiController@listDocuments');
-$router->add('POST', '/api/v2/groups/{id}/documents', 'Nexus\Controllers\Api\IdeationChallengesApiController@uploadDocument');
-$router->add('DELETE', '/api/v2/team-documents/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteDocument');
+// $router->add('GET', '/api/v2/ideation-categories', 'Nexus\Controllers\Api\IdeationChallengesApiController@listCategories');
+// $router->add('POST', '/api/v2/ideation-categories', 'Nexus\Controllers\Api\IdeationChallengesApiController@createCategory');
+// $router->add('PUT', '/api/v2/ideation-categories/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateCategory');
+// $router->add('DELETE', '/api/v2/ideation-categories/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteCategory');
+// $router->add('GET', '/api/v2/ideation-tags/popular', 'Nexus\Controllers\Api\IdeationChallengesApiController@popularTags');
+// $router->add('GET', '/api/v2/ideation-tags', 'Nexus\Controllers\Api\IdeationChallengesApiController@listTags');
+// $router->add('POST', '/api/v2/ideation-tags', 'Nexus\Controllers\Api\IdeationChallengesApiController@createTag');
+// $router->add('DELETE', '/api/v2/ideation-tags/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteTag');
+// $router->add('GET', '/api/v2/ideation-ideas/{id}/media', 'Nexus\Controllers\Api\IdeationChallengesApiController@listIdeaMedia');
+// $router->add('POST', '/api/v2/ideation-ideas/{id}/media', 'Nexus\Controllers\Api\IdeationChallengesApiController@addIdeaMedia');
+// $router->add('DELETE', '/api/v2/ideation-media/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteIdeaMedia');
+// $router->add('GET', '/api/v2/ideation-campaigns', 'Nexus\Controllers\Api\IdeationChallengesApiController@listCampaigns');
+// $router->add('GET', '/api/v2/ideation-campaigns/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showCampaign');
+// $router->add('POST', '/api/v2/ideation-campaigns', 'Nexus\Controllers\Api\IdeationChallengesApiController@createCampaign');
+// $router->add('PUT', '/api/v2/ideation-campaigns/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateCampaign');
+// $router->add('DELETE', '/api/v2/ideation-campaigns/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteCampaign');
+// $router->add('POST', '/api/v2/ideation-campaigns/{id}/challenges', 'Nexus\Controllers\Api\IdeationChallengesApiController@linkChallengeToCampaign');
+// $router->add('DELETE', '/api/v2/ideation-campaigns/{id}/challenges/{challengeId}', 'Nexus\Controllers\Api\IdeationChallengesApiController@unlinkChallengeFromCampaign');
+// $router->add('GET', '/api/v2/ideation-templates', 'Nexus\Controllers\Api\IdeationChallengesApiController@listTemplates');
+// $router->add('GET', '/api/v2/ideation-templates/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showTemplate');
+// $router->add('POST', '/api/v2/ideation-templates', 'Nexus\Controllers\Api\IdeationChallengesApiController@createTemplate');
+// $router->add('PUT', '/api/v2/ideation-templates/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateTemplate');
+// $router->add('DELETE', '/api/v2/ideation-templates/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteTemplate');
+// $router->add('GET', '/api/v2/ideation-templates/{id}/data', 'Nexus\Controllers\Api\IdeationChallengesApiController@getTemplateData');
+// $router->add('GET', '/api/v2/ideation-challenges/{id}/outcome', 'Nexus\Controllers\Api\IdeationChallengesApiController@getOutcome');
+// $router->add('PUT', '/api/v2/ideation-challenges/{id}/outcome', 'Nexus\Controllers\Api\IdeationChallengesApiController@upsertOutcome');
+// $router->add('GET', '/api/v2/ideation-outcomes/dashboard', 'Nexus\Controllers\Api\IdeationChallengesApiController@outcomesDashboard');
+// $router->add('GET', '/api/v2/ideation-challenges/{id}/team-links', 'Nexus\Controllers\Api\IdeationChallengesApiController@getTeamLinks');
+// $router->add('GET', '/api/v2/groups/{id}/chatrooms', 'Nexus\Controllers\Api\IdeationChallengesApiController@listChatrooms');
+// $router->add('POST', '/api/v2/groups/{id}/chatrooms', 'Nexus\Controllers\Api\IdeationChallengesApiController@createChatroom');
+// $router->add('DELETE', '/api/v2/group-chatrooms/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteChatroom');
+// $router->add('GET', '/api/v2/group-chatrooms/{id}/messages', 'Nexus\Controllers\Api\IdeationChallengesApiController@chatroomMessages');
+// $router->add('POST', '/api/v2/group-chatrooms/{id}/messages', 'Nexus\Controllers\Api\IdeationChallengesApiController@postChatroomMessage');
+// $router->add('DELETE', '/api/v2/group-chatroom-messages/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteChatroomMessage');
+// $router->add('GET', '/api/v2/groups/{id}/tasks', 'Nexus\Controllers\Api\IdeationChallengesApiController@listTasks');
+// $router->add('POST', '/api/v2/groups/{id}/tasks', 'Nexus\Controllers\Api\IdeationChallengesApiController@createTask');
+// $router->add('GET', '/api/v2/team-tasks/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@showTask');
+// $router->add('PUT', '/api/v2/team-tasks/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@updateTask');
+// $router->add('DELETE', '/api/v2/team-tasks/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteTask');
+// $router->add('GET', '/api/v2/groups/{id}/task-stats', 'Nexus\Controllers\Api\IdeationChallengesApiController@taskStats');
+// $router->add('GET', '/api/v2/groups/{id}/documents', 'Nexus\Controllers\Api\IdeationChallengesApiController@listDocuments');
+// $router->add('POST', '/api/v2/groups/{id}/documents', 'Nexus\Controllers\Api\IdeationChallengesApiController@uploadDocument');
+// $router->add('DELETE', '/api/v2/team-documents/{id}', 'Nexus\Controllers\Api\IdeationChallengesApiController@deleteDocument');
 
 // ============================================
 // API V2 - ADMIN ANALYTICS & REPORTS (Additional endpoints)
 // Note: /reports/social-value, /members, /hours, /export-types, /{type}/export
 //       moved above /reports/{id} catch-all in the Admin Reports section
 // ============================================
-$router->add('GET', '/api/v2/admin/members/inactive', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@inactiveMembers');
-$router->add('POST', '/api/v2/admin/members/inactive/detect', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@detectInactive');
-$router->add('POST', '/api/v2/admin/members/inactive/notify', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@markInactiveNotified');
-$router->add('GET', '/api/v2/admin/moderation/queue', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationQueue');
-$router->add('POST', '/api/v2/admin/moderation/{id}/review', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationReview');
-$router->add('GET', '/api/v2/admin/moderation/stats', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationStats');
-$router->add('GET', '/api/v2/admin/moderation/settings', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationSettings');
-$router->add('PUT', '/api/v2/admin/moderation/settings', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@updateModerationSettings');
+// $router->add('GET', '/api/v2/admin/members/inactive', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@inactiveMembers');
+// $router->add('POST', '/api/v2/admin/members/inactive/detect', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@detectInactive');
+// $router->add('POST', '/api/v2/admin/members/inactive/notify', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@markInactiveNotified');
+// $router->add('GET', '/api/v2/admin/moderation/queue', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationQueue');
+// $router->add('POST', '/api/v2/admin/moderation/{id}/review', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationReview');
+// $router->add('GET', '/api/v2/admin/moderation/stats', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationStats');
+// $router->add('GET', '/api/v2/admin/moderation/settings', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@moderationSettings');
+// $router->add('PUT', '/api/v2/admin/moderation/settings', 'Nexus\Controllers\Api\AdminAnalyticsReportsApiController@updateModerationSettings');
 
 // ============================================
 // API V2 - LISTING FEATURES (New endpoints)
 // Note: /featured, /tags/* moved above /listings/{id} in main listings section
 // ============================================
-$router->add('POST', '/api/v2/listings/{id}/renew', 'Nexus\Controllers\Api\ListingsApiController@renew');
-$router->add('GET', '/api/v2/listings/{id}/analytics', 'Nexus\Controllers\Api\ListingsApiController@analytics');
-$router->add('PUT', '/api/v2/listings/{id}/tags', 'Nexus\Controllers\Api\ListingsApiController@setSkillTags');
-$router->add('POST', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@feature');
-$router->add('DELETE', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@unfeature');
-$router->add('POST', '/api/v2/admin/listings/{id}/reject', 'Nexus\Controllers\Api\AdminListingsApiController@reject');
+// $router->add('POST', '/api/v2/listings/{id}/renew', 'Nexus\Controllers\Api\ListingsApiController@renew');
+// $router->add('GET', '/api/v2/listings/{id}/analytics', 'Nexus\Controllers\Api\ListingsApiController@analytics');
+// $router->add('PUT', '/api/v2/listings/{id}/tags', 'Nexus\Controllers\Api\ListingsApiController@setSkillTags');
+// $router->add('POST', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@feature');
+// $router->add('DELETE', '/api/v2/admin/listings/{id}/feature', 'Nexus\Controllers\Api\AdminListingsApiController@unfeature');
+// $router->add('POST', '/api/v2/admin/listings/{id}/reject', 'Nexus\Controllers\Api\AdminListingsApiController@reject');
 // ============================================
 // API V2 - SEARCH FEATURES (New endpoints)
 // ============================================
-$router->add('GET', '/api/v2/search/saved', 'Nexus\Controllers\Api\SearchApiController@savedSearches');
-$router->add('POST', '/api/v2/search/saved', 'Nexus\Controllers\Api\SearchApiController@saveSearch');
-$router->add('DELETE', '/api/v2/search/saved/{id}', 'Nexus\Controllers\Api\SearchApiController@deleteSavedSearch');
-$router->add('POST', '/api/v2/search/saved/{id}/run', 'Nexus\Controllers\Api\SearchApiController@runSavedSearch');
-$router->add('GET', '/api/v2/search/trending', 'Nexus\Controllers\Api\SearchApiController@trending');
-$router->add('GET', '/api/v2/admin/search/analytics', 'Nexus\Controllers\Api\AdminListingsApiController@searchAnalytics');
-$router->add('GET', '/api/v2/admin/search/trending', 'Nexus\Controllers\Api\AdminListingsApiController@searchTrending');
-$router->add('GET', '/api/v2/admin/search/zero-results', 'Nexus\Controllers\Api\AdminListingsApiController@searchZeroResults');
+// $router->add('GET', '/api/v2/search/saved', 'Nexus\Controllers\Api\SearchApiController@savedSearches');
+// $router->add('POST', '/api/v2/search/saved', 'Nexus\Controllers\Api\SearchApiController@saveSearch');
+// $router->add('DELETE', '/api/v2/search/saved/{id}', 'Nexus\Controllers\Api\SearchApiController@deleteSavedSearch');
+// $router->add('POST', '/api/v2/search/saved/{id}/run', 'Nexus\Controllers\Api\SearchApiController@runSavedSearch');
+// $router->add('GET', '/api/v2/search/trending', 'Nexus\Controllers\Api\SearchApiController@trending');
+// $router->add('GET', '/api/v2/admin/search/analytics', 'Nexus\Controllers\Api\AdminListingsApiController@searchAnalytics');
+// $router->add('GET', '/api/v2/admin/search/trending', 'Nexus\Controllers\Api\AdminListingsApiController@searchTrending');
+// $router->add('GET', '/api/v2/admin/search/zero-results', 'Nexus\Controllers\Api\AdminListingsApiController@searchZeroResults');
 
 // ============================================
 // API V2 - CROSS-MODULE MATCHING (New endpoints)
 // ============================================
-$router->add('GET',  '/api/v2/matches/all',           'Nexus\Controllers\Api\MatchingApiController@allMatches');
-$router->add('POST', '/api/v2/matches/{id}/dismiss', 'Nexus\Controllers\Api\MatchingApiController@dismiss');
+// $router->add('GET',  '/api/v2/matches/all',           'Nexus\Controllers\Api\MatchingApiController@allMatches');
+// $router->add('POST', '/api/v2/matches/{id}/dismiss', 'Nexus\Controllers\Api\MatchingApiController@dismiss');
 
 // ============================================
 // WEBHOOKS - External Service Callbacks
 // ============================================
 // SendGrid Event Webhook (unauthenticated — verified by signature)
-$router->add('POST', '/api/webhooks/sendgrid/events', 'Nexus\Controllers\Api\SendGridWebhookController@events');
+// $router->add('POST', '/api/webhooks/sendgrid/events', 'Nexus\Controllers\Api\SendGridWebhookController@events');
 

@@ -35,6 +35,8 @@
         "guzzlehttp/guzzle": "7.10.0",
         "guzzlehttp/promises": "2.3.0",
         "guzzlehttp/psr7": "2.8.0",
+        "laravel/framework": "^12.54",
+        "laravel/sanctum": "^4.3",
         "lbuchs/webauthn": "^2.2",
         "meilisearch/meilisearch-php": "^1.10",
         "minishlink/web-push": "^10.0",
