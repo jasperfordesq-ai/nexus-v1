@@ -63,7 +63,6 @@ import {
   Lightbulb,
   GraduationCap,
   Activity,
-  Library,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
@@ -129,32 +128,38 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   }, [onSearchOpenChange]);
 
   // Dropdown state - controlled to fix close behavior
+  const [timebankingOpen, setTimebankingOpen] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
 
   const closeAllDropdowns = useCallback(() => {
+    setTimebankingOpen(false);
     setCommunityOpen(false);
     setMoreOpen(false);
     setCreateOpen(false);
     setUserOpen(false);
   }, []);
 
+  const handleTimebankingOpenChange = useCallback((open: boolean) => {
+    if (open) { setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); setUserOpen(false); }
+    setTimebankingOpen(open);
+  }, []);
   const handleCommunityOpenChange = useCallback((open: boolean) => {
-    if (open) { setMoreOpen(false); setCreateOpen(false); setUserOpen(false); }
+    if (open) { setTimebankingOpen(false); setMoreOpen(false); setCreateOpen(false); setUserOpen(false); }
     setCommunityOpen(open);
   }, []);
   const handleMoreOpenChange = useCallback((open: boolean) => {
-    if (open) { setCommunityOpen(false); setCreateOpen(false); setUserOpen(false); }
+    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setCreateOpen(false); setUserOpen(false); }
     setMoreOpen(open);
   }, []);
   const handleCreateOpenChange = useCallback((open: boolean) => {
-    if (open) { setCommunityOpen(false); setMoreOpen(false); setUserOpen(false); }
+    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setUserOpen(false); }
     setCreateOpen(open);
   }, []);
   const handleUserOpenChange = useCallback((open: boolean) => {
-    if (open) { setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); }
+    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); }
     setUserOpen(open);
   }, []);
 
@@ -196,23 +201,31 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   // ─── Memoized nav item arrays ──────────────────────────────────────────────
   const isHourTimebank = tenant?.slug === 'hour-timebank';
 
+  // Timebanking dropdown — replaces top-level Listings link
+  const timebankingItems = useMemo(() => [
+    { label: t('nav.listings'), desc: t('nav_desc.timebanking_listings', 'Offers & requests'), href: tenantPath('/listings'), icon: ListTodo, module: 'listings' as const },
+    { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
+    { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
+    { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
+  ].filter(item => {
+    if ('feature' in item && item.feature) return hasFeature(item.feature as Parameters<typeof hasFeature>[0]);
+    if ('module' in item && item.module) return hasModule(item.module as Parameters<typeof hasModule>[0]);
+    return true;
+  }), [t, tenantPath, hasFeature, hasModule]);
+
   const communityItems = useMemo(() => [
     { label: t('nav.members'), desc: t('nav_desc.members'), href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
     { label: t('nav.connections'), desc: t('nav_desc.connections'), href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
     { label: t('nav.events'), desc: t('nav_desc.events'), href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
     { label: t('nav.groups'), desc: t('nav_desc.groups'), href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
-    { label: t('nav.blog'), desc: t('nav_desc.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' as const },
     { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
-    { label: t('nav.organisations'), desc: t('nav_desc.organisations'), href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
     { label: t('nav.resources'), desc: t('nav_desc.resources'), href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
-    { label: t('nav.knowledge_base', 'Knowledge Base'), desc: t('nav_desc.knowledge_base'), href: tenantPath('/kb'), icon: Library, feature: 'resources' as const },
-    { label: t('nav.polls'), desc: t('nav_desc.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' as const },
     { label: t('nav.jobs'), desc: t('nav_desc.jobs'), href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
-    { label: t('nav.ideation'), desc: t('nav_desc.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' as const },
   ].filter(item => hasFeature(item.feature)), [t, tenantPath, hasFeature]);
 
   // Helper to filter items by feature/module gates
-  const gateFilter = (item: { feature?: string; module?: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const gateFilter = (item: any) => {
     if ('feature' in item && item.feature && !hasFeature(item.feature as Parameters<typeof hasFeature>[0])) return false;
     if ('module' in item && item.module && !hasModule(item.module as Parameters<typeof hasModule>[0])) return false;
     return true;
@@ -225,8 +238,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       items.push({ label: t('nav.dashboard'), desc: t('nav_desc.dashboard', 'Your personal dashboard'), href: tenantPath('/dashboard'), icon: LayoutDashboard, module: 'dashboard' });
     if (hasModule('feed') && maxVisibleNav < 2)
       items.push({ label: t('nav.feed'), desc: t('nav_desc.feed', 'Community feed'), href: tenantPath('/feed'), icon: Newspaper, module: 'feed' });
-    if (hasModule('listings') && maxVisibleNav < 3)
-      items.push({ label: t('nav.listings'), desc: t('nav_desc.listings', 'Browse listings'), href: tenantPath('/listings'), icon: ListTodo, module: 'listings' });
     if (hasModule('messages') && maxVisibleNav < 4)
       items.push({ label: t('nav.messages'), desc: t('nav_desc.messages', 'Your messages'), href: tenantPath('/messages'), icon: MessageSquare, module: 'messages' });
     return items;
@@ -241,13 +252,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       items: overflowNavItems,
     }] : []),
     {
-      key: 'core',
-      title: t('sections.core', 'Core'),
+      key: 'engage',
+      title: t('sections.engage', 'Engage'),
       items: [
-        { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' },
-        { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' },
-        { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' },
         { label: t('nav.goals'), desc: t('nav_desc.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' },
+        { label: t('nav.polls'), desc: t('nav_desc.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' },
+        { label: t('nav.ideation'), desc: t('nav_desc.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' },
       ].filter(gateFilter),
     },
     {
@@ -282,6 +292,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       title: t('sections.about'),
       items: [
         { label: t('nav.about'), desc: t('nav_desc.about'), href: tenantPath('/about'), icon: Info },
+        { label: t('nav.blog'), desc: t('nav_desc.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' },
         { label: t('nav.faq'), desc: t('nav_desc.faq'), href: tenantPath('/faq'), icon: HelpCircle },
         { label: t('nav.timebanking_guide'), desc: t('nav_desc.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
         ...(tenant?.menu_pages?.about || []).map((pg: { title: string; slug: string }) => ({
@@ -290,7 +301,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
           href: tenantPath(`/page/${pg.slug}`),
           icon: FileText,
         })),
-      ],
+      ].filter(gateFilter),
     },
     ...(isHourTimebank ? [{
       key: 'impact',
@@ -322,6 +333,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     }] : []),
   ], [t, tenantPath, isHourTimebank, hasFeature, tenant?.menu_pages?.about]);
 
+  const timebankingPaths = useMemo(() => timebankingItems.map(i => i.href), [timebankingItems]);
   const communityPaths = useMemo(() => communityItems.map(i => i.href), [communityItems]);
   const morePaths = useMemo(() => [
     ...leftSections.flatMap(s => s.items.map(i => i.href)),
@@ -470,20 +482,46 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </NavLink>
               )}
 
-              {hasModule('listings') && maxVisibleNav >= 3 && (
-                <NavLink
-                  to={tenantPath('/listings')}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-theme-active text-theme-primary'
-                        : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                    }`
-                  }
-                >
-                  <ListTodo className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('nav.listings')}</span>
-                </NavLink>
+              {/* Timebanking Dropdown — replaces top-level Listings link */}
+              {timebankingItems.length > 0 && maxVisibleNav >= 3 && (
+                <Dropdown placement="bottom-start" isOpen={timebankingOpen} onOpenChange={handleTimebankingOpenChange} shouldBlockScroll={false}>
+                  <DropdownTrigger>
+                    <Button
+                      variant="light"
+                      size="sm"
+                      className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all ${
+                        isActiveGroup(timebankingPaths)
+                          ? 'bg-theme-active text-theme-primary'
+                          : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
+                      }`}
+                      endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
+                    >
+                      <ArrowRightLeft className="w-4 h-4" aria-hidden="true" />
+                      {t('nav.timebanking', 'Timebanking')}
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Timebanking navigation"
+                    className="min-w-[220px]"
+                    classNames={{
+                      base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
+                    }}
+                    onAction={(key) => {
+                      dropdownNavigate(String(key));
+                    }}
+                  >
+                    {timebankingItems.map((item) => (
+                      <DropdownItem
+                        key={item.href}
+                        description={item.desc}
+                        startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
+                        className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
+                      >
+                        {item.label}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
               )}
 
               {hasModule('messages') && maxVisibleNav >= 4 && (

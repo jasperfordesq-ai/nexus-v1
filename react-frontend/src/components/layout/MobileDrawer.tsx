@@ -61,7 +61,6 @@ import {
   Lightbulb,
   GraduationCap,
   Activity,
-  Library,
   Sun,
   Moon,
 } from 'lucide-react';
@@ -105,26 +104,30 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.home'), href: '/', icon: Home },
     { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
     { label: t('nav.feed'), href: '/feed', icon: Newspaper, auth: true, module: 'feed' as keyof TenantModules },
-    { label: t('nav.listings'), href: '/listings', icon: ListTodo, module: 'listings' as keyof TenantModules },
     { label: t('nav.messages'), href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
+  ];
+
+  const timebankingNavItems = [
+    { label: t('nav.listings'), href: '/listings', icon: ListTodo, module: 'listings' as keyof TenantModules },
+    { label: t('nav.exchanges'), href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
+    { label: t('nav.group_exchanges'), href: '/group-exchanges', icon: Users, feature: 'group_exchanges' as keyof TenantFeatures },
     { label: t('nav.wallet'), href: '/wallet', icon: Wallet, auth: true, module: 'wallet' as keyof TenantModules },
   ];
 
   const communityNavItems = [
-    { label: t('nav.exchanges'), href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
-    { label: t('nav.group_exchanges'), href: '/group-exchanges', icon: Users, feature: 'group_exchanges' as keyof TenantFeatures },
     { label: t('nav.members'), href: '/members', icon: Users, feature: 'connections' as const },
     { label: t('nav.connections'), href: '/connections', icon: Users2, feature: 'connections' as keyof TenantFeatures },
     { label: t('nav.events'), href: '/events', icon: Calendar, feature: 'events' as const },
     { label: t('nav.groups'), href: '/groups', icon: Users, feature: 'groups' as const },
-    { label: t('nav.blog'), href: '/blog', icon: BookOpen, feature: 'blog' as const },
     { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
-    { label: t('nav.organisations'), href: '/organisations', icon: Building2, feature: 'organisations' as const },
     { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
-    { label: t('nav.knowledge_base', 'Knowledge Base'), href: '/kb', icon: Library, feature: 'resources' as keyof TenantFeatures },
-    { label: t('nav.polls'), href: '/polls', icon: BarChart3, feature: 'polls' as const },
     { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
-    { label: t('nav.ideation'), href: '/ideation', icon: Lightbulb, feature: 'ideation_challenges' as const },
+  ];
+
+  const engageNavItems = [
+    { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
+    { label: t('nav.polls'), href: '/polls', icon: BarChart3, feature: 'polls' as const },
+    { label: t('nav.ideation'), href: '/ideation', icon: Lightbulb, feature: 'ideation_challenges' as keyof TenantFeatures },
   ];
 
   const exploreNavItems = [
@@ -132,7 +135,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
     { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
     { label: t('nav.nexus_score', 'NexusScore'), href: '/nexus-score', icon: BarChart3, feature: 'gamification' as const },
-    { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
     { label: t('nav.skills', 'Skills'), href: '/skills', icon: GraduationCap },
     { label: t('nav.activity', 'My Activity'), href: '/activity', icon: Activity },
     { label: t('nav.ai_chat', 'AI Assistant'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
@@ -150,6 +152,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
   const aboutNavItems = [
     { label: t('nav.about'), href: '/about', icon: Info },
+    { label: t('nav.blog'), href: '/blog', icon: BookOpen, feature: 'blog' as const },
     { label: t('nav.faq'), href: '/faq', icon: HelpCircle },
     { label: t('nav.timebanking_guide'), href: '/timebanking-guide', icon: BookOpen },
   ];
@@ -220,7 +223,13 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   };
 
   // Filter nav arrays to count visible items (for hiding empty sections)
+  const visibleTimebanking = timebankingNavItems.filter(i => {
+    if ('feature' in i && i.feature) return hasFeature(i.feature as keyof TenantFeatures);
+    if ('module' in i && i.module) return hasModule(i.module as keyof TenantModules);
+    return true;
+  });
   const visibleCommunity = communityNavItems.filter(i => !i.feature || hasFeature(i.feature));
+  const visibleEngage = engageNavItems.filter(i => !i.feature || hasFeature(i.feature as keyof TenantFeatures));
   const visibleExplore = exploreNavItems.filter(i => !i.feature || hasFeature(i.feature));
   const visibleFederation = federationNavItems.filter(i => !i.feature || hasFeature(i.feature));
 
@@ -359,11 +368,29 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 </div>
               </AccordionItem>
 
+              {/* Timebanking */}
+              {visibleTimebanking.length > 0 ? (
+                <AccordionItem key="timebanking" title={t('nav.timebanking', 'Timebanking')} aria-label="Timebanking navigation">
+                  <div className="space-y-0.5">
+                    {timebankingNavItems.map(renderNavLink)}
+                  </div>
+                </AccordionItem>
+              ) : null}
+
               {/* Community */}
               {visibleCommunity.length > 0 ? (
                 <AccordionItem key="community" title={t('sections.community')} aria-label="Community navigation">
                   <div className="space-y-0.5">
                     {communityNavItems.map(renderNavLink)}
+                  </div>
+                </AccordionItem>
+              ) : null}
+
+              {/* Engage */}
+              {visibleEngage.length > 0 ? (
+                <AccordionItem key="engage" title={t('sections.engage', 'Engage')} aria-label="Engage navigation">
+                  <div className="space-y-0.5">
+                    {engageNavItems.map(renderNavLink)}
                   </div>
                 </AccordionItem>
               ) : null}
