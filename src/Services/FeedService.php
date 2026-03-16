@@ -87,6 +87,7 @@ class FeedService
                 'posts' => 'post', 'listings' => 'listing', 'events' => 'event',
                 'polls' => 'poll', 'goals' => 'goal', 'jobs' => 'job',
                 'challenges' => 'challenge', 'volunteering' => 'volunteer',
+                'blogs' => 'blog', 'discussions' => 'discussion',
             ];
             $sourceType = $typeMap[$type] ?? $type;
         }
@@ -509,7 +510,39 @@ class FeedService
                 $stmt->execute([$id, $tenantId]);
                 $items = self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
                 break;
-            // Add other types as needed
+            case 'blog':
+                $sql = "
+                    SELECT p.id, p.title, p.content, p.featured_image as image_url, p.created_at,
+                           0 as likes_count, p.author_id as user_id, 'blog' as type,
+                           COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                           u.avatar_url as author_avatar,
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id) as comments_count
+                    FROM posts p
+                    JOIN users u ON p.author_id = u.id
+                    WHERE p.id = ? AND p.tenant_id = ? AND p.status = 'published'
+                ";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([$id, $tenantId]);
+                $items = self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+                break;
+
+            case 'discussion':
+                $sql = "
+                    SELECT gd.id, gd.title, gp_first.content, NULL as image_url, gd.created_at,
+                           0 as likes_count, gd.user_id, 'discussion' as type,
+                           COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                           u.avatar_url as author_avatar,
+                           (SELECT COUNT(*) FROM group_posts gpc WHERE gpc.discussion_id = gd.id AND gpc.tenant_id = gd.tenant_id) as comments_count
+                    FROM group_discussions gd
+                    JOIN users u ON gd.user_id = u.id
+                    LEFT JOIN group_posts gp_first ON gp_first.discussion_id = gd.id AND gp_first.tenant_id = gd.tenant_id
+                        AND gp_first.id = (SELECT MIN(gpm.id) FROM group_posts gpm WHERE gpm.discussion_id = gd.id AND gpm.tenant_id = gd.tenant_id)
+                    WHERE gd.id = ? AND gd.tenant_id = ?
+                ";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([$id, $tenantId]);
+                $items = self::formatItems($stmt->fetchAll(\PDO::FETCH_ASSOC), $userId);
+                break;
         }
 
         return !empty($items) ? $items[0] : null;

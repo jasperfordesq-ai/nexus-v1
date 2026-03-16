@@ -321,6 +321,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           type="button"
                           onClick={() => { action.action(); handleClose(); }}
                           onMouseEnter={() => setSelectedIndex(i)}
+                          onFocus={() => setSelectedIndex(i)}
                           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
                             i === selectedIndex
                               ? 'bg-indigo-50 dark:bg-indigo-500/10'

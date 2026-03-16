@@ -104,8 +104,6 @@ function syncConsentToServer(consent: CookieConsent): void {
     analytics: consent.analytics,
     marketing: false,
     source: 'web',
-  }).catch(() => {
-    // Fire-and-forget — server sync is best-effort
   });
 }
 
@@ -188,7 +186,9 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
   // If user grants analytics consent mid-session, initialize Sentry
   useEffect(() => {
     if (consent?.analytics && !prevAnalytics.current) {
-      import('@/lib/sentry').then(({ initSentry }) => initSentry());
+      import('@/lib/sentry').then(({ initSentry }) => initSentry()).catch(() => {
+        // Sentry initialization is optional
+      });
     }
     prevAnalytics.current = consent?.analytics ?? false;
   }, [consent?.analytics]);

@@ -112,7 +112,7 @@ export default function MembersScreen() {
           clearButtonMode="never"
           autoCorrect={false}
           autoCapitalize="none"
-          accessibilityLabel="Search members"
+          accessibilityLabel={t('search.placeholder')}
         />
         {search.length > 0 && (
           <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>

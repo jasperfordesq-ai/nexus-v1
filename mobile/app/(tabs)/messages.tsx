@@ -42,6 +42,8 @@ export default function MessagesScreen() {
       <TouchableOpacity
         style={styles.row}
         activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.other_user.name}${lastMsg ? `, ${lastMsg.body}` : ''}`}
         onPress={() =>
           router.push({
             pathname: '/(modals)/thread',

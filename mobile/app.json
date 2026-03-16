@@ -18,7 +18,12 @@
       "supportsTablet": false,
       "associatedDomains": [
         "applinks:app.project-nexus.ie"
-      ]
+      ],
+      "infoPlist": {
+        "NSCameraUsageDescription": "Take a photo for your profile picture or post.",
+        "NSPhotoLibraryUsageDescription": "Choose a photo from your library for your profile or post.",
+        "NSPhotoLibraryAddUsageDescription": "Save photos to your library."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -58,7 +63,8 @@
           "sounds": []
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "@sentry/react-native/expo"
     ],
     "experiments": {
       "typedRoutes": true

@@ -11,7 +11,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie"
+        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:8090",
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank"
       }
     },
     "preview": {

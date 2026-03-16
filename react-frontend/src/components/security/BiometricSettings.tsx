@@ -154,7 +154,7 @@ export function BiometricSettings() {
   }, []);
 
   useEffect(() => {
-    isBiometricAvailable().then(setSupported);
+    isBiometricAvailable().then(setSupported).catch(() => setSupported(false));
     loadCredentials();
   }, [loadCredentials]);
 

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export type FeedFilter = 'all' | 'posts' | 'listings' | 'events' | 'polls' | 'goals' | 'jobs' | 'challenges' | 'volunteering';
+export type FeedFilter = 'all' | 'posts' | 'listings' | 'events' | 'polls' | 'goals' | 'jobs' | 'challenges' | 'volunteering' | 'blogs' | 'discussions';
 export type PostMode = 'text' | 'poll';
 
 export interface FeedItem {
@@ -20,7 +20,7 @@ export interface FeedItem {
     avatar_url?: string;
   };
   created_at: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion';
   likes_count: number;
   comments_count: number;
   is_liked: boolean;
@@ -112,6 +112,10 @@ export function getItemDetailPath(item: FeedItem): string | null {
       return `/ideation/${item.id}`;
     case 'volunteer':
       return `/volunteering/opportunities/${item.id}`;
+    case 'blog':
+      return `/blog/${item.id}`;
+    case 'discussion':
+      return null;
     default:
       return null;
   }
@@ -134,6 +138,8 @@ export function getItemDetailLabel(item: FeedItem): string | null {
       return 'View Challenge';
     case 'volunteer':
       return 'View Opportunity';
+    case 'blog':
+      return 'Read Article';
     default:
       return null;
   }

@@ -15,7 +15,8 @@
     "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
     "network": "Error de red. Comprueba tu conexión.",
     "unauthorized": "Tu sesión ha caducado. Inicia sesión de nuevo.",
-    "notFound": "No encontrado."
+    "notFound": "No encontrado.",
+    "alertTitle": "Error"
   },
   "loading": "Cargando…",
   "noResults": "Sin resultados.",
@@ -23,5 +24,10 @@
   "no": "No",
   "search": "Buscar",
   "filter": "Filtrar",
-  "clear": "Borrar"
+  "clear": "Borrar",
+  "labels": {
+    "member": "Miembro",
+    "friend": "ahí",
+    "you": "Tú"
+  }
 }

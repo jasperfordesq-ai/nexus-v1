@@ -103,7 +103,7 @@ export default function NewExchangeModal() {
                 type === tp && { backgroundColor: primary, borderColor: primary },
               ]}
               onPress={() => setType(tp)}
-              accessibilityLabel={t(tp) + ' type'}
+              accessibilityLabel={t('typeLabel', { type: t(tp) })}
               accessibilityRole="button"
             >
               <Text style={[styles.toggleText, type === tp && styles.toggleTextActive]}>
@@ -168,7 +168,7 @@ export default function NewExchangeModal() {
                     ]}
                     onPress={() => setCategoryId(cat.id)}
                     activeOpacity={0.7}
-                    accessibilityLabel={cat.name + ' category'}
+                    accessibilityLabel={t('categoryLabel', { name: cat.name })}
                     accessibilityRole="button"
                   >
                     <Text style={[styles.categoryChipText, selected && { color: primary, fontWeight: '600' }]}>

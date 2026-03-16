@@ -69,6 +69,19 @@ jest.mock('@/lib/storage', () => ({
   },
 }));
 
+jest.mock('@/lib/notifications', () => ({
+  registerForPushNotifications: jest.fn().mockResolvedValue(undefined),
+  unregisterPushNotifications: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null, token: null, isLoading: false, isAuthenticated: false,
+    login: jest.fn(), logout: jest.fn(), displayName: '',
+    setSession: jest.fn(), refreshUser: jest.fn(),
+  }),
+}));
+
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
 }));
@@ -129,8 +142,8 @@ describe('RegisterScreen', () => {
     const { getAllByText, getByText, getByPlaceholderText } = render(<RegisterScreen />);
 
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
+    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
     // Leave first name empty
     pressSubmit(getAllByText);
 
@@ -157,7 +170,7 @@ describe('RegisterScreen', () => {
     fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'short');
     pressSubmit(getAllByText);
 
-    await waitFor(() => expect(getByText('Password must be at least 8 characters')).toBeTruthy());
+    await waitFor(() => expect(getByText('Password must be at least 8 characters.')).toBeTruthy());
     expect(mockApiRegister).not.toHaveBeenCalled();
   });
 
@@ -166,11 +179,11 @@ describe('RegisterScreen', () => {
 
     fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'different123');
+    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
+    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Different123');
     pressSubmit(getAllByText);
 
-    await waitFor(() => expect(getByText('Passwords do not match')).toBeTruthy());
+    await waitFor(() => expect(getByText('Passwords do not match.')).toBeTruthy());
     expect(mockApiRegister).not.toHaveBeenCalled();
   });
 
@@ -183,8 +196,8 @@ describe('RegisterScreen', () => {
     fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
     fireEvent.changeText(getByPlaceholderText('Smith'), 'Smith');
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'jane@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
+    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
     pressSubmit(getAllByText);
 
     await waitFor(() => expect(mockApiRegister).toHaveBeenCalledTimes(1));
@@ -192,8 +205,8 @@ describe('RegisterScreen', () => {
       first_name: 'Jane',
       last_name: 'Smith',
       email: 'jane@example.com',
-      password: 'password123',
-      password_confirmation: 'password123',
+      password: 'Password123',
+      password_confirmation: 'Password123',
     }));
     await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith('/(tabs)/home'));
   });
@@ -204,8 +217,8 @@ describe('RegisterScreen', () => {
 
     fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'taken@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
+    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
     pressSubmit(getAllByText);
 
     expect(await findByText('Email already in use')).toBeTruthy();
@@ -217,8 +230,8 @@ describe('RegisterScreen', () => {
 
     fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'password123');
+    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
+    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
     pressSubmit(getAllByText);
 
     expect(await findByText('Unable to register. Please try again.')).toBeTruthy();

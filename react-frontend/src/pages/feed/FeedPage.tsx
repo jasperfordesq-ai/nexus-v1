@@ -400,6 +400,8 @@ export function FeedPage() {
     { key: 'jobs', label: t('filter.jobs', 'Jobs') },
     { key: 'challenges', label: t('filter.challenges', 'Challenges') },
     { key: 'volunteering', label: t('filter.volunteering', 'Volunteering') },
+    { key: 'blogs', label: t('filter.blogs', 'Blog') },
+    { key: 'discussions', label: t('filter.discussions', 'Discussions') },
   ];
 
   const containerVariants = {

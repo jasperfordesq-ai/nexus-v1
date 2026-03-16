@@ -15,7 +15,8 @@
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Please check your connection.",
     "unauthorized": "Your session has expired. Please log in again.",
-    "notFound": "Not found."
+    "notFound": "Not found.",
+    "alertTitle": "Error"
   },
   "labels": {
     "timeBalance": "Time balance",
@@ -26,7 +27,10 @@
     "settings": "Settings",
     "signOut": "Sign out",
     "signOutConfirmTitle": "Sign out",
-    "signOutConfirmMessage": "Are you sure you want to sign out?"
+    "signOutConfirmMessage": "Are you sure you want to sign out?",
+    "member": "Member",
+    "friend": "there",
+    "you": "You"
   },
   "offline": "No internet connection",
   "loading": "Loading…",

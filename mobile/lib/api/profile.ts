@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { api } from '@/lib/api/client';
-import { API_V2, API_BASE_URL, DEFAULT_TENANT, STORAGE_KEYS } from '@/lib/constants';
+import { api, ApiResponseError } from '@/lib/api/client';
+import { API_V2, API_BASE_URL, DEFAULT_TENANT, STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
 import { type User } from '@/lib/api/auth';
 
@@ -53,14 +53,29 @@ export async function updateAvatar(uri: string): Promise<{ data: { avatar_url: s
   const token = await storage.get(STORAGE_KEYS.AUTH_TOKEN);
   const tenant = await storage.get(STORAGE_KEYS.TENANT_SLUG) ?? DEFAULT_TENANT;
 
-  const response = await fetch(`${API_BASE_URL}/api/v2/users/me/avatar`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'X-Tenant-Slug': tenant,
-    },
-    body: formData,
-  });
+  // Apply timeout to prevent hanging uploads
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUTS.API_REQUEST);
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/v2/users/me/avatar`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Tenant-Slug': tenant,
+      },
+      body: formData,
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new ApiResponseError(0, 'Upload timed out. Please try again.');
+    }
+    throw new ApiResponseError(0, 'Network error. Please check your connection.');
+  }
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     let message = 'Avatar upload failed';
@@ -69,7 +84,7 @@ export async function updateAvatar(uri: string): Promise<{ data: { avatar_url: s
       if (errBody?.message) message = errBody.message;
     } catch { /* response may not be JSON */ }
     if (response.status === 413) message = 'Image is too large. Please choose a smaller photo.';
-    throw new Error(message);
+    throw new ApiResponseError(response.status, message);
   }
   return response.json() as Promise<{ data: { avatar_url: string } }>;
 }

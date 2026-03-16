@@ -8,6 +8,7 @@ namespace Nexus\Models;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Services\FeedActivityService;
 
 class Post
 {
@@ -26,7 +27,14 @@ class Post
             $data['status'] ?? 'draft',
             $data['category_id'] ?? null
         ]);
-        return Database::lastInsertId();
+        $postId = Database::lastInsertId();
+
+        // Publish published blog posts to the unified feed
+        if (($data['status'] ?? 'draft') === 'published') {
+            self::recordFeedActivity($tenantId, $authorId, (int)$postId, $data);
+        }
+
+        return $postId;
     }
 
     public static function update($id, $data)
@@ -60,12 +68,35 @@ class Post
             $id,
             $tenantId
         ]);
+
+        // If a draft/archived post is now being published, record to feed
+        $newStatus = $data['status'] ?? $existing['status'];
+        $wasPublished = ($existing['status'] === 'published');
+        if ($newStatus === 'published' && !$wasPublished) {
+            $merged = array_merge($existing, $data);
+            $merged['featured_image'] = $featured_image;
+            self::recordFeedActivity($tenantId, (int)$existing['author_id'], (int)$id, $merged);
+        } elseif ($newStatus !== 'published' && $wasPublished) {
+            // Post was unpublished — remove from feed
+            try {
+                FeedActivityService::hideActivity('blog', (int)$id);
+            } catch (\Throwable $e) {
+                error_log("Post::update feed hide error: " . $e->getMessage());
+            }
+        }
     }
 
     public static function delete($id)
     {
         $tenantId = TenantContext::getId();
         Database::query("DELETE FROM posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        // Remove from feed
+        try {
+            FeedActivityService::removeActivity('blog', (int)$id);
+        } catch (\Throwable $e) {
+            error_log("Post::delete feed activity error: " . $e->getMessage());
+        }
     }
 
     public static function findBySlug($slug)
@@ -119,5 +150,28 @@ class Post
         }
 
         return (int)Database::query($sql, $params)->fetch()['total'];
+    }
+
+    /**
+     * Record blog post to the unified activity feed
+     */
+    private static function recordFeedActivity(int $tenantId, int $authorId, int $postId, array $data): void
+    {
+        try {
+            FeedActivityService::recordActivity(
+                $tenantId,
+                $authorId,
+                'blog',
+                $postId,
+                [
+                    'title'     => $data['title'] ?? null,
+                    'content'   => mb_substr(strip_tags($data['content'] ?? ''), 0, 500),
+                    'image_url' => $data['featured_image'] ?? null,
+                    'metadata'  => ['blog' => true],
+                ]
+            );
+        } catch (\Throwable $e) {
+            error_log("Post feed activity error: " . $e->getMessage());
+        }
     }
 }

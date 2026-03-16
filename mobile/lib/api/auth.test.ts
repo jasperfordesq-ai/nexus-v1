@@ -59,9 +59,15 @@ describe('extractToken', () => {
     expect(extractToken(response)).toBe('tok_legacy');
   });
 
-  it('returns empty string when neither token field is set', () => {
+  it('throws when neither token field is set', () => {
+    const response = { ...baseResponse, access_token: undefined as unknown as string, token: undefined };
+    expect(() => extractToken(response)).toThrow('Auth response did not contain a token');
+  });
+
+  it('returns empty-string access_token when that is the actual value', () => {
+    // Empty string is falsy but still a string — extractToken should throw since '' is falsy
     const response: AuthResponse = { ...baseResponse, access_token: '' };
-    expect(extractToken(response)).toBe('');
+    expect(() => extractToken(response)).toThrow('Auth response did not contain a token');
   });
 });
 

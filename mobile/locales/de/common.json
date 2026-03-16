@@ -15,7 +15,8 @@
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "network": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
     "unauthorized": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
-    "notFound": "Nicht gefunden."
+    "notFound": "Nicht gefunden.",
+    "alertTitle": "Error"
   },
   "loading": "Wird geladen…",
   "noResults": "Keine Ergebnisse gefunden.",
@@ -23,5 +24,10 @@
   "no": "Nein",
   "search": "Suchen",
   "filter": "Filtern",
-  "clear": "Löschen"
+  "clear": "Löschen",
+  "labels": {
+    "member": "Mitglied",
+    "friend": "dort",
+    "you": "Du"
+  }
 }

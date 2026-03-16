@@ -47,6 +47,8 @@ import {
   MapPin,
   ArrowRight,
   Repeat2,
+  BookOpen,
+  Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -130,6 +132,18 @@ const typeConfig = {
     icon: <Heart className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-green-500/10 to-emerald-500/10',
   },
+  blog: {
+    label: 'Blog',
+    color: 'primary' as const,
+    icon: <BookOpen className="w-3 h-3" aria-hidden="true" />,
+    gradient: 'from-sky-500/10 to-blue-500/10',
+  },
+  discussion: {
+    label: 'Discussion',
+    color: 'secondary' as const,
+    icon: <Users className="w-3 h-3" aria-hidden="true" />,
+    gradient: 'from-fuchsia-500/10 to-purple-500/10',
+  },
 };
 
 /* ───────────────────────── Comment Item ───────────────────────── */
@@ -138,7 +152,7 @@ interface CommentItemProps {
   comment: FeedComment;
 }
 
-export function CommentItem({ comment }: CommentItemProps) {
+export const CommentItem = React.memo(function CommentItem({ comment }: CommentItemProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
   const [showReplies, setShowReplies] = useState(false);
@@ -219,7 +233,7 @@ export function CommentItem({ comment }: CommentItemProps) {
       </div>
     </div>
   );
-}
+});
 
 /* ───────────────────────── Feed Card ───────────────────────── */
 
@@ -511,6 +525,8 @@ const FeedCard = React.memo(function FeedCard({
                   alt={`${config.label ?? 'Post'} image by ${author.name}`}
                   className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
                   loading="lazy"
+                  width={800}
+                  height={448}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               </Link>
@@ -520,6 +536,8 @@ const FeedCard = React.memo(function FeedCard({
                 alt={`Post image by ${author.name}`}
                 className="w-full max-h-[28rem] object-cover hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"
+                width={800}
+                height={448}
               />
             )}
           </div>

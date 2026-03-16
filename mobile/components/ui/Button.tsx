@@ -53,6 +53,7 @@ export default function Button({
       style={containerStyle}
       disabled={disabled || isLoading}
       activeOpacity={0.8}
+      accessibilityRole="button"
       {...rest}
     >
       {isLoading ? (

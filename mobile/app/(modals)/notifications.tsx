@@ -56,7 +56,7 @@ export default function NotificationsScreen() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refresh();
     } catch {
-      Alert.alert('Error', t('markError'));
+      Alert.alert(t('common:errors.alertTitle'), t('markError'));
     } finally {
       setMarkingAll(false);
     }

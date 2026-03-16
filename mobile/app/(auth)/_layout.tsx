@@ -4,15 +4,18 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Stack } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function AuthLayout() {
+  const { t } = useTranslation('auth');
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
       <Stack.Screen
         name="select-tenant"
-        options={{ headerShown: true, title: 'Select Community' }}
+        options={{ headerShown: true, title: t('selectTenant.title') }}
       />
     </Stack>
   );

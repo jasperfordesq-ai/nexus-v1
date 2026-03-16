@@ -342,6 +342,8 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
                 alt={post.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
+                width={600}
+                height={288}
               />
             ) : (
               <BookOpen className="w-16 h-16 text-blue-300 opacity-50" aria-hidden="true" />

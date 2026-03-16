@@ -59,13 +59,17 @@ export interface MessageListResponse {
 }
 
 /** GET /api/v2/messages — list conversations for current user */
-export function getConversations(): Promise<ConversationListResponse> {
-  return api.get<ConversationListResponse>(`${API_V2}/messages`);
+export function getConversations(cursor?: string | null): Promise<ConversationListResponse> {
+  const params: Record<string, string> = {};
+  if (cursor) params.cursor = cursor;
+  return api.get<ConversationListResponse>(`${API_V2}/messages`, params);
 }
 
 /** GET /api/v2/messages/:otherUserId — message thread for a conversation */
-export function getThread(otherUserId: number): Promise<MessageListResponse> {
-  return api.get<MessageListResponse>(`${API_V2}/messages/${otherUserId}`);
+export function getThread(otherUserId: number, cursor?: string | null): Promise<MessageListResponse> {
+  const params: Record<string, string> = {};
+  if (cursor) params.cursor = cursor;
+  return api.get<MessageListResponse>(`${API_V2}/messages/${otherUserId}`, params);
 }
 
 /**

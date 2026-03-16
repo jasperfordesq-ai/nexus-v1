@@ -132,7 +132,7 @@ export default function ThreadScreen() {
     const optimistic: Message = {
       id: Date.now(), // temporary local id
       body,
-      sender: { id: -1, name: 'You', avatar_url: null },
+      sender: { id: -1, name: t('common:labels.you'), avatar_url: null },
       created_at: new Date().toISOString(),
       is_own: true,
       is_voice: false,

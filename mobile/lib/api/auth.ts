@@ -99,9 +99,16 @@ export function refreshToken(token: string): Promise<AuthResponse> {
   return api.post<AuthResponse>('/api/auth/refresh-token', { refresh_token: token });
 }
 
-/** Helper: extract the bearer token string from an AuthResponse */
+/**
+ * Extract the bearer token string from an AuthResponse.
+ * Throws if no token is present — callers must not proceed with an empty token.
+ */
 export function extractToken(response: AuthResponse): string {
-  return response.access_token ?? response.token ?? '';
+  const token = response.access_token ?? response.token;
+  if (!token) {
+    throw new Error('Auth response did not contain a token');
+  }
+  return token;
 }
 
 /** Helper: build a display name from first/last name fields */

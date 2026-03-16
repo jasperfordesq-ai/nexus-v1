@@ -209,6 +209,8 @@ export function TemplateForm() {
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(() => {
       toast.success(`Copied ${text} to clipboard`);
+    }).catch(() => {
+      toast.error('Failed to copy to clipboard');
     });
   }
 
