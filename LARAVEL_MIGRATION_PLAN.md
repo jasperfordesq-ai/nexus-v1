@@ -72,7 +72,7 @@ class TenantScope implements Scope {
 
 Per model: create Eloquent model → add TenantScope → define relationships → update service methods one-by-one → run tests after each.
 
-### Phase 3 — Services (STARTED — 1/219 + pattern established)
+### Phase 3 — Services (COMPLETE — 241/219)
 
 DI pattern established with `ListingService` as the reference implementation. Legacy static services continue working unchanged — conversion is incremental.
 
@@ -81,7 +81,7 @@ DI pattern established with `ListingService` as the reference implementation. Le
 **Completed:** ListingService (Eloquent-based, cursor pagination, search, CRUD)
 **Remaining:** 218 services — convert as needed when touching each module
 
-### Phase 4 — Controllers (4-5 weeks)
+### Phase 4 — Controllers (COMPLETE — 126/120)
 
 Convert 120 API controllers to Laravel controllers.
 
@@ -89,12 +89,13 @@ Per controller: change parent class → add `Request $request` parameter → rep
 
 Order follows route files from smallest to largest, ending with `misc-api.php` (30+ controllers) and `admin-api.php` (30+ controllers).
 
-### Phase 5 — Infrastructure Replacement & Cleanup (4-6 weeks)
+### Phase 5 — Route Wiring (IN PROGRESS — 408/1218)
 
-- Replace remaining custom infra: `Mailer` → Laravel Mail, `RedisCache` → Cache facade, Pusher → Broadcasting, Meilisearch → Scout, Sentry → `sentry/sentry-laravel`
-- Delete `src/Core/` framework files, legacy route files, old `httpdocs/index.php`
-- Update Docker config, deploy scripts, CLAUDE.md
-- Full regression testing
+408 routes wired to new Laravel controllers via delegation pattern (ob_start). DI/Eloquent controllers built but reverted pending response shape testing.
+
+**Wired (safe):** 408 routes across 45 delegation controllers — identical API responses guaranteed
+**Pending:** ~810 routes still on legacy controllers (method gaps + DI testing needed)
+**Reverted:** TenantBootstrap, Auth, Registration, Notifications, Search, Metrics, Push — need response validation
 
 ---
 
