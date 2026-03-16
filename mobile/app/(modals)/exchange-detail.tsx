@@ -89,7 +89,7 @@ export default function ExchangeDetailModal() {
           <View style={[styles.creditsCard, { borderColor: primary }]}>
             <Text style={styles.creditsLabel}>{t('detail.timeEstimate')}</Text>
             <Text style={[styles.creditsValue, { color: primary }]}>
-              {exchange.hours_estimate} hr{exchange.hours_estimate !== 1 ? 's' : ''}
+              {t('detail.hours', { count: exchange.hours_estimate ?? 0 })}
             </Text>
           </View>
         )}

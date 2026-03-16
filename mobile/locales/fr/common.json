@@ -15,7 +15,8 @@
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
     "network": "Erreur réseau. Vérifiez votre connexion.",
     "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
-    "notFound": "Introuvable."
+    "notFound": "Introuvable.",
+    "alertTitle": "Error"
   },
   "loading": "Chargement…",
   "noResults": "Aucun résultat trouvé.",
@@ -23,5 +24,10 @@
   "no": "Non",
   "search": "Rechercher",
   "filter": "Filtrer",
-  "clear": "Effacer"
+  "clear": "Effacer",
+  "labels": {
+    "member": "Membre",
+    "friend": "là",
+    "you": "Vous"
+  }
 }

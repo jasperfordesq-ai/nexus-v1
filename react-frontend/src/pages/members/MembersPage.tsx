@@ -422,7 +422,7 @@ export function MembersPage() {
                     <div className="p-2 max-w-[200px]">
                       <div className="flex items-center gap-2">
                         {m.avatar_url && (
-                          <img src={resolveAvatarUrl(m.avatar_url) || undefined} alt="" className="w-8 h-8 rounded-full" loading="lazy" />
+                          <img src={resolveAvatarUrl(m.avatar_url) || undefined} alt="" className="w-8 h-8 rounded-full" width={32} height={32} loading="lazy" />
                         )}
                         <div>
                           <h4 className="font-semibold text-sm text-gray-900">

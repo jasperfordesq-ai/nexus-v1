@@ -15,7 +15,8 @@
     "generic": "Qualcosa è andato storto. Riprova.",
     "network": "Errore di rete. Controlla la connessione.",
     "unauthorized": "La sessione è scaduta. Accedi di nuovo.",
-    "notFound": "Non trovato."
+    "notFound": "Non trovato.",
+    "alertTitle": "Error"
   },
   "loading": "Caricamento…",
   "noResults": "Nessun risultato.",
@@ -23,5 +24,10 @@
   "no": "No",
   "search": "Cerca",
   "filter": "Filtra",
-  "clear": "Cancella"
+  "clear": "Cancella",
+  "labels": {
+    "member": "Membro",
+    "friend": "lì",
+    "you": "Tu"
+  }
 }

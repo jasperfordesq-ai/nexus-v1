@@ -76,7 +76,7 @@ export default function EventDetailScreen() {
         setRsvp(null);
         setRsvpCounts({ ...counts, [status]: Math.max(0, counts[status] - 1) });
       } catch {
-        Alert.alert('Error', t('rsvpError'));
+        Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
       } finally {
         setUpdating(false);
       }
@@ -88,7 +88,7 @@ export default function EventDetailScreen() {
       setRsvp(result.data.rsvp);
       setRsvpCounts(result.data.rsvp_counts);
     } catch {
-      Alert.alert('Error', t('rsvpError'));
+      Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
     } finally {
       setUpdating(false);
     }

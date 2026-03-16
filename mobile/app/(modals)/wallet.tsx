@@ -43,11 +43,13 @@ function TransactionRow({
   primary,
   theme,
   styles,
+  t,
 }: {
   item: TransactionItem;
   primary: string;
   theme: Theme;
   styles: ReturnType<typeof makeStyles>;
+  t: (key: string) => string;
 }) {
   const isCredit = item.type === 'credit';
   const sign = isCredit ? '+' : '\u2212';
@@ -75,7 +77,7 @@ function TransactionRow({
 
       <View style={styles.rowRight}>
         <Text style={[styles.rowAmount, { color: amountColor }]}>
-          {sign}{item.amount.toFixed(1)} hrs
+          {sign}{item.amount.toFixed(1)} {t('hrs')}
         </Text>
         {item.status !== 'completed' && (
           <View style={[styles.statusBadge, { borderColor: primary }]}>
@@ -163,7 +165,7 @@ export default function WalletModal() {
         data={transactions}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <TransactionRow item={item} primary={primary} theme={theme} styles={styles} />
+          <TransactionRow item={item} primary={primary} theme={theme} styles={styles} t={t} />
         )}
         ListHeaderComponent={ListHeader}
         ListEmptyComponent={ListEmpty}

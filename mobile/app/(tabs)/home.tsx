@@ -74,7 +74,7 @@ export default function HomeScreen() {
           <View style={styles.headerRow}>
             <View>
               <Text style={styles.greetingText}>
-                {t('feed.greeting', { name: displayName.split(' ')[0] || 'there' })} 👋
+                {t('feed.greeting', { name: displayName.split(' ')[0] || t('common:labels.friend') })} 👋
               </Text>
               <Text style={styles.subText}>{t('feed.subtitle')}</Text>
             </View>
@@ -143,7 +143,7 @@ function makeStyles(theme: Theme) {
     },
     greetingText: { fontSize: 22, fontWeight: '700', color: theme.text },
     subText: { fontSize: 14, color: theme.textSecondary, marginTop: 2 },
-    bellButton: { position: 'relative', padding: 4 },
+    bellButton: { position: 'relative', padding: 10 },
     bellBadge: {
       position: 'absolute',
       top: 0,

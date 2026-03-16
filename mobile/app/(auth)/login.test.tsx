@@ -75,7 +75,7 @@ describe('LoginScreen', () => {
     const { getByText, getByPlaceholderText } = render(<LoginScreen />);
     expect(getByText('Sign in')).toBeTruthy();
     expect(getByPlaceholderText('you@example.com')).toBeTruthy();
-    expect(getByText('Register')).toBeTruthy();
+    expect(getByText('Create account')).toBeTruthy();
   });
 
   it('shows field error when email is invalid on submit', async () => {

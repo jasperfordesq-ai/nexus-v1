@@ -27,7 +27,7 @@ export default function MemberCard({ member }: MemberCardProps) {
 
   const displayName = member.name?.trim() ||
     [member.first_name, member.last_name].filter(Boolean).join(' ') ||
-    'Member';
+    t('common:labels.member');
 
   return (
     <TouchableOpacity

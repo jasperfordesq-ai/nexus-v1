@@ -51,7 +51,7 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
           </View>
           {hours > 0 && (
             <Text style={[styles.credits, { color: primary }]}>
-              {hours} hr{hours !== 1 ? 's' : ''}
+              {t('detail.hours', { count: hours })}
             </Text>
           )}
         </View>

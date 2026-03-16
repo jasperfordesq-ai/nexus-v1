@@ -21,6 +21,8 @@
     "titleRequired": "Please enter a title.",
     "invalidCredits": "Please enter a valid number of time credits."
   },
+  "typeLabel": "{{type}} type",
+  "categoryLabel": "{{name}} category",
   "createError": "Failed to create exchange.",
   "detail": {
     "invalidId": "Invalid exchange ID.",

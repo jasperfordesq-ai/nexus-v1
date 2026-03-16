@@ -62,6 +62,9 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
                   src={resolveAssetUrl(group.image_url)}
                   alt={group.name}
                   className="w-full h-full object-cover"
+                  width={36}
+                  height={36}
+                  loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               ) : (

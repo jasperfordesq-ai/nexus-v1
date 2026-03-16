@@ -34,7 +34,7 @@ export default function SelectTenantScreen() {
   const { t } = useTranslation('auth');
   const { setTenantSlug, tenantSlug } = useTenant();
   const primary = usePrimaryColor();
-  const { data, isLoading, error } = useApi(() => listTenants());
+  const { data, isLoading, error, refresh } = useApi(() => listTenants());
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme, primary), [theme, primary]);
   const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
@@ -62,6 +62,9 @@ export default function SelectTenantScreen() {
       {error && (
         <View style={styles.centered}>
           <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={() => void refresh()} style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 10 }}>
+            <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
+          </TouchableOpacity>
         </View>
       )}
 

@@ -15,7 +15,8 @@
     "generic": "Chuaigh rud éigin mícheart. Déan iarracht arís.",
     "network": "Earráid líonra. Seiceáil do nasc.",
     "unauthorized": "Tá do sheisiún imithe in éag. Logáil isteach arís.",
-    "notFound": "Gan aimsiú."
+    "notFound": "Gan aimsiú.",
+    "alertTitle": "Error"
   },
   "loading": "Ag luchtú…",
   "noResults": "Gan torthaí.",
@@ -23,5 +24,10 @@
   "no": "Ní hea",
   "search": "Cuardaigh",
   "filter": "Scag",
-  "clear": "Glan"
+  "clear": "Glan",
+  "labels": {
+    "member": "Ball",
+    "friend": "ansin",
+    "you": "Tú"
+  }
 }

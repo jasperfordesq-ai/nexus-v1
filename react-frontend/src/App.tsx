@@ -88,8 +88,14 @@ import { Layout, AuthLayout } from '@/components/layout';
 import { ProtectedRoute, FeatureGate, ScrollToTop, TenantShell } from '@/components/routing';
 import { LoadingScreen, ErrorBoundary, FeatureErrorBoundary } from '@/components/feedback';
 
-// Auth Pages (not lazy loaded - critical path)
-import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage, VerifyIdentityPage } from '@/pages/auth';
+// Auth Pages (critical path - eager loaded)
+import { LoginPage, RegisterPage } from '@/pages/auth';
+
+// Auth Pages (rarely used - lazy loaded)
+const ForgotPasswordPage = lazyWithRetry(() => import('./pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazyWithRetry(() => import('./pages/auth/ResetPasswordPage'));
+const VerifyEmailPage = lazyWithRetry(() => import('./pages/auth/VerifyEmailPage'));
+const VerifyIdentityPage = lazyWithRetry(() => import('./pages/auth/VerifyIdentityPage'));
 
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
 const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
@@ -235,46 +241,46 @@ function AppRoutes() {
       {/* Main Routes (with navbar/footer) */}
       <Route element={<Layout />}>
         {/* Public Routes */}
-        <Route index element={<HomePage />} />
-        <Route path="development-status" element={<DevelopmentStatusPage />} />
-        <Route path="about" element={<AboutPage />} />
-        <Route path="faq" element={<FaqPage />} />
-        <Route path="contact" element={<ContactPage />} />
-        <Route path="help" element={<HelpCenterPage />} />
-        <Route path="terms" element={<TermsPage />} />
-        <Route path="terms/versions" element={<LegalVersionHistoryPage />} />
-        <Route path="privacy" element={<PrivacyPage />} />
-        <Route path="privacy/versions" element={<LegalVersionHistoryPage />} />
-        <Route path="accessibility" element={<AccessibilityPage />} />
-        <Route path="accessibility/versions" element={<LegalVersionHistoryPage />} />
-        <Route path="cookies" element={<CookiesPage />} />
-        <Route path="cookies/versions" element={<LegalVersionHistoryPage />} />
-        <Route path="community-guidelines" element={<CommunityGuidelinesPage />} />
-        <Route path="community-guidelines/versions" element={<LegalVersionHistoryPage />} />
-        <Route path="acceptable-use" element={<AcceptableUsePage />} />
-        <Route path="acceptable-use/versions" element={<LegalVersionHistoryPage />} />
-        <Route path="legal" element={<LegalHubPage />} />
-        <Route path="platform/terms" element={<PlatformTermsPage />} />
-        <Route path="platform/privacy" element={<PlatformPrivacyPage />} />
-        <Route path="platform/disclaimer" element={<PlatformDisclaimerPage />} />
-        <Route path="timebanking-guide" element={<TimebankingGuidePage />} />
+        <Route index element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
+        <Route path="development-status" element={<ErrorBoundary><DevelopmentStatusPage /></ErrorBoundary>} />
+        <Route path="about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
+        <Route path="faq" element={<ErrorBoundary><FaqPage /></ErrorBoundary>} />
+        <Route path="contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+        <Route path="help" element={<ErrorBoundary><HelpCenterPage /></ErrorBoundary>} />
+        <Route path="terms" element={<ErrorBoundary><TermsPage /></ErrorBoundary>} />
+        <Route path="terms/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
+        <Route path="privacy" element={<ErrorBoundary><PrivacyPage /></ErrorBoundary>} />
+        <Route path="privacy/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
+        <Route path="accessibility" element={<ErrorBoundary><AccessibilityPage /></ErrorBoundary>} />
+        <Route path="accessibility/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
+        <Route path="cookies" element={<ErrorBoundary><CookiesPage /></ErrorBoundary>} />
+        <Route path="cookies/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
+        <Route path="community-guidelines" element={<ErrorBoundary><CommunityGuidelinesPage /></ErrorBoundary>} />
+        <Route path="community-guidelines/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
+        <Route path="acceptable-use" element={<ErrorBoundary><AcceptableUsePage /></ErrorBoundary>} />
+        <Route path="acceptable-use/versions" element={<ErrorBoundary><LegalVersionHistoryPage /></ErrorBoundary>} />
+        <Route path="legal" element={<ErrorBoundary><LegalHubPage /></ErrorBoundary>} />
+        <Route path="platform/terms" element={<ErrorBoundary><PlatformTermsPage /></ErrorBoundary>} />
+        <Route path="platform/privacy" element={<ErrorBoundary><PlatformPrivacyPage /></ErrorBoundary>} />
+        <Route path="platform/disclaimer" element={<ErrorBoundary><PlatformDisclaimerPage /></ErrorBoundary>} />
+        <Route path="timebanking-guide" element={<ErrorBoundary><TimebankingGuidePage /></ErrorBoundary>} />
 
         {/* Newsletter unsubscribe — public, no auth, token-based */}
-        <Route path="newsletter/unsubscribe" element={<NewsletterUnsubscribePage />} />
+        <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
 
         {/* Matches — cross-module matches page (MA1) */}
-        <Route path="matches" element={<MatchesPage />} />
+        <Route path="matches" element={<ErrorBoundary><MatchesPage /></ErrorBoundary>} />
         <Route path="matches/preferences" element={<Navigate to="settings" replace />} />
 
         {/* Tenant 2 (hOUR Timebank) specific pages — redirect other tenants to /about */}
-        <Route path="partner" element={<TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate>} />
-        <Route path="social-prescribing" element={<TenantSlugGate slug="hour-timebank"><SocialPrescribingPage /></TenantSlugGate>} />
-        <Route path="impact-summary" element={<TenantSlugGate slug="hour-timebank"><ImpactSummaryPage /></TenantSlugGate>} />
-        <Route path="impact-report" element={<TenantSlugGate slug="hour-timebank"><ImpactReportPage /></TenantSlugGate>} />
-        <Route path="strategic-plan" element={<TenantSlugGate slug="hour-timebank"><StrategicPlanPage /></TenantSlugGate>} />
+        <Route path="partner" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate></ErrorBoundary>} />
+        <Route path="social-prescribing" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><SocialPrescribingPage /></TenantSlugGate></ErrorBoundary>} />
+        <Route path="impact-summary" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><ImpactSummaryPage /></TenantSlugGate></ErrorBoundary>} />
+        <Route path="impact-report" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><ImpactReportPage /></TenantSlugGate></ErrorBoundary>} />
+        <Route path="strategic-plan" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><StrategicPlanPage /></TenantSlugGate></ErrorBoundary>} />
 
         {/* Dynamic CMS pages created via admin Page Builder */}
-        <Route path="page/:slug" element={<CustomPage />} />
+        <Route path="page/:slug" element={<ErrorBoundary><CustomPage /></ErrorBoundary>} />
 
         {/* Public: Blog (feature-gated) */}
         <Route path="blog" element={
@@ -397,7 +403,7 @@ function AppRoutes() {
           } />
 
           {/* Onboarding Wizard */}
-          <Route path="onboarding" element={<OnboardingPage />} />
+          <Route path="onboarding" element={<FeatureErrorBoundary featureName="Onboarding"><OnboardingPage /></FeatureErrorBoundary>} />
 
           {/* Feature-gated: Group Exchanges */}
           <Route path="group-exchanges" element={

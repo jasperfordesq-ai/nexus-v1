@@ -94,7 +94,7 @@ export function LoginPage() {
 
   // Check if passkey login is available on this device
   useEffect(() => {
-    isBiometricAvailable().then(setBiometricAvailable);
+    isBiometricAvailable().then(setBiometricAvailable).catch(() => setBiometricAvailable(false));
   }, []);
 
   // Start conditional mediation (passkey autofill) when a tenant is selected

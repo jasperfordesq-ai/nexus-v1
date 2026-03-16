@@ -49,6 +49,8 @@ if (import.meta.env.PROD) {
     setInterval(() => {
       updateSW();
     }, 30 * 60 * 1000);
+  }).catch(() => {
+    // PWA registration is optional — app works without it
   });
 }
 

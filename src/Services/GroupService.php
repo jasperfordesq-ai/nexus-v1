@@ -14,6 +14,8 @@ use Nexus\Models\GroupPost;
 use Nexus\Models\User;
 use Nexus\Models\Notification;
 use Nexus\Services\NotificationDispatcher;
+use Nexus\Services\FeedActivityService;
+use Nexus\Services\GamificationService;
 
 /**
  * GroupService - Business logic for groups
@@ -446,6 +448,11 @@ class GroupService
             $discussions = $db->prepare("SELECT id FROM group_discussions WHERE group_id = ?");
             $discussions->execute([$id]);
             foreach ($discussions->fetchAll(\PDO::FETCH_COLUMN) as $discId) {
+                try {
+                    FeedActivityService::removeActivity('discussion', (int)$discId);
+                } catch (\Throwable $e) {
+                    error_log("GroupService::delete feed removal error: " . $e->getMessage());
+                }
                 $db->prepare("DELETE FROM group_posts WHERE discussion_id = ?")->execute([$discId]);
             }
             $db->prepare("DELETE FROM group_discussions WHERE group_id = ?")->execute([$id]);
@@ -893,8 +900,26 @@ class GroupService
         }
 
         try {
+            $tenantId = TenantContext::getId();
             $discussionId = GroupDiscussion::create($groupId, $userId, $title);
             GroupPost::create($discussionId, $userId, $content);
+
+            // Publish to the unified feed so this discussion appears for all members
+            try {
+                FeedActivityService::recordActivity(
+                    $tenantId,
+                    $userId,
+                    'discussion',
+                    (int)$discussionId,
+                    [
+                        'title'    => $title,
+                        'content'  => mb_substr($content, 0, 500),
+                        'group_id' => $groupId,
+                    ]
+                );
+            } catch (\Throwable $feedEx) {
+                error_log("GroupService::createDiscussion feed activity error: " . $feedEx->getMessage());
+            }
 
             // Return the full discussion object so the frontend can render it immediately
             $discussion = GroupDiscussion::findById($discussionId);

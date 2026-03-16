@@ -45,7 +45,7 @@ interface FeedActivityItem {
   author_avatar: string;
   author_id: number;
   created_at: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'blog' | 'discussion';
   likes_count: number;
   comments_count: number;
   is_liked: boolean;

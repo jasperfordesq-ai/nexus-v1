@@ -27,6 +27,7 @@ class FeedActivityService
     private const VALID_TYPES = [
         'post', 'listing', 'event', 'poll', 'goal',
         'review', 'job', 'challenge', 'volunteer',
+        'blog', 'discussion',
     ];
 
     /**

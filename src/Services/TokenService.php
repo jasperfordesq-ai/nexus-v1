@@ -33,6 +33,7 @@ class TokenService
     private const ACCESS_TOKEN_EXPIRY_MOBILE = 2592000;     // 30 days (mobile - balanced UX/security)
     private const REFRESH_TOKEN_EXPIRY = 63072000;          // 2 years (allows indefinite login with periodic refresh)
     private const REFRESH_TOKEN_EXPIRY_MOBILE = 157680000;  // 5 years (mobile - essentially indefinite)
+    private const IMPERSONATION_TOKEN_EXPIRY = 300;         // 5 minutes (admin impersonation - short-lived for security)
 
     // Algorithm identifier
     private const ALGORITHM = 'HS256';
@@ -110,6 +111,87 @@ class TokenService
             'platform' => $platform,  // Track which platform token was issued for
             ...$additionalClaims
         ], $expiry);
+    }
+
+    /**
+     * Generate a short-lived, single-use impersonation token
+     *
+     * These tokens have a 5-minute TTL and are consumed (revoked) on first use.
+     * The token includes an `impersonated_by` claim identifying the admin who
+     * initiated the impersonation, and a unique `jti` for single-use enforcement.
+     *
+     * @param int $userId The target user to impersonate
+     * @param int $tenantId The tenant context for the impersonated session
+     * @param int $adminId The admin who initiated the impersonation
+     * @return string The signed impersonation token
+     */
+    public static function generateImpersonationToken(int $userId, int $tenantId, int $adminId): string
+    {
+        return self::createToken([
+            'user_id' => $userId,
+            'tenant_id' => $tenantId,
+            'type' => 'impersonation',
+            'impersonated_by' => $adminId,
+            'jti' => bin2hex(random_bytes(16)),
+        ], self::IMPERSONATION_TOKEN_EXPIRY);
+    }
+
+    /**
+     * Validate and consume an impersonation token (single-use)
+     *
+     * Verifies the token signature, expiry, and type, then marks it as consumed
+     * so it cannot be reused. Returns the payload on success, null on failure.
+     *
+     * @param string $token The impersonation token to validate
+     * @return array|null The payload if valid and not yet consumed, null otherwise
+     */
+    public static function validateImpersonationToken(string $token): ?array
+    {
+        $payload = self::validateToken($token);
+
+        if (!$payload) {
+            return null;
+        }
+
+        // Must be an impersonation token
+        if (($payload['type'] ?? '') !== 'impersonation') {
+            return null;
+        }
+
+        // Must have the impersonated_by claim
+        if (empty($payload['impersonated_by'])) {
+            return null;
+        }
+
+        // Must have a jti for single-use tracking
+        $jti = $payload['jti'] ?? null;
+        if (!$jti) {
+            return null;
+        }
+
+        // Check if already consumed (single-use enforcement)
+        try {
+            $db = NexusCoreDatabase::getConnection();
+
+            $stmt = $db->prepare("SELECT id FROM revoked_tokens WHERE jti = ?");
+            $stmt->execute([$jti]);
+            if ($stmt->fetch()) {
+                // Token already consumed
+                return null;
+            }
+
+            // Mark as consumed — insert revocation record
+            $stmt = $db->prepare(
+                "INSERT INTO revoked_tokens (user_id, jti, expires_at) VALUES (?, ?, FROM_UNIXTIME(?))"
+            );
+            $stmt->execute([$payload['user_id'], $jti, $payload['exp']]);
+        } catch (Exception $e) {
+            error_log('[TokenService] Failed to consume impersonation token: ' . $e->getMessage());
+            // Fail closed — reject the token if we cannot verify/record consumption
+            return null;
+        }
+
+        return $payload;
     }
 
     /**

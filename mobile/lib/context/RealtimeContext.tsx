@@ -97,21 +97,31 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         // Bump the unread badge and notify any open thread screens
         ch.bind('new-message', (rawPayload: unknown) => {
           if (!mounted) return;
-          setUnreadMessages((prev) => prev + 1);
+
+          let hasActiveListener = false;
           if (isMessagePayload(rawPayload)) {
             const listeners = messageListenersRef.current;
             // Dispatch by conversation ID
-            listeners
-              .get(rawPayload.conversation_id)
-              ?.forEach((handler) => handler(rawPayload.message));
+            const convListeners = listeners.get(rawPayload.conversation_id);
+            if (convListeners && convListeners.size > 0) {
+              hasActiveListener = true;
+              convListeners.forEach((handler) => handler(rawPayload.message));
+            }
             // Also dispatch by sender's user ID — the thread screen subscribes
             // using the other user's ID (not the conversation row ID)
             const senderId = rawPayload.message.sender?.id;
             if (senderId && senderId !== rawPayload.conversation_id) {
-              listeners
-                .get(senderId)
-                ?.forEach((handler) => handler(rawPayload.message));
+              const senderListeners = listeners.get(senderId);
+              if (senderListeners && senderListeners.size > 0) {
+                hasActiveListener = true;
+                senderListeners.forEach((handler) => handler(rawPayload.message));
+              }
             }
+          }
+
+          // Only bump badge if no thread screen is actively viewing this conversation
+          if (!hasActiveListener) {
+            setUnreadMessages((prev) => prev + 1);
           }
         });
       })

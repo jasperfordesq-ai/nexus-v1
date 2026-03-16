@@ -139,6 +139,7 @@ export default function LoginScreen() {
                   placeholder="••••••••"
                   secureTextEntry
                   autoComplete="password"
+                  textContentType="password"
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit(onSubmit)}
                 />

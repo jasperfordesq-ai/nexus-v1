@@ -68,7 +68,7 @@ export default function MembersScreen() {
           placeholderTextColor={theme.textMuted}
           returnKeyType="search"
           clearButtonMode="while-editing"
-          accessibilityLabel="Search members"
+          accessibilityLabel={t('search.placeholder')}
         />
       </View>
 

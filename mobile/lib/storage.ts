@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import * as SecureStore from 'expo-secure-store';
+import * as Sentry from '@sentry/react-native';
 
 /**
  * Secure key-value storage backed by expo-secure-store.
@@ -22,8 +23,9 @@ export const storage = {
   async set(key: string, value: string): Promise<void> {
     try {
       await SecureStore.setItemAsync(key, value);
-    } catch {
-      // Silently fail — caller should handle missing data gracefully
+    } catch (err) {
+      // Log to Sentry so "random logouts" can be diagnosed
+      Sentry.captureException(err, { tags: { storage_op: 'set', key } });
     }
   },
 

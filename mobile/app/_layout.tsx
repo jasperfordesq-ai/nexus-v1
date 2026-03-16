@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Stack, router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
@@ -66,14 +66,28 @@ function RootNavigator() {
     }
   }, [isLoading, isAuthenticated]);
 
-  // Handle taps on push notifications received while app was backgrounded/killed
+  // Queue deep link from push notification taps — only navigate once auth resolves.
+  const pendingDeepLinkRef = useRef<string | null>(null);
+
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data as { link?: string } | undefined;
-      if (data?.link) navigateToLink(data.link);
+      if (data?.link) {
+        pendingDeepLinkRef.current = data.link;
+      }
     });
     return () => subscription.remove();
   }, []);
+
+  // Process queued deep link only after auth state is resolved and user is authenticated
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) return;
+    const link = pendingDeepLinkRef.current;
+    if (link) {
+      pendingDeepLinkRef.current = null;
+      navigateToLink(link);
+    }
+  }, [isLoading, isAuthenticated]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

@@ -15,7 +15,8 @@
     "generic": "Algo correu mal. Tente novamente.",
     "network": "Erro de rede. Verifique a sua ligação.",
     "unauthorized": "A sua sessão expirou. Inicie sessão novamente.",
-    "notFound": "Não encontrado."
+    "notFound": "Não encontrado.",
+    "alertTitle": "Error"
   },
   "loading": "A carregar…",
   "noResults": "Sem resultados.",
@@ -23,5 +24,10 @@
   "no": "Não",
   "search": "Pesquisar",
   "filter": "Filtrar",
-  "clear": "Limpar"
+  "clear": "Limpar",
+  "labels": {
+    "member": "Membro",
+    "friend": "aí",
+    "you": "Você"
+  }
 }

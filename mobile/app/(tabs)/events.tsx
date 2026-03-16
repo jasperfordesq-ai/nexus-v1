@@ -69,6 +69,8 @@ export default function EventsScreen() {
             style={[styles.tab, when === tab && { borderBottomColor: primary, borderBottomWidth: 2 }]}
             onPress={() => handleTabChange(tab)}
             activeOpacity={0.8}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: when === tab }}
           >
             <Text style={[styles.tabText, when === tab && { color: primary, fontWeight: '700' }]}>
               {t(tab)}

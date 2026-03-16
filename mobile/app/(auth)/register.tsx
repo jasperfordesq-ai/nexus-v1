@@ -36,7 +36,10 @@ function makeRegisterSchema(t: (key: string) => string) {
       firstName: z.string().min(1, t('errors.firstNameRequired')),
       lastName: z.string().default(''),
       email: z.string().email(t('errors.validEmail')),
-      password: z.string().min(8, t('errors.weakPassword')),
+      password: z.string()
+        .min(8, t('errors.weakPassword'))
+        .regex(/[A-Z]/, t('errors.passwordUppercase'))
+        .regex(/[0-9]/, t('errors.passwordNumber')),
       passwordConfirm: z.string().min(1, t('errors.confirmPasswordRequired')),
     })
     .refine((d) => d.password === d.passwordConfirm, {
@@ -205,6 +208,8 @@ export default function RegisterScreen() {
                   onBlur={onBlur}
                   placeholder={t('register.passwordPlaceholder')}
                   secureTextEntry
+                  autoComplete="new-password"
+                  textContentType="newPassword"
                   returnKeyType="next"
                 />
                 {errors.password && <Text style={styles.fieldError}>{errors.password.message}</Text>}
@@ -225,6 +230,8 @@ export default function RegisterScreen() {
                   onBlur={onBlur}
                   placeholder={t('register.confirmPasswordPlaceholder')}
                   secureTextEntry
+                  autoComplete="new-password"
+                  textContentType="newPassword"
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit(onSubmit)}
                 />

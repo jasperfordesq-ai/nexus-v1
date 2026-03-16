@@ -85,14 +85,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedToken = await storage.get(STORAGE_KEYS.AUTH_TOKEN);
         if (!storedToken) return;
 
-        // Use stored user data immediately so UI isn't blank while we validate
-        const cached = await storage.getJson<AnyUser>(STORAGE_KEYS.USER_DATA);
-        if (cached) {
-          setToken(storedToken);
-          setUser(cached);
-        }
-
-        // Validate + upgrade to full User from /users/me
+        // Validate token with /users/me BEFORE exposing auth state.
+        // This prevents briefly showing authenticated UI for revoked sessions.
         const response = await getMe();
         setToken(storedToken);
         setUser(response.data);
@@ -143,8 +137,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    // Best-effort: unregister push token before clearing auth
-    void unregisterPushNotifications();
+    // Unregister push token BEFORE server logout — the server call invalidates the
+    // auth token, so push unregister must happen first to avoid a silent 401 failure.
+    try {
+      await unregisterPushNotifications();
+    } catch {
+      // Best-effort — continue with logout even if push unregister fails
+    }
 
     try {
       await apiLogout();
