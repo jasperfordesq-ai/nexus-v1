@@ -449,11 +449,11 @@ export function WellbeingTab() {
                     </Button>
                     {showTips && (
                       <div className="mt-4 space-y-2">
-                        <p className="text-sm text-default-600">&#8226; Take regular breaks between volunteer shifts</p>
-                        <p className="text-sm text-default-600">&#8226; Set boundaries on your availability</p>
-                        <p className="text-sm text-default-600">&#8226; Connect with fellow volunteers for support</p>
-                        <p className="text-sm text-default-600">&#8226; Celebrate your impact -- every hour counts</p>
-                        <p className="text-sm text-default-600">&#8226; Consider reducing frequency if feeling overwhelmed</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_breaks', 'Take regular breaks between volunteer shifts')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_boundaries', 'Set boundaries on your availability')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_connect', 'Connect with fellow volunteers for support')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_celebrate', 'Celebrate your impact -- every hour counts')}</p>
+                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_reduce', 'Consider reducing frequency if feeling overwhelmed')}</p>
                       </div>
                     )}
                   </div>
@@ -506,8 +506,8 @@ export function WellbeingTab() {
 
             {/* Optional Note */}
             <Textarea
-              label="Add a note (optional)"
-              placeholder="How's your energy level? Anything on your mind?"
+              label={t('wellbeing.note_label', 'Add a note (optional)')}
+              placeholder={t('wellbeing.note_placeholder', "How's your energy level? Anything on your mind?")}
               value={checkinNote}
               onChange={(e) => setCheckinNote(e.target.value)}
               maxLength={500}

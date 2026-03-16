@@ -726,6 +726,10 @@ class CronController
                     $processed = NewsletterService::processScheduled();
                     echo "   Processed $processed scheduled newsletters.\n";
                 });
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Retrying failed webhooks...\n";
+                echo $this->runSubTask('retry-failed-webhooks', fn() => $this->retryFailedWebhooksInternal());
             }
 
             // ── EVERY 15 MINUTES ──
@@ -747,6 +751,14 @@ class CronController
                 $taskNum++;
                 echo "\n[{$taskNum}] Batch geocoding...\n";
                 echo $this->runSubTask('geocode-batch', fn() => $this->geocodeBatchInternal());
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Volunteer pre-shift reminders...\n";
+                echo $this->runSubTask('volunteer-pre-shift', fn() => $this->volunteerPreShiftRemindersInternal());
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Volunteer post-shift feedback...\n";
+                echo $this->runSubTask('volunteer-post-shift', fn() => $this->volunteerPostShiftFeedbackInternal());
             }
 
             if ($minute === 30) {
@@ -806,6 +818,20 @@ class CronController
                 $taskNum++;
                 echo "\n[{$taskNum}] Gamification daily tasks...\n";
                 echo $this->runSubTask('gamification-daily', fn() => $this->gamificationDailyInternal());
+            }
+
+            if ($hour === 5 && $minute === 0) {
+                $taskNum++;
+                echo "\n[{$taskNum}] Volunteer lapsed nudge...\n";
+                echo $this->runSubTask('volunteer-lapsed-nudge', fn() => $this->volunteerLapsedNudgeInternal());
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Volunteer expiry warnings...\n";
+                echo $this->runSubTask('volunteer-expiry-warnings', fn() => $this->volunteerExpiryWarningsInternal());
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Guardian consent expiry...\n";
+                echo $this->runSubTask('volunteer-expire-consents', fn() => $this->volunteerExpireConsentsInternal());
             }
 
             if ($hour === 6 && $minute === 0) {
@@ -2202,5 +2228,200 @@ class CronController
         } catch (\Throwable $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
+    }
+
+    // ─── Volunteer Reminders Cron ───────────────────────────────────────
+
+    /**
+     * Send pre-shift reminders (24h and 2h before). Schedule: every 30 minutes.
+     */
+    public function volunteerPreShiftReminders()
+    {
+        $this->checkAccess();
+        $this->startJob('volunteer_pre_shift_reminders');
+        try {
+            $sent = \Nexus\Services\VolunteerReminderService::sendPreShiftReminders();
+            $this->logJob('success', "Sent {$sent} pre-shift reminders");
+            echo json_encode(['success' => true, 'reminders_sent' => $sent]);
+        } catch (\Throwable $e) {
+            $this->logJob('error', $e->getMessage());
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Send post-shift feedback requests. Schedule: every hour.
+     */
+    public function volunteerPostShiftFeedback()
+    {
+        $this->checkAccess();
+        $this->startJob('volunteer_post_shift_feedback');
+        try {
+            $sent = \Nexus\Services\VolunteerReminderService::sendPostShiftFeedback();
+            $this->logJob('success', "Sent {$sent} feedback requests");
+            echo json_encode(['success' => true, 'feedback_sent' => $sent]);
+        } catch (\Throwable $e) {
+            $this->logJob('error', $e->getMessage());
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Nudge lapsed volunteers. Schedule: daily.
+     */
+    public function volunteerLapsedNudge()
+    {
+        $this->checkAccess();
+        $this->startJob('volunteer_lapsed_nudge');
+        try {
+            $sent = \Nexus\Services\VolunteerReminderService::nudgeLapsedVolunteers();
+            $this->logJob('success', "Nudged {$sent} lapsed volunteers");
+            echo json_encode(['success' => true, 'nudges_sent' => $sent]);
+        } catch (\Throwable $e) {
+            $this->logJob('error', $e->getMessage());
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Send credential and training expiry warnings. Schedule: daily.
+     */
+    public function volunteerExpiryWarnings()
+    {
+        $this->checkAccess();
+        $this->startJob('volunteer_expiry_warnings');
+        try {
+            $credentials = \Nexus\Services\VolunteerReminderService::sendCredentialExpiryWarnings();
+            $training = \Nexus\Services\VolunteerReminderService::sendTrainingExpiryWarnings();
+            $total = $credentials + $training;
+            $this->logJob('success', "Sent {$total} expiry warnings (creds: {$credentials}, training: {$training})");
+            echo json_encode(['success' => true, 'credential_warnings' => $credentials, 'training_warnings' => $training]);
+        } catch (\Throwable $e) {
+            $this->logJob('error', $e->getMessage());
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Expire old guardian consents past their expiry date. Schedule: daily.
+     */
+    public function volunteerExpireConsents()
+    {
+        $this->checkAccess();
+        $this->startJob('volunteer_expire_consents');
+        try {
+            $expired = \Nexus\Services\GuardianConsentService::expireOldConsents();
+            $this->logJob('success', "Expired {$expired} consents");
+            echo json_encode(['success' => true, 'consents_expired' => $expired]);
+        } catch (\Throwable $e) {
+            $this->logJob('error', $e->getMessage());
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    // ─── Outbound Webhook Retry Cron ────────────────────────────────────
+
+    /**
+     * Retry failed outbound webhook deliveries. Schedule: every 5 minutes.
+     */
+    public function retryFailedWebhooks()
+    {
+        $this->checkAccess();
+        $this->startJob('retry_failed_webhooks');
+        try {
+            $retried = \Nexus\Services\WebhookDispatchService::retryFailed();
+            $this->logJob('success', "Retried {$retried} failed webhooks");
+            echo json_encode(['success' => true, 'webhooks_retried' => $retried]);
+        } catch (\Throwable $e) {
+            $this->logJob('error', $e->getMessage());
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    // ─── Volunteer Cron Internal Methods (for runAll scheduler) ─────────
+
+    private function volunteerPreShiftRemindersInternal(): void
+    {
+        $this->forEachTenant(function ($tenantId, $slug) {
+            try {
+                $sent = \Nexus\Services\VolunteerReminderService::sendPreShiftReminders();
+                if ($sent > 0) {
+                    echo "   [{$slug}] Pre-shift reminders: {$sent} sent.\n";
+                }
+            } catch (\Throwable $e) {
+                echo "   [{$slug}] Pre-shift error: {$e->getMessage()}\n";
+            }
+        });
+    }
+
+    private function volunteerPostShiftFeedbackInternal(): void
+    {
+        $this->forEachTenant(function ($tenantId, $slug) {
+            try {
+                $sent = \Nexus\Services\VolunteerReminderService::sendPostShiftFeedback();
+                if ($sent > 0) {
+                    echo "   [{$slug}] Post-shift feedback: {$sent} sent.\n";
+                }
+            } catch (\Throwable $e) {
+                echo "   [{$slug}] Post-shift error: {$e->getMessage()}\n";
+            }
+        });
+    }
+
+    private function volunteerLapsedNudgeInternal(): void
+    {
+        $this->forEachTenant(function ($tenantId, $slug) {
+            try {
+                $sent = \Nexus\Services\VolunteerReminderService::nudgeLapsedVolunteers();
+                if ($sent > 0) {
+                    echo "   [{$slug}] Lapsed nudges: {$sent} sent.\n";
+                }
+            } catch (\Throwable $e) {
+                echo "   [{$slug}] Lapsed nudge error: {$e->getMessage()}\n";
+            }
+        });
+    }
+
+    private function volunteerExpiryWarningsInternal(): void
+    {
+        $this->forEachTenant(function ($tenantId, $slug) {
+            try {
+                $creds = \Nexus\Services\VolunteerReminderService::sendCredentialExpiryWarnings();
+                $train = \Nexus\Services\VolunteerReminderService::sendTrainingExpiryWarnings();
+                $total = $creds + $train;
+                if ($total > 0) {
+                    echo "   [{$slug}] Expiry warnings: {$total} sent (creds: {$creds}, training: {$train}).\n";
+                }
+            } catch (\Throwable $e) {
+                echo "   [{$slug}] Expiry warning error: {$e->getMessage()}\n";
+            }
+        });
+    }
+
+    private function volunteerExpireConsentsInternal(): void
+    {
+        // Guardian consent expiry is not tenant-scoped (runs across all tenants in one query)
+        try {
+            $expired = \Nexus\Services\GuardianConsentService::expireOldConsents();
+            if ($expired > 0) {
+                echo "   Expired {$expired} guardian consents.\n";
+            }
+        } catch (\Throwable $e) {
+            echo "   Consent expiry error: {$e->getMessage()}\n";
+        }
+    }
+
+    private function retryFailedWebhooksInternal(): void
+    {
+        $this->forEachTenant(function ($tenantId, $slug) {
+            try {
+                $retried = \Nexus\Services\WebhookDispatchService::retryFailed();
+                if ($retried > 0) {
+                    echo "   [{$slug}] Webhook retries: {$retried}.\n";
+                }
+            } catch (\Throwable $e) {
+                echo "   [{$slug}] Webhook retry error: {$e->getMessage()}\n";
+            }
+        });
     }
 }

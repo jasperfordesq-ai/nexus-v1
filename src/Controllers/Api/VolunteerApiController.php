@@ -7,6 +7,7 @@
 namespace Nexus\Controllers\Api;
 
 use Nexus\Services\VolunteerService;
+use Nexus\Services\WebhookDispatchService;
 use Nexus\Core\TenantContext;
 
 /**
@@ -1447,12 +1448,27 @@ class VolunteerApiController extends BaseApiController
             return;
         }
 
+        // Resolve volunteer user_id from the token before checkout
+        $checkinUserId = \Nexus\Services\VolunteerCheckInService::getUserIdByToken($token);
+
         $success = \Nexus\Services\VolunteerCheckInService::checkOut($token);
 
         if (!$success) {
             $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
             $status = $this->getErrorStatus($errors);
             $this->respondWithErrors($errors, $status);
+        }
+
+        // Webhook: shift.completed
+        if ($success && $checkinUserId) {
+            try {
+                WebhookDispatchService::dispatch('shift.completed', [
+                    'user_id' => $checkinUserId,
+                    'shift_id' => $shiftId,
+                ]);
+            } catch (\Throwable $e) {
+                error_log("Webhook dispatch failed for shift.completed: " . $e->getMessage());
+            }
         }
 
         $this->respondWithData(['message' => 'Successfully checked out']);
@@ -2088,5 +2104,1050 @@ class VolunteerApiController extends BaseApiController
         }
 
         $this->respondWithData(['success' => true]);
+    }
+
+    // ========================================
+    // V11: EXPENSE REIMBURSEMENT
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/expenses
+     */
+    public function myExpenses(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_expenses_list', 30, 60);
+
+        $filters = [
+            'user_id' => $userId,
+            'status' => $this->query('status'),
+            'date_from' => $this->query('date_from'),
+            'date_to' => $this->query('date_to'),
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $result = \Nexus\Services\VolunteerExpenseService::getExpenses($filters);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/volunteering/expenses
+     */
+    public function submitExpense(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_expense_submit', 10, 60);
+
+        $data = $this->getJsonInput();
+        $result = \Nexus\Services\VolunteerExpenseService::submitExpense($userId, $data);
+
+        if (isset($result['error'])) {
+            $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 422);
+            return;
+        }
+
+        $this->respondWithData($result, null, 201);
+    }
+
+    /**
+     * GET /api/v2/volunteering/expenses/{id}
+     */
+    public function getExpense(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_expense_get', 30, 60);
+
+        $expense = \Nexus\Services\VolunteerExpenseService::getExpense($id);
+        if (!$expense || (int)$expense['user_id'] !== $userId) {
+            $this->respondWithError('NOT_FOUND', 'Expense not found', null, 404);
+            return;
+        }
+
+        $this->respondWithData($expense);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/expenses
+     */
+    public function adminExpenses(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->rateLimit('vol_admin_expenses', 30, 60);
+
+        $filters = [
+            'status' => $this->query('status'),
+            'user_id' => $this->query('user_id') ? (int)$this->query('user_id') : null,
+            'organization_id' => $this->query('organization_id') ? (int)$this->query('organization_id') : null,
+            'date_from' => $this->query('date_from'),
+            'date_to' => $this->query('date_to'),
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $result = \Nexus\Services\VolunteerExpenseService::getExpenses($filters);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/expenses/{id}
+     */
+    public function reviewExpense(int $id): void
+    {
+        $this->checkFeature();
+        $adminId = $this->requireAdmin();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_expense_review', 30, 60);
+
+        $data = $this->getJsonInput();
+        $status = $data['status'] ?? '';
+
+        $allowedStatuses = ['approved', 'rejected', 'paid'];
+        if (!in_array($status, $allowedStatuses, true)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Invalid status. Must be one of: ' . implode(', ', $allowedStatuses), 'status', 422);
+            return;
+        }
+
+        if ($status === 'paid') {
+            $result = \Nexus\Services\VolunteerExpenseService::markPaid($id, $adminId, $data['payment_reference'] ?? null);
+        } else {
+            $result = \Nexus\Services\VolunteerExpenseService::reviewExpense($id, $adminId, $status, $data['review_notes'] ?? null);
+        }
+
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Expense not found or invalid status', null, 404);
+            return;
+        }
+
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/expenses/export
+     */
+    public function exportExpenses(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $filters = [
+            'status' => $this->query('status'),
+            'date_from' => $this->query('date_from'),
+            'date_to' => $this->query('date_to'),
+        ];
+
+        $csv = \Nexus\Services\VolunteerExpenseService::exportExpenses($filters);
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="volunteer_expenses_' . date('Y-m-d') . '.csv"');
+        echo $csv;
+        exit;
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/expenses/policies
+     */
+    public function getExpensePolicies(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $orgId = $this->query('organization_id') ? (int)$this->query('organization_id') : null;
+        $policies = \Nexus\Services\VolunteerExpenseService::getPolicies($orgId);
+        $this->respondWithData($policies);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/expenses/policies
+     */
+    public function updateExpensePolicy(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_expense_policy_update', 10, 60);
+
+        $data = $this->getJsonInput();
+
+        if (empty($data['expense_type'])) {
+            $this->respondWithError('VALIDATION_ERROR', 'expense_type is required', 'expense_type', 422);
+            return;
+        }
+
+        // Ensure at least one policy field is present besides expense_type
+        $policyFields = ['max_amount', 'requires_receipt', 'auto_approve_below', 'description', 'enabled'];
+        $hasPolicyField = false;
+        foreach ($policyFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $hasPolicyField = true;
+                break;
+            }
+        }
+        if (!$hasPolicyField) {
+            $this->respondWithError('VALIDATION_ERROR', 'At least one policy field is required (e.g., max_amount, requires_receipt, auto_approve_below, description, enabled)', null, 422);
+            return;
+        }
+
+        $result = \Nexus\Services\VolunteerExpenseService::updatePolicy($data);
+        $this->respondWithData(['success' => $result]);
+    }
+
+    // ========================================
+    // V12: GUARDIAN CONSENT
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/guardian-consents
+     */
+    public function myGuardianConsents(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_guardian_consents', 30, 60);
+
+        $consents = \Nexus\Services\GuardianConsentService::getConsentsForMinor($userId);
+        $this->respondWithData($consents);
+    }
+
+    /**
+     * POST /api/v2/volunteering/guardian-consents
+     */
+    public function requestGuardianConsent(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_guardian_consent_request', 5, 60);
+
+        $data = $this->getJsonInput();
+        $opportunityId = isset($data['opportunity_id']) ? (int)$data['opportunity_id'] : null;
+
+        try {
+            $result = \Nexus\Services\GuardianConsentService::requestConsent($userId, $data, $opportunityId);
+            $this->respondWithData($result, null, 201);
+        } catch (\RuntimeException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * GET /api/v2/volunteering/guardian-consents/verify/{token}
+     */
+    public function verifyGuardianConsent(string $token): void
+    {
+        $this->rateLimit('guardian_consent_verify', 10, 300);
+
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $result = \Nexus\Services\GuardianConsentService::grantConsent($token, $ip);
+
+        if (!$result) {
+            $this->respondWithError('INVALID_TOKEN', 'Consent token is invalid or expired', null, 400);
+            return;
+        }
+
+        $this->respondWithData(['success' => true, 'message' => 'Guardian consent has been granted successfully.']);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/guardian-consents/{id}
+     */
+    public function withdrawGuardianConsent(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_guardian_consent_withdraw', 10, 60);
+
+        $result = \Nexus\Services\GuardianConsentService::withdrawConsent($id, $userId);
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Consent not found', null, 404);
+            return;
+        }
+
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/guardian-consents
+     */
+    public function adminGuardianConsents(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $filters = [
+            'status' => $this->query('status'),
+            'search' => $this->query('search'),
+        ];
+
+        $consents = \Nexus\Services\GuardianConsentService::getConsentsForAdmin($filters);
+        $this->respondWithData($consents);
+    }
+
+    // ========================================
+    // V13: SAFEGUARDING TRAINING & INCIDENTS
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/training
+     */
+    public function myTraining(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_training_list', 30, 60);
+
+        $training = \Nexus\Services\SafeguardingService::getTrainingForUser($userId);
+        $this->respondWithData($training);
+    }
+
+    /**
+     * POST /api/v2/volunteering/training
+     */
+    public function recordTraining(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_training_record', 10, 60);
+
+        $data = $this->getJsonInput();
+
+        try {
+            $result = \Nexus\Services\SafeguardingService::recordTraining($userId, $data);
+            $this->respondWithData($result, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/training
+     */
+    public function adminTraining(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $filters = [
+            'status' => $this->query('status'),
+            'training_type' => $this->query('training_type'),
+            'user_id' => $this->query('user_id') ? (int)$this->query('user_id') : null,
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $result = \Nexus\Services\SafeguardingService::getTrainingForAdmin($filters);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/training/{id}/verify
+     */
+    public function verifyTraining(int $id): void
+    {
+        $this->checkFeature();
+        $adminId = $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $result = \Nexus\Services\SafeguardingService::verifyTraining($id, $adminId);
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Training record not found', null, 404);
+            return;
+        }
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/training/{id}/reject
+     */
+    public function rejectTraining(int $id): void
+    {
+        $this->checkFeature();
+        $adminId = $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $result = \Nexus\Services\SafeguardingService::rejectTraining($id, $adminId);
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Training record not found', null, 404);
+            return;
+        }
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/volunteering/incidents
+     */
+    public function reportIncident(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_incident_report', 5, 60);
+
+        $data = $this->getJsonInput();
+
+        try {
+            $result = \Nexus\Services\SafeguardingService::reportIncident($userId, $data);
+            $this->respondWithData($result, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * GET /api/v2/volunteering/incidents
+     */
+    public function getIncidents(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_incidents_list', 30, 60);
+
+        $filters = [
+            'reported_by' => $userId,
+            'status' => $this->query('status'),
+        ];
+
+        $result = \Nexus\Services\SafeguardingService::getIncidents($filters);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * GET /api/v2/volunteering/incidents/{id}
+     */
+    public function getIncident(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('vol_incident_get', 30, 60);
+
+        $incident = \Nexus\Services\SafeguardingService::getIncident($id);
+        if (!$incident) {
+            $this->respondWithError('NOT_FOUND', 'Incident not found', null, 404);
+            return;
+        }
+
+        // Ownership check: only the reporter or an admin can view the incident
+        $role = $this->getAuthenticatedUserRole() ?? 'member';
+        $isAdmin = in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
+        if ((int)($incident['reported_by'] ?? 0) !== $userId && !$isAdmin) {
+            $this->respondWithError('FORBIDDEN', 'You do not have permission to view this incident', null, 403);
+            return;
+        }
+
+        $this->respondWithData($incident);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/incidents
+     */
+    public function adminIncidents(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $filters = [
+            'status' => $this->query('status'),
+            'severity' => $this->query('severity'),
+            'organization_id' => $this->query('organization_id') ? (int)$this->query('organization_id') : null,
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $result = \Nexus\Services\SafeguardingService::getIncidents($filters);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/incidents/{id}
+     */
+    public function updateIncident(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+        $result = \Nexus\Services\SafeguardingService::updateIncident($id, $data);
+
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Incident not found', null, 404);
+            return;
+        }
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/organizations/{id}/dlp
+     */
+    public function assignDlp(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+
+        $dlpUserId = (int)($data['dlp_user_id'] ?? 0);
+        if ($dlpUserId <= 0) {
+            $this->respondWithError('VALIDATION_ERROR', 'dlp_user_id is required and must be a positive integer', 'dlp_user_id', 422);
+            return;
+        }
+
+        $result = \Nexus\Services\SafeguardingService::assignDlp(
+            $id,
+            $dlpUserId,
+            isset($data['deputy_dlp_user_id']) ? (int)$data['deputy_dlp_user_id'] : null
+        );
+
+        $this->respondWithData(['success' => $result]);
+    }
+
+    // ========================================
+    // V14: CUSTOM FORMS & ACCESSIBILITY
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/custom-fields
+     *
+     * Intentionally public (no auth required) — custom field definitions are needed
+     * to render application forms, which may be accessible before login.
+     */
+    public function getCustomFields(): void
+    {
+        $this->checkFeature();
+        $this->rateLimit('vol_public_read', 60, 30);
+
+        $orgId = $this->query('organization_id') ? (int)$this->query('organization_id') : null;
+        $appliesTo = $this->query('applies_to') ?: 'application';
+
+        $fields = \Nexus\Services\VolunteerFormService::getCustomFields($orgId, $appliesTo);
+        $this->respondWithData($fields);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/custom-fields
+     */
+    public function adminCustomFields(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $orgId = $this->query('organization_id') ? (int)$this->query('organization_id') : null;
+        $fields = \Nexus\Services\VolunteerFormService::getCustomFields($orgId);
+        $this->respondWithData($fields);
+    }
+
+    /**
+     * POST /api/v2/admin/volunteering/custom-fields
+     */
+    public function createCustomField(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_custom_field_create', 10, 60);
+
+        $data = $this->getJsonInput();
+
+        if (empty($data['field_label'])) {
+            $this->respondWithError('VALIDATION_ERROR', 'field_label is required', 'field_label', 422);
+            return;
+        }
+
+        try {
+            $result = \Nexus\Services\VolunteerFormService::createField($data);
+            $this->respondWithData($result, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\Exception $e) {
+            error_log("VolunteerApiController::createCustomField error: " . $e->getMessage());
+            $this->respondWithError('INTERNAL_ERROR', 'Failed to create custom field', null, 500);
+        }
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/custom-fields/{id}
+     */
+    public function updateCustomField(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+        $result = \Nexus\Services\VolunteerFormService::updateField($id, $data);
+
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Custom field not found', null, 404);
+            return;
+        }
+
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * DELETE /api/v2/admin/volunteering/custom-fields/{id}
+     */
+    public function deleteCustomField(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $result = \Nexus\Services\VolunteerFormService::deleteField($id);
+
+        if (!$result) {
+            $this->respondWithError('NOT_FOUND', 'Custom field not found', null, 404);
+            return;
+        }
+
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * GET /api/v2/volunteering/accessibility-needs
+     */
+    public function myAccessibilityNeeds(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+
+        $needs = \Nexus\Services\VolunteerFormService::getAccessibilityNeeds($userId);
+        $this->respondWithData($needs);
+    }
+
+    /**
+     * PUT /api/v2/volunteering/accessibility-needs
+     */
+    public function updateAccessibilityNeeds(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+        \Nexus\Services\VolunteerFormService::updateAccessibilityNeeds($userId, $data['needs'] ?? []);
+        $this->respondWithData(['success' => true]);
+    }
+
+    // ========================================
+    // V15: COMMUNITY PROJECTS
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/community-projects
+     *
+     * Intentionally public (no auth required) — community project listings may be
+     * embedded on public pages for visibility and community engagement.
+     */
+    public function getCommunityProjects(): void
+    {
+        $this->checkFeature();
+        $this->rateLimit('vol_public_read', 60, 30);
+
+        $filters = [
+            'status' => $this->query('status') ?: 'proposed',
+            'category' => $this->query('category'),
+            'search' => $this->query('search'),
+            'sort' => $this->query('sort') ?: 'newest',
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $result = \Nexus\Services\CommunityProjectService::getProposals($filters);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/volunteering/community-projects
+     */
+    public function proposeCommunityProject(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_project_propose', 5, 60);
+
+        $data = $this->getJsonInput();
+
+        try {
+            $result = \Nexus\Services\CommunityProjectService::propose($userId, $data);
+            $this->respondWithData($result, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * GET /api/v2/volunteering/community-projects/{id}
+     *
+     * Intentionally public (no auth required) — individual project pages may be
+     * shared via direct links for community engagement.
+     */
+    public function getCommunityProject(int $id): void
+    {
+        $this->checkFeature();
+        $this->rateLimit('vol_public_read', 60, 30);
+
+        $project = \Nexus\Services\CommunityProjectService::getProposal($id);
+        if (!$project) {
+            $this->respondWithError('NOT_FOUND', 'Project not found', null, 404);
+            return;
+        }
+        $this->respondWithData($project);
+    }
+
+    /**
+     * PUT /api/v2/volunteering/community-projects/{id}
+     */
+    public function updateCommunityProject(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+        $result = \Nexus\Services\CommunityProjectService::updateProposal($id, $userId, $data);
+
+        if (!$result) {
+            $this->respondWithError('FORBIDDEN', 'Cannot update this project', null, 403);
+            return;
+        }
+        $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * POST /api/v2/volunteering/community-projects/{id}/support
+     */
+    public function supportCommunityProject(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_project_support', 30, 60);
+
+        $data = $this->getJsonInput();
+        $result = \Nexus\Services\CommunityProjectService::support($id, $userId, $data['message'] ?? null);
+        $this->respondWithData(['success' => $result]);
+    }
+
+    /**
+     * DELETE /api/v2/volunteering/community-projects/{id}/support
+     */
+    public function unsupportCommunityProject(int $id): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+
+        $result = \Nexus\Services\CommunityProjectService::unsupport($id, $userId);
+        $this->respondWithData(['success' => $result]);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/community-projects/{id}/review
+     */
+    public function reviewCommunityProject(int $id): void
+    {
+        $this->checkFeature();
+        $adminId = $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+
+        try {
+            $result = \Nexus\Services\CommunityProjectService::review(
+                $id,
+                $adminId,
+                $data['status'] ?? '',
+                $data['notes'] ?? null
+            );
+            $this->respondWithData(['success' => $result]);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    // ========================================
+    // V16: DONATIONS & GIVING DAYS
+    // ========================================
+
+    /**
+     * GET /api/v2/volunteering/donations
+     *
+     * Intentionally public (no auth required) — donation listings may be embedded
+     * on fundraising pages and shared externally.
+     */
+    public function getDonations(): void
+    {
+        $this->checkFeature();
+        $this->rateLimit('vol_public_read', 60, 30);
+
+        $filters = [
+            'opportunity_id' => $this->query('opportunity_id') ? (int)$this->query('opportunity_id') : null,
+            'community_project_id' => $this->query('community_project_id') ? (int)$this->query('community_project_id') : null,
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $result = \Nexus\Services\VolunteerDonationService::getDonations($filters);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/volunteering/donations
+     */
+    public function createDonation(): void
+    {
+        $this->checkFeature();
+        $userId = $this->getUserIdOptional();
+        $this->verifyCsrf();
+        $this->rateLimit('vol_donation_create', 10, 60);
+
+        $data = $this->getJsonInput();
+        if ($userId) {
+            $data['user_id'] = $userId;
+        }
+
+        try {
+            $result = \Nexus\Services\VolunteerDonationService::createDonation($userId ?: 0, $data);
+            $this->respondWithData($result, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * GET /api/v2/volunteering/giving-days
+     */
+    public function getGivingDays(): void
+    {
+        $this->checkFeature();
+        $this->rateLimit('vol_giving_days', 30, 60);
+
+        $result = \Nexus\Services\VolunteerDonationService::getGivingDays();
+        $this->respondWithData($result);
+    }
+
+    /**
+     * GET /api/v2/volunteering/giving-days/{id}/stats
+     *
+     * Intentionally public (no auth required) — giving day stats are displayed
+     * on public fundraising pages and real-time donation widgets.
+     */
+    public function getGivingDayStats(int $id): void
+    {
+        $this->checkFeature();
+        $this->rateLimit('vol_public_read', 60, 30);
+
+        $stats = \Nexus\Services\VolunteerDonationService::getGivingDayStats($id);
+        if (!$stats) {
+            $this->respondWithError('NOT_FOUND', 'Giving day not found', null, 404);
+            return;
+        }
+        $this->respondWithData($stats);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/giving-days
+     */
+    public function adminGivingDays(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $result = \Nexus\Services\VolunteerDonationService::adminGetGivingDays();
+        $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/admin/volunteering/giving-days
+     */
+    public function createGivingDay(): void
+    {
+        $this->checkFeature();
+        $adminId = $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+
+        try {
+            $result = \Nexus\Services\VolunteerDonationService::createGivingDay($adminId, $data);
+            $this->respondWithData($result, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/giving-days/{id}
+     */
+    public function updateGivingDay(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+        $result = \Nexus\Services\VolunteerDonationService::updateGivingDay($id, $data);
+        $this->respondWithData(['success' => $result]);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/donations/export
+     */
+    public function exportDonations(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $filters = [
+            'date_from' => $this->query('date_from'),
+            'date_to' => $this->query('date_to'),
+        ];
+
+        $csv = \Nexus\Services\VolunteerDonationService::exportDonations($filters);
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="volunteer_donations_' . date('Y-m-d') . '.csv"');
+        echo $csv;
+        exit;
+    }
+
+    // ========================================
+    // OUTBOUND WEBHOOKS (Admin)
+    // ========================================
+
+    /**
+     * GET /api/v2/admin/volunteering/webhooks
+     */
+    public function getWebhooks(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $webhooks = WebhookDispatchService::getWebhooks();
+        $this->respondWithData($webhooks);
+    }
+
+    /**
+     * POST /api/v2/admin/volunteering/webhooks
+     */
+    public function createWebhook(): void
+    {
+        $this->checkFeature();
+        $adminId = $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+
+        try {
+            $result = WebhookDispatchService::createWebhook($adminId, $data);
+            $this->respondWithData($result, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/webhooks/{id}
+     */
+    public function updateWebhook(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+        $result = WebhookDispatchService::updateWebhook($id, $data);
+        $this->respondWithData(['success' => $result]);
+    }
+
+    /**
+     * DELETE /api/v2/admin/volunteering/webhooks/{id}
+     */
+    public function deleteWebhook(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $result = WebhookDispatchService::deleteWebhook($id);
+        $this->respondWithData(['success' => $result]);
+    }
+
+    /**
+     * POST /api/v2/admin/volunteering/webhooks/{id}/test
+     */
+    public function testWebhook(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $result = WebhookDispatchService::testWebhook($id);
+        $this->respondWithData($result);
+    }
+
+    /**
+     * GET /api/v2/admin/volunteering/webhooks/{id}/logs
+     */
+    public function getWebhookLogs(int $id): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $filters = [
+            'cursor' => $this->query('cursor'),
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        $logs = WebhookDispatchService::getLogs($id, $filters);
+        $this->respondWithData($logs);
+    }
+
+    // ========================================
+    // REMINDER SETTINGS (Admin)
+    // ========================================
+
+    /**
+     * GET /api/v2/admin/volunteering/reminder-settings
+     */
+    public function getReminderSettings(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+
+        $settings = \Nexus\Services\VolunteerReminderService::getSettings();
+        $this->respondWithData($settings);
+    }
+
+    /**
+     * PUT /api/v2/admin/volunteering/reminder-settings
+     */
+    public function updateReminderSettings(): void
+    {
+        $this->checkFeature();
+        $this->requireAdmin();
+        $this->verifyCsrf();
+
+        $data = $this->getJsonInput();
+        $type = $data['reminder_type'] ?? '';
+
+        $allowedTypes = ['pre_shift', 'post_shift_feedback', 'lapsed_volunteer', 'credential_expiry', 'training_expiry'];
+        if (!in_array($type, $allowedTypes, true)) {
+            $this->respondWithError('VALIDATION_ERROR', 'Invalid reminder_type. Must be one of: ' . implode(', ', $allowedTypes), 'reminder_type', 422);
+            return;
+        }
+
+        $result = \Nexus\Services\VolunteerReminderService::updateSetting($type, $data);
+        $this->respondWithData(['success' => $result]);
     }
 }
