@@ -76,4 +76,72 @@ class WalletController extends BaseApiController
 
         return $this->respondWithData($result, null, 201);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function balanceV2(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'balanceV2');
+    }
+
+
+    public function transactionsV2(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'transactionsV2');
+    }
+
+
+    public function showTransaction($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'showTransaction', [$id]);
+    }
+
+
+    public function transferV2(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'transferV2');
+    }
+
+
+    public function destroyTransaction($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'destroyTransaction', [$id]);
+    }
+
+
+    public function userSearchV2(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'userSearchV2');
+    }
+
+
+    public function pendingCount(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'pendingCount');
+    }
+
+
+    public function delete(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'delete');
+    }
+
+
+    public function userSearch(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'userSearch');
+    }
+
 }

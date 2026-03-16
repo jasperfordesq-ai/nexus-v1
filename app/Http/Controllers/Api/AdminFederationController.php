@@ -86,4 +86,108 @@ class AdminFederationController extends BaseApiController
 
         return $this->respondWithData(['updated' => $updated]);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function settings(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'settings');
+    }
+
+
+    public function updateSettings(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'updateSettings');
+    }
+
+
+    public function partnerships(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'partnerships');
+    }
+
+
+    public function approvePartnership($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'approvePartnership', [$id]);
+    }
+
+
+    public function rejectPartnership($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'rejectPartnership', [$id]);
+    }
+
+
+    public function terminatePartnership($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'terminatePartnership', [$id]);
+    }
+
+
+    public function requestPartnership(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'requestPartnership');
+    }
+
+
+    public function directory(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'directory');
+    }
+
+
+    public function profile(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'profile');
+    }
+
+
+    public function updateProfile(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'updateProfile');
+    }
+
+
+    public function analytics(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'analytics');
+    }
+
+
+    public function apiKeys(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'apiKeys');
+    }
+
+
+    public function createApiKey(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'createApiKey');
+    }
+
+
+    public function dataManagement(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'dataManagement');
+    }
+
+
+    public function exportData($type): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminFederationApiController::class, 'exportData', [$type]);
+    }
+
 }

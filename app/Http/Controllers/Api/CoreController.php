@@ -116,4 +116,66 @@ class CoreController extends BaseApiController
 
         return response()->json($data);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function apiSubmit(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\ContactController::class, 'apiSubmit');
+    }
+
+
+    public function members(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CoreApiController::class, 'members');
+    }
+
+
+    public function listings(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CoreApiController::class, 'listings');
+    }
+
+
+    public function groups(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CoreApiController::class, 'groups');
+    }
+
+
+    public function messages(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CoreApiController::class, 'messages');
+    }
+
+
+    public function notifications(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CoreApiController::class, 'notifications');
+    }
+
+
+    public function checkNotifications(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CoreApiController::class, 'checkNotifications');
+    }
+
+
+    public function unreadCount(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\CoreApiController::class, 'unreadCount');
+    }
+
 }

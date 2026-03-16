@@ -32,4 +32,54 @@ class HelpController extends BaseApiController
         return $this->respondWithData($faqs);
     }
 
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function getFaqs(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\HelpApiController::class, 'getFaqs');
+    }
+
+
+    public function adminGetFaqs(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\HelpApiController::class, 'adminGetFaqs');
+    }
+
+
+    public function adminCreateFaq(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\HelpApiController::class, 'adminCreateFaq');
+    }
+
+
+    public function adminUpdateFaq($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\HelpApiController::class, 'adminUpdateFaq', [$id]);
+    }
+
+
+    public function adminDeleteFaq($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\HelpApiController::class, 'adminDeleteFaq', [$id]);
+    }
+
+
+    public function feedback(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\HelpController::class, 'feedback');
+    }
+
 }

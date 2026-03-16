@@ -151,4 +151,34 @@ class AdminEnterpriseController extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\Api\AdminEnterpriseApiController::class, 'secrets');
     }
+
+    public function legalDocs(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminEnterpriseApiController::class, 'legalDocs');
+    }
+
+
+    public function createLegalDoc(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminEnterpriseApiController::class, 'createLegalDoc');
+    }
+
+
+    public function showLegalDoc($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminEnterpriseApiController::class, 'showLegalDoc', [$id]);
+    }
+
+
+    public function updateLegalDoc($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminEnterpriseApiController::class, 'updateLegalDoc', [$id]);
+    }
+
+
+    public function deleteLegalDoc($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminEnterpriseApiController::class, 'deleteLegalDoc', [$id]);
+    }
+
 }

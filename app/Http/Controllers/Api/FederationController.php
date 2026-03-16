@@ -166,4 +166,78 @@ class FederationController extends BaseApiController
 
         return response()->json($data);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function index(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'index');
+    }
+
+
+    public function timebanks(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'timebanks');
+    }
+
+
+    public function members(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'members');
+    }
+
+
+    public function member($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'member', [$id]);
+    }
+
+
+    public function listings(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'listings');
+    }
+
+
+    public function listing($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'listing', [$id]);
+    }
+
+
+    public function sendMessage(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'sendMessage');
+    }
+
+
+    public function createTransaction(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'createTransaction');
+    }
+
+
+    public function oauthToken(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'oauthToken');
+    }
+
+
+    public function testWebhook(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'testWebhook');
+    }
+
 }

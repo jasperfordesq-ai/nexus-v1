@@ -151,4 +151,100 @@ class AdminSuperController extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'userMoveAndPromote', [$id]);
     }
+
+    public function bulkMoveUsers(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'bulkMoveUsers');
+    }
+
+
+    public function bulkUpdateTenants(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'bulkUpdateTenants');
+    }
+
+
+    public function audit(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'audit');
+    }
+
+
+    public function federationOverview(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationOverview');
+    }
+
+
+    public function federationGetSystemControls(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationGetSystemControls');
+    }
+
+
+    public function federationUpdateSystemControls(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationUpdateSystemControls');
+    }
+
+
+    public function federationEmergencyLockdown(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationEmergencyLockdown');
+    }
+
+
+    public function federationLiftLockdown(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationLiftLockdown');
+    }
+
+
+    public function federationGetWhitelist(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationGetWhitelist');
+    }
+
+
+    public function federationAddToWhitelist(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationAddToWhitelist');
+    }
+
+
+    public function federationRemoveFromWhitelist($tenantId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationRemoveFromWhitelist', [$tenantId]);
+    }
+
+
+    public function federationPartnerships(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationPartnerships');
+    }
+
+
+    public function federationSuspendPartnership($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationSuspendPartnership', [$id]);
+    }
+
+
+    public function federationTerminatePartnership($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationTerminatePartnership', [$id]);
+    }
+
+
+    public function federationGetTenantFeatures($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationGetTenantFeatures', [$id]);
+    }
+
+
+    public function federationUpdateTenantFeature($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminSuperApiController::class, 'federationUpdateTenantFeature', [$id]);
+    }
+
 }

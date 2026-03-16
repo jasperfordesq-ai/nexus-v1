@@ -78,4 +78,102 @@ class AiChatController extends BaseApiController
 
         return $this->respondWithPaginatedCollection($items, (int) $total, $page, $perPage);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function listConversations(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiChatController::class, 'listConversations');
+    }
+
+
+    public function getConversation($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiChatController::class, 'getConversation', [$id]);
+    }
+
+
+    public function createConversation(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiChatController::class, 'createConversation');
+    }
+
+
+    public function deleteConversation($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiChatController::class, 'deleteConversation', [$id]);
+    }
+
+
+    public function getProviders(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiProviderController::class, 'getProviders');
+    }
+
+
+    public function getLimits(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiProviderController::class, 'getLimits');
+    }
+
+
+    public function testProvider(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiProviderController::class, 'testProvider');
+    }
+
+
+    public function generateListing(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiContentController::class, 'generateListing');
+    }
+
+
+    public function generateEvent(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiContentController::class, 'generateEvent');
+    }
+
+
+    public function generateMessage(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiContentController::class, 'generateMessage');
+    }
+
+
+    public function generateBio(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiContentController::class, 'generateBio');
+    }
+
+
+    public function generateNewsletter(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiAdminContentController::class, 'generateNewsletter');
+    }
+
+
+    public function generateBlog(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiAdminContentController::class, 'generateBlog');
+    }
+
+
+    public function generatePage(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\Ai\AiAdminContentController::class, 'generatePage');
+    }
+
 }

@@ -111,4 +111,42 @@ class NotificationsController extends BaseApiController
 
         return $this->noContent();
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function destroyAll(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\NotificationsApiController::class, 'destroyAll');
+    }
+
+
+    public function markRead($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\NotificationsApiController::class, 'markRead', [$id]);
+    }
+
+
+    public function poll(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'poll');
+    }
+
+
+    public function delete(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'delete');
+    }
+
 }

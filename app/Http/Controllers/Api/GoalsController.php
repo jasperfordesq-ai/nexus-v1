@@ -80,4 +80,126 @@ class GoalsController extends BaseApiController
 
         return $this->respondWithData($result);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function discover(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'discover');
+    }
+
+
+    public function mentoring(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'mentoring');
+    }
+
+
+    public function templates(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'templates');
+    }
+
+
+    public function templateCategories(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'templateCategories');
+    }
+
+
+    public function createTemplate(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'createTemplate');
+    }
+
+
+    public function createFromTemplate($templateId): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'createFromTemplate', [$templateId]);
+    }
+
+
+    public function update($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'update', [$id]);
+    }
+
+
+    public function destroy($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'destroy', [$id]);
+    }
+
+
+    public function buddy($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'buddy', [$id]);
+    }
+
+
+    public function listCheckins($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'listCheckins', [$id]);
+    }
+
+
+    public function createCheckin($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'createCheckin', [$id]);
+    }
+
+
+    public function history($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'history', [$id]);
+    }
+
+
+    public function historySummary($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'historySummary', [$id]);
+    }
+
+
+    public function getReminder($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'getReminder', [$id]);
+    }
+
+
+    public function setReminder($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'setReminder', [$id]);
+    }
+
+
+    public function deleteReminder($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalsApiController::class, 'deleteReminder', [$id]);
+    }
+
+
+    public function updateProgress(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalApiController::class, 'updateProgress');
+    }
+
+
+    public function offerBuddy(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GoalApiController::class, 'offerBuddy');
+    }
+
 }

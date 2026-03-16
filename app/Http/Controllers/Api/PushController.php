@@ -64,4 +64,42 @@ class PushController extends BaseApiController
 
         return $this->respondWithData(['vapid_public_key' => $key]);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function send(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PushApiController::class, 'send');
+    }
+
+
+    public function status(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PushApiController::class, 'status');
+    }
+
+
+    public function registerDevice(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PushApiController::class, 'registerDevice');
+    }
+
+
+    public function unregisterDevice(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PushApiController::class, 'unregisterDevice');
+    }
+
 }

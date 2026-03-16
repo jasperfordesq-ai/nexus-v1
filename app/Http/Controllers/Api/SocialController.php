@@ -166,4 +166,132 @@ class SocialController extends BaseApiController
 
         return response()->json($data);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function createPollV2(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'createPollV2');
+    }
+
+
+    public function getPollV2($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'getPollV2', [$id]);
+    }
+
+
+    public function votePollV2($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'votePollV2', [$id]);
+    }
+
+
+    public function reportPostV2($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'reportPostV2', [$id]);
+    }
+
+
+    public function muteUserV2($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'muteUserV2', [$id]);
+    }
+
+
+    public function recordClick($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'recordClick', [$id]);
+    }
+
+
+    public function test(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'test');
+    }
+
+
+    public function like(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'like');
+    }
+
+
+    public function likers(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'likers');
+    }
+
+
+    public function comments(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'comments');
+    }
+
+
+    public function share(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'share');
+    }
+
+
+    public function delete(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'delete');
+    }
+
+
+    public function reaction(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'reaction');
+    }
+
+
+    public function reply(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'reply');
+    }
+
+
+    public function editComment(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'editComment');
+    }
+
+
+    public function deleteComment(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'deleteComment');
+    }
+
+
+    public function mentionSearch(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'mentionSearch');
+    }
+
+
+    public function feed(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'feed');
+    }
+
+
+    public function createPost(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SocialApiController::class, 'createPost');
+    }
+
 }

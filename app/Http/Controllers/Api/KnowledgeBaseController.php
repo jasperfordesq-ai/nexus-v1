@@ -77,4 +77,42 @@ class KnowledgeBaseController extends BaseApiController
 
         return $this->respondWithData($article, null, 201);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function showBySlug($slug): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\KnowledgeBaseApiController::class, 'showBySlug', [$slug]);
+    }
+
+
+    public function update($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\KnowledgeBaseApiController::class, 'update', [$id]);
+    }
+
+
+    public function destroy($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\KnowledgeBaseApiController::class, 'destroy', [$id]);
+    }
+
+
+    public function feedback($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\KnowledgeBaseApiController::class, 'feedback', [$id]);
+    }
+
 }

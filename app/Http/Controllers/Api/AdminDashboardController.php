@@ -47,4 +47,42 @@ class AdminDashboardController extends BaseApiController
         return $this->respondWithData($stats);
     }
 
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function stats(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminDashboardApiController::class, 'stats');
+    }
+
+
+    public function trends(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminDashboardApiController::class, 'trends');
+    }
+
+
+    public function activity(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminDashboardApiController::class, 'activity');
+    }
+
+
+    public function apiInsights(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\InsightsController::class, 'apiInsights');
+    }
+
 }

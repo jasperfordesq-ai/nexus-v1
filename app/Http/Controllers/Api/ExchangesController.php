@@ -89,4 +89,54 @@ class ExchangesController extends BaseApiController
         return $this->respondWithData($result);
     }
 
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function config(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ExchangesApiController::class, 'config');
+    }
+
+
+    public function check(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ExchangesApiController::class, 'check');
+    }
+
+
+    public function start($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ExchangesApiController::class, 'start', [$id]);
+    }
+
+
+    public function complete($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ExchangesApiController::class, 'complete', [$id]);
+    }
+
+
+    public function confirm($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ExchangesApiController::class, 'confirm', [$id]);
+    }
+
+
+    public function cancel($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ExchangesApiController::class, 'cancel', [$id]);
+    }
+
 }

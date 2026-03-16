@@ -163,4 +163,54 @@ class SkillTaxonomyController extends BaseApiController
 
         return response()->json($data);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function getCategoryById($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getCategoryById', [$id]);
+    }
+
+
+    public function createCategory(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'createCategory');
+    }
+
+
+    public function updateCategory($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'updateCategory', [$id]);
+    }
+
+
+    public function deleteCategory($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'deleteCategory', [$id]);
+    }
+
+
+    public function updateSkill($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'updateSkill', [$id]);
+    }
+
+
+    public function getUserSkills($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getUserSkills', [$id]);
+    }
+
 }

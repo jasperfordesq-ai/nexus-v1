@@ -115,4 +115,90 @@ class MessagesController extends BaseApiController
 
         return $this->respondWithData(['unread_count' => $count]);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function restrictionStatus(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restrictionStatus');
+    }
+
+
+    public function typing(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'typing');
+    }
+
+
+    public function uploadVoice(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'uploadVoice');
+    }
+
+
+    public function sendVoice(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'sendVoice');
+    }
+
+
+    public function archiveConversation($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archiveConversation', [$id]);
+    }
+
+
+    public function toggleReaction($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'toggleReaction', [$id]);
+    }
+
+
+    public function update($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'update', [$id]);
+    }
+
+
+    public function deleteMessage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'deleteMessage', [$id]);
+    }
+
+
+    public function archive($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archive', [$id]);
+    }
+
+
+    public function restoreConversation($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restoreConversation', [$id]);
+    }
+
+
+    public function deleteConversation(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\MessageController::class, 'deleteConversation');
+    }
+
+
+    public function getReactionsBatch(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\MessageController::class, 'getReactionsBatch');
+    }
+
 }

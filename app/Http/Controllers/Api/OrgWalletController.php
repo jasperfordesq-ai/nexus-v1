@@ -122,4 +122,30 @@ class OrgWalletController extends BaseApiController
 
         return $this->respondWithData(['from_org_id' => $fromOrgId, 'to_org_id' => $toOrgId, 'amount' => $amount]);
     }
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function apiMembers($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\OrgWalletController::class, 'apiMembers', [$id]);
+    }
+
+
+    public function apiBalance($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\OrgWalletController::class, 'apiBalance', [$id]);
+    }
+
 }

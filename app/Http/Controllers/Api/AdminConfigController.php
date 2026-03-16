@@ -151,4 +151,46 @@ class AdminConfigController extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'getNativeAppConfig');
     }
+
+    public function getAlgorithmInfo(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'getAlgorithmInfo');
+    }
+
+
+    public function getAlgorithmConfig(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'getAlgorithmConfig');
+    }
+
+
+    public function updateAlgorithmConfig($area): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'updateAlgorithmConfig', [$area]);
+    }
+
+
+    public function getAlgorithmHealth(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'getAlgorithmHealth');
+    }
+
+
+    public function getLanguageConfig(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'getLanguageConfig');
+    }
+
+
+    public function updateLanguageConfig(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'updateLanguageConfig');
+    }
+
+
+    public function updateNativeAppConfig(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\AdminConfigApiController::class, 'updateNativeAppConfig');
+    }
+
 }

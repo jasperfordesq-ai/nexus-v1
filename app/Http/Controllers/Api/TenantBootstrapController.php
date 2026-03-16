@@ -7,38 +7,45 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use App\Services\TenantService;
 
 /**
  * TenantBootstrapController -- Tenant configuration bootstrap for SPA init.
+ * Uses delegation to legacy controller for guaranteed response compatibility.
  */
 class TenantBootstrapController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly TenantService $tenantService,
-    ) {}
-
     /** GET /api/v2/tenant/bootstrap */
     public function bootstrap(): JsonResponse
     {
-        $tenantId = $this->getTenantId();
-        $config = $this->tenantService->getBootstrapConfig($tenantId);
-        
-        if ($config === null) {
-            return $this->respondWithError('NOT_FOUND', 'Tenant not found', null, 404);
-        }
-        
-        return $this->respondWithData($config);
+        return $this->delegate(\Nexus\Controllers\Api\TenantBootstrapController::class, 'bootstrap');
     }
 
     /** GET /api/v2/tenants */
     public function list(): JsonResponse
     {
-        $tenants = $this->tenantService->getPublicList();
-        
-        return $this->respondWithData($tenants);
+        return $this->delegate(\Nexus\Controllers\Api\TenantBootstrapController::class, 'list');
+    }
+
+
+    /**
+     * Delegate to legacy controller via output buffering.
+     */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
+
+    public function platformStats(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\TenantBootstrapController::class, 'platformStats');
     }
 
 }
