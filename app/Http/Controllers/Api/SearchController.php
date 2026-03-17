@@ -6,61 +6,151 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\SearchService;
 use Illuminate\Http\JsonResponse;
-
 
 /**
  * SearchController - Unified search across content types.
+ *
+ * Endpoints (v2):
+ *   GET  /api/v2/search              index()        — unified search
+ *   GET  /api/v2/search/suggestions  suggestions()  — autocomplete
+ *   GET  /api/v2/search/trending     trending()     — trending terms
  */
 class SearchController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
+    public function __construct(
+        private readonly SearchService $searchService,
+    ) {}
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/search
+    // -----------------------------------------------------------------
+
+    /**
+     * Unified search across listings, users, events, and groups.
+     *
+     * Query params: q (required, min 2), type (all|listings|users|events|groups),
+     *               cursor, per_page (default 20, max 50), category_id,
+     *               sort (relevance|newest|oldest), skills.
+     */
     public function index(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SearchApiController::class, 'index');
+        $this->rateLimit('search', 60, 60);
+
+        $query = trim($this->query('q', ''));
+
+        if (strlen($query) < 2) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Search query must be at least 2 characters', 'q', 400);
+        }
+
+        // Validate type param
+        $type = $this->query('type');
+        if ($type !== null) {
+            $validTypes = ['all', 'listings', 'users', 'events', 'groups'];
+            if (! in_array($type, $validTypes, true)) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    'Invalid type. Must be one of: ' . implode(', ', $validTypes),
+                    'type',
+                    400
+                );
+            }
+        }
+
+        $userId = $this->getOptionalUserId();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 50),
+        ];
+
+        if ($type) {
+            $filters['type'] = $type;
+        }
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+        if ($this->query('category_id')) {
+            $filters['category_id'] = $this->queryInt('category_id');
+        }
+        if ($this->query('sort')) {
+            $validSorts = ['relevance', 'newest', 'oldest'];
+            $sort = $this->query('sort');
+            if (in_array($sort, $validSorts, true)) {
+                $filters['sort'] = $sort;
+            }
+        }
+        if ($this->query('skills')) {
+            $filters['skills'] = $this->query('skills');
+        }
+
+        $result = $this->searchService->unifiedSearch($query, $userId, $filters);
+
+        return $this->respondWithData($result['items'], [
+            'pagination' => [
+                'cursor'   => $result['cursor'],
+                'per_page' => $filters['limit'],
+                'has_more' => $result['has_more'],
+            ],
+            'search' => [
+                'query' => $result['query'],
+                'total' => $result['total'],
+                'type'  => $filters['type'] ?? 'all',
+            ],
+        ]);
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/search/suggestions
+    // -----------------------------------------------------------------
+
+    /**
+     * Get autocomplete suggestions for a partial query.
+     *
+     * Query params: q (required, min 2), limit (default 5, max 10).
+     */
     public function suggestions(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SearchApiController::class, 'suggestions');
+        $this->rateLimit('search_suggestions', 120, 60);
+
+        $query = trim($this->query('q', ''));
+
+        if (strlen($query) < 2) {
+            return $this->respondWithData([
+                'listings' => [],
+                'users'    => [],
+                'events'   => [],
+                'groups'   => [],
+            ]);
+        }
+
+        $limit = $this->queryInt('limit', 5, 1, 10);
+
+        $suggestions = $this->searchService->suggestions($query, $limit);
+
+        return $this->respondWithData($suggestions);
     }
 
-    public function savedSearches(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\SearchApiController::class, 'savedSearches');
-    }
+    // -----------------------------------------------------------------
+    //  GET /api/v2/search/trending
+    // -----------------------------------------------------------------
 
-    public function saveSearch(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\SearchApiController::class, 'saveSearch');
-    }
-
-    public function deleteSavedSearch($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\SearchApiController::class, 'deleteSavedSearch', func_get_args());
-    }
-
-    public function runSavedSearch($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\SearchApiController::class, 'runSavedSearch', func_get_args());
-    }
-
+    /**
+     * Get trending search terms for the current tenant.
+     *
+     * Query params: days (default 7, max 30), limit (default 10, max 50).
+     */
     public function trending(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SearchApiController::class, 'trending');
+        $this->rateLimit('search_trending', 30, 60);
+
+        $days = $this->queryInt('days', 7, 1, 30);
+        $limit = $this->queryInt('limit', 10, 1, 50);
+
+        $trending = $this->searchService->trending($days, $limit);
+
+        return $this->respondWithData($trending);
     }
 }

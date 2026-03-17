@@ -13,10 +13,12 @@ use Illuminate\Http\JsonResponse;
  * ConnectionsController - Member connections (friend requests).
  *
  * Endpoints (v2):
- *   GET    /api/v2/connections              index()
- *   POST   /api/v2/connections              request()
- *   PUT    /api/v2/connections/{id}/accept   accept()
- *   DELETE /api/v2/connections/{id}         destroy()
+ *   GET    /api/v2/connections                  index()
+ *   GET    /api/v2/connections/pending          pendingCounts()
+ *   GET    /api/v2/connections/status/{userId}  status()
+ *   POST   /api/v2/connections                  request()
+ *   PUT    /api/v2/connections/{id}/accept      accept()
+ *   DELETE /api/v2/connections/{id}             destroy()
  */
 class ConnectionsController extends BaseApiController
 {
@@ -26,12 +28,19 @@ class ConnectionsController extends BaseApiController
         private readonly ConnectionService $connectionService,
     ) {}
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/connections
+    // -----------------------------------------------------------------
+
     /**
      * List connections for the authenticated user.
+     *
+     * Query params: status (accepted|pending), cursor, per_page (default 20).
      */
     public function index(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('connections_list', 60, 60);
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -53,18 +62,77 @@ class ConnectionsController extends BaseApiController
         );
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/connections/pending
+    // -----------------------------------------------------------------
+
+    /**
+     * Get pending connection request counts.
+     */
+    public function pendingCounts(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('connections_pending', 120, 60);
+
+        $counts = $this->connectionService->getPendingCounts($userId);
+
+        return $this->respondWithData($counts);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/connections/status/{userId}
+    // -----------------------------------------------------------------
+
+    /**
+     * Get connection status with a specific user.
+     */
+    public function status(int $otherUserId): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('connections_status', 120, 60);
+
+        $status = $this->connectionService->getStatus($userId, $otherUserId);
+
+        return $this->respondWithData($status);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/connections
+    // -----------------------------------------------------------------
+
     /**
      * Send a connection request. Requires authentication.
+     *
+     * Body: { "user_id": int }
      */
     public function request(): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('connection_request', 20, 60);
 
-        $result = $this->connectionService->sendRequest($userId, $this->getAllInput());
+        try {
+            $result = $this->connectionService->sendRequest($userId, $this->getAllInput());
+        } catch (\RuntimeException $e) {
+            $msg = $e->getMessage();
+            $code = 'VALIDATION_ERROR';
+            $status = 422;
+
+            if (str_contains($msg, 'yourself')) {
+                $status = 400;
+            } elseif (str_contains($msg, 'already exists')) {
+                $code = 'ALREADY_EXISTS';
+                $status = 409;
+            }
+
+            return $this->respondWithError($code, $msg, null, $status);
+        }
 
         return $this->respondWithData($result, null, 201);
     }
+
+    // -----------------------------------------------------------------
+    //  PUT /api/v2/connections/{id}/accept
+    // -----------------------------------------------------------------
 
     /**
      * Accept a pending connection request.
@@ -72,15 +140,34 @@ class ConnectionsController extends BaseApiController
     public function accept(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('connections_accept', 30, 60);
 
-        $result = $this->connectionService->accept($id, $userId);
+        try {
+            $connection = $this->connectionService->accept($id, $userId);
+        } catch (\RuntimeException $e) {
+            $msg = $e->getMessage();
+            $status = 422;
 
-        if ($result === null) {
+            if (str_contains($msg, 'not pending')) {
+                $status = 409;
+            } elseif (str_contains($msg, 'receiver')) {
+                $status = 403;
+            }
+
+            return $this->respondWithError('INVALID_STATE', $msg, null, $status);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->respondWithError('NOT_FOUND', 'Connection request not found', null, 404);
         }
 
-        return $this->respondWithData($result);
+        return $this->respondWithData([
+            'connection_id' => $connection->id,
+            'status'        => 'connected',
+        ]);
     }
+
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/connections/{id}
+    // -----------------------------------------------------------------
 
     /**
      * Remove a connection or cancel a pending request.
@@ -88,6 +175,7 @@ class ConnectionsController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('connections_delete', 30, 60);
 
         $existing = $this->connectionService->getById($id, $userId);
 
@@ -99,30 +187,4 @@ class ConnectionsController extends BaseApiController
 
         return $this->noContent();
     }
-
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
-    public function pendingCounts(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ConnectionsApiController::class, 'pendingCounts');
-    }
-
-
-    public function status($userId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ConnectionsApiController::class, 'status', [$userId]);
-    }
-
 }

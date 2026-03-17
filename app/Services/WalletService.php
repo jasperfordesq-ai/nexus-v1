@@ -106,18 +106,51 @@ class WalletService
     }
 
     /**
-     * Transfer time credits between users.
+     * Transfer time credits from one user to another.
      *
-     * @throws \RuntimeException If insufficient balance.
-     * @throws \InvalidArgumentException If amount is not positive.
+     * Accepts a flexible input array with recipient specified as
+     * user_id, username, email, or generic "recipient" field.
+     *
+     * @param int   $senderId Sender user ID
+     * @param array $data     Transfer data: recipient, amount, description
+     * @return array Created transaction data
+     *
+     * @throws \InvalidArgumentException On validation failure
+     * @throws \RuntimeException On insufficient balance or self-transfer
      */
-    public function transfer(int $senderId, int $receiverId, float $amount, string $description = ''): Transaction
+    public function transfer(int $senderId, array $data): array
     {
-        if ($amount <= 0) {
-            throw new \InvalidArgumentException('Amount must be positive');
+        $recipient = $data['recipient'] ?? $data['user_id'] ?? $data['username'] ?? $data['email'] ?? null;
+        $amount = (float) ($data['amount'] ?? 0);
+        $description = trim($data['description'] ?? '');
+
+        if (empty($recipient)) {
+            throw new \InvalidArgumentException('Recipient is required');
         }
 
-        return DB::transaction(function () use ($senderId, $receiverId, $amount, $description) {
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Amount must be greater than 0');
+        }
+
+        // Resolve recipient: ID, email, or username
+        $receiver = null;
+        if (is_numeric($recipient)) {
+            $receiver = $this->user->newQuery()->find((int) $recipient);
+        } elseif (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            $receiver = $this->user->newQuery()->where('email', $recipient)->first();
+        } else {
+            $receiver = $this->user->newQuery()->where('username', $recipient)->first();
+        }
+
+        if (! $receiver) {
+            throw new \RuntimeException('Recipient not found');
+        }
+
+        if ($senderId === $receiver->id) {
+            throw new \RuntimeException('Cannot transfer to yourself');
+        }
+
+        $txn = DB::transaction(function () use ($senderId, $receiver, $amount, $description) {
             /** @var User $sender */
             $sender = $this->user->newQuery()->lockForUpdate()->findOrFail($senderId);
 
@@ -125,12 +158,12 @@ class WalletService
                 throw new \RuntimeException('Insufficient balance');
             }
 
-            /** @var User $receiver */
-            $receiver = $this->user->newQuery()->lockForUpdate()->findOrFail($receiverId);
+            // Lock receiver row too
+            $this->user->newQuery()->lockForUpdate()->findOrFail($receiver->id);
 
             $txn = $this->transaction->newInstance([
                 'sender_id'   => $senderId,
-                'receiver_id' => $receiverId,
+                'receiver_id' => $receiver->id,
                 'amount'      => $amount,
                 'description' => $description,
                 'status'      => 'completed',
@@ -142,5 +175,146 @@ class WalletService
 
             return $txn->fresh(['sender', 'receiver']);
         });
+
+        return $this->formatTransaction($txn, $senderId);
+    }
+
+    /**
+     * Get a single transaction by ID for a specific user.
+     *
+     * @return array|null Transaction data or null if not found / not authorized
+     */
+    public function getTransaction(int $transactionId, int $userId): ?array
+    {
+        /** @var Transaction|null $txn */
+        $txn = $this->transaction->newQuery()
+            ->with([
+                'sender:id,first_name,last_name,avatar_url,organization_name,profile_type',
+                'receiver:id,first_name,last_name,avatar_url,organization_name,profile_type',
+            ])
+            ->where('id', $transactionId)
+            ->where(function (Builder $q) use ($userId) {
+                $q->where(function (Builder $q2) use ($userId) {
+                    $q2->where('sender_id', $userId)->where('deleted_for_sender', false);
+                })->orWhere(function (Builder $q2) use ($userId) {
+                    $q2->where('receiver_id', $userId)->where('deleted_for_receiver', false);
+                });
+            })
+            ->first();
+
+        if (! $txn) {
+            return null;
+        }
+
+        return $this->formatTransaction($txn, $userId);
+    }
+
+    /**
+     * Hide (soft-delete) a transaction from a user's history.
+     *
+     * @return bool True on success, false if not found/not authorized
+     */
+    public function deleteTransaction(int $transactionId, int $userId): bool
+    {
+        /** @var Transaction|null $txn */
+        $txn = $this->transaction->newQuery()
+            ->where('id', $transactionId)
+            ->where(fn (Builder $q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
+            ->first();
+
+        if (! $txn) {
+            return false;
+        }
+
+        if ($txn->sender_id === $userId) {
+            $txn->deleted_for_sender = true;
+        }
+        if ($txn->receiver_id === $userId) {
+            $txn->deleted_for_receiver = true;
+        }
+
+        $txn->save();
+
+        return true;
+    }
+
+    /**
+     * Search users for wallet transfer autocomplete.
+     *
+     * @return array Array of user summaries
+     */
+    public function searchUsers(int $excludeUserId, string $query, int $limit = 10): array
+    {
+        if (strlen($query) < 1) {
+            return [];
+        }
+
+        $like = '%' . $query . '%';
+
+        return $this->user->newQuery()
+            ->where('id', '!=', $excludeUserId)
+            ->where('status', '!=', 'banned')
+            ->where(function (Builder $q) use ($like) {
+                $q->where('first_name', 'LIKE', $like)
+                  ->orWhere('last_name', 'LIKE', $like)
+                  ->orWhere('username', 'LIKE', $like)
+                  ->orWhere('organization_name', 'LIKE', $like)
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
+            })
+            ->select('id', 'first_name', 'last_name', 'username', 'avatar_url', 'organization_name', 'profile_type')
+            ->limit($limit)
+            ->get()
+            ->map(function (User $u) {
+                $name = ($u->profile_type === 'organisation' && $u->organization_name)
+                    ? $u->organization_name
+                    : trim($u->first_name . ' ' . $u->last_name);
+
+                return [
+                    'id'         => $u->id,
+                    'username'   => $u->username,
+                    'name'       => $name,
+                    'first_name' => $u->first_name,
+                    'last_name'  => $u->last_name,
+                    'avatar_url' => $u->avatar_url,
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Format a Transaction model into the standard API response shape.
+     */
+    private function formatTransaction(Transaction $txn, int $userId): array
+    {
+        $isSender = $txn->sender_id === $userId;
+        $sender = $txn->sender;
+        $receiver = $txn->receiver;
+
+        $formatUser = function (?User $u): array {
+            if (! $u) {
+                return ['id' => 0, 'name' => 'Unknown', 'avatar_url' => null];
+            }
+            $name = ($u->profile_type === 'organisation' && $u->organization_name)
+                ? $u->organization_name
+                : trim($u->first_name . ' ' . $u->last_name);
+            return [
+                'id'         => $u->id,
+                'name'       => $name,
+                'avatar_url' => $u->avatar_url,
+            ];
+        };
+
+        return [
+            'id'               => $txn->id,
+            'type'             => $isSender ? 'debit' : 'credit',
+            'status'           => $txn->status ?? 'completed',
+            'amount'           => (float) $txn->amount,
+            'description'      => $txn->description,
+            'transaction_type' => $txn->transaction_type ?? 'transfer',
+            'sender'           => $formatUser($sender),
+            'receiver'         => $formatUser($receiver),
+            'other_user'       => $formatUser($isSender ? $receiver : $sender),
+            'created_at'       => $txn->created_at?->toIso8601String(),
+        ];
     }
 }

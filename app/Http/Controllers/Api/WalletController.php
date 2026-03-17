@@ -13,9 +13,13 @@ use Illuminate\Http\JsonResponse;
  * WalletController - Time-credit wallet operations.
  *
  * Endpoints (v2):
- *   GET   /api/v2/wallet/balance       balance()
- *   GET   /api/v2/wallet/transactions  transactions()
- *   POST  /api/v2/wallet/transfer      transfer()
+ *   GET    /api/v2/wallet/balance              balance()
+ *   GET    /api/v2/wallet/transactions         transactions()
+ *   GET    /api/v2/wallet/transactions/{id}    showTransaction()
+ *   POST   /api/v2/wallet/transfer             transfer()
+ *   DELETE /api/v2/wallet/transactions/{id}    destroyTransaction()
+ *   GET    /api/v2/wallet/user-search          userSearch()
+ *   GET    /api/v2/wallet/pending-count        pendingCount()
  */
 class WalletController extends BaseApiController
 {
@@ -25,24 +29,36 @@ class WalletController extends BaseApiController
         private readonly WalletService $walletService,
     ) {}
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/wallet/balance
+    // -----------------------------------------------------------------
+
     /**
-     * Get the current user's time-credit balance.
+     * Get the current user's time-credit balance with summary stats.
      */
     public function balance(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('wallet_balance', 60, 60);
 
         $balance = $this->walletService->getBalance($userId);
 
         return $this->respondWithData($balance);
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/wallet/transactions
+    // -----------------------------------------------------------------
+
     /**
      * List transaction history for the authenticated user.
+     *
+     * Query params: type (all|sent|received), cursor, per_page (default 20, max 100).
      */
     public function transactions(): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('wallet_transactions', 30, 60);
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
@@ -64,84 +80,123 @@ class WalletController extends BaseApiController
         );
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/wallet/transactions/{id}
+    // -----------------------------------------------------------------
+
     /**
-     * Transfer time credits to another user. Requires authentication.
+     * Get a single transaction by ID.
+     */
+    public function showTransaction(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('wallet_transactions', 60, 60);
+
+        $transaction = $this->walletService->getTransaction($id, $userId);
+
+        if ($transaction === null) {
+            return $this->respondWithError('NOT_FOUND', 'Transaction not found', null, 404);
+        }
+
+        return $this->respondWithData($transaction);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/wallet/transfer
+    // -----------------------------------------------------------------
+
+    /**
+     * Transfer time credits to another user.
+     *
+     * Body: recipient (user_id, username, or email), amount, description.
      */
     public function transfer(): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('wallet_transfer', 10, 60);
 
-        $result = $this->walletService->transfer($userId, $this->getAllInput());
+        try {
+            $result = $this->walletService->transfer($userId, $this->getAllInput());
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 400);
+        } catch (\RuntimeException $e) {
+            $code = 'TRANSFER_FAILED';
+            $status = 422;
+            $msg = $e->getMessage();
+
+            if (str_contains($msg, 'not found')) {
+                $code = 'NOT_FOUND';
+                $status = 404;
+            } elseif (str_contains($msg, 'Insufficient')) {
+                $code = 'INSUFFICIENT_FUNDS';
+                $status = 400;
+            } elseif (str_contains($msg, 'yourself')) {
+                $code = 'VALIDATION_ERROR';
+                $status = 400;
+            }
+
+            return $this->respondWithError($code, $msg, null, $status);
+        }
 
         return $this->respondWithData($result, null, 201);
     }
 
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/wallet/transactions/{id}
+    // -----------------------------------------------------------------
+
     /**
-     * Delegate to legacy controller via output buffering.
+     * Hide a transaction from the user's history (soft delete).
      */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    public function destroyTransaction(int $id): JsonResponse
     {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $userId = $this->requireAuth();
+        $this->rateLimit('wallet_delete', 20, 60);
+
+        $success = $this->walletService->deleteTransaction($id, $userId);
+
+        if (! $success) {
+            return $this->respondWithError('NOT_FOUND', 'Transaction not found', null, 404);
+        }
+
+        return $this->noContent();
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/wallet/user-search
+    // -----------------------------------------------------------------
 
-    public function balanceV2(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'balanceV2');
-    }
-
-
-    public function transactionsV2(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'transactionsV2');
-    }
-
-
-    public function showTransaction($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'showTransaction', [$id]);
-    }
-
-
-    public function transferV2(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'transferV2');
-    }
-
-
-    public function destroyTransaction($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'destroyTransaction', [$id]);
-    }
-
-
-    public function userSearchV2(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'userSearchV2');
-    }
-
-
-    public function pendingCount(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'pendingCount');
-    }
-
-
-    public function delete(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'delete');
-    }
-
-
+    /**
+     * Search users for wallet transfer autocomplete.
+     *
+     * Query params: q (search term), limit (default 10, max 20).
+     */
     public function userSearch(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\WalletApiController::class, 'userSearch');
+        $userId = $this->requireAuth();
+        $this->rateLimit('wallet_user_search', 30, 60);
+
+        $query = trim($this->query('q', ''));
+        $limit = $this->queryInt('limit', 10, 1, 20);
+
+        $users = $this->walletService->searchUsers($userId, $query, $limit);
+
+        return $this->respondWithData(['users' => $users]);
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/wallet/pending-count
+    // -----------------------------------------------------------------
+
+    /**
+     * Get count of pending wallet transactions (for badge updates).
+     * Currently all transactions are instant, so this returns 0.
+     */
+    public function pendingCount(): JsonResponse
+    {
+        $this->requireAuth();
+        $this->rateLimit('wallet_pending', 60, 60);
+
+        return $this->respondWithData(['count' => 0]);
+    }
 }
