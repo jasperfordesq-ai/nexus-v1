@@ -8,18 +8,18 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Services\IdeationChallengeService;
+use App\Services\ChallengeTagService;
+use App\Services\IdeaMediaService;
+use App\Services\IdeaTeamConversionService;
+use App\Services\TeamDocumentService;
+use App\Services\ChallengeOutcomeService;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Services\ChallengeCategoryService;
-use Nexus\Services\ChallengeTagService;
-use Nexus\Services\IdeaMediaService;
-use Nexus\Services\IdeaTeamConversionService;
 use Nexus\Services\GroupChatroomService;
 use Nexus\Services\TeamTaskService;
-use Nexus\Services\TeamDocumentService;
 use Nexus\Services\CampaignService;
 use Nexus\Services\ChallengeTemplateService;
-use Nexus\Services\ChallengeOutcomeService;
 
 /**
  * IdeationChallengesController — Community ideation challenges and idea submissions.
@@ -34,6 +34,11 @@ class IdeationChallengesController extends BaseApiController
 
     public function __construct(
         private readonly IdeationChallengeService $challengeService,
+        private readonly ChallengeTagService $challengeTagService,
+        private readonly IdeaMediaService $ideaMediaService,
+        private readonly IdeaTeamConversionService $ideaTeamConversionService,
+        private readonly TeamDocumentService $teamDocumentService,
+        private readonly ChallengeOutcomeService $challengeOutcomeService,
     ) {}
 
     /**
@@ -476,10 +481,10 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_convert_group', 5, 60);
 
         $options = $this->getAllInput();
-        $result = IdeaTeamConversionService::convert((int) $id, $userId, $options);
+        $result = $this->ideaTeamConversionService->convert((int) $id, $userId, $options);
 
         if (!$result) {
-            $errors = IdeaTeamConversionService::getErrors();
+            $errors = $this->ideaTeamConversionService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
@@ -570,7 +575,7 @@ class IdeationChallengesController extends BaseApiController
     {
         $this->ensureFeature();
         $tagType = $this->query('type');
-        $tags = ChallengeTagService::getAll($tagType);
+        $tags = $this->challengeTagService->getAll($tagType);
         return $this->respondWithData($tags);
     }
 
@@ -582,14 +587,14 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_tag', 30, 60);
 
         $data = $this->getAllInput();
-        $id = ChallengeTagService::create($userId, $data);
+        $id = $this->challengeTagService->create($userId, $data);
 
         if ($id === null) {
-            $errors = ChallengeTagService::getErrors();
+            $errors = $this->challengeTagService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
-        $tag = ChallengeTagService::getById($id);
+        $tag = $this->challengeTagService->getById($id);
         return $this->respondWithData($tag, null, 201);
     }
 
@@ -600,10 +605,10 @@ class IdeationChallengesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('ideation_tag', 10, 60);
 
-        $success = ChallengeTagService::delete((int) $id, $userId);
+        $success = $this->challengeTagService->delete((int) $id, $userId);
 
         if (!$success) {
-            $errors = ChallengeTagService::getErrors();
+            $errors = $this->challengeTagService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
@@ -618,7 +623,7 @@ class IdeationChallengesController extends BaseApiController
     public function listIdeaMedia($id): JsonResponse
     {
         $this->ensureFeature();
-        $media = IdeaMediaService::getMediaForIdea((int) $id);
+        $media = $this->ideaMediaService->getMediaForIdea((int) $id);
         return $this->respondWithData($media);
     }
 
@@ -630,10 +635,10 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_media', 20, 60);
 
         $data = $this->getAllInput();
-        $mediaId = IdeaMediaService::addMedia((int) $id, $userId, $data);
+        $mediaId = $this->ideaMediaService->addMedia((int) $id, $userId, $data);
 
         if ($mediaId === null) {
-            $errors = IdeaMediaService::getErrors();
+            $errors = $this->ideaMediaService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
@@ -647,10 +652,10 @@ class IdeationChallengesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('ideation_media', 10, 60);
 
-        $success = IdeaMediaService::deleteMedia((int) $id, $userId);
+        $success = $this->ideaMediaService->deleteMedia((int) $id, $userId);
 
         if (!$success) {
-            $errors = IdeaMediaService::getErrors();
+            $errors = $this->ideaMediaService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
@@ -890,7 +895,7 @@ class IdeationChallengesController extends BaseApiController
     public function getOutcome($id): JsonResponse
     {
         $this->ensureFeature();
-        $outcome = ChallengeOutcomeService::getForChallenge((int) $id);
+        $outcome = $this->challengeOutcomeService->getForChallenge((int) $id);
         return $this->respondWithData($outcome);
     }
 
@@ -902,14 +907,14 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_outcome', 10, 60);
 
         $data = $this->getAllInput();
-        $outcomeId = ChallengeOutcomeService::upsert((int) $id, $userId, $data);
+        $outcomeId = $this->challengeOutcomeService->upsert((int) $id, $userId, $data);
 
         if ($outcomeId === null) {
-            $errors = ChallengeOutcomeService::getErrors();
+            $errors = $this->challengeOutcomeService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
-        $outcome = ChallengeOutcomeService::getForChallenge((int) $id);
+        $outcome = $this->challengeOutcomeService->getForChallenge((int) $id);
         return $this->respondWithData($outcome);
     }
 
@@ -917,7 +922,7 @@ class IdeationChallengesController extends BaseApiController
     public function outcomesDashboard(): JsonResponse
     {
         $this->ensureFeature();
-        $dashboard = ChallengeOutcomeService::getDashboard();
+        $dashboard = $this->challengeOutcomeService->getDashboard();
         return $this->respondWithData($dashboard);
     }
 
@@ -929,7 +934,7 @@ class IdeationChallengesController extends BaseApiController
     public function getTeamLinks($id): JsonResponse
     {
         $this->ensureFeature();
-        $links = IdeaTeamConversionService::getLinksForChallenge((int) $id);
+        $links = $this->ideaTeamConversionService->getLinksForChallenge((int) $id);
         return $this->respondWithData($links);
     }
 
@@ -1147,7 +1152,7 @@ class IdeationChallengesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = TeamDocumentService::getDocuments((int) $id, $filters);
+        $result = $this->teamDocumentService->getDocuments((int) $id, $filters);
         return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
@@ -1178,10 +1183,10 @@ class IdeationChallengesController extends BaseApiController
             ];
         }
 
-        $docId = TeamDocumentService::upload((int) $id, $userId, $fileData, $title);
+        $docId = $this->teamDocumentService->upload((int) $id, $userId, $fileData, $title);
 
         if ($docId === null) {
-            $errors = TeamDocumentService::getErrors();
+            $errors = $this->teamDocumentService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
@@ -1195,10 +1200,10 @@ class IdeationChallengesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('team_document', 10, 60);
 
-        $success = TeamDocumentService::delete((int) $id, $userId);
+        $success = $this->teamDocumentService->delete((int) $id, $userId);
 
         if (!$success) {
-            $errors = TeamDocumentService::getErrors();
+            $errors = $this->teamDocumentService->getErrors();
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 

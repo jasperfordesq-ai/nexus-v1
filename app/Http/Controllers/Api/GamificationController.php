@@ -8,11 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Services\BadgeCollectionService;
 use App\Services\GamificationService;
 use Nexus\Core\TenantContext;
 use Nexus\Services\DailyRewardService;
 use Nexus\Services\ChallengeService;
-use Nexus\Services\BadgeCollectionService;
 use Nexus\Services\XPShopService;
 use Nexus\Services\GamificationService as LegacyGamificationService;
 use Nexus\Services\LeaderboardSeasonService;
@@ -32,6 +32,7 @@ class GamificationController extends BaseApiController
 
     public function __construct(
         private readonly GamificationService $gamificationService,
+        private readonly BadgeCollectionService $badgeCollectionService,
     ) {}
 
     // -----------------------------------------------------------------
@@ -269,7 +270,7 @@ class GamificationController extends BaseApiController
         $this->rateLimit('collections', 30, 60);
 
         try {
-            $collections = BadgeCollectionService::getCollectionsWithProgress($userId);
+            $collections = $this->badgeCollectionService->getCollectionsWithProgress($userId);
             return $this->success(['collections' => $collections]);
         } catch (\Throwable $e) {
             return $this->error('An internal error occurred', 500, 'SERVER_ERROR');

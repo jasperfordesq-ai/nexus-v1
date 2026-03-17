@@ -8,19 +8,24 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\CrossModuleMatchingService;
-use Nexus\Services\MatchLearningService;
+use App\Services\CrossModuleMatchingService;
+use App\Services\MatchLearningService;
 
 /**
  * MatchingController — Eloquent-powered smart matching engine endpoints.
  *
- * Fully migrated from legacy delegation. Uses legacy static services
+ * Fully migrated from legacy delegation. Uses DI-based App services
  * (CrossModuleMatchingService, MatchLearningService) which handle their
  * own tenant scoping via TenantContext.
  */
 class MatchingController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly CrossModuleMatchingService $crossModuleMatchingService,
+        private readonly MatchLearningService $matchLearningService,
+    ) {}
 
     /**
      * GET /api/v2/matches/all
@@ -60,7 +65,7 @@ class MatchingController extends BaseApiController
             $options['modules'] = array_values(array_intersect($requested, $allowed));
         }
 
-        $matches = CrossModuleMatchingService::getAllMatches($userId, $options);
+        $matches = $this->crossModuleMatchingService->getAllMatches($userId, $options);
 
         return $this->respondWithData($matches);
     }
@@ -106,7 +111,7 @@ class MatchingController extends BaseApiController
         }
 
         // Record negative signal in MatchLearningService
-        MatchLearningService::recordInteraction($userId, $listingId, 'dismissed', []);
+        $this->matchLearningService->recordInteraction($userId, $listingId, 'dismissed', []);
 
         return $this->respondWithData(['dismissed' => true, 'listing_id' => $listingId]);
     }
