@@ -357,19 +357,103 @@ class AdminFederationController extends BaseApiController
         ]);
     }
 
-    /** GET /api/v2/admin/federation/export/{type} -- delegation (CSV download via php://output + exit) */
-    public function exportData($type): JsonResponse
+    /** GET /api/v2/admin/federation/export/{type} */
+    public function exportData($type)
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminFederationApiController::class, 'exportData', [(string)$type]);
-    }
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $type = (string) $type;
 
-    private function delegateLegacy(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $allowedTypes = ['users', 'partnerships', 'transactions', 'audit'];
+        if (!in_array($type, $allowedTypes, true)) {
+            return $this->respondWithError('INVALID_TYPE', 'Invalid export type. Allowed: ' . implode(', ', $allowedTypes), null, 400);
+        }
+
+        try {
+            $rows = [];
+            $headers = [];
+
+            switch ($type) {
+                case 'users':
+                    if (!$this->tableExists('federation_user_settings')) {
+                        return $this->respondWithError('NO_DATA', 'Federation user settings table not found', null, 404);
+                    }
+                    $rows = Database::query("
+                        SELECT u.id, u.first_name, u.last_name, u.email, u.username,
+                               fus.federation_optin, fus.privacy_level, fus.service_reach,
+                               fus.created_at, fus.updated_at
+                        FROM federation_user_settings fus
+                        JOIN users u ON u.id = fus.user_id
+                        WHERE u.tenant_id = ? AND fus.federation_optin = 1
+                        ORDER BY u.first_name, u.last_name
+                    ", [$tenantId])->fetchAll();
+                    $headers = ['ID', 'First Name', 'Last Name', 'Email', 'Username', 'Opted In', 'Privacy Level', 'Service Reach', 'Created', 'Updated'];
+                    break;
+
+                case 'partnerships':
+                    if (!$this->tableExists('federation_partnerships')) {
+                        return $this->respondWithError('NO_DATA', 'Federation partnerships table not found', null, 404);
+                    }
+                    $rows = Database::query("
+                        SELECT fp.id, t1.name AS tenant_name, t2.name AS partner_name,
+                               fp.status, fp.level, fp.created_at, fp.updated_at
+                        FROM federation_partnerships fp
+                        LEFT JOIN tenants t1 ON t1.id = fp.tenant_id
+                        LEFT JOIN tenants t2 ON t2.id = fp.partner_tenant_id
+                        WHERE fp.tenant_id = ? OR fp.partner_tenant_id = ?
+                        ORDER BY fp.created_at DESC
+                    ", [$tenantId, $tenantId])->fetchAll();
+                    $headers = ['ID', 'Tenant', 'Partner', 'Status', 'Level', 'Created', 'Updated'];
+                    break;
+
+                case 'transactions':
+                    if (!$this->tableExists('federation_transactions')) {
+                        return $this->respondWithError('NO_DATA', 'Federation transactions table not found', null, 404);
+                    }
+                    $rows = Database::query("
+                        SELECT ft.id, ft.sender_user_id, ft.receiver_user_id,
+                               ft.amount, ft.description, ft.status,
+                               ft.created_at, ft.completed_at
+                        FROM federation_transactions ft
+                        WHERE ft.sender_tenant_id = ? OR ft.receiver_tenant_id = ?
+                        ORDER BY ft.created_at DESC
+                    ", [$tenantId, $tenantId])->fetchAll();
+                    $headers = ['ID', 'Sender ID', 'Receiver ID', 'Amount', 'Description', 'Status', 'Created', 'Completed'];
+                    break;
+
+                case 'audit':
+                    if (!$this->tableExists('federation_audit_log')) {
+                        return $this->respondWithError('NO_DATA', 'Federation audit log table not found', null, 404);
+                    }
+                    $rows = Database::query("
+                        SELECT id, action, category, level, actor_user_id,
+                               source_tenant_id, target_tenant_id, details, created_at
+                        FROM federation_audit_log
+                        WHERE source_tenant_id = ? OR target_tenant_id = ?
+                        ORDER BY created_at DESC LIMIT 5000
+                    ", [$tenantId, $tenantId])->fetchAll();
+                    $headers = ['ID', 'Action', 'Category', 'Level', 'Actor ID', 'Source Tenant', 'Target Tenant', 'Details', 'Created'];
+                    break;
+            }
+
+            $filename = "federation_{$type}_" . date('Y-m-d_His') . '.csv';
+
+            return new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($headers, $rows) {
+                $output = fopen('php://output', 'w');
+                fwrite($output, "\xEF\xBB\xBF"); // BOM for Excel UTF-8 compatibility
+                fputcsv($output, $headers);
+                foreach ($rows as $row) {
+                    fputcsv($output, array_values($row));
+                }
+                fclose($output);
+            }, 200, [
+                'Content-Type' => 'text/csv; charset=utf-8',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->respondWithError('EXPORT_FAILED', 'Failed to export data', null, 500);
+        }
     }
 }

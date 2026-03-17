@@ -15,7 +15,7 @@ use Nexus\Services\GroupNotificationService;
  * GroupsController - Groups CRUD, members, discussions, announcements.
  *
  * Converted from delegation to direct static service calls.
- * Only uploadImage() remains delegated (uses $_FILES).
+ * All methods are now native Laravel — no legacy delegation remains.
  */
 class GroupsController extends BaseApiController
 {
@@ -707,15 +707,65 @@ class GroupsController extends BaseApiController
     }
 
     // ================================================================
-    // DELEGATED — file upload uses $_FILES
+    // IMAGE UPLOAD
     // ================================================================
 
     /**
-     * POST /api/v2/groups/{id}/image — uses $_FILES, kept as delegation
+     * POST /api/v2/groups/{id}/image
+     *
+     * Upload an image for a group (avatar or cover). Uses request()->file() (Laravel native).
+     * Field name: 'image'. Query param 'type' = 'avatar' (default) or 'cover'.
      */
     public function uploadImage($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'uploadImage', [$id]);
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_image_upload', 10, 60);
+
+        $file = request()->file('image');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+        }
+
+        $imageType = $this->query('type', 'avatar');
+        if (!in_array($imageType, ['avatar', 'cover'])) {
+            $imageType = 'avatar';
+        }
+
+        try {
+            // Build a $_FILES-compatible array for ImageUploader::upload()
+            $fileArray = [
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ];
+
+            $imageUrl = \Nexus\Core\ImageUploader::upload($fileArray);
+
+            $success = GroupService::updateImage($id, $userId, $imageUrl, $imageType);
+
+            if (!$success) {
+                $errors = GroupService::getErrors();
+                $status = 400;
+                foreach ($errors as $error) {
+                    if ($error['code'] === 'NOT_FOUND') {
+                        $status = 404;
+                        break;
+                    }
+                    if ($error['code'] === 'FORBIDDEN') {
+                        $status = 403;
+                        break;
+                    }
+                }
+                return $this->respondWithErrors($errors, $status);
+            }
+
+            return $this->respondWithData(['image_url' => $imageUrl]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+        }
     }
 
     // ================================================================
@@ -733,18 +783,5 @@ class GroupsController extends BaseApiController
             }
         }
         return 400;
-    }
-
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
     }
 }

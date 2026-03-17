@@ -7,12 +7,13 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Core\TenantContext;
 use Nexus\Services\InsuranceCertificateService;
 
 /**
  * UserInsuranceController -- User insurance certificate upload and listing.
  *
- * list() is native; upload() is kept as delegation because it handles file uploads.
+ * All methods are native Laravel — no legacy delegation remains.
  *
  * Endpoints:
  *   GET  /api/v2/users/me/insurance  list()
@@ -42,25 +43,77 @@ class UserInsuranceController extends BaseApiController
     /**
      * POST /api/v2/users/me/insurance
      *
-     * Upload a new insurance certificate. Kept as delegation because it
-     * handles multipart file uploads via $_FILES.
+     * Upload a new insurance certificate. Uses request()->file() (Laravel native).
+     * Field name: 'certificate_file'. Form fields: insurance_type, provider_name,
+     * policy_number, coverage_amount, start_date, expiry_date, notes.
      */
     public function upload(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\UserInsuranceApiController::class, 'upload');
-    }
+        $userId = $this->requireAuth();
+        $tenantId = TenantContext::getId();
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     * Kept only for upload() which handles file uploads.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $validTypes = ['public_liability', 'professional_indemnity', 'employers_liability',
+                        'product_liability', 'personal_accident', 'other'];
+
+        $insuranceType = request()->input('insurance_type', 'public_liability');
+        if (!in_array($insuranceType, $validTypes, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid insurance type', 'insurance_type');
+        }
+
+        // Handle file upload
+        $filePath = null;
+        $file = request()->file('certificate_file');
+        if ($file && $file->isValid()) {
+            // Validate MIME type using file content
+            $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png'];
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($finfo, $file->getRealPath());
+            finfo_close($finfo);
+
+            if (!in_array($mimeType, $allowedMimes, true)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPG, and PNG files are accepted', 'certificate_file');
+            }
+
+            // Validate file size (10MB max)
+            if ($file->getSize() > 10 * 1024 * 1024) {
+                return $this->respondWithError('VALIDATION_ERROR', 'File must be under 10MB', 'certificate_file');
+            }
+
+            // Store file — derive extension from validated MIME type (not user filename)
+            $uploadDir = "uploads/insurance/{$tenantId}/{$userId}";
+            $extMap = ['application/pdf' => 'pdf', 'image/jpeg' => 'jpg', 'image/png' => 'png'];
+            $ext = $extMap[$mimeType] ?? 'bin';
+            $filename = 'cert_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $file->move($uploadDir, $filename);
+            $filePath = "{$uploadDir}/{$filename}";
+        }
+
+        try {
+            $data = [
+                'user_id' => $userId,
+                'insurance_type' => $insuranceType,
+                'provider_name' => request()->input('provider_name'),
+                'policy_number' => request()->input('policy_number'),
+                'coverage_amount' => request()->input('coverage_amount') !== null && request()->input('coverage_amount') !== ''
+                    ? (float) request()->input('coverage_amount') : null,
+                'start_date' => request()->input('start_date'),
+                'expiry_date' => request()->input('expiry_date'),
+                'certificate_file_path' => $filePath,
+                'status' => 'submitted',
+                'notes' => request()->input('notes'),
+            ];
+
+            $id = InsuranceCertificateService::create($data);
+            $record = InsuranceCertificateService::getById($id);
+
+            return $this->respondWithData($record, null, 201);
+        } catch (\Exception $e) {
+            return $this->respondWithError('SERVER_ERROR', 'Failed to upload insurance certificate', null, 500);
+        }
     }
 }

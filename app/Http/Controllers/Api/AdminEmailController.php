@@ -185,13 +185,35 @@ class AdminEmailController extends BaseApiController
     }
 
     // =========================================================================
-    // Test Emails (email-sending — delegate to legacy for Mailer)
+    // Test Emails
     // =========================================================================
 
     /** POST /api/v2/admin/email/test */
     public function test(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'test');
+        $this->requireAdmin();
+        $to = $this->input('to', '');
+
+        if (empty($to) || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Valid email address required', 'to', 400);
+        }
+
+        $mailer = new Mailer();
+        $provider = $mailer->getProviderType();
+
+        $result = $mailer->send(
+            $to,
+            'Project NEXUS — Email Test',
+            '<h2>Email Test</h2>' .
+            '<p>This test email was sent via <strong>' . strtoupper($provider) . '</strong> at ' . date('Y-m-d H:i:s') . '.</p>' .
+            '<p>If you received this, email delivery is working.</p>'
+        );
+
+        if ($result) {
+            return $this->respondWithData(['success' => true, 'provider' => $provider, 'to' => $to]);
+        }
+
+        return $this->respondWithError('SERVER_ERROR', 'Failed to send test email. Check server logs.', null, 500);
     }
 
     /** POST /api/v2/admin/email/test (v1 wrapper) */
@@ -203,22 +225,36 @@ class AdminEmailController extends BaseApiController
     /** POST /api/v2/admin/email/test-gmail */
     public function testGmail(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'testGmail');
+        $this->requireAdmin();
+        $result = Mailer::testGmailConnection();
+        return $this->respondWithData($result);
     }
 
     /** POST /api/v2/admin/email/test-provider */
     public function testProvider(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\EmailAdminApiController::class, 'testProvider');
-    }
+        $this->requireAdmin();
+        $to = $this->input('to', '');
 
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        if (empty($to) || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Valid email address required', 'to', 400);
+        }
+
+        $mailer = Mailer::forCurrentTenant();
+        $provider = $mailer->getProviderType();
+
+        $result = $mailer->send(
+            $to,
+            'Project NEXUS — Email Provider Test',
+            '<h2>Email Provider Test</h2>' .
+            '<p>Sent via <strong>' . htmlspecialchars(strtoupper($provider)) . '</strong> at ' . date('Y-m-d H:i:s') . '.</p>' .
+            '<p>Tenant-specific configuration is working correctly.</p>'
+        );
+
+        if ($result) {
+            return $this->respondWithData(['success' => true, 'provider' => $provider, 'to' => $to]);
+        }
+
+        return $this->respondWithError('SERVER_ERROR', 'Failed to send test email via ' . $provider . '. Check server logs.', null, 500);
     }
 }

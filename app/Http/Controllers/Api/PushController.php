@@ -74,11 +74,93 @@ class PushController extends BaseApiController
      * POST /api/v2/push/send
      *
      * Sends a push notification to specified users (admin only).
-     * Kept as delegation because it uses the Minishlink\WebPush library.
      */
     public function send(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PushApiController::class, 'send');
+        $this->requireAdmin();
+        $this->rateLimit('push_send', 10, 60);
+
+        $tenantId = $this->getTenantId();
+        $title = $this->input('title');
+        $body = $this->input('body');
+
+        if (empty($title) || empty($body)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Title and body are required', null, 400);
+        }
+
+        $db = Database::getConnection();
+        $targetUserIds = $this->input('user_ids');
+
+        if ($targetUserIds && is_array($targetUserIds)) {
+            $placeholders = str_repeat('?,', count($targetUserIds) - 1) . '?';
+            $stmt = $db->prepare("SELECT * FROM push_subscriptions WHERE tenant_id = ? AND user_id IN ($placeholders)");
+            $stmt->execute(array_merge([$tenantId], $targetUserIds));
+        } else {
+            $stmt = $db->prepare("SELECT * FROM push_subscriptions WHERE tenant_id = ?");
+            $stmt->execute([$tenantId]);
+        }
+
+        $subscriptions = $stmt->fetchAll();
+
+        if (empty($subscriptions)) {
+            return $this->respondWithData(['sent' => 0, 'failed' => 0, 'message' => 'No subscribers found']);
+        }
+
+        $sent = 0;
+        $failed = 0;
+
+        $pushController = new \Nexus\Controllers\Api\PushApiController();
+
+        foreach ($subscriptions as $sub) {
+            // Use reflection to call the private sendPush method, or call the service directly
+            try {
+                $publicKey = \Nexus\Core\Env::get('VAPID_PUBLIC_KEY');
+                $privateKey = \Nexus\Core\Env::get('VAPID_PRIVATE_KEY');
+
+                if (empty($publicKey) || empty($privateKey) || !class_exists('Minishlink\WebPush\WebPush')) {
+                    $failed++;
+                    continue;
+                }
+
+                $auth = ['VAPID' => [
+                    'subject' => 'mailto:' . (getenv('MAIL_FROM') ?: 'admin@nexus.local'),
+                    'publicKey' => $publicKey,
+                    'privateKey' => $privateKey,
+                ]];
+
+                $webPush = new \Minishlink\WebPush\WebPush($auth);
+                $webPush->queueNotification(
+                    \Minishlink\WebPush\Subscription::create([
+                        'endpoint' => $sub['endpoint'],
+                        'keys' => ['p256dh' => $sub['p256dh_key'], 'auth' => $sub['auth_key']],
+                    ]),
+                    json_encode([
+                        'title' => $title,
+                        'body' => $body,
+                        'icon' => $this->input('icon', '/assets/images/pwa/icon.svg'),
+                        'badge' => $this->input('badge', '/assets/images/pwa/badge.png'),
+                        'url' => $this->input('url', '/'),
+                        'tag' => $this->input('tag', 'nexus-notification'),
+                    ])
+                );
+
+                $reports = $webPush->flush();
+                foreach ($reports as $report) {
+                    if ($report->isSuccess()) {
+                        $sent++;
+                    } else {
+                        $failed++;
+                        if ($report->isSubscriptionExpired()) {
+                            $db->prepare("DELETE FROM push_subscriptions WHERE endpoint = ?")->execute([$sub['endpoint']]);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                $failed++;
+            }
+        }
+
+        return $this->respondWithData(['sent' => $sent, 'failed' => $failed, 'total' => count($subscriptions)]);
     }
 
     /**
@@ -183,17 +265,4 @@ class PushController extends BaseApiController
         }
     }
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     * Kept only for send() which uses WebPush library.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }

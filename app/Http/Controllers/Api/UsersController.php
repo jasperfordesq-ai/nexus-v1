@@ -17,7 +17,7 @@ use Nexus\Models\User;
  * UsersController - User profiles, settings, preferences, sessions.
  *
  * Converted from delegation to direct static service calls.
- * Only updateAvatar() remains delegated (uses $_FILES).
+ * All methods are now native Laravel — no legacy delegation remains.
  */
 class UsersController extends BaseApiController
 {
@@ -670,15 +670,42 @@ class UsersController extends BaseApiController
     }
 
     // ================================================================
-    // DELEGATED — file upload uses $_FILES
+    // AVATAR UPLOAD
     // ================================================================
 
     /**
-     * PUT /api/v2/users/me/avatar — uses $_FILES, kept as delegation
+     * PUT /api/v2/users/me/avatar
+     *
+     * Upload a new avatar for the authenticated user. Uses request()->file() (Laravel native).
+     * Field name: 'avatar'
      */
     public function updateAvatar(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'updateAvatar');
+        $userId = $this->requireAuth();
+        $this->rateLimit('avatar_upload', 5, 60);
+
+        $file = request()->file('avatar');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No avatar file uploaded or upload error', 'avatar', 400);
+        }
+
+        // Build a $_FILES-compatible array for UserService::updateAvatar()
+        $fileArray = [
+            'name'     => $file->getClientOriginalName(),
+            'type'     => $file->getMimeType(),
+            'tmp_name' => $file->getRealPath(),
+            'error'    => UPLOAD_ERR_OK,
+            'size'     => $file->getSize(),
+        ];
+
+        $avatarUrl = UserService::updateAvatar($userId, $fileArray);
+
+        if (!$avatarUrl) {
+            $errors = UserService::getErrors();
+            return $this->respondWithErrors($errors, 400);
+        }
+
+        return $this->respondWithData(['avatar_url' => $avatarUrl]);
     }
 
     // ================================================================
@@ -794,16 +821,4 @@ class UsersController extends BaseApiController
         return ucfirst($deviceType);
     }
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }

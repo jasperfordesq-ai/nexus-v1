@@ -7,37 +7,121 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Core\ApiErrorCodes;
+use Nexus\Services\Identity\IdentityProviderRegistry;
+use Nexus\Services\Identity\IdentityVerificationSessionService;
+use Nexus\Services\Identity\RegistrationOrchestrationService;
 
 /**
  * IdentityWebhookController -- Identity provider webhook handler.
  *
- * Delegates to legacy: IdentityWebhookController
+ * Converted from delegation to direct service calls.
+ * Legacy: src/Controllers/Api/IdentityWebhookController.php
  */
 class IdentityWebhookController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** POST webhooks/identity */
+    /** POST webhooks/identity/{provider_slug} */
     public function handleWebhook(): JsonResponse
     {
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\IdentityWebhookController();
-            $controller->handleWebhook();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        // Rate limit webhooks (generous but protective)
+        $ip = \Nexus\Core\ClientIp::get();
+        if (\Nexus\Services\RateLimitService::check("webhook:identity:$ip", 60, 60)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                'Too many webhook requests',
+                null,
+                429
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        \Nexus\Services\RateLimitService::increment("webhook:identity:$ip", 60);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        // Extract provider slug from route
+        $providerSlug = request()->route('provider_slug');
+        if (!$providerSlug || !IdentityProviderRegistry::has($providerSlug)) {
+            return $this->respondWithError(
+                ApiErrorCodes::RESOURCE_NOT_FOUND,
+                'Unknown identity provider',
+                null,
+                404
+            );
         }
 
-        return response()->json($data);
+        $provider = IdentityProviderRegistry::get($providerSlug);
+
+        // Get raw body for signature verification — use request()->getContent() instead of php://input
+        $rawBody = request()->getContent();
+        $headers = getallheaders() ?: [];
+
+        // Verify webhook signature
+        if (!$provider->verifyWebhookSignature($rawBody, $headers)) {
+            error_log("[IdentityWebhook] Signature verification failed for provider '{$providerSlug}' from IP {$ip}");
+            return $this->respondWithError(
+                ApiErrorCodes::FORBIDDEN,
+                'Invalid webhook signature',
+                null,
+                403
+            );
+        }
+
+        // Parse payload
+        $payload = json_decode($rawBody, true);
+        if (!is_array($payload)) {
+            return $this->respondWithError(
+                ApiErrorCodes::VALIDATION_INVALID_FORMAT,
+                'Invalid webhook payload',
+                null,
+                400
+            );
+        }
+
+        // Process through provider adapter
+        try {
+            $result = $provider->handleWebhook($payload, $headers);
+        } catch (\Throwable $e) {
+            error_log("[IdentityWebhook] Provider '{$providerSlug}' handleWebhook() failed: " . $e->getMessage());
+            return $this->respondWithError(
+                ApiErrorCodes::SERVER_INTERNAL_ERROR,
+                'Webhook processing failed',
+                null,
+                500
+            );
+        }
+
+        // Find the matching session
+        $providerSessionId = $result['provider_session_id'] ?? '';
+        if (empty($providerSessionId)) {
+            error_log("[IdentityWebhook] No provider_session_id in result from '{$providerSlug}'");
+            // Acknowledge receipt but log the issue
+            return $this->respondWithData(['received' => true, 'warning' => 'no_session_match']);
+        }
+
+        $session = IdentityVerificationSessionService::findByProviderSession($providerSlug, $providerSessionId);
+        if (!$session) {
+            error_log("[IdentityWebhook] Session not found for provider '{$providerSlug}', session '{$providerSessionId}'");
+            // Acknowledge receipt — the session may have been cancelled
+            return $this->respondWithData(['received' => true, 'warning' => 'session_not_found']);
+        }
+
+        // Route to orchestration service
+        $status = $result['status'] ?? 'processing';
+
+        // Idempotency check: skip if this session already has this terminal status
+        $currentStatus = $session['status'] ?? '';
+        $isTerminal = in_array($currentStatus, ['passed', 'failed', 'expired', 'cancelled'], true);
+        if ($isTerminal && $currentStatus === $status) {
+            // Duplicate webhook — acknowledge but skip processing
+            return $this->respondWithData(['received' => true, 'status' => $status, 'duplicate' => true]);
+        }
+
+        RegistrationOrchestrationService::handleVerificationResult(
+            (int) $session['id'],
+            $status,
+            $result
+        );
+
+        // Always return 200 to the webhook provider
+        return $this->respondWithData(['received' => true, 'status' => $status]);
     }
 }

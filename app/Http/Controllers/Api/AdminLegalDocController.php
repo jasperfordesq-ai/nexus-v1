@@ -145,10 +145,36 @@ class AdminLegalDocController extends BaseApiController
         }
     }
 
-    /** GET /api/v2/admin/legal-docs/{docId}/export -- keep as delegation (CSV download via php://output) */
-    public function exportAcceptances(int $docId): JsonResponse
+    /** GET /api/v2/admin/legal-docs/{docId}/export */
+    public function exportAcceptances(int $docId)
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminLegalDocController::class, 'exportAcceptances', [$docId]);
+        $this->requireAdmin();
+        $startDate = $this->query('start_date');
+        $endDate = $this->query('end_date');
+
+        try {
+            $records = LegalDocumentService::exportAcceptanceRecords($docId, $startDate, $endDate);
+
+            $filename = "acceptances_{$docId}_" . date('Y-m-d') . '.csv';
+
+            return new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($records) {
+                $output = fopen('php://output', 'w');
+                fputcsv($output, ['Acceptance ID', 'User ID', 'User Name', 'User Email', 'Version Number', 'Accepted At', 'Acceptance Method', 'IP Address']);
+                foreach ($records as $record) {
+                    fputcsv($output, [
+                        $record['acceptance_id'], $record['user_id'], $record['user_name'], $record['user_email'],
+                        $record['version_number'], $record['accepted_at'], $record['acceptance_method'], $record['ip_address'] ?? 'N/A',
+                    ]);
+                }
+                fclose($output);
+            }, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            ]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('SERVER_ERROR', 'Failed to export acceptances', null, 500);
+        }
     }
 
     /** POST /api/v2/admin/legal-docs/{docId}/versions/{vid}/notify */
@@ -248,9 +274,9 @@ class AdminLegalDocController extends BaseApiController
     }
 
     /**
-     * Delegate to legacy controller for CSV export methods.
+     * @deprecated Unused - all methods now call services directly.
      */
-    private function delegateLegacy(string $legacyClass, string $method, array $params = []): JsonResponse
+    private function delegateLegacy_unused(string $legacyClass, string $method, array $params = []): JsonResponse
     {
         $controller = new $legacyClass();
         ob_start();

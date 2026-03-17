@@ -8,20 +8,24 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\Database;
-use Nexus\Services\FederationFeatureService;
-use Nexus\Services\FederationUserService;
-use Nexus\Services\FederationAuditService;
+use Nexus\Middleware\FederationApiMiddleware;
+use Nexus\Models\Notification;
+use Nexus\Services\BrokerMessageVisibilityService;
 use Nexus\Services\FederationActivityService;
+use Nexus\Services\FederationAuditService;
+use Nexus\Services\FederationEmailService;
+use Nexus\Services\FederationFeatureService;
+use Nexus\Services\FederationJwtService;
+use Nexus\Services\FederationRealtimeService;
+use Nexus\Services\FederationUserService;
+use Nexus\Core\CorsHelper;
 
 /**
  * FederationController -- Federation cross-tenant features.
  *
- * V2 endpoints (status, opt-in/out, partners, activity) are fully migrated.
- * V1 federation API endpoints (timebanks, members, listings, etc.) delegate
- * to the legacy FederationApiController which uses FederationApiMiddleware
- * for API key authentication.
- * sendMessage and createTransaction are kept as delegation because they
- * involve email sending and Pusher realtime notifications.
+ * V2 endpoints (status, opt-in/out, partners, activity) use user JWT auth.
+ * V1 federation API endpoints use FederationApiMiddleware (API key auth).
+ * All methods converted from delegation to direct service/DB calls.
  */
 class FederationController extends BaseApiController
 {
@@ -264,69 +268,454 @@ class FederationController extends BaseApiController
     }
 
     // =====================================================================
-    // V1 FEDERATION API — Delegation (uses FederationApiMiddleware auth)
+    // V1 FEDERATION API — Direct implementation (API key auth)
     // =====================================================================
 
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
+    /** GET /api/v1/federation — API info */
     public function index(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'index');
+        return $this->fedSuccess([
+            'api' => 'Federation API',
+            'version' => '1.0',
+            'documentation' => '/docs/api/federation',
+            'endpoints' => [
+                'GET /api/v1/federation/timebanks' => 'List partner timebanks',
+                'GET /api/v1/federation/members' => 'Search federated members',
+                'GET /api/v1/federation/members/{id}' => 'Get member profile',
+                'GET /api/v1/federation/listings' => 'Search federated listings',
+                'GET /api/v1/federation/listings/{id}' => 'Get listing details',
+                'POST /api/v1/federation/messages' => 'Send federated message',
+                'POST /api/v1/federation/transactions' => 'Initiate time credit transfer',
+            ],
+        ]);
     }
 
+    /** GET /api/v1/federation/timebanks */
     public function timebanks(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'timebanks');
+        $auth = $this->fedAuth('timebanks:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $db = Database::getInstance();
+
+        if ($isExternal) {
+            $stmt = $db->prepare("
+                SELECT t.id, t.name, t.tagline, t.location_name, t.country_code, t.created_at as partnership_since,
+                    (SELECT COUNT(*) FROM federation_user_settings fus JOIN users u ON u.id = fus.user_id
+                     WHERE u.tenant_id = t.id AND fus.federation_optin = 1 AND u.status = 'active') as member_count
+                FROM tenants t WHERE t.id = ?
+            ");
+            $stmt->execute([$partnerTenantId]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT t.id, t.name, t.tagline, t.location_name, t.country_code, fp.status as partnership_status, fp.created_at as partnership_since,
+                    (SELECT COUNT(*) FROM federation_user_settings fus JOIN users u ON u.id = fus.user_id
+                     WHERE u.tenant_id = t.id AND fus.federation_optin = 1) as member_count
+                FROM federation_partnerships fp
+                JOIN tenants t ON ((fp.tenant_id = ? AND t.id = fp.partner_tenant_id) OR (fp.partner_tenant_id = ? AND t.id = fp.tenant_id))
+                WHERE fp.status = 'active' ORDER BY t.name ASC
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId]);
+        }
+
+        $timebanks = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $formatted = array_map(fn($tb) => [
+            'id' => (int) $tb['id'],
+            'name' => $tb['name'],
+            'tagline' => $tb['tagline'],
+            'location' => ['city' => $tb['location_name'], 'country' => $tb['country_code']],
+            'member_count' => (int) $tb['member_count'],
+            'partnership_status' => $tb['partnership_status'] ?? 'active',
+            'partnership_since' => $tb['partnership_since'],
+        ], $timebanks);
+
+        return $this->fedSuccess(['data' => $formatted, 'count' => count($formatted)]);
     }
 
+    /** GET /api/v1/federation/members */
     public function members(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'members');
+        $auth = $this->fedAuth('members:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $db = Database::getInstance();
+
+        $query = $_GET['q'] ?? '';
+        $timebankId = isset($_GET['timebank_id']) ? (int) $_GET['timebank_id'] : null;
+        $skills = !empty($_GET['skills']) ? explode(',', $_GET['skills']) : [];
+        $location = $_GET['location'] ?? '';
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 20)));
+
+        if ($isExternal) {
+            $sql = "SELECT SQL_CALC_FOUND_ROWS u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id, fus.service_reach, t.name as timebank_name
+                    FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
+                    WHERE u.tenant_id = ? AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1 AND u.status = 'active'";
+            $params = [$partnerTenantId];
+        } else {
+            $sql = "SELECT SQL_CALC_FOUND_ROWS u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id, fus.service_reach, t.name as timebank_name
+                    FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
+                    JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id))
+                    WHERE fus.federation_optin = 1 AND fus.appear_in_federated_search = 1 AND fp.status = 'active' AND u.tenant_id != ?";
+            $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
+        }
+
+        if (!empty($query)) {
+            $sql .= " AND (u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ? OR u.skills LIKE ?)";
+            $term = "%{$query}%";
+            array_push($params, $term, $term, $term, $term);
+        }
+        if ($timebankId) { $sql .= " AND u.tenant_id = ?"; $params[] = $timebankId; }
+        foreach ($skills as $skill) { $sql .= " AND u.skills LIKE ?"; $params[] = "%{$skill}%"; }
+        if (!empty($location)) { $sql .= " AND u.location LIKE ?"; $params[] = "%{$location}%"; }
+
+        $sql .= " ORDER BY u.first_name ASC, u.last_name ASC LIMIT ?, ?";
+        $params[] = (int) (($page - 1) * $perPage);
+        $params[] = (int) $perPage;
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
+
+        $formatted = array_map(fn($m) => [
+            'id' => (int) $m['id'], 'username' => $m['username'],
+            'name' => trim($m['first_name'] . ' ' . $m['last_name']),
+            'avatar' => $m['avatar'] ?: null, 'bio' => $m['bio'],
+            'skills' => $m['skills'] ? explode(',', $m['skills']) : [],
+            'location' => $m['location'],
+            'timebank' => ['id' => (int) $m['tenant_id'], 'name' => $m['timebank_name']],
+            'service_reach' => $m['service_reach'], 'joined' => $m['created_at'],
+        ], $rows);
+
+        return $this->fedPaginated($formatted, $total, $page, $perPage);
     }
 
+    /** GET /api/v1/federation/members/{id} */
     public function member($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'member', [$id]);
+        $auth = $this->fedAuth('members:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $db = Database::getInstance();
+
+        if ($isExternal) {
+            $stmt = $db->prepare("
+                SELECT u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id,
+                       fus.service_reach, fus.messaging_enabled_federated, fus.transactions_enabled_federated, t.name as timebank_name
+                FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
+                WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1 AND u.status = 'active'
+            ");
+            $stmt->execute([$id, $partnerTenantId]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id,
+                       fus.service_reach, fus.messaging_enabled_federated, fus.transactions_enabled_federated, t.name as timebank_name
+                FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN tenants t ON t.id = u.tenant_id
+                JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id))
+                WHERE u.id = ? AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1 AND fp.status = 'active'
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
+        }
+
+        $member = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$member) {
+            return $this->fedError(404, 'Member not found or not accessible', 'MEMBER_NOT_FOUND');
+        }
+
+        return $this->fedSuccess(['data' => [
+            'id' => (int) $member['id'], 'username' => $member['username'],
+            'name' => trim($member['first_name'] . ' ' . $member['last_name']),
+            'avatar' => $member['avatar'] ?: null, 'bio' => $member['bio'],
+            'skills' => $member['skills'] ? explode(',', $member['skills']) : [],
+            'location' => $member['location'],
+            'timebank' => ['id' => (int) $member['tenant_id'], 'name' => $member['timebank_name']],
+            'service_reach' => $member['service_reach'],
+            'accepts_messages' => (bool) $member['messaging_enabled_federated'],
+            'accepts_transactions' => (bool) $member['transactions_enabled_federated'],
+            'joined' => $member['created_at'],
+        ]]);
     }
 
+    /** GET /api/v1/federation/listings */
     public function listings(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'listings');
+        $auth = $this->fedAuth('listings:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $db = Database::getInstance();
+
+        $query = $_GET['q'] ?? '';
+        $type = $_GET['type'] ?? '';
+        $timebankId = isset($_GET['timebank_id']) ? (int) $_GET['timebank_id'] : null;
+        $category = $_GET['category'] ?? '';
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 20)));
+
+        if ($isExternal) {
+            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
+                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                    WHERE l.status = 'active' AND l.tenant_id = ? AND fus.federation_optin = 1";
+            $params = [$partnerTenantId];
+        } else {
+            $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
+                    FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                    JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
+                    WHERE l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active' AND l.tenant_id != ?";
+            $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
+        }
+
+        if (!empty($query)) { $sql .= " AND (l.title LIKE ? OR l.description LIKE ?)"; $term = "%{$query}%"; array_push($params, $term, $term); }
+        if (!empty($type) && in_array($type, ['offer', 'request'])) { $sql .= " AND l.type = ?"; $params[] = $type; }
+        if ($timebankId) { $sql .= " AND l.tenant_id = ?"; $params[] = $timebankId; }
+        if (!empty($category)) { $sql .= " AND l.category = ?"; $params[] = $category; }
+
+        $sql .= " ORDER BY l.created_at DESC LIMIT ?, ?";
+        $params[] = (int) (($page - 1) * $perPage);
+        $params[] = (int) $perPage;
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $total = (int) $db->query("SELECT FOUND_ROWS()")->fetchColumn();
+
+        $formatted = array_map(fn($l) => [
+            'id' => (int) $l['id'], 'title' => $l['title'], 'description' => $l['description'],
+            'type' => $l['type'], 'category' => $l['category'], 'rate' => $l['rate'],
+            'owner' => ['id' => (int) $l['user_id'], 'name' => trim($l['first_name'] . ' ' . $l['last_name']), 'avatar' => $l['avatar'] ?: null],
+            'timebank' => ['id' => (int) $l['tenant_id'], 'name' => $l['timebank_name']],
+            'created_at' => $l['created_at'],
+        ], $rows);
+
+        return $this->fedPaginated($formatted, $total, $page, $perPage);
     }
 
+    /** GET /api/v1/federation/listings/{id} */
     public function listing($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'listing', [$id]);
+        $auth = $this->fedAuth('listings:read');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $db = Database::getInstance();
+
+        if ($isExternal) {
+            $stmt = $db->prepare("
+                SELECT l.*, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
+                FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                WHERE l.id = ? AND l.tenant_id = ? AND l.status = 'active' AND fus.federation_optin = 1
+            ");
+            $stmt->execute([$id, $partnerTenantId]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT l.*, u.first_name, u.last_name, u.avatar_url as avatar, u.location, t.name as timebank_name
+                FROM listings l JOIN users u ON u.id = l.user_id JOIN tenants t ON t.id = l.tenant_id JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id))
+                WHERE l.id = ? AND l.status = 'active' AND fus.federation_optin = 1 AND fp.status = 'active'
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
+        }
+
+        $listing = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$listing) {
+            return $this->fedError(404, 'Listing not found or not accessible', 'LISTING_NOT_FOUND');
+        }
+
+        return $this->fedSuccess(['data' => [
+            'id' => (int) $listing['id'], 'title' => $listing['title'], 'description' => $listing['description'],
+            'type' => $listing['type'], 'category' => $listing['category'], 'rate' => $listing['rate'] ?? $listing['price'] ?? null,
+            'owner' => ['id' => (int) $listing['user_id'], 'name' => trim($listing['first_name'] . ' ' . $listing['last_name']), 'avatar' => $listing['avatar'] ?: null, 'location' => $listing['location']],
+            'timebank' => ['id' => (int) $listing['tenant_id'], 'name' => $listing['timebank_name']],
+            'created_at' => $listing['created_at'], 'updated_at' => $listing['updated_at'] ?? null,
+        ]]);
     }
 
-    /** Delegation — involves email sending */
+    /** POST /api/v1/federation/messages */
     public function sendMessage(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'sendMessage');
+        $auth = $this->fedAuth('messages:write');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $db = Database::getInstance();
+
+        foreach (['recipient_id', 'subject', 'body', 'sender_id'] as $field) {
+            if (empty($input[$field])) {
+                return $this->fedError(400, "Missing required field: {$field}", 'VALIDATION_ERROR');
+            }
+        }
+
+        if ($isExternal) {
+            $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'");
+            $stmt->execute([$input['recipient_id'], $partnerTenantId]);
+        } else {
+            $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)) WHERE u.id = ? AND fus.federation_optin = 1 AND fp.status = 'active'");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $input['recipient_id']]);
+        }
+
+        $recipient = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$recipient) return $this->fedError(404, 'Recipient not found or not accessible', 'RECIPIENT_NOT_FOUND');
+        if (!$recipient['messaging_enabled_federated']) return $this->fedError(403, 'Recipient does not accept federated messages', 'MESSAGES_DISABLED');
+
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $input['sender_id'])) {
+            return $this->fedError(403, 'Sender messaging privileges have been restricted', 'SENDER_RESTRICTED');
+        }
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $input['recipient_id'])) {
+            return $this->fedError(403, 'Recipient is not currently accepting messages', 'RECIPIENT_UNAVAILABLE');
+        }
+
+        $stmt = $db->prepare("INSERT INTO messages (tenant_id, sender_id, receiver_id, subject, body, is_federated, created_at) VALUES (?, ?, ?, ?, ?, 1, NOW())");
+        $stmt->execute([$recipient['tenant_id'], $input['sender_id'], $input['recipient_id'], $input['subject'], $input['body']]);
+        $messageId = $db->lastInsertId();
+
+        FederationAuditService::log('api_message_sent', $partnerTenantId, $recipient['tenant_id'], null, ['message_id' => $messageId, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
+
+        // Non-blocking notifications
+        $senderName = $input['sender_name'] ?? 'A federation member';
+        $senderTenantName = 'Partner Timebank';
+        try {
+            $sRow = $db->prepare("SELECT u.name, u.first_name, u.last_name, t.name as tenant_name FROM users u JOIN tenants t ON u.tenant_id = t.id WHERE u.id = ?");
+            $sRow->execute([$input['sender_id']]);
+            $sr = $sRow->fetch(\PDO::FETCH_ASSOC);
+            if ($sr) { $senderName = $sr['name'] ?: trim($sr['first_name'] . ' ' . $sr['last_name']); $senderTenantName = $sr['tenant_name'] ?: 'Partner Timebank'; }
+        } catch (\Exception $e) {}
+
+        try { FederationEmailService::sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { error_log("FederationV1: email failed: " . $e->getMessage()); }
+        try { FederationRealtimeService::broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $input['subject'], 'body' => $input['body']]); } catch (\Exception $e) {}
+        try { Notification::create((int) $input['recipient_id'], "New federated message from {$senderName} ({$senderTenantName}): " . substr($input['subject'], 0, 50), '/federation/messages', 'federation_message', true, (int) $recipient['tenant_id']); } catch (\Exception $e) {}
+
+        return $this->fedSuccess(['message_id' => (int) $messageId, 'status' => 'sent'], 201);
     }
 
-    /** Delegation — involves cross-tenant transaction processing */
+    /** POST /api/v1/federation/transactions */
     public function createTransaction(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'createTransaction');
+        $auth = $this->fedAuth('transactions:write');
+        if ($auth instanceof JsonResponse) return $auth;
+
+        $partnerTenantId = $auth['tenant_id'];
+        $isExternal = !empty($auth['platform_id']);
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $db = Database::getInstance();
+
+        foreach (['recipient_id', 'amount', 'description', 'sender_id'] as $field) {
+            if (!isset($input[$field]) || $input[$field] === '') {
+                return $this->fedError(400, "Missing required field: {$field}", 'VALIDATION_ERROR');
+            }
+        }
+
+        $amount = (float) $input['amount'];
+        if ($amount <= 0 || $amount > 100) {
+            return $this->fedError(400, 'Amount must be between 0 and 100 hours', 'INVALID_AMOUNT');
+        }
+
+        if ($isExternal) {
+            $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.transactions_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id WHERE u.id = ? AND u.tenant_id = ? AND fus.federation_optin = 1 AND u.status = 'active'");
+            $stmt->execute([$input['recipient_id'], $partnerTenantId]);
+        } else {
+            $stmt = $db->prepare("SELECT u.id, u.first_name, u.tenant_id, fus.transactions_enabled_federated FROM users u JOIN federation_user_settings fus ON fus.user_id = u.id JOIN federation_partnerships fp ON ((fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)) WHERE u.id = ? AND fus.federation_optin = 1 AND fp.status = 'active'");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $input['recipient_id']]);
+        }
+
+        $recipient = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if (!$recipient) return $this->fedError(404, 'Recipient not found or not accessible', 'RECIPIENT_NOT_FOUND');
+        if (!$recipient['transactions_enabled_federated']) return $this->fedError(403, 'Recipient does not accept federated transactions', 'TRANSACTIONS_DISABLED');
+
+        $stmt = $db->prepare("INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at) VALUES (?, ?, ?, ?, ?, 'pending', 1, ?, ?, NOW())");
+        $stmt->execute([$recipient['tenant_id'], $input['sender_id'], $input['recipient_id'], $amount, $input['description'], $partnerTenantId, $recipient['tenant_id']]);
+        $transactionId = $db->lastInsertId();
+
+        $status = 'pending';
+        if ($isExternal) {
+            $db->prepare("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?")->execute([$amount, $input['recipient_id'], $partnerTenantId]);
+            $db->prepare("UPDATE transactions SET status = 'completed' WHERE id = ?")->execute([$transactionId]);
+            $status = 'completed';
+        }
+
+        FederationAuditService::log('api_transaction_initiated', $partnerTenantId, $recipient['tenant_id'], null, ['transaction_id' => $transactionId, 'amount' => $amount, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
+
+        return $this->fedSuccess(['transaction_id' => (int) $transactionId, 'status' => $status, 'amount' => $amount, 'note' => $status === 'completed' ? 'Transaction completed successfully' : 'Transaction requires recipient confirmation'], 201);
     }
 
+    /** POST /api/v1/federation/oauth/token */
     public function oauthToken(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'oauthToken');
+        CorsHelper::handlePreflight([], ['POST', 'OPTIONS'], ['Content-Type', 'Authorization']);
+        CorsHelper::setHeaders([], ['POST', 'OPTIONS'], ['Content-Type', 'Authorization']);
+
+        $result = FederationJwtService::handleTokenRequest();
+
+        if (isset($result['error'])) {
+            return response()->json($result, 400);
+        }
+
+        return response()->json($result, 200)->withHeaders([
+            'Cache-Control' => 'no-store',
+            'Pragma' => 'no-cache',
+        ]);
     }
 
+    /** POST /api/v1/federation/test-webhook */
     public function testWebhook(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\FederationApiController::class, 'testWebhook');
+        $platformId = $_SERVER['HTTP_X_FEDERATION_PLATFORM_ID'] ?? '';
+        $timestamp = $_SERVER['HTTP_X_FEDERATION_TIMESTAMP'] ?? '';
+        $signature = $_SERVER['HTTP_X_FEDERATION_SIGNATURE'] ?? '';
+
+        if (empty($platformId) || empty($timestamp) || empty($signature)) {
+            return $this->fedError(400, 'Missing required headers', 'MISSING_HEADERS');
+        }
+
+        $requestTime = strtotime($timestamp);
+        if ($requestTime === false) {
+            $requestTime = is_numeric($timestamp) ? (int) $timestamp : null;
+            if ($requestTime === null) return $this->fedError(400, 'Invalid timestamp format', 'INVALID_TIMESTAMP');
+        }
+
+        $timeDiff = abs(time() - $requestTime);
+        if ($timeDiff > 300) return $this->fedError(401, 'Timestamp expired (max 5 minutes)', 'TIMESTAMP_EXPIRED');
+
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT id, name, signing_secret, platform_id FROM federation_api_keys WHERE platform_id = ? AND status = 'active'");
+        $stmt->execute([$platformId]);
+        $partner = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$partner) return $this->fedError(404, 'Platform not found', 'PLATFORM_NOT_FOUND');
+        if (empty($partner['signing_secret'])) return $this->fedError(400, 'HMAC signing not configured for this platform', 'SIGNING_NOT_CONFIGURED');
+
+        $method = $_SERVER['REQUEST_METHOD'];
+        $path = $_SERVER['REQUEST_URI'];
+        $body = file_get_contents('php://input') ?: '';
+        $stringToSign = implode("\n", [$method, $path, $timestamp, $body]);
+        $expectedSignature = hash_hmac('sha256', $stringToSign, $partner['signing_secret']);
+        $signatureValid = hash_equals($expectedSignature, $signature);
+
+        if (!$signatureValid) {
+            return $this->fedSuccess([
+                'valid' => false, 'message' => 'Signature verification failed',
+                'debug' => ['platform_id' => $platformId, 'timestamp_age_seconds' => $timeDiff, 'method' => $method, 'path' => $path, 'body_length' => strlen($body),
+                    'expected_signature_preview' => substr($expectedSignature, 0, 16) . '...', 'received_signature_preview' => substr($signature, 0, 16) . '...',
+                    'hint' => 'Ensure you are signing: METHOD\\nPATH\\nTIMESTAMP\\nBODY'],
+            ]);
+        }
+
+        return $this->fedSuccess([
+            'valid' => true, 'message' => 'Signature verified successfully',
+            'platform' => ['id' => $partner['platform_id'], 'name' => $partner['name']],
+            'timestamp_age_seconds' => $timeDiff,
+        ]);
     }
 
     // =====================================================================
@@ -335,11 +724,64 @@ class FederationController extends BaseApiController
 
     private function mapActivityType(string $rawType): string
     {
-        $map = [
-            'message' => 'message_received',
-            'transaction' => 'transaction_received',
-            'new_partner' => 'partnership_approved',
-        ];
-        return $map[$rawType] ?? 'member_joined';
+        return ['message' => 'message_received', 'transaction' => 'transaction_received', 'new_partner' => 'partnership_approved'][$rawType] ?? 'member_joined';
+    }
+
+    /**
+     * Authenticate federation API request. Returns partner array on success, JsonResponse on failure.
+     * @return array|JsonResponse
+     */
+    private function fedAuth(string $permission): array|JsonResponse
+    {
+        // Use output buffering to capture FederationApiMiddleware's exit-based auth
+        ob_start();
+        $previousCode = http_response_code();
+        $authenticated = false;
+
+        try {
+            $authenticated = FederationApiMiddleware::authenticate();
+        } catch (\Throwable $e) {
+            ob_end_clean();
+            return $this->fedError(500, 'Authentication error', 'AUTH_ERROR');
+        }
+
+        $output = ob_get_clean();
+        $currentCode = http_response_code();
+
+        if (!$authenticated) {
+            // Middleware already set status code and output
+            $decoded = json_decode($output, true);
+            http_response_code($previousCode); // Reset for Laravel
+            return response()->json($decoded ?: ['error' => true, 'message' => 'Authentication failed'], $currentCode ?: 401);
+        }
+
+        // Check permission
+        if (!FederationApiMiddleware::hasPermission($permission)) {
+            return $this->fedError(403, "Permission denied for: {$permission}", 'PERMISSION_DENIED');
+        }
+
+        return FederationApiMiddleware::getPartner();
+    }
+
+    /** Federation API error response */
+    private function fedError(int $status, string $message, string $code): JsonResponse
+    {
+        return response()->json(['error' => true, 'code' => $code, 'message' => $message, 'timestamp' => date('c')], $status);
+    }
+
+    /** Federation API success response */
+    private function fedSuccess(array $data, int $status = 200): JsonResponse
+    {
+        return response()->json(array_merge(['success' => true, 'timestamp' => date('c')], $data), $status);
+    }
+
+    /** Federation API paginated response */
+    private function fedPaginated(array $items, int $total, int $page, int $perPage): JsonResponse
+    {
+        $totalPages = (int) ceil($total / $perPage);
+        return $this->fedSuccess([
+            'data' => $items,
+            'pagination' => ['total' => $total, 'page' => $page, 'per_page' => $perPage, 'total_pages' => $totalPages, 'has_more' => $page < $totalPages],
+        ]);
     }
 }

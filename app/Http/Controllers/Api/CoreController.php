@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Nexus\Core\Mailer;
 use Nexus\Core\TenantContext;
 use Nexus\Services\BrokerMessageVisibilityService;
 
@@ -22,30 +23,108 @@ class CoreController extends BaseApiController
     protected bool $isV2Api = true;
 
     // ──────────────────────────────────────────────
-    // Messaging endpoints — keep as delegation because
-    // sendMessage uses Pusher real-time + email sending
+    // Messaging endpoints
     // ──────────────────────────────────────────────
 
-    /** POST /api/messages/send — uses Pusher + email, keep delegation */
+    /** POST /api/messages/send */
     public function sendMessage(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('send_message', 30, 60);
 
-        return $this->delegate(
-            \Nexus\Controllers\Api\CoreApiController::class,
-            'sendMessage'
-        );
+        $receiverId = $this->inputInt('receiver_id', 0, 1);
+        $body = trim($this->input('body', ''));
+
+        if (!$receiverId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Missing receiver_id', 'receiver_id', 400);
+        }
+        if (empty($body)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Message body is required', 'body', 400);
+        }
+        if ($receiverId === $userId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Cannot send message to yourself', 'receiver_id', 400);
+        }
+
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser($userId)) {
+            return $this->respondWithError('SENDER_RESTRICTED', 'Your messaging privileges have been restricted. Please contact support.', null, 403);
+        }
+        if (BrokerMessageVisibilityService::isMessagingDisabledForUser($receiverId)) {
+            return $this->respondWithError('RECIPIENT_UNAVAILABLE', 'This user is not currently accepting messages.', null, 403);
+        }
+
+        $tenantId = $this->getTenantId();
+
+        try {
+            DB::insert(
+                "INSERT INTO messages (tenant_id, sender_id, receiver_id, body, created_at) VALUES (?, ?, ?, ?, NOW())",
+                [$tenantId, $userId, $receiverId, $body]
+            );
+            $messageId = (int) DB::getPdo()->lastInsertId();
+
+            $message = (array) DB::selectOne(
+                "SELECT id, sender_id, receiver_id, body, created_at FROM messages WHERE id = ?",
+                [$messageId]
+            );
+
+            // Pusher broadcast (non-blocking)
+            if (class_exists('Nexus\Services\RealtimeService')) {
+                try {
+                    \Nexus\Services\RealtimeService::broadcastMessage($userId, $receiverId, $message);
+                } catch (\Exception $e) {
+                    error_log("Pusher notification failed: " . $e->getMessage());
+                }
+            }
+
+            // In-app notification + email (non-blocking)
+            try {
+                $sender = DB::selectOne("SELECT name FROM users WHERE id = ?", [$userId]);
+                $senderName = $sender->name ?? 'Someone';
+
+                if ($sender && class_exists('Nexus\Models\Notification')) {
+                    \Nexus\Models\Notification::create(
+                        $receiverId,
+                        "New message from " . $senderName,
+                        "/messages/" . $userId,
+                        'message'
+                    );
+                }
+
+                $preview = mb_strlen($body) > 50 ? mb_substr($body, 0, 47) . '...' : $body;
+                \Nexus\Models\Message::sendEmailNotification($receiverId, $senderName, $preview, $userId);
+            } catch (\Exception $e) {
+                error_log("Message notification failed: " . $e->getMessage());
+            }
+
+            return $this->respondWithData($message, null, 201);
+        } catch (\Exception $e) {
+            error_log("Send message error: " . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', 'Failed to send message', null, 500);
+        }
     }
 
-    /** POST /api/messages/typing — uses Pusher, keep delegation */
+    /** POST /api/messages/typing */
     public function typing(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('typing', 60, 60);
 
-        return $this->delegate(
-            \Nexus\Controllers\Api\CoreApiController::class,
-            'typing'
-        );
+        $receiverId = $this->inputInt('receiver_id', 0, 1);
+
+        if (!$receiverId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Missing receiver_id', 'receiver_id', 400);
+        }
+
+        if (class_exists('Nexus\Services\RealtimeService')) {
+            try {
+                \Nexus\Services\RealtimeService::broadcastTyping($userId, $receiverId, true);
+                return $this->respondWithData(['note' => 'Typing broadcast']);
+            } catch (\Exception $e) {
+                error_log("Pusher typing notification failed: " . $e->getMessage());
+                return $this->respondWithData(['note' => 'Realtime disabled']);
+            }
+        }
+
+        return $this->respondWithData(['note' => 'Realtime not configured']);
     }
 
     /** GET /api/messages/poll */
@@ -104,13 +183,59 @@ class CoreController extends BaseApiController
     }
 
     // ──────────────────────────────────────────────
-    // Contact form — uses email sending, keep delegation
+    // Contact form
     // ──────────────────────────────────────────────
 
     /** POST /api/contact */
     public function apiSubmit(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\ContactController::class, 'apiSubmit');
+        $this->rateLimit('contact_form', 5, 60);
+
+        $name = trim($this->input('name', ''));
+        $email = trim($this->input('email', ''));
+        $subject = trim($this->input('subject', 'General Inquiry'));
+        $message = trim($this->input('message', ''));
+
+        $errors = [];
+        if (empty($name)) $errors[] = 'Name is required.';
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'A valid email address is required.';
+        if (empty($message)) $errors[] = 'Message is required.';
+
+        if (!empty($errors)) {
+            return response()->json(['success' => false, 'error' => implode(' ', $errors)], 400);
+        }
+
+        $tenant = TenantContext::get();
+        $tenantName = $tenant['name'] ?? 'Project NEXUS';
+        $tenantEmail = $tenant['contact_email'] ?? '';
+
+        if (empty($tenantEmail)) {
+            return response()->json(['success' => false, 'error' => 'No contact email configured for this community.'], 500);
+        }
+
+        $emailSubject = "[{$tenantName}] Contact Form: {$subject}";
+        $emailBody = "Name: {$name}\nEmail: {$email}\nSubject: {$subject}\n\nMessage:\n{$message}";
+
+        $sent = false;
+        try {
+            $mailer = new Mailer();
+            $replyTo = "{$name} <{$email}>";
+            $sent = $mailer->send($tenantEmail, $emailSubject, $emailBody, null, $replyTo);
+        } catch (\Exception $e) {
+            error_log("Contact form email error: " . $e->getMessage());
+        }
+
+        // Log submission
+        try {
+            DB::insert(
+                "INSERT INTO contact_submissions (tenant_id, name, email, subject, message, email_sent, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+                [TenantContext::getId(), $name, $email, $subject, $message, $sent ? 1 : 0]
+            );
+        } catch (\Throwable $e) {
+            // Table may not exist — non-critical
+        }
+
+        return response()->json(['success' => true, 'message' => $sent ? 'Message sent successfully.' : "Message received. We'll get back to you soon."]);
     }
 
     // ──────────────────────────────────────────────
@@ -279,17 +404,4 @@ class CoreController extends BaseApiController
         ]);
     }
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     * Kept for methods that use Pusher real-time or email sending.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }

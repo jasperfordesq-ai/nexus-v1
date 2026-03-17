@@ -431,25 +431,120 @@ class AdminGroupsController extends BaseApiController
     /** GET /api/v2/admin/groups/types */
     public function getGroupTypes(): JsonResponse
     {
-        return $this->delegateLegacy('getGroupTypes');
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $types = Database::query(
+                "SELECT gt.*, t.name as tenant_name,
+                    (SELECT COUNT(*) FROM `groups` g WHERE g.type_id = gt.id AND g.tenant_id = ?) as member_count
+                 FROM group_types gt
+                 LEFT JOIN tenants t ON gt.tenant_id = t.id
+                 WHERE gt.tenant_id = ?
+                 ORDER BY gt.sort_order ASC, gt.name ASC",
+                [$tenantId, $tenantId]
+            )->fetchAll();
+
+            $formatted = array_map(function ($row) use ($tenantId) {
+                $policyCount = 0;
+                try {
+                    $policyCount = (int) Database::query("SELECT COUNT(*) as cnt FROM group_policies WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'];
+                } catch (\Throwable $e) {}
+
+                return [
+                    'id' => (int) $row['id'],
+                    'tenant_id' => (int) $row['tenant_id'],
+                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
+                    'name' => $row['name'],
+                    'description' => $row['description'] ?? '',
+                    'icon' => $row['icon'] ?? 'fa-layer-group',
+                    'color' => $row['color'] ?? '#6366f1',
+                    'member_count' => (int) $row['member_count'],
+                    'policy_count' => $policyCount,
+                    'created_at' => $row['created_at'],
+                ];
+            }, $types);
+
+            return $this->respondWithData($formatted);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('GROUP_TYPES_ERROR', 'Failed to load group types: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** POST /api/v2/admin/groups/types */
     public function createGroupType(): JsonResponse
     {
-        return $this->delegateLegacy('createGroupType');
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $name = trim($this->input('name', ''));
+
+        if (empty($name)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Name is required', 'name', 422);
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO group_types (tenant_id, name, slug, description, icon, color, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, NOW())",
+                [$tenantId, $name, \Nexus\Helpers\TextHelper::slugify($name), $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1')]
+            );
+            $id = Database::lastInsertId();
+            ActivityLog::log($adminId, 'admin_create_group_type', "Created group type: {$name}");
+            return $this->respondWithData(['id' => $id, 'name' => $name]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('GROUP_TYPE_CREATE_ERROR', 'Failed to create group type: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** PUT /api/v2/admin/groups/types/{id} */
     public function updateGroupType($id): JsonResponse
     {
-        return $this->delegateLegacy('updateGroupType', [(int) $id]);
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $id = (int) $id;
+
+        try {
+            $existing = Database::query("SELECT id, name, tenant_id FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            if (!$existing) {
+                return $this->respondWithError('NOT_FOUND', 'Group type not found', null, 404);
+            }
+
+            $name = trim($this->input('name', $existing['name']));
+            Database::query(
+                "UPDATE group_types SET name = ?, description = ?, icon = ?, color = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$name, $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1'), $id, $tenantId]
+            );
+            ActivityLog::log($adminId, 'admin_update_group_type', "Updated group type #{$id}: {$name}");
+            return $this->respondWithData(['id' => $id, 'name' => $name]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('GROUP_TYPE_UPDATE_ERROR', 'Failed to update group type: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** DELETE /api/v2/admin/groups/types/{id} */
     public function deleteGroupType($id): JsonResponse
     {
-        return $this->delegateLegacy('deleteGroupType', [(int) $id]);
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $id = (int) $id;
+
+        try {
+            $type = Database::query("SELECT id, name FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            if (!$type) {
+                return $this->respondWithError('NOT_FOUND', 'Group type not found', null, 404);
+            }
+
+            $count = (int) Database::query("SELECT COUNT(*) as cnt FROM `groups` WHERE type_id = ? AND tenant_id = ?", [$id, $tenantId])->fetch()['cnt'];
+            if ($count > 0) {
+                return $this->respondWithError('GROUP_TYPE_IN_USE', "Cannot delete group type: {$count} groups are using it", null, 422);
+            }
+
+            Database::query("DELETE FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            ActivityLog::log($adminId, 'admin_delete_group_type', "Deleted group type #{$id}: {$type['name']}");
+            return $this->respondWithData(['deleted' => true, 'id' => $id]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', 'Failed to delete group type: ' . $e->getMessage(), null, 500);
+        }
     }
 
     // =========================================================================
@@ -459,13 +554,52 @@ class AdminGroupsController extends BaseApiController
     /** GET /api/v2/admin/groups/types/{id}/policies */
     public function getPolicies($id): JsonResponse
     {
-        return $this->delegateLegacy('getPolicies', [(int) $id]);
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $policies = \Nexus\Services\GroupPolicyRepository::getAllPolicies($tenantId);
+            $formatted = [];
+            foreach ($policies as $category => $categoryPolicies) {
+                foreach ($categoryPolicies as $key => $policy) {
+                    $formatted[] = [
+                        'category' => $category,
+                        'key' => $key,
+                        'value' => $policy['value'],
+                        'type' => $policy['type'],
+                        'label' => ucwords(str_replace('_', ' ', $key)),
+                        'description' => $policy['description'],
+                    ];
+                }
+            }
+            return $this->respondWithData($formatted);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('POLICIES_ERROR', 'Failed to load policies: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** PUT /api/v2/admin/groups/types/{id}/policies */
     public function setPolicy($id): JsonResponse
     {
-        return $this->delegateLegacy('setPolicy', [(int) $id]);
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $key = $this->input('key');
+        $value = $this->input('value');
+
+        if (empty($key)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Policy key is required', 'key', 422);
+        }
+
+        try {
+            $category = $this->input('category', \Nexus\Services\GroupPolicyRepository::CATEGORY_FEATURES);
+            $type = $this->input('type', \Nexus\Services\GroupPolicyRepository::TYPE_STRING);
+            \Nexus\Services\GroupPolicyRepository::setPolicy($key, $value, $category, $type, $this->input('description'), $tenantId);
+            ActivityLog::log($adminId, 'admin_set_group_policy', "Set policy {$key} = " . json_encode($value));
+            return $this->respondWithData(['key' => $key, 'value' => $value]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('POLICY_SET_ERROR', 'Failed to set policy: ' . $e->getMessage(), null, 500);
+        }
     }
 
     // =========================================================================
@@ -610,13 +744,63 @@ class AdminGroupsController extends BaseApiController
     /** POST /api/v2/admin/groups/{id}/geocode */
     public function geocodeGroup($id): JsonResponse
     {
-        return $this->delegateLegacy('geocodeGroup', [(int) $id]);
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $id = (int) $id;
+
+        try {
+            $group = Database::query("SELECT id, name, location, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            if (!$group) {
+                return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            }
+            if (empty($group['location'])) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Group has no location to geocode', null, 422);
+            }
+
+            $coords = \Nexus\Services\GeocodingService::geocode($group['location']);
+            if (!$coords) {
+                return $this->respondWithError('GEOCODING_FAILED', 'Failed to geocode location', null, 500);
+            }
+
+            Database::query("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?", [$coords['latitude'], $coords['longitude'], $id, $tenantId]);
+            ActivityLog::log($adminId, 'admin_geocode_group', "Geocoded group #{$id}: {$group['name']}");
+            return $this->respondWithData(['latitude' => $coords['latitude'], 'longitude' => $coords['longitude']]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('GEOCODE_ERROR', 'Failed to geocode group: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** POST /api/v2/admin/groups/batch-geocode */
     public function batchGeocode(): JsonResponse
     {
-        return $this->delegateLegacy('batchGeocode');
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $groups = Database::query(
+                "SELECT id, location FROM `groups` WHERE tenant_id = ? AND location IS NOT NULL AND location != '' AND (latitude IS NULL OR longitude IS NULL) LIMIT 50",
+                [$tenantId]
+            )->fetchAll();
+
+            $success = 0;
+            $failed = 0;
+
+            foreach ($groups as $group) {
+                $coords = \Nexus\Services\GeocodingService::geocode($group['location']);
+                if ($coords) {
+                    Database::query("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ?", [$coords['latitude'], $coords['longitude'], $group['id']]);
+                    $success++;
+                } else {
+                    $failed++;
+                }
+                usleep(100000);
+            }
+
+            ActivityLog::log($adminId, 'admin_batch_geocode_groups', "Batch geocoded {$success} groups, {$failed} failed");
+            return $this->respondWithData(['processed' => count($groups), 'success' => $success, 'failed' => $failed]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('BATCH_GEOCODE_ERROR', 'Failed to batch geocode: ' . $e->getMessage(), null, 500);
+        }
     }
 
     // =========================================================================
@@ -626,19 +810,85 @@ class AdminGroupsController extends BaseApiController
     /** GET /api/v2/admin/groups/recommendations */
     public function getRecommendationData(): JsonResponse
     {
-        return $this->delegateLegacy('getRecommendationData');
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $limit = min(100, max(1, $this->queryInt('limit', 20)));
+        $offset = $this->queryInt('offset', 0, 0);
+
+        try {
+            $recommendations = [];
+            $stats = ['total' => 0, 'avg_score' => 0, 'joined_count' => 0];
+
+            try {
+                $recommendations = Database::query(
+                    "SELECT gr.user_id, gr.group_id, gr.score, gr.created_at, g.tenant_id, t.name as tenant_name,
+                        CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
+                        g.name as group_name,
+                        (SELECT COUNT(*) FROM group_members gm WHERE gm.user_id = gr.user_id AND gm.group_id = gr.group_id) > 0 as joined
+                     FROM group_recommendations gr
+                     JOIN users u ON gr.user_id = u.id
+                     JOIN `groups` g ON gr.group_id = g.id
+                     LEFT JOIN tenants t ON g.tenant_id = t.id
+                     WHERE g.tenant_id = ?
+                     ORDER BY gr.created_at DESC LIMIT ? OFFSET ?",
+                    [$tenantId, $limit, $offset]
+                )->fetchAll();
+
+                $stats = Database::query(
+                    "SELECT COUNT(*) as total, AVG(score) as avg_score,
+                        SUM(CASE WHEN EXISTS(SELECT 1 FROM group_members gm WHERE gm.user_id = gr.user_id AND gm.group_id = gr.group_id) THEN 1 ELSE 0 END) as joined_count
+                     FROM group_recommendations gr JOIN `groups` g ON gr.group_id = g.id WHERE g.tenant_id = ?",
+                    [$tenantId]
+                )->fetch();
+            } catch (\Throwable $e) {
+                // Table doesn't exist
+            }
+
+            $formatted = array_map(fn($row) => [
+                'user_id' => (int) $row['user_id'], 'user_name' => trim($row['user_name']),
+                'group_id' => (int) $row['group_id'], 'group_name' => $row['group_name'],
+                'tenant_id' => (int) $row['tenant_id'], 'tenant_name' => $row['tenant_name'] ?? 'Unknown',
+                'score' => (float) $row['score'], 'joined' => (bool) $row['joined'], 'created_at' => $row['created_at'],
+            ], $recommendations);
+
+            $joinRate = $stats['total'] > 0 ? round(($stats['joined_count'] / $stats['total']) * 100, 1) : 0;
+
+            return $this->respondWithData([
+                'recommendations' => $formatted,
+                'stats' => ['total' => (int) $stats['total'], 'avg_score' => round((float) ($stats['avg_score'] ?? 0), 2), 'join_rate' => $joinRate],
+            ]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('RECOMMENDATIONS_ERROR', 'Failed to load recommendations: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** GET /api/v2/admin/groups/featured */
     public function getFeaturedGroups(): JsonResponse
     {
-        return $this->delegateLegacy('getFeaturedGroups');
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $groups = \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores('local_hubs', $tenantId);
+            return $this->respondWithData($groups);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('FEATURED_GROUPS_ERROR', 'Failed to load featured groups: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** POST /api/v2/admin/groups/featured/update */
     public function updateFeaturedGroups(): JsonResponse
     {
-        return $this->delegateLegacy('updateFeaturedGroups');
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $result = \Nexus\Services\SmartGroupRankingService::updateFeaturedLocalHubs($tenantId);
+            ActivityLog::log($adminId, 'admin_update_featured_groups', "Updated featured groups: {$result['featured']} groups featured, {$result['cleared']} cleared");
+            return $this->respondWithData($result);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('UPDATE_FEATURED_ERROR', 'Failed to update featured groups: ' . $e->getMessage(), null, 500);
+        }
     }
 
     /** PUT /api/v2/admin/groups/{id}/toggle-featured */
@@ -670,25 +920,31 @@ class AdminGroupsController extends BaseApiController
     /** GET /api/v2/admin/groups/{id}/analytics */
     public function apiData($id): JsonResponse
     {
-        $controller = new \Nexus\Controllers\GroupAnalyticsController();
-        ob_start();
-        $controller->apiData((int) $id);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+        $id = (int) $id;
 
-    // =========================================================================
-    // Private Helpers
-    // =========================================================================
+        try {
+            $group = Database::query("SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            if (!$group) {
+                return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+            }
 
-    private function delegateLegacy(string $method, array $params = []): JsonResponse
-    {
-        $controller = new \Nexus\Controllers\Api\AdminGroupsApiController();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+            $memberCount = (int) Database::query("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ?", [$id])->fetch()['cnt'];
+            $postsCount = 0;
+            try { $postsCount = (int) Database::query("SELECT COUNT(*) as cnt FROM group_posts WHERE group_id = ?", [$id])->fetch()['cnt']; } catch (\Throwable $e) {}
+            $eventsCount = 0;
+            try { $eventsCount = (int) Database::query("SELECT COUNT(*) as cnt FROM events WHERE group_id = ?", [$id])->fetch()['cnt']; } catch (\Throwable $e) {}
+
+            return $this->respondWithData([
+                'group_id' => $id,
+                'group_name' => $group['name'],
+                'member_count' => $memberCount,
+                'posts_count' => $postsCount,
+                'events_count' => $eventsCount,
+            ]);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('ANALYTICS_ERROR', 'Failed to load group analytics: ' . $e->getMessage(), null, 500);
+        }
     }
 }

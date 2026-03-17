@@ -10,12 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * AdminCrmController -- CRM contact management, notes, tasks, tags, timeline, exports.
  *
- * Converted from legacy delegation to direct DB/service calls.
- * CSV export methods remain as delegation (they write to php://output).
+ * Fully converted from legacy delegation to direct DB/service calls.
  */
 class AdminCrmController extends BaseApiController
 {
@@ -24,7 +24,7 @@ class AdminCrmController extends BaseApiController
     public function __construct() {}
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Contacts (already converted)
+    // Contacts
     // ─────────────────────────────────────────────────────────────────────────
 
     /** GET /api/v2/admin/crm/contacts */
@@ -190,103 +190,720 @@ class AdminCrmController extends BaseApiController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Notes, Tasks, Tags, Timeline — delegate to legacy (complex DB logic)
+    // Notes
     // ─────────────────────────────────────────────────────────────────────────
 
+    /** GET /api/v2/admin/crm/notes */
     public function listNotes(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'listNotes');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $userId = $this->queryInt('user_id');
+        $category = $this->query('category');
+        $search = $this->query('search');
+        $page = max(1, $this->queryInt('page', 1));
+        $limit = min(100, max(1, $this->queryInt('limit', 20)));
+        $offset = ($page - 1) * $limit;
+
+        $where = "mn.tenant_id = ?";
+        $params = [$tenantId];
+
+        if ($userId) {
+            $where .= " AND mn.user_id = ?";
+            $params[] = $userId;
+        }
+
+        $validCategories = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'];
+        if ($category && in_array($category, $validCategories, true)) {
+            $where .= " AND mn.category = ?";
+            $params[] = $category;
+        }
+
+        if ($search && mb_strlen($search) >= 2) {
+            $searchTerm = '%' . $search . '%';
+            $where .= " AND (mn.content LIKE ? OR u.name LIKE ?)";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        $total = (int) Database::query(
+            "SELECT COUNT(*) as cnt FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id WHERE {$where}",
+            $params
+        )->fetch()['cnt'];
+
+        $dataParams = array_merge($params, [$limit, $offset]);
+        $notes = Database::query(
+            "SELECT mn.*, u.name as user_name, u.avatar_url as user_avatar, a.name as author_name
+             FROM member_notes mn
+             LEFT JOIN users u ON u.id = mn.user_id
+             LEFT JOIN users a ON a.id = mn.author_id
+             WHERE {$where}
+             ORDER BY mn.is_pinned DESC, mn.created_at DESC
+             LIMIT ? OFFSET ?",
+            $dataParams
+        )->fetchAll();
+
+        return $this->respondWithPaginatedCollection($notes, $total, $page, $limit);
     }
 
+    /** POST /api/v2/admin/crm/notes */
     public function createNote(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'createNote');
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $userId = (int) $this->input('user_id', 0);
+        $content = trim($this->input('content', ''));
+        $category = $this->input('category', 'general');
+
+        if (!$userId || !$content) {
+            return $this->respondWithError('VALIDATION_ERROR', 'user_id and content are required', null, 400);
+        }
+
+        $user = Database::query("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
+        if (!$user) {
+            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+        }
+
+        $validCategories = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'];
+        if (!in_array($category, $validCategories, true)) {
+            $category = 'general';
+        }
+
+        Database::query(
+            "INSERT INTO member_notes (tenant_id, user_id, author_id, content, category, is_pinned) VALUES (?, ?, ?, ?, ?, ?)",
+            [$tenantId, $userId, $adminId, $content, $category, (int) $this->input('is_pinned', 0)]
+        );
+
+        $noteId = Database::lastInsertId();
+
+        $note = Database::query(
+            "SELECT mn.*, u.name as user_name, u.avatar_url as user_avatar, a.name as author_name
+             FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
+             WHERE mn.id = ? AND mn.tenant_id = ?",
+            [$noteId, $tenantId]
+        )->fetch();
+
+        return $this->respondWithData($note);
     }
 
+    /** PUT /api/v2/admin/crm/notes/{id} */
     public function updateNote($id): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'updateNote', [(int)$id]);
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        $note = Database::query("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        if (!$note) {
+            return $this->respondWithError('NOT_FOUND', 'Note not found', null, 404);
+        }
+
+        $updates = [];
+        $params = [];
+
+        $content = $this->input('content');
+        if ($content !== null) {
+            $updates[] = "content = ?";
+            $params[] = trim($content);
+        }
+
+        $category = $this->input('category');
+        $validCategories = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'];
+        if ($category !== null && in_array($category, $validCategories, true)) {
+            $updates[] = "category = ?";
+            $params[] = $category;
+        }
+
+        $isPinned = $this->input('is_pinned');
+        if ($isPinned !== null) {
+            $updates[] = "is_pinned = ?";
+            $params[] = (int) $isPinned;
+        }
+
+        if (empty($updates)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 400);
+        }
+
+        $params[] = $id;
+        $params[] = $tenantId;
+        Database::query("UPDATE member_notes SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+
+        $updated = Database::query(
+            "SELECT mn.*, u.name as user_name, u.avatar_url as user_avatar, a.name as author_name
+             FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
+             WHERE mn.id = ? AND mn.tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
+
+        return $this->respondWithData($updated);
     }
 
+    /** DELETE /api/v2/admin/crm/notes/{id} */
     public function deleteNote($id): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'deleteNote', [(int)$id]);
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        $note = Database::query("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        if (!$note) {
+            return $this->respondWithError('NOT_FOUND', 'Note not found', null, 404);
+        }
+
+        Database::query("DELETE FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        return $this->respondWithData(['deleted' => true]);
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Coordinator Tasks
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** GET /api/v2/admin/crm/tasks */
     public function listTasks(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'listTasks');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $status = $this->query('status');
+        $priority = $this->query('priority');
+        $assignedTo = $this->queryInt('assigned_to');
+        $search = $this->query('search');
+        $page = max(1, $this->queryInt('page', 1));
+        $limit = min(100, max(1, $this->queryInt('limit', 20)));
+        $offset = ($page - 1) * $limit;
+
+        $where = "ct.tenant_id = ?";
+        $params = [$tenantId];
+
+        $validStatuses = ['pending', 'in_progress', 'completed', 'cancelled'];
+        if ($status && in_array($status, $validStatuses, true)) {
+            $where .= " AND ct.status = ?";
+            $params[] = $status;
+        }
+
+        $validPriorities = ['low', 'medium', 'high', 'urgent'];
+        if ($priority && in_array($priority, $validPriorities, true)) {
+            $where .= " AND ct.priority = ?";
+            $params[] = $priority;
+        }
+
+        if ($assignedTo) {
+            $where .= " AND ct.assigned_to = ?";
+            $params[] = $assignedTo;
+        }
+
+        if ($search && mb_strlen($search) >= 2) {
+            $searchTerm = '%' . $search . '%';
+            $where .= " AND (ct.title LIKE ? OR ct.description LIKE ?)";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        $total = (int) Database::query("SELECT COUNT(*) as cnt FROM coordinator_tasks ct WHERE {$where}", $params)->fetch()['cnt'];
+
+        $dataParams = array_merge($params, [$limit, $offset]);
+        $tasks = Database::query(
+            "SELECT ct.*, assigned.name as assigned_to_name, creator.name as created_by_name,
+                    member.name as user_name, member.avatar_url as user_avatar
+             FROM coordinator_tasks ct
+             LEFT JOIN users assigned ON assigned.id = ct.assigned_to
+             LEFT JOIN users creator ON creator.id = ct.created_by
+             LEFT JOIN users member ON member.id = ct.user_id
+             WHERE {$where}
+             ORDER BY
+                CASE ct.status WHEN 'pending' THEN 0 WHEN 'in_progress' THEN 1 WHEN 'completed' THEN 2 WHEN 'cancelled' THEN 3 END,
+                CASE ct.priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END,
+                ct.due_date ASC, ct.created_at DESC
+             LIMIT ? OFFSET ?",
+            $dataParams
+        )->fetchAll();
+
+        return $this->respondWithPaginatedCollection($tasks, $total, $page, $limit);
     }
 
+    /** POST /api/v2/admin/crm/tasks */
     public function createTask(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'createTask');
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $title = trim($this->input('title', ''));
+        $assignedTo = (int) $this->input('assigned_to', $adminId);
+
+        if (!$title) {
+            return $this->respondWithError('VALIDATION_ERROR', 'title is required', null, 400);
+        }
+
+        $validPriorities = ['low', 'medium', 'high', 'urgent'];
+        $priority = in_array($this->input('priority', ''), $validPriorities, true) ? $this->input('priority') : 'medium';
+
+        $userId = $this->input('user_id') ? (int) $this->input('user_id') : null;
+        $dueDate = $this->input('due_date') ? trim($this->input('due_date')) : null;
+        $description = $this->input('description') ? trim($this->input('description')) : null;
+
+        if ($dueDate && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueDate)) {
+            $dueDate = null;
+        }
+
+        Database::query(
+            "INSERT INTO coordinator_tasks (tenant_id, assigned_to, user_id, title, description, priority, status, due_date, created_by)
+             VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?)",
+            [$tenantId, $assignedTo, $userId, $title, $description, $priority, $dueDate, $adminId]
+        );
+
+        $taskId = Database::lastInsertId();
+
+        $task = Database::query(
+            "SELECT ct.*, assigned.name as assigned_to_name, creator.name as created_by_name,
+                    member.name as user_name, member.avatar_url as user_avatar
+             FROM coordinator_tasks ct
+             LEFT JOIN users assigned ON assigned.id = ct.assigned_to
+             LEFT JOIN users creator ON creator.id = ct.created_by
+             LEFT JOIN users member ON member.id = ct.user_id
+             WHERE ct.id = ? AND ct.tenant_id = ?",
+            [$taskId, $tenantId]
+        )->fetch();
+
+        return $this->respondWithData($task);
     }
 
+    /** PUT /api/v2/admin/crm/tasks/{id} */
     public function updateTask($id): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'updateTask', [(int)$id]);
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        $task = Database::query("SELECT id, status FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        if (!$task) {
+            return $this->respondWithError('NOT_FOUND', 'Task not found', null, 404);
+        }
+
+        $updates = [];
+        $params = [];
+
+        $title = $this->input('title');
+        if ($title !== null) { $updates[] = "title = ?"; $params[] = trim($title); }
+
+        $description = $this->input('description');
+        if ($description !== null) { $updates[] = "description = ?"; $params[] = trim($description); }
+
+        $priority = $this->input('priority');
+        $validPriorities = ['low', 'medium', 'high', 'urgent'];
+        if ($priority !== null && in_array($priority, $validPriorities, true)) {
+            $updates[] = "priority = ?"; $params[] = $priority;
+        }
+
+        $status = $this->input('status');
+        $validStatuses = ['pending', 'in_progress', 'completed', 'cancelled'];
+        if ($status !== null && in_array($status, $validStatuses, true)) {
+            $updates[] = "status = ?"; $params[] = $status;
+            if ($status === 'completed') { $updates[] = "completed_at = NOW()"; }
+        }
+
+        $assignedTo = $this->input('assigned_to');
+        if ($assignedTo !== null) { $updates[] = "assigned_to = ?"; $params[] = (int) $assignedTo; }
+
+        $dueDate = $this->input('due_date');
+        if ($dueDate !== null) {
+            if ($dueDate === '' || $dueDate === null) {
+                $updates[] = "due_date = NULL";
+            } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueDate)) {
+                $updates[] = "due_date = ?"; $params[] = $dueDate;
+            }
+        }
+
+        $userIdInput = $this->input('user_id');
+        if ($userIdInput !== null) {
+            $updates[] = "user_id = ?"; $params[] = $userIdInput ? (int) $userIdInput : null;
+        }
+
+        if (empty($updates)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No fields to update', null, 400);
+        }
+
+        $params[] = $id;
+        $params[] = $tenantId;
+        Database::query("UPDATE coordinator_tasks SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+
+        $updated = Database::query(
+            "SELECT ct.*, assigned.name as assigned_to_name, creator.name as created_by_name,
+                    member.name as user_name, member.avatar_url as user_avatar
+             FROM coordinator_tasks ct
+             LEFT JOIN users assigned ON assigned.id = ct.assigned_to
+             LEFT JOIN users creator ON creator.id = ct.created_by
+             LEFT JOIN users member ON member.id = ct.user_id
+             WHERE ct.id = ? AND ct.tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
+
+        return $this->respondWithData($updated);
     }
 
+    /** DELETE /api/v2/admin/crm/tasks/{id} */
     public function deleteTask($id): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'deleteTask', [(int)$id]);
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        $task = Database::query("SELECT id FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        if (!$task) {
+            return $this->respondWithError('NOT_FOUND', 'Task not found', null, 404);
+        }
+
+        Database::query("DELETE FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        return $this->respondWithData(['deleted' => true]);
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Member Tags
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** GET /api/v2/admin/crm/tags */
     public function listTags(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'listTags');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $userId = $this->queryInt('user_id');
+        $tagFilter = $this->query('tag');
+
+        if ($userId) {
+            $tags = Database::query(
+                "SELECT mt.*, u.name as user_name FROM member_tags mt LEFT JOIN users u ON u.id = mt.user_id
+                 WHERE mt.tenant_id = ? AND mt.user_id = ? ORDER BY mt.tag ASC",
+                [$tenantId, $userId]
+            )->fetchAll();
+        } elseif ($tagFilter) {
+            $tags = Database::query(
+                "SELECT mt.*, u.name as user_name, u.avatar_url as user_avatar FROM member_tags mt LEFT JOIN users u ON u.id = mt.user_id
+                 WHERE mt.tenant_id = ? AND mt.tag = ? ORDER BY mt.created_at DESC",
+                [$tenantId, $tagFilter]
+            )->fetchAll();
+        } else {
+            $tags = Database::query(
+                "SELECT tag, COUNT(*) as member_count FROM member_tags WHERE tenant_id = ? GROUP BY tag ORDER BY member_count DESC",
+                [$tenantId]
+            )->fetchAll();
+        }
+
+        return $this->respondWithCollection($tags);
     }
 
+    /** POST /api/v2/admin/crm/tags */
     public function addTag(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'addTag');
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $userId = (int) $this->input('user_id', 0);
+        $tag = trim($this->input('tag', ''));
+
+        if (!$userId || !$tag) {
+            return $this->respondWithError('VALIDATION_ERROR', 'user_id and tag are required', null, 400);
+        }
+
+        if (mb_strlen($tag) > 50) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Tag must be 50 characters or less', null, 400);
+        }
+
+        $user = Database::query("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
+        if (!$user) {
+            return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
+        }
+
+        try {
+            Database::query(
+                "INSERT INTO member_tags (tenant_id, user_id, tag, created_by) VALUES (?, ?, ?, ?)",
+                [$tenantId, $userId, $tag, $adminId]
+            );
+        } catch (\Throwable $e) {
+            if (strpos($e->getMessage(), 'Duplicate') !== false) {
+                return $this->respondWithError('RESOURCE_ALREADY_EXISTS', 'Tag already assigned', null, 409);
+            }
+            throw $e;
+        }
+
+        $tagId = Database::lastInsertId();
+
+        return $this->respondWithData([
+            'id' => $tagId, 'tenant_id' => $tenantId,
+            'user_id' => $userId, 'tag' => $tag, 'created_by' => $adminId,
+        ]);
     }
 
+    /** DELETE /api/v2/admin/crm/tags/bulk */
     public function bulkRemoveTag(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'bulkRemoveTag');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $tag = trim($this->query('tag', ''));
+        if (!$tag) {
+            return $this->respondWithError('VALIDATION_ERROR', 'tag parameter is required', null, 400);
+        }
+
+        $count = (int) Database::query("SELECT COUNT(*) as cnt FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag])->fetch()['cnt'];
+        if ($count === 0) {
+            return $this->respondWithError('NOT_FOUND', 'Tag not found', null, 404);
+        }
+
+        Database::query("DELETE FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag]);
+
+        return $this->respondWithData(['deleted' => $count]);
     }
 
+    /** DELETE /api/v2/admin/crm/tags/{id} */
     public function removeTag($id): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'removeTag', [(int)$id]);
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $id = (int) $id;
+
+        $tag = Database::query("SELECT id FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        if (!$tag) {
+            return $this->respondWithError('NOT_FOUND', 'Tag not found', null, 404);
+        }
+
+        Database::query("DELETE FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        return $this->respondWithData(['deleted' => true]);
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Activity Timeline
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** GET /api/v2/admin/crm/timeline */
     public function timeline(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'timeline');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $userId = $this->queryInt('user_id');
+        $type = $this->query('type');
+        $days = $this->queryInt('days', 30);
+        $page = max(1, $this->queryInt('page', 1));
+        $limit = min(100, max(1, $this->queryInt('limit', 25)));
+        $offset = ($page - 1) * $limit;
+
+        $unions = [];
+        $params = [];
+        $countParams = [];
+
+        // 1. Logins
+        if (!$type || $type === 'login') {
+            $sql = "SELECT 'login' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                     'Logged in' as description, NULL as metadata, u.last_login_at as created_at
+                     FROM users u WHERE u.tenant_id = ? AND u.last_login_at IS NOT NULL";
+            $p = [$tenantId]; $cp = [$tenantId];
+            if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
+            if ($days > 0) { $sql .= " AND u.last_login_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+            $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+        }
+
+        // 2. Signups
+        if (!$type || $type === 'signup') {
+            $sql = "SELECT 'signup' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                     'Registered an account' as description, NULL as metadata, u.created_at as created_at
+                     FROM users u WHERE u.tenant_id = ?";
+            $p = [$tenantId]; $cp = [$tenantId];
+            if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
+            if ($days > 0) { $sql .= " AND u.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+            $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+        }
+
+        // 3. Listings created
+        if (!$type || $type === 'listing_created') {
+            try {
+                Database::query("SELECT 1 FROM listings LIMIT 1");
+                $sql = "SELECT 'listing_created' as activity_type, l.user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         CONCAT('Created listing: ', l.title) as description, NULL as metadata, l.created_at
+                         FROM listings l LEFT JOIN users u ON u.id = l.user_id WHERE l.tenant_id = ?";
+                $p = [$tenantId]; $cp = [$tenantId];
+                if ($userId) { $sql .= " AND l.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
+                if ($days > 0) { $sql .= " AND l.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            } catch (\Throwable $e) {}
+        }
+
+        // 4. Exchanges completed
+        if (!$type || $type === 'exchange_completed') {
+            try {
+                Database::query("SELECT 1 FROM transactions LIMIT 1");
+                $sql = "SELECT 'exchange_completed' as activity_type, t.sender_id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         CONCAT('Completed exchange with ', r.name) as description, NULL as metadata, t.created_at
+                         FROM transactions t LEFT JOIN users u ON u.id = t.sender_id LEFT JOIN users r ON r.id = t.receiver_id
+                         WHERE t.tenant_id = ? AND t.status = 'completed'";
+                $p = [$tenantId]; $cp = [$tenantId];
+                if ($userId) { $sql .= " AND t.sender_id = ?"; $p[] = $userId; $cp[] = $userId; }
+                if ($days > 0) { $sql .= " AND t.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            } catch (\Throwable $e) {}
+        }
+
+        // 5. Notes added
+        if (!$type || $type === 'note_added') {
+            try {
+                Database::query("SELECT 1 FROM member_notes LIMIT 1");
+                $sql = "SELECT 'note_added' as activity_type, mn.user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         CONCAT('Note added by ', a.name, ': ', LEFT(mn.content, 80)) as description, NULL as metadata, mn.created_at
+                         FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
+                         WHERE mn.tenant_id = ?";
+                $p = [$tenantId]; $cp = [$tenantId];
+                if ($userId) { $sql .= " AND mn.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
+                if ($days > 0) { $sql .= " AND mn.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            } catch (\Throwable $e) {}
+        }
+
+        // 6. Tasks created
+        if (!$type || $type === 'task_created') {
+            try {
+                Database::query("SELECT 1 FROM coordinator_tasks LIMIT 1");
+                $sql = "SELECT 'task_created' as activity_type, ct.created_by as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         CONCAT('Created task: ', ct.title) as description, NULL as metadata, ct.created_at
+                         FROM coordinator_tasks ct LEFT JOIN users u ON u.id = ct.created_by WHERE ct.tenant_id = ?";
+                $p = [$tenantId]; $cp = [$tenantId];
+                if ($userId) { $sql .= " AND ct.created_by = ?"; $p[] = $userId; $cp[] = $userId; }
+                if ($days > 0) { $sql .= " AND ct.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            } catch (\Throwable $e) {}
+        }
+
+        // 7. Group joins
+        if (!$type || $type === 'group_joined') {
+            try {
+                Database::query("SELECT 1 FROM group_members LIMIT 1");
+                $sql = "SELECT 'group_joined' as activity_type, gm.user_id, u.name as user_name, u.avatar_url as user_avatar,
+                         CONCAT('Joined group: ', g.name) as description, NULL as metadata, gm.created_at
+                         FROM group_members gm LEFT JOIN users u ON u.id = gm.user_id
+                         INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ? WHERE 1=1";
+                $p = [$tenantId]; $cp = [$tenantId];
+                if ($userId) { $sql .= " AND gm.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
+                if ($days > 0) { $sql .= " AND gm.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+            } catch (\Throwable $e) {}
+        }
+
+        // 8. Profile updates
+        if (!$type || $type === 'profile_updated') {
+            $sql = "SELECT 'profile_updated' as activity_type, u.id as user_id, u.name as user_name, u.avatar_url as user_avatar,
+                     'Updated their profile' as description, NULL as metadata, u.updated_at as created_at
+                     FROM users u WHERE u.tenant_id = ? AND u.updated_at > u.created_at";
+            $p = [$tenantId]; $cp = [$tenantId];
+            if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
+            if ($days > 0) { $sql .= " AND u.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+            $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
+        }
+
+        if (empty($unions)) {
+            return $this->respondWithPaginatedCollection([], 0, $page, $limit);
+        }
+
+        $unionSql = implode(" UNION ALL ", $unions);
+
+        $total = (int) Database::query("SELECT COUNT(*) as cnt FROM ({$unionSql}) AS timeline", $countParams)->fetch()['cnt'];
+
+        $dataParams = array_merge($params, [$limit, $offset]);
+        $entries = Database::query("SELECT * FROM ({$unionSql}) AS timeline ORDER BY created_at DESC LIMIT ? OFFSET ?", $dataParams)->fetchAll();
+
+        foreach ($entries as $i => &$entry) {
+            $entry['id'] = ($page - 1) * $limit + $i + 1;
+        }
+
+        return $this->respondWithPaginatedCollection($entries, $total, $page, $limit);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // CSV Exports — delegation (write to php://output + exit)
+    // CSV Exports
     // ─────────────────────────────────────────────────────────────────────────
 
-    public function exportNotes(): JsonResponse
+    /** GET /api/v2/admin/crm/export/notes */
+    public function exportNotes(): StreamedResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'exportNotes');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $notes = Database::query(
+            "SELECT mn.id, mn.user_id, u.name as user_name, mn.content, mn.category,
+                    mn.is_pinned, a.name as author_name, mn.created_at, mn.updated_at
+             FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
+             WHERE mn.tenant_id = ? ORDER BY mn.created_at DESC",
+            [$tenantId]
+        )->fetchAll();
+
+        return $this->streamCsv('crm-notes', ['ID', 'User ID', 'User Name', 'Content', 'Category', 'Pinned', 'Author', 'Created', 'Updated'], $notes);
     }
 
-    public function exportTasks(): JsonResponse
+    /** GET /api/v2/admin/crm/export/tasks */
+    public function exportTasks(): StreamedResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'exportTasks');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $tasks = Database::query(
+            "SELECT ct.id, ct.title, ct.description, ct.priority, ct.status,
+                    assigned.name as assigned_to_name, member.name as related_member,
+                    ct.due_date, ct.completed_at, creator.name as created_by_name, ct.created_at
+             FROM coordinator_tasks ct
+             LEFT JOIN users assigned ON assigned.id = ct.assigned_to
+             LEFT JOIN users creator ON creator.id = ct.created_by
+             LEFT JOIN users member ON member.id = ct.user_id
+             WHERE ct.tenant_id = ? ORDER BY ct.created_at DESC",
+            [$tenantId]
+        )->fetchAll();
+
+        return $this->streamCsv('crm-tasks', ['ID', 'Title', 'Description', 'Priority', 'Status', 'Assigned To', 'Related Member', 'Due Date', 'Completed At', 'Created By', 'Created'], $tasks);
     }
 
-    public function exportDashboard(): JsonResponse
+    /** GET /api/v2/admin/crm/export/dashboard */
+    public function exportDashboard(): StreamedResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminCrmApiController::class, 'exportDashboard');
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $totalMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'];
+        $activeMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->fetch()['cnt'];
+        $newThisMonth = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->fetch()['cnt'];
+        $pendingApprovals = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->fetch()['cnt'];
+        $approvedMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->fetch()['cnt'];
+        $retentionRate = $approvedMembers > 0 ? round(($activeMembers / $approvedMembers) * 100, 1) : 0;
+
+        $rows = [
+            ['metric' => 'Total Members', 'value' => $totalMembers],
+            ['metric' => 'Active Members', 'value' => $activeMembers],
+            ['metric' => 'New This Month', 'value' => $newThisMonth],
+            ['metric' => 'Pending Approvals', 'value' => $pendingApprovals],
+            ['metric' => 'Retention Rate', 'value' => $retentionRate . '%'],
+        ];
+
+        return $this->streamCsv('crm-dashboard', ['Metric', 'Value'], $rows);
     }
 
-    /**
-     * Delegate to legacy controller.
-     */
-    private function delegateLegacy(string $legacyClass, string $method, array $params = []): JsonResponse
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function streamCsv(string $filename, array $headers, array $rows): StreamedResponse
     {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $date = date('Y-m-d');
+        return new StreamedResponse(function () use ($headers, $rows) {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, $headers);
+            foreach ($rows as $row) {
+                fputcsv($output, array_values($row));
+            }
+            fclose($output);
+        }, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}-{$date}.csv\"",
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ]);
     }
 }

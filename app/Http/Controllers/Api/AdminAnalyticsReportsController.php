@@ -213,10 +213,60 @@ class AdminAnalyticsReportsController extends BaseApiController
     // A5: CSV EXPORT
     // ============================================
 
-    /** GET /api/v2/admin/analytics/export/{type} -- Keep as delegation (CSV download via php://output) */
-    public function exportReport(string $type): JsonResponse
+    /** GET /api/v2/admin/analytics/export/{type} */
+    public function exportReport(string $type)
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminAnalyticsReportsApiController::class, 'exportReport', [$type]);
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $format = $this->query('format', 'csv');
+
+        if (!in_array($format, ['csv', 'pdf'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Supported formats: csv, pdf', 'format', 400);
+        }
+
+        $supportedTypes = ReportExportService::getSupportedTypes();
+        if (!isset($supportedTypes[$type])) {
+            $validTypes = implode(', ', array_keys($supportedTypes));
+            return $this->respondWithError('VALIDATION_ERROR', "Unknown report type: {$type}. Valid types: {$validTypes}", 'type', 400);
+        }
+
+        $filters = [
+            'date_from' => $this->query('date_from'),
+            'date_to' => $this->query('date_to'),
+            'status' => $this->query('status'),
+            'days' => $this->queryInt('days', 90),
+        ];
+
+        if ($format === 'pdf') {
+            $result = ReportExportService::exportPdf($type, $tenantId, $filters);
+            if (!$result['success']) {
+                return $this->respondWithError('NO_DATA', $result['message'] ?? 'No data found for export', null, 404);
+            }
+            return response($result['pdf'], 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $result['filename'] . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+                'Content-Length' => strlen($result['pdf']),
+            ]);
+        }
+
+        $result = ReportExportService::export($type, $tenantId, $filters);
+
+        if (!$result['success']) {
+            return $this->respondWithError('NO_DATA', $result['message'] ?? 'No data found for export', null, 404);
+        }
+
+        return response($result['csv'], 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $result['filename'] . '"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+            'Content-Length' => strlen($result['csv']),
+        ]);
     }
 
     /** GET /api/v2/admin/analytics/export-types */
@@ -342,16 +392,4 @@ class AdminAnalyticsReportsController extends BaseApiController
         return $range;
     }
 
-    /**
-     * Delegate to legacy controller for CSV/PDF export methods that write directly to php://output.
-     */
-    private function delegateLegacy(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }
