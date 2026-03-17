@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FCMPushService;
 use App\Services\PushNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,7 @@ class PushController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly FCMPushService $fcmPushService,
         private readonly PushNotificationService $pushService,
     ) {}
 
@@ -211,9 +213,9 @@ class PushController extends BaseApiController
         }
 
         try {
-            \Nexus\Services\FCMPushService::ensureTableExists();
+            $this->fcmPushService->ensureTableExists();
 
-            $result = \Nexus\Services\FCMPushService::registerDevice(
+            $result = $this->fcmPushService->registerDevice(
                 $userId,
                 $token,
                 $platform
@@ -250,7 +252,7 @@ class PushController extends BaseApiController
         }
 
         try {
-            $result = \Nexus\Services\FCMPushService::unregisterDevice($token);
+            $result = $this->fcmPushService->unregisterDevice($token);
 
             return $this->respondWithData([
                 'unregistered' => $result,

@@ -79,12 +79,12 @@ class LegalController extends BaseApiController
     // ──────────────────────────────────────────────
 
     private const VALID_TYPES = [
-        \Nexus\Services\LegalDocumentService::TYPE_TERMS,
-        \Nexus\Services\LegalDocumentService::TYPE_PRIVACY,
-        \Nexus\Services\LegalDocumentService::TYPE_COOKIES,
-        \Nexus\Services\LegalDocumentService::TYPE_ACCESSIBILITY,
-        \Nexus\Services\LegalDocumentService::TYPE_COMMUNITY_GUIDELINES,
-        \Nexus\Services\LegalDocumentService::TYPE_ACCEPTABLE_USE,
+        LegalDocumentService::TYPE_TERMS,
+        LegalDocumentService::TYPE_PRIVACY,
+        LegalDocumentService::TYPE_COOKIES,
+        LegalDocumentService::TYPE_ACCESSIBILITY,
+        LegalDocumentService::TYPE_COMMUNITY_GUIDELINES,
+        LegalDocumentService::TYPE_ACCEPTABLE_USE,
     ];
 
     /** GET /api/v2/legal/{type} (legacy format) */
@@ -282,7 +282,7 @@ class LegalController extends BaseApiController
                 $userId,
                 $documentId,
                 $versionId,
-                \Nexus\Services\LegalDocumentService::ACCEPTANCE_SETTINGS
+                LegalDocumentService::ACCEPTANCE_SETTINGS
             );
 
             return $this->respondWithData([

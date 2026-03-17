@@ -58,7 +58,7 @@ class AdminEnterpriseController extends BaseApiController
         try { DB::select("SELECT 1"); } catch (\Exception $e) { $dbConnected = false; }
 
         $redisConnected = false;
-        try { $stats = \Nexus\Services\RedisCache::getStats(); $redisConnected = !empty($stats['enabled']); } catch (\Exception $e) {}
+        try { $stats = \App\Services\RedisCache::getStats(); $redisConnected = !empty($stats['enabled']); } catch (\Exception $e) {}
 
         $healthStatus = ($dbConnected && $redisConnected) ? 'healthy' : ($dbConnected ? 'degraded' : 'unhealthy');
 
@@ -365,7 +365,7 @@ class AdminEnterpriseController extends BaseApiController
         try { $rows = DB::select("SHOW GLOBAL STATUS LIKE 'Uptime'"); $row = $rows[0] ?? null; if ($row) { $s = (int)($row->Value ?? 0); $uptime = floor($s/86400) . 'd ' . floor(($s%86400)/3600) . 'h'; } } catch (\Exception $e) {}
 
         $redisConnected = false; $redisMemory = 'N/A';
-        try { $stats = \Nexus\Services\RedisCache::getStats(); $redisConnected = !empty($stats['enabled']); if ($redisConnected) { $redisMemory = $stats['memory_used'] ?? 'N/A'; } } catch (\Exception $e) {}
+        try { $stats = \App\Services\RedisCache::getStats(); $redisConnected = !empty($stats['enabled']); if ($redisConnected) { $redisMemory = $stats['memory_used'] ?? 'N/A'; } } catch (\Exception $e) {}
 
         return $this->respondWithData([
             'php_version' => PHP_VERSION, 'memory_usage' => $this->formatBytes($memUsage),
@@ -380,7 +380,7 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         $dbOk = false; try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) {}
-        $redisOk = false; try { $stats = \Nexus\Services\RedisCache::getStats(); $redisOk = !empty($stats['enabled']); } catch (\Exception $e) {}
+        $redisOk = false; try { $stats = \App\Services\RedisCache::getStats(); $redisOk = !empty($stats['enabled']); } catch (\Exception $e) {}
 
         $diskFree = 'N/A'; $diskTotal = 'N/A';
         try { $f = disk_free_space('/'); $t = disk_total_space('/'); if ($f !== false && $t !== false) { $diskFree = $this->formatBytes($f); $diskTotal = $this->formatBytes($t); } } catch (\Exception $e) {}
@@ -443,7 +443,7 @@ class AdminEnterpriseController extends BaseApiController
             $existing = json_decode($row->configuration ?? '{}', true) ?: [];
             $merged = array_merge($existing, $newConfig);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($merged), $tenantId]);
-            try { \Nexus\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+            try { \App\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
             return $this->respondWithData($merged);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', 'Failed to update configuration', null, 500);

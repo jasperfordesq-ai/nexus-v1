@@ -9,16 +9,15 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Services\BadgeCollectionService;
+use App\Services\ChallengeService;
+use App\Services\DailyRewardService;
 use App\Services\GamificationService;
+use App\Services\LeaderboardSeasonService;
+use App\Services\LeaderboardService;
+use App\Services\NexusScoreService;
+use App\Services\StreakService;
+use App\Services\XPShopService;
 use Nexus\Core\TenantContext;
-use Nexus\Services\DailyRewardService;
-use Nexus\Services\ChallengeService;
-use Nexus\Services\XPShopService;
-use Nexus\Services\GamificationService as LegacyGamificationService;
-use Nexus\Services\LeaderboardSeasonService;
-use Nexus\Services\LeaderboardService;
-use Nexus\Services\StreakService;
-use Nexus\Services\NexusScoreService;
 use App\Models\UserBadge;
 
 /**
@@ -31,8 +30,15 @@ class GamificationController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
-        private readonly GamificationService $gamificationService,
         private readonly BadgeCollectionService $badgeCollectionService,
+        private readonly ChallengeService $challengeService,
+        private readonly DailyRewardService $dailyRewardService,
+        private readonly GamificationService $gamificationService,
+        private readonly LeaderboardSeasonService $leaderboardSeasonService,
+        private readonly LeaderboardService $leaderboardService,
+        private readonly NexusScoreService $nexusScoreService,
+        private readonly StreakService $streakService,
+        private readonly XPShopService $xpShopService,
     ) {}
 
     // -----------------------------------------------------------------
@@ -141,11 +147,11 @@ class GamificationController extends BaseApiController
             return $this->success(['error' => 'Invalid leaderboard type']);
         }
 
-        $leaderboard = LeaderboardService::getLeaderboard($type, $period, $limit);
+        $leaderboard = $this->leaderboardService->getLeaderboard($type, $period, $limit);
 
         foreach ($leaderboard as &$entry) {
-            $entry['formatted_score'] = LeaderboardService::formatScore($entry['score'], $type);
-            $entry['medal'] = LeaderboardService::getMedalIcon($entry['rank']);
+            $entry['formatted_score'] = $this->leaderboardService->formatScore($entry['score'], $type);
+            $entry['medal'] = $this->leaderboardService->getMedalIcon($entry['rank']);
         }
 
         return $this->success([
@@ -163,15 +169,15 @@ class GamificationController extends BaseApiController
     public function widget(): JsonResponse
     {
         $summary = [
-            'xp' => LeaderboardService::getLeaderboard('xp', 'all_time', 3, false),
-            'vol_hours' => LeaderboardService::getLeaderboard('vol_hours', 'all_time', 3, false),
-            'credits_earned' => LeaderboardService::getLeaderboard('credits_earned', 'all_time', 3, false),
+            'xp' => $this->leaderboardService->getLeaderboard('xp', 'all_time', 3, false),
+            'vol_hours' => $this->leaderboardService->getLeaderboard('vol_hours', 'all_time', 3, false),
+            'credits_earned' => $this->leaderboardService->getLeaderboard('credits_earned', 'all_time', 3, false),
         ];
 
         foreach ($summary as $type => &$leaders) {
             foreach ($leaders as &$entry) {
-                $entry['medal'] = LeaderboardService::getMedalIcon($entry['rank']);
-                $entry['formatted_score'] = LeaderboardService::formatScore($entry['score'], $type);
+                $entry['medal'] = $this->leaderboardService->getMedalIcon($entry['rank']);
+                $entry['formatted_score'] = $this->leaderboardService->formatScore($entry['score'], $type);
             }
         }
 
@@ -186,11 +192,11 @@ class GamificationController extends BaseApiController
     {
         $userId = $this->getUserId();
 
-        $streaks = StreakService::getAllStreaks($userId);
+        $streaks = $this->streakService->getAllStreaks($userId);
 
         foreach ($streaks as $type => &$streak) {
-            $streak['icon'] = StreakService::getStreakIcon($streak['current']);
-            $streak['message'] = StreakService::getStreakMessage($streak);
+            $streak['icon'] = $this->streakService->getStreakIcon($streak['current']);
+            $streak['message'] = $this->streakService->getStreakMessage($streak);
         }
 
         return $this->success(['streaks' => $streaks]);
@@ -204,7 +210,7 @@ class GamificationController extends BaseApiController
     {
         $userId = $this->getUserId();
 
-        $progress = LegacyGamificationService::getBadgeProgress($userId);
+        $progress = $this->gamificationService->getBadgeProgress($userId);
 
         return $this->success(['progress' => $progress]);
     }
@@ -219,7 +225,7 @@ class GamificationController extends BaseApiController
         $this->rateLimit('daily_reward', 10, 60);
 
         try {
-            $reward = DailyRewardService::checkAndAwardDailyReward($userId);
+            $reward = $this->dailyRewardService->checkAndAwardDailyReward($userId);
             return $this->success(['reward' => $reward]);
         } catch (\Throwable $e) {
             return $this->error('Daily rewards not available', 500, 'SERVICE_UNAVAILABLE');
@@ -236,7 +242,7 @@ class GamificationController extends BaseApiController
         $this->rateLimit('daily_status', 30, 60);
 
         try {
-            $status = DailyRewardService::getTodayStatus($userId);
+            $status = $this->dailyRewardService->getTodayStatus($userId);
             return $this->success(['status' => $status]);
         } catch (\Throwable $e) {
             return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
@@ -253,7 +259,7 @@ class GamificationController extends BaseApiController
         $this->rateLimit('challenges', 30, 60);
 
         try {
-            $challenges = ChallengeService::getChallengesWithProgress($userId);
+            $challenges = $this->challengeService->getChallengesWithProgress($userId);
             return $this->success(['challenges' => $challenges]);
         } catch (\Throwable $e) {
             return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
@@ -287,7 +293,7 @@ class GamificationController extends BaseApiController
         $this->rateLimit('shop_items', 30, 60);
 
         try {
-            $data = XPShopService::getItemsWithUserStatus($userId);
+            $data = $this->xpShopService->getItemsWithUserStatus($userId);
             return $this->success($data);
         } catch (\Throwable $e) {
             return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
@@ -310,7 +316,7 @@ class GamificationController extends BaseApiController
         }
 
         try {
-            $result = XPShopService::purchase($userId, $itemId);
+            $result = $this->xpShopService->purchase($userId, $itemId);
 
             if ($result['success'] ?? false) {
                 return $this->success($result);
@@ -343,7 +349,7 @@ class GamificationController extends BaseApiController
                 'xp' => (int) ($user->xp ?? 0),
                 'level' => (int) ($user->level ?? 1),
                 'badges_count' => count($badges),
-                'level_progress' => LegacyGamificationService::getLevelProgress(
+                'level_progress' => $this->gamificationService->getLevelProgress(
                     (int) ($user->xp ?? 0),
                     (int) ($user->level ?? 1)
                 ),
@@ -390,7 +396,7 @@ class GamificationController extends BaseApiController
             $badges = UserBadge::getShowcased($userId);
 
             foreach ($badges as &$badge) {
-                $def = LegacyGamificationService::getBadgeByKey($badge['badge_key']);
+                $def = $this->gamificationService->getBadgeByKey($badge['badge_key']);
                 if ($def) {
                     $badge = array_merge($badge, $def);
                 }
@@ -425,7 +431,7 @@ class GamificationController extends BaseApiController
 
         switch ($type) {
             case 'badge':
-                $badge = LegacyGamificationService::getBadgeByKey($key);
+                $badge = $this->gamificationService->getBadgeByKey($key);
                 if ($badge) {
                     $shareData['title'] = "I earned the {$badge['name']} badge!";
                     $shareData['text'] = "{$badge['icon']} I just earned the '{$badge['name']}' badge on our Timebank!";
@@ -459,7 +465,7 @@ class GamificationController extends BaseApiController
         $this->rateLimit('seasons', 30, 60);
 
         try {
-            $seasons = LeaderboardSeasonService::getAllSeasons();
+            $seasons = $this->leaderboardSeasonService->getAllSeasons();
             return $this->success(['seasons' => $seasons]);
         } catch (\Throwable $e) {
             return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
@@ -476,7 +482,7 @@ class GamificationController extends BaseApiController
         $this->rateLimit('current_season', 30, 60);
 
         try {
-            $data = LeaderboardSeasonService::getSeasonWithUserData($userId);
+            $data = $this->leaderboardSeasonService->getSeasonWithUserData($userId);
             return $this->success($data);
         } catch (\Throwable $e) {
             return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
@@ -503,9 +509,7 @@ class GamificationController extends BaseApiController
         }
 
         try {
-            $db = \Illuminate\Support\Facades\DB::getPdo();
-            $scoreService = new NexusScoreService($db);
-            $scoreData = $scoreService->calculateNexusScore($targetUserId, $tenantId);
+            $scoreData = $this->nexusScoreService->calculateNexusScore($targetUserId, $tenantId);
             return response()->json($scoreData);
         } catch (\Throwable $e) {
             return $this->error('Failed to calculate score', 500, 'SERVER_ERROR');

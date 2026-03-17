@@ -8,12 +8,12 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\TenantContext;
-use Nexus\Services\CommunityFundService;
-use Nexus\Services\TransactionCategoryService;
-use Nexus\Services\ExchangeRatingService;
-use Nexus\Services\CreditDonationService;
-use Nexus\Services\StartingBalanceService;
-use Nexus\Services\TransactionExportService;
+use App\Services\CommunityFundService;
+use App\Services\TransactionCategoryService;
+use App\Services\ExchangeRatingService;
+use App\Services\CreditDonationService;
+use App\Services\StartingBalanceService;
+use App\Services\TransactionExportService;
 
 /**
  * WalletFeaturesController -- Extended wallet: community fund, categories,
@@ -25,7 +25,14 @@ class WalletFeaturesController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly CommunityFundService $communityFundService,
+        private readonly CreditDonationService $creditDonationService,
+        private readonly ExchangeRatingService $exchangeRatingService,
+        private readonly StartingBalanceService $startingBalanceService,
+        private readonly TransactionCategoryService $transactionCategoryService,
+        private readonly TransactionExportService $transactionExportService,
+    ) {}
 
     // ============================================
     // COMMUNITY FUND (W1)
@@ -40,7 +47,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->respondWithData(['balance' => 0, 'enabled' => false]);
         }
 
-        $data = CommunityFundService::getBalance();
+        $data = $this->communityFundService->getBalance();
 
         return $this->respondWithData($data);
     }
@@ -57,7 +64,7 @@ class WalletFeaturesController extends BaseApiController
         $limit = $this->queryInt('limit', 20, 1, 100);
         $offset = $this->queryInt('offset', 0, 0);
 
-        $result = CommunityFundService::getTransactions($limit, $offset);
+        $result = $this->communityFundService->getTransactions($limit, $offset);
 
         return $this->respondWithData($result['items'], ['total' => $result['total']]);
     }
@@ -78,7 +85,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->error('Amount must be greater than 0', 400);
         }
 
-        $result = CommunityFundService::adminDeposit(
+        $result = $this->communityFundService->adminDeposit(
             $userId,
             (float) $data['amount'],
             $data['description'] ?? ''
@@ -115,7 +122,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->error('Amount must be greater than 0', 400);
         }
 
-        $result = CommunityFundService::adminWithdraw(
+        $result = $this->communityFundService->adminWithdraw(
             $userId,
             (int) $data['recipient_id'],
             (float) $data['amount'],
@@ -144,7 +151,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->error('Amount must be greater than 0', 400);
         }
 
-        $result = CreditDonationService::donateToCommunityFund(
+        $result = $this->creditDonationService->donateToCommunityFund(
             $userId,
             (float) $data['amount'],
             $data['message'] ?? ''
@@ -170,7 +177,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->respondWithData(['balance' => 0, 'enabled' => false]);
         }
 
-        $categories = TransactionCategoryService::getAll();
+        $categories = $this->transactionCategoryService->getAll();
 
         return $this->respondWithData($categories);
     }
@@ -187,13 +194,13 @@ class WalletFeaturesController extends BaseApiController
             return $this->error('Name is required', 400);
         }
 
-        $id = TransactionCategoryService::create($data);
+        $id = $this->transactionCategoryService->create($data);
 
         if (!$id) {
             return $this->error('Failed to create category', 500);
         }
 
-        $category = TransactionCategoryService::getById($id);
+        $category = $this->transactionCategoryService->getById($id);
 
         return $this->respondWithData($category, null, 201);
     }
@@ -206,13 +213,13 @@ class WalletFeaturesController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $success = TransactionCategoryService::update($id, $data);
+        $success = $this->transactionCategoryService->update($id, $data);
 
         if (!$success) {
             return $this->error('Failed to update category', 400);
         }
 
-        $category = TransactionCategoryService::getById($id);
+        $category = $this->transactionCategoryService->getById($id);
 
         return $this->respondWithData($category);
     }
@@ -223,7 +230,7 @@ class WalletFeaturesController extends BaseApiController
         $this->requireAuth();
         $this->requireAdmin();
 
-        $success = TransactionCategoryService::delete($id);
+        $success = $this->transactionCategoryService->delete($id);
 
         if (!$success) {
             return $this->error('Cannot delete this category (may be a system category)', 400);
@@ -247,7 +254,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->error('Rating is required (1-5)', 400);
         }
 
-        $result = ExchangeRatingService::submitRating(
+        $result = $this->exchangeRatingService->submitRating(
             $eid,
             $userId,
             (int) $data['rating'],
@@ -258,7 +265,7 @@ class WalletFeaturesController extends BaseApiController
             return $this->error($result['error'], 400);
         }
 
-        $ratings = ExchangeRatingService::getRatingsForExchange($eid);
+        $ratings = $this->exchangeRatingService->getRatingsForExchange($eid);
 
         return $this->respondWithData($ratings, null, 201);
     }
@@ -268,8 +275,8 @@ class WalletFeaturesController extends BaseApiController
     {
         $this->requireAuth();
 
-        $ratings = ExchangeRatingService::getRatingsForExchange($eid);
-        $hasRated = ExchangeRatingService::hasRated($eid, $this->getUserId());
+        $ratings = $this->exchangeRatingService->getRatingsForExchange($eid);
+        $hasRated = $this->exchangeRatingService->hasRated($eid, $this->getUserId());
 
         return $this->respondWithData([
             'ratings' => $ratings,
@@ -282,7 +289,7 @@ class WalletFeaturesController extends BaseApiController
     {
         $this->requireAuth();
 
-        $rating = ExchangeRatingService::getUserRating($userId);
+        $rating = $this->exchangeRatingService->getUserRating($userId);
 
         return $this->respondWithData($rating);
     }
@@ -309,14 +316,14 @@ class WalletFeaturesController extends BaseApiController
                 return $this->error('recipient_id is required when donating to a user', 400);
             }
 
-            $result = CreditDonationService::donateToMember(
+            $result = $this->creditDonationService->donateToMember(
                 $userId,
                 (int) $data['recipient_id'],
                 (float) $data['amount'],
                 $data['message'] ?? ''
             );
         } else {
-            $result = CreditDonationService::donateToCommunityFund(
+            $result = $this->creditDonationService->donateToCommunityFund(
                 $userId,
                 (float) $data['amount'],
                 $data['message'] ?? ''
@@ -338,7 +345,7 @@ class WalletFeaturesController extends BaseApiController
         $limit = $this->queryInt('limit', 20, 1, 100);
         $offset = $this->queryInt('offset', 0, 0);
 
-        $result = CreditDonationService::getDonationHistory($userId, $limit, $offset);
+        $result = $this->creditDonationService->getDonationHistory($userId, $limit, $offset);
 
         return $this->respondWithData($result['items'], ['total' => $result['total']]);
     }
@@ -352,7 +359,7 @@ class WalletFeaturesController extends BaseApiController
     {
         $this->requireAuth();
 
-        $amount = StartingBalanceService::getStartingBalance();
+        $amount = $this->startingBalanceService->getStartingBalance();
 
         return $this->respondWithData(['starting_balance' => $amount]);
     }
@@ -372,7 +379,7 @@ class WalletFeaturesController extends BaseApiController
         $amount = max(0, (float) $data['amount']);
 
         try {
-            StartingBalanceService::setStartingBalance($amount);
+            $this->startingBalanceService->setStartingBalance($amount);
         } catch (\Exception $e) {
             return $this->error('Failed to update starting balance', 500);
         }
@@ -403,14 +410,14 @@ class WalletFeaturesController extends BaseApiController
             return $v !== null && $v !== '';
         });
 
-        $result = TransactionExportService::exportPersonalStatementCSV($userId, $filters);
+        $result = $this->transactionExportService->exportPersonalStatementCSV($userId, $filters);
 
         if (!$result['success']) {
             return $this->error($result['message'] ?? 'Export failed', 400);
         }
 
         // Send CSV download directly (bypasses JSON response)
-        TransactionExportService::sendCSVDownload($result['csv'], $result['filename']);
+        $this->transactionExportService->sendCSVDownload($result['csv'], $result['filename']);
 
         // This line won't be reached in production (sendCSVDownload exits),
         // but provides a fallback for testing environments

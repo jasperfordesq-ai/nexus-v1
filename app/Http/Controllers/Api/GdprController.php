@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\Enterprise\GdprService;
+use App\Services\Enterprise\GdprService;
 
 /**
  * GdprController — Eloquent-powered GDPR consent and data request endpoints.
@@ -20,12 +20,9 @@ class GdprController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    private GdprService $gdprService;
-
-    public function __construct()
-    {
-        $this->gdprService = new GdprService();
-    }
+    public function __construct(
+        private readonly GdprService $gdprService,
+    ) {}
 
     /**
      * POST /api/v2/gdpr/consent

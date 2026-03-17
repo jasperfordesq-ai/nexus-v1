@@ -10,9 +10,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Nexus\Core\TenantContext;
-use Nexus\Services\PusherService;
-use Nexus\Services\RealtimeService;
-use Nexus\Services\FederationRealtimeService;
+use App\Services\PusherService;
+use App\Services\RealtimeService;
+use App\Services\FederationRealtimeService;
 
 /**
  * PusherController — Eloquent-powered Pusher realtime auth and config.
@@ -24,6 +24,12 @@ use Nexus\Services\FederationRealtimeService;
 class PusherController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly FederationRealtimeService $federationRealtimeService,
+        private readonly PusherService $pusherService,
+        private readonly RealtimeService $realtimeService,
+    ) {}
 
     /**
      * POST /api/v2/pusher/auth
@@ -78,13 +84,13 @@ class PusherController extends BaseApiController
     public function config(): JsonResponse
     {
         $userId = $this->getOptionalUserId();
-        $config = RealtimeService::getFrontendConfig();
+        $config = $this->realtimeService->getFrontendConfig();
 
         // Add user-specific channels if logged in
         if ($userId !== null) {
             $config['channels'] = [
-                'user' => PusherService::getUserChannel($userId),
-                'presence' => PusherService::getPresenceChannel(),
+                'user' => $this->pusherService->getUserChannel($userId),
+                'presence' => $this->pusherService->getPresenceChannel(),
             ];
             $config['userId'] = $userId;
         }
@@ -99,7 +105,7 @@ class PusherController extends BaseApiController
     private function authPrivate(string $channelName, string $socketId, int $userId): JsonResponse
     {
         try {
-            $auth = PusherService::authPrivateChannel($channelName, $socketId, $userId);
+            $auth = $this->pusherService->authPrivateChannel($channelName, $socketId, $userId);
 
             if ($auth === null) {
                 return response()->json(['error' => 'Forbidden'], 403);
@@ -122,7 +128,7 @@ class PusherController extends BaseApiController
         try {
             $userInfo = $this->getUserInfo($userId);
 
-            $auth = PusherService::authPresenceChannel($channelName, $socketId, $userId, $userInfo);
+            $auth = $this->pusherService->authPresenceChannel($channelName, $socketId, $userId, $userInfo);
 
             if ($auth === null) {
                 return response()->json(['error' => 'Forbidden'], 403);
@@ -144,7 +150,7 @@ class PusherController extends BaseApiController
     {
         try {
             $tenantId = TenantContext::getId();
-            $auth = FederationRealtimeService::authFederationChannel($channelName, $socketId, $userId, $tenantId);
+            $auth = $this->federationRealtimeService->authFederationChannel($channelName, $socketId, $userId, $tenantId);
 
             if ($auth === null) {
                 return response()->json(['error' => 'Forbidden'], 403);

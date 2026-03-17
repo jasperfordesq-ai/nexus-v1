@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Helpers\UrlHelper;
+use App\Helpers\UrlHelper;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**

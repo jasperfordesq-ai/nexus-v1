@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
@@ -18,6 +19,10 @@ use Nexus\Core\TenantContext;
 class AdminNewsletterController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly NewsletterService $newsletterService,
+    ) {}
 
     /**
      * Allowed tables for existence checks — prevents SQL injection via table name.
@@ -2288,7 +2293,7 @@ class AdminNewsletterController extends BaseApiController
             $targetAudience = $newsletter->target_audience ?? 'all_members';
             $segmentId = $newsletter->segment_id ?? null;
 
-            $queued = \Nexus\Services\NewsletterService::sendNow($id, $targetAudience, $segmentId);
+            $queued = $this->newsletterService->sendNow($id, $targetAudience, $segmentId);
 
             return $this->respondWithData([
                 'queued' => $queued,
@@ -2340,7 +2345,7 @@ class AdminNewsletterController extends BaseApiController
                 'name' => trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? '')),
             ];
 
-            $html = \Nexus\Services\NewsletterService::renderEmail(
+            $html = $this->newsletterService->renderEmail(
                 (array)$newsletter,
                 $tenantName,
                 'test-unsubscribe-token',
@@ -2376,9 +2381,9 @@ class AdminNewsletterController extends BaseApiController
             $segmentId = $this->inputInt('segment_id');
 
             if ($segmentId) {
-                $count = \Nexus\Services\NewsletterService::getSegmentRecipientCount($segmentId);
+                $count = $this->newsletterService->getSegmentRecipientCount($segmentId);
             } else {
-                $count = \Nexus\Services\NewsletterService::getRecipientCount($targetAudience);
+                $count = $this->newsletterService->getRecipientCount($targetAudience);
             }
 
             return $this->respondWithData(['count' => $count]);

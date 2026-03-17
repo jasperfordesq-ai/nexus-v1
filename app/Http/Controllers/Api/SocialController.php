@@ -10,6 +10,7 @@ use App\Services\CommentService;
 use App\Services\FeedActivityService;
 use App\Services\FeedRankingService;
 use App\Services\FeedService;
+use App\Services\PollService;
 use App\Services\SocialNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +38,7 @@ class SocialController extends BaseApiController
         private readonly CommentService $commentService,
         private readonly FeedRankingService $feedRankingService,
         private readonly FeedActivityService $feedActivityService,
+        private readonly PollService $pollService,
     ) {}
 
     /**
@@ -189,10 +191,10 @@ class SocialController extends BaseApiController
             $data['image_url'] = $imageUrl;
         }
 
-        $postId = \Nexus\Services\FeedService::createPost($userId, $data);
+        $postId = $this->feedService->createPost($userId, $data);
 
         if ($postId === null) {
-            $errors = \Nexus\Services\FeedService::getErrors();
+            $errors = $this->feedService->getErrors();
             $status = 422;
 
             foreach ($errors as $error) {
@@ -206,7 +208,7 @@ class SocialController extends BaseApiController
         }
 
         // Get the created post
-        $post = \Nexus\Services\FeedService::getItem('post', $postId, $userId);
+        $post = $this->feedService->getItem('post', $postId, $userId);
 
         return $this->respondWithData($post, null, 201);
     }
@@ -397,14 +399,14 @@ class SocialController extends BaseApiController
             'visibility' => $data['visibility'] ?? 'public',
         ];
 
-        $pollId = \Nexus\Services\PollService::create($userId, $pollData);
+        $pollId = $this->pollService->create($userId, $pollData);
 
         if ($pollId === null) {
-            $errors = \Nexus\Services\PollService::getErrors();
+            $errors = $this->pollService->getErrors();
             return $this->respondWithErrors($errors, 422);
         }
 
-        $poll = \Nexus\Services\PollService::getById($pollId, $userId);
+        $poll = $this->pollService->getById($pollId, $userId);
         return $this->respondWithData($poll, null, 201);
     }
 
@@ -414,7 +416,7 @@ class SocialController extends BaseApiController
         $userId = $this->getOptionalUserId();
         $this->rateLimit('feed_poll_get', 60, 60);
 
-        $poll = \Nexus\Services\PollService::getById((int) $id, $userId);
+        $poll = $this->pollService->getById((int) $id, $userId);
 
         if (! $poll) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found', null, 404);
@@ -435,14 +437,14 @@ class SocialController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'option_id is required', 'option_id', 400);
         }
 
-        $success = \Nexus\Services\PollService::vote((int) $id, $optionId, $userId);
+        $success = $this->pollService->vote((int) $id, $optionId, $userId);
 
         if (! $success) {
-            $errors = \Nexus\Services\PollService::getErrors();
+            $errors = $this->pollService->getErrors();
             return $this->respondWithErrors($errors, 400);
         }
 
-        $poll = \Nexus\Services\PollService::getById((int) $id, $userId);
+        $poll = $this->pollService->getById((int) $id, $userId);
         return $this->respondWithData($poll);
     }
 

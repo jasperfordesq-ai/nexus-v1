@@ -12,13 +12,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use App\Models\UserBadge;
-use Nexus\Services\ChallengeService;
-use Nexus\Services\DailyRewardService;
-use Nexus\Services\GamificationService;
-use Nexus\Services\LeaderboardSeasonService;
-use Nexus\Services\NexusScoreCacheService;
-use Nexus\Services\NexusScoreService;
-use Nexus\Services\XPShopService;
+use App\Services\ChallengeService;
+use App\Services\DailyRewardService;
+use App\Services\GamificationService;
+use App\Services\LeaderboardSeasonService;
+use App\Services\NexusScoreCacheService;
+use App\Services\XPShopService;
 
 /**
  * GamificationV2Controller -- Gamification v2: profile, badges, leaderboard,
@@ -32,7 +31,13 @@ class GamificationV2Controller extends BaseApiController
 
     public function __construct(
         private readonly BadgeCollectionService $badgeCollectionService,
+        private readonly ChallengeService $challengeService,
+        private readonly DailyRewardService $dailyRewardService,
+        private readonly GamificationService $gamificationServiceLegacy,
+        private readonly LeaderboardSeasonService $leaderboardSeasonService,
         private readonly LeaderboardService $leaderboardService,
+        private readonly NexusScoreCacheService $nexusScoreCacheService,
+        private readonly XPShopService $xpShopService,
     ) {}
 
     // =====================================================================
@@ -62,13 +67,13 @@ class GamificationV2Controller extends BaseApiController
         $xp = (int) ($user['xp'] ?? 0);
         $level = (int) ($user['level'] ?? 1);
 
-        $levelProgress = GamificationService::getLevelProgress($xp, $level);
+        $levelProgress = $this->gamificationServiceLegacy->getLevelProgress($xp, $level);
 
         $badges = UserBadge::getForUser($targetUserId);
         $showcasedBadges = UserBadge::getShowcased($targetUserId);
 
         foreach ($showcasedBadges as &$badge) {
-            $def = GamificationService::getBadgeByKey($badge['badge_key']);
+            $def = $this->gamificationServiceLegacy->getBadgeByKey($badge['badge_key']);
             if ($def) {
                 $badge = array_merge($badge, $def);
             }
@@ -118,7 +123,7 @@ class GamificationV2Controller extends BaseApiController
 
         $enrichedBadges = [];
         foreach ($badges as $badge) {
-            $def = GamificationService::getBadgeByKey($badge['badge_key']);
+            $def = $this->gamificationServiceLegacy->getBadgeByKey($badge['badge_key']);
             if ($def) {
                 $enriched = array_merge($badge, $def);
                 $enriched['description'] = $enriched['msg'] ?? $enriched['description'] ?? null;
@@ -131,7 +136,7 @@ class GamificationV2Controller extends BaseApiController
             }
         }
 
-        $allDefinitions = GamificationService::getBadgeDefinitions();
+        $allDefinitions = $this->gamificationServiceLegacy->getBadgeDefinitions();
         $availableTypes = array_unique(array_column($allDefinitions, 'type'));
 
         return $this->respondWithData($enrichedBadges, [
@@ -147,7 +152,7 @@ class GamificationV2Controller extends BaseApiController
 
         $this->rateLimit('gamification_badge_detail', 60, 60);
 
-        $definition = GamificationService::getBadgeByKey($key);
+        $definition = $this->gamificationServiceLegacy->getBadgeByKey($key);
 
         if (!$definition) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Badge not found', null, 404);
@@ -334,7 +339,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_challenges', 30, 60);
 
         try {
-            $challenges = ChallengeService::getChallengesWithProgress($userId);
+            $challenges = $this->challengeService->getChallengesWithProgress($userId);
             return $this->respondWithData($challenges);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load challenges', null, 500);
@@ -348,7 +353,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_claim_challenge', 10, 60);
 
         try {
-            $challenge = ChallengeService::getById($id);
+            $challenge = $this->challengeService->getById($id);
 
             if (!$challenge) {
                 return $this->respondWithError('RESOURCE_NOT_FOUND', 'Challenge not found', null, 404);
@@ -375,7 +380,7 @@ class GamificationV2Controller extends BaseApiController
 
             $xpReward = (int) ($challenge['xp_reward'] ?? 0);
             if ($xpReward > 0) {
-                GamificationService::awardXP($userId, $xpReward, 'challenge_complete', "Completed challenge: {$challenge['title']}");
+                $this->gamificationServiceLegacy->awardXP($userId, $xpReward, 'challenge_complete', "Completed challenge: {$challenge['title']}");
             }
 
             return $this->respondWithData([
@@ -419,7 +424,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_daily_status', 30, 60);
 
         try {
-            $status = DailyRewardService::getTodayStatus($userId);
+            $status = $this->dailyRewardService->getTodayStatus($userId);
             return $this->respondWithData($status);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Daily rewards not available', null, 500);
@@ -433,7 +438,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_daily_claim', 10, 60);
 
         try {
-            $reward = DailyRewardService::checkAndAwardDailyReward($userId);
+            $reward = $this->dailyRewardService->checkAndAwardDailyReward($userId);
 
             if ($reward === null) {
                 return $this->respondWithError('RESOURCE_CONFLICT', 'Daily reward already claimed today', null, 409);
@@ -459,7 +464,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_shop', 30, 60);
 
         try {
-            $data = XPShopService::getItemsWithUserStatus($userId);
+            $data = $this->xpShopService->getItemsWithUserStatus($userId);
             return $this->respondWithData($data['items'] ?? $data, ['user_xp' => $data['user_xp'] ?? null]);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load shop', null, 500);
@@ -479,7 +484,7 @@ class GamificationV2Controller extends BaseApiController
         }
 
         try {
-            $result = XPShopService::purchase($userId, $itemId);
+            $result = $this->xpShopService->purchase($userId, $itemId);
 
             if ($result['success'] ?? false) {
                 return $this->respondWithData($result);
@@ -524,7 +529,7 @@ class GamificationV2Controller extends BaseApiController
 
             $showcased = UserBadge::getShowcased($userId);
             foreach ($showcased as &$badge) {
-                $def = GamificationService::getBadgeByKey($badge['badge_key']);
+                $def = $this->gamificationServiceLegacy->getBadgeByKey($badge['badge_key']);
                 if ($def) {
                     $badge = array_merge($badge, $def);
                 }
@@ -549,7 +554,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_seasons', 30, 60);
 
         try {
-            $seasons = LeaderboardSeasonService::getAllSeasons();
+            $seasons = $this->leaderboardSeasonService->getAllSeasons();
             return $this->respondWithData($seasons);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load seasons', null, 500);
@@ -563,7 +568,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_current_season', 30, 60);
 
         try {
-            $data = LeaderboardSeasonService::getSeasonWithUserData($userId);
+            $data = $this->leaderboardSeasonService->getSeasonWithUserData($userId);
 
             if ($data === null) {
                 return $this->respondWithData([
@@ -597,9 +602,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('nexus_score', 30, 60);
 
         try {
-            $db = DB::getPdo();
-            $cacheService = new NexusScoreCacheService($db);
-            $scoreData = $cacheService->getScore($userId, $tenantId);
+            $scoreData = $this->nexusScoreCacheService->getScore($userId, $tenantId);
 
             $tier = $scoreData['tier'];
             if (is_array($tier)) {

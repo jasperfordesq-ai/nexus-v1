@@ -13,12 +13,12 @@ use App\Core\Validator;
 use Nexus\Middleware\SuperPanelAccess;
 use App\Models\Tenant;
 use App\Models\User;
-use Nexus\Services\FederationAuditService;
-use Nexus\Services\FederationFeatureService;
-use Nexus\Services\FederationPartnershipService;
-use Nexus\Services\SuperAdminAuditService;
-use Nexus\Services\TenantHierarchyService;
-use Nexus\Services\TenantVisibilityService;
+use App\Services\FederationAuditService;
+use App\Services\FederationFeatureService;
+use App\Services\FederationPartnershipService;
+use App\Services\SuperAdminAuditService;
+use App\Services\TenantHierarchyService;
+use App\Services\TenantVisibilityService;
 
 /**
  * AdminSuperController -- Super-admin tenant and cross-tenant user management.
@@ -37,7 +37,14 @@ class AdminSuperController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly FederationAuditService $federationAuditService,
+        private readonly FederationFeatureService $federationFeatureService,
+        private readonly FederationPartnershipService $federationPartnershipService,
+        private readonly SuperAdminAuditService $superAdminAuditService,
+        private readonly TenantHierarchyService $tenantHierarchyService,
+        private readonly TenantVisibilityService $tenantVisibilityService,
+    ) {}
 
     // ─────────────────────────────────────────────────────────────────────────
     // Helpers
@@ -119,7 +126,7 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $stats = TenantVisibilityService::getDashboardStats();
+        $stats = $this->tenantVisibilityService->getDashboardStats();
 
         return $this->respondWithData($stats);
     }
@@ -139,7 +146,7 @@ class AdminSuperController extends BaseApiController
             'allows_subtenants' => $this->query('hub') !== null ? 1 : null,
         ], fn($v) => $v !== null);
 
-        $tenants = TenantVisibilityService::getTenantList($filters);
+        $tenants = $this->tenantVisibilityService->getTenantList($filters);
 
         return $this->respondWithData($tenants);
     }
@@ -149,7 +156,7 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $tree = TenantVisibilityService::getHierarchyTree();
+        $tree = $this->tenantVisibilityService->getHierarchyTree();
 
         return $this->respondWithData($tree);
     }
@@ -159,13 +166,13 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $tenant = TenantVisibilityService::getTenant($id);
+        $tenant = $this->tenantVisibilityService->getTenant($id);
         if (!$tenant) {
             return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Tenant not found', null, 404);
         }
 
         $children = Tenant::getChildren($id);
-        $admins = TenantVisibilityService::getTenantAdmins($id);
+        $admins = $this->tenantVisibilityService->getTenantAdmins($id);
         $breadcrumb = Tenant::getBreadcrumb($id);
 
         // Decode features JSON for the frontend
@@ -297,7 +304,7 @@ class AdminSuperController extends BaseApiController
             'configuration' => $input['configuration'] ?? null,
         ];
 
-        $result = TenantHierarchyService::createTenant($data, $parentId);
+        $result = $this->tenantHierarchyService->createTenant($data, $parentId);
 
         if ($result['success']) {
             return $this->respondWithData([
@@ -366,7 +373,7 @@ class AdminSuperController extends BaseApiController
             }
         }
 
-        $result = TenantHierarchyService::updateTenant($id, $input);
+        $result = $this->tenantHierarchyService->updateTenant($id, $input);
 
         if ($result['success']) {
             return $this->respondWithData(['updated' => true, 'tenant_id' => $id]);
@@ -387,7 +394,7 @@ class AdminSuperController extends BaseApiController
         $input = $this->getAllInput();
         $hardDelete = !empty($input['hard_delete']);
 
-        $result = TenantHierarchyService::deleteTenant($id, $hardDelete);
+        $result = $this->tenantHierarchyService->deleteTenant($id, $hardDelete);
 
         if ($result['success']) {
             return $this->respondWithData(['deleted' => true, 'tenant_id' => $id]);
@@ -405,7 +412,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
         }
 
-        $result = TenantHierarchyService::updateTenant($id, ['is_active' => 1]);
+        $result = $this->tenantHierarchyService->updateTenant($id, ['is_active' => 1]);
 
         if ($result['success']) {
             return $this->respondWithData(['reactivated' => true, 'tenant_id' => $id]);
@@ -426,7 +433,7 @@ class AdminSuperController extends BaseApiController
         $input = $this->getAllInput();
         $enable = !empty($input['enable']);
 
-        $result = TenantHierarchyService::toggleSubtenantCapability($id, $enable);
+        $result = $this->tenantHierarchyService->toggleSubtenantCapability($id, $enable);
 
         if ($result['success']) {
             return $this->respondWithData([
@@ -458,7 +465,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to the destination tenant', null, 403);
         }
 
-        $result = TenantHierarchyService::moveTenant($id, $newParentId);
+        $result = $this->tenantHierarchyService->moveTenant($id, $newParentId);
 
         if ($result['success']) {
             return $this->respondWithData([
@@ -492,7 +499,7 @@ class AdminSuperController extends BaseApiController
             'offset' => ($page - 1) * $limit,
         ], fn($v) => $v !== null);
 
-        $users = TenantVisibilityService::getUserList($filters);
+        $users = $this->tenantVisibilityService->getUserList($filters);
 
         return $this->respondWithData($users);
     }
@@ -567,7 +574,7 @@ class AdminSuperController extends BaseApiController
         $newUserId = User::createWithTenant($tenantId, $firstName, $lastName, $email, $password, $role, $options);
 
         if ($newUserId) {
-            SuperAdminAuditService::log(
+            $this->superAdminAuditService->log(
                 'user_created',
                 'user',
                 $newUserId,
@@ -658,7 +665,7 @@ class AdminSuperController extends BaseApiController
             );
         }
 
-        $result = TenantHierarchyService::assignTenantSuperAdmin($id, (int) $user['tenant_id']);
+        $result = $this->tenantHierarchyService->assignTenantSuperAdmin($id, (int) $user['tenant_id']);
 
         if ($result['success']) {
             return $this->respondWithData(['granted' => true, 'user_id' => $id]);
@@ -692,7 +699,7 @@ class AdminSuperController extends BaseApiController
             );
         }
 
-        $result = TenantHierarchyService::revokeTenantSuperAdmin($id);
+        $result = $this->tenantHierarchyService->revokeTenantSuperAdmin($id);
 
         if ($result['success']) {
             return $this->respondWithData(['revoked' => true, 'user_id' => $id]);
@@ -789,7 +796,7 @@ class AdminSuperController extends BaseApiController
 
         // Audit
         $userName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: $user['email'];
-        SuperAdminAuditService::log(
+        $this->superAdminAuditService->log(
             'user_moved',
             'user',
             $id,
@@ -862,7 +869,7 @@ class AdminSuperController extends BaseApiController
 
         // Audit
         $userName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: $user['email'];
-        SuperAdminAuditService::log(
+        $this->superAdminAuditService->log(
             'user_moved',
             'user',
             $id,
@@ -982,7 +989,7 @@ class AdminSuperController extends BaseApiController
             }
         }
 
-        SuperAdminAuditService::log(
+        $this->superAdminAuditService->log(
             'bulk_users_moved',
             'bulk',
             null,
@@ -1067,7 +1074,7 @@ class AdminSuperController extends BaseApiController
             'disable_hub' => 'Hub Disabled',
         ];
 
-        SuperAdminAuditService::log(
+        $this->superAdminAuditService->log(
             'bulk_tenants_updated',
             'bulk',
             null,
@@ -1107,7 +1114,7 @@ class AdminSuperController extends BaseApiController
             'offset' => ($page - 1) * $limit,
         ], fn($v) => $v !== null);
 
-        $logs = SuperAdminAuditService::getLog($filters);
+        $logs = $this->superAdminAuditService->getLog($filters);
 
         // Map DB columns to frontend field names
         $mapped = array_map(function ($row) {
@@ -1139,10 +1146,10 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $systemControls = FederationFeatureService::getSystemControls();
-        $partnershipStats = FederationPartnershipService::getStats();
-        $whitelistedTenants = FederationFeatureService::getWhitelistedTenants();
-        $recentAudit = FederationAuditService::getLog(['limit' => 20]);
+        $systemControls = $this->federationFeatureService->getSystemControls();
+        $partnershipStats = $this->federationPartnershipService->getStats();
+        $whitelistedTenants = $this->federationFeatureService->getWhitelistedTenants();
+        $recentAudit = $this->federationAuditService->getLog(['limit' => 20]);
 
         return $this->respondWithData([
             'system_controls' => $systemControls,
@@ -1157,7 +1164,7 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $controls = FederationFeatureService::getSystemControls();
+        $controls = $this->federationFeatureService->getSystemControls();
 
         return $this->respondWithData($controls);
     }
@@ -1208,9 +1215,9 @@ class AdminSuperController extends BaseApiController
             $params
         );
 
-        FederationFeatureService::clearCache();
+        $this->federationFeatureService->clearCache();
 
-        FederationAuditService::log(
+        $this->federationAuditService->log(
             'system_controls_updated',
             null,
             null,
@@ -1230,7 +1237,7 @@ class AdminSuperController extends BaseApiController
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Emergency lockdown triggered via API';
 
-        $result = FederationFeatureService::triggerEmergencyLockdown($userId, $reason);
+        $result = $this->federationFeatureService->triggerEmergencyLockdown($userId, $reason);
 
         if ($result) {
             return $this->respondWithData(['lockdown' => true, 'message' => 'Emergency lockdown activated']);
@@ -1244,7 +1251,7 @@ class AdminSuperController extends BaseApiController
     {
         $userId = $this->requireSuperAdmin();
 
-        $result = FederationFeatureService::liftEmergencyLockdown($userId);
+        $result = $this->federationFeatureService->liftEmergencyLockdown($userId);
 
         if ($result) {
             return $this->respondWithData(['lockdown' => false, 'message' => 'Emergency lockdown lifted']);
@@ -1258,7 +1265,7 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $whitelisted = FederationFeatureService::getWhitelistedTenants();
+        $whitelisted = $this->federationFeatureService->getWhitelistedTenants();
 
         return $this->respondWithData($whitelisted);
     }
@@ -1276,7 +1283,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'tenant_id is required', 'tenant_id', 422);
         }
 
-        $result = FederationFeatureService::addToWhitelist($tenantId, $userId, $notes);
+        $result = $this->federationFeatureService->addToWhitelist($tenantId, $userId, $notes);
 
         if ($result) {
             return $this->respondWithData(['added' => true, 'tenant_id' => $tenantId]);
@@ -1296,7 +1303,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'Invalid tenant ID', 'tenantId', 400);
         }
 
-        $result = FederationFeatureService::removeFromWhitelist($tenantId, $userId);
+        $result = $this->federationFeatureService->removeFromWhitelist($tenantId, $userId);
 
         if ($result) {
             return $this->respondWithData(['removed' => true, 'tenant_id' => $tenantId]);
@@ -1310,8 +1317,8 @@ class AdminSuperController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $partnerships = FederationPartnershipService::getAllPartnerships(null, 100);
-        $stats = FederationPartnershipService::getStats();
+        $partnerships = $this->federationPartnershipService->getAllPartnerships(null, 100);
+        $stats = $this->federationPartnershipService->getStats();
 
         return $this->respondWithData([
             'partnerships' => $partnerships,
@@ -1333,7 +1340,7 @@ class AdminSuperController extends BaseApiController
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Suspended by super admin via API';
 
-        $result = FederationPartnershipService::suspendPartnership($partnershipId, $userId, $reason);
+        $result = $this->federationPartnershipService->suspendPartnership($partnershipId, $userId, $reason);
 
         if (is_array($result) && !empty($result['success'])) {
             return $this->respondWithData(['suspended' => true, 'partnership_id' => $partnershipId]);
@@ -1357,7 +1364,7 @@ class AdminSuperController extends BaseApiController
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Terminated by super admin via API';
 
-        $result = FederationPartnershipService::terminatePartnership($partnershipId, $userId, $reason);
+        $result = $this->federationPartnershipService->terminatePartnership($partnershipId, $userId, $reason);
 
         if (is_array($result) && !empty($result['success'])) {
             return $this->respondWithData(['terminated' => true, 'partnership_id' => $partnershipId]);
@@ -1387,9 +1394,9 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, 'You do not have access to this tenant', null, 403);
         }
 
-        $features = FederationFeatureService::getAllTenantFeatures($tenantId);
-        $isWhitelisted = FederationFeatureService::isTenantWhitelisted($tenantId);
-        $partnerships = FederationPartnershipService::getTenantPartnerships($tenantId);
+        $features = $this->federationFeatureService->getAllTenantFeatures($tenantId);
+        $isWhitelisted = $this->federationFeatureService->isTenantWhitelisted($tenantId);
+        $partnerships = $this->federationPartnershipService->getTenantPartnerships($tenantId);
 
         return $this->respondWithData([
             'tenant' => $tenant,
@@ -1423,9 +1430,9 @@ class AdminSuperController extends BaseApiController
         }
 
         if ($enabled) {
-            $result = FederationFeatureService::enableTenantFeature($feature, $tenantId);
+            $result = $this->federationFeatureService->enableTenantFeature($feature, $tenantId);
         } else {
-            $result = FederationFeatureService::disableTenantFeature($feature, $tenantId);
+            $result = $this->federationFeatureService->disableTenantFeature($feature, $tenantId);
         }
 
         if ($result) {

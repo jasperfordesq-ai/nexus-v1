@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Services\WebAuthnChallengeStore;
 use Illuminate\Http\JsonResponse;
@@ -26,6 +27,7 @@ class WebAuthnController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly TenantSettingsService $tenantSettingsService,
         private readonly WebAuthnChallengeStore $webAuthnChallengeStore,
         private readonly TokenService $tokenService,
     ) {}
@@ -386,7 +388,7 @@ class WebAuthnController extends BaseApiController
         );
 
         if ($webauthnUser) {
-            $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates((array)$webauthnUser);
+            $gateBlock = $this->tenantSettingsService->checkLoginGates((array)$webauthnUser);
             if ($gateBlock) {
                 return response()->json([
                     'error' => $gateBlock['message'],

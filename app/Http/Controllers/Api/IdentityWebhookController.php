@@ -8,9 +8,10 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Services\Identity\IdentityProviderRegistry;
-use Nexus\Services\Identity\IdentityVerificationSessionService;
-use Nexus\Services\Identity\RegistrationOrchestrationService;
+use App\Services\Identity\IdentityProviderRegistry;
+use App\Services\Identity\IdentityVerificationSessionService;
+use App\Services\Identity\RegistrationOrchestrationService;
+use App\Services\RateLimitService;
 
 /**
  * IdentityWebhookController -- Identity provider webhook handler.
@@ -22,12 +23,19 @@ class IdentityWebhookController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly IdentityProviderRegistry $identityProviderRegistry,
+        private readonly IdentityVerificationSessionService $sessionService,
+        private readonly RateLimitService $rateLimitService,
+        private readonly RegistrationOrchestrationService $orchestrationService,
+    ) {}
+
     /** POST webhooks/identity/{provider_slug} */
     public function handleWebhook(): JsonResponse
     {
         // Rate limit webhooks (generous but protective)
         $ip = \App\Core\ClientIp::get();
-        if (\Nexus\Services\RateLimitService::check("webhook:identity:$ip", 60, 60)) {
+        if ($this->rateLimitService->check("webhook:identity:$ip", 60, 60)) {
             return $this->respondWithError(
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
                 'Too many webhook requests',
@@ -35,11 +43,11 @@ class IdentityWebhookController extends BaseApiController
                 429
             );
         }
-        \Nexus\Services\RateLimitService::increment("webhook:identity:$ip", 60);
+        $this->rateLimitService->increment("webhook:identity:$ip", 60);
 
         // Extract provider slug from route
         $providerSlug = request()->route('provider_slug');
-        if (!$providerSlug || !IdentityProviderRegistry::has($providerSlug)) {
+        if (!$providerSlug || !$this->identityProviderRegistry->has($providerSlug)) {
             return $this->respondWithError(
                 ApiErrorCodes::RESOURCE_NOT_FOUND,
                 'Unknown identity provider',
@@ -48,7 +56,7 @@ class IdentityWebhookController extends BaseApiController
             );
         }
 
-        $provider = IdentityProviderRegistry::get($providerSlug);
+        $provider = $this->identityProviderRegistry->get($providerSlug);
 
         // Get raw body for signature verification — use request()->getContent() instead of php://input
         $rawBody = request()->getContent();
@@ -97,7 +105,7 @@ class IdentityWebhookController extends BaseApiController
             return $this->respondWithData(['received' => true, 'warning' => 'no_session_match']);
         }
 
-        $session = IdentityVerificationSessionService::findByProviderSession($providerSlug, $providerSessionId);
+        $session = $this->sessionService->findByProviderSession($providerSlug, $providerSessionId);
         if (!$session) {
             error_log("[IdentityWebhook] Session not found for provider '{$providerSlug}', session '{$providerSessionId}'");
             // Acknowledge receipt — the session may have been cancelled
@@ -115,7 +123,7 @@ class IdentityWebhookController extends BaseApiController
             return $this->respondWithData(['received' => true, 'status' => $status, 'duplicate' => true]);
         }
 
-        RegistrationOrchestrationService::handleVerificationResult(
+        $this->orchestrationService->handleVerificationResult(
             (int) $session['id'],
             $status,
             $result

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Core\Mailer;
 use Nexus\Core\TenantContext;
 use App\Services\BrokerMessageVisibilityService;
+use App\Services\RealtimeService;
 
 /**
  * CoreController -- Core platform endpoints (members, listings, groups,
@@ -24,6 +25,7 @@ class CoreController extends BaseApiController
 
     public function __construct(
         private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
+        private readonly RealtimeService $realtimeService,
     ) {}
 
     // ──────────────────────────────────────────────
@@ -71,9 +73,9 @@ class CoreController extends BaseApiController
             );
 
             // Pusher broadcast (non-blocking)
-            if (class_exists('Nexus\Services\RealtimeService')) {
+            if (class_exists(RealtimeService::class)) {
                 try {
-                    \Nexus\Services\RealtimeService::broadcastMessage($userId, $receiverId, $message);
+                    $this->realtimeService->broadcastMessage($userId, $receiverId, $message);
                 } catch (\Exception $e) {
                     error_log("Pusher notification failed: " . $e->getMessage());
                 }
@@ -118,9 +120,9 @@ class CoreController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Missing receiver_id', 'receiver_id', 400);
         }
 
-        if (class_exists('Nexus\Services\RealtimeService')) {
+        if (class_exists(RealtimeService::class)) {
             try {
-                \Nexus\Services\RealtimeService::broadcastTyping($userId, $receiverId, true);
+                $this->realtimeService->broadcastTyping($userId, $receiverId, true);
                 return $this->respondWithData(['note' => 'Typing broadcast']);
             } catch (\Exception $e) {
                 error_log("Pusher typing notification failed: " . $e->getMessage());
