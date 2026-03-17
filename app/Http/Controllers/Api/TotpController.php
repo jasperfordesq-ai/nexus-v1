@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
@@ -25,6 +26,7 @@ class TotpController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly TenantSettingsService $tenantSettingsService,
         private readonly TwoFactorChallengeManager $twoFactorChallengeManager,
         private readonly TokenService $tokenService,
         private readonly TotpService $totpService,
@@ -175,7 +177,7 @@ class TotpController extends BaseApiController
         }
 
         // SECURITY: Enforce registration policy gates after 2FA completion
-        $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        $gateBlock = $this->tenantSettingsService->checkLoginGates($user);
         if ($gateBlock) {
             return response()->json([
                 'error' => $gateBlock['message'],

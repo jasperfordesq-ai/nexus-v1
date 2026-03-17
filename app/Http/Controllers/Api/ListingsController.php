@@ -7,12 +7,12 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\ListingService;
-use Nexus\Services\ListingAnalyticsService;
-use Nexus\Services\ListingExpiryService;
-use Nexus\Services\ListingRankingService;
-use Nexus\Services\ListingSkillTagService;
-use Nexus\Services\ListingFeaturedService;
+use App\Services\ListingService;
+use App\Services\ListingAnalyticsService;
+use App\Services\ListingExpiryService;
+use App\Services\ListingRankingService;
+use App\Services\ListingSkillTagService;
+use App\Services\ListingFeaturedService;
 
 /**
  * ListingsController - Listings CRUD, search, favorites, tags, analytics, renewal.
@@ -23,6 +23,15 @@ use Nexus\Services\ListingFeaturedService;
 class ListingsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly ListingAnalyticsService $listingAnalyticsService,
+        private readonly ListingExpiryService $listingExpiryService,
+        private readonly ListingFeaturedService $listingFeaturedService,
+        private readonly ListingRankingService $listingRankingService,
+        private readonly ListingService $listingService,
+        private readonly ListingSkillTagService $listingSkillTagService,
+    ) {}
 
     // -----------------------------------------------------------------
     //  GET /api/v2/listings
@@ -72,11 +81,11 @@ class ListingsController extends BaseApiController
             $filters['current_user_id'] = $userId;
         }
 
-        $result = ListingService::getAll($filters);
+        $result = $this->listingService->getAll($filters);
 
         // Apply MatchRank if enabled; skip when featured_first is set
-        if (ListingRankingService::isEnabled() && !empty($result['items']) && empty($filters['featured_first'])) {
-            $result['items'] = ListingRankingService::rankListings(
+        if ($this->listingRankingService->isEnabled() && !empty($result['items']) && empty($filters['featured_first'])) {
+            $result['items'] = $this->listingRankingService->rankListings(
                 $result['items'],
                 $userId,
                 ['search' => $filters['search'] ?? null]
@@ -102,7 +111,7 @@ class ListingsController extends BaseApiController
     public function show(int $id): JsonResponse
     {
         $userId = $this->getOptionalUserId();
-        $listing = ListingService::getById($id, false, $userId);
+        $listing = $this->listingService->getById($id, false, $userId);
 
         if (!$listing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
@@ -112,7 +121,7 @@ class ListingsController extends BaseApiController
         if ($userId === null || $userId !== (int) ($listing['user_id'] ?? 0)) {
             try {
                 $ip = \App\Core\ClientIp::get();
-                ListingAnalyticsService::recordView($id, $userId, $ip);
+                $this->listingAnalyticsService->recordView($id, $userId, $ip);
             } catch (\Exception $e) {
                 // Non-critical
             }
@@ -120,7 +129,7 @@ class ListingsController extends BaseApiController
 
         // Attach skill tags
         try {
-            $listing['skill_tags'] = ListingSkillTagService::getTags($id);
+            $listing['skill_tags'] = $this->listingSkillTagService->getTags($id);
         } catch (\Exception $e) {
             $listing['skill_tags'] = [];
         }
@@ -141,14 +150,14 @@ class ListingsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $listingId = ListingService::create($userId, $data);
+        $listingId = $this->listingService->create($userId, $data);
 
         if ($listingId === null) {
-            $errors = ListingService::getErrors();
+            $errors = $this->listingService->getErrors();
             return $this->respondWithErrors($errors, 422);
         }
 
-        $listing = ListingService::getById($listingId);
+        $listing = $this->listingService->getById($listingId);
 
         return $this->respondWithData($listing, null, 201);
     }
@@ -164,10 +173,10 @@ class ListingsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $success = ListingService::update($id, $userId, $data);
+        $success = $this->listingService->update($id, $userId, $data);
 
         if (!$success) {
-            $errors = ListingService::getErrors();
+            $errors = $this->listingService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -182,7 +191,7 @@ class ListingsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $listing = ListingService::getById($id);
+        $listing = $this->listingService->getById($id);
 
         return $this->respondWithData($listing);
     }
@@ -196,10 +205,10 @@ class ListingsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('listing_delete', 10, 60);
 
-        $success = ListingService::delete($id, $userId);
+        $success = $this->listingService->delete($id, $userId);
 
         if (!$success) {
-            $errors = ListingService::getErrors();
+            $errors = $this->listingService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -254,7 +263,7 @@ class ListingsController extends BaseApiController
             $filters['category_id'] = $this->queryInt('category_id');
         }
 
-        $result = ListingService::getNearby($lat, $lon, $filters);
+        $result = $this->listingService->getNearby($lat, $lon, $filters);
 
         return $this->respondWithData($result['items'], [
             'search' => [
@@ -276,7 +285,7 @@ class ListingsController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $savedIds = ListingService::getSavedListingIds($userId);
+        $savedIds = $this->listingService->getSavedListingIds($userId);
 
         return $this->respondWithData($savedIds);
     }
@@ -289,7 +298,7 @@ class ListingsController extends BaseApiController
     {
         $limit = $this->queryInt('per_page', 10, 1, 50);
 
-        $items = ListingFeaturedService::getFeaturedListings($limit);
+        $items = $this->listingFeaturedService->getFeaturedListings($limit);
 
         return $this->respondWithData($items);
     }
@@ -302,14 +311,14 @@ class ListingsController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $result = ListingService::saveListing($userId, $id);
+        $result = $this->listingService->saveListing($userId, $id);
 
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
 
         try {
-            ListingAnalyticsService::updateSaveCount($id, true);
+            $this->listingAnalyticsService->updateSaveCount($id, true);
         } catch (\Exception $e) {
             // Non-critical
         }
@@ -325,10 +334,10 @@ class ListingsController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        ListingService::unsaveListing($userId, $id);
+        $this->listingService->unsaveListing($userId, $id);
 
         try {
-            ListingAnalyticsService::updateSaveCount($id, false);
+            $this->listingAnalyticsService->updateSaveCount($id, false);
         } catch (\Exception $e) {
             // Non-critical
         }
@@ -344,7 +353,7 @@ class ListingsController extends BaseApiController
     {
         $limit = $this->queryInt('limit', 20, 1, 50);
 
-        $tags = ListingSkillTagService::getPopularTags($limit);
+        $tags = $this->listingSkillTagService->getPopularTags($limit);
 
         return $this->respondWithData($tags);
     }
@@ -361,7 +370,7 @@ class ListingsController extends BaseApiController
         }
 
         $limit = $this->queryInt('limit', 10, 1, 20);
-        $tags = ListingSkillTagService::autocompleteTags($prefix, $limit);
+        $tags = $this->listingSkillTagService->autocompleteTags($prefix, $limit);
 
         return $this->respondWithData($tags);
     }
@@ -375,17 +384,17 @@ class ListingsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
-        $listing = ListingService::getById($id);
+        $listing = $this->listingService->getById($id);
 
         if (!$listing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
 
-        if (!ListingService::canModify($listing, $userId)) {
+        if (!$this->listingService->canModify($listing, $userId)) {
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
         }
 
-        ListingService::update($id, $userId, ['image_url' => null]);
+        $this->listingService->update($id, $userId, ['image_url' => null]);
 
         return $this->respondWithData(['image_url' => null]);
     }
@@ -400,7 +409,7 @@ class ListingsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('listing_renew', 10, 60);
 
-        $result = ListingExpiryService::renewListing($id, $userId);
+        $result = $this->listingExpiryService->renewListing($id, $userId);
 
         if (!$result['success']) {
             $status = $result['error'] === 'Listing not found' ? 404
@@ -424,17 +433,17 @@ class ListingsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
-        $listing = ListingService::getById($id);
+        $listing = $this->listingService->getById($id);
         if (!$listing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
 
-        if (!ListingService::canModify($listing, $userId)) {
+        if (!$this->listingService->canModify($listing, $userId)) {
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to view analytics', null, 403);
         }
 
         $days = $this->queryInt('days', 30, 1, 90);
-        $analytics = ListingAnalyticsService::getAnalytics($id, $days);
+        $analytics = $this->listingAnalyticsService->getAnalytics($id, $days);
 
         return $this->respondWithData($analytics);
     }
@@ -448,12 +457,12 @@ class ListingsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
-        $listing = ListingService::getById($id);
+        $listing = $this->listingService->getById($id);
         if (!$listing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
 
-        if (!ListingService::canModify($listing, $userId)) {
+        if (!$this->listingService->canModify($listing, $userId)) {
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
         }
 
@@ -464,13 +473,13 @@ class ListingsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Tags must be an array of strings', 'tags', 400);
         }
 
-        $success = ListingSkillTagService::setTags($id, $tags);
+        $success = $this->listingSkillTagService->setTags($id, $tags);
 
         if (!$success) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
 
-        $updatedTags = ListingSkillTagService::getTags($id);
+        $updatedTags = $this->listingSkillTagService->getTags($id);
 
         return $this->respondWithData(['listing_id' => $id, 'tags' => $updatedTags]);
     }
@@ -492,12 +501,12 @@ class ListingsController extends BaseApiController
         $this->rateLimit('listing_image_upload', 10, 60);
 
         // Verify listing exists and user can modify it
-        $listing = ListingService::getById($id);
+        $listing = $this->listingService->getById($id);
         if (!$listing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
 
-        if (!ListingService::canModify($listing, $userId)) {
+        if (!$this->listingService->canModify($listing, $userId)) {
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
         }
 
@@ -519,7 +528,7 @@ class ListingsController extends BaseApiController
             $imageUrl = \App\Core\ImageUploader::upload($fileArray);
 
             // Update listing with new image
-            ListingService::update($id, $userId, ['image_url' => $imageUrl]);
+            $this->listingService->update($id, $userId, ['image_url' => $imageUrl]);
 
             return $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {

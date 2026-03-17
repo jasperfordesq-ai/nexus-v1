@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use App\Services\AuditLogService;
+use App\Services\BrokerControlConfigService;
 use App\Services\ExchangeWorkflowService;
 use App\Services\ListingRiskTagService;
 use App\Services\NotificationDispatcher;
@@ -25,6 +26,7 @@ class AdminBrokerController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly BrokerControlConfigService $brokerControlConfigService,
         private readonly ExchangeWorkflowService $exchangeWorkflowService,
         private readonly NotificationDispatcher $notificationDispatcher,
     ) {}
@@ -1247,7 +1249,7 @@ class AdminBrokerController extends BaseApiController
                 }
             }
             if (!empty($workflowConfig)) {
-                \Nexus\Services\BrokerControlConfigService::updateConfig($workflowConfig);
+                $this->brokerControlConfigService->updateConfig($workflowConfig);
             }
 
             return $this->respondWithData($config);
@@ -1261,7 +1263,7 @@ class AdminBrokerController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $count = \Nexus\Services\BrokerMessageVisibilityService::countUnreviewed();
+        $count = $this->brokerMessageVisibilityService->countUnreviewed();
 
         return $this->respondWithData(['count' => $count]);
     }

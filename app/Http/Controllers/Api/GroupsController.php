@@ -8,8 +8,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\GroupNotificationService;
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\GroupService;
-use Nexus\Services\GroupAnnouncementService;
+use App\Services\GroupService;
+use App\Services\GroupAnnouncementService;
 
 /**
  * GroupsController - Groups CRUD, members, discussions, announcements.
@@ -22,7 +22,9 @@ class GroupsController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly GroupAnnouncementService $groupAnnouncementService,
         private readonly GroupNotificationService $groupNotificationService,
+        private readonly GroupService $groupService,
     ) {}
 
     // ================================================================
@@ -59,12 +61,12 @@ class GroupsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = GroupService::getAll($filters);
+        $result = $this->groupService->getAll($filters);
 
         // Add user's membership status to each group if logged in
         if ($userId) {
             foreach ($result['items'] as &$group) {
-                $fullGroup = GroupService::getById($group['id'], $userId);
+                $fullGroup = $this->groupService->getById($group['id'], $userId);
                 if ($fullGroup) {
                     $group['viewer_membership'] = $fullGroup['viewer_membership'] ?? null;
                 }
@@ -86,7 +88,7 @@ class GroupsController extends BaseApiController
     {
         $userId = $this->getOptionalUserId();
 
-        $group = GroupService::getById($id, $userId);
+        $group = $this->groupService->getById($id, $userId);
 
         if (!$group) {
             return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
@@ -109,10 +111,10 @@ class GroupsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $groupId = GroupService::create($userId, $data);
+        $groupId = $this->groupService->create($userId, $data);
 
         if ($groupId === null) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
@@ -123,7 +125,7 @@ class GroupsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $group = GroupService::getById($groupId, $userId);
+        $group = $this->groupService->getById($groupId, $userId);
 
         return $this->respondWithData($group, null, 201);
     }
@@ -139,10 +141,10 @@ class GroupsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $success = GroupService::update($id, $userId, $data);
+        $success = $this->groupService->update($id, $userId, $data);
 
         if (!$success) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -157,7 +159,7 @@ class GroupsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $group = GroupService::getById($id, $userId);
+        $group = $this->groupService->getById($id, $userId);
 
         return $this->respondWithData($group);
     }
@@ -171,10 +173,10 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_delete', 10, 60);
 
-        $success = GroupService::delete($id, $userId);
+        $success = $this->groupService->delete($id, $userId);
 
         if (!$success) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -204,10 +206,10 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_join', 30, 60);
 
-        $status = GroupService::join($id, $userId);
+        $status = $this->groupService->join($id, $userId);
 
         if ($status === null) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $httpStatus = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -247,10 +249,10 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_leave', 30, 60);
 
-        $success = GroupService::leave($id, $userId);
+        $success = $this->groupService->leave($id, $userId);
 
         if (!$success) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $httpStatus = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -283,7 +285,7 @@ class GroupsController extends BaseApiController
     {
         $id = (int) $id;
 
-        $group = GroupService::getById($id);
+        $group = $this->groupService->getById($id);
         if (!$group) {
             return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
         }
@@ -299,7 +301,7 @@ class GroupsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = GroupService::getMembers($id, $filters);
+        $result = $this->groupService->getMembers($id, $filters);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -325,10 +327,10 @@ class GroupsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Role is required', 'role', 400);
         }
 
-        $success = GroupService::updateMemberRole($id, $targetUserId, $userId, $role);
+        $success = $this->groupService->updateMemberRole($id, $targetUserId, $userId, $role);
 
         if (!$success) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_MEMBER') {
@@ -359,10 +361,10 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('groups_member_remove', 20, 60);
 
-        $success = GroupService::removeMember($id, $targetUserId, $userId);
+        $success = $this->groupService->removeMember($id, $targetUserId, $userId);
 
         if (!$success) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
@@ -388,10 +390,10 @@ class GroupsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
-        $requests = GroupService::getPendingRequests($id, $userId);
+        $requests = $this->groupService->getPendingRequests($id, $userId);
 
         if ($requests === null) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
@@ -421,10 +423,10 @@ class GroupsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Action is required', 'action', 400);
         }
 
-        $success = GroupService::handleJoinRequest($id, $requesterId, $userId, $action);
+        $success = $this->groupService->handleJoinRequest($id, $requesterId, $userId, $action);
 
         if (!$success) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -476,10 +478,10 @@ class GroupsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = GroupService::getDiscussions($id, $userId, $filters);
+        $result = $this->groupService->getDiscussions($id, $userId, $filters);
 
         if ($result === null) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
@@ -509,10 +511,10 @@ class GroupsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $discussion = GroupService::createDiscussion($id, $userId, $data);
+        $discussion = $this->groupService->createDiscussion($id, $userId, $data);
 
         if ($discussion === null) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
@@ -551,10 +553,10 @@ class GroupsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = GroupService::getDiscussionMessages($id, $discussionId, $userId, $filters);
+        $result = $this->groupService->getDiscussionMessages($id, $discussionId, $userId, $filters);
 
         if ($result === null) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -591,10 +593,10 @@ class GroupsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $message = GroupService::postToDiscussion($id, $discussionId, $userId, $data);
+        $message = $this->groupService->postToDiscussion($id, $discussionId, $userId, $data);
 
         if ($message === null) {
-            $errors = GroupService::getErrors();
+            $errors = $this->groupService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -630,10 +632,10 @@ class GroupsController extends BaseApiController
             'include_expired' => $this->queryBool('include_expired'),
         ];
 
-        $result = GroupAnnouncementService::list($id, $userId, $filters);
+        $result = $this->groupAnnouncementService->list($id, $userId, $filters);
 
         if ($result === null) {
-            $errors = GroupAnnouncementService::getErrors();
+            $errors = $this->groupAnnouncementService->getErrors();
             $status = $this->resolveErrorStatus($errors);
             return $this->respondWithErrors($errors, $status);
         }
@@ -650,10 +652,10 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $data = $this->getAllInput();
 
-        $result = GroupAnnouncementService::create($id, $userId, $data);
+        $result = $this->groupAnnouncementService->create($id, $userId, $data);
 
         if ($result === null) {
-            $errors = GroupAnnouncementService::getErrors();
+            $errors = $this->groupAnnouncementService->getErrors();
             $status = $this->resolveErrorStatus($errors);
             return $this->respondWithErrors($errors, $status);
         }
@@ -679,10 +681,10 @@ class GroupsController extends BaseApiController
         $userId = $this->requireAuth();
         $data = $this->getAllInput();
 
-        $result = GroupAnnouncementService::update($id, $announcementId, $userId, $data);
+        $result = $this->groupAnnouncementService->update($id, $announcementId, $userId, $data);
 
         if ($result === null) {
-            $errors = GroupAnnouncementService::getErrors();
+            $errors = $this->groupAnnouncementService->getErrors();
             $status = $this->resolveErrorStatus($errors);
             return $this->respondWithErrors($errors, $status);
         }
@@ -699,10 +701,10 @@ class GroupsController extends BaseApiController
         $announcementId = (int) $announcementId;
         $userId = $this->requireAuth();
 
-        $success = GroupAnnouncementService::delete($id, $announcementId, $userId);
+        $success = $this->groupAnnouncementService->delete($id, $announcementId, $userId);
 
         if (!$success) {
-            $errors = GroupAnnouncementService::getErrors();
+            $errors = $this->groupAnnouncementService->getErrors();
             $status = $this->resolveErrorStatus($errors);
             return $this->respondWithErrors($errors, $status);
         }
@@ -748,10 +750,10 @@ class GroupsController extends BaseApiController
 
             $imageUrl = \App\Core\ImageUploader::upload($fileArray);
 
-            $success = GroupService::updateImage($id, $userId, $imageUrl, $imageType);
+            $success = $this->groupService->updateImage($id, $userId, $imageUrl, $imageType);
 
             if (!$success) {
-                $errors = GroupService::getErrors();
+                $errors = $this->groupService->getErrors();
                 $status = 400;
                 foreach ($errors as $error) {
                     if ($error['code'] === 'NOT_FOUND') {

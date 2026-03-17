@@ -11,7 +11,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Nexus\Core\TenantContext;
-use Nexus\Helpers\UrlHelper;
+use App\Helpers\UrlHelper;
 
 /**
  * BaseApiController - Laravel base class for all API controllers

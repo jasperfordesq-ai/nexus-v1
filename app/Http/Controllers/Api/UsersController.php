@@ -8,8 +8,10 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\UserService;
-use Nexus\Services\Enterprise\GdprService;
+use App\Services\UserService;
+use App\Services\Enterprise\GdprService;
+use App\Services\ListingService;
+use App\Services\MailchimpService;
 use Nexus\Core\TenantContext;
 use App\Models\User;
 
@@ -23,6 +25,13 @@ class UsersController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly GdprService $gdprService,
+        private readonly ListingService $listingService,
+        private readonly MailchimpService $mailchimpService,
+        private readonly UserService $userService,
+    ) {}
+
     // ================================================================
     // PROFILE
     // ================================================================
@@ -34,7 +43,7 @@ class UsersController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $profile = UserService::getOwnProfile($userId);
+        $profile = $this->userService->getOwnProfile($userId);
 
         if (!$profile) {
             return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
@@ -53,14 +62,14 @@ class UsersController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $success = UserService::updateProfile($userId, $data);
+        $success = $this->userService->updateProfile($userId, $data);
 
         if (!$success) {
-            $errors = UserService::getErrors();
+            $errors = $this->userService->getErrors();
             return $this->respondWithErrors($errors, 422);
         }
 
-        $profile = UserService::getOwnProfile($userId);
+        $profile = $this->userService->getOwnProfile($userId);
 
         return $this->respondWithData($profile);
     }
@@ -72,10 +81,10 @@ class UsersController extends BaseApiController
     {
         $viewerId = $this->getOptionalUserId();
 
-        $profile = UserService::getPublicProfile($id, $viewerId);
+        $profile = $this->userService->getPublicProfile($id, $viewerId);
 
         if (!$profile) {
-            $errors = UserService::getErrors();
+            $errors = $this->userService->getErrors();
             if (!empty($errors)) {
                 $errorCode = $errors[0]['code'] ?? 'NOT_FOUND';
                 if ($errorCode === 'FORBIDDEN') {
@@ -96,7 +105,7 @@ class UsersController extends BaseApiController
         $q = $this->query('q', '');
         $limit = $this->queryInt('limit', 20, 1, 100);
 
-        $results = UserService::search($q, $limit);
+        $results = $this->userService->search($q, $limit);
 
         return $this->respondWithData($results);
     }
@@ -109,7 +118,7 @@ class UsersController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
-        $stats = UserService::getProfileStats($userId, $tenantId);
+        $stats = $this->userService->getProfileStats($userId, $tenantId);
 
         return $this->respondWithData($stats);
     }
@@ -152,7 +161,7 @@ class UsersController extends BaseApiController
             $filters['cursor'] = $cursor;
         }
 
-        $result = \Nexus\Services\ListingService::getAll($filters);
+        $result = $this->listingService->getAll($filters);
 
         return $this->respondWithData($result['items'], [
             'cursor'   => $result['cursor'],
@@ -172,7 +181,7 @@ class UsersController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $profile = UserService::getOwnProfile($userId);
+        $profile = $this->userService->getOwnProfile($userId);
 
         return $this->respondWithData([
             'privacy' => [
@@ -196,19 +205,19 @@ class UsersController extends BaseApiController
 
         // Update privacy settings if provided
         if (isset($data['privacy']) && is_array($data['privacy'])) {
-            $success = UserService::updatePrivacy($userId, $data['privacy']);
+            $success = $this->userService->updatePrivacy($userId, $data['privacy']);
             if (!$success) {
-                $errors = UserService::getErrors();
+                $errors = $this->userService->getErrors();
                 return $this->respondWithErrors($errors, 422);
             }
         }
 
         // Update notification preferences if provided
         if (isset($data['notifications']) && is_array($data['notifications'])) {
-            UserService::updateNotificationPreferences($userId, $data['notifications']);
+            $this->userService->updateNotificationPreferences($userId, $data['notifications']);
         }
 
-        $profile = UserService::getOwnProfile($userId);
+        $profile = $this->userService->getOwnProfile($userId);
 
         return $this->respondWithData([
             'privacy' => [
@@ -322,10 +331,10 @@ class UsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'New password is required', 'new_password', 400);
         }
 
-        $success = UserService::updatePassword($userId, $currentPassword, $newPassword);
+        $success = $this->userService->updatePassword($userId, $currentPassword, $newPassword);
 
         if (!$success) {
-            $errors = UserService::getErrors();
+            $errors = $this->userService->getErrors();
             return $this->respondWithErrors($errors, 400);
         }
 
@@ -344,10 +353,10 @@ class UsersController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('delete_account', 1, 60);
 
-        $success = UserService::deleteAccount($userId);
+        $success = $this->userService->deleteAccount($userId);
 
         if (!$success) {
-            $errors = UserService::getErrors();
+            $errors = $this->userService->getErrors();
             return $this->respondWithErrors($errors, 400);
         }
 
@@ -433,8 +442,7 @@ class UsersController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $gdprService = new GdprService();
-        $consents = $gdprService->getUserConsents($userId);
+        $consents = $this->gdprService->getUserConsents($userId);
 
         return $this->respondWithData($consents);
     }
@@ -456,8 +464,7 @@ class UsersController extends BaseApiController
         }
 
         try {
-            $gdprService = new GdprService();
-            $result = $gdprService->updateUserConsent($userId, $slug, $given);
+            $result = $this->gdprService->updateUserConsent($userId, $slug, $given);
 
             // Sync newsletter subscription when marketing_email consent changes
             if ($slug === 'marketing_email') {
@@ -494,8 +501,7 @@ class UsersController extends BaseApiController
         }
 
         try {
-            $gdprService = new GdprService();
-            $result = $gdprService->createRequest($userId, $type, [
+            $result = $this->gdprService->createRequest($userId, $type, [
                 'notes'    => $notes,
                 'metadata' => [
                     'source'        => 'user_settings',
@@ -591,7 +597,7 @@ class UsersController extends BaseApiController
             'limit'     => $this->queryInt('per_page', 20, 1, 100),
         ];
 
-        $result = UserService::getNearby($lat, $lon, $filters, $currentUserId);
+        $result = $this->userService->getNearby($lat, $lon, $filters, $currentUserId);
 
         return $this->respondWithData($result['items'], [
             'search' => [
@@ -689,7 +695,7 @@ class UsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No avatar file uploaded or upload error', 'avatar', 400);
         }
 
-        // Build a $_FILES-compatible array for UserService::updateAvatar()
+        // Build a $_FILES-compatible array for $this->userService->updateAvatar()
         $fileArray = [
             'name'     => $file->getClientOriginalName(),
             'type'     => $file->getMimeType(),
@@ -698,10 +704,10 @@ class UsersController extends BaseApiController
             'size'     => $file->getSize(),
         ];
 
-        $avatarUrl = UserService::updateAvatar($userId, $fileArray);
+        $avatarUrl = $this->userService->updateAvatar($userId, $fileArray);
 
         if (!$avatarUrl) {
-            $errors = UserService::getErrors();
+            $errors = $this->userService->getErrors();
             return $this->respondWithErrors($errors, 400);
         }
 
@@ -740,7 +746,7 @@ class UsersController extends BaseApiController
                 }
 
                 try {
-                    $mailchimp = new \Nexus\Services\MailchimpService();
+                    $mailchimp = $this->mailchimpService;
                     $mailchimp->subscribe($email, $user['first_name'], $user['last_name']);
                 } catch (\Throwable $e) {
                     error_log("Mailchimp Subscribe Failed: " . $e->getMessage());
@@ -750,7 +756,7 @@ class UsersController extends BaseApiController
                     \App\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'unsubscribed']);
 
                     try {
-                        $mailchimp = new \Nexus\Services\MailchimpService();
+                        $mailchimp = $this->mailchimpService;
                         $mailchimp->unsubscribe($email);
                     } catch (\Throwable $e) {
                         error_log("Mailchimp Unsubscribe Failed: " . $e->getMessage());

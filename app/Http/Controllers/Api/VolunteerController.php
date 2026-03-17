@@ -25,6 +25,8 @@ use App\Services\VolunteerService;
 use App\Services\SafeguardingService;
 use App\Services\VolunteerCheckInService;
 use App\Services\VolunteerWellbeingService;
+use App\Services\VolunteerMatchingService;
+use App\Services\VolunteerReminderService;
 use App\Services\WebhookDispatchService;
 use Nexus\Core\TenantContext;
 
@@ -54,6 +56,8 @@ class VolunteerController extends BaseApiController
         private readonly VolunteerWellbeingService $volunteerWellbeingService,
         private readonly SafeguardingService $safeguardingService,
         private readonly VolunteerCheckInService $volunteerCheckInService,
+        private readonly VolunteerMatchingService $volunteerMatchingService,
+        private readonly VolunteerReminderService $volunteerReminderService,
     ) {}
 
     private function ensureFeature(): void
@@ -724,10 +728,10 @@ class VolunteerController extends BaseApiController
         }
 
         $checkinUserId = $this->volunteerCheckInService->getUserIdByToken($token);
-        $success = \Nexus\Services\VolunteerCheckInService::checkOut($token);
+        $success = $this->volunteerCheckInService->checkOut($token);
 
         if (!$success) {
-            $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
+            $errors = $this->volunteerCheckInService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
@@ -808,7 +812,7 @@ class VolunteerController extends BaseApiController
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
-        $pattern = \Nexus\Services\RecurringShiftService::getPattern($patternId);
+        $pattern = $this->recurringShiftService->getPattern($patternId);
         return $this->respondWithData($pattern, null, 201);
     }
 
@@ -819,14 +823,14 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_recurring_update', 10, 60);
         $patternId = (int) $id;
 
-        $success = \Nexus\Services\RecurringShiftService::updatePattern($patternId, $this->getAllInput(), $userId);
+        $success = $this->recurringShiftService->updatePattern($patternId, $this->getAllInput(), $userId);
 
         if (!$success) {
-            $errors = \Nexus\Services\RecurringShiftService::getErrors();
+            $errors = $this->recurringShiftService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
-        $pattern = \Nexus\Services\RecurringShiftService::getPattern($patternId);
+        $pattern = $this->recurringShiftService->getPattern($patternId);
         return $this->respondWithData($pattern);
     }
 
@@ -837,14 +841,14 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_recurring_delete', 10, 60);
         $patternId = (int) $id;
 
-        $deactivated = \Nexus\Services\RecurringShiftService::deactivatePattern($patternId, $userId);
+        $deactivated = $this->recurringShiftService->deactivatePattern($patternId, $userId);
 
         if (!$deactivated) {
-            $errors = \Nexus\Services\RecurringShiftService::getErrors();
+            $errors = $this->recurringShiftService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
-        $deleted = \Nexus\Services\RecurringShiftService::deleteFutureShifts($patternId, $userId);
+        $deleted = $this->recurringShiftService->deleteFutureShifts($patternId, $userId);
 
         return $this->respondWithData([
             'message' => 'Recurring pattern deactivated',
@@ -862,7 +866,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_recommended', 30, 60);
 
-        $shifts = \Nexus\Services\VolunteerMatchingService::getRecommendedShifts($userId, [
+        $shifts = $this->volunteerMatchingService->getRecommendedShifts($userId, [
             'limit' => $this->queryInt('limit', 10, 1, 20),
             'min_match_score' => $this->queryInt('min_score', 20, 0, 100),
         ]);
@@ -929,7 +933,7 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Certificate not found', null, 404);
         }
 
-        \Nexus\Services\VolunteerCertificateService::markDownloaded($code);
+        $this->volunteerCertificateService->markDownloaded($code);
 
         return response($html, 200)->header('Content-Type', 'text/html; charset=utf-8');
     }
@@ -1177,7 +1181,7 @@ class VolunteerController extends BaseApiController
             'date_to' => $this->query('date_to'),
         ];
 
-        $csv = \Nexus\Services\VolunteerExpenseService::exportExpenses($filters);
+        $csv = $this->volunteerExpenseService->exportExpenses($filters);
 
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')
@@ -1190,7 +1194,7 @@ class VolunteerController extends BaseApiController
         $this->requireAdmin();
 
         $orgId = $this->query('organization_id') ? (int) $this->query('organization_id') : null;
-        $policies = \Nexus\Services\VolunteerExpenseService::getPolicies($orgId);
+        $policies = $this->volunteerExpenseService->getPolicies($orgId);
         return $this->respondWithData($policies);
     }
 
@@ -1218,7 +1222,7 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'At least one policy field is required (e.g., max_amount, requires_receipt, auto_approve_below, description, enabled)', null, 422);
         }
 
-        $result = \Nexus\Services\VolunteerExpenseService::updatePolicy($data);
+        $result = $this->volunteerExpenseService->updatePolicy($data);
         return $this->respondWithData(['success' => $result]);
     }
 
@@ -1292,7 +1296,7 @@ class VolunteerController extends BaseApiController
             'search' => $this->query('search'),
         ];
 
-        $consents = \Nexus\Services\GuardianConsentService::getConsentsForAdmin($filters);
+        $consents = $this->guardianConsentService->getConsentsForAdmin($filters);
         return $this->respondWithData($consents);
     }
 
@@ -1404,7 +1408,7 @@ class VolunteerController extends BaseApiController
             'status' => $this->query('status'),
         ];
 
-        $result = \Nexus\Services\SafeguardingService::getIncidents($filters);
+        $result = $this->safeguardingService->getIncidents($filters);
         return $this->respondWithData($result);
     }
 
@@ -1444,7 +1448,7 @@ class VolunteerController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 50),
         ];
 
-        $result = \Nexus\Services\SafeguardingService::getIncidents($filters);
+        $result = $this->safeguardingService->getIncidents($filters);
         return $this->respondWithData($result);
     }
 
@@ -1751,7 +1755,7 @@ class VolunteerController extends BaseApiController
             'date_to' => $this->query('date_to'),
         ];
 
-        $csv = \Nexus\Services\VolunteerDonationService::exportDonations($filters);
+        $csv = $this->volunteerDonationService->exportDonations($filters);
 
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')
@@ -1873,7 +1877,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $result = \Nexus\Services\WebhookDispatchService::testWebhook((int) $id);
+        $result = $this->webhookDispatchService->testWebhook((int) $id);
         return $this->respondWithData($result);
     }
 
@@ -1887,7 +1891,7 @@ class VolunteerController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 50),
         ];
 
-        $logs = \Nexus\Services\WebhookDispatchService::getLogs((int) $id, $filters);
+        $logs = $this->webhookDispatchService->getLogs((int) $id, $filters);
         return $this->respondWithData($logs);
     }
 
@@ -1900,7 +1904,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $settings = \Nexus\Services\VolunteerReminderService::getSettings();
+        $settings = $this->volunteerReminderService->getSettings();
         return $this->respondWithData($settings);
     }
 
@@ -1918,7 +1922,7 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid reminder_type. Must be one of: ' . implode(', ', $allowedTypes), 'reminder_type', 422);
         }
 
-        $result = \Nexus\Services\VolunteerReminderService::updateSetting($type, $data);
+        $result = $this->volunteerReminderService->updateSetting($type, $data);
         return $this->respondWithData(['success' => $result]);
     }
 

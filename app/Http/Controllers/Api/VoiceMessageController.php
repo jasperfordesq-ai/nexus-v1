@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\AudioUploader;
+use App\Core\AudioUploader;
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use Nexus\Core\TenantContext;

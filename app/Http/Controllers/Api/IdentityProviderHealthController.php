@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\Identity\IdentityProviderRegistry;
+use App\Services\Identity\IdentityProviderRegistry;
 
 /**
  * IdentityProviderHealthController -- Identity provider health status.
@@ -20,13 +20,17 @@ class IdentityProviderHealthController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly IdentityProviderRegistry $identityProviderRegistry,
+    ) {}
+
     /** GET /api/v2/identity/provider-health */
     public function getProviderHealth(): JsonResponse
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $providers = IdentityProviderRegistry::all();
+        $providers = $this->identityProviderRegistry->all();
         $health = [];
 
         foreach ($providers as $slug => $provider) {

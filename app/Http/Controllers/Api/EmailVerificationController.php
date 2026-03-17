@@ -13,6 +13,7 @@ use Nexus\Core\TenantContext;
 use App\Core\RateLimiter;
 use App\Core\Mailer;
 use App\Core\EmailTemplate;
+use App\Services\RateLimitService;
 
 /**
  * EmailVerificationController -- Email verification endpoints.
@@ -23,6 +24,10 @@ use App\Core\EmailTemplate;
 class EmailVerificationController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly RateLimitService $rateLimitService,
+    ) {}
 
     /** Token expiry in seconds (24 hours) */
     private const TOKEN_EXPIRY_SECONDS = 86400;
@@ -177,7 +182,7 @@ class EmailVerificationController extends BaseApiController
     {
         // Rate limit by IP — 3 per 5 minutes (aggressive since unauthenticated)
         $ip = \App\Core\ClientIp::get();
-        if (\Nexus\Services\RateLimitService::check("resend_verify:$ip", 3, 300)) {
+        if ($this->rateLimitService->check("resend_verify:$ip", 3, 300)) {
             return $this->respondWithError(
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
                 'Too many requests. Please try again later.',
@@ -185,7 +190,7 @@ class EmailVerificationController extends BaseApiController
                 429
             );
         }
-        \Nexus\Services\RateLimitService::increment("resend_verify:$ip", 300);
+        $this->rateLimitService->increment("resend_verify:$ip", 300);
 
         $email = strtolower(trim($this->input('email', '')));
         $tenantId = TenantContext::getId();

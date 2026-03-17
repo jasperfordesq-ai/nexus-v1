@@ -16,7 +16,7 @@ use App\Models\AiUserLimit;
 use App\Models\Event;
 use App\Models\Listing;
 use App\Models\User;
-use Nexus\Services\AI\AIServiceFactory;
+use App\Services\AI\AIServiceFactory;
 
 /**
  * AiChatController -- AI chat endpoints (chat, stream, history, conversations,
@@ -30,7 +30,9 @@ class AiChatController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly AIServiceFactory $aiServiceFactory,
+    ) {}
 
     // =====================================================================
     // CHAT (already migrated)
@@ -176,13 +178,13 @@ class AiChatController extends BaseApiController
     {
         $this->getUserId();
 
-        $providers = AIServiceFactory::getAvailableProviders();
-        $defaultProvider = AIServiceFactory::getDefaultProvider();
+        $providers = $this->aiServiceFactory->getAvailableProviders();
+        $defaultProvider = $this->aiServiceFactory->getDefaultProvider();
 
         return $this->respondWithData([
             'providers' => $providers,
             'default' => $defaultProvider,
-            'enabled' => AIServiceFactory::isEnabled(),
+            'enabled' => $this->aiServiceFactory->isEnabled(),
         ]);
     }
 
@@ -203,7 +205,7 @@ class AiChatController extends BaseApiController
         $providerId = $this->input('provider', 'gemini');
 
         try {
-            $provider = AIServiceFactory::getProvider($providerId);
+            $provider = $this->aiServiceFactory->getProvider($providerId);
             $result = $provider->testConnection();
 
             return $this->respondWithData([
@@ -228,7 +230,7 @@ class AiChatController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
+        if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
             return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
         }
 
@@ -246,7 +248,7 @@ class AiChatController extends BaseApiController
         }
 
         try {
-            $aiProvider = AIServiceFactory::getProvider();
+            $aiProvider = $this->aiServiceFactory->getProvider();
             $prompt = $this->buildListingPrompt($userId, $title, $type, $context);
 
             $messages = [
@@ -277,7 +279,7 @@ class AiChatController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
+        if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
             return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
         }
 
@@ -294,7 +296,7 @@ class AiChatController extends BaseApiController
         }
 
         try {
-            $aiProvider = AIServiceFactory::getProvider();
+            $aiProvider = $this->aiServiceFactory->getProvider();
             $prompt = $this->buildEventPrompt($userId, $title, $context);
 
             $messages = [
@@ -325,7 +327,7 @@ class AiChatController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
+        if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
             return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
         }
 
@@ -343,7 +345,7 @@ class AiChatController extends BaseApiController
         }
 
         try {
-            $aiProvider = AIServiceFactory::getProvider();
+            $aiProvider = $this->aiServiceFactory->getProvider();
 
             $prompt = "Suggest a reply to this message on a community timebank platform.\n\n";
             $prompt .= "## ORIGINAL MESSAGE\n{$originalMessage}\n\n";
@@ -387,7 +389,7 @@ class AiChatController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
+        if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
             return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
         }
 
@@ -401,7 +403,7 @@ class AiChatController extends BaseApiController
         $skills = $this->input('skills', []);
 
         try {
-            $aiProvider = AIServiceFactory::getProvider();
+            $aiProvider = $this->aiServiceFactory->getProvider();
             $tenantId = $this->getTenantId();
 
             $listings = DB::select(
@@ -470,7 +472,7 @@ class AiChatController extends BaseApiController
     {
         $userId = $this->requireAdmin();
 
-        if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
+        if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
             return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
         }
 
@@ -483,7 +485,7 @@ class AiChatController extends BaseApiController
         $context = $this->input('context', []);
 
         try {
-            $aiProvider = AIServiceFactory::getProvider();
+            $aiProvider = $this->aiServiceFactory->getProvider();
             $prompt = $this->buildNewsletterPrompt($type, $context);
 
             if ($type === 'content') {
@@ -522,7 +524,7 @@ class AiChatController extends BaseApiController
     {
         $userId = $this->requireAdmin();
 
-        if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
+        if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
             return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
         }
 
@@ -535,7 +537,7 @@ class AiChatController extends BaseApiController
         $context = $this->input('context', []);
 
         try {
-            $aiProvider = AIServiceFactory::getProvider();
+            $aiProvider = $this->aiServiceFactory->getProvider();
             $prompt = $this->buildBlogPrompt($type, $context);
 
             $messages = [
@@ -570,7 +572,7 @@ class AiChatController extends BaseApiController
     {
         $userId = $this->requireAdmin();
 
-        if (!AIServiceFactory::isFeatureEnabled('content_generation')) {
+        if (!$this->aiServiceFactory->isFeatureEnabled('content_generation')) {
             return $this->respondWithError('FEATURE_DISABLED', 'Content generation is not enabled', null, 403);
         }
 
@@ -583,7 +585,7 @@ class AiChatController extends BaseApiController
         $context = $this->input('context', []);
 
         try {
-            $aiProvider = AIServiceFactory::getProvider();
+            $aiProvider = $this->aiServiceFactory->getProvider();
             $prompt = $this->buildPagePrompt($type, $context);
 
             $messages = [

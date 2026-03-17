@@ -8,13 +8,13 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\TenantContext;
-use Nexus\Services\Identity\IdentityProviderRegistry;
-use Nexus\Services\Identity\IdentityVerificationEventService;
-use Nexus\Services\Identity\IdentityVerificationSessionService;
-use Nexus\Services\Identity\InviteCodeService;
-use Nexus\Services\Identity\RegistrationOrchestrationService;
-use Nexus\Services\Identity\RegistrationPolicyService;
-use Nexus\Services\Identity\TenantProviderCredentialService;
+use App\Services\Identity\IdentityProviderRegistry;
+use App\Services\Identity\IdentityVerificationEventService;
+use App\Services\Identity\IdentityVerificationSessionService;
+use App\Services\Identity\InviteCodeService;
+use App\Services\Identity\RegistrationOrchestrationService;
+use App\Services\Identity\RegistrationPolicyService;
+use App\Services\Identity\TenantProviderCredentialService;
 
 /**
  * RegistrationPolicyController -- Registration policy and identity verification.
@@ -25,6 +25,16 @@ class RegistrationPolicyController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly IdentityProviderRegistry $identityProviderRegistry,
+        private readonly IdentityVerificationEventService $identityVerificationEventService,
+        private readonly IdentityVerificationSessionService $identityVerificationSessionService,
+        private readonly InviteCodeService $inviteCodeService,
+        private readonly RegistrationOrchestrationService $registrationOrchestrationService,
+        private readonly RegistrationPolicyService $registrationPolicyService,
+        private readonly TenantProviderCredentialService $tenantProviderCredentialService,
+    ) {}
+
     // ─── Admin Endpoints ─────────────────────────────────────────────────
 
     /** GET /api/v2/admin/config/registration-policy */
@@ -33,7 +43,7 @@ class RegistrationPolicyController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $policy = RegistrationPolicyService::getEffectivePolicy($tenantId);
+        $policy = $this->registrationPolicyService->getEffectivePolicy($tenantId);
 
         return $this->respondWithData($policy);
     }
@@ -46,7 +56,7 @@ class RegistrationPolicyController extends BaseApiController
         $input = $this->getAllInput();
 
         try {
-            $policy = RegistrationPolicyService::upsertPolicy($tenantId, $input);
+            $policy = $this->registrationPolicyService->upsertPolicy($tenantId, $input);
             return $this->respondWithData($policy);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_INVALID_VALUE', $e->getMessage(), null, 422);
@@ -59,12 +69,12 @@ class RegistrationPolicyController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $providers = IdentityProviderRegistry::listForAdmin();
+        $providers = $this->identityProviderRegistry->listForAdmin();
 
-        $configured = TenantProviderCredentialService::listConfigured($tenantId);
+        $configured = $this->tenantProviderCredentialService->listConfigured($tenantId);
         foreach ($providers as &$provider) {
             try {
-                $instance = IdentityProviderRegistry::get($provider['slug']);
+                $instance = $this->identityProviderRegistry->get($provider['slug']);
                 $provider['available'] = $instance->isAvailable($tenantId);
             } catch (\Throwable) {
                 $provider['available'] = false;
@@ -84,7 +94,7 @@ class RegistrationPolicyController extends BaseApiController
         $limit = min($this->inputInt('limit', 50), 100);
         $offset = max($this->inputInt('offset', 0), 0);
 
-        $sessions = IdentityVerificationSessionService::getPendingForTenant($tenantId, $limit, $offset);
+        $sessions = $this->identityVerificationSessionService->getPendingForTenant($tenantId, $limit, $offset);
 
         return $this->respondWithData($sessions);
     }
@@ -99,7 +109,7 @@ class RegistrationPolicyController extends BaseApiController
         $offset = max($this->inputInt('offset', 0), 0);
         $eventType = $this->input('event_type', null);
 
-        $result = IdentityVerificationEventService::getForTenant($tenantId, $limit, $offset, $eventType);
+        $result = $this->identityVerificationEventService->getForTenant($tenantId, $limit, $offset, $eventType);
 
         return $this->respondWithData($result);
     }
@@ -117,7 +127,7 @@ class RegistrationPolicyController extends BaseApiController
         }
 
         try {
-            $result = RegistrationOrchestrationService::adminReview($sessionId, $adminId, 'approve');
+            $result = $this->registrationOrchestrationService->adminReview($sessionId, $adminId, 'approve');
             return $this->respondWithData($result);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_INVALID_VALUE', $e->getMessage(), null, 422);
@@ -135,7 +145,7 @@ class RegistrationPolicyController extends BaseApiController
         }
 
         try {
-            $result = RegistrationOrchestrationService::adminReview($sessionId, $adminId, 'reject');
+            $result = $this->registrationOrchestrationService->adminReview($sessionId, $adminId, 'reject');
             return $this->respondWithData($result);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_INVALID_VALUE', $e->getMessage(), null, 422);
@@ -150,8 +160,8 @@ class RegistrationPolicyController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $configured = TenantProviderCredentialService::listConfigured($tenantId);
-        $allProviders = IdentityProviderRegistry::all();
+        $configured = $this->tenantProviderCredentialService->listConfigured($tenantId);
+        $allProviders = $this->identityProviderRegistry->all();
 
         $result = [];
         foreach ($allProviders as $slug => $provider) {
@@ -162,7 +172,7 @@ class RegistrationPolicyController extends BaseApiController
                 'provider_slug' => $slug,
                 'provider_name' => $provider->getName(),
                 'has_credentials' => isset($configured[$slug]),
-                'required_fields' => TenantProviderCredentialService::getRequiredFields($slug),
+                'required_fields' => $this->tenantProviderCredentialService->getRequiredFields($slug),
             ];
         }
 
@@ -175,7 +185,7 @@ class RegistrationPolicyController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        if (!$slug || !IdentityProviderRegistry::has($slug)) {
+        if (!$slug || !$this->identityProviderRegistry->has($slug)) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Unknown provider', null, 404);
         }
 
@@ -193,7 +203,7 @@ class RegistrationPolicyController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'At least one credential field is required', null, 422);
         }
 
-        $saved = TenantProviderCredentialService::save($tenantId, $slug, $credentials);
+        $saved = $this->tenantProviderCredentialService->save($tenantId, $slug, $credentials);
 
         return $this->respondWithData(['saved' => $saved, 'provider_slug' => $slug]);
     }
@@ -204,11 +214,11 @@ class RegistrationPolicyController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        if (!$slug || !IdentityProviderRegistry::has($slug)) {
+        if (!$slug || !$this->identityProviderRegistry->has($slug)) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Unknown provider', null, 404);
         }
 
-        $deleted = TenantProviderCredentialService::delete($tenantId, $slug);
+        $deleted = $this->tenantProviderCredentialService->delete($tenantId, $slug);
 
         return $this->respondWithData(['deleted' => $deleted, 'provider_slug' => $slug]);
     }
@@ -224,7 +234,7 @@ class RegistrationPolicyController extends BaseApiController
         $limit = min($this->inputInt('limit', 50), 100);
         $offset = max($this->inputInt('offset', 0), 0);
 
-        $result = InviteCodeService::listForTenant($tenantId, $limit, $offset);
+        $result = $this->inviteCodeService->listForTenant($tenantId, $limit, $offset);
 
         return $this->respondWithData($result);
     }
@@ -245,7 +255,7 @@ class RegistrationPolicyController extends BaseApiController
             return $this->respondWithError('VALIDATION_INVALID_FORMAT', 'Invalid expires_at date', null, 422);
         }
 
-        $codes = InviteCodeService::generate($tenantId, $adminId, $count, $maxUses, $expiresAt, $note);
+        $codes = $this->inviteCodeService->generate($tenantId, $adminId, $count, $maxUses, $expiresAt, $note);
 
         return $this->respondWithData(['codes' => $codes, 'count' => count($codes)]);
     }
@@ -261,7 +271,7 @@ class RegistrationPolicyController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Code ID required', null, 400);
         }
 
-        $success = InviteCodeService::deactivate($tenantId, $codeId);
+        $success = $this->inviteCodeService->deactivate($tenantId, $codeId);
         if (!$success) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Invite code not found', null, 404);
         }
@@ -277,7 +287,7 @@ class RegistrationPolicyController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
-        $status = RegistrationOrchestrationService::getRegistrationStatus($userId, $tenantId);
+        $status = $this->registrationOrchestrationService->getRegistrationStatus($userId, $tenantId);
 
         return $this->respondWithData($status);
     }
@@ -292,7 +302,7 @@ class RegistrationPolicyController extends BaseApiController
         $this->rateLimit("verify_start_{$userId}", 5, 3600);
 
         try {
-            $result = RegistrationOrchestrationService::initiateVerification($userId, $tenantId);
+            $result = $this->registrationOrchestrationService->initiateVerification($userId, $tenantId);
             return $this->respondWithData($result);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('SERVER_INTERNAL_ERROR', $e->getMessage(), null, 503);
@@ -313,7 +323,7 @@ class RegistrationPolicyController extends BaseApiController
         }
 
         $tenantId = $this->getTenantId();
-        $result = InviteCodeService::validate($tenantId, $code);
+        $result = $this->inviteCodeService->validate($tenantId, $code);
 
         return $this->respondWithData(['valid' => $result['valid'], 'reason' => $result['reason'] ?? null]);
     }
@@ -325,7 +335,7 @@ class RegistrationPolicyController extends BaseApiController
         $this->rateLimit('reg_info_' . request()->ip(), 30, 60);
 
         $tenantId = $this->getTenantId();
-        $policy = RegistrationPolicyService::getEffectivePolicy($tenantId);
+        $policy = $this->registrationPolicyService->getEffectivePolicy($tenantId);
 
         return $this->respondWithData([
             'registration_mode' => $policy['registration_mode'],

@@ -14,7 +14,10 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Models\ActivityLog;
 use App\Services\AuditLogService;
+use App\Services\Enterprise\GdprService;
+use App\Services\GamificationService;
 use App\Services\TenantSettingsService;
+use App\Services\TokenService;
 
 /**
  * AdminUsersController — Admin user management (list, view, create, update, approve, suspend, ban, etc.).
@@ -27,7 +30,10 @@ class AdminUsersController extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly GamificationService $gamificationService,
+        private readonly GdprService $gdprService,
         private readonly TenantSettingsService $tenantSettingsService,
+        private readonly TokenService $tokenService,
     ) {}
 
     // =========================================================================
@@ -367,11 +373,10 @@ class AdminUsersController extends BaseApiController
 
         // Record GDPR consents (admin-created accounts)
         try {
-            $gdprService = new \Nexus\Services\Enterprise\GdprService($tenantId);
             $consentText = "Account created by administrator. User agrees to Terms of Service and Privacy Policy upon first login.";
             $consentVersion = '1.0';
-            $gdprService->recordConsent((int) $newUser['id'], 'terms_of_service', true, $consentText, $consentVersion);
-            $gdprService->recordConsent((int) $newUser['id'], 'privacy_policy', true, $consentText, $consentVersion);
+            $this->gdprService->recordConsent((int) $newUser['id'], 'terms_of_service', true, $consentText, $consentVersion);
+            $this->gdprService->recordConsent((int) $newUser['id'], 'privacy_policy', true, $consentText, $consentVersion);
         } catch (\Throwable $e) {
             error_log("GDPR Consent Recording Failed for admin-created user: " . $e->getMessage());
         }
@@ -625,7 +630,7 @@ class AdminUsersController extends BaseApiController
         }
 
         try {
-            \Nexus\Services\GamificationService::awardBadgeByKey($id, $badgeSlug);
+            $this->gamificationService->awardBadgeByKey($id, $badgeSlug);
             ActivityLog::log($adminId, 'admin_award_badge', "Awarded badge '{$badgeSlug}' to user #{$id}");
             return $this->respondWithData(['awarded' => true, 'user_id' => $id, 'badge_slug' => $badgeSlug], null, 201);
         } catch (\Throwable $e) {
@@ -669,7 +674,7 @@ class AdminUsersController extends BaseApiController
         }
 
         try {
-            \Nexus\Services\GamificationService::runAllBadgeChecks($id);
+            $this->gamificationService->runAllBadgeChecks($id);
             ActivityLog::log($adminId, 'admin_recheck_badges', "Rechecked badges for user #{$id}");
 
             $badgeRows = DB::select(
@@ -706,8 +711,7 @@ class AdminUsersController extends BaseApiController
         }
 
         try {
-            $gdprService = new \Nexus\Services\Enterprise\GdprService($tenantId);
-            $consents = $gdprService->getUserConsents($id);
+            $consents = $this->gdprService->getUserConsents($id);
 
             $formatted = array_map(fn($c) => [
                 'consent_type' => $c['consent_type_slug'] ?? $c['consent_type'] ?? '',
@@ -785,7 +789,7 @@ class AdminUsersController extends BaseApiController
 
         try {
             // Generate an access token for the target user with impersonation claim
-            $token = \Nexus\Services\TokenService::generateToken($id, $userTenantId, [
+            $token = $this->tokenService->generateToken($id, $userTenantId, [
                 'impersonated_by' => $adminId,
             ]);
 

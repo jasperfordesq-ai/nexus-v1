@@ -7,9 +7,9 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\MessageService;
-use Nexus\Services\BrokerMessageVisibilityService;
-use Nexus\Core\AudioUploader;
+use App\Services\MessageService;
+use App\Services\BrokerMessageVisibilityService;
+use App\Core\AudioUploader;
 use Nexus\Core\TenantContext;
 use App\Models\Message;
 
@@ -23,6 +23,11 @@ use App\Models\Message;
 class MessagesController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly MessageService $messageService,
+        private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
+    ) {}
 
     // ================================================================
     // CONVERSATIONS
@@ -43,7 +48,7 @@ class MessagesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = MessageService::getConversations($userId, $filters);
+        $result = $this->messageService->getConversations($userId, $filters);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -62,10 +67,10 @@ class MessagesController extends BaseApiController
         $otherUserId = $id;
 
         // Verify conversation exists
-        $conversation = MessageService::getConversation($otherUserId, $userId);
+        $conversation = $this->messageService->getConversation($otherUserId, $userId);
 
         if (!$conversation) {
-            $errors = MessageService::getErrors();
+            $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
                 return $this->respondWithErrors($errors, 404);
             }
@@ -80,11 +85,11 @@ class MessagesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = MessageService::getMessages($otherUserId, $userId, $filters);
+        $result = $this->messageService->getMessages($otherUserId, $userId, $filters);
 
         // Mark as read when viewing (unless explicitly fetching newer messages for polling)
         if ($filters['direction'] !== 'newer' || !$this->query('cursor')) {
-            MessageService::markAsRead($otherUserId, $userId);
+            $this->messageService->markAsRead($otherUserId, $userId);
         }
 
         return $this->respondWithData($result['items'], [
@@ -116,10 +121,10 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Message body or voice message is required', 'body', 422);
         }
 
-        $message = MessageService::send($userId, $data);
+        $message = $this->messageService->send($userId, $data);
 
         if (!$message) {
-            $errors = MessageService::getErrors();
+            $errors = $this->messageService->getErrors();
             return $this->respondWithErrors($errors, 422);
         }
 
@@ -134,7 +139,7 @@ class MessagesController extends BaseApiController
         $userId = $this->requireAuth();
         $otherUserId = $id;
 
-        $count = MessageService::markAsRead($otherUserId, $userId);
+        $count = $this->messageService->markAsRead($otherUserId, $userId);
 
         return $this->respondWithData(['marked_read' => $count]);
     }
@@ -146,7 +151,7 @@ class MessagesController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $count = MessageService::getUnreadCount($userId);
+        $count = $this->messageService->getUnreadCount($userId);
 
         return $this->respondWithData(['count' => $count]);
     }
@@ -163,7 +168,7 @@ class MessagesController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('messages_restriction_status', 30, 60);
 
-        $status = BrokerMessageVisibilityService::getUserRestrictionStatus($userId);
+        $status = $this->brokerMessageVisibilityService->getUserRestrictionStatus($userId);
 
         return $this->respondWithData($status);
     }
@@ -181,15 +186,15 @@ class MessagesController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('messages_delete', 10, 60);
 
-        $conversation = MessageService::getConversation($id, $userId);
+        $conversation = $this->messageService->getConversation($id, $userId);
         if (!$conversation) {
             return $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
         }
 
-        $success = MessageService::archiveConversation($id, $userId);
+        $success = $this->messageService->archiveConversation($id, $userId);
 
         if (!$success) {
-            $errors = MessageService::getErrors();
+            $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
                 return $this->respondWithErrors($errors, 500);
             }
@@ -208,12 +213,12 @@ class MessagesController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('messages_delete', 10, 60);
 
-        $conversation = MessageService::getConversation($id, $userId);
+        $conversation = $this->messageService->getConversation($id, $userId);
         if (!$conversation) {
             return $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
         }
 
-        MessageService::archiveConversation($id, $userId);
+        $this->messageService->archiveConversation($id, $userId);
 
         return $this->noContent();
     }
@@ -227,7 +232,7 @@ class MessagesController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('messages_restore', 20, 60);
 
-        $count = MessageService::unarchiveConversation($id, $userId);
+        $count = $this->messageService->unarchiveConversation($id, $userId);
 
         if ($count === 0) {
             return $this->respondWithError('NOT_FOUND', 'No archived conversation found', null, 404);
@@ -258,10 +263,10 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Message is too long (max 10000 characters)', 'body', 400);
         }
 
-        $result = MessageService::editMessage($id, $userId, $body);
+        $result = $this->messageService->editMessage($id, $userId, $body);
 
         if ($result === null) {
-            $errors = MessageService::getErrors();
+            $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
                 return $this->respondWithErrors($errors, 403);
             }
@@ -280,10 +285,10 @@ class MessagesController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('messages_delete', 20, 60);
 
-        $success = MessageService::deleteMessage($id, $userId);
+        $success = $this->messageService->deleteMessage($id, $userId);
 
         if (!$success) {
-            $errors = MessageService::getErrors();
+            $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
                 return $this->respondWithErrors($errors, 403);
             }
@@ -316,10 +321,10 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid emoji', 'emoji', 400);
         }
 
-        $result = MessageService::toggleReaction($id, $userId, $emoji);
+        $result = $this->messageService->toggleReaction($id, $userId, $emoji);
 
         if ($result === null) {
-            $errors = MessageService::getErrors();
+            $errors = $this->messageService->getErrors();
             if (!empty($errors)) {
                 return $this->respondWithErrors($errors, 404);
             }
@@ -403,7 +408,7 @@ class MessagesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Recipient ID is required', 'recipient_id', 400);
         }
 
-        MessageService::setTypingIndicator($recipientId, $userId, $isTyping);
+        $this->messageService->setTypingIndicator($recipientId, $userId, $isTyping);
 
         return $this->respondWithData(['sent' => true]);
     }
@@ -491,7 +496,7 @@ class MessagesController extends BaseApiController
             $audioResult = AudioUploader::upload($fileArray, 0);
 
             // Send the message with voice attachment
-            $message = MessageService::send($userId, [
+            $message = $this->messageService->send($userId, [
                 'recipient_id'   => $recipientId,
                 'body'           => '', // Voice messages have no text body
                 'is_voice'       => true,
@@ -500,7 +505,7 @@ class MessagesController extends BaseApiController
             ]);
 
             if (!$message) {
-                $errors = MessageService::getErrors();
+                $errors = $this->messageService->getErrors();
                 return $this->respondWithErrors($errors, 422);
             }
 

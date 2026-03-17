@@ -13,10 +13,10 @@ use App\Services\FederationUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
-use Nexus\Services\FederatedConnectionService;
-use Nexus\Services\FederationAuditService;
-use Nexus\Services\FederationFeatureService;
-use Nexus\Services\FederationPartnershipService;
+use App\Services\FederatedConnectionService;
+use App\Services\FederationAuditService;
+use App\Services\FederationFeatureService;
+use App\Services\FederationPartnershipService;
 
 /**
  * FederationV2Controller -- Federation v2: cross-tenant discovery, messaging, connections.
@@ -28,8 +28,12 @@ class FederationV2Controller extends BaseApiController
     protected bool $isV2Api = true;
 
     public function __construct(
+        private readonly FederatedConnectionService $federatedConnectionService,
         private readonly FederationActivityService $federationActivityService,
+        private readonly FederationAuditService $federationAuditService,
         private readonly FederationEmailService $federationEmailService,
+        private readonly FederationFeatureService $federationFeatureService,
+        private readonly FederationPartnershipService $federationPartnershipService,
         private readonly FederationRealtimeService $federationRealtimeService,
         private readonly FederationUserService $federationUserService,
     ) {}
@@ -51,8 +55,8 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
-        $tenantFederationEnabled = FederationFeatureService::isGloballyEnabled()
-            && FederationFeatureService::isTenantFederationEnabled($tenantId);
+        $tenantFederationEnabled = $this->federationFeatureService->isGloballyEnabled()
+            && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         $userSettings = $this->federationUserService->getUserSettings($userId);
         $userOptedIn = (bool) ($userSettings['federation_optin'] ?? false);
@@ -83,8 +87,8 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
-        $tenantEnabled = FederationFeatureService::isGloballyEnabled()
-            && FederationFeatureService::isTenantFederationEnabled($tenantId);
+        $tenantEnabled = $this->federationFeatureService->isGloballyEnabled()
+            && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
             return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
@@ -108,7 +112,7 @@ class FederationV2Controller extends BaseApiController
         $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
-            FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
+            $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         }
 
@@ -121,8 +125,8 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
-        $tenantEnabled = FederationFeatureService::isGloballyEnabled()
-            && FederationFeatureService::isTenantFederationEnabled($tenantId);
+        $tenantEnabled = $this->federationFeatureService->isGloballyEnabled()
+            && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
             return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
@@ -147,7 +151,7 @@ class FederationV2Controller extends BaseApiController
         $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
-            FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
+            $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         }
 
@@ -163,7 +167,7 @@ class FederationV2Controller extends BaseApiController
         $success = $this->federationUserService->optOut($userId);
 
         if ($success) {
-            FederationAuditService::log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
+            $this->federationAuditService->log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation disabled successfully.']);
         }
 
@@ -806,7 +810,7 @@ class FederationV2Controller extends BaseApiController
             }
 
             // Verify an active partnership exists between the two tenants
-            $partnership = FederationPartnershipService::getPartnership($tenantId, (int)$receiverTenantId);
+            $partnership = $this->federationPartnershipService->getPartnership($tenantId, (int)$receiverTenantId);
             if (!$partnership || $partnership['status'] !== 'active') {
                 return $this->respondWithError('NO_PARTNERSHIP', 'No active partnership with the recipient\'s community.', null, 403);
             }
@@ -854,7 +858,7 @@ class FederationV2Controller extends BaseApiController
             ]);
 
             // Audit log
-            FederationAuditService::log(
+            $this->federationAuditService->log(
                 'cross_tenant_message',
                 $tenantId,
                 (int)$receiverTenantId,
@@ -1053,8 +1057,8 @@ class FederationV2Controller extends BaseApiController
         $limit = min($this->queryInt('limit', 50, 1, 100), 100);
         $offset = max($this->queryInt('offset', 0, 0), 0);
 
-        $connections = FederatedConnectionService::getConnections($userId, $status, $limit, $offset);
-        $pendingCount = FederatedConnectionService::getPendingCount($userId);
+        $connections = $this->federatedConnectionService->getConnections($userId, $status, $limit, $offset);
+        $pendingCount = $this->federatedConnectionService->getPendingCount($userId);
 
         return $this->respondWithData([
             'connections' => $connections,
@@ -1074,7 +1078,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'receiver_id and receiver_tenant_id are required.', null, 400);
         }
 
-        $result = FederatedConnectionService::sendRequest($userId, $receiverId, $receiverTenantId, $message);
+        $result = $this->federatedConnectionService->sendRequest($userId, $receiverId, $receiverTenantId, $message);
 
         if (!$result['success']) {
             return $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
@@ -1087,7 +1091,7 @@ class FederationV2Controller extends BaseApiController
     public function acceptConnection(int $id): JsonResponse
     {
         $userId = $this->getUserId();
-        $result = FederatedConnectionService::acceptRequest($id, $userId);
+        $result = $this->federatedConnectionService->acceptRequest($id, $userId);
 
         if (!$result['success']) {
             return $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
@@ -1100,7 +1104,7 @@ class FederationV2Controller extends BaseApiController
     public function rejectConnection(int $id): JsonResponse
     {
         $userId = $this->getUserId();
-        $result = FederatedConnectionService::rejectRequest($id, $userId);
+        $result = $this->federatedConnectionService->rejectRequest($id, $userId);
 
         if (!$result['success']) {
             return $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 400);
@@ -1113,7 +1117,7 @@ class FederationV2Controller extends BaseApiController
     public function removeConnection(int $id): JsonResponse
     {
         $userId = $this->getUserId();
-        $result = FederatedConnectionService::removeConnection($id, $userId);
+        $result = $this->federatedConnectionService->removeConnection($id, $userId);
 
         if (!$result['success']) {
             return $this->respondWithError('CONNECTION_ERROR', $result['error'], null, 404);
@@ -1126,7 +1130,7 @@ class FederationV2Controller extends BaseApiController
     public function connectionStatus($userId, $tenantId): JsonResponse
     {
         $currentUserId = $this->getUserId();
-        $status = FederatedConnectionService::getStatus($currentUserId, $userId, $tenantId);
+        $status = $this->federatedConnectionService->getStatus($currentUserId, $userId, $tenantId);
         return $this->respondWithData($status);
     }
 

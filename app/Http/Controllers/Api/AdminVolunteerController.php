@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\VolunteerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
@@ -18,6 +19,10 @@ use Nexus\Core\TenantContext;
 class AdminVolunteerController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly VolunteerService $volunteerService,
+    ) {}
 
     private const ALLOWED_TABLES = [
         'vol_opportunities', 'vol_applications', 'vol_shifts', 'vol_shift_signups',
@@ -461,7 +466,7 @@ class AdminVolunteerController extends BaseApiController
     {
         $this->requireSuperAdmin();
 
-        $sent = \Nexus\Services\VolunteerService::sendShiftReminders();
+        $sent = $this->volunteerService->sendShiftReminders();
         return $this->respondWithData(['reminders_sent' => $sent]);
     }
 

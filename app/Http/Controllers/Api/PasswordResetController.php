@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TokenService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
@@ -25,6 +26,10 @@ use App\Models\User;
 class PasswordResetController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly TokenService $tokenService,
+    ) {}
 
     /** Token expiry in seconds (1 hour) */
     private const TOKEN_EXPIRY_SECONDS = 3600;
@@ -334,7 +339,7 @@ class PasswordResetController extends BaseApiController
     private function invalidateUserTokens(int $userId): void
     {
         try {
-            \Nexus\Services\TokenService::revokeAllTokensForUser($userId);
+            $this->tokenService->revokeAllTokensForUser($userId);
         } catch (\Throwable $e) {
             error_log("Could not revoke tokens for user {$userId}: " . $e->getMessage());
         }

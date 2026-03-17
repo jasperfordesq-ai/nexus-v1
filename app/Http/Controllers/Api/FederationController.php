@@ -13,12 +13,12 @@ use App\Services\FederationRealtimeService;
 use App\Services\FederationUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\CorsHelper;
+use App\Core\CorsHelper;
 use Nexus\Middleware\FederationApiMiddleware;
 use App\Models\Notification;
-use Nexus\Services\BrokerMessageVisibilityService;
-use Nexus\Services\FederationAuditService;
-use Nexus\Services\FederationFeatureService;
+use App\Services\BrokerMessageVisibilityService;
+use App\Services\FederationAuditService;
+use App\Services\FederationFeatureService;
 
 /**
  * FederationController -- Federation cross-tenant features.
@@ -33,10 +33,13 @@ class FederationController extends BaseApiController
 
     public function __construct(
         private readonly FederationActivityService $federationActivityService,
+        private readonly FederationAuditService $federationAuditService,
         private readonly FederationEmailService $federationEmailService,
+        private readonly FederationFeatureService $federationFeatureService,
         private readonly FederationJwtService $federationJwtService,
         private readonly FederationRealtimeService $federationRealtimeService,
         private readonly FederationUserService $federationUserService,
+        private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
     ) {}
 
     private const LEVEL_NAMES = [
@@ -56,8 +59,8 @@ class FederationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
-        $tenantFederationEnabled = FederationFeatureService::isGloballyEnabled()
-            && FederationFeatureService::isTenantFederationEnabled($tenantId);
+        $tenantFederationEnabled = $this->federationFeatureService->isGloballyEnabled()
+            && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         $userSettings = $this->federationUserService->getUserSettings($userId);
         $userOptedIn = (bool) ($userSettings['federation_optin'] ?? false);
@@ -88,8 +91,8 @@ class FederationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
-        $tenantEnabled = FederationFeatureService::isGloballyEnabled()
-            && FederationFeatureService::isTenantFederationEnabled($tenantId);
+        $tenantEnabled = $this->federationFeatureService->isGloballyEnabled()
+            && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
             return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
@@ -113,7 +116,7 @@ class FederationController extends BaseApiController
         $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
-            FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
+            $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         } else {
             return $this->respondWithError('OPT_IN_FAILED', 'Failed to enable federation. Please try again.', null, 500);
@@ -126,8 +129,8 @@ class FederationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
-        $tenantEnabled = FederationFeatureService::isGloballyEnabled()
-            && FederationFeatureService::isTenantFederationEnabled($tenantId);
+        $tenantEnabled = $this->federationFeatureService->isGloballyEnabled()
+            && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
 
         if (!$tenantEnabled) {
             return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
@@ -152,7 +155,7 @@ class FederationController extends BaseApiController
         $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
-            FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
+            $this->federationAuditService->log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation enabled successfully.']);
         } else {
             return $this->respondWithError('SETUP_FAILED', 'Failed to enable federation. Please try again.', null, 500);
@@ -168,7 +171,7 @@ class FederationController extends BaseApiController
         $success = $this->federationUserService->optOut($userId);
 
         if ($success) {
-            FederationAuditService::log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
+            $this->federationAuditService->log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
             return $this->respondWithData(['success' => true, 'message' => 'Federation disabled successfully.']);
         } else {
             return $this->respondWithError('OPT_OUT_FAILED', 'Failed to disable federation. Please try again.', null, 500);
@@ -578,10 +581,10 @@ class FederationController extends BaseApiController
         if (!$recipient) return $this->fedError(404, 'Recipient not found or not accessible', 'RECIPIENT_NOT_FOUND');
         if (!$recipient['messaging_enabled_federated']) return $this->fedError(403, 'Recipient does not accept federated messages', 'MESSAGES_DISABLED');
 
-        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $input['sender_id'])) {
+        if ($this->brokerMessageVisibilityService->isMessagingDisabledForUser((int) $input['sender_id'])) {
             return $this->fedError(403, 'Sender messaging privileges have been restricted', 'SENDER_RESTRICTED');
         }
-        if (BrokerMessageVisibilityService::isMessagingDisabledForUser((int) $input['recipient_id'])) {
+        if ($this->brokerMessageVisibilityService->isMessagingDisabledForUser((int) $input['recipient_id'])) {
             return $this->fedError(403, 'Recipient is not currently accepting messages', 'RECIPIENT_UNAVAILABLE');
         }
 
@@ -589,7 +592,7 @@ class FederationController extends BaseApiController
         $stmt->execute([$recipient['tenant_id'], $input['sender_id'], $input['recipient_id'], $input['subject'], $input['body']]);
         $messageId = $db->lastInsertId();
 
-        FederationAuditService::log('api_message_sent', $partnerTenantId, $recipient['tenant_id'], null, ['message_id' => $messageId, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
+        $this->federationAuditService->log('api_message_sent', $partnerTenantId, $recipient['tenant_id'], null, ['message_id' => $messageId, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
 
         // Non-blocking notifications
         $senderName = $input['sender_name'] ?? 'A federation member';
@@ -653,7 +656,7 @@ class FederationController extends BaseApiController
             $status = 'completed';
         }
 
-        FederationAuditService::log('api_transaction_initiated', $partnerTenantId, $recipient['tenant_id'], null, ['transaction_id' => $transactionId, 'amount' => $amount, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
+        $this->federationAuditService->log('api_transaction_initiated', $partnerTenantId, $recipient['tenant_id'], null, ['transaction_id' => $transactionId, 'amount' => $amount, 'recipient_id' => $input['recipient_id'], 'external_partner' => $isExternal]);
 
         return $this->fedSuccess(['transaction_id' => (int) $transactionId, 'status' => $status, 'amount' => $amount, 'note' => $status === 'completed' ? 'Transaction completed successfully' : 'Transaction requires recipient confirmation'], 201);
     }
