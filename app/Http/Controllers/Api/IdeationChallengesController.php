@@ -26,7 +26,7 @@ use Nexus\Services\ChallengeOutcomeService;
  *
  * Core CRUD uses Eloquent via IdeationChallengeService.
  * All other methods call legacy static services directly (no ob_start delegation).
- * uploadDocument kept as delegation due to $_FILES usage.
+ * All methods are now fully native — no legacy delegation remaining.
  */
 class IdeationChallengesController extends BaseApiController
 {
@@ -1153,11 +1153,39 @@ class IdeationChallengesController extends BaseApiController
 
     /**
      * POST /api/v2/groups/{id}/documents
-     * Delegates to legacy due to $_FILES multipart upload handling.
+     * Multipart upload with 'file' field.
      */
     public function uploadDocument($id): JsonResponse
     {
-        return $this->delegateToLegacy(\Nexus\Controllers\Api\IdeationChallengesApiController::class, 'uploadDocument', [(int) $id]);
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('team_document', 10, 60);
+
+        /** @var \Illuminate\Http\Request $request */
+        $request = request();
+        $file = $request->file('file');
+        $title = $request->input('title');
+
+        // Build the fileData array in the same shape TeamDocumentService::upload expects ($_FILES format)
+        $fileData = [];
+        if ($file) {
+            $fileData = [
+                'name' => $file->getClientOriginalName(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error' => $file->getError(),
+                'size' => $file->getSize(),
+            ];
+        }
+
+        $docId = TeamDocumentService::upload((int) $id, $userId, $fileData, $title);
+
+        if ($docId === null) {
+            $errors = TeamDocumentService::getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
+        return $this->respondWithData(['id' => $docId], null, 201);
     }
 
     /** DELETE /api/v2/team-documents/{id} */
@@ -1187,22 +1215,4 @@ class IdeationChallengesController extends BaseApiController
         return $this->voteIdea($id);
     }
 
-    // ========================================
-    // Delegation helper — only for $_FILES methods
-    // ========================================
-
-    private function delegateToLegacy(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        try {
-            $controller->$method(...$params);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError('INTERNAL_ERROR', $e->getMessage(), null, 500);
-        }
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }
