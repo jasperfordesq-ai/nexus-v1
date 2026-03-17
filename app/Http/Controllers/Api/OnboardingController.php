@@ -9,26 +9,30 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\OnboardingService;
+use App\Services\OnboardingService;
 
 /**
  * OnboardingController -- New member onboarding flow.
  *
- * All methods now call legacy static services directly (no ob_start delegation).
+ * All methods now use Laravel DI services (no legacy static calls).
  */
 class OnboardingController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly OnboardingService $onboardingService,
+    ) {}
 
     /** GET onboarding/status */
     public function status(): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $complete = OnboardingService::isOnboardingComplete($userId);
-        $interests = OnboardingService::getUserInterests($userId);
+        $complete = $this->onboardingService->isOnboardingComplete($userId);
+        $interests = $this->onboardingService->getUserInterests($userId);
 
-        $user = \Nexus\Models\User::findById($userId);
+        $user = \App\Models\User::findById($userId);
         $hasAvatar = !empty($user['avatar_url'] ?? '');
         $hasBio = !empty(trim($user['bio'] ?? ''));
 
@@ -60,7 +64,7 @@ class OnboardingController extends BaseApiController
         $userId = $this->requireAuth();
 
         // Verify profile photo and bio are present
-        $user = \Nexus\Models\User::findById($userId);
+        $user = \App\Models\User::findById($userId);
         if (empty($user['avatar_url'])) {
             return $this->respondWithError(
                 'VALIDATION_REQUIRED_FIELD',
@@ -90,10 +94,10 @@ class OnboardingController extends BaseApiController
         // All-or-nothing: wrap in transaction
         \Nexus\Core\Database::beginTransaction();
         try {
-            OnboardingService::saveInterests($userId, $interests);
-            OnboardingService::saveSkills($userId, $offers, $needs);
-            $listingIds = OnboardingService::autoCreateListings($userId, $offers, $needs);
-            OnboardingService::completeOnboarding($userId);
+            $this->onboardingService->saveInterests($userId, $interests);
+            $this->onboardingService->saveSkills($userId, $offers, $needs);
+            $listingIds = $this->onboardingService->autoCreateListings($userId, $offers, $needs);
+            $this->onboardingService->completeOnboarding($userId);
 
             \Nexus\Core\Database::commit();
         } catch (\Throwable $e) {

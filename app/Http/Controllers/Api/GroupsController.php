@@ -746,7 +746,7 @@ class GroupsController extends BaseApiController
                 'size'     => $file->getSize(),
             ];
 
-            $imageUrl = \Nexus\Core\ImageUploader::upload($fileArray);
+            $imageUrl = \App\Core\ImageUploader::upload($fileArray);
 
             $success = GroupService::updateImage($id, $userId, $imageUrl, $imageType);
 

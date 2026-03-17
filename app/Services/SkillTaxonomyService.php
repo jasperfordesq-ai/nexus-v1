@@ -99,4 +99,108 @@ class SkillTaxonomyService
             ->where('user_id', $userId)
             ->delete() > 0;
     }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\SkillTaxonomyService::getErrors();
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::getTree().
+     */
+    public function getTree(bool $activeOnly = true): array
+    {
+        return \Nexus\Services\SkillTaxonomyService::getTree($activeOnly);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::getCategoryById().
+     */
+    public function getCategoryById(int $id): ?array
+    {
+        return \Nexus\Services\SkillTaxonomyService::getCategoryById($id);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::createCategory().
+     */
+    public function createCategory(array $data): ?int
+    {
+        return \Nexus\Services\SkillTaxonomyService::createCategory($data);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::updateCategory().
+     */
+    public function updateCategory(int $id, array $data): bool
+    {
+        return \Nexus\Services\SkillTaxonomyService::updateCategory($id, $data);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::deleteCategory().
+     */
+    public function deleteCategory(int $id, bool $hard = false): bool
+    {
+        return \Nexus\Services\SkillTaxonomyService::deleteCategory($id, $hard);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::getUserSkills().
+     */
+    public function getUserSkills(int $userId): array
+    {
+        return \Nexus\Services\SkillTaxonomyService::getUserSkills($userId);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::addUserSkill().
+     */
+    public function addUserSkill(int $userId, array $data): ?int
+    {
+        return \Nexus\Services\SkillTaxonomyService::addUserSkill($userId, $data);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::updateUserSkill().
+     */
+    public function updateUserSkill(int $userId, int $skillId, array $data): bool
+    {
+        return \Nexus\Services\SkillTaxonomyService::updateUserSkill($userId, $skillId, $data);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::removeUserSkill().
+     */
+    public function removeUserSkill(int $userId, int $skillId): bool
+    {
+        return \Nexus\Services\SkillTaxonomyService::removeUserSkill($userId, $skillId);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::searchSkills().
+     */
+    public function searchSkills(string $query, int $limit = 20): array
+    {
+        return \Nexus\Services\SkillTaxonomyService::searchSkills($query, $limit);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::getCategorySkills().
+     */
+    public function getCategorySkills(int $categoryId): array
+    {
+        return \Nexus\Services\SkillTaxonomyService::getCategorySkills($categoryId);
+    }
+
+    /**
+     * Delegates to legacy SkillTaxonomyService::getMembersWithSkill().
+     */
+    public function getMembersWithSkill(string $skillName, int $limit = 30): array
+    {
+        return \Nexus\Services\SkillTaxonomyService::getMembersWithSkill($skillName, $limit);
+    }
 }

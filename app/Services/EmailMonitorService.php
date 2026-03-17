@@ -56,4 +56,12 @@ class EmailMonitorService
     {
         \Nexus\Services\EmailMonitorService::recordRateLimitHit($tenantId);
     }
+
+    /**
+     * Get email health summary.
+     */
+    public function getHealthSummary(?int $tenantId = null): array
+    {
+        return \Nexus\Services\EmailMonitorService::getHealthSummary($tenantId);
+    }
 }

@@ -26,7 +26,7 @@ class IdentityWebhookController extends BaseApiController
     public function handleWebhook(): JsonResponse
     {
         // Rate limit webhooks (generous but protective)
-        $ip = \Nexus\Core\ClientIp::get();
+        $ip = \App\Core\ClientIp::get();
         if (\Nexus\Services\RateLimitService::check("webhook:identity:$ip", 60, 60)) {
             return $this->respondWithError(
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,

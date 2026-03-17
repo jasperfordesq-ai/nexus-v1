@@ -9,8 +9,8 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Models\ActivityLog;
-use Nexus\Services\VettingService;
+use App\Models\ActivityLog;
+use App\Services\VettingService;
 
 /**
  * AdminVettingController -- Admin member vetting and background check management.
@@ -22,7 +22,9 @@ class AdminVettingController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly VettingService $vettingService,
+    ) {}
 
     /** GET /api/v2/admin/vetting */
     public function list(): JsonResponse
@@ -40,7 +42,7 @@ class AdminVettingController extends BaseApiController
                 'per_page' => $this->queryInt('per_page', 25, 10, 100),
             ];
 
-            $result = VettingService::getAll($filters);
+            $result = $this->vettingService->getAll($filters);
 
             return $this->respondWithPaginatedCollection(
                 $result['data'],
@@ -57,7 +59,7 @@ class AdminVettingController extends BaseApiController
     public function stats(): JsonResponse
     {
         $this->requireAdmin();
-        return $this->respondWithData(VettingService::getStats());
+        return $this->respondWithData($this->vettingService->getStats());
     }
 
     /** GET /api/v2/admin/vetting/{id} */
@@ -66,7 +68,7 @@ class AdminVettingController extends BaseApiController
         $this->requireAdmin();
 
         try {
-            $record = VettingService::getById($id);
+            $record = $this->vettingService->getById($id);
             if (!$record) {
                 return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
             }
@@ -130,10 +132,10 @@ class AdminVettingController extends BaseApiController
                 'requires_enhanced_check' => $this->inputBool('requires_enhanced_check') ? 1 : 0,
             ];
 
-            $id = VettingService::create($data);
+            $id = $this->vettingService->create($data);
             ActivityLog::log($adminId, 'vetting_record_created', "Created vetting record #{$id} for user #{$userId} ({$data['vetting_type']})", false, null, 'admin', 'vetting_record', $id);
 
-            $record = VettingService::getById($id);
+            $record = $this->vettingService->getById($id);
             return $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to create vetting record', null, 500);
@@ -146,7 +148,7 @@ class AdminVettingController extends BaseApiController
         $adminId = $this->requireAdmin();
 
         try {
-            $existing = VettingService::getById($id);
+            $existing = $this->vettingService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
             }
@@ -196,11 +198,11 @@ class AdminVettingController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', 'No valid fields to update');
             }
 
-            VettingService::update($id, $data);
+            $this->vettingService->update($id, $data);
             $changedFields = implode(', ', array_keys($data));
             ActivityLog::log($adminId, 'vetting_record_updated', "Updated vetting record #{$id} ({$changedFields})", false, null, 'admin', 'vetting_record', $id);
 
-            $record = VettingService::getById($id);
+            $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to update vetting record', null, 500);
@@ -213,7 +215,7 @@ class AdminVettingController extends BaseApiController
         $adminId = $this->requireAdmin();
 
         try {
-            $existing = VettingService::getById($id);
+            $existing = $this->vettingService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
             }
@@ -221,10 +223,10 @@ class AdminVettingController extends BaseApiController
                 return $this->respondWithError('INVALID_STATUS', 'Record is already verified');
             }
 
-            VettingService::verify($id, $adminId);
+            $this->vettingService->verify($id, $adminId);
             ActivityLog::log($adminId, 'vetting_record_verified', "Verified vetting record #{$id} for {$existing['first_name']} {$existing['last_name']}", false, null, 'admin', 'vetting_record', $id);
 
-            $record = VettingService::getById($id);
+            $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to verify vetting record', null, 500);
@@ -242,15 +244,15 @@ class AdminVettingController extends BaseApiController
         }
 
         try {
-            $existing = VettingService::getById($id);
+            $existing = $this->vettingService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
             }
 
-            VettingService::reject($id, $adminId, $reason);
+            $this->vettingService->reject($id, $adminId, $reason);
             ActivityLog::log($adminId, 'vetting_record_rejected', "Rejected vetting record #{$id}: {$reason}", false, null, 'admin', 'vetting_record', $id);
 
-            $record = VettingService::getById($id);
+            $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to reject vetting record', null, 500);
@@ -263,12 +265,12 @@ class AdminVettingController extends BaseApiController
         $adminId = $this->requireAdmin();
 
         try {
-            $existing = VettingService::getById($id);
+            $existing = $this->vettingService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
             }
 
-            VettingService::delete($id);
+            $this->vettingService->delete($id);
             ActivityLog::log($adminId, 'vetting_record_deleted', "Deleted vetting record #{$id} ({$existing['vetting_type']})", false, null, 'admin', 'vetting_record', $id);
 
             return $this->respondWithData(['deleted' => true]);
@@ -305,24 +307,24 @@ class AdminVettingController extends BaseApiController
         foreach ($ids as $id) {
             $id = (int) $id;
             try {
-                $existing = VettingService::getById($id);
+                $existing = $this->vettingService->getById($id);
                 if (!$existing) { $failed++; continue; }
 
                 switch ($action) {
                     case 'verify':
                         if (in_array($existing['status'], ['pending', 'submitted'])) {
-                            VettingService::verify($id, $adminId);
+                            $this->vettingService->verify($id, $adminId);
                             $processed++;
                         } else {
                             $failed++;
                         }
                         break;
                     case 'reject':
-                        VettingService::reject($id, $adminId, $reason);
+                        $this->vettingService->reject($id, $adminId, $reason);
                         $processed++;
                         break;
                     case 'delete':
-                        VettingService::delete($id);
+                        $this->vettingService->delete($id);
                         $processed++;
                         break;
                 }
@@ -346,7 +348,7 @@ class AdminVettingController extends BaseApiController
     {
         $this->requireAdmin();
         try {
-            $records = VettingService::getUserRecords($userId);
+            $records = $this->vettingService->getUserRecords($userId);
             return $this->respondWithData($records);
         } catch (\Exception $e) {
             return $this->respondWithData([]);
@@ -364,7 +366,7 @@ class AdminVettingController extends BaseApiController
         $adminId = $this->requireAdmin();
 
         try {
-            $existing = VettingService::getById($id);
+            $existing = $this->vettingService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
             }
@@ -396,12 +398,12 @@ class AdminVettingController extends BaseApiController
                 'size'     => $file->getSize(),
             ];
 
-            $url = \Nexus\Core\ImageUploader::upload($fileArray, 'vetting/documents');
-            VettingService::updateDocumentUrl($id, $url);
+            $url = \App\Core\ImageUploader::upload($fileArray, 'vetting/documents');
+            $this->vettingService->updateDocumentUrl($id, $url);
 
             ActivityLog::log($adminId, 'vetting_document_uploaded', "Uploaded document for vetting record #{$id} ({$existing['first_name']} {$existing['last_name']})", false, null, 'admin', 'vetting_record', $id);
 
-            $record = VettingService::getById($id);
+            $record = $this->vettingService->getById($id);
             return $this->respondWithData($record);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to upload document', null, 500);

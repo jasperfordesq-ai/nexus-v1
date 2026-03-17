@@ -8,13 +8,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\RateLimitService;
 use App\Services\TenantSettingsService;
+use App\Services\TokenService;
+use App\Services\TotpService;
+use App\Services\TwoFactorChallengeManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\TenantContext;
-use Nexus\Services\TokenService;
-use Nexus\Services\TotpService;
-use Nexus\Services\TwoFactorChallengeManager;
 
 /**
  * AuthController — Authentication: login, logout, token refresh, session management.
@@ -29,6 +29,9 @@ class AuthController extends BaseApiController
     public function __construct(
         private readonly RateLimitService $rateLimitService,
         private readonly TenantSettingsService $tenantSettingsService,
+        private readonly TokenService $tokenService,
+        private readonly TotpService $totpService,
+        private readonly TwoFactorChallengeManager $twoFactorChallengeManager,
     ) {}
 
     /**
@@ -63,7 +66,7 @@ class AuthController extends BaseApiController
         }
 
         // SECURITY: Redis-based rate limiting (fast, per-IP, 10 attempts per minute)
-        $ip = \Nexus\Core\ClientIp::get();
+        $ip = \App\Core\ClientIp::get();
         if (!$this->rateLimitService->increment("auth:login:$ip", 10, 60)) {
             return $this->authError(
                 'Too many login attempts. Please try again later.',
@@ -75,9 +78,9 @@ class AuthController extends BaseApiController
 
         // SECURITY: Database-based rate limiting for brute force protection (tracks failed attempts)
         if (!empty($email)) {
-            $emailLimit = \Nexus\Core\RateLimiter::check($email, 'email');
+            $emailLimit = \App\Core\RateLimiter::check($email, 'email');
             if ($emailLimit['limited']) {
-                $message = \Nexus\Core\RateLimiter::getRetryMessage($emailLimit['retry_after']);
+                $message = \App\Core\RateLimiter::getRetryMessage($emailLimit['retry_after']);
                 return $this->authError(
                     $message,
                     ApiErrorCodes::RATE_LIMIT_EXCEEDED,
@@ -88,9 +91,9 @@ class AuthController extends BaseApiController
         }
 
         // Check rate limit by IP
-        $ipLimit = \Nexus\Core\RateLimiter::check($ip, 'ip');
+        $ipLimit = \App\Core\RateLimiter::check($ip, 'ip');
         if ($ipLimit['limited']) {
-            $message = \Nexus\Core\RateLimiter::getRetryMessage($ipLimit['retry_after']);
+            $message = \App\Core\RateLimiter::getRetryMessage($ipLimit['retry_after']);
             return $this->authError(
                 $message,
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
@@ -124,9 +127,9 @@ class AuthController extends BaseApiController
         if ($user && $passwordValid) {
             // Record successful login and clear failed attempts
             if (!empty($email)) {
-                \Nexus\Core\RateLimiter::recordAttempt($email, 'email', true);
+                \App\Core\RateLimiter::recordAttempt($email, 'email', true);
             }
-            \Nexus\Core\RateLimiter::recordAttempt($ip, 'ip', true);
+            \App\Core\RateLimiter::recordAttempt($ip, 'ip', true);
 
             // Clear Redis rate limit counter on successful login
             $this->rateLimitService->reset("auth:login:$ip");
@@ -143,7 +146,7 @@ class AuthController extends BaseApiController
             }
 
             // Detect if this is a mobile/API request
-            $isMobile = TokenService::isMobileRequest();
+            $isMobile = $this->tokenService->isMobileRequest();
             $wantsStateless = $isMobile || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
 
             // 2FA CHECK — ENFORCED FOR ADMIN USERS
@@ -152,12 +155,12 @@ class AuthController extends BaseApiController
                 || !empty($user['is_tenant_super_admin']);
 
             if ($isAdminUser) {
-                $has2faEnabled = !empty($user['totp_enabled']) || TotpService::isEnabled((int)$user['id']);
-                $isTrustedDevice = $has2faEnabled && TotpService::isTrustedDevice((int)$user['id']);
+                $has2faEnabled = !empty($user['totp_enabled']) || $this->totpService->isEnabled((int)$user['id']);
+                $isTrustedDevice = $has2faEnabled && $this->totpService->isTrustedDevice((int)$user['id']);
 
                 if ($has2faEnabled && !$isTrustedDevice) {
                     // 2FA required - create challenge token
-                    $twoFactorToken = TwoFactorChallengeManager::create(
+                    $twoFactorToken = $this->twoFactorChallengeManager->create(
                         (int)$user['id'],
                         ['totp', 'backup_code']
                     );
@@ -208,16 +211,16 @@ class AuthController extends BaseApiController
             }
 
             // Generate secure tokens
-            $accessToken = TokenService::generateToken((int)$user['id'], (int)$user['tenant_id'], [
+            $accessToken = $this->tokenService->generateToken((int)$user['id'], (int)$user['tenant_id'], [
                 'role' => $user['role'],
                 'email' => $user['email'],
                 'is_super_admin' => !empty($user['is_super_admin']),
                 'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
             ], $isMobile);
-            $refreshToken = TokenService::generateRefreshToken((int)$user['id'], (int)$user['tenant_id'], $isMobile);
+            $refreshToken = $this->tokenService->generateRefreshToken((int)$user['id'], (int)$user['tenant_id'], $isMobile);
 
-            $accessTokenExpiry = TokenService::getAccessTokenExpiry($isMobile);
-            $refreshTokenExpiry = TokenService::getRefreshTokenExpiry($isMobile);
+            $accessTokenExpiry = $this->tokenService->getAccessTokenExpiry($isMobile);
+            $refreshTokenExpiry = $this->tokenService->getRefreshTokenExpiry($isMobile);
 
             return response()->json([
                 'success' => true,
@@ -248,9 +251,9 @@ class AuthController extends BaseApiController
 
         // Record failed login attempt
         if (!empty($email)) {
-            \Nexus\Core\RateLimiter::recordAttempt($email, 'email', false);
+            \App\Core\RateLimiter::recordAttempt($email, 'email', false);
         }
-        \Nexus\Core\RateLimiter::recordAttempt($ip, 'ip', false);
+        \App\Core\RateLimiter::recordAttempt($ip, 'ip', false);
 
         return $this->authError(
             'Invalid credentials',
@@ -282,7 +285,7 @@ class AuthController extends BaseApiController
         $tokenRevoked = false;
 
         if (!empty($refreshToken) && $userId) {
-            $tokenRevoked = TokenService::revokeToken($refreshToken, $userId);
+            $tokenRevoked = $this->tokenService->revokeToken($refreshToken, $userId);
         }
 
         // Clear all session data
@@ -323,7 +326,7 @@ class AuthController extends BaseApiController
     public function refreshToken(): JsonResponse
     {
         // Rate limiting
-        $ip = \Nexus\Core\ClientIp::get();
+        $ip = \App\Core\ClientIp::get();
         if (!$this->rateLimitService->increment("auth:refresh:$ip", 10, 60)) {
             return $this->authError(
                 'Too many attempts. Please try again later.',
@@ -353,7 +356,7 @@ class AuthController extends BaseApiController
         }
 
         // Validate the refresh token
-        $payload = TokenService::validateToken($refreshToken);
+        $payload = $this->tokenService->validateToken($refreshToken);
 
         if (!$payload) {
             return $this->authError(
@@ -414,25 +417,25 @@ class AuthController extends BaseApiController
             );
         }
 
-        $isMobile = TokenService::isMobileRequest();
+        $isMobile = $this->tokenService->isMobileRequest();
 
         // Generate new tokens
-        $newAccessToken = TokenService::generateToken((int)$userId, (int)$tenantId, [
+        $newAccessToken = $this->tokenService->generateToken((int)$userId, (int)$tenantId, [
             'role' => $user['role'],
             'email' => $user['email'],
             'is_super_admin' => !empty($user['is_super_admin']),
             'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
         ], $isMobile);
 
-        $accessTokenExpiry = TokenService::getAccessTokenExpiry($isMobile);
-        $refreshTokenExpiry = TokenService::getRefreshTokenExpiry($isMobile);
+        $accessTokenExpiry = $this->tokenService->getAccessTokenExpiry($isMobile);
+        $refreshTokenExpiry = $this->tokenService->getRefreshTokenExpiry($isMobile);
 
         // Only generate new refresh token if current one is close to expiring (< 30 days)
-        $refreshTimeRemaining = TokenService::getTimeRemaining($refreshToken);
+        $refreshTimeRemaining = $this->tokenService->getTimeRemaining($refreshToken);
         $newRefreshToken = null;
 
         if ($refreshTimeRemaining < 2592000) { // 30 days
-            $newRefreshToken = TokenService::generateRefreshToken((int)$userId, (int)$tenantId, $isMobile);
+            $newRefreshToken = $this->tokenService->generateRefreshToken((int)$userId, (int)$tenantId, $isMobile);
         }
 
         $response = [
@@ -471,13 +474,13 @@ class AuthController extends BaseApiController
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         if (preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
             $token = $matches[1];
-            $payload = TokenService::validateToken($token);
+            $payload = $this->tokenService->validateToken($token);
             if ($payload) {
                 $tokenInfo = [
                     'valid' => true,
                     'expires_at' => date('c', $payload['exp']),
                     'time_remaining' => $payload['exp'] - time(),
-                    'needs_refresh' => TokenService::needsRefresh($token)
+                    'needs_refresh' => $this->tokenService->needsRefresh($token)
                 ];
                 $isBearerAuth = true;
                 $bearerUserId = $payload['user_id'];
@@ -507,7 +510,7 @@ class AuthController extends BaseApiController
         // For Bearer-authenticated requests, verify user still exists
         if ($isBearerAuth && $bearerUserId) {
             try {
-                $bearerUser = \Nexus\Models\User::findById((int)$bearerUserId, false);
+                $bearerUser = \App\Models\User::findById((int)$bearerUserId, false);
                 if (!$bearerUser || ($bearerUser['status'] ?? 'active') === 'suspended') {
                     return $this->authError(
                         'User not found',
@@ -526,13 +529,13 @@ class AuthController extends BaseApiController
             $lastUserCheck = $_SESSION['_last_user_check'] ?? 0;
             if (time() - $lastUserCheck >= 300) {
                 try {
-                    $user = \Nexus\Models\User::findById($_SESSION['user_id'], false);
+                    $user = \App\Models\User::findById($_SESSION['user_id'], false);
 
                     if (!$user) {
                         $maxRetries = 3;
                         for ($i = 0; $i < $maxRetries && !$user; $i++) {
                             usleep(200000);
-                            $user = \Nexus\Models\User::findById($_SESSION['user_id'], false);
+                            $user = \App\Models\User::findById($_SESSION['user_id'], false);
                         }
                     }
 
@@ -569,8 +572,8 @@ class AuthController extends BaseApiController
 
             if ($shouldUpdate) {
                 try {
-                    if (class_exists('\Nexus\Models\User')) {
-                        \Nexus\Models\User::updateLastActive((int)$userId);
+                    if (class_exists('\App\Models\User')) {
+                        \App\Models\User::updateLastActive((int)$userId);
                         if (!$isBearerAuth) {
                             $_SESSION['_last_active_update'] = time();
                         }
@@ -681,7 +684,7 @@ class AuthController extends BaseApiController
         }
 
         $token = $matches[1];
-        $payload = TokenService::validateToken($token);
+        $payload = $this->tokenService->validateToken($token);
 
         if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
             return $this->authError(
@@ -782,7 +785,7 @@ class AuthController extends BaseApiController
             );
         }
 
-        $payload = TokenService::validateToken($token);
+        $payload = $this->tokenService->validateToken($token);
 
         if (!$payload) {
             return $this->authError(
@@ -800,7 +803,7 @@ class AuthController extends BaseApiController
             'type' => $payload['type'] ?? 'access',
             'expires_at' => date('c', $payload['exp']),
             'time_remaining' => $payload['exp'] - time(),
-            'needs_refresh' => TokenService::needsRefresh($token)
+            'needs_refresh' => $this->tokenService->needsRefresh($token)
         ]);
     }
 
@@ -829,7 +832,7 @@ class AuthController extends BaseApiController
             );
         }
 
-        $revoked = TokenService::revokeToken($refreshToken, $userId);
+        $revoked = $this->tokenService->revokeToken($refreshToken, $userId);
 
         if (!$revoked) {
             return $this->authError(
@@ -858,7 +861,7 @@ class AuthController extends BaseApiController
             );
         }
 
-        $revokedCount = TokenService::revokeAllTokensForUser($userId);
+        $revokedCount = $this->tokenService->revokeAllTokensForUser($userId);
 
         return response()->json([
             'data' => [
@@ -887,7 +890,7 @@ class AuthController extends BaseApiController
         }
 
         // Validate the JWT
-        $payload = TokenService::validateToken($token);
+        $payload = $this->tokenService->validateToken($token);
         if (!$payload) {
             return response()->json(['error' => 'Invalid or expired token'], 401);
         }
@@ -943,8 +946,8 @@ class AuthController extends BaseApiController
     public function getCsrfToken(): JsonResponse
     {
         // Rate limit this endpoint (10 per minute per IP)
-        $ip = \Nexus\Core\ClientIp::get();
-        $rateLimitResult = \Nexus\Core\RateLimiter::check($ip . ':csrf', 'csrf_token');
+        $ip = \App\Core\ClientIp::get();
+        $rateLimitResult = \App\Core\RateLimiter::check($ip . ':csrf', 'csrf_token');
 
         if ($rateLimitResult['limited']) {
             return $this->authError(
@@ -954,10 +957,10 @@ class AuthController extends BaseApiController
             );
         }
 
-        \Nexus\Core\RateLimiter::recordAttempt($ip . ':csrf', 'csrf_token', true);
+        \App\Core\RateLimiter::recordAttempt($ip . ':csrf', 'csrf_token', true);
 
         // Generate and return the CSRF token
-        $token = \Nexus\Core\Csrf::generate();
+        $token = \App\Core\Csrf::generate();
 
         return response()->json([
             'data' => [

@@ -397,7 +397,7 @@ class AdminNewsletterController extends BaseApiController
                 return $this->respondWithError('DUPLICATE', 'A subscriber with this email already exists', 'email', 409);
             }
 
-            $id = \Nexus\Models\NewsletterSubscriber::createConfirmed($email, $firstName, $lastName, 'manual');
+            $id = \App\Models\NewsletterSubscriber::createConfirmed($email, $firstName, $lastName, 'manual');
             return $this->respondWithData([
                 'id' => $id,
                 'email' => strtolower(trim($email)),
@@ -445,7 +445,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $result = \Nexus\Models\NewsletterSubscriber::import($rows);
+            $result = \App\Models\NewsletterSubscriber::import($rows);
             return $this->respondWithData([
                 'imported' => $result['imported'],
                 'skipped' => $result['skipped'],
@@ -465,7 +465,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $subscribers = \Nexus\Models\NewsletterSubscriber::export();
+            $subscribers = \App\Models\NewsletterSubscriber::export();
             return $this->respondWithData($subscribers ?: []);
         } catch (\Exception $e) {
             return $this->respondWithData([]);
@@ -481,7 +481,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $result = \Nexus\Models\NewsletterSubscriber::syncMembersWithStats();
+            $result = \App\Models\NewsletterSubscriber::syncMembersWithStats();
             return $this->respondWithData([
                 'synced' => $result['synced'],
                 'total_users' => $result['total_users'],
@@ -2349,7 +2349,7 @@ class AdminNewsletterController extends BaseApiController
 
             $subject = '[TEST] ' . ($newsletter->subject ?? 'No Subject');
 
-            $sent = (new \Nexus\Core\Mailer())->send($admin->email, $subject, $html);
+            $sent = (new \App\Core\Mailer())->send($admin->email, $subject, $html);
 
             if ($sent) {
                 return $this->respondWithData([

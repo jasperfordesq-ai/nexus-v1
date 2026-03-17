@@ -11,7 +11,7 @@ use Nexus\Services\MessageService;
 use Nexus\Services\BrokerMessageVisibilityService;
 use Nexus\Core\AudioUploader;
 use Nexus\Core\TenantContext;
-use Nexus\Models\Message;
+use App\Models\Message;
 
 /**
  * MessagesController - Conversations, direct messaging, reactions.

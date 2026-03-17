@@ -56,4 +56,12 @@ class MatchingService
     {
         return \Nexus\Services\MatchingService::savePreferences($userId, $preferences);
     }
+
+    /**
+     * Delegates to legacy MatchingService::getPreferences().
+     */
+    public function getPreferences($userId)
+    {
+        return \Nexus\Services\MatchingService::getPreferences($userId);
+    }
 }

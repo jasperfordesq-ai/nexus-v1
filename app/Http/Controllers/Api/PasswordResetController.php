@@ -9,12 +9,12 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\Env;
+use App\Core\Env;
 use Nexus\Core\TenantContext;
-use Nexus\Core\RateLimiter;
-use Nexus\Core\Mailer;
-use Nexus\Core\EmailTemplate;
-use Nexus\Models\User;
+use App\Core\RateLimiter;
+use App\Core\Mailer;
+use App\Core\EmailTemplate;
+use App\Models\User;
 
 /**
  * PasswordResetController -- Password reset flow.
@@ -171,7 +171,7 @@ class PasswordResetController extends BaseApiController
 
         // Log the password change
         try {
-            \Nexus\Models\ActivityLog::log(
+            \App\Models\ActivityLog::log(
                 $user['id'],
                 'password_reset',
                 'Password was reset via API'

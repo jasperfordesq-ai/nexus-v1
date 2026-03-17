@@ -56,4 +56,12 @@ class UserInsightsService
     {
         return \Nexus\Services\UserInsightsService::getWeeklyTrends($userId, $weeks);
     }
+
+    /**
+     * Get partner stats for a user.
+     */
+    public function getPartnerStats($userId, $months = null)
+    {
+        return \Nexus\Services\UserInsightsService::getPartnerStats($userId, $months);
+    }
 }

@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\AbuseDetectionService;
+use App\Services\AbuseDetectionService;
 
 /**
  * AdminTimebankingController -- Admin timebanking stats, alerts, balance adjustments, org wallets, user reports.
@@ -21,7 +21,9 @@ class AdminTimebankingController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly AbuseDetectionService $abuseDetectionService,
+    ) {}
 
     /** GET /api/v2/admin/timebanking/stats */
     public function stats(): JsonResponse
@@ -139,7 +141,7 @@ class AdminTimebankingController extends BaseApiController
 
             $resolvedBy = in_array($status, ['resolved', 'dismissed']) ? $this->getUserId() : null;
             $notes = $this->input('notes', '');
-            AbuseDetectionService::updateAlertStatus($id, $status, $resolvedBy, $notes);
+            $this->abuseDetectionService->updateAlertStatus($id, $status, $resolvedBy, $notes);
         } catch (\Throwable $e) {
             return $this->respondWithError('UPDATE_FAILED', 'Failed to update alert status', null, 500);
         }

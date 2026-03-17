@@ -9,8 +9,8 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\RedisCache;
-use Nexus\Services\TokenService;
+use App\Services\RedisCache;
+use App\Services\TokenService;
 
 /**
  * AdminToolsController -- Admin tools: redirects, 404s, health checks, WebP, SEO audit, seed, blog backups, IP debug.
@@ -21,7 +21,10 @@ class AdminToolsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly RedisCache $redisCache,
+        private readonly TokenService $tokenService,
+    ) {}
 
     // =========================================================================
     // SEO Redirects
@@ -192,7 +195,7 @@ class AdminToolsController extends BaseApiController
         // Redis
         $start = microtime(true);
         try {
-            $stats = RedisCache::getStats();
+            $stats = $this->redisCache->getStats();
             $tests[] = ['name' => 'Redis Connection', 'status' => ($stats['enabled'] ?? false) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
             $tests[] = ['name' => 'Redis Connection', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => $e->getMessage()];
@@ -201,7 +204,7 @@ class AdminToolsController extends BaseApiController
         // Token Service
         $start = microtime(true);
         try {
-            $testToken = TokenService::generateToken(0, $tenantId);
+            $testToken = $this->tokenService->generateToken(0, $tenantId);
             $tests[] = ['name' => 'API Auth (Token Service)', 'status' => !empty($testToken) ? 'pass' : 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000)];
         } catch (\Throwable $e) {
             $tests[] = ['name' => 'API Auth (Token Service)', 'status' => 'fail', 'duration_ms' => round((microtime(true) - $start) * 1000), 'error' => $e->getMessage()];
@@ -397,7 +400,7 @@ class AdminToolsController extends BaseApiController
     public function ipDebug(): JsonResponse
     {
         $this->requireAdmin();
-        return $this->respondWithData(\Nexus\Core\ClientIp::debug());
+        return $this->respondWithData(\App\Core\ClientIp::debug());
     }
 
 }

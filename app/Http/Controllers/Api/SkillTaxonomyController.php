@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\SkillTaxonomyService;
+use App\Services\SkillTaxonomyService;
 
 /**
  * SkillTaxonomyController -- Skill taxonomy and user skills.
@@ -17,6 +17,10 @@ use Nexus\Services\SkillTaxonomyService;
 class SkillTaxonomyController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly SkillTaxonomyService $skillTaxonomyService,
+    ) {}
 
     // =============================================
     // CATEGORY ENDPOINTS
@@ -31,13 +35,13 @@ class SkillTaxonomyController extends BaseApiController
         $format = $this->query('format', 'tree');
 
         if ($format === 'flat') {
-            $categories = SkillTaxonomyService::getCategories(
+            $categories = $this->skillTaxonomyService->getCategories(
                 $parentId !== null ? (int) $parentId : null
             );
             return $this->respondWithData($categories);
         }
 
-        $tree = SkillTaxonomyService::getTree();
+        $tree = $this->skillTaxonomyService->getTree();
 
         return $this->respondWithData($tree);
     }
@@ -45,13 +49,13 @@ class SkillTaxonomyController extends BaseApiController
     /** GET /api/v2/skills/categories/{id} */
     public function getCategoryById($id): JsonResponse
     {
-        $category = SkillTaxonomyService::getCategoryById((int) $id);
+        $category = $this->skillTaxonomyService->getCategoryById((int) $id);
 
         if (!$category) {
             return $this->respondWithError('NOT_FOUND', 'Category not found', null, 404);
         }
 
-        $category['skills'] = SkillTaxonomyService::getCategorySkills((int) $id);
+        $category['skills'] = $this->skillTaxonomyService->getCategorySkills((int) $id);
 
         return $this->respondWithData($category);
     }
@@ -63,13 +67,13 @@ class SkillTaxonomyController extends BaseApiController
         $this->rateLimit('skills_category_create', 10, 60);
 
         $data = $this->getAllInput();
-        $id = SkillTaxonomyService::createCategory($data);
+        $id = $this->skillTaxonomyService->createCategory($data);
 
         if ($id === null) {
-            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+            return $this->respondWithErrors($this->skillTaxonomyService->getErrors(), 422);
         }
 
-        $category = SkillTaxonomyService::getCategoryById($id);
+        $category = $this->skillTaxonomyService->getCategoryById($id);
 
         return $this->respondWithData($category, null, 201);
     }
@@ -81,13 +85,13 @@ class SkillTaxonomyController extends BaseApiController
         $this->rateLimit('skills_category_update', 10, 60);
 
         $data = $this->getAllInput();
-        $success = SkillTaxonomyService::updateCategory((int) $id, $data);
+        $success = $this->skillTaxonomyService->updateCategory((int) $id, $data);
 
         if (!$success) {
-            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+            return $this->respondWithErrors($this->skillTaxonomyService->getErrors(), 422);
         }
 
-        $category = SkillTaxonomyService::getCategoryById((int) $id);
+        $category = $this->skillTaxonomyService->getCategoryById((int) $id);
 
         return $this->respondWithData($category);
     }
@@ -98,10 +102,10 @@ class SkillTaxonomyController extends BaseApiController
         $this->requireAuth();
 
         $hard = $this->queryBool('hard', false);
-        $success = SkillTaxonomyService::deleteCategory((int) $id, $hard);
+        $success = $this->skillTaxonomyService->deleteCategory((int) $id, $hard);
 
         if (!$success) {
-            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+            return $this->respondWithErrors($this->skillTaxonomyService->getErrors(), 422);
         }
 
         return $this->respondWithData(['message' => 'Category deleted']);
@@ -122,7 +126,7 @@ class SkillTaxonomyController extends BaseApiController
         }
 
         $limit = $this->queryInt('limit', 20, 1, 50);
-        $results = SkillTaxonomyService::searchSkills($query, $limit);
+        $results = $this->skillTaxonomyService->searchSkills($query, $limit);
 
         return $this->respondWithData($results);
     }
@@ -138,7 +142,7 @@ class SkillTaxonomyController extends BaseApiController
         }
 
         $limit = $this->queryInt('limit', 30, 1, 50);
-        $members = SkillTaxonomyService::getMembersWithSkill($skillName, $limit);
+        $members = $this->skillTaxonomyService->getMembersWithSkill($skillName, $limit);
 
         return $this->respondWithData($members);
     }
@@ -152,7 +156,7 @@ class SkillTaxonomyController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $skills = SkillTaxonomyService::getUserSkills($userId);
+        $skills = $this->skillTaxonomyService->getUserSkills($userId);
 
         return $this->respondWithData($skills);
     }
@@ -162,7 +166,7 @@ class SkillTaxonomyController extends BaseApiController
     {
         $this->rateLimit('user_skills_view', 30, 60);
 
-        $skills = SkillTaxonomyService::getUserSkills((int) $id);
+        $skills = $this->skillTaxonomyService->getUserSkills((int) $id);
 
         return $this->respondWithData($skills);
     }
@@ -174,13 +178,13 @@ class SkillTaxonomyController extends BaseApiController
         $this->rateLimit('skills_add', 20, 60);
 
         $data = $this->getAllInput();
-        $skillId = SkillTaxonomyService::addUserSkill($userId, $data);
+        $skillId = $this->skillTaxonomyService->addUserSkill($userId, $data);
 
         if ($skillId === null) {
-            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+            return $this->respondWithErrors($this->skillTaxonomyService->getErrors(), 422);
         }
 
-        $skills = SkillTaxonomyService::getUserSkills($userId);
+        $skills = $this->skillTaxonomyService->getUserSkills($userId);
 
         return $this->respondWithData($skills, null, 201);
     }
@@ -192,13 +196,13 @@ class SkillTaxonomyController extends BaseApiController
         $this->rateLimit('skills_update', 20, 60);
 
         $data = $this->getAllInput();
-        $success = SkillTaxonomyService::updateUserSkill($userId, (int) $id, $data);
+        $success = $this->skillTaxonomyService->updateUserSkill($userId, (int) $id, $data);
 
         if (!$success) {
-            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+            return $this->respondWithErrors($this->skillTaxonomyService->getErrors(), 422);
         }
 
-        $skills = SkillTaxonomyService::getUserSkills($userId);
+        $skills = $this->skillTaxonomyService->getUserSkills($userId);
 
         return $this->respondWithData($skills);
     }
@@ -208,7 +212,7 @@ class SkillTaxonomyController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        SkillTaxonomyService::removeUserSkill($userId, $id);
+        $this->skillTaxonomyService->removeUserSkill($userId, $id);
 
         return $this->respondWithData(['message' => 'Skill removed']);
     }

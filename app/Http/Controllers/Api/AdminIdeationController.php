@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\IdeationChallengeService;
+use App\Services\IdeationChallengeService;
 
 /**
  * AdminIdeationController -- Admin ideation challenge moderation.
@@ -17,6 +17,10 @@ use Nexus\Services\IdeationChallengeService;
 class AdminIdeationController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly IdeationChallengeService $ideationChallengeService,
+    ) {}
 
     /**
      * GET /api/v2/admin/ideation
@@ -34,7 +38,7 @@ class AdminIdeationController extends BaseApiController
             'limit' => min(200, max(1, $this->queryInt('limit', 50))),
         ];
 
-        $result = IdeationChallengeService::getAllChallenges($filters);
+        $result = $this->ideationChallengeService->getAllChallenges($filters);
 
         $items = $result['data'] ?? $result['items'] ?? $result;
         $total = $result['total'] ?? (is_array($items) ? count($items) : 0);
@@ -57,7 +61,7 @@ class AdminIdeationController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $challenge = IdeationChallengeService::getChallengeById($id);
+        $challenge = $this->ideationChallengeService->getChallengeById($id);
 
         if (!$challenge) {
             return $this->respondWithError('NOT_FOUND', 'Challenge not found', null, 404);
@@ -73,12 +77,12 @@ class AdminIdeationController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
 
-        $challenge = IdeationChallengeService::getChallengeById($id);
+        $challenge = $this->ideationChallengeService->getChallengeById($id);
         if (!$challenge) {
             return $this->respondWithError('NOT_FOUND', 'Challenge not found', null, 404);
         }
 
-        $deleted = IdeationChallengeService::deleteChallenge($id, $adminId);
+        $deleted = $this->ideationChallengeService->deleteChallenge($id, $adminId);
 
         if ($deleted) {
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
@@ -99,7 +103,7 @@ class AdminIdeationController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid status. Valid: open, closed, reviewing, archived', 'status', 400);
         }
 
-        $updated = IdeationChallengeService::updateChallengeStatus($id, $adminId, $status);
+        $updated = $this->ideationChallengeService->updateChallengeStatus($id, $adminId, $status);
 
         if ($updated) {
             return $this->respondWithData(['id' => $id, 'status' => $status]);

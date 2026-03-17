@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\TenantContext;
-use Nexus\Services\LegalDocumentService;
+use App\Services\LegalDocumentService;
 
 /**
  * AdminLegalDocController -- Admin legal document version management and compliance.
@@ -21,14 +21,16 @@ class AdminLegalDocController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly LegalDocumentService $legalDocumentService,
+    ) {}
 
     /** GET /api/v2/admin/legal-docs/{docId}/versions */
     public function getVersions(int $docId): JsonResponse
     {
         $this->requireAdmin();
         try {
-            $versions = LegalDocumentService::getVersions($docId);
+            $versions = $this->legalDocumentService->getVersions($docId);
             return $this->respondWithData($versions);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getVersions error: " . $e->getMessage());
@@ -48,7 +50,7 @@ class AdminLegalDocController extends BaseApiController
         }
 
         try {
-            $comparison = LegalDocumentService::compareVersions((int) $v1, (int) $v2);
+            $comparison = $this->legalDocumentService->compareVersions((int) $v1, (int) $v2);
 
             if (!$comparison) {
                 return $this->respondWithError('NOT_FOUND', 'One or both versions not found', null, 404);
@@ -82,7 +84,7 @@ class AdminLegalDocController extends BaseApiController
         }
 
         try {
-            $versionId = LegalDocumentService::createVersion($docId, [
+            $versionId = $this->legalDocumentService->createVersion($docId, [
                 'version_number' => $input['version_number'],
                 'version_label' => $input['version_label'] ?? null,
                 'content' => $input['content'],
@@ -103,7 +105,7 @@ class AdminLegalDocController extends BaseApiController
     {
         $this->requireAdmin();
         try {
-            $success = LegalDocumentService::publishVersion($vid);
+            $success = $this->legalDocumentService->publishVersion($vid);
 
             if ($success) {
                 return $this->respondWithData(['published' => true]);
@@ -121,7 +123,7 @@ class AdminLegalDocController extends BaseApiController
         $this->requireAdmin();
         try {
             $tenantId = TenantContext::getId();
-            $stats = LegalDocumentService::getComplianceSummary($tenantId);
+            $stats = $this->legalDocumentService->getComplianceSummary($tenantId);
             return $this->respondWithData($stats);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getComplianceStats error: " . $e->getMessage());
@@ -137,7 +139,7 @@ class AdminLegalDocController extends BaseApiController
         $offset = $this->queryInt('offset', 0, 0);
 
         try {
-            $acceptances = LegalDocumentService::getVersionAcceptances($vid, $limit, $offset);
+            $acceptances = $this->legalDocumentService->getVersionAcceptances($vid, $limit, $offset);
             return $this->respondWithData($acceptances);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getAcceptances error: " . $e->getMessage());
@@ -153,7 +155,7 @@ class AdminLegalDocController extends BaseApiController
         $endDate = $this->query('end_date');
 
         try {
-            $records = LegalDocumentService::exportAcceptanceRecords($docId, $startDate, $endDate);
+            $records = $this->legalDocumentService->exportAcceptanceRecords($docId, $startDate, $endDate);
 
             $filename = "acceptances_{$docId}_" . date('Y-m-d') . '.csv';
 
@@ -185,7 +187,7 @@ class AdminLegalDocController extends BaseApiController
         $target = $input['target'] ?? 'non_accepted';
 
         try {
-            $count = LegalDocumentService::notifyUsersOfUpdate($docId, $vid, true);
+            $count = $this->legalDocumentService->notifyUsersOfUpdate($docId, $vid, true);
             return $this->respondWithData(['notified' => true, 'count' => $count]);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] notifyUsers error: " . $e->getMessage());
@@ -198,7 +200,7 @@ class AdminLegalDocController extends BaseApiController
     {
         $this->requireAdmin();
         try {
-            $count = LegalDocumentService::getUsersPendingAcceptanceCount($docId, $vid);
+            $count = $this->legalDocumentService->getUsersPendingAcceptanceCount($docId, $vid);
             return $this->respondWithData(['count' => $count]);
         } catch (\Exception $e) {
             error_log("[AdminLegalDocController] getUsersPendingCount error: " . $e->getMessage());
@@ -213,7 +215,7 @@ class AdminLegalDocController extends BaseApiController
         $input = $this->getAllInput();
 
         try {
-            $version = LegalDocumentService::getVersion($vid);
+            $version = $this->legalDocumentService->getVersion($vid);
 
             if (!$version) {
                 return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
@@ -225,7 +227,7 @@ class AdminLegalDocController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', 'Only draft versions can be edited', null, 400);
             }
 
-            $success = LegalDocumentService::updateVersion($vid, [
+            $success = $this->legalDocumentService->updateVersion($vid, [
                 'version_number' => $input['version_number'] ?? $version['version_number'],
                 'version_label' => $input['version_label'] ?? $version['version_label'],
                 'content' => $input['content'] ?? $version['content'],
@@ -249,7 +251,7 @@ class AdminLegalDocController extends BaseApiController
         $this->requireAdmin();
 
         try {
-            $version = LegalDocumentService::getVersion($vid);
+            $version = $this->legalDocumentService->getVersion($vid);
 
             if (!$version) {
                 return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
@@ -261,7 +263,7 @@ class AdminLegalDocController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', 'Only draft versions can be deleted', null, 400);
             }
 
-            $success = LegalDocumentService::deleteVersion($vid);
+            $success = $this->legalDocumentService->deleteVersion($vid);
 
             if ($success) {
                 return $this->respondWithData(['deleted' => true]);

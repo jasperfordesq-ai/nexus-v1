@@ -111,8 +111,8 @@ class PushController extends BaseApiController
         foreach ($subscriptions as $sub) {
             // Use reflection to call the private sendPush method, or call the service directly
             try {
-                $publicKey = \Nexus\Core\Env::get('VAPID_PUBLIC_KEY');
-                $privateKey = \Nexus\Core\Env::get('VAPID_PRIVATE_KEY');
+                $publicKey = \App\Core\Env::get('VAPID_PUBLIC_KEY');
+                $privateKey = \App\Core\Env::get('VAPID_PRIVATE_KEY');
 
                 if (empty($publicKey) || empty($privateKey) || !class_exists('Minishlink\WebPush\WebPush')) {
                     $failed++;

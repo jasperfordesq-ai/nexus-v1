@@ -108,4 +108,68 @@ class MemberAvailabilityService
 
         return $compatible;
     }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\MemberAvailabilityService::getErrors();
+    }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::getUserAvailability().
+     */
+    public function getUserAvailability(int $userId): array
+    {
+        return \Nexus\Services\MemberAvailabilityService::getUserAvailability($userId);
+    }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::setBulkAvailability().
+     */
+    public function setBulkAvailability(int $userId, array $schedule): bool
+    {
+        return \Nexus\Services\MemberAvailabilityService::setBulkAvailability($userId, $schedule);
+    }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::setDayAvailability().
+     */
+    public function setDayAvailability(int $userId, int $dayOfWeek, array $slots): bool
+    {
+        return \Nexus\Services\MemberAvailabilityService::setDayAvailability($userId, $dayOfWeek, $slots);
+    }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::addSpecificDate().
+     */
+    public function addSpecificDate(int $userId, array $data): ?int
+    {
+        return \Nexus\Services\MemberAvailabilityService::addSpecificDate($userId, $data);
+    }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::deleteSlot().
+     */
+    public function deleteSlot(int $userId, int $slotId): bool
+    {
+        return \Nexus\Services\MemberAvailabilityService::deleteSlot($userId, $slotId);
+    }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::findCompatibleTimes().
+     */
+    public function findCompatibleTimes(int $userId1, int $userId2): array
+    {
+        return \Nexus\Services\MemberAvailabilityService::findCompatibleTimes($userId1, $userId2);
+    }
+
+    /**
+     * Delegates to legacy MemberAvailabilityService::getAvailableMembers().
+     */
+    public function getAvailableMembers(int $dayOfWeek, ?string $time = null, int $limit = 50): array
+    {
+        return \Nexus\Services\MemberAvailabilityService::getAvailableMembers($dayOfWeek, $time, $limit);
+    }
 }

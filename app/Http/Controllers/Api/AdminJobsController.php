@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\JobVacancyService;
+use App\Services\JobVacancyService;
 
 /**
  * AdminJobsController -- Admin job vacancy management.
@@ -18,7 +18,9 @@ class AdminJobsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly JobVacancyService $jobVacancyService,
+    ) {}
 
     /** GET /api/v2/admin/jobs */
     public function index(): JsonResponse
@@ -32,7 +34,7 @@ class AdminJobsController extends BaseApiController
         if ($this->query('status')) $filters['status'] = $this->query('status');
         if ($this->query('search')) $filters['search'] = $this->query('search');
 
-        $result = JobVacancyService::getAll($filters);
+        $result = $this->jobVacancyService->getAll($filters);
         $allItems = $result['items'] ?? [];
 
         $total = count($allItems);
@@ -46,7 +48,7 @@ class AdminJobsController extends BaseApiController
     public function show(int $id): JsonResponse
     {
         $this->requireAdmin();
-        $job = JobVacancyService::getById($id);
+        $job = $this->jobVacancyService->getById($id);
         if (!$job) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
         return $this->respondWithData($job);
     }
@@ -55,10 +57,10 @@ class AdminJobsController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
-        $job = JobVacancyService::getById($id);
+        $job = $this->jobVacancyService->getById($id);
         if (!$job) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
 
-        $deleted = JobVacancyService::delete($id, $adminId);
+        $deleted = $this->jobVacancyService->delete($id, $adminId);
         if ($deleted) return $this->respondWithData(['deleted' => true, 'id' => $id]);
         return $this->respondWithError('DELETE_FAILED', 'Failed to delete job', null, 400);
     }
@@ -69,7 +71,7 @@ class AdminJobsController extends BaseApiController
         $adminId = $this->requireAdmin();
         $days = $this->inputInt('duration_days', 7, 1, 90);
 
-        $featured = JobVacancyService::featureJob($id, $adminId, $days);
+        $featured = $this->jobVacancyService->featureJob($id, $adminId, $days);
         if ($featured) return $this->respondWithData(['featured' => true, 'id' => $id, 'duration_days' => $days]);
         return $this->respondWithError('FEATURE_FAILED', 'Failed to feature job', null, 400);
     }
@@ -78,7 +80,7 @@ class AdminJobsController extends BaseApiController
     public function unfeature(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
-        $unfeatured = JobVacancyService::unfeatureJob($id, $adminId);
+        $unfeatured = $this->jobVacancyService->unfeatureJob($id, $adminId);
         if ($unfeatured) return $this->respondWithData(['featured' => false, 'id' => $id]);
         return $this->respondWithError('UNFEATURE_FAILED', 'Failed to unfeature job', null, 400);
     }
@@ -87,10 +89,10 @@ class AdminJobsController extends BaseApiController
     public function getApplications(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
-        $job = JobVacancyService::getById($id);
+        $job = $this->jobVacancyService->getById($id);
         if (!$job) return $this->respondWithError('NOT_FOUND', 'Job not found', null, 404);
 
-        $applications = JobVacancyService::getApplications($id, $adminId);
+        $applications = $this->jobVacancyService->getApplications($id, $adminId);
         if ($applications === null) return $this->respondWithError('FETCH_FAILED', 'Failed to load applications', null, 400);
         return $this->respondWithData($applications);
     }
@@ -104,10 +106,10 @@ class AdminJobsController extends BaseApiController
 
         if (!$status) return $this->respondWithError('VALIDATION_REQUIRED', 'Status is required', 'status', 422);
 
-        $updated = JobVacancyService::updateApplicationStatus($id, $adminId, $status, $notes);
+        $updated = $this->jobVacancyService->updateApplicationStatus($id, $adminId, $status, $notes);
         if ($updated) return $this->respondWithData(['updated' => true, 'id' => $id, 'status' => $status]);
 
-        $errors = JobVacancyService::getErrors();
+        $errors = $this->jobVacancyService->getErrors();
         $first = $errors[0] ?? [];
         return $this->respondWithError($first['code'] ?? 'UPDATE_FAILED', $first['message'] ?? 'Failed to update', null, 400);
     }

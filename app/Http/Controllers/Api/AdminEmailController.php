@@ -8,11 +8,11 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Mailer;
+use App\Core\Mailer;
 use Nexus\Core\TenantContext;
-use Nexus\Models\EmailSettings;
-use Nexus\Services\EmailMonitorService;
-use Nexus\Services\RedisCache;
+use App\Models\EmailSettings;
+use App\Services\EmailMonitorService;
+use App\Services\RedisCache;
 
 /**
  * AdminEmailController -- Email settings, provider config, test emails, and deliverability status.
@@ -24,7 +24,10 @@ class AdminEmailController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly EmailMonitorService $emailMonitorService,
+        private readonly RedisCache $redisCache,
+    ) {}
 
     // =========================================================================
     // Settings
@@ -84,15 +87,15 @@ class AdminEmailController extends BaseApiController
 
         $response = [
             'provider' => $providerType,
-            'health' => EmailMonitorService::getHealthSummary(),
-            'redis' => RedisCache::getStats(),
+            'health' => $this->emailMonitorService->getHealthSummary(),
+            'redis' => $this->redisCache->getStats(),
         ];
 
         if ($providerType === 'gmail_api') {
-            $circuitBreakerExpiry = RedisCache::get('gmail_oauth_circuit_breaker', null);
-            $refreshAttempts = (int) RedisCache::get('gmail_oauth_refresh_attempts', null);
-            $failureCount = (int) RedisCache::get('gmail_oauth_failure_count', null);
-            $tokenExpiry = RedisCache::get('gmail_oauth_token_expiry', null);
+            $circuitBreakerExpiry = $this->redisCache->get('gmail_oauth_circuit_breaker', null);
+            $refreshAttempts = (int) $this->redisCache->get('gmail_oauth_refresh_attempts', null);
+            $failureCount = (int) $this->redisCache->get('gmail_oauth_failure_count', null);
+            $tokenExpiry = $this->redisCache->get('gmail_oauth_token_expiry', null);
 
             $response['gmail_api'] = [
                 'token_cached' => $tokenExpiry !== null && $tokenExpiry > time(),

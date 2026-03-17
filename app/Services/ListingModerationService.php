@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright ï¿½ 2024ï¿½2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -7,7 +7,7 @@
 namespace App\Services;
 
 /**
- * ListingModerationService — Laravel DI wrapper for legacy \Nexus\Services\ListingModerationService.
+ * ListingModerationService ï¿½ Laravel DI wrapper for legacy \Nexus\Services\ListingModerationService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -47,5 +47,29 @@ class ListingModerationService
     public function getPending(int $tenantId): array
     {
         return \Nexus\Services\ListingModerationService::getPending($tenantId);
+    }
+
+    /**
+     * Delegates to legacy ListingModerationService::reject() (admin shorthand without tenantId).
+     */
+    public function rejectListing(int $id, int $adminId, string $reason = ''): array
+    {
+        return \Nexus\Services\ListingModerationService::reject($id, $adminId, $reason);
+    }
+
+    /**
+     * Delegates to legacy ListingModerationService::getReviewQueue().
+     */
+    public function getReviewQueue(int $page = 1, int $limit = 20, ?string $type = null): array
+    {
+        return \Nexus\Services\ListingModerationService::getReviewQueue($page, $limit, $type);
+    }
+
+    /**
+     * Delegates to legacy ListingModerationService::getStats().
+     */
+    public function getStats(): array
+    {
+        return \Nexus\Services\ListingModerationService::getStats();
     }
 }

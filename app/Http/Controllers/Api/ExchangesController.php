@@ -8,8 +8,8 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Services\ExchangeService;
-use Nexus\Services\BrokerControlConfigService;
-use Nexus\Services\ExchangeWorkflowService;
+use App\Services\BrokerControlConfigService;
+use App\Services\ExchangeWorkflowService;
 
 /**
  * ExchangesController -- Time credit exchange lifecycle (create, accept, decline, confirm).
@@ -22,6 +22,8 @@ class ExchangesController extends BaseApiController
 
     public function __construct(
         private readonly ExchangeService $exchangeService,
+        private readonly BrokerControlConfigService $brokerControlConfigService,
+        private readonly ExchangeWorkflowService $exchangeWorkflowService,
     ) {}
 
     /** GET /api/v2/exchanges/config — exchange workflow configuration */
@@ -29,11 +31,11 @@ class ExchangesController extends BaseApiController
     {
         $this->requireAuth();
 
-        $config = BrokerControlConfigService::getConfig('exchange_workflow');
-        $directMessaging = BrokerControlConfigService::isDirectMessagingEnabled();
+        $config = $this->brokerControlConfigService->getConfig('exchange_workflow');
+        $directMessaging = $this->brokerControlConfigService->isDirectMessagingEnabled();
 
         return $this->respondWithData([
-            'exchange_workflow_enabled' => BrokerControlConfigService::isExchangeWorkflowEnabled(),
+            'exchange_workflow_enabled' => $this->brokerControlConfigService->isExchangeWorkflowEnabled(),
             'direct_messaging_enabled' => $directMessaging,
             'require_broker_approval'  => $config['require_broker_approval'] ?? false,
             'confirmation_deadline_hours' => $config['confirmation_deadline_hours'] ?? 72,
@@ -52,7 +54,7 @@ class ExchangesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'listing_id is required', 'listing_id', 400);
         }
 
-        $exchange = ExchangeWorkflowService::getActiveExchangeForListing($userId, $listingId);
+        $exchange = $this->exchangeWorkflowService->getActiveExchangeForListing($userId, $listingId);
 
         return $this->respondWithData($exchange ? [
             'id'             => (int) $exchange['id'],
@@ -68,7 +70,7 @@ class ExchangesController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        if (!BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+        if (!$this->brokerControlConfigService->isExchangeWorkflowEnabled()) {
             return $this->respondWithError('FEATURE_DISABLED', 'Exchange workflow is not enabled for this community', null, 400);
         }
 
@@ -97,7 +99,7 @@ class ExchangesController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
@@ -107,7 +109,7 @@ class ExchangesController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
 
-        $history = ExchangeWorkflowService::getExchangeHistory($id);
+        $history = $this->exchangeWorkflowService->getExchangeHistory($id);
 
         $formatted = $this->formatExchange($exchange);
         $formatted['status_history'] = array_map(fn ($h) => [
@@ -129,7 +131,7 @@ class ExchangesController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('exchange_create', 10, 60);
 
-        if (!BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+        if (!$this->brokerControlConfigService->isExchangeWorkflowEnabled()) {
             return $this->respondWithError('FEATURE_DISABLED', 'Exchange workflow is not enabled for this community', null, 400);
         }
 
@@ -140,12 +142,12 @@ class ExchangesController extends BaseApiController
         }
 
         // Check compliance requirements
-        $violations = ExchangeWorkflowService::checkComplianceRequirements((int) $data['listing_id'], $userId);
+        $violations = $this->exchangeWorkflowService->checkComplianceRequirements((int) $data['listing_id'], $userId);
         if (!empty($violations)) {
             return $this->respondWithError('COMPLIANCE_VIOLATION', implode(' ', $violations), null, 403);
         }
 
-        $exchangeId = ExchangeWorkflowService::createRequest(
+        $exchangeId = $this->exchangeWorkflowService->createRequest(
             $userId,
             (int) $data['listing_id'],
             [
@@ -159,7 +161,7 @@ class ExchangesController extends BaseApiController
             return $this->error('Failed to create exchange request', 400);
         }
 
-        $exchange = ExchangeWorkflowService::getExchange($exchangeId);
+        $exchange = $this->exchangeWorkflowService->getExchange($exchangeId);
 
         return $this->respondWithData($this->formatExchange($exchange), null, 201);
     }
@@ -169,7 +171,7 @@ class ExchangesController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
@@ -178,17 +180,17 @@ class ExchangesController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'Only the provider can accept this request', null, 403);
         }
 
-        $violations = ExchangeWorkflowService::checkComplianceRequirements((int) $exchange['listing_id'], $userId);
+        $violations = $this->exchangeWorkflowService->checkComplianceRequirements((int) $exchange['listing_id'], $userId);
         if (!empty($violations)) {
             return $this->respondWithError('COMPLIANCE_VIOLATION', implode(' ', $violations), null, 403);
         }
 
-        $success = ExchangeWorkflowService::acceptRequest($id, $userId);
+        $success = $this->exchangeWorkflowService->acceptRequest($id, $userId);
         if (!$success) {
             return $this->error('Unable to accept this exchange request', 400);
         }
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
 
         return $this->respondWithData($this->formatExchange($exchange));
     }
@@ -198,7 +200,7 @@ class ExchangesController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
@@ -209,7 +211,7 @@ class ExchangesController extends BaseApiController
 
         $reason = $this->input('reason', '');
 
-        $success = ExchangeWorkflowService::declineRequest($id, $userId, $reason);
+        $success = $this->exchangeWorkflowService->declineRequest($id, $userId, $reason);
         if (!$success) {
             return $this->error('Unable to decline this exchange request', 400);
         }
@@ -223,7 +225,7 @@ class ExchangesController extends BaseApiController
         $userId = $this->requireAuth();
         $id = (int) $id;
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
@@ -232,12 +234,12 @@ class ExchangesController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
 
-        $success = ExchangeWorkflowService::startProgress($id, $userId);
+        $success = $this->exchangeWorkflowService->startProgress($id, $userId);
         if (!$success) {
             return $this->error('Unable to start this exchange', 400);
         }
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
 
         return $this->respondWithData($this->formatExchange($exchange));
     }
@@ -248,7 +250,7 @@ class ExchangesController extends BaseApiController
         $userId = $this->requireAuth();
         $id = (int) $id;
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
@@ -257,12 +259,12 @@ class ExchangesController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
 
-        $success = ExchangeWorkflowService::markReadyForConfirmation($id, $userId);
+        $success = $this->exchangeWorkflowService->markReadyForConfirmation($id, $userId);
         if (!$success) {
             return $this->error('Unable to complete this exchange', 400);
         }
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
 
         return $this->respondWithData($this->formatExchange($exchange));
     }
@@ -273,7 +275,7 @@ class ExchangesController extends BaseApiController
         $userId = $this->requireAuth();
         $id = (int) $id;
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
@@ -287,12 +289,12 @@ class ExchangesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'hours must be greater than 0', 'hours', 400);
         }
 
-        $success = ExchangeWorkflowService::confirmCompletion($id, $userId, $hours);
+        $success = $this->exchangeWorkflowService->confirmCompletion($id, $userId, $hours);
         if (!$success) {
             return $this->error('Unable to confirm this exchange', 400);
         }
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
 
         $message = 'Hours confirmed';
         if ($exchange['status'] === 'completed') {
@@ -310,7 +312,7 @@ class ExchangesController extends BaseApiController
         $userId = $this->requireAuth();
         $id = (int) $id;
 
-        $exchange = ExchangeWorkflowService::getExchange($id);
+        $exchange = $this->exchangeWorkflowService->getExchange($id);
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Exchange not found', null, 404);
         }
@@ -321,7 +323,7 @@ class ExchangesController extends BaseApiController
 
         $reason = $this->input('reason', '');
 
-        $success = ExchangeWorkflowService::cancelExchange($id, $userId, $reason);
+        $success = $this->exchangeWorkflowService->cancelExchange($id, $userId, $reason);
         if (!$success) {
             return $this->error('Unable to cancel this exchange', 400);
         }

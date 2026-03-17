@@ -13,7 +13,7 @@ use App\Services\SmartGroupRankingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Models\ActivityLog;
+use App\Models\ActivityLog;
 
 /**
  * AdminGroupsController -- Admin group management (list, analytics, approvals, moderation,

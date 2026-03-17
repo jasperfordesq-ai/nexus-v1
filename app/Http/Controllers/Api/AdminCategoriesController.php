@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Models\ActivityLog;
+use App\Models\ActivityLog;
 
 /**
  * AdminCategoriesController -- Admin category and attribute management.
@@ -317,7 +317,7 @@ class AdminCategoriesController extends BaseApiController
         $categoryId = $this->input('category_id') ? (int) $this->input('category_id') : null;
         $inputType = trim($this->input('type', $this->input('input_type', 'checkbox')));
 
-        $id = \Nexus\Models\Attribute::create($name, $categoryId, $inputType);
+        $id = \App\Models\Attribute::create($name, $categoryId, $inputType);
 
         ActivityLog::log($adminId, 'admin_create_attribute', "Created attribute #{$id}: {$name}");
 
@@ -343,7 +343,7 @@ class AdminCategoriesController extends BaseApiController
         $tenantId = $this->getTenantId();
         $data = $this->getAllInput();
 
-        $attribute = \Nexus\Models\Attribute::find($id);
+        $attribute = \App\Models\Attribute::find($id);
         if (!$attribute) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Attribute not found', null, 404);
         }
@@ -353,7 +353,7 @@ class AdminCategoriesController extends BaseApiController
         $inputType = isset($data['type']) ? trim($data['type']) : (isset($data['input_type']) ? trim($data['input_type']) : $attribute['input_type']);
         $isActive = isset($data['is_active']) ? ($data['is_active'] ? 1 : 0) : ($attribute['is_active'] ?? 1);
 
-        \Nexus\Models\Attribute::update($id, [
+        \App\Models\Attribute::update($id, [
             'name' => $name,
             'category_id' => $categoryId,
             'input_type' => $inputType,
@@ -380,12 +380,12 @@ class AdminCategoriesController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
 
-        $attribute = \Nexus\Models\Attribute::find($id);
+        $attribute = \App\Models\Attribute::find($id);
         if (!$attribute) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Attribute not found', null, 404);
         }
 
-        \Nexus\Models\Attribute::delete($id);
+        \App\Models\Attribute::delete($id);
 
         ActivityLog::log($adminId, 'admin_delete_attribute', "Deleted attribute #{$id}: {$attribute['name']}");
 

@@ -56,4 +56,44 @@ class GroupExchangeService
     {
         return \Nexus\Services\GroupExchangeService::removeParticipant($exchangeId, $userId);
     }
+
+    /**
+     * Delegates to legacy GroupExchangeService::calculateSplit().
+     */
+    public function calculateSplit(int $exchangeId): array
+    {
+        return \Nexus\Services\GroupExchangeService::calculateSplit($exchangeId);
+    }
+
+    /**
+     * Delegates to legacy GroupExchangeService::update().
+     */
+    public function update(int $id, array $data): bool
+    {
+        return \Nexus\Services\GroupExchangeService::update($id, $data);
+    }
+
+    /**
+     * Delegates to legacy GroupExchangeService::updateStatus().
+     */
+    public function updateStatus(int $id, string $status): bool
+    {
+        return \Nexus\Services\GroupExchangeService::updateStatus($id, $status);
+    }
+
+    /**
+     * Delegates to legacy GroupExchangeService::confirmParticipation().
+     */
+    public function confirmParticipation(int $exchangeId, int $userId): bool
+    {
+        return \Nexus\Services\GroupExchangeService::confirmParticipation($exchangeId, $userId);
+    }
+
+    /**
+     * Delegates to legacy GroupExchangeService::complete().
+     */
+    public function complete(int $exchangeId): array
+    {
+        return \Nexus\Services\GroupExchangeService::complete($exchangeId);
+    }
 }

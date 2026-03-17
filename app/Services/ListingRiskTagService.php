@@ -13,6 +13,9 @@ namespace App\Services;
  */
 class ListingRiskTagService
 {
+    public const RISK_HIGH = 'high';
+    public const RISK_CRITICAL = 'critical';
+
     public function __construct()
     {
     }

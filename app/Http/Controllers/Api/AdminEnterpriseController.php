@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\LegalDocumentService;
+use App\Services\LegalDocumentService;
 
 /**
  * AdminEnterpriseController -- Enterprise: roles, GDPR, monitoring, health, logs, secrets, legal docs.
@@ -20,7 +20,9 @@ class AdminEnterpriseController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly LegalDocumentService $legalDocumentService,
+    ) {}
 
     private const PERMISSIONS = [
         'users' => ['users.view','users.create','users.edit','users.delete','users.suspend','users.ban','users.impersonate'],
@@ -466,7 +468,7 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         try {
-            $docs = LegalDocumentService::getAllForTenant(TenantContext::getId());
+            $docs = $this->legalDocumentService->getAllForTenant(TenantContext::getId());
             return $this->respondWithData($docs);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
@@ -479,7 +481,7 @@ class AdminEnterpriseController extends BaseApiController
         if (empty($data['title'])) { return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 422); }
 
         try {
-            $doc = LegalDocumentService::createDocument([
+            $doc = $this->legalDocumentService->createDocument([
                 'title' => $data['title'], 'document_type' => $data['type'] ?? $data['document_type'] ?? 'terms',
                 'slug' => $data['slug'] ?? null, 'requires_acceptance' => $data['requires_acceptance'] ?? true,
                 'acceptance_required_for' => $data['acceptance_required_for'] ?? 'registration',
@@ -526,7 +528,7 @@ class AdminEnterpriseController extends BaseApiController
             if (isset($data['acceptance_required_for'])) $updateData['acceptance_required_for'] = $data['acceptance_required_for'];
             if (isset($data['notify_on_update'])) $updateData['notify_on_update'] = $data['notify_on_update'];
 
-            $doc = LegalDocumentService::updateDocument($id, $updateData);
+            $doc = $this->legalDocumentService->updateDocument($id, $updateData);
             if (!$doc) { return $this->respondWithError('NOT_FOUND', 'Document not found', null, 404); }
             return $this->respondWithData($doc);
         } catch (\Exception $e) {

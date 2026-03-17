@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\InsuranceCertificateService;
+use App\Services\InsuranceCertificateService;
 
 /**
  * AdminInsuranceCertificateController -- Admin insurance certificate management.
@@ -19,7 +19,9 @@ class AdminInsuranceCertificateController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly InsuranceCertificateService $insuranceCertificateService,
+    ) {}
 
     /** GET /api/v2/admin/insurance-certificates */
     public function list(): JsonResponse
@@ -37,7 +39,7 @@ class AdminInsuranceCertificateController extends BaseApiController
                 'per_page' => $this->queryInt('per_page', 25, 10, 100),
             ];
 
-            $result = InsuranceCertificateService::getAll($filters);
+            $result = $this->insuranceCertificateService->getAll($filters);
 
             return $this->respondWithPaginatedCollection(
                 $result['data'],
@@ -54,7 +56,7 @@ class AdminInsuranceCertificateController extends BaseApiController
     public function stats(): JsonResponse
     {
         $this->requireAdmin();
-        return $this->respondWithData(InsuranceCertificateService::getStats());
+        return $this->respondWithData($this->insuranceCertificateService->getStats());
     }
 
     /** GET /api/v2/admin/insurance-certificates/{id} */
@@ -63,7 +65,7 @@ class AdminInsuranceCertificateController extends BaseApiController
         $this->requireAdmin();
 
         try {
-            $record = InsuranceCertificateService::getById($id);
+            $record = $this->insuranceCertificateService->getById($id);
             if (!$record) {
                 return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
             }
@@ -110,8 +112,8 @@ class AdminInsuranceCertificateController extends BaseApiController
                 'notes' => $this->input('notes'),
             ];
 
-            $id = InsuranceCertificateService::create($data);
-            $record = InsuranceCertificateService::getById($id);
+            $id = $this->insuranceCertificateService->create($data);
+            $record = $this->insuranceCertificateService->getById($id);
 
             return $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {
@@ -125,7 +127,7 @@ class AdminInsuranceCertificateController extends BaseApiController
         $this->requireAdmin();
 
         try {
-            $existing = InsuranceCertificateService::getById($id);
+            $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
             }
@@ -160,8 +162,8 @@ class AdminInsuranceCertificateController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', 'No valid fields to update');
             }
 
-            InsuranceCertificateService::update($id, $data);
-            $record = InsuranceCertificateService::getById($id);
+            $this->insuranceCertificateService->update($id, $data);
+            $record = $this->insuranceCertificateService->getById($id);
 
             return $this->respondWithData($record);
         } catch (\Exception $e) {
@@ -175,7 +177,7 @@ class AdminInsuranceCertificateController extends BaseApiController
         $adminId = $this->requireAdmin();
 
         try {
-            $existing = InsuranceCertificateService::getById($id);
+            $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
             }
@@ -183,8 +185,8 @@ class AdminInsuranceCertificateController extends BaseApiController
                 return $this->respondWithError('INVALID_STATUS', 'Certificate is already verified');
             }
 
-            InsuranceCertificateService::verify($id, $adminId);
-            $record = InsuranceCertificateService::getById($id);
+            $this->insuranceCertificateService->verify($id, $adminId);
+            $record = $this->insuranceCertificateService->getById($id);
 
             return $this->respondWithData($record);
         } catch (\Exception $e) {
@@ -203,13 +205,13 @@ class AdminInsuranceCertificateController extends BaseApiController
         }
 
         try {
-            $existing = InsuranceCertificateService::getById($id);
+            $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
             }
 
-            InsuranceCertificateService::reject($id, $adminId, $reason);
-            $record = InsuranceCertificateService::getById($id);
+            $this->insuranceCertificateService->reject($id, $adminId, $reason);
+            $record = $this->insuranceCertificateService->getById($id);
 
             return $this->respondWithData($record);
         } catch (\Exception $e) {
@@ -223,12 +225,12 @@ class AdminInsuranceCertificateController extends BaseApiController
         $this->requireAdmin();
 
         try {
-            $existing = InsuranceCertificateService::getById($id);
+            $existing = $this->insuranceCertificateService->getById($id);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Insurance certificate not found', null, 404);
             }
 
-            InsuranceCertificateService::delete($id);
+            $this->insuranceCertificateService->delete($id);
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to delete insurance certificate', null, 500);
@@ -241,7 +243,7 @@ class AdminInsuranceCertificateController extends BaseApiController
         $this->requireAdmin();
 
         try {
-            $records = InsuranceCertificateService::getUserCertificates($userId);
+            $records = $this->insuranceCertificateService->getUserCertificates($userId);
             return $this->respondWithData($records);
         } catch (\Exception $e) {
             return $this->respondWithData([]);

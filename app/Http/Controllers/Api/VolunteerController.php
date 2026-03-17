@@ -27,7 +27,6 @@ use App\Services\VolunteerCheckInService;
 use App\Services\VolunteerWellbeingService;
 use App\Services\WebhookDispatchService;
 use Nexus\Core\TenantContext;
-use Nexus\Services\VolunteerService as LegacyVolunteerService;
 
 /**
  * VolunteerController -- Volunteering opportunities, applications, shifts, hours, and organisations.
@@ -205,13 +204,13 @@ class VolunteerController extends BaseApiController
         }
         if ($this->input('category_id') !== null) $data['category_id'] = $this->inputInt('category_id') ?: null;
 
-        $success = LegacyVolunteerService::updateOpportunity((int) $id, $userId, $data);
+        $success = $this->volunteerService->updateOpportunity((int) $id, $userId, $data);
         if (!$success) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
-        $opportunity = LegacyVolunteerService::getOpportunityById((int) $id, $userId);
+        $opportunity = $this->volunteerService->getOpportunityById((int) $id, $userId);
         return $this->respondWithData($opportunity);
     }
 
@@ -221,9 +220,9 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_delete', 10, 60);
 
-        $success = LegacyVolunteerService::deleteOpportunity((int) $id, $userId);
+        $success = $this->volunteerService->deleteOpportunity((int) $id, $userId);
         if (!$success) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->noContent();
@@ -243,9 +242,9 @@ class VolunteerController extends BaseApiController
         if ($this->query('status')) $filters['status'] = $this->query('status');
         if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
 
-        $result = LegacyVolunteerService::getApplicationsForOpportunity((int) $id, $userId, $filters);
+        $result = $this->volunteerService->getApplicationsForOpportunity((int) $id, $userId, $filters);
         if ($result === null) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['items' => $result['items'], 'cursor' => $result['cursor'], 'has_more' => $result['has_more']]);
@@ -261,9 +260,9 @@ class VolunteerController extends BaseApiController
         $orgNote = trim((string) ($this->input('org_note') ?? ''));
         if (!$action) return $this->respondWithError('VALIDATION_ERROR', 'Action is required (approve or decline)', 'action', 400);
 
-        $success = LegacyVolunteerService::handleApplication((int) $id, $userId, $action, $orgNote);
+        $success = $this->volunteerService->handleApplication((int) $id, $userId, $action, $orgNote);
         if (!$success) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['id' => (int) $id, 'status' => $action === 'approve' ? 'approved' : 'declined']);
@@ -275,9 +274,9 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_withdraw', 20, 60);
 
-        $success = LegacyVolunteerService::withdrawApplication((int) $id, $userId);
+        $success = $this->volunteerService->withdrawApplication((int) $id, $userId);
         if (!$success) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->noContent();
@@ -291,7 +290,7 @@ class VolunteerController extends BaseApiController
     {
         $this->ensureFeature();
         $this->rateLimit('volunteering_shifts', 120, 60);
-        $shifts = LegacyVolunteerService::getShiftsForOpportunity((int) $id);
+        $shifts = $this->volunteerService->getShiftsForOpportunity((int) $id);
         return $this->respondWithData(['shifts' => $shifts]);
     }
 
@@ -301,9 +300,9 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_shift_signup', 20, 60);
 
-        $success = LegacyVolunteerService::signUpForShift((int) $id, $userId);
+        $success = $this->volunteerService->signUpForShift((int) $id, $userId);
         if (!$success) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['shift_id' => (int) $id, 'message' => 'Successfully signed up for shift']);
@@ -315,9 +314,9 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_shift_cancel', 20, 60);
 
-        $success = LegacyVolunteerService::cancelShiftSignup((int) $id, $userId);
+        $success = $this->volunteerService->cancelShiftSignup((int) $id, $userId);
         if (!$success) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->noContent();
@@ -341,9 +340,9 @@ class VolunteerController extends BaseApiController
             'description'     => trim($this->input('description', '')),
         ];
 
-        $logId = LegacyVolunteerService::logHours($userId, $data);
+        $logId = $this->volunteerService->logHours($userId, $data);
         if ($logId === null) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['id' => $logId, 'status' => 'pending', 'message' => 'Hours logged successfully, pending verification'], null, 201);
@@ -358,7 +357,7 @@ class VolunteerController extends BaseApiController
         $filters = ['limit' => $this->queryInt('per_page', 20, 1, 50)];
         if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
 
-        $result = LegacyVolunteerService::getPendingHoursForOrgOwner($userId, $filters);
+        $result = $this->volunteerService->getPendingHoursForOrgOwner($userId, $filters);
         return $this->respondWithData(['items' => $result['items'], 'cursor' => $result['cursor'], 'has_more' => $result['has_more']]);
     }
 
@@ -371,9 +370,9 @@ class VolunteerController extends BaseApiController
         $action = $this->input('action');
         if (!$action) return $this->respondWithError('VALIDATION_ERROR', 'Action is required (approve or decline)', 'action', 400);
 
-        $success = LegacyVolunteerService::verifyHours((int) $id, $userId, $action);
+        $success = $this->volunteerService->verifyHours((int) $id, $userId, $action);
         if (!$success) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['id' => (int) $id, 'status' => $action === 'approve' ? 'approved' : 'declined']);
@@ -388,7 +387,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_my_orgs', 60, 60);
-        $orgs = LegacyVolunteerService::getMyOrganizations($userId);
+        $orgs = $this->volunteerService->getMyOrganizations($userId);
         return $this->respondWithData($orgs);
     }
 
@@ -405,12 +404,12 @@ class VolunteerController extends BaseApiController
             'website'       => trim($this->input('website', '')),
         ];
 
-        $orgId = LegacyVolunteerService::createOrganization($userId, $data);
+        $orgId = $this->volunteerService->createOrganization($userId, $data);
         if ($orgId === null) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        $org = LegacyVolunteerService::getOrganizationById($orgId, true);
+        $org = $this->volunteerService->getOrganizationById($orgId, true);
         return $this->respondWithData($org, null, 201);
     }
 
@@ -433,9 +432,9 @@ class VolunteerController extends BaseApiController
         if (!$targetId) return $this->respondWithError('VALIDATION_ERROR', 'Target ID is required', 'target_id', 400);
         if (!$rating) return $this->respondWithError('VALIDATION_ERROR', 'Rating is required', 'rating', 400);
 
-        $reviewId = LegacyVolunteerService::createReview($userId, $targetType, $targetId, $rating, $comment);
+        $reviewId = $this->volunteerService->createReview($userId, $targetType, $targetId, $rating, $comment);
         if ($reviewId === null) {
-            $errors = LegacyVolunteerService::getErrors();
+            $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['id' => $reviewId, 'rating' => $rating, 'message' => 'Review submitted successfully'], null, 201);
@@ -446,7 +445,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('volunteering_reviews', 60, 60);
         if (!in_array($type, ['organization', 'user'])) return $this->respondWithError('VALIDATION_ERROR', 'Type must be organization or user', 'type', 400);
-        $reviews = LegacyVolunteerService::getReviews($type, (int) $id);
+        $reviews = $this->volunteerService->getReviews($type, (int) $id);
         return $this->respondWithData(['reviews' => $reviews]);
     }
 
@@ -1032,7 +1031,7 @@ class VolunteerController extends BaseApiController
             }
         }
 
-        $fileUrl = \Nexus\Core\ImageUploader::upload($uploadedFile, 'credentials');
+        $fileUrl = \App\Core\ImageUploader::upload($uploadedFile, 'credentials');
         $fileName = $uploadedFile['name'] ?? null;
 
         DB::insert(
@@ -2179,7 +2178,7 @@ class VolunteerController extends BaseApiController
         $this->getUserId();
         $this->rateLimit('volunteering_legacy_list', 60, 60);
 
-        $opps = \Nexus\Models\VolOpportunity::search(TenantContext::getId(), '');
+        $opps = \App\Models\VolOpportunity::search(TenantContext::getId(), '');
         return $this->respondWithCollection($opps);
     }
 
@@ -2212,7 +2211,7 @@ class VolunteerController extends BaseApiController
                 return true;
             }
 
-            if (\Nexus\Models\OrgMember::isAdmin((int) $row->organization_id, $userId)) {
+            if (\App\Models\OrgMember::isAdmin((int) $row->organization_id, $userId)) {
                 return true;
             }
 

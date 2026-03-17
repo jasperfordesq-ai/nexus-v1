@@ -11,7 +11,7 @@ use App\Services\SmartMatchingEngine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\MatchApprovalWorkflowService;
+use App\Services\MatchApprovalWorkflowService;
 
 /**
  * AdminMatchingController -- Admin matching approval, configuration, cache, and statistics.
@@ -25,6 +25,7 @@ class AdminMatchingController extends BaseApiController
     public function __construct(
         private readonly SmartMatchingEngine $smartMatchingEngine,
         private readonly SmartMatchingAnalyticsService $smartMatchingAnalyticsService,
+        private readonly MatchApprovalWorkflowService $matchApprovalWorkflowService,
     ) {}
 
     /** GET /api/v2/admin/matching */
@@ -101,7 +102,7 @@ class AdminMatchingController extends BaseApiController
     {
         $this->requireAdmin();
         $days = $this->queryInt('days', 30, 1);
-        return $this->respondWithData(MatchApprovalWorkflowService::getStatistics($days));
+        return $this->respondWithData($this->matchApprovalWorkflowService->getStatistics($days));
     }
 
     /** GET /api/v2/admin/matching/{id} */
@@ -164,7 +165,7 @@ class AdminMatchingController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
         $notes = trim($this->input('notes', ''));
-        $success = MatchApprovalWorkflowService::approveMatch($id, $adminId, $notes);
+        $success = $this->matchApprovalWorkflowService->approveMatch($id, $adminId, $notes);
         if (!$success) return $this->respondWithError('NOT_FOUND', 'Match approval not found or already reviewed', null, 404);
         return $this->respondWithData(['approved' => true, 'id' => $id]);
     }
@@ -176,7 +177,7 @@ class AdminMatchingController extends BaseApiController
         $reason = trim($this->input('reason', ''));
         if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', 'Rejection reason is required', 'reason', 422);
 
-        $success = MatchApprovalWorkflowService::rejectMatch($id, $adminId, $reason);
+        $success = $this->matchApprovalWorkflowService->rejectMatch($id, $adminId, $reason);
         if (!$success) return $this->respondWithError('NOT_FOUND', 'Match approval not found or already reviewed', null, 404);
         return $this->respondWithData(['rejected' => true, 'id' => $id]);
     }

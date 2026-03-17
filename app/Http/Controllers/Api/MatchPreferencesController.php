@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\MatchingService;
+use App\Services\MatchingService;
 
 /**
  * MatchPreferencesController — Eloquent-powered match preference endpoints.
@@ -19,6 +19,10 @@ class MatchPreferencesController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly MatchingService $matchingService,
+    ) {}
+
     /**
      * GET /api/v2/users/me/match-preferences
      *
@@ -28,7 +32,7 @@ class MatchPreferencesController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $preferences = MatchingService::getPreferences($userId);
+        $preferences = $this->matchingService->getPreferences($userId);
 
         return $this->respondWithData($preferences);
     }
@@ -47,7 +51,7 @@ class MatchPreferencesController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $current = MatchingService::getPreferences($userId);
+        $current = $this->matchingService->getPreferences($userId);
         $updated = $current;
 
         // Only update fields that were provided
@@ -74,12 +78,12 @@ class MatchPreferencesController extends BaseApiController
             $updated['notify_mutual_matches'] = (bool) $notifyMutual;
         }
 
-        $success = MatchingService::savePreferences($userId, $updated);
+        $success = $this->matchingService->savePreferences($userId, $updated);
 
         if (!$success) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to save match preferences');
         }
 
-        return $this->respondWithData(MatchingService::getPreferences($userId));
+        return $this->respondWithData($this->matchingService->getPreferences($userId));
     }
 }

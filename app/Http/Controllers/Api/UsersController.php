@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Nexus\Services\UserService;
 use Nexus\Services\Enterprise\GdprService;
 use Nexus\Core\TenantContext;
-use Nexus\Models\User;
+use App\Models\User;
 
 /**
  * UsersController - User profiles, settings, preferences, sessions.
@@ -724,11 +724,11 @@ class UsersController extends BaseApiController
             }
 
             $email = $user['email'];
-            $existing = \Nexus\Models\NewsletterSubscriber::findByEmail($email);
+            $existing = \App\Models\NewsletterSubscriber::findByEmail($email);
 
             if ($subscribed) {
                 if (!$existing) {
-                    \Nexus\Models\NewsletterSubscriber::createConfirmed(
+                    \App\Models\NewsletterSubscriber::createConfirmed(
                         $email,
                         $user['first_name'],
                         $user['last_name'],
@@ -736,7 +736,7 @@ class UsersController extends BaseApiController
                         $userId
                     );
                 } elseif ($existing['status'] === 'unsubscribed') {
-                    \Nexus\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'active']);
+                    \App\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'active']);
                 }
 
                 try {
@@ -747,7 +747,7 @@ class UsersController extends BaseApiController
                 }
             } else {
                 if ($existing && $existing['status'] === 'active') {
-                    \Nexus\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'unsubscribed']);
+                    \App\Models\NewsletterSubscriber::update($existing['id'], ['status' => 'unsubscribed']);
 
                     try {
                         $mailchimp = new \Nexus\Services\MailchimpService();

@@ -87,4 +87,48 @@ class AdminAnalyticsService
             'active_last_week' => $activeLastWeek,
         ];
     }
+
+    // =========================================================================
+    // Legacy delegation methods — used by AdminCommunityAnalyticsController
+    // =========================================================================
+
+    /**
+     * Delegates to legacy AdminAnalyticsService::getOverallStats().
+     */
+    public function getOverallStats(): array
+    {
+        return \Nexus\Services\AdminAnalyticsService::getOverallStats();
+    }
+
+    /**
+     * Delegates to legacy AdminAnalyticsService::getMonthlyTrends().
+     */
+    public function getMonthlyTrends(int $months = 12): array
+    {
+        return \Nexus\Services\AdminAnalyticsService::getMonthlyTrends($months);
+    }
+
+    /**
+     * Delegates to legacy AdminAnalyticsService::getWeeklyTrends().
+     */
+    public function getWeeklyTrends(int $weeks = 12): array
+    {
+        return \Nexus\Services\AdminAnalyticsService::getWeeklyTrends($weeks);
+    }
+
+    /**
+     * Delegates to legacy AdminAnalyticsService::getTopEarners().
+     */
+    public function getTopEarners(int $days = 30, int $limit = 10): array
+    {
+        return \Nexus\Services\AdminAnalyticsService::getTopEarners($days, $limit);
+    }
+
+    /**
+     * Delegates to legacy AdminAnalyticsService::getTopSpenders().
+     */
+    public function getTopSpenders(int $days = 30, int $limit = 10): array
+    {
+        return \Nexus\Services\AdminAnalyticsService::getTopSpenders($days, $limit);
+    }
 }

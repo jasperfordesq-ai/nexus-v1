@@ -8,9 +8,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Mailer;
+use App\Core\Mailer;
 use Nexus\Core\TenantContext;
-use Nexus\Services\BrokerMessageVisibilityService;
+use App\Services\BrokerMessageVisibilityService;
 
 /**
  * CoreController -- Core platform endpoints (members, listings, groups,
@@ -21,6 +21,10 @@ use Nexus\Services\BrokerMessageVisibilityService;
 class CoreController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
+    ) {}
 
     // ──────────────────────────────────────────────
     // Messaging endpoints
@@ -45,10 +49,10 @@ class CoreController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Cannot send message to yourself', 'receiver_id', 400);
         }
 
-        if (BrokerMessageVisibilityService::isMessagingDisabledForUser($userId)) {
+        if ($this->brokerMessageVisibilityService->isMessagingDisabledForUser($userId)) {
             return $this->respondWithError('SENDER_RESTRICTED', 'Your messaging privileges have been restricted. Please contact support.', null, 403);
         }
-        if (BrokerMessageVisibilityService::isMessagingDisabledForUser($receiverId)) {
+        if ($this->brokerMessageVisibilityService->isMessagingDisabledForUser($receiverId)) {
             return $this->respondWithError('RECIPIENT_UNAVAILABLE', 'This user is not currently accepting messages.', null, 403);
         }
 
@@ -80,8 +84,8 @@ class CoreController extends BaseApiController
                 $sender = DB::selectOne("SELECT name FROM users WHERE id = ?", [$userId]);
                 $senderName = $sender->name ?? 'Someone';
 
-                if ($sender && class_exists('Nexus\Models\Notification')) {
-                    \Nexus\Models\Notification::create(
+                if ($sender && class_exists('App\Models\Notification')) {
+                    \App\Models\Notification::createNotification(
                         $receiverId,
                         "New message from " . $senderName,
                         "/messages/" . $userId,
@@ -90,7 +94,7 @@ class CoreController extends BaseApiController
                 }
 
                 $preview = mb_strlen($body) > 50 ? mb_substr($body, 0, 47) . '...' : $body;
-                \Nexus\Models\Message::sendEmailNotification($receiverId, $senderName, $preview, $userId);
+                \App\Models\Message::sendEmailNotification($receiverId, $senderName, $preview, $userId);
             } catch (\Exception $e) {
                 error_log("Message notification failed: " . $e->getMessage());
             }
@@ -167,8 +171,8 @@ class CoreController extends BaseApiController
 
         $count = 0;
         try {
-            if (class_exists('Nexus\Models\MessageThread')) {
-                $threads = \Nexus\Models\MessageThread::getForUser($userId);
+            if (class_exists('App\Models\MessageThread')) {
+                $threads = \App\Models\MessageThread::getForUser($userId);
                 foreach ($threads as $thread) {
                     if (!empty($thread['unread_count'])) {
                         $count += (int) $thread['unread_count'];
@@ -370,7 +374,7 @@ class CoreController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('check_notifications', 120, 60);
 
-        $count = \Nexus\Models\Notification::countUnread($userId);
+        $count = \App\Models\Notification::countUnread($userId);
 
         return $this->respondWithData(['unread_count' => $count]);
     }
@@ -383,8 +387,8 @@ class CoreController extends BaseApiController
 
         $messagesCount = 0;
         try {
-            if (class_exists('Nexus\Models\MessageThread')) {
-                $threads = \Nexus\Models\MessageThread::getForUser($userId);
+            if (class_exists('App\Models\MessageThread')) {
+                $threads = \App\Models\MessageThread::getForUser($userId);
                 foreach ($threads as $thread) {
                     if (!empty($thread['unread_count'])) {
                         $messagesCount += (int) $thread['unread_count'];
@@ -395,7 +399,7 @@ class CoreController extends BaseApiController
             $messagesCount = 0;
         }
 
-        $notificationsCount = \Nexus\Models\Notification::countUnread($userId);
+        $notificationsCount = \App\Models\Notification::countUnread($userId);
 
         return $this->respondWithData([
             'messages' => $messagesCount,

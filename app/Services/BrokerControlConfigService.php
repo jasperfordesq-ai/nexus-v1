@@ -56,4 +56,28 @@ class BrokerControlConfigService
     {
         return \Nexus\Services\BrokerControlConfigService::isFirstContactMonitoringEnabled();
     }
+
+    /**
+     * Delegates to legacy BrokerControlConfigService::isExchangeWorkflowEnabled().
+     */
+    public function isExchangeWorkflowEnabled(): bool
+    {
+        return \Nexus\Services\BrokerControlConfigService::isExchangeWorkflowEnabled();
+    }
+
+    /**
+     * Delegates to legacy BrokerControlConfigService::isVettingEnabled().
+     */
+    public function isVettingEnabled(): bool
+    {
+        return \Nexus\Services\BrokerControlConfigService::isVettingEnabled();
+    }
+
+    /**
+     * Delegates to legacy BrokerControlConfigService::isInsuranceEnabled().
+     */
+    public function isInsuranceEnabled(): bool
+    {
+        return \Nexus\Services\BrokerControlConfigService::isInsuranceEnabled();
+    }
 }

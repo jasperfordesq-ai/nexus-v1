@@ -117,4 +117,208 @@ class JobVacancyService
             'updated_at'     => now(),
         ]);
     }
+
+    /**
+     * Delegates to legacy JobVacancyService::delete().
+     */
+    public function delete(int $id, int $adminId): bool
+    {
+        return \Nexus\Services\JobVacancyService::delete($id, $adminId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::featureJob().
+     */
+    public function featureJob(int $id, int $adminId, int $days = 7): bool
+    {
+        return \Nexus\Services\JobVacancyService::featureJob($id, $adminId, $days);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::unfeatureJob().
+     */
+    public function unfeatureJob(int $id, int $adminId): bool
+    {
+        return \Nexus\Services\JobVacancyService::unfeatureJob($id, $adminId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getApplications().
+     */
+    public function getApplications(int $jobId, int $adminId): ?array
+    {
+        return \Nexus\Services\JobVacancyService::getApplications($jobId, $adminId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::updateApplicationStatus().
+     */
+    public function updateApplicationStatus(int $applicationId, int $adminId, string $status, ?string $notes = null): bool
+    {
+        return \Nexus\Services\JobVacancyService::updateApplicationStatus($applicationId, $adminId, $status, $notes);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\JobVacancyService::getErrors();
+    }
+
+    // =========================================================================
+    // Legacy delegation methods — used by JobVacanciesController
+    // =========================================================================
+
+    /**
+     * Delegates to legacy JobVacancyService::getById() with optional userId.
+     */
+    public function legacyGetById(int $id, ?int $userId = null): ?array
+    {
+        return \Nexus\Services\JobVacancyService::getById($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::incrementViews().
+     */
+    public function incrementViews(int $id, ?int $userId = null): void
+    {
+        \Nexus\Services\JobVacancyService::incrementViews($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::update().
+     */
+    public function update(int $id, int $userId, array $data): bool
+    {
+        return \Nexus\Services\JobVacancyService::update($id, $userId, $data);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::apply() with message string.
+     */
+    public function legacyApply(int $jobId, int $userId, ?string $message = null): ?int
+    {
+        return \Nexus\Services\JobVacancyService::apply($jobId, $userId, $message);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getSavedJobs().
+     */
+    public function getSavedJobs(int $userId, array $filters = []): array
+    {
+        return \Nexus\Services\JobVacancyService::getSavedJobs($userId, $filters);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::saveJob().
+     */
+    public function saveJob(int $id, int $userId): bool
+    {
+        return \Nexus\Services\JobVacancyService::saveJob($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::unsaveJob().
+     */
+    public function unsaveJob(int $id, int $userId): void
+    {
+        \Nexus\Services\JobVacancyService::unsaveJob($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getMyApplications().
+     */
+    public function getMyApplications(int $userId, array $filters = []): array
+    {
+        return \Nexus\Services\JobVacancyService::getMyApplications($userId, $filters);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getMyPostings().
+     */
+    public function getMyPostings(int $userId, int $tenantId, array $params = []): array
+    {
+        return \Nexus\Services\JobVacancyService::getMyPostings($userId, $tenantId, $params);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getAlerts().
+     */
+    public function getAlerts(int $userId): array
+    {
+        return \Nexus\Services\JobVacancyService::getAlerts($userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::subscribeAlert().
+     */
+    public function subscribeAlert(int $userId, array $data): ?int
+    {
+        return \Nexus\Services\JobVacancyService::subscribeAlert($userId, $data);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::deleteAlert().
+     */
+    public function deleteAlert(int $id, int $userId): void
+    {
+        \Nexus\Services\JobVacancyService::deleteAlert($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::unsubscribeAlert().
+     */
+    public function unsubscribeAlert(int $id, int $userId): void
+    {
+        \Nexus\Services\JobVacancyService::unsubscribeAlert($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::resubscribeAlert().
+     */
+    public function resubscribeAlert(int $id, int $userId): void
+    {
+        \Nexus\Services\JobVacancyService::resubscribeAlert($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::calculateMatchPercentage().
+     */
+    public function calculateMatchPercentage(int $userId, int $jobId): array
+    {
+        return \Nexus\Services\JobVacancyService::calculateMatchPercentage($userId, $jobId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getQualificationAssessment().
+     */
+    public function getQualificationAssessment(int $userId, int $jobId): ?array
+    {
+        return \Nexus\Services\JobVacancyService::getQualificationAssessment($userId, $jobId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getApplicationHistory().
+     */
+    public function getApplicationHistory(int $applicationId, int $userId): ?array
+    {
+        return \Nexus\Services\JobVacancyService::getApplicationHistory($applicationId, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::getAnalytics().
+     */
+    public function getAnalytics(int $jobId, int $userId): ?array
+    {
+        return \Nexus\Services\JobVacancyService::getAnalytics($jobId, $userId);
+    }
+
+    /**
+     * Delegates to legacy JobVacancyService::renewJob().
+     */
+    public function renewJob(int $id, int $userId, int $days = 30): bool
+    {
+        return \Nexus\Services\JobVacancyService::renewJob($id, $userId, $days);
+    }
 }

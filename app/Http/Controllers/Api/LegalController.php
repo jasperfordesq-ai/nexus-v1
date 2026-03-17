@@ -11,7 +11,6 @@ use App\Services\RedisCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\LegalDocumentService as LegacyLegalDocumentService;
 
 /**
  * LegalController -- Legal documents (terms, privacy policy, etc.).
@@ -80,12 +79,12 @@ class LegalController extends BaseApiController
     // ──────────────────────────────────────────────
 
     private const VALID_TYPES = [
-        LegacyLegalDocumentService::TYPE_TERMS,
-        LegacyLegalDocumentService::TYPE_PRIVACY,
-        LegacyLegalDocumentService::TYPE_COOKIES,
-        LegacyLegalDocumentService::TYPE_ACCESSIBILITY,
-        LegacyLegalDocumentService::TYPE_COMMUNITY_GUIDELINES,
-        LegacyLegalDocumentService::TYPE_ACCEPTABLE_USE,
+        \Nexus\Services\LegalDocumentService::TYPE_TERMS,
+        \Nexus\Services\LegalDocumentService::TYPE_PRIVACY,
+        \Nexus\Services\LegalDocumentService::TYPE_COOKIES,
+        \Nexus\Services\LegalDocumentService::TYPE_ACCESSIBILITY,
+        \Nexus\Services\LegalDocumentService::TYPE_COMMUNITY_GUIDELINES,
+        \Nexus\Services\LegalDocumentService::TYPE_ACCEPTABLE_USE,
     ];
 
     /** GET /api/v2/legal/{type} (legacy format) */
@@ -95,13 +94,13 @@ class LegalController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Document type not found', null, 404);
         }
 
-        $document = LegacyLegalDocumentService::getByType($type);
+        $document = $this->legalService->getByType($type);
 
         if (!$document || !$document['content']) {
             return $this->respondWithData(null);
         }
 
-        $versions = LegacyLegalDocumentService::getVersions((int) $document['id']);
+        $versions = $this->legalService->legacyGetVersions((int) $document['id']);
         $publishedCount = count(array_filter($versions, fn ($v) => !$v['is_draft']));
 
         return $this->respondWithData([
@@ -124,13 +123,13 @@ class LegalController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', 'Document type not found', null, 404);
         }
 
-        $document = LegacyLegalDocumentService::getByType($type);
+        $document = $this->legalService->getByType($type);
 
         if (!$document) {
             return $this->respondWithData(['title' => '', 'versions' => []]);
         }
 
-        $versions = LegacyLegalDocumentService::getVersions((int) $document['id']);
+        $versions = $this->legalService->legacyGetVersions((int) $document['id']);
 
         $published = [];
         foreach ($versions as $v) {
@@ -158,7 +157,7 @@ class LegalController extends BaseApiController
     /** GET /api/v2/legal/version/{versionId} */
     public function apiGetVersion($versionId): JsonResponse
     {
-        $version = LegacyLegalDocumentService::getVersion((int) $versionId);
+        $version = $this->legalService->getVersion((int) $versionId);
 
         if (!$version) {
             return $this->respondWithError('NOT_FOUND', 'Version not found', null, 404);
@@ -198,8 +197,8 @@ class LegalController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Both v1 and v2 parameters are required', null, 400);
         }
 
-        $version1 = LegacyLegalDocumentService::getVersion((int) $v1);
-        $version2 = LegacyLegalDocumentService::getVersion((int) $v2);
+        $version1 = $this->legalService->getVersion((int) $v1);
+        $version2 = $this->legalService->getVersion((int) $v2);
 
         if (!$version1 || !$version2) {
             return $this->respondWithError('NOT_FOUND', 'One or both versions not found', null, 404);
@@ -225,7 +224,7 @@ class LegalController extends BaseApiController
             return $this->respondWithData($cached['data'] ?? $cached);
         }
 
-        $comparison = LegacyLegalDocumentService::compareVersions((int) $v1, (int) $v2);
+        $comparison = $this->legalService->compareVersions((int) $v1, (int) $v2);
 
         if (!$comparison) {
             return $this->respondWithError('INTERNAL_ERROR', 'Comparison failed', null, 500);
@@ -268,22 +267,22 @@ class LegalController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Missing document_id or version_id', null, 400);
         }
 
-        $version = LegacyLegalDocumentService::getVersion($versionId);
+        $version = $this->legalService->getVersion($versionId);
         if (!$version || (int) $version['tenant_id'] !== TenantContext::getId()) {
             return $this->respondWithError('NOT_FOUND', 'Document version not found', null, 404);
         }
 
-        $document = LegacyLegalDocumentService::getById($documentId);
+        $document = $this->legalService->legacyGetById($documentId);
         if (!$document || ($document['current_version_id'] ?? null) !== $versionId) {
             return $this->respondWithError('VALIDATION_ERROR', 'This is not the current version', null, 400);
         }
 
         try {
-            LegacyLegalDocumentService::recordAcceptanceFromRequest(
+            $this->legalService->recordAcceptanceFromRequest(
                 $userId,
                 $documentId,
                 $versionId,
-                LegacyLegalDocumentService::ACCEPTANCE_SETTINGS
+                \Nexus\Services\LegalDocumentService::ACCEPTANCE_SETTINGS
             );
 
             return $this->respondWithData([
@@ -301,12 +300,12 @@ class LegalController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $status = LegacyLegalDocumentService::getUserAcceptanceStatus($userId);
+        $status = $this->legalService->getUserAcceptanceStatus($userId);
 
         return $this->respondWithData([
             'success' => true,
             'documents' => $status,
-            'has_pending' => LegacyLegalDocumentService::hasPendingAcceptances($userId),
+            'has_pending' => $this->legalService->hasPendingAcceptances($userId),
         ]);
     }
 }

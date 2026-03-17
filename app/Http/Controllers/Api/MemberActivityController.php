@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\MemberActivityService;
+use App\Services\MemberActivityService;
 
 /**
  * MemberActivityController -- Member activity dashboard.
@@ -18,13 +18,17 @@ class MemberActivityController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly MemberActivityService $memberActivityService,
+    ) {}
+
     /** GET /api/v2/users/me/activity/dashboard */
     public function getDashboard(): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('activity_dashboard', 10, 60);
 
-        $data = MemberActivityService::getDashboardData($userId);
+        $data = $this->memberActivityService->getDashboardData($userId);
 
         return $this->respondWithData($data);
     }
@@ -36,7 +40,7 @@ class MemberActivityController extends BaseApiController
         $this->rateLimit('activity_timeline', 20, 60);
 
         $limit = $this->queryInt('limit', 30, 1, 100);
-        $timeline = MemberActivityService::getRecentTimeline($userId, null, $limit);
+        $timeline = $this->memberActivityService->getRecentTimeline($userId, null, $limit);
 
         return $this->respondWithData($timeline);
     }
@@ -47,7 +51,7 @@ class MemberActivityController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('activity_hours', 20, 60);
 
-        $summary = MemberActivityService::getHoursSummary($userId);
+        $summary = $this->memberActivityService->getHoursSummary($userId);
 
         return $this->respondWithData($summary);
     }
@@ -58,7 +62,7 @@ class MemberActivityController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('activity_monthly', 10, 60);
 
-        $monthly = MemberActivityService::getMonthlyHours($userId);
+        $monthly = $this->memberActivityService->getMonthlyHours($userId);
 
         return $this->respondWithData($monthly);
     }
@@ -68,7 +72,7 @@ class MemberActivityController extends BaseApiController
     {
         $this->rateLimit('activity_public_dashboard', 20, 60);
 
-        $data = MemberActivityService::getDashboardData($id);
+        $data = $this->memberActivityService->getDashboardData($id);
 
         return $this->respondWithData($data);
     }

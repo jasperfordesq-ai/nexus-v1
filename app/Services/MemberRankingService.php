@@ -115,4 +115,28 @@ class MemberRankingService
 
         return $ranked;
     }
+
+    /**
+     * Check if the CommunityRank algorithm is enabled.
+     */
+    public function isEnabled(): bool
+    {
+        return \Nexus\Services\MemberRankingService::isEnabled();
+    }
+
+    /**
+     * Get the current CommunityRank configuration.
+     */
+    public function getConfig(): array
+    {
+        return \Nexus\Services\MemberRankingService::getConfig();
+    }
+
+    /**
+     * Clear the CommunityRank cache.
+     */
+    public function clearCache(): void
+    {
+        \Nexus\Services\MemberRankingService::clearCache();
+    }
 }

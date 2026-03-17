@@ -6,22 +6,26 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\EventService;
+use App\Services\EventNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\EventService;
-use Nexus\Services\EventNotificationService;
 use Nexus\Core\TenantContext;
-use Nexus\Models\EventRsvp;
+use App\Models\EventRsvp;
 
 /**
  * EventsController - CRUD for community events, RSVPs, waitlist, series, recurring.
  *
- * Converted from legacy delegation to direct static service calls.
- * All methods are now native Laravel — no legacy delegation remains.
+ * All methods use Laravel DI services — no legacy static calls.
  */
 class EventsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly EventService $eventService,
+        private readonly EventNotificationService $eventNotificationService,
+    ) {}
 
     // ================================================================
     // LIST / SHOW
@@ -57,12 +61,12 @@ class EventsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = EventService::getAll($filters);
+        $result = $this->eventService->getAll($filters);
 
         // Add user's RSVP status to each event if logged in
         if ($userId) {
             foreach ($result['items'] as &$event) {
-                $event['user_rsvp'] = EventService::getUserRsvp($event['id'], $userId);
+                $event['user_rsvp'] = $this->eventService->getUserRsvp($event['id'], $userId);
             }
         }
 
@@ -81,7 +85,7 @@ class EventsController extends BaseApiController
     {
         $userId = $this->getOptionalUserId();
 
-        $event = EventService::getById($id, $userId);
+        $event = $this->eventService->getById($id, $userId);
 
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
@@ -123,7 +127,7 @@ class EventsController extends BaseApiController
             $filters['category'] = $this->query('category');
         }
 
-        $result = EventService::getNearby($lat, $lon, $filters);
+        $result = $this->eventService->getNearby($lat, $lon, $filters);
 
         return $this->respondWithData($result['items'], [
             'search' => [
@@ -151,10 +155,10 @@ class EventsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $eventId = EventService::create($userId, $data);
+        $eventId = $this->eventService->create($userId, $data);
 
         if ($eventId === null) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
@@ -165,7 +169,7 @@ class EventsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $event = EventService::getById($eventId, $userId);
+        $event = $this->eventService->getById($eventId, $userId);
 
         return $this->respondWithData($event, null, 201);
     }
@@ -180,10 +184,10 @@ class EventsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $success = EventService::update($id, $userId, $data);
+        $success = $this->eventService->update($id, $userId, $data);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -200,12 +204,12 @@ class EventsController extends BaseApiController
 
         // Notify attendees of meaningful changes
         try {
-            EventNotificationService::notifyEventUpdated($id, $data);
+            $this->eventNotificationService->notifyEventUpdated($id, $data);
         } catch (\Throwable $e) {
             error_log("Event update notification error: " . $e->getMessage());
         }
 
-        $event = EventService::getById($id, $userId);
+        $event = $this->eventService->getById($id, $userId);
 
         return $this->respondWithData($event);
     }
@@ -218,10 +222,10 @@ class EventsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('events_delete', 10, 60);
 
-        $success = EventService::delete($id, $userId);
+        $success = $this->eventService->delete($id, $userId);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -258,10 +262,10 @@ class EventsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'RSVP status is required', 'status', 400);
         }
 
-        $success = EventService::rsvp($id, $userId, $status);
+        $success = $this->eventService->rsvp($id, $userId, $status);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $httpStatus = 422;
 
             $isWaitlisted = false;
@@ -282,8 +286,8 @@ class EventsController extends BaseApiController
 
             // Waitlisted is a 200 with special response, not a true error
             if ($isWaitlisted) {
-                $position = EventService::getUserWaitlistPosition($id, $userId);
-                $event = EventService::getById($id, $userId);
+                $position = $this->eventService->getUserWaitlistPosition($id, $userId);
+                $event = $this->eventService->getById($id, $userId);
                 return $this->respondWithData([
                     'status'             => 'waitlisted',
                     'waitlist_position'  => $position,
@@ -295,11 +299,11 @@ class EventsController extends BaseApiController
             return $this->respondWithErrors($errors, $httpStatus);
         }
 
-        $event = EventService::getById($id, $userId);
+        $event = $this->eventService->getById($id, $userId);
 
         // Notify event organizer of RSVP
         try {
-            EventNotificationService::notifyRsvp($id, $userId, $status);
+            $this->eventNotificationService->notifyRsvp($id, $userId, $status);
         } catch (\Throwable $e) {
             error_log("RSVP notification error: " . $e->getMessage());
         }
@@ -319,10 +323,10 @@ class EventsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('events_rsvp', 30, 60);
 
-        $success = EventService::removeRsvp($id, $userId);
+        $success = $this->eventService->removeRsvp($id, $userId);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             return $this->respondWithErrors($errors, 400);
         }
 
@@ -340,7 +344,7 @@ class EventsController extends BaseApiController
     {
         $id = (int) $id;
 
-        $event = EventService::getById($id);
+        $event = $this->eventService->getById($id);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
@@ -354,7 +358,7 @@ class EventsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = EventService::getAttendees($id, $filters);
+        $result = $this->eventService->getAttendees($id, $filters);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -377,7 +381,7 @@ class EventsController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         // Verify event exists
-        $event = EventService::getById($id);
+        $event = $this->eventService->getById($id);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
@@ -429,7 +433,7 @@ class EventsController extends BaseApiController
 
         try {
             // Create time credit transaction (organizer -> attendee)
-            \Nexus\Models\Transaction::create(
+            \App\Models\Transaction::create(
                 $userId,
                 $attendeeId,
                 $duration,
@@ -465,10 +469,10 @@ class EventsController extends BaseApiController
 
         $reason = $this->input('reason') ?? '';
 
-        $success = EventService::cancelEvent($id, $userId, $reason);
+        $success = $this->eventService->cancelEvent($id, $userId, $reason);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -506,16 +510,16 @@ class EventsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
-        $event = EventService::getById($id);
+        $event = $this->eventService->getById($id);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
 
-        $result = EventService::getWaitlist($id, [
+        $result = $this->eventService->getWaitlist($id, [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
         ]);
 
-        $userPosition = EventService::getUserWaitlistPosition($id, $userId);
+        $userPosition = $this->eventService->getUserWaitlistPosition($id, $userId);
 
         return $this->respondWithData($result['items'], [
             'has_more'      => $result['has_more'],
@@ -532,18 +536,18 @@ class EventsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('events_waitlist', 30, 60);
 
-        $event = EventService::getById($id);
+        $event = $this->eventService->getById($id);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
 
-        $success = EventService::addToWaitlist($id, $userId);
+        $success = $this->eventService->addToWaitlist($id, $userId);
 
         if (!$success) {
             return $this->respondWithError('WAITLIST_FAILED', 'Failed to join waitlist', null, 400);
         }
 
-        $position = EventService::getUserWaitlistPosition($id, $userId);
+        $position = $this->eventService->getUserWaitlistPosition($id, $userId);
 
         return $this->respondWithData([
             'waitlisted' => true,
@@ -560,7 +564,7 @@ class EventsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('events_waitlist', 30, 60);
 
-        EventService::removeFromWaitlist($id, $userId);
+        $this->eventService->removeFromWaitlist($id, $userId);
 
         return $this->noContent();
     }
@@ -577,7 +581,7 @@ class EventsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
-        $reminders = EventService::getUserReminders($id, $userId);
+        $reminders = $this->eventService->getUserReminders($id, $userId);
 
         return $this->respondWithData($reminders);
     }
@@ -596,13 +600,13 @@ class EventsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'reminders must be an array', 'reminders', 400);
         }
 
-        $success = EventService::updateReminders($id, $userId, $reminders);
+        $success = $this->eventService->updateReminders($id, $userId, $reminders);
 
         if (!$success) {
             return $this->respondWithError('UPDATE_FAILED', 'Failed to update reminders', null, 400);
         }
 
-        $updated = EventService::getUserReminders($id, $userId);
+        $updated = $this->eventService->getUserReminders($id, $userId);
 
         return $this->respondWithData($updated);
     }
@@ -619,12 +623,12 @@ class EventsController extends BaseApiController
         $id = (int) $id;
         $this->requireAuth();
 
-        $event = EventService::getById($id);
+        $event = $this->eventService->getById($id);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
 
-        $records = EventService::getAttendanceRecords($id);
+        $records = $this->eventService->getAttendanceRecords($id);
 
         return $this->respondWithData($records);
     }
@@ -646,10 +650,10 @@ class EventsController extends BaseApiController
         $hours = $this->input('hours') !== null ? (float) $this->input('hours') : null;
         $notes = $this->input('notes');
 
-        $success = EventService::markAttended($id, $attendeeId, $userId, $hours, $notes);
+        $success = $this->eventService->markAttended($id, $attendeeId, $userId, $hours, $notes);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -685,7 +689,7 @@ class EventsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'user_ids must be a non-empty array', 'user_ids', 400);
         }
 
-        $result = EventService::bulkMarkAttended($id, $userIds, $userId);
+        $result = $this->eventService->bulkMarkAttended($id, $userIds, $userId);
 
         return $this->respondWithData($result);
     }
@@ -699,7 +703,7 @@ class EventsController extends BaseApiController
      */
     public function listSeries(): JsonResponse
     {
-        $result = EventService::getAllSeries([
+        $result = $this->eventService->getAllSeries([
             'limit' => $this->queryInt('per_page', 20, 1, 100),
         ]);
 
@@ -723,14 +727,14 @@ class EventsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Series title is required', 'title', 400);
         }
 
-        $seriesId = EventService::createSeries($userId, $title, $description);
+        $seriesId = $this->eventService->createSeries($userId, $title, $description);
 
         if (!$seriesId) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             return $this->respondWithErrors($errors, 422);
         }
 
-        $series = EventService::getSeriesInfo($seriesId);
+        $series = $this->eventService->getSeriesInfo($seriesId);
 
         return $this->respondWithData($series, null, 201);
     }
@@ -742,12 +746,12 @@ class EventsController extends BaseApiController
     {
         $seriesId = (int) $seriesId;
 
-        $series = EventService::getSeriesInfo($seriesId);
+        $series = $this->eventService->getSeriesInfo($seriesId);
         if (!$series) {
             return $this->respondWithError('NOT_FOUND', 'Series not found', null, 404);
         }
 
-        $events = EventService::getSeriesEvents($seriesId);
+        $events = $this->eventService->getSeriesEvents($seriesId);
 
         return $this->respondWithData([
             'series' => $series,
@@ -769,10 +773,10 @@ class EventsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'series_id is required', 'series_id', 400);
         }
 
-        $success = EventService::linkToSeries($id, $seriesId, $userId);
+        $success = $this->eventService->linkToSeries($id, $seriesId, $userId);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -804,10 +808,10 @@ class EventsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $result = EventService::createRecurring($userId, $data);
+        $result = $this->eventService->createRecurring($userId, $data);
 
         if (!$result) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'FORBIDDEN') {
@@ -818,7 +822,7 @@ class EventsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $template = EventService::getById($result['template_id'], $userId);
+        $template = $this->eventService->getById($result['template_id'], $userId);
 
         return $this->respondWithData([
             'template'             => $template,
@@ -842,10 +846,10 @@ class EventsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'scope must be "single" or "all"', 'scope', 400);
         }
 
-        $success = EventService::updateRecurring($id, $userId, $data, $scope);
+        $success = $this->eventService->updateRecurring($id, $userId, $data, $scope);
 
         if (!$success) {
-            $errors = EventService::getErrors();
+            $errors = $this->eventService->getErrors();
             $status = 422;
             foreach ($errors as $error) {
                 if ($error['code'] === 'NOT_FOUND') {
@@ -860,7 +864,7 @@ class EventsController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $event = EventService::getById($id, $userId);
+        $event = $this->eventService->getById($id, $userId);
 
         return $this->respondWithData($event);
     }
@@ -896,12 +900,12 @@ class EventsController extends BaseApiController
                 'size'     => $file->getSize(),
             ];
 
-            $imageUrl = \Nexus\Core\ImageUploader::upload($fileArray);
+            $imageUrl = \App\Core\ImageUploader::upload($fileArray);
 
-            $success = EventService::updateImage($id, $userId, $imageUrl);
+            $success = $this->eventService->updateImage($id, $userId, $imageUrl);
 
             if (!$success) {
-                $errors = EventService::getErrors();
+                $errors = $this->eventService->getErrors();
                 $status = 400;
                 foreach ($errors as $error) {
                     if ($error['code'] === 'NOT_FOUND') {

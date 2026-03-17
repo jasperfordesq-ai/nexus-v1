@@ -103,4 +103,60 @@ class SubAccountService
                 'updated_at' => now(),
             ]) > 0;
     }
+
+    /**
+     * Delegates to legacy SubAccountService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\SubAccountService::getErrors();
+    }
+
+    /**
+     * Delegates to legacy SubAccountService::getChildAccounts().
+     */
+    public function getChildAccounts(int $parentUserId): array
+    {
+        return \Nexus\Services\SubAccountService::getChildAccounts($parentUserId);
+    }
+
+    /**
+     * Delegates to legacy SubAccountService::getParentAccounts().
+     */
+    public function getParentAccounts(int $childUserId): array
+    {
+        return \Nexus\Services\SubAccountService::getParentAccounts($childUserId);
+    }
+
+    /**
+     * Delegates to legacy SubAccountService::approveRelationship().
+     */
+    public function approveRelationship(int $childUserId, int $relationshipId): bool
+    {
+        return \Nexus\Services\SubAccountService::approveRelationship($childUserId, $relationshipId);
+    }
+
+    /**
+     * Delegates to legacy SubAccountService::revokeRelationship().
+     */
+    public function revokeRelationship(int $userId, int $relationshipId): bool
+    {
+        return \Nexus\Services\SubAccountService::revokeRelationship($userId, $relationshipId);
+    }
+
+    /**
+     * Delegates to legacy SubAccountService::updatePermissions().
+     */
+    public function updatePermissions(int $parentUserId, int $relationshipId, array $permissions): bool
+    {
+        return \Nexus\Services\SubAccountService::updatePermissions($parentUserId, $relationshipId, $permissions);
+    }
+
+    /**
+     * Delegates to legacy SubAccountService::getChildActivitySummary().
+     */
+    public function getChildActivitySummary(int $parentUserId, int $childUserId): ?array
+    {
+        return \Nexus\Services\SubAccountService::getChildActivitySummary($parentUserId, $childUserId);
+    }
 }

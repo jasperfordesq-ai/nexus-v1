@@ -516,35 +516,32 @@ if (file_exists($pageBuilderBlocks)) {
     require_once $pageBuilderBlocks;
 }
 
-// 5. LARAVEL BRIDGE — Try Laravel routes first, fall through to legacy if unmatched
-// During migration, Laravel handles converted routes while legacy handles the rest.
-// CRITICAL: Capture php://input BEFORE Laravel consumes it.
-// php://input is a one-time-read stream. Laravel's Request::capture() reads it,
-// so legacy controllers can't read it again. We store it globally.
-$GLOBALS['__LARAVEL_BRIDGE_RAW_BODY'] = file_get_contents('php://input');
-
-$laravelBootstrap = $baseDir . '/bootstrap/app.php';
-if (file_exists($laravelBootstrap)) {
-    try {
-        $laravelApp = require_once $laravelBootstrap;
-        $laravelKernel = $laravelApp->make(\Illuminate\Contracts\Http\Kernel::class);
-        $laravelRequest = \Illuminate\Http\Request::capture();
-
-        // Let Laravel handle the request — if it returns 404, fall through to legacy
-        $laravelResponse = $laravelKernel->handle($laravelRequest);
-
-        if ($laravelResponse->getStatusCode() !== 404) {
-            // Laravel matched a route — send the response and exit
-            $laravelResponse->send();
-            $laravelKernel->terminate($laravelRequest, $laravelResponse);
-            exit;
-        }
-        // 404 = no Laravel route matched — fall through to legacy router
-    } catch (\Throwable $e) {
-        // Laravel bootstrap failed — log and fall through to legacy
-        error_log('[Laravel Bridge] Error: ' . $e->getMessage());
-    }
-}
+// 5. LARAVEL BRIDGE — DISABLED (2026-03-17)
+// The Laravel bridge was intercepting ALL requests and hanging during bootstrap,
+// causing cascading Apache worker exhaustion (70+ stuck processes).
+// Root cause: Laravel's autoloader/kernel->handle() hangs in the Docker container,
+// likely due to missing/incomplete composer install or class resolution issues.
+//
+// To re-enable: fix Laravel bootstrap, test with scripts/test-laravel-bridge.php,
+// then uncomment the block below.
+//
+// $GLOBALS['__LARAVEL_BRIDGE_RAW_BODY'] = file_get_contents('php://input');
+// $laravelBootstrap = $baseDir . '/bootstrap/app.php';
+// if (file_exists($laravelBootstrap)) {
+//     try {
+//         $laravelApp = require_once $laravelBootstrap;
+//         $laravelKernel = $laravelApp->make(\Illuminate\Contracts\Http\Kernel::class);
+//         $laravelRequest = \Illuminate\Http\Request::capture();
+//         $laravelResponse = $laravelKernel->handle($laravelRequest);
+//         if ($laravelResponse->getStatusCode() !== 404) {
+//             $laravelResponse->send();
+//             $laravelKernel->terminate($laravelRequest, $laravelResponse);
+//             exit;
+//         }
+//     } catch (\Throwable $e) {
+//         error_log('[Laravel Bridge] Error: ' . $e->getMessage());
+//     }
+// }
 
 // 5b. LOAD LEGACY ROUTES (Standard desktop routing)
 // Any request not matched by Laravel falls through here

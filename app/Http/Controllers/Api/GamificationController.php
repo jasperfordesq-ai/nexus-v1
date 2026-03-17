@@ -19,7 +19,7 @@ use Nexus\Services\LeaderboardSeasonService;
 use Nexus\Services\LeaderboardService;
 use Nexus\Services\StreakService;
 use Nexus\Services\NexusScoreService;
-use Nexus\Models\UserBadge;
+use App\Models\UserBadge;
 
 /**
  * GamificationController — Eloquent-powered badges, XP, leaderboard, and daily rewards.

@@ -9,11 +9,11 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\AuditLogService;
-use Nexus\Services\ExchangeWorkflowService;
-use Nexus\Services\ListingRiskTagService;
-use Nexus\Services\NotificationDispatcher;
-use Nexus\Models\Notification;
+use App\Services\AuditLogService;
+use App\Services\ExchangeWorkflowService;
+use App\Services\ListingRiskTagService;
+use App\Services\NotificationDispatcher;
+use App\Models\Notification;
 
 /**
  * AdminBrokerController -- Admin time-broker exchange monitoring and risk management.
@@ -24,7 +24,10 @@ class AdminBrokerController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly ExchangeWorkflowService $exchangeWorkflowService,
+        private readonly NotificationDispatcher $notificationDispatcher,
+    ) {}
 
     // ============================================
     // HELPERS
@@ -359,7 +362,7 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithError('INVALID_STATUS', 'Exchange is not pending broker approval');
             }
 
-            $success = ExchangeWorkflowService::approveExchange($id, $adminId, $notes);
+            $success = $this->exchangeWorkflowService->approveExchange($id, $adminId, $notes);
             if (!$success) {
                 return $this->respondWithError('SERVER_ERROR', 'Failed to approve exchange', null, 500);
             }
@@ -400,7 +403,7 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithError('INVALID_STATUS', 'Exchange is not pending broker approval');
             }
 
-            $success = ExchangeWorkflowService::rejectExchange($id, $adminId, $reason);
+            $success = $this->exchangeWorkflowService->rejectExchange($id, $adminId, $reason);
             if (!$success) {
                 return $this->respondWithError('SERVER_ERROR', 'Failed to reject exchange', null, 500);
             }
@@ -966,7 +969,7 @@ class AdminBrokerController extends BaseApiController
                     $msg = $messagingDisabled
                         ? 'Your messaging has been temporarily restricted by your timebank coordinator.'
                         : 'Your account has been placed under review by your timebank coordinator.';
-                    Notification::create($userId, $msg, '/messages', 'system', true);
+                    Notification::createNotification($userId, $msg, '/messages', 'system', true);
                 } catch (\Throwable $e) {}
 
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => true]);
@@ -981,7 +984,7 @@ class AdminBrokerController extends BaseApiController
                 AuditLogService::log('user_monitoring_removed', null, $adminId, ['user_id' => $userId, 'user_name' => $userName]);
 
                 try {
-                    Notification::create($userId, 'Your messaging restrictions have been lifted.', '/messages', 'system', true);
+                    Notification::createNotification($userId, 'Your messaging restrictions have been lifted.', '/messages', 'system', true);
                 } catch (\Throwable $e) {}
 
                 return $this->respondWithData(['user_id' => $userId, 'under_monitoring' => false]);
@@ -1276,7 +1279,7 @@ class AdminBrokerController extends BaseApiController
             );
 
             if ($listing) {
-                NotificationDispatcher::notifyAdmins(
+                $this->notificationDispatcher->notifyAdmins(
                     'listing_risk_tagged',
                     [
                         'listing_id' => $listingId,

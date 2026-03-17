@@ -56,4 +56,12 @@ class BrokerMessageVisibilityService
     {
         return \Nexus\Services\BrokerMessageVisibilityService::markAsReviewed($copyId, $brokerId);
     }
+
+    /**
+     * Delegates to legacy BrokerMessageVisibilityService::isMessagingDisabledForUser().
+     */
+    public function isMessagingDisabledForUser(int $userId): bool
+    {
+        return \Nexus\Services\BrokerMessageVisibilityService::isMessagingDisabledForUser($userId);
+    }
 }

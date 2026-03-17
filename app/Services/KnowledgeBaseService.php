@@ -100,4 +100,12 @@ class KnowledgeBaseService
             'updated_at'   => now(),
         ]);
     }
+
+    /**
+     * Delegates to legacy KnowledgeBaseService::delete().
+     */
+    public function delete(int $id): bool
+    {
+        return \Nexus\Services\KnowledgeBaseService::delete($id);
+    }
 }

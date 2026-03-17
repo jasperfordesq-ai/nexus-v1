@@ -56,4 +56,44 @@ class VettingService
     {
         return \Nexus\Services\VettingService::create($data);
     }
+
+    /**
+     * Delegates to legacy VettingService::update().
+     */
+    public function update(int $id, array $data): bool
+    {
+        return \Nexus\Services\VettingService::update($id, $data);
+    }
+
+    /**
+     * Delegates to legacy VettingService::verify().
+     */
+    public function verify(int $id, int $adminId): bool
+    {
+        return \Nexus\Services\VettingService::verify($id, $adminId);
+    }
+
+    /**
+     * Delegates to legacy VettingService::reject().
+     */
+    public function reject(int $id, int $adminId, string $reason): bool
+    {
+        return \Nexus\Services\VettingService::reject($id, $adminId, $reason);
+    }
+
+    /**
+     * Delegates to legacy VettingService::delete().
+     */
+    public function delete(int $id): bool
+    {
+        return \Nexus\Services\VettingService::delete($id);
+    }
+
+    /**
+     * Delegates to legacy VettingService::updateDocumentUrl().
+     */
+    public function updateDocumentUrl(int $id, string $url): bool
+    {
+        return \Nexus\Services\VettingService::updateDocumentUrl($id, $url);
+    }
 }

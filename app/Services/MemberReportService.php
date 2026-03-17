@@ -56,4 +56,12 @@ class MemberReportService
     {
         return \Nexus\Services\MemberReportService::getTopContributors($tenantId, $days, $limit);
     }
+
+    /**
+     * Delegates to legacy MemberReportService::getLeastActiveMembers().
+     */
+    public function getLeastActiveMembers(int $tenantId, int $days = 30, int $limit = 50, int $offset = 0): array
+    {
+        return \Nexus\Services\MemberReportService::getLeastActiveMembers($tenantId, $days, $limit, $offset);
+    }
 }

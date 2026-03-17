@@ -9,7 +9,6 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use App\Services\JobVacancyService;
 use Nexus\Core\TenantContext;
-use Nexus\Services\JobVacancyService as LegacyJobVacancyService;
 
 /**
  * JobVacanciesController — Community job vacancy listings.
@@ -97,14 +96,14 @@ class JobVacanciesController extends BaseApiController
 
         $userId = $this->getOptionalUserId();
 
-        $job = LegacyJobVacancyService::getById($id, $userId);
+        $job = $this->jobService->legacyGetById($id, $userId);
 
         if (!$job) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Job vacancy not found', null, 404);
         }
 
         // Increment views
-        LegacyJobVacancyService::incrementViews($id, $userId);
+        $this->jobService->incrementViews($id, $userId);
 
         return $this->respondWithData($job);
     }
@@ -133,10 +132,10 @@ class JobVacanciesController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $success = LegacyJobVacancyService::update((int) $id, $userId, $data);
+        $success = $this->jobService->update((int) $id, $userId, $data);
 
         if (!$success) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $status = 422;
 
             foreach ($errors as $error) {
@@ -153,7 +152,7 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $vacancy = LegacyJobVacancyService::getById((int) $id, $userId);
+        $vacancy = $this->jobService->legacyGetById((int) $id, $userId);
 
         return $this->respondWithData($vacancy);
     }
@@ -165,10 +164,10 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_delete', 5, 60);
 
-        $success = LegacyJobVacancyService::delete((int) $id, $userId);
+        $success = $this->jobService->delete((int) $id, $userId);
 
         if (!$success) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $status = 400;
 
             foreach ($errors as $error) {
@@ -197,10 +196,10 @@ class JobVacanciesController extends BaseApiController
 
         $message = $this->input('message');
 
-        $applicationId = LegacyJobVacancyService::apply($id, $userId, $message);
+        $applicationId = $this->jobService->legacyApply($id, $userId, $message);
 
         if ($applicationId === null) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $status = 400;
 
             foreach ($errors as $error) {
@@ -217,7 +216,7 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, $status);
         }
 
-        $vacancy = LegacyJobVacancyService::getById($id, $userId);
+        $vacancy = $this->jobService->legacyGetById($id, $userId);
 
         return $this->respondWithData($vacancy, null, 201);
     }
@@ -240,7 +239,7 @@ class JobVacanciesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = LegacyJobVacancyService::getSavedJobs($userId, $filters);
+        $result = $this->jobService->getSavedJobs($userId, $filters);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -257,10 +256,10 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_save', 30, 60);
 
-        $success = LegacyJobVacancyService::saveJob((int) $id, $userId);
+        $success = $this->jobService->saveJob((int) $id, $userId);
 
         if (!$success) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             return $this->respondWithErrors($errors, 400);
         }
 
@@ -274,7 +273,7 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_unsave', 30, 60);
 
-        LegacyJobVacancyService::unsaveJob((int) $id, $userId);
+        $this->jobService->unsaveJob((int) $id, $userId);
 
         return $this->respondWithData(['message' => 'Job removed from saved', 'is_saved' => false]);
     }
@@ -301,7 +300,7 @@ class JobVacanciesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = LegacyJobVacancyService::getMyApplications($userId, $filters);
+        $result = $this->jobService->getMyApplications($userId, $filters);
 
         return $this->respondWithData([
             'items' => $result['items'],
@@ -327,7 +326,7 @@ class JobVacanciesController extends BaseApiController
             $params['cursor'] = $this->query('cursor');
         }
 
-        $result = LegacyJobVacancyService::getMyPostings($userId, $tenantId, $params);
+        $result = $this->jobService->getMyPostings($userId, $tenantId, $params);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -348,7 +347,7 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_alerts_list', 30, 60);
 
-        $alerts = LegacyJobVacancyService::getAlerts($userId);
+        $alerts = $this->jobService->getAlerts($userId);
 
         return $this->respondWithData($alerts);
     }
@@ -362,10 +361,10 @@ class JobVacanciesController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $alertId = LegacyJobVacancyService::subscribeAlert($userId, $data);
+        $alertId = $this->jobService->subscribeAlert($userId, $data);
 
         if ($alertId === null) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             return $this->respondWithErrors($errors, 422);
         }
 
@@ -382,7 +381,7 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_alerts_delete', 10, 60);
 
-        LegacyJobVacancyService::deleteAlert((int) $id, $userId);
+        $this->jobService->deleteAlert((int) $id, $userId);
 
         return $this->noContent();
     }
@@ -394,7 +393,7 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_alerts_unsub', 10, 60);
 
-        LegacyJobVacancyService::unsubscribeAlert((int) $id, $userId);
+        $this->jobService->unsubscribeAlert((int) $id, $userId);
 
         return $this->respondWithData(['message' => 'Alert unsubscribed successfully']);
     }
@@ -406,7 +405,7 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_alerts_resub', 10, 60);
 
-        LegacyJobVacancyService::resubscribeAlert((int) $id, $userId);
+        $this->jobService->resubscribeAlert((int) $id, $userId);
 
         return $this->respondWithData(['message' => 'Alert resubscribed successfully']);
     }
@@ -422,7 +421,7 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_match', 30, 60);
 
-        $result = LegacyJobVacancyService::calculateMatchPercentage($userId, (int) $id);
+        $result = $this->jobService->calculateMatchPercentage($userId, (int) $id);
 
         return $this->respondWithData($result);
     }
@@ -434,10 +433,10 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_qualified', 20, 60);
 
-        $result = LegacyJobVacancyService::getQualificationAssessment($userId, (int) $id);
+        $result = $this->jobService->getQualificationAssessment($userId, (int) $id);
 
         if ($result === null) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             return $this->respondWithErrors($errors, 404);
         }
 
@@ -455,10 +454,10 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_applications', 30, 60);
 
-        $applications = LegacyJobVacancyService::getApplications((int) $id, $userId);
+        $applications = $this->jobService->getApplications((int) $id, $userId);
 
         if ($applications === null) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $status = 400;
 
             foreach ($errors as $error) {
@@ -492,10 +491,10 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Status is required', 'status', 400);
         }
 
-        $success = LegacyJobVacancyService::updateApplicationStatus((int) $id, $userId, $status, $notes);
+        $success = $this->jobService->updateApplicationStatus((int) $id, $userId, $status, $notes);
 
         if (!$success) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $httpStatus = 400;
 
             foreach ($errors as $error) {
@@ -522,10 +521,10 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_app_history', 30, 60);
 
-        $history = LegacyJobVacancyService::getApplicationHistory((int) $id, $userId);
+        $history = $this->jobService->getApplicationHistory((int) $id, $userId);
 
         if ($history === null) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $httpStatus = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'RESOURCE_NOT_FOUND') {
@@ -554,10 +553,10 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('jobs_analytics', 20, 60);
 
-        $analytics = LegacyJobVacancyService::getAnalytics((int) $id, $userId);
+        $analytics = $this->jobService->getAnalytics((int) $id, $userId);
 
         if ($analytics === null) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $httpStatus = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'RESOURCE_NOT_FOUND') {
@@ -585,10 +584,10 @@ class JobVacanciesController extends BaseApiController
         $days = $this->input('days') ?? 30;
         $days = max(1, min(90, (int) $days));
 
-        $success = LegacyJobVacancyService::renewJob((int) $id, $userId, $days);
+        $success = $this->jobService->renewJob((int) $id, $userId, $days);
 
         if (!$success) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $httpStatus = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'RESOURCE_NOT_FOUND') {
@@ -603,7 +602,7 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, $httpStatus);
         }
 
-        $vacancy = LegacyJobVacancyService::getById((int) $id, $userId);
+        $vacancy = $this->jobService->legacyGetById((int) $id, $userId);
 
         return $this->respondWithData($vacancy);
     }
@@ -618,10 +617,10 @@ class JobVacanciesController extends BaseApiController
         $days = $this->input('days') ?? 7;
         $days = max(1, min(30, (int) $days));
 
-        $success = LegacyJobVacancyService::featureJob((int) $id, $userId, $days);
+        $success = $this->jobService->featureJob((int) $id, $userId, $days);
 
         if (!$success) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             $httpStatus = 400;
             foreach ($errors as $error) {
                 if ($error['code'] === 'RESOURCE_NOT_FOUND') {
@@ -636,7 +635,7 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, $httpStatus);
         }
 
-        $vacancy = LegacyJobVacancyService::getById((int) $id, $userId);
+        $vacancy = $this->jobService->legacyGetById((int) $id, $userId);
 
         return $this->respondWithData($vacancy);
     }
@@ -648,14 +647,14 @@ class JobVacanciesController extends BaseApiController
         $userId = $this->requireAdmin();
         $this->rateLimit('jobs_unfeature', 10, 60);
 
-        $success = LegacyJobVacancyService::unfeatureJob((int) $id, $userId);
+        $success = $this->jobService->unfeatureJob((int) $id, $userId);
 
         if (!$success) {
-            $errors = LegacyJobVacancyService::getErrors();
+            $errors = $this->jobService->getErrors();
             return $this->respondWithErrors($errors, 400);
         }
 
-        $vacancy = LegacyJobVacancyService::getById((int) $id, $userId);
+        $vacancy = $this->jobService->legacyGetById((int) $id, $userId);
 
         return $this->respondWithData($vacancy);
     }

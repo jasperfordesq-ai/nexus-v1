@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\MenuManager;
 use Nexus\Core\TenantContext;
-use Nexus\Models\PayPlan;
+use App\Models\PayPlan;
 
 /**
  * MenuController — Navigation menu management.

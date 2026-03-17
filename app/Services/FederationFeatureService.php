@@ -13,6 +13,9 @@ namespace App\Services;
  */
 class FederationFeatureService
 {
+    /** Feature key for tenant-level federation toggle. */
+    public const TENANT_FEDERATION_ENABLED = 'tenant_federation_enabled';
+
     public function __construct()
     {
     }
@@ -55,5 +58,21 @@ class FederationFeatureService
     public function isSystemFeatureEnabled(string $feature): bool
     {
         return \Nexus\Services\FederationFeatureService::isSystemFeatureEnabled($feature);
+    }
+
+    /**
+     * Enable a federation feature for a tenant.
+     */
+    public function enableTenantFeature(string $feature, ?int $tenantId = null): bool
+    {
+        return \Nexus\Services\FederationFeatureService::enableTenantFeature($feature, $tenantId);
+    }
+
+    /**
+     * Disable a federation feature for a tenant.
+     */
+    public function disableTenantFeature(string $feature, ?int $tenantId = null): bool
+    {
+        return \Nexus\Services\FederationFeatureService::disableTenantFeature($feature, $tenantId);
     }
 }

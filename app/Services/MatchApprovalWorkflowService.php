@@ -56,4 +56,12 @@ class MatchApprovalWorkflowService
     {
         return \Nexus\Services\MatchApprovalWorkflowService::bulkReject($requestIds, $rejectedBy, $reason);
     }
+
+    /**
+     * Delegates to legacy MatchApprovalWorkflowService::getStatistics().
+     */
+    public function getStatistics(int $days = 30): array
+    {
+        return \Nexus\Services\MatchApprovalWorkflowService::getStatistics($days);
+    }
 }

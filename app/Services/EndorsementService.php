@@ -21,35 +21,9 @@ class EndorsementService
      *
      * @return int|null Endorsement ID or null on failure.
      */
-    public function endorse(int $endorserId, int $endorsedId, string $skillName, ?string $comment = null): ?int
+    public function endorse(int $endorserId, int $endorsedId, string $skillName, ?int $skillId = null, ?string $comment = null): ?int
     {
-        if ($endorserId === $endorsedId) {
-            return null;
-        }
-
-        $skillName = trim($skillName);
-        if (empty($skillName) || strlen($skillName) > 100) {
-            return null;
-        }
-
-        $exists = DB::table('skill_endorsements')
-            ->where('endorser_id', $endorserId)
-            ->where('endorsed_id', $endorsedId)
-            ->where('skill_name', $skillName)
-            ->exists();
-
-        if ($exists) {
-            return null;
-        }
-
-        return DB::table('skill_endorsements')->insertGetId([
-            'endorser_id' => $endorserId,
-            'endorsed_id' => $endorsedId,
-            'skill_name'  => $skillName,
-            'comment'     => $comment ? substr(trim($comment), 0, 500) : null,
-            'created_at'  => now(),
-            'updated_at'  => now(),
-        ]);
+        return \Nexus\Services\EndorsementService::endorse($endorserId, $endorsedId, $skillName, $skillId, $comment);
     }
 
     /**
@@ -105,5 +79,45 @@ class EndorsementService
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
             ->exists();
+    }
+
+    /**
+     * Delegates to legacy EndorsementService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\EndorsementService::getErrors();
+    }
+
+    /**
+     * Delegates to legacy EndorsementService::getSkillEndorsements().
+     */
+    public function getSkillEndorsements(int $userId, string $skillName): array
+    {
+        return \Nexus\Services\EndorsementService::getSkillEndorsements($userId, $skillName);
+    }
+
+    /**
+     * Delegates to legacy EndorsementService::getEndorsementsForUser().
+     */
+    public function getEndorsementsForUser(int $userId): array
+    {
+        return \Nexus\Services\EndorsementService::getEndorsementsForUser($userId);
+    }
+
+    /**
+     * Delegates to legacy EndorsementService::getStats().
+     */
+    public function getStats(int $userId): array
+    {
+        return \Nexus\Services\EndorsementService::getStats($userId);
+    }
+
+    /**
+     * Delegates to legacy EndorsementService::getTopEndorsedMembers().
+     */
+    public function getTopEndorsedMembers(int $limit = 10): array
+    {
+        return \Nexus\Services\EndorsementService::getTopEndorsedMembers($limit);
     }
 }
