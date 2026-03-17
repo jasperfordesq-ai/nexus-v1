@@ -9,6 +9,8 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
+use Nexus\Core\TenantContext;
 
 class Gamification extends Model
 {
@@ -34,5 +36,25 @@ class Gamification extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Award points to a user for an action.
+     */
+    public static function awardPoints(int $userId, string $action, int $points, ?string $description = null): void
+    {
+        try {
+            $tenantId = TenantContext::getId();
+
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'points' => DB::raw("points + {$points}"),
+                ]);
+        } catch (\Exception $e) {
+            // Column may not exist — silently fail
+            error_log("Gamification::awardPoints error: " . $e->getMessage());
+        }
     }
 }

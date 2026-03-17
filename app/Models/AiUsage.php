@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright ï¿½ 2024ï¿½2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -9,6 +9,7 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class AiUsage extends Model
 {
@@ -35,5 +36,30 @@ class AiUsage extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Log an AI usage record.
+     */
+    public static function log(
+        int $userId,
+        int $tenantId,
+        string $model,
+        int $inputTokens,
+        int $outputTokens,
+        float $cost
+    ): int {
+        $id = DB::table('ai_usage')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'provider' => 'openai', // default provider
+            'feature' => $model,
+            'tokens_input' => $inputTokens,
+            'tokens_output' => $outputTokens,
+            'cost_usd' => $cost,
+            'created_at' => now(),
+        ]);
+
+        return (int) $id;
     }
 }

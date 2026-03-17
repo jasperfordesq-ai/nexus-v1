@@ -392,6 +392,32 @@ class FeedService
     }
 
     /**
+     * Create a feed post — delegates to legacy FeedService.
+     *
+     * @return int|null Post ID or null on failure
+     */
+    public function createPostLegacy(int $userId, array $data): ?int
+    {
+        return \Nexus\Services\FeedService::createPost($userId, $data);
+    }
+
+    /**
+     * Get a single feed item by type and ID — delegates to legacy FeedService.
+     */
+    public function getItem(string $type, int $id, ?int $userId): ?array
+    {
+        return \Nexus\Services\FeedService::getItem($type, $id, $userId);
+    }
+
+    /**
+     * Get validation errors — delegates to legacy FeedService.
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\FeedService::getErrors();
+    }
+
+    /**
      * Toggle like on a feed post.
      *
      * @return array{liked: bool, likes_count: int}

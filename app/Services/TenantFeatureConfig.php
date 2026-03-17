@@ -13,6 +13,47 @@ namespace App\Services;
  */
 class TenantFeatureConfig
 {
+    /**
+     * All known optional features with their default enabled/disabled state.
+     * Mirrors \Nexus\Services\TenantFeatureConfig::FEATURE_DEFAULTS.
+     */
+    public const FEATURE_DEFAULTS = [
+        'events' => true,
+        'groups' => true,
+        'gamification' => true,
+        'goals' => true,
+        'blog' => true,
+        'resources' => true,
+        'volunteering' => true,
+        'exchange_workflow' => true,
+        'organisations' => true,
+        'federation' => true,
+        'connections' => true,
+        'reviews' => true,
+        'polls' => true,
+        'job_vacancies' => true,
+        'ideation_challenges' => true,
+        'direct_messaging' => true,
+        'group_exchanges' => true,
+        'search' => true,
+        'ai_chat' => true,
+    ];
+
+    /**
+     * All known core modules with their default enabled/disabled state.
+     * Mirrors \Nexus\Services\TenantFeatureConfig::MODULE_DEFAULTS.
+     */
+    public const MODULE_DEFAULTS = [
+        'listings' => true,
+        'wallet' => true,
+        'messages' => true,
+        'dashboard' => true,
+        'feed' => true,
+        'notifications' => true,
+        'profile' => true,
+        'settings' => true,
+    ];
+
     public function __construct()
     {
     }
