@@ -516,6 +516,12 @@ abstract class BaseApiController
 
         $rawBody = file_get_contents('php://input');
 
+        // Laravel bridge: php://input may be empty because Laravel already consumed it.
+        // Fall back to the pre-captured body stored in index.php.
+        if (($rawBody === '' || $rawBody === false) && !empty($GLOBALS['__LARAVEL_BRIDGE_RAW_BODY'])) {
+            $rawBody = $GLOBALS['__LARAVEL_BRIDGE_RAW_BODY'];
+        }
+
         // Parse JSON if content type is JSON or body looks like JSON
         if (strpos($contentType, 'application/json') !== false ||
             (strlen($rawBody) > 0 && ($rawBody[0] === '{' || $rawBody[0] === '['))) {

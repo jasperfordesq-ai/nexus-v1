@@ -518,6 +518,11 @@ if (file_exists($pageBuilderBlocks)) {
 
 // 5. LARAVEL BRIDGE — Try Laravel routes first, fall through to legacy if unmatched
 // During migration, Laravel handles converted routes while legacy handles the rest.
+// CRITICAL: Capture php://input BEFORE Laravel consumes it.
+// php://input is a one-time-read stream. Laravel's Request::capture() reads it,
+// so legacy controllers can't read it again. We store it globally.
+$GLOBALS['__LARAVEL_BRIDGE_RAW_BODY'] = file_get_contents('php://input');
+
 $laravelBootstrap = $baseDir . '/bootstrap/app.php';
 if (file_exists($laravelBootstrap)) {
     try {
