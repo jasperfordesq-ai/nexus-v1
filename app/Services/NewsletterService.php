@@ -103,4 +103,83 @@ class NewsletterService
 
         return $newsletter;
     }
+
+    /**
+     * Send a newsletter immediately.
+     *
+     * Delegates to the legacy NewsletterService which handles recipient
+     * resolution, queue building, A/B testing, and actual email dispatch.
+     */
+    public function sendNow(int $newsletterId, int $tenantId): bool
+    {
+        $newsletter = $this->newsletter->newQuery()->find($newsletterId);
+
+        if (!$newsletter) {
+            return false;
+        }
+
+        if ($newsletter->status === 'sent') {
+            return false;
+        }
+
+        try {
+            \Nexus\Services\NewsletterService::sendNow(
+                $newsletterId,
+                $newsletter->target_audience ?? 'all_members',
+                $newsletter->segment_id
+            );
+            return true;
+        } catch (\Exception $e) {
+            \Log::error("NewsletterService::sendNow error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Render the email HTML for a newsletter (preview).
+     *
+     * Delegates to the legacy NewsletterService::renderEmail() which handles
+     * dynamic content blocks, personalization, and full HTML template rendering.
+     */
+    public function renderEmail(int $newsletterId, int $tenantId): string
+    {
+        $newsletter = $this->newsletter->newQuery()->find($newsletterId);
+
+        if (!$newsletter) {
+            return '';
+        }
+
+        $tenantName = DB::table('tenants')
+            ->where('id', $tenantId)
+            ->value('name') ?? 'Community';
+
+        return \Nexus\Services\NewsletterService::renderEmail(
+            $newsletter->toArray(),
+            $tenantName
+        );
+    }
+
+    /**
+     * Get the count of recipients matching a segment.
+     */
+    public function getSegmentRecipientCount(int $segmentId, int $tenantId): int
+    {
+        return (int) \Nexus\Services\NewsletterService::getSegmentRecipientCount($segmentId);
+    }
+
+    /**
+     * Get the total recipient count for a newsletter based on its target audience.
+     */
+    public function getRecipientCount(int $newsletterId, int $tenantId): int
+    {
+        $newsletter = $this->newsletter->newQuery()->find($newsletterId);
+
+        if (!$newsletter) {
+            return 0;
+        }
+
+        return (int) \Nexus\Services\NewsletterService::getRecipientCount(
+            $newsletter->target_audience ?? 'all_members'
+        );
+    }
 }
