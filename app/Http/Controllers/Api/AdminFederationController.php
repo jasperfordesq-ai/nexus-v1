@@ -10,7 +10,7 @@ use App\Services\FederationDirectoryService;
 use App\Services\FederationPartnershipService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * AdminFederationController -- Federation management.

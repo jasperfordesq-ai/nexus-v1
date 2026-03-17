@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Services\JobVacancyService;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * JobVacanciesController — Community job vacancy listings.

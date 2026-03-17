@@ -10,7 +10,7 @@ use App\Services\RedisCache;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Helpers\UrlHelper;
 use App\Services\BrokerControlConfigService;
 
@@ -131,7 +131,7 @@ class TenantBootstrapController extends BaseApiController
         // Guard: if resolved tenant is inactive, reject
         if (!empty($tenant['id']) && $tenant['id'] > 1 && empty($tenant['is_active'])) {
             return $this->respondWithError(
-                \Nexus\Core\ApiErrorCodes::INVALID_TENANT,
+                \App\Core\ApiErrorCodes::INVALID_TENANT,
                 'Tenant is inactive',
                 null,
                 503

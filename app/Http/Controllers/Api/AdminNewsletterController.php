@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * Admin Newsletter API Controller

@@ -11,8 +11,8 @@ use App\Services\TokenService;
 use App\Services\WebAuthnChallengeStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\TenantContext;
+use App\Core\ApiErrorCodes;
+use App\Core\TenantContext;
 use lbuchs\WebAuthn\WebAuthn;
 use lbuchs\WebAuthn\WebAuthnException;
 

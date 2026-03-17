@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\InsuranceCertificateService;
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * UserInsuranceController -- User insurance certificate upload and listing.

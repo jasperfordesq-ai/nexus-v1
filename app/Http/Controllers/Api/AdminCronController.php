@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * AdminCronController -- Admin cron job logs, settings, and health metrics.

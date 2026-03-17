@@ -12,7 +12,7 @@ use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\ApiErrorCodes;
+use App\Core\ApiErrorCodes;
 use App\Core\Csrf;
 
 /**

@@ -16,7 +16,7 @@ use App\Services\SmartMatchingEngine;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * AdminConfigController -- Admin system configuration, features, modules, cache, jobs,

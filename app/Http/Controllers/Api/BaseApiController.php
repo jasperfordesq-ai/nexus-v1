@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Helpers\UrlHelper;
 
 /**

@@ -12,7 +12,7 @@ use App\Services\UserService;
 use App\Services\Enterprise\GdprService;
 use App\Services\ListingService;
 use App\Services\MailchimpService;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Models\User;
 
 /**

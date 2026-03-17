@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Services\PusherService;
 use App\Services\RealtimeService;
 use App\Services\FederationRealtimeService;

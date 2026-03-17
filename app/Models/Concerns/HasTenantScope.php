@@ -7,7 +7,7 @@
 namespace App\Models\Concerns;
 
 use App\Scopes\TenantScope;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * Trait for Eloquent models that are tenant-scoped.

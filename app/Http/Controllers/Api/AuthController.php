@@ -13,8 +13,8 @@ use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\TenantContext;
+use App\Core\ApiErrorCodes;
+use App\Core\TenantContext;
 
 /**
  * AuthController — Authentication: login, logout, token refresh, session management.

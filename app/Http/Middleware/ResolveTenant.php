@@ -8,7 +8,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResolveTenant

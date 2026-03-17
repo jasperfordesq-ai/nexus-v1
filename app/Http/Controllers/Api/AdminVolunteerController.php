@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\VolunteerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * AdminVolunteerController -- Admin volunteer management.

@@ -11,7 +11,7 @@ use App\Services\HoursReportService;
 use App\Services\InactiveMemberService;
 use App\Services\ReportExportService;
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Services\MemberReportService;
 use App\Services\ContentModerationService;
 
