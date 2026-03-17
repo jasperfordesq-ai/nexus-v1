@@ -6,13 +6,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\SocialValueService;
+use App\Services\HoursReportService;
+use App\Services\InactiveMemberService;
+use App\Services\ReportExportService;
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\TenantContext;
-use Nexus\Services\SocialValueService;
 use Nexus\Services\MemberReportService;
-use Nexus\Services\HoursReportService;
-use Nexus\Services\InactiveMemberService;
-use Nexus\Services\ReportExportService;
 use Nexus\Services\ContentModerationService;
 
 /**
@@ -24,7 +24,12 @@ class AdminAnalyticsReportsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly SocialValueService $socialValueService,
+        private readonly HoursReportService $hoursReportService,
+        private readonly InactiveMemberService $inactiveMemberService,
+        private readonly ReportExportService $reportExportService,
+    ) {}
 
     // ============================================
     // A1: SOCIAL VALUE / SROI
@@ -38,7 +43,7 @@ class AdminAnalyticsReportsController extends BaseApiController
 
         $dateRange = $this->getDateRange();
 
-        $report = SocialValueService::calculateSROI($tenantId, $dateRange);
+        $report = $this->socialValueService->calculateSROI($tenantId, $dateRange);
 
         return $this->respondWithData($report);
     }
@@ -68,7 +73,7 @@ class AdminAnalyticsReportsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid reporting period', 'reporting_period', 400);
         }
 
-        $success = SocialValueService::saveConfig($tenantId, $config);
+        $success = $this->socialValueService->saveConfig($tenantId, $config);
 
         if ($success) {
             return $this->respondWithData(['message' => 'Social value configuration updated', 'config' => $config]);
@@ -128,10 +133,10 @@ class AdminAnalyticsReportsController extends BaseApiController
         $offset = max(0, ($this->queryInt('page', 1) - 1) * $limit);
 
         $data = match ($groupBy) {
-            'category' => ['categories' => HoursReportService::getHoursByCategory($tenantId, $dateRange)],
-            'member' => ['members' => HoursReportService::getHoursByMember($tenantId, $dateRange, $sortBy, $limit, $offset)],
-            'period' => ['periods' => HoursReportService::getHoursByPeriod($tenantId, $dateRange)],
-            'summary' => HoursReportService::getHoursSummary($tenantId, $dateRange),
+            'category' => ['categories' => $this->hoursReportService->getHoursByCategory($tenantId, $dateRange)],
+            'member' => ['members' => $this->hoursReportService->getHoursByMember($tenantId, $dateRange, $sortBy, $limit, $offset)],
+            'period' => ['periods' => $this->hoursReportService->getHoursByPeriod($tenantId, $dateRange)],
+            'summary' => $this->hoursReportService->getHoursSummary($tenantId, $dateRange),
             default => null,
         };
 
@@ -158,8 +163,8 @@ class AdminAnalyticsReportsController extends BaseApiController
         $page = max(1, $this->queryInt('page', 1));
         $offset = ($page - 1) * $limit;
 
-        $result = InactiveMemberService::getInactiveMembers($tenantId, $days, $flagType, $limit, $offset);
-        $stats = InactiveMemberService::getInactivityStats($tenantId);
+        $result = $this->inactiveMemberService->getInactiveMembers($tenantId, $days, $flagType, $limit, $offset);
+        $stats = $this->inactiveMemberService->getInactivityStats($tenantId);
 
         return $this->respondWithData([
             'members' => $result['members'],
@@ -182,7 +187,7 @@ class AdminAnalyticsReportsController extends BaseApiController
 
         $thresholdDays = $this->inputInt('threshold_days', 90, 1, 730);
 
-        $result = InactiveMemberService::detectInactive($tenantId, $thresholdDays);
+        $result = $this->inactiveMemberService->detectInactive($tenantId, $thresholdDays);
 
         return $this->respondWithData($result);
     }
@@ -201,7 +206,7 @@ class AdminAnalyticsReportsController extends BaseApiController
 
         $userIds = array_map('intval', $userIds);
 
-        $updated = InactiveMemberService::markNotified($tenantId, $userIds);
+        $updated = $this->inactiveMemberService->markNotified($tenantId, $userIds);
 
         return $this->respondWithData([
             'updated' => $updated,
@@ -225,7 +230,7 @@ class AdminAnalyticsReportsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Supported formats: csv, pdf', 'format', 400);
         }
 
-        $supportedTypes = ReportExportService::getSupportedTypes();
+        $supportedTypes = $this->reportExportService->getSupportedTypes();
         if (!isset($supportedTypes[$type])) {
             $validTypes = implode(', ', array_keys($supportedTypes));
             return $this->respondWithError('VALIDATION_ERROR', "Unknown report type: {$type}. Valid types: {$validTypes}", 'type', 400);
@@ -239,7 +244,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         ];
 
         if ($format === 'pdf') {
-            $result = ReportExportService::exportPdf($type, $tenantId, $filters);
+            $result = $this->reportExportService->exportPdf($type, $tenantId, $filters);
             if (!$result['success']) {
                 return $this->respondWithError('NO_DATA', $result['message'] ?? 'No data found for export', null, 404);
             }
@@ -253,7 +258,7 @@ class AdminAnalyticsReportsController extends BaseApiController
             ]);
         }
 
-        $result = ReportExportService::export($type, $tenantId, $filters);
+        $result = $this->reportExportService->export($type, $tenantId, $filters);
 
         if (!$result['success']) {
             return $this->respondWithError('NO_DATA', $result['message'] ?? 'No data found for export', null, 404);
@@ -274,7 +279,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $types = ReportExportService::getSupportedTypes();
+        $types = $this->reportExportService->getSupportedTypes();
 
         $formatted = [];
         foreach ($types as $key => $label) {

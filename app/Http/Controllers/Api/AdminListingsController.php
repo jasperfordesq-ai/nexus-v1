@@ -6,13 +6,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\SearchLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Models\ActivityLog;
 use Nexus\Services\ListingFeaturedService;
 use Nexus\Services\ListingModerationService;
-use Nexus\Services\SearchLogService;
 
 /**
  * AdminListingsController -- Admin listing moderation (list, approve, reject, feature, search analytics).
@@ -23,7 +23,9 @@ class AdminListingsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly SearchLogService $searchLogService,
+    ) {}
 
     // =========================================================================
     // Listings CRUD
@@ -363,7 +365,7 @@ class AdminListingsController extends BaseApiController
         $this->requireAdmin();
         $days = $this->queryInt('days', 30, 1, 90);
 
-        $analytics = SearchLogService::getAnalyticsSummary($days);
+        $analytics = $this->searchLogService->getAnalyticsSummary($days);
 
         return $this->respondWithData($analytics);
     }
@@ -375,7 +377,7 @@ class AdminListingsController extends BaseApiController
         $days = $this->queryInt('days', 7, 1, 90);
         $limit = $this->queryInt('limit', 20, 1, 50);
 
-        $trending = SearchLogService::getTrendingSearches($days, $limit);
+        $trending = $this->searchLogService->getTrendingSearches($days, $limit);
 
         return $this->respondWithData($trending);
     }
@@ -387,7 +389,7 @@ class AdminListingsController extends BaseApiController
         $days = $this->queryInt('days', 30, 1, 90);
         $limit = $this->queryInt('limit', 20, 1, 50);
 
-        $zeroResults = SearchLogService::getZeroResultSearches($days, $limit);
+        $zeroResults = $this->searchLogService->getZeroResultSearches($days, $limit);
 
         return $this->respondWithData($zeroResults);
     }

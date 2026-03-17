@@ -13,6 +13,19 @@ namespace App\Services;
  */
 class GroupPolicyRepository
 {
+    const CATEGORY_CREATION = 'creation';
+    const CATEGORY_MEMBERSHIP = 'membership';
+    const CATEGORY_CONTENT = 'content';
+    const CATEGORY_MODERATION = 'moderation';
+    const CATEGORY_NOTIFICATIONS = 'notifications';
+    const CATEGORY_FEATURES = 'features';
+
+    const TYPE_BOOLEAN = 'boolean';
+    const TYPE_NUMBER = 'number';
+    const TYPE_STRING = 'string';
+    const TYPE_JSON = 'json';
+    const TYPE_LIST = 'list';
+
     public function __construct()
     {
     }

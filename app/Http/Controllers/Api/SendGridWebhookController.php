@@ -6,11 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\EmailMonitorService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 use Nexus\Core\TenantContext;
 use Nexus\Models\NewsletterBounce;
-use Nexus\Services\EmailMonitorService;
 
 /**
  * SendGridWebhookController — Eloquent-powered SendGrid event webhook handler.
@@ -24,6 +23,10 @@ use Nexus\Services\EmailMonitorService;
 class SendGridWebhookController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly EmailMonitorService $emailMonitorService,
+    ) {}
 
     /**
      * POST /api/v2/webhooks/sendgrid/events
@@ -78,7 +81,7 @@ class SendGridWebhookController extends BaseApiController
                     break;
 
                 case 'delivered':
-                    EmailMonitorService::recordEmailSend('sendgrid', true, $tenantId ?: null);
+                    $this->emailMonitorService->recordEmailSend('sendgrid', true, $tenantId ?: null);
                     $processed++;
                     break;
 
@@ -118,7 +121,7 @@ class SendGridWebhookController extends BaseApiController
             $status
         );
 
-        EmailMonitorService::recordEmailSend('sendgrid', false, $tenantId ?: null);
+        $this->emailMonitorService->recordEmailSend('sendgrid', false, $tenantId ?: null);
     }
 
     /**
@@ -137,6 +140,6 @@ class SendGridWebhookController extends BaseApiController
             null
         );
 
-        EmailMonitorService::recordEmailSend('sendgrid', false, $tenantId ?: null);
+        $this->emailMonitorService->recordEmailSend('sendgrid', false, $tenantId ?: null);
     }
 }

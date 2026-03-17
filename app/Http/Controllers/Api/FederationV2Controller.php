@@ -6,17 +6,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FederationActivityService;
+use App\Services\FederationEmailService;
+use App\Services\FederationRealtimeService;
+use App\Services\FederationUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\FederationFeatureService;
-use Nexus\Services\FederationUserService;
-use Nexus\Services\FederationAuditService;
-use Nexus\Services\FederationActivityService;
-use Nexus\Services\FederatedConnectionService;
-use Nexus\Services\FederationEmailService;
-use Nexus\Services\FederationPartnershipService;
-use Nexus\Services\FederationRealtimeService;
 use Nexus\Models\Notification;
+use Nexus\Services\FederatedConnectionService;
+use Nexus\Services\FederationAuditService;
+use Nexus\Services\FederationFeatureService;
+use Nexus\Services\FederationPartnershipService;
 
 /**
  * FederationV2Controller -- Federation v2: cross-tenant discovery, messaging, connections.
@@ -27,14 +27,19 @@ class FederationV2Controller extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly FederationActivityService $federationActivityService,
+        private readonly FederationEmailService $federationEmailService,
+        private readonly FederationRealtimeService $federationRealtimeService,
+        private readonly FederationUserService $federationUserService,
+    ) {}
+
     private const LEVEL_NAMES = [
         1 => 'Discovery',
         2 => 'Social',
         3 => 'Economic',
         4 => 'Integrated',
     ];
-
-    public function __construct() {}
 
     // =====================================================================
     // STATUS & OPT-IN/OUT
@@ -49,7 +54,7 @@ class FederationV2Controller extends BaseApiController
         $tenantFederationEnabled = FederationFeatureService::isGloballyEnabled()
             && FederationFeatureService::isTenantFederationEnabled($tenantId);
 
-        $userSettings = FederationUserService::getUserSettings($userId);
+        $userSettings = $this->federationUserService->getUserSettings($userId);
         $userOptedIn = (bool) ($userSettings['federation_optin'] ?? false);
 
         $partnershipsCount = 0;
@@ -85,7 +90,7 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
         }
 
-        $current = FederationUserService::getUserSettings($userId);
+        $current = $this->federationUserService->getUserSettings($userId);
 
         if ($current['federation_optin']) {
             return $this->respondWithData(['success' => true, 'message' => 'Already opted in to federation.']);
@@ -100,7 +105,7 @@ class FederationV2Controller extends BaseApiController
             'transactions_enabled_federated' => true,
         ]);
 
-        $success = FederationUserService::updateSettings($userId, $settings);
+        $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
             FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
@@ -139,7 +144,7 @@ class FederationV2Controller extends BaseApiController
             'travel_radius_km' => array_key_exists('travel_radius_km', $data) ? (int) $data['travel_radius_km'] : 25,
         ];
 
-        $success = FederationUserService::updateSettings($userId, $settings);
+        $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
             FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
@@ -155,7 +160,7 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
-        $success = FederationUserService::optOut($userId);
+        $success = $this->federationUserService->optOut($userId);
 
         if ($success) {
             FederationAuditService::log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
@@ -241,7 +246,7 @@ class FederationV2Controller extends BaseApiController
         $userId = $this->getUserId();
 
         try {
-            $rawActivity = FederationActivityService::getActivityFeed($userId, 20);
+            $rawActivity = $this->federationActivityService->getActivityFeed($userId, 20);
 
             $formatted = [];
             $id = 1;
@@ -865,7 +870,7 @@ class FederationV2Controller extends BaseApiController
 
             // 1. Email notification to recipient
             try {
-                FederationEmailService::sendNewMessageNotification(
+                $this->federationEmailService->sendNewMessageNotification(
                     (int)$receiverId,
                     $userId,
                     $tenantId,
@@ -877,7 +882,7 @@ class FederationV2Controller extends BaseApiController
 
             // 2. Real-time notification via Pusher
             try {
-                FederationRealtimeService::broadcastNewMessage(
+                $this->federationRealtimeService->broadcastNewMessage(
                     $userId,
                     $tenantId,
                     (int)$receiverId,
@@ -985,7 +990,7 @@ class FederationV2Controller extends BaseApiController
     {
         $userId = $this->getUserId();
 
-        $userSettings = FederationUserService::getUserSettings($userId);
+        $userSettings = $this->federationUserService->getUserSettings($userId);
 
         return $this->respondWithData([
             'enabled' => (bool) ($userSettings['federation_optin'] ?? false),
@@ -1012,7 +1017,7 @@ class FederationV2Controller extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $current = FederationUserService::getUserSettings($userId);
+        $current = $this->federationUserService->getUserSettings($userId);
         $settings = [
             'federation_optin' => $current['federation_optin'],
             'profile_visible_federated' => $data['profile_visible_federated'] ?? $current['profile_visible_federated'],
@@ -1027,7 +1032,7 @@ class FederationV2Controller extends BaseApiController
             'travel_radius_km' => array_key_exists('travel_radius_km', $data) ? $data['travel_radius_km'] : $current['travel_radius_km'],
         ];
 
-        $success = FederationUserService::updateSettings($userId, $settings);
+        $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
             return $this->respondWithData(['success' => true, 'message' => 'Settings updated successfully.']);

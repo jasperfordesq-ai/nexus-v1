@@ -6,19 +6,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\BadgeCollectionService;
+use App\Services\LeaderboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\DailyRewardService;
+use Nexus\Models\UserBadge;
 use Nexus\Services\ChallengeService;
-use Nexus\Services\BadgeCollectionService;
-use Nexus\Services\XPShopService;
+use Nexus\Services\DailyRewardService;
 use Nexus\Services\GamificationService;
 use Nexus\Services\LeaderboardSeasonService;
-use Nexus\Services\LeaderboardService;
 use Nexus\Services\NexusScoreCacheService;
 use Nexus\Services\NexusScoreService;
-use Nexus\Models\UserBadge;
+use Nexus\Services\XPShopService;
 
 /**
  * GamificationV2Controller -- Gamification v2: profile, badges, leaderboard,
@@ -30,7 +30,10 @@ class GamificationV2Controller extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly BadgeCollectionService $badgeCollectionService,
+        private readonly LeaderboardService $leaderboardService,
+    ) {}
 
     // =====================================================================
     // PROFILE
@@ -258,7 +261,7 @@ class GamificationV2Controller extends BaseApiController
         }
 
         // Standard leaderboard via LeaderboardService
-        $rawEntries = LeaderboardService::getLeaderboard(
+        $rawEntries = $this->leaderboardService->getLeaderboard(
             $serviceType,
             $servicePeriod,
             $limit,
@@ -398,7 +401,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('gamification_collections', 30, 60);
 
         try {
-            $collections = BadgeCollectionService::getCollectionsWithProgress($userId);
+            $collections = $this->badgeCollectionService->getCollectionsWithProgress($userId);
             return $this->respondWithData($collections);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to load collections', null, 500);

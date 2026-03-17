@@ -6,12 +6,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\AchievementAnalyticsService;
+use App\Services\SmartMatchingAnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Services\AdminAnalyticsService;
-use Nexus\Services\AchievementAnalyticsService;
-use Nexus\Services\SmartMatchingAnalyticsService;
 
 /**
  * AdminCommunityAnalyticsController -- Admin community-level analytics and export.
@@ -23,6 +23,11 @@ use Nexus\Services\SmartMatchingAnalyticsService;
 class AdminCommunityAnalyticsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly AchievementAnalyticsService $achievementAnalyticsService,
+        private readonly SmartMatchingAnalyticsService $smartMatchingAnalyticsService,
+    ) {}
 
     /**
      * GET /api/v2/admin/community-analytics
@@ -66,7 +71,7 @@ class AdminCommunityAnalyticsController extends BaseApiController
         $gamification = null;
         try {
             if (TenantContext::hasFeature('gamification')) {
-                $gamStats = AchievementAnalyticsService::getOverallStats();
+                $gamStats = $this->achievementAnalyticsService->getOverallStats();
                 $gamification = [
                     'total_xp' => $gamStats['total_xp'] ?? 0,
                     'total_badges' => $gamStats['total_badges'] ?? 0,
@@ -80,8 +85,8 @@ class AdminCommunityAnalyticsController extends BaseApiController
         // Matching stats
         $matching = null;
         try {
-            $matchStats = SmartMatchingAnalyticsService::getOverallStats();
-            $conversionFunnel = SmartMatchingAnalyticsService::getConversionFunnel();
+            $matchStats = $this->smartMatchingAnalyticsService->getOverallStats();
+            $conversionFunnel = $this->smartMatchingAnalyticsService->getConversionFunnel();
             $matching = [
                 'total_matches' => ($matchStats['total_matches_month'] ?? 0),
                 'conversion_rate' => ($conversionFunnel['conversion_rate'] ?? 0),

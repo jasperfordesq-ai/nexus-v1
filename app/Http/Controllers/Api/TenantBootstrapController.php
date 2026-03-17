@@ -6,12 +6,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\RedisCache;
+use App\Services\TenantFeatureConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Helpers\UrlHelper;
-use Nexus\Services\RedisCache;
-use Nexus\Services\TenantFeatureConfig;
 use Nexus\Services\BrokerControlConfigService;
 
 /**
@@ -27,6 +27,11 @@ use Nexus\Services\BrokerControlConfigService;
 class TenantBootstrapController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly RedisCache $redisCache,
+        private readonly TenantFeatureConfig $tenantFeatureConfig,
+    ) {}
 
     /** Cache TTL for tenant bootstrap data (10 minutes) */
     private const CACHE_TTL = 600;
@@ -72,13 +77,13 @@ class TenantBootstrapController extends BaseApiController
             TenantContext::setById($tenantId);
 
             // Try cache first
-            $cached = RedisCache::get(self::CACHE_KEY, $tenantId);
+            $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
             if ($cached !== null) {
                 return $this->respondWithData($cached);
             }
 
             $data = $this->buildBootstrapData($slugTenant);
-            RedisCache::set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
+            $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
             return $this->respondWithData($data);
         }
 
@@ -100,13 +105,13 @@ class TenantBootstrapController extends BaseApiController
 
                     TenantContext::setById($tenantId);
 
-                    $cached = RedisCache::get(self::CACHE_KEY, $tenantId);
+                    $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
                     if ($cached !== null) {
                         return $this->respondWithData($cached);
                     }
 
                     $data = $this->buildBootstrapData($originTenant);
-                    RedisCache::set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
+                    $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
                     return $this->respondWithData($data);
                 }
             }
@@ -115,7 +120,7 @@ class TenantBootstrapController extends BaseApiController
         // Default: use TenantContext resolved by index.php
         $tenantId = TenantContext::getId();
 
-        $cached = RedisCache::get(self::CACHE_KEY, $tenantId);
+        $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
         if ($cached !== null) {
             return $this->respondWithData($cached);
         }
@@ -133,7 +138,7 @@ class TenantBootstrapController extends BaseApiController
         }
 
         $data = $this->buildBootstrapData($tenant);
-        RedisCache::set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
+        $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
 
         return $this->respondWithData($data);
     }
@@ -149,7 +154,7 @@ class TenantBootstrapController extends BaseApiController
         $includeMaster = $this->queryBool('include_master');
 
         $cacheKey = $includeMaster ? 'tenants_list_public_all' : 'tenants_list_public';
-        $cached = RedisCache::get($cacheKey);
+        $cached = $this->redisCache->get($cacheKey);
 
         if ($cached !== null) {
             return $this->respondWithData($cached);
@@ -183,7 +188,7 @@ class TenantBootstrapController extends BaseApiController
             $data[] = $item;
         }
 
-        RedisCache::set($cacheKey, $data, 300);
+        $this->redisCache->set($cacheKey, $data, 300);
 
         return $this->respondWithData($data);
     }
@@ -197,7 +202,7 @@ class TenantBootstrapController extends BaseApiController
     public function platformStats(): JsonResponse
     {
         $cacheKey = 'platform_stats_public';
-        $cached = RedisCache::get($cacheKey);
+        $cached = $this->redisCache->get($cacheKey);
 
         if ($cached !== null) {
             return $this->respondWithData($cached);
@@ -234,7 +239,7 @@ class TenantBootstrapController extends BaseApiController
             'communities' => $communities,
         ];
 
-        RedisCache::set($cacheKey, $data, 300);
+        $this->redisCache->set($cacheKey, $data, 300);
 
         return $this->respondWithData($data);
     }
@@ -394,7 +399,7 @@ class TenantBootstrapController extends BaseApiController
 
     private function buildFeaturesData(?array $features): array
     {
-        return TenantFeatureConfig::mergeFeatures($features);
+        return $this->tenantFeatureConfig->mergeFeatures($features);
     }
 
     private function buildModulesData(?array $config): array
@@ -404,7 +409,7 @@ class TenantBootstrapController extends BaseApiController
             $modules = $config['modules'];
         }
 
-        return TenantFeatureConfig::mergeModules($modules);
+        return $this->tenantFeatureConfig->mergeModules($modules);
     }
 
     private function buildSeoData(array $tenant): array

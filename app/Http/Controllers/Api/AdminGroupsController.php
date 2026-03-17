@@ -6,6 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\GeocodingService;
+use App\Services\GroupPolicyRepository;
+use App\Services\GroupService;
+use App\Services\SmartGroupRankingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
@@ -21,7 +25,12 @@ class AdminGroupsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly GroupService $groupService,
+        private readonly GeocodingService $geocodingService,
+        private readonly GroupPolicyRepository $groupPolicyRepository,
+        private readonly SmartGroupRankingService $smartGroupRankingService,
+    ) {}
 
     // =========================================================================
     // Groups List & Detail
@@ -100,7 +109,7 @@ class AdminGroupsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $group = \Nexus\Services\GroupService::getById((int) $id);
+            $group = $this->groupService->getById((int) $id);
 
             if (!$group || ($group['tenant_id'] ?? null) != $tenantId) {
                 return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
@@ -557,7 +566,7 @@ class AdminGroupsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $policies = \Nexus\Services\GroupPolicyRepository::getAllPolicies($tenantId);
+            $policies = $this->groupPolicyRepository->getAllPolicies($tenantId);
             $formatted = [];
             foreach ($policies as $category => $categoryPolicies) {
                 foreach ($categoryPolicies as $key => $policy) {
@@ -591,9 +600,9 @@ class AdminGroupsController extends BaseApiController
         }
 
         try {
-            $category = $this->input('category', \Nexus\Services\GroupPolicyRepository::CATEGORY_FEATURES);
-            $type = $this->input('type', \Nexus\Services\GroupPolicyRepository::TYPE_STRING);
-            \Nexus\Services\GroupPolicyRepository::setPolicy($key, $value, $category, $type, $this->input('description'), $tenantId);
+            $category = $this->input('category', GroupPolicyRepository::CATEGORY_FEATURES);
+            $type = $this->input('type', GroupPolicyRepository::TYPE_STRING);
+            $this->groupPolicyRepository->setPolicy($key, $value, $category, $type, $this->input('description'), $tenantId);
             ActivityLog::log($adminId, 'admin_set_group_policy', "Set policy {$key} = " . json_encode($value));
             return $this->respondWithData(['key' => $key, 'value' => $value]);
         } catch (\Throwable $e) {
@@ -756,7 +765,7 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', 'Group has no location to geocode', null, 422);
             }
 
-            $coords = \Nexus\Services\GeocodingService::geocode($group->location);
+            $coords = $this->geocodingService->geocode($group->location);
             if (!$coords) {
                 return $this->respondWithError('GEOCODING_FAILED', 'Failed to geocode location', null, 500);
             }
@@ -785,7 +794,7 @@ class AdminGroupsController extends BaseApiController
             $failed = 0;
 
             foreach ($groups as $group) {
-                $coords = \Nexus\Services\GeocodingService::geocode($group->location);
+                $coords = $this->geocodingService->geocode($group->location);
                 if ($coords) {
                     DB::update("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ?", [$coords['latitude'], $coords['longitude'], $group->id]);
                     $success++;
@@ -869,7 +878,7 @@ class AdminGroupsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $groups = \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores('local_hubs', $tenantId);
+            $groups = $this->smartGroupRankingService->getFeaturedGroupsWithScores('local_hubs', $tenantId);
             return $this->respondWithData($groups);
         } catch (\Throwable $e) {
             return $this->respondWithError('FEATURED_GROUPS_ERROR', 'Failed to load featured groups: ' . $e->getMessage(), null, 500);
@@ -883,7 +892,7 @@ class AdminGroupsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $result = \Nexus\Services\SmartGroupRankingService::updateFeaturedLocalHubs($tenantId);
+            $result = $this->smartGroupRankingService->updateFeaturedLocalHubs($tenantId);
             ActivityLog::log($adminId, 'admin_update_featured_groups', "Updated featured groups: {$result['featured']} groups featured, {$result['cleared']} cleared");
             return $this->respondWithData($result);
         } catch (\Throwable $e) {

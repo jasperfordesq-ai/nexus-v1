@@ -6,12 +6,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\WebAuthnChallengeStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\TenantContext;
 use Nexus\Services\TokenService;
-use Nexus\Services\WebAuthnChallengeStore;
 use lbuchs\WebAuthn\WebAuthn;
 use lbuchs\WebAuthn\WebAuthnException;
 
@@ -24,6 +24,10 @@ use lbuchs\WebAuthn\WebAuthnException;
 class WebAuthnController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly WebAuthnChallengeStore $webAuthnChallengeStore,
+    ) {}
 
     /** POST /api/webauthn/register-challenge */
     public function registerChallenge(): JsonResponse
@@ -46,7 +50,7 @@ class WebAuthnController extends BaseApiController
         $challengeB64 = $this->base64UrlEncode($challenge);
 
         // Store challenge for stateless verification
-        $challengeId = WebAuthnChallengeStore::create(
+        $challengeId = $this->webAuthnChallengeStore->create(
             $challengeB64,
             $userId,
             'register',
@@ -254,7 +258,7 @@ class WebAuthnController extends BaseApiController
         }
 
         // Store challenge
-        $challengeId = WebAuthnChallengeStore::create(
+        $challengeId = $this->webAuthnChallengeStore->create(
             $challengeB64,
             $userId,
             'authenticate',
@@ -656,7 +660,7 @@ class WebAuthnController extends BaseApiController
         $challengeId = $input['challenge_id'] ?? null;
 
         if ($challengeId) {
-            $challengeData = WebAuthnChallengeStore::get($challengeId);
+            $challengeData = $this->webAuthnChallengeStore->get($challengeId);
             if (!$challengeData) {
                 return response()->json([
                     'error' => 'Challenge expired or invalid',
@@ -708,7 +712,7 @@ class WebAuthnController extends BaseApiController
         $challengeId = $input['challenge_id'] ?? null;
 
         if ($challengeId) {
-            $challengeData = WebAuthnChallengeStore::get($challengeId);
+            $challengeData = $this->webAuthnChallengeStore->get($challengeId);
             if (!$challengeData) {
                 return response()->json([
                     'error' => 'Challenge expired or invalid',
@@ -749,7 +753,7 @@ class WebAuthnController extends BaseApiController
     {
         $challengeId = $input['challenge_id'] ?? null;
         if ($challengeId) {
-            WebAuthnChallengeStore::consume($challengeId);
+            $this->webAuthnChallengeStore->consume($challengeId);
         }
         unset($_SESSION['webauthn_challenge'], $_SESSION['webauthn_challenge_expires']);
     }

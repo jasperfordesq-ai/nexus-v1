@@ -6,11 +6,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FederationDirectoryService;
+use App\Services\FederationPartnershipService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\FederationDirectoryService;
-use Nexus\Services\FederationPartnershipService;
 
 /**
  * AdminFederationController -- Federation management.
@@ -22,7 +22,10 @@ class AdminFederationController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly FederationDirectoryService $federationDirectoryService,
+        private readonly FederationPartnershipService $federationPartnershipService,
+    ) {}
 
     private const ALLOWED_TABLES = [
         'federation_partnerships', 'federation_transactions', 'federation_messages',
@@ -222,7 +225,7 @@ class AdminFederationController extends BaseApiController
         if ($targetTenantId === $tenantId) { return $this->respondWithError('VALIDATION_ERROR', 'Cannot partner with your own community'); }
 
         try {
-            $result = FederationPartnershipService::requestPartnership($tenantId, $targetTenantId, $userId, FederationPartnershipService::LEVEL_DISCOVERY, $notes);
+            $result = $this->federationPartnershipService->requestPartnership($tenantId, $targetTenantId, $userId, FederationPartnershipService::LEVEL_DISCOVERY, $notes);
             if ($result['success']) { return $this->respondWithData($result, null, 201); }
             return $this->respondWithError('REQUEST_FAILED', $result['error'] ?? 'Failed to send partnership request');
         } catch (\Exception $e) { return $this->respondWithError('REQUEST_FAILED', 'Failed to send partnership request'); }
@@ -243,9 +246,9 @@ class AdminFederationController extends BaseApiController
         if ($this->queryBool('exclude_partnered')) { $filters['exclude_partnered'] = true; }
 
         try {
-            $communities = FederationDirectoryService::getDiscoverableTimebanks($tenantId, $filters);
-            $regions = FederationDirectoryService::getAvailableRegions();
-            $categories = FederationDirectoryService::getAvailableCategories();
+            $communities = $this->federationDirectoryService->getDiscoverableTimebanks($tenantId, $filters);
+            $regions = $this->federationDirectoryService->getAvailableRegions();
+            $categories = $this->federationDirectoryService->getAvailableCategories();
             return $this->respondWithData(['communities' => $communities, 'regions' => $regions, 'categories' => $categories]);
         } catch (\Exception $e) {
             try {

@@ -7,11 +7,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\LegalDocumentService;
+use App\Services\RedisCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Services\LegalDocumentService as LegacyLegalDocumentService;
-use Nexus\Services\RedisCache;
 
 /**
  * LegalController -- Legal documents (terms, privacy policy, etc.).
@@ -24,6 +24,7 @@ class LegalController extends BaseApiController
 
     public function __construct(
         private readonly LegalDocumentService $legalService,
+        private readonly RedisCache $redisCache,
     ) {}
 
     /**
@@ -219,7 +220,7 @@ class LegalController extends BaseApiController
 
         // Check cache
         $cacheKey = "legal:compare:{$tenantId}:" . min((int) $v1, (int) $v2) . ':' . max((int) $v1, (int) $v2);
-        $cached = RedisCache::get($cacheKey);
+        $cached = $this->redisCache->get($cacheKey);
         if ($cached) {
             return $this->respondWithData($cached['data'] ?? $cached);
         }
@@ -250,7 +251,7 @@ class LegalController extends BaseApiController
         ];
 
         // Cache for 24 hours
-        RedisCache::set($cacheKey, ['data' => $responseData], 86400);
+        $this->redisCache->set($cacheKey, ['data' => $responseData], 86400);
 
         return $this->respondWithData($responseData);
     }
