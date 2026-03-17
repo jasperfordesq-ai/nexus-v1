@@ -12,12 +12,8 @@ use Illuminate\Http\JsonResponse;
 /**
  * GroupsController - Groups CRUD with join/leave.
  *
- * Endpoints (v2):
- *   GET    /api/v2/groups              index()
- *   GET    /api/v2/groups/{id}         show()
- *   POST   /api/v2/groups              store()
- *   POST   /api/v2/groups/{id}/join    join()
- *   POST   /api/v2/groups/{id}/leave   leave()
+ * Native Eloquent methods: index, show, store, join, leave.
+ * Complex features (members, discussions, announcements, etc.) delegate to legacy.
  */
 class GroupsController extends BaseApiController
 {
@@ -28,7 +24,9 @@ class GroupsController extends BaseApiController
     ) {}
 
     /**
-     * List groups with optional search and pagination.
+     * GET /api/v2/groups
+     *
+     * List groups with optional search, type/visibility filters, and cursor pagination.
      */
     public function index(): JsonResponse
     {
@@ -38,6 +36,18 @@ class GroupsController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 100),
         ];
 
+        if ($this->query('type')) {
+            $filters['type'] = $this->query('type');
+        }
+        if ($this->query('type_id')) {
+            $filters['type_id'] = $this->queryInt('type_id');
+        }
+        if ($this->query('visibility')) {
+            $filters['visibility'] = $this->query('visibility');
+        }
+        if ($this->query('user_id')) {
+            $filters['user_id'] = $this->queryInt('user_id');
+        }
         if ($this->query('q')) {
             $filters['search'] = $this->query('q');
         }
@@ -59,7 +69,9 @@ class GroupsController extends BaseApiController
     }
 
     /**
-     * Get a single group by ID.
+     * GET /api/v2/groups/{id}
+     *
+     * Get a single group by ID with member count and viewer's membership status.
      */
     public function show(int $id): JsonResponse
     {
@@ -74,6 +86,8 @@ class GroupsController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/groups
+     *
      * Create a new group. Requires authentication.
      */
     public function store(): JsonResponse
@@ -87,7 +101,9 @@ class GroupsController extends BaseApiController
     }
 
     /**
-     * Join a group. Requires authentication.
+     * POST /api/v2/groups/{id}/join
+     *
+     * Join a group. For private groups creates a pending request.
      */
     public function join(int $id): JsonResponse
     {
@@ -104,7 +120,9 @@ class GroupsController extends BaseApiController
     }
 
     /**
-     * Leave a group. Requires authentication.
+     * DELETE /api/v2/groups/{id}/membership
+     *
+     * Leave a group.
      */
     public function leave(int $id): JsonResponse
     {
@@ -113,12 +131,16 @@ class GroupsController extends BaseApiController
 
         $result = $this->groupService->leave($id, $userId);
 
-        if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+        if (! $result) {
+            return $this->respondWithError('NOT_FOUND', 'Group not found or not a member', null, 404);
         }
 
-        return $this->respondWithData($result);
+        return $this->noContent();
     }
+
+    // ================================================================
+    // Delegated methods — complex features that still use legacy services
+    // ================================================================
 
     /**
      * Delegate to legacy controller via output buffering.
@@ -228,5 +250,4 @@ class GroupsController extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'deleteAnnouncement', [$id, $announcementId]);
     }
-
 }

@@ -22,12 +22,14 @@ class NotificationService
      */
     private const TYPE_CATEGORIES = [
         'messages'     => ['message', 'new_message', 'message_received', 'federation_message'],
-        'connections'  => ['connection_request', 'connection_accepted', 'friend_request', 'friend_accepted'],
+        'connections'  => ['connection_request', 'connection_accepted', 'friend_request', 'friend_accepted', 'federation_connection_request', 'federation_connection_accepted'],
         'reviews'      => ['review', 'new_review', 'review_received'],
-        'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received'],
+        'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received', 'federation_transaction'],
         'social'       => ['like', 'comment', 'mention', 'post_like', 'post_comment'],
         'events'       => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
-        'groups'       => ['group_invite', 'group_join', 'group_post'],
+        'groups'       => ['group_invite', 'group_join', 'group_post', 'federation_group_join'],
+        'listings'     => ['listing', 'listing_interest', 'listing_match', 'listing_expiry', 'hot_match', 'mutual_match'],
+        'jobs'         => ['job_application', 'job_application_status'],
         'system'       => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
     ];
 
@@ -91,20 +93,40 @@ class NotificationService
             ->unread()
             ->get(['type']);
 
-        $total = $unread->count();
+        // Build flat counts matching legacy response shape:
+        // { total, messages, connections, reviews, transactions, social, events, groups, listings, system, other }
+        $counts = [
+            'total' => 0,
+            'messages' => 0,
+            'connections' => 0,
+            'reviews' => 0,
+            'transactions' => 0,
+            'social' => 0,
+            'events' => 0,
+            'groups' => 0,
+            'listings' => 0,
+            'system' => 0,
+            'other' => 0,
+        ];
 
-        $categories = [];
-        foreach (self::TYPE_CATEGORIES as $category => $types) {
-            $count = $unread->whereIn('type', $types)->count();
-            if ($count > 0) {
-                $categories[$category] = $count;
+        foreach ($unread as $notification) {
+            $counts['total']++;
+            $categorized = false;
+
+            foreach (self::TYPE_CATEGORIES as $category => $types) {
+                if (in_array($notification->type, $types, true)) {
+                    $counts[$category]++;
+                    $categorized = true;
+                    break;
+                }
+            }
+
+            if (!$categorized) {
+                $counts['other']++;
             }
         }
 
-        return [
-            'total'      => $total,
-            'categories' => $categories,
-        ];
+        return $counts;
     }
 
     /**
@@ -116,5 +138,37 @@ class NotificationService
             ->where('user_id', $userId)
             ->where('is_read', false)
             ->update(['is_read' => true]);
+    }
+
+    /**
+     * Get a single notification by ID for the given user.
+     *
+     * @return array|null Notification data or null if not found
+     */
+    public function getById(int $id, int $userId): ?array
+    {
+        $notification = $this->notification->newQuery()
+            ->where('id', $id)
+            ->where('user_id', $userId)
+            ->first();
+
+        return $notification?->toArray();
+    }
+
+    /**
+     * Delete (soft-delete) a notification.
+     */
+    public function delete(int $id, int $userId): bool
+    {
+        $notification = $this->notification->newQuery()
+            ->where('id', $id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($notification === null) {
+            return false;
+        }
+
+        return (bool) $notification->delete();
     }
 }

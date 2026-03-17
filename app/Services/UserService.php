@@ -45,6 +45,7 @@ class UserService
 
     /**
      * Get the authenticated user's own profile (for /me endpoint).
+     * Matches the legacy UserService::getOwnProfile() response shape.
      */
     public function getMe(int $userId): ?array
     {
@@ -56,22 +57,70 @@ class UserService
             return null;
         }
 
-        $data = $user->toArray();
-        $data['name'] = ($user->profile_type === 'organisation' && $user->organization_name)
-            ? $user->organization_name
-            : trim($user->first_name . ' ' . $user->last_name);
+        $profile = $this->formatProfile($user, true);
 
-        $data['stats'] = [
-            'balance'           => (float) $user->balance,
-            'listings_count'    => $user->listings()->count(),
-            'connections_count' => DB::table('connections')
-                ->where('status', 'accepted')
-                ->where(fn ($q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))
-                ->count(),
-            'reviews_count'     => DB::table('reviews')->where('receiver_id', $userId)->count(),
-        ];
+        // Add notification preferences
+        $profile['notification_preferences'] = $this->getNotificationPreferences($userId);
 
-        return $data;
+        // Add statistics
+        $profile['stats'] = $this->getUserStats($userId);
+
+        // Add badges
+        $profile['badges'] = $this->getUserBadges($userId);
+
+        return $profile;
+    }
+
+    /**
+     * Get a user's public profile with privacy checks.
+     * Matches the legacy UserService::getPublicProfile() response shape.
+     */
+    public function getPublicProfile(int $userId, ?int $viewerId = null): ?array
+    {
+        $user = $this->user->newQuery()
+            ->with(['listings', 'badges'])
+            ->find($userId);
+
+        if (! $user) {
+            return null;
+        }
+
+        // Check privacy settings
+        $privacyLevel = $user->privacy_profile ?? 'public';
+
+        if ($privacyLevel !== 'public' && $viewerId !== $userId) {
+            if ($privacyLevel === 'members' && ! $viewerId) {
+                return null;
+            }
+            if ($privacyLevel === 'connections') {
+                if (! $viewerId || ! $this->areConnected($userId, $viewerId)) {
+                    return null;
+                }
+            }
+        }
+
+        $profile = $this->formatProfile($user, false);
+
+        // Add connection status if viewer is logged in
+        if ($viewerId && $viewerId !== $userId) {
+            $profile['connection_status'] = $this->getConnectionStatus($userId, $viewerId);
+        }
+
+        // Add public stats
+        $stats = $this->getPublicStats($userId);
+        $profile['stats'] = $stats;
+
+        // Flatten key stats to root for frontend compatibility
+        $profile['total_hours_given'] = $stats['total_hours_given'] ?? 0;
+        $profile['total_hours_received'] = $stats['total_hours_received'] ?? 0;
+        $profile['groups_count'] = $stats['groups_count'] ?? 0;
+        $profile['events_attended'] = $stats['events_attended'] ?? 0;
+        $profile['rating'] = $stats['average_rating'] ?? null;
+
+        // Add badges
+        $profile['badges'] = $this->getUserBadges($userId);
+
+        return $profile;
     }
 
     /**
@@ -126,5 +175,274 @@ class UserService
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];
+    }
+
+    /**
+     * Get profile stats for sidebar widget.
+     * Matches legacy UserService::getProfileStats() response shape.
+     */
+    public function getProfileStats(int $userId): array
+    {
+        // Count offers
+        $offersCount = DB::table('listings')
+            ->where('user_id', $userId)
+            ->where('type', 'offer')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            })
+            ->count();
+
+        // Count requests
+        $requestsCount = DB::table('listings')
+            ->where('user_id', $userId)
+            ->where('type', 'request')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            })
+            ->count();
+
+        // Hours given
+        $givenTotal = (float) DB::table('transactions')
+            ->where('sender_id', $userId)
+            ->where('status', 'completed')
+            ->sum('amount');
+
+        // Hours received
+        $receivedTotal = (float) DB::table('transactions')
+            ->where('receiver_id', $userId)
+            ->where('status', 'completed')
+            ->sum('amount');
+
+        // Wallet balance
+        $balance = (float) ($this->user->newQuery()->where('id', $userId)->value('balance') ?? 0);
+
+        return [
+            'listings_count'  => $offersCount + $requestsCount,
+            'given_count'     => round($givenTotal, 1),
+            'received_count'  => round($receivedTotal, 1),
+            'offers_count'    => $offersCount,
+            'requests_count'  => $requestsCount,
+            'wallet_balance'  => round($balance, 2),
+        ];
+    }
+
+    // ================================================================
+    // Private helpers
+    // ================================================================
+
+    /**
+     * Format user model for API response.
+     */
+    private function formatProfile(User $user, bool $includePrivate = false): array
+    {
+        $profile = [
+            'id'                => $user->id,
+            'name'              => ($user->profile_type === 'organisation' && $user->organization_name)
+                                    ? $user->organization_name
+                                    : trim($user->first_name . ' ' . $user->last_name),
+            'first_name'        => $user->first_name,
+            'last_name'         => $user->last_name,
+            'avatar_url'        => $user->avatar_url,
+            'bio'               => $user->bio,
+            'tagline'           => $user->tagline ?? null,
+            'location'          => $user->location,
+            'latitude'          => $user->latitude,
+            'longitude'         => $user->longitude,
+            'skills'            => $user->skills ? array_map('trim', explode(',', $user->skills)) : null,
+            'profile_type'      => $user->profile_type ?? 'individual',
+            'organization_name' => $user->organization_name,
+            'created_at'        => $user->created_at?->toISOString(),
+            'is_online'         => $user->last_active_at && $user->last_active_at->diffInMinutes(now()) < 5,
+            'online_status'     => $this->getOnlineStatusText($user->last_active_at),
+        ];
+
+        // Gamification fields
+        if (isset($user->xp)) {
+            $profile['xp'] = (int) $user->xp;
+        }
+        if (isset($user->level)) {
+            $profile['level'] = (int) $user->level;
+        }
+
+        // Private fields (only for own profile)
+        if ($includePrivate) {
+            $profile['email']                   = $user->email;
+            $profile['phone']                   = $user->phone;
+            $profile['balance']                 = (float) ($user->balance ?? 0);
+            $profile['role']                    = $user->role ?? 'member';
+            $profile['is_admin']                = in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin'])
+                                                    || (bool) $user->is_super_admin
+                                                    || (bool) $user->is_tenant_super_admin;
+            $profile['is_super_admin']          = (bool) $user->is_super_admin;
+            $profile['is_god']                  = (bool) $user->is_god;
+            $profile['is_tenant_super_admin']   = (bool) $user->is_tenant_super_admin;
+            $profile['is_approved']             = (bool) ($user->is_approved ?? false);
+            $profile['privacy_profile']         = $user->privacy_profile ?? 'public';
+            $profile['privacy_search']          = (bool) ($user->privacy_search ?? true);
+            $profile['privacy_contact']         = (bool) ($user->privacy_contact ?? true);
+            $profile['onboarding_completed']    = (bool) ($user->onboarding_completed ?? false);
+            $profile['preferred_language']       = $user->preferred_language ?? 'en';
+        }
+
+        return $profile;
+    }
+
+    /**
+     * Get user stats (own profile).
+     */
+    private function getUserStats(int $userId): array
+    {
+        $avgRating = DB::table('reviews')
+            ->where('receiver_id', $userId)->avg('rating');
+
+        return [
+            'listings_count'     => DB::table('listings')
+                ->where('user_id', $userId)
+                ->where(function ($q) { $q->whereNull('status')->orWhere('status', 'active'); })
+                ->count(),
+            'transactions_count' => DB::table('transactions')
+                ->where(function ($q) use ($userId) {
+                    $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+                })
+                ->count(),
+            'connections_count'  => DB::table('connections')
+                ->where('status', 'accepted')
+                ->where(function ($q) use ($userId) {
+                    $q->where('requester_id', $userId)->orWhere('receiver_id', $userId);
+                })
+                ->count(),
+            'reviews_count'      => DB::table('reviews')->where('receiver_id', $userId)->count(),
+            'average_rating'     => $avgRating ? round((float) $avgRating, 1) : null,
+        ];
+    }
+
+    /**
+     * Get public stats (includes hours, groups, events).
+     */
+    private function getPublicStats(int $userId): array
+    {
+        $stats = $this->getUserStats($userId);
+        unset($stats['transactions_count']);
+
+        $stats['total_hours_given'] = round((float) DB::table('transactions')
+            ->where('sender_id', $userId)->where('status', 'completed')->sum('amount'), 1);
+
+        $stats['total_hours_received'] = round((float) DB::table('transactions')
+            ->where('receiver_id', $userId)->where('status', 'completed')->sum('amount'), 1);
+
+        $stats['groups_count'] = (int) DB::table('group_members')
+            ->join('groups', 'group_members.group_id', '=', 'groups.id')
+            ->where('group_members.user_id', $userId)
+            ->where('group_members.status', 'active')
+            ->count();
+
+        $stats['events_attended'] = (int) DB::table('event_rsvps')
+            ->where('user_id', $userId)
+            ->where('status', 'going')
+            ->count();
+
+        return $stats;
+    }
+
+    /**
+     * Get user badges.
+     */
+    private function getUserBadges(int $userId): array
+    {
+        try {
+            return DB::table('user_badges')
+                ->join('badges', function ($join) {
+                    $join->on('user_badges.badge_key', '=', 'badges.badge_key')
+                         ->on('user_badges.tenant_id', '=', 'badges.tenant_id');
+                })
+                ->where('user_badges.user_id', $userId)
+                ->select('badges.name', 'badges.badge_key', 'badges.icon', 'badges.description', 'user_badges.awarded_at as earned_at')
+                ->orderByDesc('user_badges.awarded_at')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get notification preferences for a user.
+     */
+    private function getNotificationPreferences(int $userId): array
+    {
+        try {
+            $row = DB::table('user_notification_preferences')
+                ->where('user_id', $userId)
+                ->first();
+
+            if (! $row) {
+                return [];
+            }
+
+            return (array) $row;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Check if two users are connected.
+     */
+    private function areConnected(int $userId1, int $userId2): bool
+    {
+        return DB::table('connections')
+            ->where('status', 'accepted')
+            ->where(function ($q) use ($userId1, $userId2) {
+                $q->where(function ($q2) use ($userId1, $userId2) {
+                    $q2->where('requester_id', $userId1)->where('receiver_id', $userId2);
+                })->orWhere(function ($q2) use ($userId1, $userId2) {
+                    $q2->where('requester_id', $userId2)->where('receiver_id', $userId1);
+                });
+            })
+            ->exists();
+    }
+
+    /**
+     * Get connection status between two users.
+     */
+    private function getConnectionStatus(int $targetUserId, int $viewerId): ?string
+    {
+        $connection = DB::table('connections')
+            ->where(function ($q) use ($targetUserId, $viewerId) {
+                $q->where(function ($q2) use ($targetUserId, $viewerId) {
+                    $q2->where('requester_id', $viewerId)->where('receiver_id', $targetUserId);
+                })->orWhere(function ($q2) use ($targetUserId, $viewerId) {
+                    $q2->where('requester_id', $targetUserId)->where('receiver_id', $viewerId);
+                });
+            })
+            ->first();
+
+        if (! $connection) {
+            return null;
+        }
+
+        return $connection->status;
+    }
+
+    /**
+     * Get online status text.
+     */
+    private function getOnlineStatusText($lastActiveAt): string
+    {
+        if (! $lastActiveAt) {
+            return 'offline';
+        }
+
+        $minutes = $lastActiveAt->diffInMinutes(now());
+
+        if ($minutes < 5) {
+            return 'online';
+        }
+        if ($minutes < 60) {
+            return 'away';
+        }
+
+        return 'offline';
     }
 }

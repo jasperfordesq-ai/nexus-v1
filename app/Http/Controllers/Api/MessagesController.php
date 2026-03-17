@@ -12,6 +12,9 @@ use Illuminate\Http\JsonResponse;
 /**
  * MessagesController - Conversations and direct messaging.
  *
+ * Native Eloquent implementation for core endpoints.
+ * Complex endpoints (typing indicators, voice upload, reactions) delegate to legacy.
+ *
  * Endpoints (v2):
  *   GET    /api/v2/messages/conversations  conversations()
  *   GET    /api/v2/messages/{id}           show()
@@ -28,7 +31,12 @@ class MessagesController extends BaseApiController
     ) {}
 
     /**
-     * List conversations for the authenticated user.
+     * GET /api/v2/messages/conversations
+     *
+     * List conversations for the authenticated user, grouped by partner.
+     * Each conversation shows the latest message, partner info, and unread count.
+     *
+     * Response: { data: [...], meta: { cursor, per_page, has_more } }
      */
     public function conversations(): JsonResponse
     {
@@ -52,7 +60,15 @@ class MessagesController extends BaseApiController
     }
 
     /**
-     * Get messages in a conversation.
+     * GET /api/v2/messages/{id}
+     *
+     * Get messages in a conversation with user {id}.
+     * Automatically marks messages as read when viewed.
+     *
+     * Query params: per_page (int, default 50), cursor (string),
+     *               direction ('older'|'newer', default 'older').
+     *
+     * Response: { data: [...messages], meta: { cursor, per_page, has_more } }
      */
     public function show(int $id): JsonResponse
     {
@@ -60,6 +76,7 @@ class MessagesController extends BaseApiController
 
         $filters = [
             'limit' => $this->queryInt('per_page', 50, 1, 100),
+            'direction' => $this->query('direction', 'older'),
         ];
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
@@ -80,32 +97,72 @@ class MessagesController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/messages
+     *
      * Send a new message. Requires authentication.
+     *
+     * Request body:
+     * {
+     *   "recipient_id": int (required),
+     *   "body": string (required unless voice_url provided),
+     *   "voice_url": string (optional),
+     *   "voice_duration": int (optional)
+     * }
+     *
+     * Response: 201 { data: { ...message } }
      */
     public function send(): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('message_send', 30, 60);
 
-        $message = $this->messageService->send($userId, $this->getAllInput());
+        $input = $this->getAllInput();
+
+        if (empty($input['recipient_id'])) {
+            return $this->respondWithError('VALIDATION_ERROR', 'recipient_id is required', 'recipient_id', 422);
+        }
+
+        $body = trim($input['body'] ?? '');
+        $voiceUrl = $input['voice_url'] ?? null;
+
+        if (empty($body) && empty($voiceUrl)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Message body or voice message is required', 'body', 422);
+        }
+
+        $message = $this->messageService->send($userId, $input);
+
+        if (isset($message['error'])) {
+            return $this->respondWithError('VALIDATION_ERROR', $message['error'], null, 422);
+        }
 
         return $this->respondWithData($message, null, 201);
     }
 
     /**
-     * Mark a conversation as read.
+     * PUT /api/v2/messages/{id}/read
+     *
+     * Mark all messages from user {id} as read.
+     *
+     * Response: { data: { marked_read: true } }
      */
     public function markRead(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $this->messageService->markRead($id, $userId);
+        $this->messageService->markRead($userId, $id);
 
         return $this->respondWithData(['marked_read' => true]);
     }
 
     /**
-     * Get unread message count for the authenticated user.
+     * GET /api/v2/messages/unread-count
+     *
+     * Get unread message count for badge display.
+     *
+     * Response: { data: { count: N } }
+     *
+     * Note: Legacy response used "count", we match that. The old controller
+     * used "unread_count" but the legacy API used "count".
      */
     public function unreadCount(): JsonResponse
     {
@@ -113,7 +170,73 @@ class MessagesController extends BaseApiController
 
         $count = $this->messageService->getUnreadCount($userId);
 
-        return $this->respondWithData(['unread_count' => $count]);
+        return $this->respondWithData([
+            'count' => $count,
+        ]);
+    }
+
+    // ========================================================================
+    // Delegated endpoints — complex logic (Pusher typing, voice upload, etc.)
+    // ========================================================================
+
+    public function restrictionStatus(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restrictionStatus');
+    }
+
+    public function typing(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'typing');
+    }
+
+    public function uploadVoice(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'uploadVoice');
+    }
+
+    public function sendVoice(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'sendVoice');
+    }
+
+    public function archiveConversation($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archiveConversation', [$id]);
+    }
+
+    public function toggleReaction($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'toggleReaction', [$id]);
+    }
+
+    public function update($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'update', [$id]);
+    }
+
+    public function deleteMessage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'deleteMessage', [$id]);
+    }
+
+    public function archive($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archive', [$id]);
+    }
+
+    public function restoreConversation($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restoreConversation', [$id]);
+    }
+
+    public function deleteConversation(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\MessageController::class, 'deleteConversation');
+    }
+
+    public function getReactionsBatch(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\MessageController::class, 'getReactionsBatch');
     }
 
     /**
@@ -128,77 +251,4 @@ class MessagesController extends BaseApiController
         $status = http_response_code();
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
     }
-
-
-    public function restrictionStatus(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restrictionStatus');
-    }
-
-
-    public function typing(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'typing');
-    }
-
-
-    public function uploadVoice(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'uploadVoice');
-    }
-
-
-    public function sendVoice(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'sendVoice');
-    }
-
-
-    public function archiveConversation($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archiveConversation', [$id]);
-    }
-
-
-    public function toggleReaction($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'toggleReaction', [$id]);
-    }
-
-
-    public function update($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'update', [$id]);
-    }
-
-
-    public function deleteMessage($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'deleteMessage', [$id]);
-    }
-
-
-    public function archive($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archive', [$id]);
-    }
-
-
-    public function restoreConversation($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restoreConversation', [$id]);
-    }
-
-
-    public function deleteConversation(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\MessageController::class, 'deleteConversation');
-    }
-
-
-    public function getReactionsBatch(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\MessageController::class, 'getReactionsBatch');
-    }
-
 }

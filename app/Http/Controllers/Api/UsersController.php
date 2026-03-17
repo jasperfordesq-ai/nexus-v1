@@ -20,42 +20,45 @@ class UsersController extends BaseApiController
         private readonly UserService $userService,
     ) {}
 
-    /** GET /api/v2/users/me */
+    /** GET /api/v2/users/me — authenticated user's full profile */
     public function me(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $profile = $this->userService->getProfile($userId, $this->getTenantId());
-        
+        $profile = $this->userService->getMe($userId);
+
         if ($profile === null) {
             return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
         }
-        
+
         return $this->respondWithData($profile);
     }
 
-    /** PUT /api/v2/users/me */
+    /** PUT /api/v2/users/me — update own profile */
     public function update(): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('user_update', 10, 60);
-        
+
         $data = $this->getAllInput();
-        $user = $this->userService->updateProfile($userId, $this->getTenantId(), $data);
-        
-        return $this->respondWithData($user);
+        $this->userService->update($userId, $data);
+
+        // Return updated full profile (matches legacy behaviour)
+        $profile = $this->userService->getMe($userId);
+
+        return $this->respondWithData($profile);
     }
 
-    /** GET /api/v2/users/{id} */
+    /** GET /api/v2/users/{id} — public profile of another user */
     public function show(int $id): JsonResponse
     {
         $viewerId = $this->getOptionalUserId();
-        $user = $this->userService->getPublicProfile($id, $this->getTenantId(), $viewerId);
-        
-        if ($user === null) {
+        $profile = $this->userService->getPublicProfile($id, $viewerId);
+
+        if ($profile === null) {
             return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
         }
-        
-        return $this->respondWithData($user);
+
+        return $this->respondWithData($profile);
     }
 
     /** GET /api/v2/users/search?q= */
@@ -63,12 +66,24 @@ class UsersController extends BaseApiController
     {
         $q = $this->query('q', '');
         $limit = $this->queryInt('limit', 20, 1, 100);
-        
-        $results = $this->userService->search($q, $this->getTenantId(), $limit);
-        
+
+        $results = $this->userService->search($q, $limit);
+
         return $this->respondWithData($results);
     }
 
+    /** GET /api/v2/me/stats — sidebar widget stats */
+    public function stats(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $stats = $this->userService->getProfileStats($userId);
+
+        return $this->respondWithData($stats);
+    }
+
+    // ================================================================
+    // Delegated methods — complex features that still use legacy services
+    // ================================================================
 
     /**
      * Delegate to legacy controller via output buffering.
@@ -81,12 +96,6 @@ class UsersController extends BaseApiController
         $output = ob_get_clean();
         $status = http_response_code();
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
-    public function stats(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\UsersApiController::class, 'stats');
     }
 
 
@@ -190,5 +199,4 @@ class UsersController extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\UserPreferenceController::class, 'updateSettings');
     }
-
 }

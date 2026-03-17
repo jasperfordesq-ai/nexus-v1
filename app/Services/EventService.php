@@ -57,6 +57,10 @@ class EventService
             $query->where('group_id', (int) $filters['group_id']);
         }
 
+        if (! empty($filters['user_id'])) {
+            $query->where('user_id', (int) $filters['user_id']);
+        }
+
         if (! empty($filters['search'])) {
             $term = '%' . $filters['search'] . '%';
             $query->where(function (Builder $q) use ($term) {

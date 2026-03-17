@@ -12,12 +12,16 @@ use Illuminate\Http\JsonResponse;
 /**
  * NotificationsController - User notification management.
  *
+ * Native Eloquent implementation (no delegation for core endpoints).
+ *
  * Endpoints (v2):
  *   GET    /api/v2/notifications            index()
  *   GET    /api/v2/notifications/counts     counts()
  *   POST   /api/v2/notifications/read-all   markAllRead()
+ *   POST   /api/v2/notifications/{id}/read  markRead()
  *   GET    /api/v2/notifications/{id}       show()
  *   DELETE /api/v2/notifications/{id}       destroy()
+ *   DELETE /api/v2/notifications            destroyAll()
  */
 class NotificationsController extends BaseApiController
 {
@@ -28,7 +32,14 @@ class NotificationsController extends BaseApiController
     ) {}
 
     /**
-     * List notifications for the authenticated user.
+     * GET /api/v2/notifications
+     *
+     * List notifications for the authenticated user with cursor-based pagination.
+     *
+     * Query params: per_page (int, default 20), cursor (string), type (string),
+     *               unread_only (bool).
+     *
+     * Response: { data: [...], meta: { cursor, per_page, has_more } }
      */
     public function index(): JsonResponse
     {
@@ -39,6 +50,9 @@ class NotificationsController extends BaseApiController
         ];
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
+        }
+        if ($this->query('type')) {
+            $filters['type'] = $this->query('type');
         }
         if ($this->queryBool('unread_only')) {
             $filters['unread_only'] = true;
@@ -55,7 +69,11 @@ class NotificationsController extends BaseApiController
     }
 
     /**
-     * Get notification counts (total unread, by type).
+     * GET /api/v2/notifications/counts
+     *
+     * Get unread notification counts (total + by category).
+     *
+     * Response: { data: { total: N, categories: { messages: N, ... } } }
      */
     public function counts(): JsonResponse
     {
@@ -67,19 +85,56 @@ class NotificationsController extends BaseApiController
     }
 
     /**
-     * Mark all notifications as read.
+     * POST /api/v2/notifications/read-all
+     *
+     * Mark all notifications as read for the authenticated user.
+     *
+     * Response: { data: { marked_all_read: true } }
      */
     public function markAllRead(): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $this->notificationService->markAllRead($userId);
+        $count = $this->notificationService->markAllRead($userId);
 
-        return $this->respondWithData(['marked_all_read' => true]);
+        return $this->respondWithData([
+            'marked_all_read' => true,
+            'marked_read' => $count,
+        ]);
     }
 
     /**
+     * POST /api/v2/notifications/{id}/read
+     *
+     * Mark a single notification as read.
+     *
+     * Response: { data: { ...notification } }
+     */
+    public function markRead(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $notification = $this->notificationService->getById($id, $userId);
+        if ($notification === null) {
+            return $this->respondWithError('NOT_FOUND', 'Notification not found', null, 404);
+        }
+
+        // Mark as read via direct update
+        \App\Models\Notification::where('id', $id)
+            ->where('user_id', $userId)
+            ->update(['is_read' => true]);
+
+        // Return updated notification
+        $updated = $this->notificationService->getById($id, $userId);
+        return $this->respondWithData($updated);
+    }
+
+    /**
+     * GET /api/v2/notifications/{id}
+     *
      * Get a single notification by ID.
+     *
+     * Response: { data: { ...notification } }
      */
     public function show(int $id): JsonResponse
     {
@@ -95,21 +150,74 @@ class NotificationsController extends BaseApiController
     }
 
     /**
-     * Delete a notification.
+     * DELETE /api/v2/notifications/{id}
+     *
+     * Delete (soft-delete) a notification.
+     *
+     * Response: 204 No Content
      */
     public function destroy(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $existing = $this->notificationService->getById($id, $userId);
+        $deleted = $this->notificationService->delete($id, $userId);
 
-        if ($existing === null) {
+        if (!$deleted) {
             return $this->respondWithError('NOT_FOUND', 'Notification not found', null, 404);
         }
 
-        $this->notificationService->delete($id, $userId);
-
         return $this->noContent();
+    }
+
+    /**
+     * DELETE /api/v2/notifications
+     *
+     * Delete all notifications for the user.
+     *
+     * Response: { data: { deleted: N } }
+     */
+    public function destroyAll(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $category = $this->query('category');
+        $query = \App\Models\Notification::where('user_id', $userId);
+
+        if ($category) {
+            // Use the same type categories as the service
+            $typeCategories = [
+                'messages'     => ['message', 'new_message', 'message_received', 'federation_message'],
+                'connections'  => ['connection_request', 'connection_accepted', 'friend_request', 'friend_accepted'],
+                'reviews'      => ['review', 'new_review', 'review_received'],
+                'transactions' => ['transaction', 'payment', 'payment_received', 'credits_received'],
+                'social'       => ['like', 'comment', 'mention', 'post_like', 'post_comment'],
+                'events'       => ['event', 'event_reminder', 'event_rsvp', 'event_update'],
+                'groups'       => ['group_invite', 'group_join', 'group_post'],
+                'system'       => ['system', 'announcement', 'welcome', 'badge', 'achievement', 'level_up'],
+            ];
+            if (isset($typeCategories[$category])) {
+                $query->whereIn('type', $typeCategories[$category]);
+            }
+        }
+
+        $count = $query->count();
+        $query->delete(); // soft-delete via SoftDeletes trait
+
+        return $this->respondWithData(['deleted' => $count]);
+    }
+
+    // ========================================================================
+    // Delegated endpoints — legacy notification system (polling, old delete)
+    // ========================================================================
+
+    public function poll(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'poll');
+    }
+
+    public function delete(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'delete');
     }
 
     /**
@@ -124,29 +232,4 @@ class NotificationsController extends BaseApiController
         $status = http_response_code();
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
     }
-
-
-    public function destroyAll(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\NotificationsApiController::class, 'destroyAll');
-    }
-
-
-    public function markRead($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\NotificationsApiController::class, 'markRead', [$id]);
-    }
-
-
-    public function poll(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'poll');
-    }
-
-
-    public function delete(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'delete');
-    }
-
 }
