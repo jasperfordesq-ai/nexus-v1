@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use App\Services\PollService;
+
 
 /**
  * PollsController -- Community polls with voting support.
@@ -15,64 +15,6 @@ use App\Services\PollService;
 class PollsController extends BaseApiController
 {
     protected bool $isV2Api = true;
-
-    public function __construct(
-        private readonly PollService $pollService,
-    ) {}
-
-    /** GET /api/v2/polls */
-    public function index(): JsonResponse
-    {
-        $tenantId = $this->getTenantId();
-        $page = $this->queryInt('page', 1, 1);
-        $perPage = $this->queryInt('per_page', 20, 1, 100);
-
-        $result = $this->pollService->getActive($tenantId, $page, $perPage);
-
-        return $this->respondWithPaginatedCollection(
-            $result['items'], $result['total'], $page, $perPage
-        );
-    }
-
-    /** GET /api/v2/polls/{id} */
-    public function show(int $id): JsonResponse
-    {
-        $poll = $this->pollService->getById($id, $this->getTenantId());
-
-        if ($poll === null) {
-            return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
-        }
-
-        return $this->respondWithData($poll);
-    }
-
-    /** POST /api/v2/polls */
-    public function store(): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $this->rateLimit('poll_create', 5, 60);
-
-        $data = $this->getAllInput();
-        $poll = $this->pollService->create($userId, $this->getTenantId(), $data);
-
-        return $this->respondWithData($poll, null, 201);
-    }
-
-    /** POST /api/v2/polls/{id}/vote */
-    public function vote(int $id): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $this->rateLimit('poll_vote', 30, 60);
-
-        $optionId = $this->requireInput('option_id');
-        $result = $this->pollService->castVote($id, $userId, $this->getTenantId(), (int) $optionId);
-
-        if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
-        }
-
-        return $this->respondWithData($result);
-    }
 
     /**
      * Delegate to legacy controller via output buffering.
@@ -87,40 +29,53 @@ class PollsController extends BaseApiController
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
     }
 
+    public function index(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'index');
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'show', func_get_args());
+    }
+
+    public function store(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'store');
+    }
+
+    public function vote(int $id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'vote', func_get_args());
+    }
 
     public function categories(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'categories');
     }
 
-
     public function update($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'update', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'update', func_get_args());
     }
-
 
     public function destroy($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'destroy', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'destroy', func_get_args());
     }
-
 
     public function rank($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'rank', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'rank', func_get_args());
     }
-
 
     public function rankedResults($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'rankedResults', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'rankedResults', func_get_args());
     }
-
 
     public function export($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'export', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'export', func_get_args());
     }
-
 }

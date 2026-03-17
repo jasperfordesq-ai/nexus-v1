@@ -6,8 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\JobVacancyService;
 use Illuminate\Http\JsonResponse;
+
 
 /**
  * JobVacanciesController — Community job vacancy listings.
@@ -15,74 +15,6 @@ use Illuminate\Http\JsonResponse;
 class JobVacanciesController extends BaseApiController
 {
     protected bool $isV2Api = true;
-
-    public function __construct(
-        private readonly JobVacancyService $jobService,
-    ) {}
-
-    /** GET /api/v2/job-vacancies */
-    public function index(): JsonResponse
-    {
-        $tenantId = $this->getTenantId();
-        $page = $this->queryInt('page', 1, 1);
-        $perPage = $this->queryInt('per_page', 20, 1, 100);
-        $q = $this->query('q');
-
-        $result = $this->jobService->getAll($tenantId, $page, $perPage, $q);
-
-        return $this->respondWithPaginatedCollection(
-            $result['items'],
-            $result['total'],
-            $page,
-            $perPage
-        );
-    }
-
-    /** GET /api/v2/job-vacancies/{id} */
-    public function show(int $id): JsonResponse
-    {
-        $tenantId = $this->getTenantId();
-
-        $job = $this->jobService->getById($id, $tenantId);
-
-        if ($job === null) {
-            return $this->respondWithError('NOT_FOUND', 'Job vacancy not found', null, 404);
-        }
-
-        return $this->respondWithData($job);
-    }
-
-    /** POST /api/v2/job-vacancies */
-    public function store(): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $tenantId = $this->getTenantId();
-        $this->rateLimit('job_create', 5, 60);
-
-        $data = $this->getAllInput();
-
-        $job = $this->jobService->create($userId, $tenantId, $data);
-
-        return $this->respondWithData($job, null, 201);
-    }
-
-    /** POST /api/v2/job-vacancies/{id}/apply */
-    public function apply(int $id): JsonResponse
-    {
-        $userId = $this->requireAuth();
-        $tenantId = $this->getTenantId();
-        $this->rateLimit('job_apply', 5, 60);
-
-        $data = $this->getAllInput();
-
-        $result = $this->jobService->apply($id, $userId, $tenantId, $data);
-
-        if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Job vacancy not found or closed', null, 404);
-        }
-
-        return $this->respondWithData($result, null, 201);
-    }
 
     /**
      * Delegate to legacy controller via output buffering.
@@ -97,130 +29,128 @@ class JobVacanciesController extends BaseApiController
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
     }
 
+    public function index(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'index');
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'show', func_get_args());
+    }
+
+    public function store(): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'store');
+    }
+
+    public function apply(int $id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'apply', func_get_args());
+    }
 
     public function savedJobs(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'savedJobs');
     }
 
-
     public function myApplications(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'myApplications');
     }
-
 
     public function myPostings(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'myPostings');
     }
 
-
     public function listAlerts(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'listAlerts');
     }
-
 
     public function createAlert(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'createAlert');
     }
 
-
     public function deleteAlert($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'deleteAlert', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'deleteAlert', func_get_args());
     }
-
 
     public function unsubscribeAlert($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'unsubscribeAlert', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'unsubscribeAlert', func_get_args());
     }
-
 
     public function resubscribeAlert($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'resubscribeAlert', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'resubscribeAlert', func_get_args());
     }
-
 
     public function update($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'update', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'update', func_get_args());
     }
-
 
     public function destroy($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'destroy', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'destroy', func_get_args());
     }
-
 
     public function saveJob($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'saveJob', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'saveJob', func_get_args());
     }
-
 
     public function unsaveJob($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'unsaveJob', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'unsaveJob', func_get_args());
     }
-
 
     public function matchPercentage($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'matchPercentage', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'matchPercentage', func_get_args());
     }
-
 
     public function qualificationAssessment($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'qualificationAssessment', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'qualificationAssessment', func_get_args());
     }
-
 
     public function applications($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'applications', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'applications', func_get_args());
     }
-
 
     public function analytics($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'analytics', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'analytics', func_get_args());
     }
-
 
     public function renewJob($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'renewJob', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'renewJob', func_get_args());
     }
-
 
     public function featureJob($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'featureJob', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'featureJob', func_get_args());
     }
-
 
     public function unfeatureJob($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'unfeatureJob', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'unfeatureJob', func_get_args());
     }
-
 
     public function updateApplication($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'updateApplication', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'updateApplication', func_get_args());
     }
-
 
     public function applicationHistory($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'applicationHistory', [$id]);
+        return $this->delegate(\Nexus\Controllers\Api\JobVacanciesApiController::class, 'applicationHistory', func_get_args());
     }
-
 }
