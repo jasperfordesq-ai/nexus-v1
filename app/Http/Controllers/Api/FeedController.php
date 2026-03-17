@@ -8,14 +8,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\FeedService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
- * FeedController - Community feed (posts, likes).
+ * FeedController - Community feed (posts, likes, hide, mute, report).
+ *
+ * All endpoints migrated to native DB facade — no legacy delegation.
  *
  * Endpoints (v2):
- *   GET   /api/v2/feed       feed()
- *   POST  /api/v2/feed       createPost()
- *   POST  /api/v2/feed/like  like()
+ *   GET   /api/v2/feed            feed()
+ *   POST  /api/v2/feed            createPost()
+ *   POST  /api/v2/feed/like       like()
+ *   POST  /api/v2/feed/hide       hidePost()
+ *   POST  /api/v2/feed/mute       muteUser()
+ *   POST  /api/v2/feed/report     reportPost()
  */
 class FeedController extends BaseApiController
 {
@@ -85,34 +91,95 @@ class FeedController extends BaseApiController
     }
 
     /**
-     * Delegate to legacy controller via output buffering.
+     * POST /api/v2/feed/hide
+     *
+     * Hide a post from the current user's feed.
+     * Body: { "post_id": 123 }
+     * Response: { "success": true }
      */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
     public function hidePost(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\FeedController::class, 'hidePost');
+        $userId = $this->requireAuth();
+
+        $postId = (int) ($this->input('post_id', 0));
+
+        if ($postId <= 0) {
+            return response()->json(['success' => false, 'error' => 'Invalid post ID']);
+        }
+
+        try {
+            DB::table('user_hidden_posts')->insertOrIgnore([
+                'user_id'    => $userId,
+                'post_id'    => $postId,
+                'created_at' => now(),
+            ]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => 'Database error']);
+        }
     }
 
-
+    /**
+     * POST /api/v2/feed/mute
+     *
+     * Mute a user so their posts are hidden from the current user's feed.
+     * Body: { "user_id": 456 }
+     * Response: { "success": true }
+     */
     public function muteUser(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\FeedController::class, 'muteUser');
+        $userId = $this->requireAuth();
+
+        $mutedUserId = (int) ($this->input('user_id', 0));
+
+        if ($mutedUserId <= 0 || $mutedUserId === $userId) {
+            return response()->json(['success' => false, 'error' => 'Invalid user']);
+        }
+
+        try {
+            DB::table('user_muted_users')->insertOrIgnore([
+                'user_id'       => $userId,
+                'muted_user_id' => $mutedUserId,
+                'created_at'    => now(),
+            ]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => 'Database error']);
+        }
     }
 
-
+    /**
+     * POST /api/v2/feed/report
+     *
+     * Report a post for moderation.
+     * Body: { "post_id": 123, "target_type"?: "post" }
+     * Response: { "success": true }
+     */
     public function reportPost(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\FeedController::class, 'reportPost');
-    }
+        $userId = $this->requireAuth();
 
+        $postId = (int) ($this->input('post_id', 0));
+        $targetType = $this->input('target_type', 'post');
+
+        if ($postId <= 0) {
+            return response()->json(['success' => false, 'error' => 'Invalid post ID']);
+        }
+
+        try {
+            DB::table('reports')->insert([
+                'reporter_id' => $userId,
+                'target_type' => $targetType,
+                'target_id'   => $postId,
+                'reason'      => 'Reported via feed',
+                'created_at'  => now(),
+            ]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => 'Database error']);
+        }
+    }
 }

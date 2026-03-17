@@ -7,112 +7,106 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\MemberVerificationBadgeService;
 
 /**
  * MemberVerificationBadgeController -- Member verification badges.
  *
- * Delegates to legacy: MemberVerificationBadgeApiController
+ * Native implementation using legacy MemberVerificationBadgeService static methods.
+ *
+ * Endpoints:
+ *   GET    /api/v2/users/{id}/verification-badges   getUserBadges()
+ *   POST   /api/v2/admin/users/{id}/badges          grantBadge()
+ *   DELETE /api/v2/admin/users/{id}/badges/{type}    revokeBadge()
+ *   GET    /api/v2/admin/users/{id}/badges           getAdminBadgeList()
  */
 class MemberVerificationBadgeController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET verification-badges */
+    /**
+     * GET /api/v2/users/{id}/verification-badges
+     *
+     * Get a user's verification badges. Public endpoint (rate-limited).
+     */
     public function getUserBadges(int $id): JsonResponse
     {
+        $this->rateLimit('verification_badges', 30, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberVerificationBadgeApiController();
-            $controller->getUserBadges($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $badges = MemberVerificationBadgeService::getUserBadges($id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData($badges);
     }
 
-    /** POST admin/badges */
+    /**
+     * POST /api/v2/admin/users/{id}/badges
+     *
+     * Grant a verification badge (admin only).
+     *
+     * Body:
+     * {
+     *   "badge_type": "id_verified",
+     *   "note": "Government ID verified in person",
+     *   "expires_at": "2027-03-01 00:00:00"  // optional
+     * }
+     */
     public function grantBadge(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
+        $this->rateLimit('admin_badge_grant', 20, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberVerificationBadgeApiController();
-            $controller->grantBadge($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $data = $this->getAllInput();
+        $badgeType = $data['badge_type'] ?? '';
+        $note = $data['note'] ?? null;
+        $expiresAt = $data['expires_at'] ?? null;
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (empty($badgeType)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'badge_type is required', 'badge_type', 400);
         }
 
-        return response()->json($data);
+        $badgeId = MemberVerificationBadgeService::grantBadge($id, $badgeType, $adminId, $note, $expiresAt);
+
+        if ($badgeId === null) {
+            return $this->respondWithErrors(MemberVerificationBadgeService::getErrors(), 422);
+        }
+
+        $badges = MemberVerificationBadgeService::getUserBadges($id);
+
+        return $this->respondWithData($badges, null, 201);
     }
 
-    /** DELETE admin/badges */
+    /**
+     * DELETE /api/v2/admin/users/{id}/badges/{type}
+     *
+     * Revoke a verification badge (admin only).
+     */
     public function revokeBadge(int $id, string $type): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberVerificationBadgeApiController();
-            $controller->revokeBadge($id, $type);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        MemberVerificationBadgeService::revokeBadge($id, $type, $adminId);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
+        $badges = MemberVerificationBadgeService::getUserBadges($id);
 
-        return response()->json($data);
+        return $this->respondWithData($badges);
     }
 
-    /** GET admin/badges */
+    /**
+     * GET /api/v2/admin/users/{id}/badges
+     *
+     * Get all badges including revoked (admin view).
+     */
     public function getAdminBadgeList(int $id): JsonResponse
     {
         $this->requireAdmin();
+        $this->rateLimit('admin_badge_list', 30, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberVerificationBadgeApiController();
-            $controller->getAdminBadgeList($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $badges = MemberVerificationBadgeService::getAdminBadgeList($id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData([
+            'badges' => $badges,
+            'available_types' => MemberVerificationBadgeService::BADGE_TYPES,
+            'labels' => MemberVerificationBadgeService::BADGE_LABELS,
+        ]);
     }
 }

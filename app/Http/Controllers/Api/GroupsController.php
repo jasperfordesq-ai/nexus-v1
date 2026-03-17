@@ -6,27 +6,27 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\GroupService;
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\GroupService;
+use Nexus\Services\GroupAnnouncementService;
+use Nexus\Services\GroupNotificationService;
 
 /**
- * GroupsController - Groups CRUD with join/leave.
+ * GroupsController - Groups CRUD, members, discussions, announcements.
  *
- * Native Eloquent methods: index, show, store, join, leave.
- * Complex features (members, discussions, announcements, etc.) delegate to legacy.
+ * Converted from delegation to direct static service calls.
+ * Only uploadImage() remains delegated (uses $_FILES).
  */
 class GroupsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly GroupService $groupService,
-    ) {}
+    // ================================================================
+    // LIST / SHOW
+    // ================================================================
 
     /**
      * GET /api/v2/groups
-     *
-     * List groups with optional search, type/visibility filters, and cursor pagination.
      */
     public function index(): JsonResponse
     {
@@ -54,93 +54,686 @@ class GroupsController extends BaseApiController
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
-        if ($userId !== null) {
-            $filters['current_user_id'] = $userId;
-        }
 
-        $result = $this->groupService->getAll($filters);
+        $result = GroupService::getAll($filters);
+
+        // Add user's membership status to each group if logged in
+        if ($userId) {
+            foreach ($result['items'] as &$group) {
+                $fullGroup = GroupService::getById($group['id'], $userId);
+                if ($fullGroup) {
+                    $group['viewer_membership'] = $fullGroup['viewer_membership'] ?? null;
+                }
+            }
+        }
 
         return $this->respondWithCollection(
             $result['items'],
-            $result['cursor'] ?? null,
+            $result['cursor'],
             $filters['limit'],
-            $result['has_more'] ?? false
+            $result['has_more']
         );
     }
 
     /**
      * GET /api/v2/groups/{id}
-     *
-     * Get a single group by ID with member count and viewer's membership status.
      */
     public function show(int $id): JsonResponse
     {
         $userId = $this->getOptionalUserId();
-        $group = $this->groupService->getById($id, $userId);
 
-        if ($group === null) {
+        $group = GroupService::getById($id, $userId);
+
+        if (!$group) {
             return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
         }
 
         return $this->respondWithData($group);
     }
 
+    // ================================================================
+    // CREATE / UPDATE / DELETE
+    // ================================================================
+
     /**
      * POST /api/v2/groups
-     *
-     * Create a new group. Requires authentication.
      */
     public function store(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('group_create', 5, 60);
+        $this->rateLimit('groups_create', 10, 60);
 
-        $group = $this->groupService->create($userId, $this->getAllInput());
+        $data = $this->getAllInput();
+
+        $groupId = GroupService::create($userId, $data);
+
+        if ($groupId === null) {
+            $errors = GroupService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        $group = GroupService::getById($groupId, $userId);
 
         return $this->respondWithData($group, null, 201);
     }
 
     /**
-     * POST /api/v2/groups/{id}/join
-     *
-     * Join a group. For private groups creates a pending request.
+     * PUT /api/v2/groups/{id}
      */
-    public function join(int $id): JsonResponse
+    public function update($id): JsonResponse
     {
+        $id = (int) $id;
         $userId = $this->requireAuth();
-        $this->rateLimit('group_join', 20, 60);
+        $this->rateLimit('groups_update', 20, 60);
 
-        $result = $this->groupService->join($id, $userId);
+        $data = $this->getAllInput();
 
-        if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+        $success = GroupService::update($id, $userId, $data);
+
+        if (!$success) {
+            $errors = GroupService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
         }
 
-        return $this->respondWithData($result);
+        $group = GroupService::getById($id, $userId);
+
+        return $this->respondWithData($group);
     }
 
     /**
-     * DELETE /api/v2/groups/{id}/membership
-     *
-     * Leave a group.
+     * DELETE /api/v2/groups/{id}
      */
-    public function leave(int $id): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $id = (int) $id;
         $userId = $this->requireAuth();
-        $this->rateLimit('group_leave', 20, 60);
+        $this->rateLimit('groups_delete', 10, 60);
 
-        $result = $this->groupService->leave($id, $userId);
+        $success = GroupService::delete($id, $userId);
 
-        if (! $result) {
-            return $this->respondWithError('NOT_FOUND', 'Group not found or not a member', null, 404);
+        if (!$success) {
+            $errors = GroupService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
         }
 
         return $this->noContent();
     }
 
     // ================================================================
-    // Delegated methods — complex features that still use legacy services
+    // JOIN / LEAVE
     // ================================================================
+
+    /**
+     * POST /api/v2/groups/{id}/join
+     */
+    public function join(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_join', 30, 60);
+
+        $status = GroupService::join($id, $userId);
+
+        if ($status === null) {
+            $errors = GroupService::getErrors();
+            $httpStatus = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $httpStatus = 404;
+                    break;
+                }
+                if ($error['code'] === 'ALREADY_MEMBER' || $error['code'] === 'PENDING') {
+                    $httpStatus = 409;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $httpStatus);
+        }
+
+        // Notify based on join result
+        try {
+            if ($status === 'active') {
+                GroupNotificationService::notifyJoined($id, $userId);
+            } elseif ($status === 'pending') {
+                GroupNotificationService::notifyJoinRequest($id, $userId);
+            }
+        } catch (\Throwable $e) {
+            error_log("Group join notification error: " . $e->getMessage());
+        }
+
+        return $this->respondWithData([
+            'status'  => $status,
+            'message' => $status === 'active' ? 'Successfully joined the group' : 'Join request submitted',
+        ]);
+    }
+
+    /**
+     * DELETE /api/v2/groups/{id}/membership
+     */
+    public function leave(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_leave', 30, 60);
+
+        $success = GroupService::leave($id, $userId);
+
+        if (!$success) {
+            $errors = GroupService::getErrors();
+            $httpStatus = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $httpStatus = 404;
+                    break;
+                }
+                if ($error['code'] === 'NOT_MEMBER') {
+                    $httpStatus = 409;
+                    break;
+                }
+                if ($error['code'] === 'SOLE_ADMIN') {
+                    $httpStatus = 422;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $httpStatus);
+        }
+
+        return $this->noContent();
+    }
+
+    // ================================================================
+    // MEMBERS
+    // ================================================================
+
+    /**
+     * GET /api/v2/groups/{id}/members
+     */
+    public function members($id): JsonResponse
+    {
+        $id = (int) $id;
+
+        $group = GroupService::getById($id);
+        if (!$group) {
+            return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
+        }
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        if ($this->query('role')) {
+            $filters['role'] = $this->query('role');
+        }
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = GroupService::getMembers($id, $filters);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    /**
+     * PUT /api/v2/groups/{id}/members/{userId}
+     */
+    public function updateMember($id, $targetUserId): JsonResponse
+    {
+        $id = (int) $id;
+        $targetUserId = (int) $targetUserId;
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_member_update', 30, 60);
+
+        $role = $this->input('role');
+
+        if (empty($role)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Role is required', 'role', 400);
+        }
+
+        $success = GroupService::updateMemberRole($id, $targetUserId, $userId, $role);
+
+        if (!$success) {
+            $errors = GroupService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_MEMBER') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData([
+            'user_id' => $targetUserId,
+            'role'    => $role,
+        ]);
+    }
+
+    /**
+     * DELETE /api/v2/groups/{id}/members/{userId}
+     */
+    public function removeMember($id, $targetUserId): JsonResponse
+    {
+        $id = (int) $id;
+        $targetUserId = (int) $targetUserId;
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_member_remove', 20, 60);
+
+        $success = GroupService::removeMember($id, $targetUserId, $userId);
+
+        if (!$success) {
+            $errors = GroupService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->noContent();
+    }
+
+    // ================================================================
+    // JOIN REQUESTS
+    // ================================================================
+
+    /**
+     * GET /api/v2/groups/{id}/requests
+     */
+    public function pendingRequests($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+
+        $requests = GroupService::getPendingRequests($id, $userId);
+
+        if ($requests === null) {
+            $errors = GroupService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($requests);
+    }
+
+    /**
+     * POST /api/v2/groups/{id}/requests/{userId}
+     */
+    public function handleRequest($id, $requesterId): JsonResponse
+    {
+        $id = (int) $id;
+        $requesterId = (int) $requesterId;
+        $userId = $this->requireAuth();
+        $this->rateLimit('groups_handle_request', 30, 60);
+
+        $action = $this->input('action');
+
+        if (empty($action)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Action is required', 'action', 400);
+        }
+
+        $success = GroupService::handleJoinRequest($id, $requesterId, $userId, $action);
+
+        if (!$success) {
+            $errors = GroupService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        // Notify requester
+        try {
+            if ($action === 'accept') {
+                GroupNotificationService::notifyJoined($id, $requesterId);
+            } else {
+                GroupNotificationService::notifyJoinRejected($id, $requesterId);
+            }
+        } catch (\Throwable $e) {
+            error_log("Group request notification error: " . $e->getMessage());
+        }
+
+        return $this->respondWithData([
+            'user_id' => $requesterId,
+            'action'  => $action,
+            'result'  => $action === 'accept' ? 'approved' : 'rejected',
+        ]);
+    }
+
+    // ================================================================
+    // DISCUSSIONS
+    // ================================================================
+
+    /**
+     * GET /api/v2/groups/{id}/discussions
+     */
+    public function discussions($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = GroupService::getDiscussions($id, $userId, $filters);
+
+        if ($result === null) {
+            $errors = GroupService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
+    }
+
+    /**
+     * POST /api/v2/groups/{id}/discussions
+     */
+    public function createDiscussion($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit("groups_create_discussion_{$id}", 10, 60);
+
+        $data = $this->getAllInput();
+
+        $discussion = GroupService::createDiscussion($id, $userId, $data);
+
+        if ($discussion === null) {
+            $errors = GroupService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        // Notify group members of new discussion
+        try {
+            $discussionTitle = $discussion['title'] ?? $data['title'] ?? 'New Discussion';
+            $discussionId = $discussion['id'] ?? 0;
+            GroupNotificationService::notifyNewDiscussion($id, $discussionId, $userId, $discussionTitle);
+        } catch (\Throwable $e) {
+            error_log("Group discussion notification error: " . $e->getMessage());
+        }
+
+        return $this->respondWithData($discussion, null, 201);
+    }
+
+    /**
+     * GET /api/v2/groups/{id}/discussions/{discussionId}
+     */
+    public function discussionMessages($id, $discussionId): JsonResponse
+    {
+        $id = (int) $id;
+        $discussionId = (int) $discussionId;
+        $userId = $this->requireAuth();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 50, 1, 100),
+        ];
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = GroupService::getDiscussionMessages($id, $discussionId, $userId, $filters);
+
+        if ($result === null) {
+            $errors = GroupService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData([
+            'discussion' => $result['discussion'],
+            'messages'   => $result['items'],
+        ], [
+            'cursor'   => $result['cursor'],
+            'per_page' => $filters['limit'],
+            'has_more' => $result['has_more'],
+        ]);
+    }
+
+    /**
+     * POST /api/v2/groups/{id}/discussions/{discussionId}/messages
+     */
+    public function postToDiscussion($id, $discussionId): JsonResponse
+    {
+        $id = (int) $id;
+        $discussionId = (int) $discussionId;
+        $userId = $this->requireAuth();
+        $this->rateLimit("groups_post_to_discussion_{$id}", 30, 60);
+
+        $data = $this->getAllInput();
+
+        $message = GroupService::postToDiscussion($id, $discussionId, $userId, $data);
+
+        if ($message === null) {
+            $errors = GroupService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($message, null, 201);
+    }
+
+    // ================================================================
+    // ANNOUNCEMENTS
+    // ================================================================
+
+    /**
+     * GET /api/v2/groups/{id}/announcements
+     */
+    public function announcements($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+
+        $filters = [
+            'cursor'          => $this->query('cursor'),
+            'limit'           => $this->queryInt('limit', 20, 1, 100),
+            'include_expired' => $this->queryBool('include_expired'),
+        ];
+
+        $result = GroupAnnouncementService::list($id, $userId, $filters);
+
+        if ($result === null) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($result);
+    }
+
+    /**
+     * POST /api/v2/groups/{id}/announcements
+     */
+    public function createAnnouncement($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $data = $this->getAllInput();
+
+        $result = GroupAnnouncementService::create($id, $userId, $data);
+
+        if ($result === null) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        // Notify group members of new announcement
+        try {
+            $announcementTitle = $result['title'] ?? $data['title'] ?? 'New Announcement';
+            GroupNotificationService::notifyNewAnnouncement($id, $userId, $announcementTitle);
+        } catch (\Throwable $e) {
+            error_log("Group announcement notification error: " . $e->getMessage());
+        }
+
+        return $this->respondWithData($result, null, 201);
+    }
+
+    /**
+     * PUT /api/v2/groups/{id}/announcements/{announcementId}
+     */
+    public function updateAnnouncement($id, $announcementId): JsonResponse
+    {
+        $id = (int) $id;
+        $announcementId = (int) $announcementId;
+        $userId = $this->requireAuth();
+        $data = $this->getAllInput();
+
+        $result = GroupAnnouncementService::update($id, $announcementId, $userId, $data);
+
+        if ($result === null) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($result);
+    }
+
+    /**
+     * DELETE /api/v2/groups/{id}/announcements/{announcementId}
+     */
+    public function deleteAnnouncement($id, $announcementId): JsonResponse
+    {
+        $id = (int) $id;
+        $announcementId = (int) $announcementId;
+        $userId = $this->requireAuth();
+
+        $success = GroupAnnouncementService::delete($id, $announcementId, $userId);
+
+        if (!$success) {
+            $errors = GroupAnnouncementService::getErrors();
+            $status = $this->resolveErrorStatus($errors);
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData(['deleted' => true]);
+    }
+
+    // ================================================================
+    // DELEGATED — file upload uses $_FILES
+    // ================================================================
+
+    /**
+     * POST /api/v2/groups/{id}/image — uses $_FILES, kept as delegation
+     */
+    public function uploadImage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'uploadImage', [$id]);
+    }
+
+    // ================================================================
+    // HELPERS
+    // ================================================================
+
+    private function resolveErrorStatus(array $errors): int
+    {
+        foreach ($errors as $error) {
+            if ($error['code'] === 'NOT_FOUND') {
+                return 404;
+            }
+            if ($error['code'] === 'FORBIDDEN') {
+                return 403;
+            }
+        }
+        return 400;
+    }
 
     /**
      * Delegate to legacy controller via output buffering.
@@ -153,101 +746,5 @@ class GroupsController extends BaseApiController
         $output = ob_get_clean();
         $status = http_response_code();
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
-    public function update($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'update', [$id]);
-    }
-
-
-    public function destroy($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'destroy', [$id]);
-    }
-
-
-    public function members($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'members', [$id]);
-    }
-
-
-    public function updateMember($id, $userId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'updateMember', [$id, $userId]);
-    }
-
-
-    public function removeMember($id, $userId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'removeMember', [$id, $userId]);
-    }
-
-
-    public function pendingRequests($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'pendingRequests', [$id]);
-    }
-
-
-    public function handleRequest($id, $userId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'handleRequest', [$id, $userId]);
-    }
-
-
-    public function discussions($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'discussions', [$id]);
-    }
-
-
-    public function createDiscussion($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'createDiscussion', [$id]);
-    }
-
-
-    public function discussionMessages($id, $discussionId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'discussionMessages', [$id, $discussionId]);
-    }
-
-
-    public function postToDiscussion($id, $discussionId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'postToDiscussion', [$id, $discussionId]);
-    }
-
-
-    public function uploadImage($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'uploadImage', [$id]);
-    }
-
-
-    public function announcements($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'announcements', [$id]);
-    }
-
-
-    public function createAnnouncement($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'createAnnouncement', [$id]);
-    }
-
-
-    public function updateAnnouncement($id, $announcementId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'updateAnnouncement', [$id, $announcementId]);
-    }
-
-
-    public function deleteAnnouncement($id, $announcementId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\GroupsApiController::class, 'deleteAnnouncement', [$id, $announcementId]);
     }
 }

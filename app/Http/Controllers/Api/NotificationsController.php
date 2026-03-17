@@ -8,11 +8,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
  * NotificationsController - User notification management.
  *
- * Native Eloquent implementation (no delegation for core endpoints).
+ * Native Eloquent/DB implementation (no delegation).
  *
  * Endpoints (v2):
  *   GET    /api/v2/notifications            index()
@@ -22,6 +23,10 @@ use Illuminate\Http\JsonResponse;
  *   GET    /api/v2/notifications/{id}       show()
  *   DELETE /api/v2/notifications/{id}       destroy()
  *   DELETE /api/v2/notifications            destroyAll()
+ *
+ * Legacy endpoints (converted from delegation):
+ *   GET    /api/v2/notifications/poll       poll()
+ *   DELETE /api/v2/notifications/delete     delete()
  */
 class NotificationsController extends BaseApiController
 {
@@ -207,29 +212,63 @@ class NotificationsController extends BaseApiController
     }
 
     // ========================================================================
-    // Delegated endpoints — legacy notification system (polling, old delete)
+    // Converted legacy endpoints (formerly delegation)
     // ========================================================================
 
+    /**
+     * GET /api/v2/notifications/poll
+     *
+     * Lightweight polling endpoint — returns unread notification count.
+     *
+     * Response: { "success": true, "count": N }
+     */
     public function poll(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'poll');
-    }
+        $userId = $this->getOptionalUserId();
 
-    public function delete(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\NotificationController::class, 'delete');
+        if (!$userId) {
+            return response()->json(['success' => false, 'count' => 0]);
+        }
+
+        $unreadCount = (int) DB::table('notifications')
+            ->where('user_id', $userId)
+            ->where('is_read', 0)
+            ->whereNull('deleted_at')
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'count' => $unreadCount,
+        ]);
     }
 
     /**
-     * Delegate to legacy controller via output buffering.
+     * DELETE /api/v2/notifications/delete (legacy)
+     *
+     * Legacy delete endpoint. Accepts { id: N } or { all: true }.
+     *
+     * Response: { "success": true }
      */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    public function delete(): JsonResponse
     {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $userId = $this->requireAuth();
+
+        $id = $this->input('id');
+        $all = $this->input('all');
+
+        if ($id) {
+            DB::table('notifications')
+                ->where('id', (int) $id)
+                ->where('user_id', $userId)
+                ->delete();
+        } elseif ($all === true || $all === 'true') {
+            DB::table('notifications')
+                ->where('user_id', $userId)
+                ->delete();
+        } else {
+            return response()->json(['success' => false, 'error' => 'Missing ID or Action']);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

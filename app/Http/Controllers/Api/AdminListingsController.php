@@ -8,9 +8,14 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Nexus\Core\TenantContext;
+use Nexus\Models\ActivityLog;
+use Nexus\Services\ListingFeaturedService;
+use Nexus\Services\ListingModerationService;
+use Nexus\Services\SearchLogService;
 
 /**
- * AdminListingsController -- Admin listing moderation (pending, approve, reject, stats).
+ * AdminListingsController -- Admin listing moderation (list, approve, reject, feature, search analytics).
  *
  * All methods require admin authentication.
  */
@@ -20,6 +25,265 @@ class AdminListingsController extends BaseApiController
 
     public function __construct() {}
 
+    // =========================================================================
+    // Listings CRUD
+    // =========================================================================
+
+    /** GET /api/v2/admin/listings */
+    public function index(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('limit', 20, 1, 100);
+        $offset = ($page - 1) * $limit;
+        $status = $this->query('status');
+        $type = $this->query('type');
+        $search = $this->query('search');
+        $sort = $this->query('sort', 'created_at');
+        $order = strtoupper($this->query('order', 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
+
+        $allowedSorts = ['title', 'type', 'status', 'created_at', 'user_name'];
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        $conditions = ['l.tenant_id = ?'];
+        $params = [$tenantId];
+
+        if ($status && $status !== 'all') {
+            switch ($status) {
+                case 'pending':
+                    $conditions[] = "l.status = 'pending'";
+                    break;
+                case 'active':
+                    $conditions[] = "l.status = 'active'";
+                    break;
+                case 'inactive':
+                    $conditions[] = "l.status IN ('inactive', 'expired', 'closed')";
+                    break;
+            }
+        }
+
+        if ($type) {
+            $conditions[] = 'l.type = ?';
+            $params[] = $type;
+        }
+
+        if ($search) {
+            $conditions[] = "(l.title LIKE ? OR l.description LIKE ?)";
+            $searchTerm = '%' . $search . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        $where = implode(' AND ', $conditions);
+
+        $sortColumnMap = [
+            'title' => 'l.title',
+            'type' => 'l.type',
+            'status' => 'l.status',
+            'created_at' => 'l.created_at',
+            'user_name' => 'user_name',
+        ];
+        $sortColumn = $sortColumnMap[$sort] ?? 'l.created_at';
+
+        $total = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt FROM listings l WHERE {$where}",
+            $params
+        )->cnt;
+
+        $items = DB::select(
+            "SELECT l.id, l.title, l.description, l.type, l.status, l.created_at, l.updated_at,
+                    l.user_id, l.category_id, l.price, l.tenant_id,
+                    CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
+                    u.email as user_email, u.avatar_url as user_avatar,
+                    c.name as category_name,
+                    t.name as tenant_name
+             FROM listings l
+             LEFT JOIN users u ON l.user_id = u.id
+             LEFT JOIN categories c ON l.category_id = c.id
+             LEFT JOIN tenants t ON l.tenant_id = t.id
+             WHERE {$where}
+             ORDER BY {$sortColumn} {$order}
+             LIMIT ? OFFSET ?",
+            array_merge($params, [$limit, $offset])
+        );
+
+        $formatted = array_map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'title' => $row->title ?? '',
+                'description' => $row->description ?? '',
+                'type' => $row->type ?? 'listing',
+                'status' => $row->status ?? 'active',
+                'tenant_id' => (int) $row->tenant_id,
+                'tenant_name' => $row->tenant_name ?? 'Unknown',
+                'user_id' => (int) ($row->user_id ?? 0),
+                'user_name' => trim($row->user_name ?? ''),
+                'user_email' => $row->user_email ?? '',
+                'user_avatar' => $row->user_avatar ?? null,
+                'category_id' => $row->category_id ? (int) $row->category_id : null,
+                'category_name' => $row->category_name ?? null,
+                'price' => $row->price ? (float) $row->price : null,
+                'created_at' => $row->created_at,
+                'updated_at' => $row->updated_at ?? null,
+            ];
+        }, $items);
+
+        return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
+    }
+
+    /** GET /api/v2/admin/listings/{id} */
+    public function show($id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $item = DB::selectOne(
+            "SELECT l.*,
+                    CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
+                    u.email as user_email, u.avatar_url as user_avatar,
+                    c.name as category_name,
+                    t.name as tenant_name
+             FROM listings l
+             LEFT JOIN users u ON l.user_id = u.id
+             LEFT JOIN categories c ON l.category_id = c.id
+             LEFT JOIN tenants t ON l.tenant_id = t.id
+             WHERE l.id = ? AND l.tenant_id = ?",
+            [$id, $tenantId]
+        );
+
+        if (!$item) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        return $this->respondWithData([
+            'id' => (int) $item->id,
+            'title' => $item->title ?? '',
+            'description' => $item->description ?? '',
+            'type' => $item->type ?? 'listing',
+            'status' => $item->status ?? 'active',
+            'tenant_id' => (int) $item->tenant_id,
+            'tenant_name' => $item->tenant_name ?? 'Unknown',
+            'user_id' => (int) ($item->user_id ?? 0),
+            'user_name' => trim($item->user_name ?? ''),
+            'user_email' => $item->user_email ?? '',
+            'user_avatar' => $item->user_avatar ?? null,
+            'category_id' => $item->category_id ? (int) $item->category_id : null,
+            'category_name' => $item->category_name ?? null,
+            'price' => $item->price ? (float) $item->price : null,
+            'location' => $item->location ?? null,
+            'created_at' => $item->created_at,
+            'updated_at' => $item->updated_at ?? null,
+        ]);
+    }
+
+    /** POST /api/v2/admin/listings/{id}/approve */
+    public function approve(int $id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $item = DB::selectOne(
+            "SELECT id, title, status, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        );
+
+        if (!$item) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        DB::update(
+            "UPDATE listings SET status = 'active' WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        );
+
+        ActivityLog::log($adminId, 'admin_approve_listing', "Approved listing #{$id}: {$item->title}");
+
+        return $this->respondWithData(['approved' => true, 'id' => $id]);
+    }
+
+    /** POST /api/v2/admin/listings/{id}/reject */
+    public function reject(int $id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $reason = $this->input('reason', '');
+
+        $result = ListingModerationService::reject($id, $adminId, $reason);
+
+        if (!$result['success']) {
+            $status = $result['error'] === 'Listing not found' ? 404 : 422;
+            return $this->respondWithError('REJECT_FAILED', $result['error'], null, $status);
+        }
+
+        return $this->respondWithData(['rejected' => true, 'id' => $id]);
+    }
+
+    /** DELETE /api/v2/admin/listings/{id} */
+    public function destroy($id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $item = DB::selectOne(
+            "SELECT id, title, tenant_id FROM listings WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        );
+
+        if (!$item) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        DB::delete("DELETE FROM listings WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+
+        ActivityLog::log($adminId, 'admin_delete_listing', "Deleted listing #{$id}: {$item->title}");
+
+        return $this->respondWithData(['deleted' => true, 'id' => (int) $id]);
+    }
+
+    // =========================================================================
+    // Feature / Unfeature
+    // =========================================================================
+
+    /** POST /api/v2/admin/listings/{id}/feature */
+    public function feature($id): JsonResponse
+    {
+        $this->requireAdmin();
+        $days = $this->inputInt('days', null, 1, 365);
+
+        $result = ListingFeaturedService::featureListing((int) $id, $days);
+
+        if (!$result['success']) {
+            return $this->respondWithError('FEATURE_FAILED', $result['error'], null, 404);
+        }
+
+        return $this->respondWithData([
+            'featured' => true,
+            'id' => (int) $id,
+            'featured_until' => $result['featured_until'],
+        ]);
+    }
+
+    /** DELETE /api/v2/admin/listings/{id}/feature */
+    public function unfeature($id): JsonResponse
+    {
+        $this->requireAdmin();
+
+        $result = ListingFeaturedService::unfeatureListing((int) $id);
+
+        if (!$result['success']) {
+            return $this->respondWithError('UNFEATURE_FAILED', $result['error'], null, 404);
+        }
+
+        return $this->respondWithData(['featured' => false, 'id' => (int) $id]);
+    }
+
+    // =========================================================================
+    // Moderation
+    // =========================================================================
+
     /** GET /api/v2/admin/listings/pending */
     public function pending(): JsonResponse
     {
@@ -27,55 +291,47 @@ class AdminListingsController extends BaseApiController
         $tenantId = $this->getTenantId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
-
         $offset = ($page - 1) * $perPage;
+
         $items = DB::select(
             'SELECT * FROM listings WHERE tenant_id = ? AND status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
             [$tenantId, 'pending', $perPage, $offset]
         );
-        $total = DB::selectOne(
+        $total = (int) DB::selectOne(
             'SELECT COUNT(*) as cnt FROM listings WHERE tenant_id = ? AND status = ?',
             [$tenantId, 'pending']
         )->cnt;
 
-        return $this->respondWithPaginatedCollection($items, (int) $total, $page, $perPage);
+        return $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
     }
 
-    /** POST /api/v2/admin/listings/{id}/approve */
-    public function approve(int $id): JsonResponse
+    /** GET /api/v2/admin/listings/moderation-queue */
+    public function moderationQueue(): JsonResponse
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
 
-        $affected = DB::update(
-            'UPDATE listings SET status = ? WHERE id = ? AND tenant_id = ?',
-            ['active', $id, $tenantId]
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('limit', 20, 1, 100);
+        $type = $this->query('type');
+
+        $result = ListingModerationService::getReviewQueue($page, $limit, $type);
+
+        return $this->respondWithPaginatedCollection(
+            $result['items'],
+            $result['total'],
+            $page,
+            $limit
         );
-
-        if ($affected === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
-        }
-
-        return $this->respondWithData(['id' => $id, 'status' => 'active']);
     }
 
-    /** POST /api/v2/admin/listings/{id}/reject */
-    public function reject(int $id): JsonResponse
+    /** GET /api/v2/admin/listings/moderation-stats */
+    public function moderationStats(): JsonResponse
     {
         $this->requireAdmin();
-        $tenantId = $this->getTenantId();
-        $reason = $this->input('reason', '');
 
-        $affected = DB::update(
-            'UPDATE listings SET status = ?, rejection_reason = ? WHERE id = ? AND tenant_id = ?',
-            ['rejected', $reason, $id, $tenantId]
-        );
+        $stats = ListingModerationService::getStats();
 
-        if ($affected === 0) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
-        }
-
-        return $this->respondWithData(['id' => $id, 'status' => 'rejected']);
+        return $this->respondWithData($stats);
     }
 
     /** GET /api/v2/admin/listings/stats */
@@ -97,77 +353,42 @@ class AdminListingsController extends BaseApiController
         return $this->respondWithData($stats);
     }
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
+    // =========================================================================
+    // Search Analytics
+    // =========================================================================
 
-
-    public function index(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'index');
-    }
-
-
-    public function moderationQueue(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'moderationQueue');
-    }
-
-
-    public function moderationStats(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'moderationStats');
-    }
-
-
-    public function show($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'show', [$id]);
-    }
-
-
-    public function destroy($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'destroy', [$id]);
-    }
-
-
-    public function feature($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'feature', [$id]);
-    }
-
-
-    public function unfeature($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'unfeature', [$id]);
-    }
-
-
+    /** GET /api/v2/admin/search/analytics */
     public function searchAnalytics(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'searchAnalytics');
+        $this->requireAdmin();
+        $days = $this->queryInt('days', 30, 1, 90);
+
+        $analytics = SearchLogService::getAnalyticsSummary($days);
+
+        return $this->respondWithData($analytics);
     }
 
-
+    /** GET /api/v2/admin/search/trending */
     public function searchTrending(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'searchTrending');
+        $this->requireAdmin();
+        $days = $this->queryInt('days', 7, 1, 90);
+        $limit = $this->queryInt('limit', 20, 1, 50);
+
+        $trending = SearchLogService::getTrendingSearches($days, $limit);
+
+        return $this->respondWithData($trending);
     }
 
-
+    /** GET /api/v2/admin/search/zero-results */
     public function searchZeroResults(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminListingsApiController::class, 'searchZeroResults');
-    }
+        $this->requireAdmin();
+        $days = $this->queryInt('days', 30, 1, 90);
+        $limit = $this->queryInt('limit', 20, 1, 50);
 
+        $zeroResults = SearchLogService::getZeroResultSearches($days, $limit);
+
+        return $this->respondWithData($zeroResults);
+    }
 }

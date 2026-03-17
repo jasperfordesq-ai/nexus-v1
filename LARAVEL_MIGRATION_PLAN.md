@@ -41,7 +41,7 @@ Install Laravel alongside the existing app without breaking anything.
 
 ### Phase 1 — Route Migration (COMPLETE)
 
-**1,218 API routes** migrated to Laravel's routes/api.php. All 14 legacy route files commented out. Still in legacy: ~600 non-API routes (super-admin, admin-legacy views, cron, closures).
+**1,224 API routes** migrated to Laravel's routes/api.php. All 14 legacy route files commented out. Still in legacy: ~600 non-API routes (super-admin, admin-legacy views, cron, closures).
 
 Existing controllers still use `echo json_encode()` + `exit()` — Laravel routes call them directly. Controller conversion to return proper Laravel Response objects is a later phase.
 

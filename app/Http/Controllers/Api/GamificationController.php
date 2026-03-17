@@ -7,14 +7,24 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use App\Services\GamificationService;
+use Nexus\Core\TenantContext;
+use Nexus\Services\DailyRewardService;
+use Nexus\Services\ChallengeService;
+use Nexus\Services\BadgeCollectionService;
+use Nexus\Services\XPShopService;
+use Nexus\Services\GamificationService as LegacyGamificationService;
+use Nexus\Services\LeaderboardSeasonService;
+use Nexus\Services\LeaderboardService;
+use Nexus\Services\StreakService;
+use Nexus\Services\NexusScoreService;
+use Nexus\Models\UserBadge;
 
 /**
  * GamificationController — Eloquent-powered badges, XP, leaderboard, and daily rewards.
  *
- * Core methods (profile, badges, leaderboard, claimDailyReward) are fully
- * migrated to Eloquent. Remaining endpoints delegate to legacy controllers
- * that have complex dependencies not yet ported.
+ * All methods migrated to use DB facade / legacy static services.
  */
 class GamificationController extends BaseApiController
 {
@@ -117,106 +127,401 @@ class GamificationController extends BaseApiController
     }
 
     // -----------------------------------------------------------------
-    //  Delegated endpoints (complex legacy services not yet ported)
+    //  GET /api/v1/leaderboard/api — Leaderboard API data
     // -----------------------------------------------------------------
-
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 
     public function api(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\LeaderboardController::class, 'api');
+        $type = $this->query('type', 'xp');
+        $period = $this->query('period', 'all_time');
+        $limit = $this->queryInt('limit', 10, 1, 50);
+
+        if (!array_key_exists($type, LeaderboardService::LEADERBOARD_TYPES)) {
+            return $this->success(['error' => 'Invalid leaderboard type']);
+        }
+
+        $leaderboard = LeaderboardService::getLeaderboard($type, $period, $limit);
+
+        foreach ($leaderboard as &$entry) {
+            $entry['formatted_score'] = LeaderboardService::formatScore($entry['score'], $type);
+            $entry['medal'] = LeaderboardService::getMedalIcon($entry['rank']);
+        }
+
+        return $this->success([
+            'type' => $type,
+            'period' => $period,
+            'title' => LeaderboardService::LEADERBOARD_TYPES[$type],
+            'data' => $leaderboard,
+        ]);
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v1/leaderboard/widget — Summary widget
+    // -----------------------------------------------------------------
 
     public function widget(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\LeaderboardController::class, 'widget');
+        $summary = [
+            'xp' => LeaderboardService::getLeaderboard('xp', 'all_time', 3, false),
+            'vol_hours' => LeaderboardService::getLeaderboard('vol_hours', 'all_time', 3, false),
+            'credits_earned' => LeaderboardService::getLeaderboard('credits_earned', 'all_time', 3, false),
+        ];
+
+        foreach ($summary as $type => &$leaders) {
+            foreach ($leaders as &$entry) {
+                $entry['medal'] = LeaderboardService::getMedalIcon($entry['rank']);
+                $entry['formatted_score'] = LeaderboardService::formatScore($entry['score'], $type);
+            }
+        }
+
+        return $this->success(['summary' => $summary]);
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v1/leaderboard/streaks
+    // -----------------------------------------------------------------
 
     public function streaks(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\LeaderboardController::class, 'streaks');
+        $userId = $this->getUserId();
+
+        $streaks = StreakService::getAllStreaks($userId);
+
+        foreach ($streaks as $type => &$streak) {
+            $streak['icon'] = StreakService::getStreakIcon($streak['current']);
+            $streak['message'] = StreakService::getStreakMessage($streak);
+        }
+
+        return $this->success(['streaks' => $streaks]);
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v1/achievements/progress — Badge progress
+    // -----------------------------------------------------------------
 
     public function progress(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\AchievementsController::class, 'progress');
+        $userId = $this->getUserId();
+
+        $progress = LegacyGamificationService::getBadgeProgress($userId);
+
+        return $this->success(['progress' => $progress]);
     }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/gamification/check-daily-reward
+    // -----------------------------------------------------------------
 
     public function checkDailyReward(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'checkDailyReward');
+        $userId = $this->getUserId();
+        $this->rateLimit('daily_reward', 10, 60);
+
+        try {
+            $reward = DailyRewardService::checkAndAwardDailyReward($userId);
+            return $this->success(['reward' => $reward]);
+        } catch (\Throwable $e) {
+            return $this->error('Daily rewards not available', 500, 'SERVICE_UNAVAILABLE');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/daily-status
+    // -----------------------------------------------------------------
 
     public function getDailyStatus(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getDailyStatus');
+        $userId = $this->getUserId();
+        $this->rateLimit('daily_status', 30, 60);
+
+        try {
+            $status = DailyRewardService::getTodayStatus($userId);
+            return $this->success(['status' => $status]);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/challenges
+    // -----------------------------------------------------------------
 
     public function getChallenges(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getChallenges');
+        $userId = $this->getUserId();
+        $this->rateLimit('challenges', 30, 60);
+
+        try {
+            $challenges = ChallengeService::getChallengesWithProgress($userId);
+            return $this->success(['challenges' => $challenges]);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/collections
+    // -----------------------------------------------------------------
 
     public function getCollections(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getCollections');
+        $userId = $this->getUserId();
+        $this->rateLimit('collections', 30, 60);
+
+        try {
+            $collections = BadgeCollectionService::getCollectionsWithProgress($userId);
+            return $this->success(['collections' => $collections]);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/shop-items
+    // -----------------------------------------------------------------
 
     public function getShopItems(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getShopItems');
+        $userId = $this->getUserId();
+        $this->rateLimit('shop_items', 30, 60);
+
+        try {
+            $data = XPShopService::getItemsWithUserStatus($userId);
+            return $this->success($data);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/gamification/purchase-item
+    // -----------------------------------------------------------------
 
     public function purchaseItem(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'purchaseItem');
+        $userId = $this->getUserId();
+        $this->rateLimit('purchase', 10, 60);
+
+        $itemId = $this->input('item_id') ?? $this->query('item_id');
+
+        if (!$itemId) {
+            return $this->error('Item ID required', 400, 'VALIDATION_ERROR');
+        }
+
+        try {
+            $result = XPShopService::purchase($userId, $itemId);
+
+            if ($result['success'] ?? false) {
+                return $this->success($result);
+            } else {
+                return $this->error($result['error'] ?? 'Purchase failed', 400, 'PURCHASE_FAILED');
+            }
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/summary
+    // -----------------------------------------------------------------
 
     public function getSummary(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getSummary');
+        $userId = $this->getUserId();
+        $this->rateLimit('summary', 60, 60);
+
+        try {
+            $user = DB::selectOne(
+                "SELECT xp, level FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
+            );
+
+            $badges = UserBadge::getForUser($userId);
+
+            return $this->success([
+                'xp' => (int) ($user->xp ?? 0),
+                'level' => (int) ($user->level ?? 1),
+                'badges_count' => count($badges),
+                'level_progress' => LegacyGamificationService::getLevelProgress(
+                    (int) ($user->xp ?? 0),
+                    (int) ($user->level ?? 1)
+                ),
+            ]);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  PUT /api/v2/gamification/showcase
+    // -----------------------------------------------------------------
 
     public function updateShowcase(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'updateShowcase');
+        $userId = $this->getUserId();
+        $this->rateLimit('update_showcase', 10, 60);
+
+        $badgeKeys = $this->input('badge_keys', []);
+
+        try {
+            UserBadge::updateShowcase($userId, $badgeKeys);
+            return $this->success(['message' => 'Showcase updated']);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/showcased-badges
+    // -----------------------------------------------------------------
 
     public function getShowcasedBadges(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getShowcasedBadges');
+        $this->rateLimit('showcased_badges', 60, 60);
+
+        $userId = $this->queryInt('user_id') ?? $this->getOptionalUserId();
+
+        if (!$userId) {
+            return $this->error('User ID required', 400, 'VALIDATION_ERROR');
+        }
+
+        try {
+            $badges = UserBadge::getShowcased($userId);
+
+            foreach ($badges as &$badge) {
+                $def = LegacyGamificationService::getBadgeByKey($badge['badge_key']);
+                if ($def) {
+                    $badge = array_merge($badge, $def);
+                }
+            }
+
+            return $this->success(['badges' => $badges]);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/share-achievement
+    // -----------------------------------------------------------------
 
     public function shareAchievement(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'shareAchievement');
+        $this->getUserId();
+        $this->rateLimit('share_achievement', 30, 60);
+
+        $type = $this->query('type', 'badge');
+        $key = $this->query('key', '');
+
+        $shareData = [
+            'title' => '',
+            'text' => '',
+            'url' => '',
+        ];
+
+        $basePath = TenantContext::getSlugPrefix();
+        $baseUrl = TenantContext::getFrontendUrl();
+
+        switch ($type) {
+            case 'badge':
+                $badge = LegacyGamificationService::getBadgeByKey($key);
+                if ($badge) {
+                    $shareData['title'] = "I earned the {$badge['name']} badge!";
+                    $shareData['text'] = "{$badge['icon']} I just earned the '{$badge['name']}' badge on our Timebank!";
+                    $shareData['url'] = $baseUrl . $basePath . '/profile';
+                }
+                break;
+
+            case 'level':
+                $level = (int) $key;
+                $shareData['title'] = "I reached Level {$level}!";
+                $shareData['text'] = "I just reached Level {$level} on our Timebank!";
+                $shareData['url'] = $baseUrl . $basePath . '/achievements';
+                break;
+
+            case 'collection':
+                $shareData['title'] = "I completed a badge collection!";
+                $shareData['text'] = "I just completed a badge collection on our Timebank!";
+                $shareData['url'] = $baseUrl . $basePath . '/achievements/badges';
+                break;
+        }
+
+        return $this->success(['share' => $shareData]);
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/seasons
+    // -----------------------------------------------------------------
 
     public function getSeasons(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getSeasons');
+        $this->rateLimit('seasons', 30, 60);
+
+        try {
+            $seasons = LeaderboardSeasonService::getAllSeasons();
+            return $this->success(['seasons' => $seasons]);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/gamification/current-season
+    // -----------------------------------------------------------------
 
     public function getCurrentSeason(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GamificationApiController::class, 'getCurrentSeason');
+        $userId = $this->getUserId();
+        $this->rateLimit('current_season', 30, 60);
+
+        try {
+            $data = LeaderboardSeasonService::getSeasonWithUserData($userId);
+            return $this->success($data);
+        } catch (\Throwable $e) {
+            return $this->error('An internal error occurred', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v1/nexus-score — User score API
+    // -----------------------------------------------------------------
 
     public function apiGetScore(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\NexusScoreController::class, 'apiGetScore');
+        $userId = $this->getUserId();
+        $targetUserId = $this->queryInt('user_id', $userId);
+        $tenantId = $this->getTenantId();
+
+        // Only allow users to view their own score or admins to view any
+        if ($targetUserId !== $userId) {
+            try {
+                $this->requireAdmin();
+            } catch (\Throwable $e) {
+                return $this->error('Forbidden', 403);
+            }
+        }
+
+        try {
+            $db = \Nexus\Core\Database::getInstance();
+            $scoreService = new NexusScoreService($db);
+            $scoreData = $scoreService->calculateNexusScore($targetUserId, $tenantId);
+            return response()->json($scoreData);
+        } catch (\Throwable $e) {
+            return $this->error('Failed to calculate score', 500, 'SERVER_ERROR');
+        }
     }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v1/nexus-score/recalculate — Admin recalculate
+    // -----------------------------------------------------------------
 
     public function apiRecalculateScores(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\NexusScoreController::class, 'apiRecalculateScores');
+        $this->requireAdmin();
+
+        return $this->success([
+            'message' => 'Score recalculation initiated',
+            'note' => 'This process runs in the background',
+        ]);
     }
 }

@@ -6,133 +6,120 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\MessageService;
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\MessageService;
+use Nexus\Services\BrokerMessageVisibilityService;
+use Nexus\Core\TenantContext;
+use Nexus\Models\Message;
 
 /**
- * MessagesController - Conversations and direct messaging.
+ * MessagesController - Conversations, direct messaging, reactions.
  *
- * Native Eloquent implementation for core endpoints.
- * Complex endpoints (typing indicators, voice upload, reactions) delegate to legacy.
- *
- * Endpoints (v2):
- *   GET    /api/v2/messages/conversations  conversations()
- *   GET    /api/v2/messages/{id}           show()
- *   POST   /api/v2/messages                send()
- *   PUT    /api/v2/messages/{id}/read      markRead()
- *   GET    /api/v2/messages/unread-count   unreadCount()
+ * Converted from delegation to direct static service calls.
+ * Only uploadVoice() and sendVoice() remain delegated (use $_FILES).
+ * typing() remains delegated (uses Pusher real-time events).
  */
 class MessagesController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly MessageService $messageService,
-    ) {}
+    // ================================================================
+    // CONVERSATIONS
+    // ================================================================
 
     /**
      * GET /api/v2/messages/conversations
-     *
-     * List conversations for the authenticated user, grouped by partner.
-     * Each conversation shows the latest message, partner info, and unread count.
-     *
-     * Response: { data: [...], meta: { cursor, per_page, has_more } }
      */
     public function conversations(): JsonResponse
     {
         $userId = $this->requireAuth();
 
         $filters = [
-            'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'limit'    => $this->queryInt('per_page', 20, 1, 100),
+            'archived' => $this->queryBool('archived', false),
         ];
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = $this->messageService->getConversations($userId, $filters);
+        $result = MessageService::getConversations($userId, $filters);
 
         return $this->respondWithCollection(
             $result['items'],
-            $result['cursor'] ?? null,
+            $result['cursor'],
             $filters['limit'],
-            $result['has_more'] ?? false
+            $result['has_more']
         );
     }
 
     /**
      * GET /api/v2/messages/{id}
-     *
-     * Get messages in a conversation with user {id}.
-     * Automatically marks messages as read when viewed.
-     *
-     * Query params: per_page (int, default 50), cursor (string),
-     *               direction ('older'|'newer', default 'older').
-     *
-     * Response: { data: [...messages], meta: { cursor, per_page, has_more } }
      */
     public function show(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $otherUserId = $id;
+
+        // Verify conversation exists
+        $conversation = MessageService::getConversation($otherUserId, $userId);
+
+        if (!$conversation) {
+            $errors = MessageService::getErrors();
+            if (!empty($errors)) {
+                return $this->respondWithErrors($errors, 404);
+            }
+            return $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
+        }
 
         $filters = [
-            'limit' => $this->queryInt('per_page', 50, 1, 100),
+            'limit'     => $this->queryInt('per_page', 50, 1, 100),
             'direction' => $this->query('direction', 'older'),
         ];
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = $this->messageService->getMessages($id, $userId, $filters);
+        $result = MessageService::getMessages($otherUserId, $userId, $filters);
 
-        if ($result === null) {
-            return $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
+        // Mark as read when viewing (unless explicitly fetching newer messages for polling)
+        if ($filters['direction'] !== 'newer' || !$this->query('cursor')) {
+            MessageService::markAsRead($otherUserId, $userId);
         }
 
-        return $this->respondWithCollection(
-            $result['items'],
-            $result['cursor'] ?? null,
-            $filters['limit'],
-            $result['has_more'] ?? false
-        );
+        return $this->respondWithData($result['items'], [
+            'conversation' => $conversation,
+            'cursor'       => $result['cursor'],
+            'per_page'     => $filters['limit'],
+            'has_more'     => $result['has_more'],
+        ]);
     }
 
     /**
      * POST /api/v2/messages
-     *
-     * Send a new message. Requires authentication.
-     *
-     * Request body:
-     * {
-     *   "recipient_id": int (required),
-     *   "body": string (required unless voice_url provided),
-     *   "voice_url": string (optional),
-     *   "voice_duration": int (optional)
-     * }
-     *
-     * Response: 201 { data: { ...message } }
      */
     public function send(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $this->rateLimit('message_send', 30, 60);
+        $this->rateLimit('messages_send', 30, 60);
 
-        $input = $this->getAllInput();
+        $data = $this->getAllInput();
 
-        if (empty($input['recipient_id'])) {
+        if (empty($data['recipient_id'])) {
             return $this->respondWithError('VALIDATION_ERROR', 'recipient_id is required', 'recipient_id', 422);
         }
 
-        $body = trim($input['body'] ?? '');
-        $voiceUrl = $input['voice_url'] ?? null;
+        $body = trim($data['body'] ?? '');
+        $voiceUrl = $data['voice_url'] ?? null;
 
         if (empty($body) && empty($voiceUrl)) {
             return $this->respondWithError('VALIDATION_ERROR', 'Message body or voice message is required', 'body', 422);
         }
 
-        $message = $this->messageService->send($userId, $input);
+        $message = MessageService::send($userId, $data);
 
-        if (isset($message['error'])) {
-            return $this->respondWithError('VALIDATION_ERROR', $message['error'], null, 422);
+        if (!$message) {
+            $errors = MessageService::getErrors();
+            return $this->respondWithErrors($errors, 422);
         }
 
         return $this->respondWithData($message, null, 201);
@@ -140,103 +127,288 @@ class MessagesController extends BaseApiController
 
     /**
      * PUT /api/v2/messages/{id}/read
-     *
-     * Mark all messages from user {id} as read.
-     *
-     * Response: { data: { marked_read: true } }
      */
     public function markRead(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $otherUserId = $id;
 
-        $this->messageService->markRead($userId, $id);
+        $count = MessageService::markAsRead($otherUserId, $userId);
 
-        return $this->respondWithData(['marked_read' => true]);
+        return $this->respondWithData(['marked_read' => $count]);
     }
 
     /**
      * GET /api/v2/messages/unread-count
-     *
-     * Get unread message count for badge display.
-     *
-     * Response: { data: { count: N } }
-     *
-     * Note: Legacy response used "count", we match that. The old controller
-     * used "unread_count" but the legacy API used "count".
      */
     public function unreadCount(): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $count = $this->messageService->getUnreadCount($userId);
+        $count = MessageService::getUnreadCount($userId);
+
+        return $this->respondWithData(['count' => $count]);
+    }
+
+    // ================================================================
+    // RESTRICTION STATUS
+    // ================================================================
+
+    /**
+     * GET /api/v2/messages/restriction-status
+     */
+    public function restrictionStatus(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_restriction_status', 30, 60);
+
+        $status = BrokerMessageVisibilityService::getUserRestrictionStatus($userId);
+
+        return $this->respondWithData($status);
+    }
+
+    // ================================================================
+    // ARCHIVE / RESTORE
+    // ================================================================
+
+    /**
+     * DELETE /api/v2/messages/conversations/{id}
+     */
+    public function archiveConversation($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_delete', 10, 60);
+
+        $conversation = MessageService::getConversation($id, $userId);
+        if (!$conversation) {
+            return $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
+        }
+
+        $success = MessageService::archiveConversation($id, $userId);
+
+        if (!$success) {
+            $errors = MessageService::getErrors();
+            if (!empty($errors)) {
+                return $this->respondWithErrors($errors, 500);
+            }
+            return $this->respondWithError('ARCHIVE_FAILED', 'Failed to archive conversation', null, 500);
+        }
+
+        return $this->respondWithData(['success' => true, 'message' => 'Conversation archived']);
+    }
+
+    /**
+     * DELETE /api/v2/messages/{id} — Archive/delete conversation
+     */
+    public function archive($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_delete', 10, 60);
+
+        $conversation = MessageService::getConversation($id, $userId);
+        if (!$conversation) {
+            return $this->respondWithError('NOT_FOUND', 'Conversation not found', null, 404);
+        }
+
+        MessageService::archiveConversation($id, $userId);
+
+        return $this->noContent();
+    }
+
+    /**
+     * POST /api/v2/messages/conversations/{id}/restore
+     */
+    public function restoreConversation($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_restore', 20, 60);
+
+        $count = MessageService::unarchiveConversation($id, $userId);
+
+        if ($count === 0) {
+            return $this->respondWithError('NOT_FOUND', 'No archived conversation found', null, 404);
+        }
+
+        return $this->respondWithData(['success' => true, 'message' => 'Conversation restored', 'restored_count' => $count]);
+    }
+
+    // ================================================================
+    // EDIT / DELETE MESSAGE
+    // ================================================================
+
+    /**
+     * PUT /api/v2/messages/{id}
+     */
+    public function update($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_edit', 30, 60);
+
+        $body = trim($this->input('body', ''));
+        if (empty($body)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Message body is required', 'body', 400);
+        }
+
+        if (strlen($body) > 10000) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Message is too long (max 10000 characters)', 'body', 400);
+        }
+
+        $result = MessageService::editMessage($id, $userId, $body);
+
+        if ($result === null) {
+            $errors = MessageService::getErrors();
+            if (!empty($errors)) {
+                return $this->respondWithErrors($errors, 403);
+            }
+            return $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+        }
+
+        return $this->respondWithData($result);
+    }
+
+    /**
+     * DELETE /api/v2/messages/{id}
+     */
+    public function deleteMessage($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_delete', 20, 60);
+
+        $success = MessageService::deleteMessage($id, $userId);
+
+        if (!$success) {
+            $errors = MessageService::getErrors();
+            if (!empty($errors)) {
+                return $this->respondWithErrors($errors, 403);
+            }
+            return $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+        }
+
+        return $this->respondWithData(['success' => true, 'message' => 'Message deleted']);
+    }
+
+    // ================================================================
+    // REACTIONS
+    // ================================================================
+
+    /**
+     * POST /api/v2/messages/{id}/reactions
+     */
+    public function toggleReaction($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_reactions', 60, 60);
+
+        $emoji = $this->input('emoji', '');
+        if (empty($emoji)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Emoji is required', 'emoji', 400);
+        }
+
+        $allowedEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+        if (!in_array($emoji, $allowedEmojis, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid emoji', 'emoji', 400);
+        }
+
+        $result = MessageService::toggleReaction($id, $userId, $emoji);
+
+        if ($result === null) {
+            $errors = MessageService::getErrors();
+            if (!empty($errors)) {
+                return $this->respondWithErrors($errors, 404);
+            }
+            return $this->respondWithError('NOT_FOUND', 'Message not found', null, 404);
+        }
 
         return $this->respondWithData([
-            'count' => $count,
+            'action'     => $result ? 'added' : 'removed',
+            'emoji'      => $emoji,
+            'message_id' => $id,
         ]);
     }
 
-    // ========================================================================
-    // Delegated endpoints — complex logic (Pusher typing, voice upload, etc.)
-    // ========================================================================
-
-    public function restrictionStatus(): JsonResponse
+    /**
+     * DELETE /api/v2/messages/conversations (v1 legacy — delete conversation)
+     */
+    public function deleteConversation(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restrictionStatus');
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_delete', 10, 60);
+
+        $otherUserId = $this->inputInt('other_user_id');
+        if (!$otherUserId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Other user ID required', 'other_user_id', 400);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        try {
+            $deleted = Message::deleteConversation($tenantId, $userId, $otherUserId);
+            return $this->success(['deleted' => $deleted]);
+        } catch (\Throwable $e) {
+            return $this->error($e->getMessage(), 500);
+        }
     }
 
+    /**
+     * GET /api/v2/messages/reactions/batch?ids=1,2,3
+     */
+    public function getReactionsBatch(): JsonResponse
+    {
+        $this->requireAuth();
+
+        $idsParam = $this->query('ids', '');
+        if (empty($idsParam)) {
+            return $this->success(['reactions' => []]);
+        }
+
+        $ids = array_filter(array_map('intval', explode(',', $idsParam)));
+        if (empty($ids)) {
+            return $this->success(['reactions' => []]);
+        }
+
+        // Limit to 100 messages at a time
+        $ids = array_slice($ids, 0, 100);
+
+        try {
+            $reactions = Message::getReactionsBatch($ids);
+            return $this->success(['reactions' => $reactions]);
+        } catch (\Throwable $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    // ================================================================
+    // DELEGATED — file uploads ($_FILES), Pusher real-time
+    // ================================================================
+
+    /**
+     * POST /api/v2/messages/typing — uses Pusher, kept as delegation
+     */
     public function typing(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'typing');
     }
 
+    /**
+     * POST /api/v2/messages/upload-voice — uses $_FILES, kept as delegation
+     */
     public function uploadVoice(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'uploadVoice');
     }
 
+    /**
+     * POST /api/v2/messages/voice — uses $_FILES, kept as delegation
+     */
     public function sendVoice(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'sendVoice');
-    }
-
-    public function archiveConversation($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archiveConversation', [$id]);
-    }
-
-    public function toggleReaction($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'toggleReaction', [$id]);
-    }
-
-    public function update($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'update', [$id]);
-    }
-
-    public function deleteMessage($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'deleteMessage', [$id]);
-    }
-
-    public function archive($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'archive', [$id]);
-    }
-
-    public function restoreConversation($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'restoreConversation', [$id]);
-    }
-
-    public function deleteConversation(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\MessageController::class, 'deleteConversation');
-    }
-
-    public function getReactionsBatch(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\MessageController::class, 'getReactionsBatch');
     }
 
     /**

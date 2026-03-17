@@ -7,63 +7,129 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Nexus\Services\CrossModuleMatchingService;
+use Nexus\Services\MatchLearningService;
 
 /**
- * MatchingController -- Smart matching engine.
+ * MatchingController — Eloquent-powered smart matching engine endpoints.
  *
- * Delegates to legacy: MatchingApiController
+ * Fully migrated from legacy delegation. Uses legacy static services
+ * (CrossModuleMatchingService, MatchLearningService) which handle their
+ * own tenant scoping via TenantContext.
  */
 class MatchingController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET matching */
+    /**
+     * GET /api/v2/matches/all
+     *
+     * Get all matches for the authenticated user across listings, jobs,
+     * volunteering, and groups.
+     *
+     * Query Parameters:
+     * - limit: int (default 20, max 100)
+     * - min_score: int (default 30, minimum match score 0-100)
+     * - modules: string (comma-separated: 'listings,jobs,volunteering,groups')
+     * - user_id: int (admin only — view another user's matches)
+     * - debug: 'true' (admin only — include debug info)
+     */
     public function allMatches(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MatchingApiController();
-            $controller->allMatches();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
+        // Admin override: allow viewing any user's matches for MatchDebugPanel
+        $adminRoles = ['admin', 'tenant_admin', 'super_admin', 'god'];
+        $callerRole = $this->resolveUserRole();
+        $requestedUserId = $this->queryInt('user_id');
+        if ($requestedUserId && in_array($callerRole, $adminRoles, true)) {
+            $userId = $requestedUserId;
         }
 
-        return response()->json($data);
+        $options = [
+            'limit' => min(100, max(1, $this->queryInt('limit', 20))),
+            'min_score' => max(0, min(100, $this->queryInt('min_score', 30))),
+            'debug' => $this->query('debug') === 'true' && in_array($callerRole, $adminRoles, true),
+        ];
+
+        $modulesParam = $this->query('modules');
+        if ($modulesParam) {
+            $allowed = ['listings', 'jobs', 'volunteering', 'groups'];
+            $requested = array_map('trim', explode(',', $modulesParam));
+            $options['modules'] = array_values(array_intersect($requested, $allowed));
+        }
+
+        $matches = CrossModuleMatchingService::getAllMatches($userId, $options);
+
+        return $this->respondWithData($matches);
     }
 
-    /** POST matching/dismiss */
+    /**
+     * POST /api/v2/matches/{id}/dismiss
+     *
+     * Dismiss a listing match — records a negative signal so the listing
+     * is ranked lower in future match results for this user.
+     *
+     * Route parameter:
+     * - id: int (listing_id)
+     *
+     * Request body (JSON, all optional):
+     * - reason: string ('not_relevant' | 'too_far' | 'already_done' | 'other')
+     */
     public function dismiss(int $listingId): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
 
-        ob_start();
+        $this->rateLimit('match_dismiss', 200, 60);
+
+        if ($listingId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid listing ID', 'id', 400);
+        }
+
+        $reason = $this->input('reason');
+        $validReasons = ['not_relevant', 'too_far', 'already_done', 'other', null];
+        if (!in_array($reason, $validReasons, true)) {
+            $reason = 'other';
+        }
+
         try {
-            $controller = new \Nexus\Controllers\Api\MatchingApiController();
-            $controller->dismiss($listingId);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+            // Upsert — ignore duplicate (user may re-dismiss)
+            DB::statement(
+                "INSERT IGNORE INTO match_dismissals (tenant_id, user_id, listing_id, reason) VALUES (?, ?, ?, ?)",
+                [$tenantId, $userId, $listingId, $reason]
             );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
+        } catch (\Throwable $e) {
+            // Table may not exist yet — degrade gracefully
+            \Log::warning('MatchingController::dismiss DB error — ' . $e->getMessage());
         }
 
-        return response()->json($data);
+        // Record negative signal in MatchLearningService
+        MatchLearningService::recordInteraction($userId, $listingId, 'dismissed', []);
+
+        return $this->respondWithData(['dismissed' => true, 'listing_id' => $listingId]);
+    }
+
+    /**
+     * Resolve the current user's role from the auth user or legacy session.
+     */
+    private function resolveUserRole(): string
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user) {
+            return $user->role ?? 'member';
+        }
+
+        // Legacy session fallback
+        if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
+            $row = DB::table('users')
+                ->where('id', (int) $_SESSION['user_id'])
+                ->select('role')
+                ->first();
+            return $row->role ?? 'member';
+        }
+
+        return 'member';
     }
 }

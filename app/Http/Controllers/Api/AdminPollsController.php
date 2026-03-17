@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024-2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -7,46 +7,82 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\PollService;
 
 /**
  * AdminPollsController -- Admin poll management.
  *
- * Delegates to legacy controller during migration.
+ * All endpoints require admin authentication.
  */
 class AdminPollsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
-
     /**
-     * Delegate to legacy controller via output buffering.
+     * GET /api/v2/admin/polls
+     *
+     * Query params: search, page, limit
      */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-    /** GET /api/v2/admin/polls */
     public function index(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminPollsApiController::class, 'index');
+        $this->requireAdmin();
+
+        $filters = [
+            'search' => $this->query('search'),
+            'page' => max(1, $this->queryInt('page', 1)),
+            'limit' => min(200, max(1, $this->queryInt('limit', 50))),
+        ];
+
+        $result = PollService::getAll($filters);
+
+        $items = $result['data'] ?? $result['items'] ?? $result;
+        $total = $result['total'] ?? (is_array($items) ? count($items) : 0);
+        $page = $filters['page'];
+        $limit = $filters['limit'];
+
+        if (is_array($items) && !isset($result['total'])) {
+            $offset = ($page - 1) * $limit;
+            $paged = array_slice($items, $offset, $limit);
+            return $this->respondWithPaginatedCollection($paged, count($items), $page, $limit);
+        }
+
+        return $this->respondWithPaginatedCollection($items, $total, $page, $limit);
     }
 
-    /** GET /api/v2/admin/polls/{id} */
+    /**
+     * GET /api/v2/admin/polls/{id}
+     */
     public function show(int $id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminPollsApiController::class, 'show', [$id]);
+        $this->requireAdmin();
+
+        $poll = PollService::getById($id);
+
+        if (!$poll) {
+            return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
+        }
+
+        return $this->respondWithData($poll);
     }
 
-    /** DELETE /api/v2/admin/polls/{id} */
+    /**
+     * DELETE /api/v2/admin/polls/{id}
+     */
     public function destroy(int $id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminPollsApiController::class, 'destroy', [$id]);
+        $adminId = $this->requireAdmin();
+
+        $poll = PollService::getById($id);
+        if (!$poll) {
+            return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
+        }
+
+        $deleted = PollService::delete($id, $adminId);
+
+        if ($deleted) {
+            return $this->respondWithData(['deleted' => true, 'id' => $id]);
+        }
+
+        return $this->respondWithError('DELETE_FAILED', 'Failed to delete poll', null, 400);
     }
 }

@@ -7,11 +7,14 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Nexus\Core\TenantContext;
+use Nexus\Services\OnboardingService;
 
 /**
  * OnboardingController -- New member onboarding flow.
  *
- * Delegates to legacy: OnboardingApiController
+ * All methods now call legacy static services directly (no ob_start delegation).
  */
 class OnboardingController extends BaseApiController
 {
@@ -20,26 +23,21 @@ class OnboardingController extends BaseApiController
     /** GET onboarding/status */
     public function status(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\OnboardingApiController();
-            $controller->status();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $complete = OnboardingService::isOnboardingComplete($userId);
+        $interests = OnboardingService::getUserInterests($userId);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
+        $user = \Nexus\Models\User::findById($userId);
+        $hasAvatar = !empty($user['avatar_url'] ?? '');
+        $hasBio = !empty(trim($user['bio'] ?? ''));
 
-        return response()->json($data);
+        return $this->respondWithData([
+            'onboarding_completed' => $complete,
+            'has_avatar'           => $hasAvatar,
+            'has_bio'              => $hasBio,
+            'interests'            => $interests,
+        ]);
     }
 
     /** GET onboarding/categories */
@@ -47,48 +45,66 @@ class OnboardingController extends BaseApiController
     {
         $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\OnboardingApiController();
-            $controller->categories();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $tenantId = TenantContext::getId();
+        $categories = DB::select(
+            "SELECT id, name, slug, color FROM categories WHERE tenant_id = ? ORDER BY name",
+            [$tenantId]
+        );
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData(array_map(fn ($c) => (array) $c, $categories));
     }
 
     /** POST onboarding/complete */
     public function complete(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\OnboardingApiController();
-            $controller->complete();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        // Verify profile photo and bio are present
+        $user = \Nexus\Models\User::findById($userId);
+        if (empty($user['avatar_url'])) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                'VALIDATION_REQUIRED_FIELD',
+                'Profile photo is required to complete onboarding',
+                'avatar_url',
+                422
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (empty(trim($user['bio'] ?? ''))) {
+            return $this->respondWithError(
+                'VALIDATION_REQUIRED_FIELD',
+                'Bio is required to complete onboarding',
+                'bio',
+                422
+            );
         }
 
-        return response()->json($data);
+        $interests = $this->input('interests', []);
+        $offers = $this->input('offers', []);
+        $needs = $this->input('needs', []);
+
+        // Sanitize: ensure all IDs are integers
+        $interests = is_array($interests) ? array_filter(array_map('intval', $interests), fn ($id) => $id > 0) : [];
+        $offers = is_array($offers) ? array_filter(array_map('intval', $offers), fn ($id) => $id > 0) : [];
+        $needs = is_array($needs) ? array_filter(array_map('intval', $needs), fn ($id) => $id > 0) : [];
+
+        // All-or-nothing: wrap in transaction
+        \Nexus\Core\Database::beginTransaction();
+        try {
+            OnboardingService::saveInterests($userId, $interests);
+            OnboardingService::saveSkills($userId, $offers, $needs);
+            $listingIds = OnboardingService::autoCreateListings($userId, $offers, $needs);
+            OnboardingService::completeOnboarding($userId);
+
+            \Nexus\Core\Database::commit();
+        } catch (\Throwable $e) {
+            \Nexus\Core\Database::rollback();
+            throw $e;
+        }
+
+        return $this->respondWithData([
+            'message'          => 'Onboarding complete!',
+            'listings_created' => count($listingIds),
+            'listing_ids'      => $listingIds,
+        ]);
     }
 }

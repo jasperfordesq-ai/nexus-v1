@@ -10,9 +10,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 /**
- * OrgWalletController -- Organization wallet (balance, transactions, transfers).
+ * OrgWalletController -- Organization wallet (balance, transactions, transfers, members).
  *
- * All methods require authentication.
+ * All endpoints migrated to native DB facade — no legacy delegation.
  */
 class OrgWalletController extends BaseApiController
 {
@@ -124,28 +124,93 @@ class OrgWalletController extends BaseApiController
     }
 
     /**
-     * Delegate to legacy controller via output buffering.
+     * GET /api/v2/organizations/{orgId}/members
+     *
+     * List active members of an organization.
+     * Response: { "success": true, "members": [ { id, name, email, avatar_url, role }, ... ] }
      */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    public function apiMembers(int $orgId): JsonResponse
     {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        $members = DB::table('org_members as om')
+            ->join('users as u', 'om.user_id', '=', 'u.id')
+            ->where('om.tenant_id', $tenantId)
+            ->where('om.organization_id', $orgId)
+            ->where('om.status', 'active')
+            ->orderByRaw("FIELD(om.role, 'owner', 'admin', 'member')")
+            ->orderBy('u.first_name')
+            ->select(
+                'om.user_id',
+                DB::raw("CONCAT(u.first_name, ' ', u.last_name) as display_name"),
+                'u.email',
+                'u.avatar_url',
+                'om.role'
+            )
+            ->get();
+
+        $result = $members->map(fn ($m) => [
+            'id'         => (int) $m->user_id,
+            'name'       => $m->display_name,
+            'email'      => $m->email,
+            'avatar_url' => $m->avatar_url ?? '',
+            'role'       => $m->role,
+        ])->all();
+
+        return response()->json(['success' => true, 'members' => $result]);
     }
 
-
-    public function apiMembers($id): JsonResponse
+    /**
+     * GET /api/v2/organizations/{orgId}/wallet/api-balance
+     *
+     * Live wallet balance for an organization.
+     * Response: { "success": true, "balance": 42.5, "pending_count": 3, "timestamp": 1234567890 }
+     */
+    public function apiBalance(int $orgId): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\OrgWalletController::class, 'apiMembers', [$id]);
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        // Check if user is admin or org member
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['role']);
+
+        $isAdmin = $user && in_array($user->role ?? '', ['super_admin', 'admin', 'tenant_admin']);
+
+        if (! $isAdmin) {
+            $isMember = DB::table('org_members')
+                ->where('tenant_id', $tenantId)
+                ->where('organization_id', $orgId)
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->exists();
+
+            if (! $isMember) {
+                return response()->json(['success' => false, 'error' => 'Access denied'], 403);
+            }
+        }
+
+        $walletRow = DB::table('org_wallets')
+            ->where('tenant_id', $tenantId)
+            ->where('organization_id', $orgId)
+            ->first(['balance']);
+
+        $balance = $walletRow ? (float) $walletRow->balance : 0.0;
+
+        $pendingCount = (int) DB::table('org_transfer_requests')
+            ->where('tenant_id', $tenantId)
+            ->where('organization_id', $orgId)
+            ->where('status', 'pending')
+            ->count();
+
+        return response()->json([
+            'success'       => true,
+            'balance'       => $balance,
+            'pending_count' => $pendingCount,
+            'timestamp'     => time(),
+        ]);
     }
-
-
-    public function apiBalance($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\OrgWalletController::class, 'apiBalance', [$id]);
-    }
-
 }
