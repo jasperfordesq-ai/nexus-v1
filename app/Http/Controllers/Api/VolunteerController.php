@@ -22,6 +22,8 @@ use App\Services\VolunteerEmergencyAlertService;
 use App\Services\VolunteerExpenseService;
 use App\Services\VolunteerFormService;
 use App\Services\VolunteerService;
+use App\Services\SafeguardingService;
+use App\Services\VolunteerCheckInService;
 use App\Services\VolunteerWellbeingService;
 use App\Services\WebhookDispatchService;
 use Nexus\Core\TenantContext;
@@ -51,6 +53,8 @@ class VolunteerController extends BaseApiController
         private readonly WebhookDispatchService $webhookDispatchService,
         private readonly VolunteerEmergencyAlertService $volunteerEmergencyAlertService,
         private readonly VolunteerWellbeingService $volunteerWellbeingService,
+        private readonly SafeguardingService $safeguardingService,
+        private readonly VolunteerCheckInService $volunteerCheckInService,
     ) {}
 
     private function ensureFeature(): void
@@ -485,9 +489,10 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_waitlist_promote', 10, 60);
 
-        $success = \Nexus\Services\ShiftWaitlistService::promoteUser((int) $id, $userId);
+        $tenantId = TenantContext::getId();
+        $success = $this->shiftWaitlistService->promoteUser((int) $id, $tenantId);
         if (!$success) {
-            $errors = \Nexus\Services\ShiftWaitlistService::getErrors();
+            $errors = $this->shiftWaitlistService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['message' => 'Successfully claimed the shift spot']);
@@ -498,7 +503,8 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_waitlists_list', 60, 60);
-        $entries = \Nexus\Services\ShiftWaitlistService::getUserWaitlists($userId);
+        $tenantId = TenantContext::getId();
+        $entries = $this->shiftWaitlistService->getUserWaitlists($userId, $tenantId);
         return $this->respondWithData($entries);
     }
 
@@ -562,9 +568,10 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_swap_cancel', 20, 60);
 
-        $success = \Nexus\Services\ShiftSwapService::cancel((int) $id, $userId);
+        $tenantId = TenantContext::getId();
+        $success = $this->shiftSwapService->cancel((int) $id, $userId, $tenantId);
         if (!$success) {
-            $errors = \Nexus\Services\ShiftSwapService::getErrors();
+            $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->noContent();
@@ -643,7 +650,8 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_group_reservations_list', 60, 60);
-        $reservations = \Nexus\Services\ShiftGroupReservationService::getUserReservations($userId);
+        $tenantId = TenantContext::getId();
+        $reservations = $this->shiftGroupReservationService->getUserReservations($userId, $tenantId);
         return $this->respondWithData($reservations);
     }
 
@@ -658,17 +666,13 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_checkin_get', 60, 60);
         $shiftId = (int) $id;
 
-        $checkin = \Nexus\Services\VolunteerCheckInService::getUserCheckIn($shiftId, $userId);
+        $tenantId = TenantContext::getId();
+        $checkin = $this->volunteerCheckInService->getUserCheckIn($userId, $shiftId, $tenantId);
 
         if (!$checkin) {
-            $token = \Nexus\Services\VolunteerCheckInService::generateToken($shiftId, $userId);
+            $token = $this->volunteerCheckInService->generateToken($shiftId, $tenantId);
             if ($token) {
-                $checkin = \Nexus\Services\VolunteerCheckInService::getUserCheckIn($shiftId, $userId);
-            } else {
-                $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
-                if (!empty($errors)) {
-                    return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
-                }
+                $checkin = $this->volunteerCheckInService->getUserCheckIn($userId, $shiftId, $tenantId);
             }
         }
 
@@ -685,7 +689,8 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_checkin_verify', 30, 60);
 
-        $shiftId = \Nexus\Services\VolunteerCheckInService::getShiftIdByToken($token);
+        $tenantId = TenantContext::getId();
+        $shiftId = $this->volunteerCheckInService->getShiftIdByToken($token, $tenantId);
         if ($shiftId === null) {
             return $this->respondWithError('NOT_FOUND', 'Invalid check-in code', null, 404);
         }
@@ -694,11 +699,10 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to verify check-ins for this shift', null, 403);
         }
 
-        $result = \Nexus\Services\VolunteerCheckInService::verifyCheckIn($token);
+        $result = $this->volunteerCheckInService->verifyCheckIn(['token' => $token], $tenantId);
 
-        if ($result === null) {
-            $errors = \Nexus\Services\VolunteerCheckInService::getErrors();
-            return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
+        if ($result === false) {
+            return $this->respondWithError('NOT_FOUND', 'Check-in not found or already completed', null, 404);
         }
 
         return $this->respondWithData($result);
@@ -710,7 +714,8 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_checkout', 30, 60);
 
-        $shiftId = \Nexus\Services\VolunteerCheckInService::getShiftIdByToken($token);
+        $tenantId = TenantContext::getId();
+        $shiftId = $this->volunteerCheckInService->getShiftIdByToken($token, $tenantId);
         if ($shiftId === null) {
             return $this->respondWithError('NOT_FOUND', 'Invalid check-in code', null, 404);
         }
@@ -719,7 +724,7 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to check out volunteers for this shift', null, 403);
         }
 
-        $checkinUserId = \Nexus\Services\VolunteerCheckInService::getUserIdByToken($token);
+        $checkinUserId = $this->volunteerCheckInService->getUserIdByToken($token);
         $success = \Nexus\Services\VolunteerCheckInService::checkOut($token);
 
         if (!$success) {
@@ -752,7 +757,8 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to view check-ins for this shift', null, 403);
         }
 
-        $checkins = \Nexus\Services\VolunteerCheckInService::getShiftCheckIns($shiftId);
+        $tenantId = TenantContext::getId();
+        $checkins = $this->volunteerCheckInService->getShiftCheckIns($shiftId, $tenantId);
         return $this->respondWithData(['checkins' => $checkins]);
     }
 
@@ -1301,7 +1307,8 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_training_list', 30, 60);
 
-        $training = \Nexus\Services\SafeguardingService::getTrainingForUser($userId);
+        $tenantId = TenantContext::getId();
+        $training = $this->safeguardingService->getTrainingForUser($userId, $tenantId);
         return $this->respondWithData($training);
     }
 
@@ -1314,7 +1321,8 @@ class VolunteerController extends BaseApiController
         $data = $this->getAllInput();
 
         try {
-            $result = \Nexus\Services\SafeguardingService::recordTraining($userId, $data);
+            $tenantId = TenantContext::getId();
+            $result = $this->safeguardingService->recordTraining($userId, $data, $tenantId);
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1334,7 +1342,8 @@ class VolunteerController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 50),
         ];
 
-        $result = \Nexus\Services\SafeguardingService::getTrainingForAdmin($filters);
+        $tenantId = TenantContext::getId();
+        $result = $this->safeguardingService->getTrainingForAdmin($tenantId);
         return $this->respondWithData($result);
     }
 
@@ -1343,7 +1352,8 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $adminId = $this->requireAdmin();
 
-        $result = \Nexus\Services\SafeguardingService::verifyTraining((int) $id, $adminId);
+        $tenantId = TenantContext::getId();
+        $result = $this->safeguardingService->verifyTraining((int) $id, $adminId, $tenantId);
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Training record not found', null, 404);
         }
@@ -1355,7 +1365,8 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $adminId = $this->requireAdmin();
 
-        $result = \Nexus\Services\SafeguardingService::rejectTraining((int) $id, $adminId);
+        $tenantId = TenantContext::getId();
+        $result = $this->safeguardingService->rejectTraining((int) $id, $adminId, '', $tenantId);
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Training record not found', null, 404);
         }
@@ -1375,7 +1386,8 @@ class VolunteerController extends BaseApiController
         $data = $this->getAllInput();
 
         try {
-            $result = \Nexus\Services\SafeguardingService::reportIncident($userId, $data);
+            $tenantId = TenantContext::getId();
+            $result = $this->safeguardingService->reportIncident($userId, $data, $tenantId);
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1403,7 +1415,8 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_incident_get', 30, 60);
 
-        $incident = \Nexus\Services\SafeguardingService::getIncident((int) $id);
+        $tenantId = TenantContext::getId();
+        $incident = $this->safeguardingService->getIncident((int) $id, $tenantId);
         if (!$incident) {
             return $this->respondWithError('NOT_FOUND', 'Incident not found', null, 404);
         }
@@ -1439,10 +1452,11 @@ class VolunteerController extends BaseApiController
     public function updateIncident($id): JsonResponse
     {
         $this->ensureFeature();
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
 
         $data = $this->getAllInput();
-        $result = \Nexus\Services\SafeguardingService::updateIncident((int) $id, $data);
+        $tenantId = TenantContext::getId();
+        $result = $this->safeguardingService->updateIncident((int) $id, $data, $adminId, $tenantId);
 
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Incident not found', null, 404);
@@ -1453,7 +1467,7 @@ class VolunteerController extends BaseApiController
     public function assignDlp($id): JsonResponse
     {
         $this->ensureFeature();
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
 
         $data = $this->getAllInput();
 
@@ -1462,10 +1476,12 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'dlp_user_id is required and must be a positive integer', 'dlp_user_id', 422);
         }
 
-        $result = \Nexus\Services\SafeguardingService::assignDlp(
+        $tenantId = TenantContext::getId();
+        $result = $this->safeguardingService->assignDlp(
             (int) $id,
             $dlpUserId,
-            isset($data['deputy_dlp_user_id']) ? (int) $data['deputy_dlp_user_id'] : null
+            $adminId,
+            $tenantId
         );
 
         return $this->respondWithData(['success' => $result]);
@@ -1559,7 +1575,8 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
 
-        $needs = \Nexus\Services\VolunteerFormService::getAccessibilityNeeds($userId);
+        $tenantId = TenantContext::getId();
+        $needs = $this->volunteerFormService->getAccessibilityNeeds($userId, $tenantId);
         return $this->respondWithData($needs);
     }
 
@@ -1569,7 +1586,8 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
 
         $data = $this->getAllInput();
-        \Nexus\Services\VolunteerFormService::updateAccessibilityNeeds($userId, $data['needs'] ?? []);
+        $tenantId = TenantContext::getId();
+        $this->volunteerFormService->updateAccessibilityNeeds($userId, $data['needs'] ?? [], $tenantId);
         return $this->respondWithData(['success' => true]);
     }
 
@@ -1646,7 +1664,8 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('vol_project_support', 30, 60);
 
         $data = $this->getAllInput();
-        $result = \Nexus\Services\CommunityProjectService::support((int) $id, $userId, $data['message'] ?? null);
+        $tenantId = TenantContext::getId();
+        $result = $this->communityProjectService->support((int) $id, $userId, $tenantId);
         return $this->respondWithData(['success' => $result]);
     }
 
@@ -1655,7 +1674,8 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
 
-        $result = \Nexus\Services\CommunityProjectService::unsupport((int) $id, $userId);
+        $tenantId = TenantContext::getId();
+        $result = $this->communityProjectService->unsupport((int) $id, $userId, $tenantId);
         return $this->respondWithData(['success' => $result]);
     }
 
@@ -1667,11 +1687,13 @@ class VolunteerController extends BaseApiController
         $data = $this->getAllInput();
 
         try {
-            $result = \Nexus\Services\CommunityProjectService::review(
+            $tenantId = TenantContext::getId();
+            $result = $this->communityProjectService->review(
                 (int) $id,
-                $adminId,
                 $data['status'] ?? '',
-                $data['notes'] ?? null
+                $data['notes'] ?? null,
+                $adminId,
+                $tenantId
             );
             return $this->respondWithData(['success' => $result]);
         } catch (\InvalidArgumentException $e) {
@@ -1780,7 +1802,9 @@ class VolunteerController extends BaseApiController
         $data = $this->getAllInput();
 
         try {
-            $result = \Nexus\Services\VolunteerDonationService::createGivingDay($adminId, $data);
+            $tenantId = TenantContext::getId();
+            $data['created_by'] = $adminId;
+            $result = $this->volunteerDonationService->createGivingDay($data, $tenantId);
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1793,7 +1817,8 @@ class VolunteerController extends BaseApiController
         $this->requireAdmin();
 
         $data = $this->getAllInput();
-        $result = \Nexus\Services\VolunteerDonationService::updateGivingDay((int) $id, $data);
+        $tenantId = TenantContext::getId();
+        $result = $this->volunteerDonationService->updateGivingDay((int) $id, $data, $tenantId);
         return $this->respondWithData(['success' => $result]);
     }
 
@@ -1963,10 +1988,11 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_emergency_cancel', 10, 60);
 
-        $success = \Nexus\Services\VolunteerEmergencyAlertService::cancelAlert((int) $id, $userId);
+        $tenantId = TenantContext::getId();
+        $success = $this->volunteerEmergencyAlertService->cancelAlert((int) $id, $userId, $tenantId);
 
         if (!$success) {
-            $errors = \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
+            $errors = $this->volunteerEmergencyAlertService->getCancelErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 

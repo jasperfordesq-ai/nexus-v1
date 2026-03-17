@@ -392,7 +392,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $existing = \Nexus\Models\NewsletterSubscriber::findByEmail($email);
+            $existing = \App\Models\NewsletterSubscriber::where('email', strtolower(trim($email)))->first();
             if ($existing) {
                 return $this->respondWithError('DUPLICATE', 'A subscriber with this email already exists', 'email', 409);
             }
@@ -419,12 +419,12 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $subscriber = \Nexus\Models\NewsletterSubscriber::findById($id);
+            $subscriber = \App\Models\NewsletterSubscriber::find($id);
             if (!$subscriber) {
                 return $this->respondWithError('NOT_FOUND', 'Subscriber not found', null, 404);
             }
 
-            \Nexus\Models\NewsletterSubscriber::delete($id);
+            $subscriber->delete();
             return $this->noContent();
         } catch (\Exception $e) {
             return $this->respondWithError('DELETE_FAILED', 'Failed to remove subscriber');
@@ -586,7 +586,11 @@ class AdminNewsletterController extends BaseApiController
             $data['total_subscribers'] = (int) ($subRow->cnt ?? 0);
 
             // Full analytics from sent newsletters (mirrors legacy PHP admin)
-            $newsletters = \Nexus\Models\Newsletter::getAllSent();
+            $newsletters = \App\Models\Newsletter::where('status', 'sent')
+                ->orderByDesc('sent_at')
+                ->get()
+                ->map(fn($n) => $n->toArray())
+                ->all();
 
             $totals = &$data['totals'];
             $monthlyStats = [];
