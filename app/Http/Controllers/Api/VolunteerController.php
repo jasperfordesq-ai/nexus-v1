@@ -10,7 +10,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\CommunityProjectService;
+use App\Services\GuardianConsentService;
+use App\Services\RecurringShiftService;
+use App\Services\ShiftGroupReservationService;
+use App\Services\ShiftSwapService;
+use App\Services\ShiftWaitlistService;
+use App\Services\VolunteerCertificateService;
+use App\Services\VolunteerDonationService;
+use App\Services\VolunteerEmergencyAlertService;
+use App\Services\VolunteerExpenseService;
+use App\Services\VolunteerFormService;
 use App\Services\VolunteerService;
+use App\Services\VolunteerWellbeingService;
+use App\Services\WebhookDispatchService;
 use Nexus\Core\TenantContext;
 use Nexus\Services\VolunteerService as LegacyVolunteerService;
 
@@ -25,6 +38,19 @@ class VolunteerController extends BaseApiController
 
     public function __construct(
         private readonly VolunteerService $volunteerService,
+        private readonly ShiftWaitlistService $shiftWaitlistService,
+        private readonly ShiftSwapService $shiftSwapService,
+        private readonly ShiftGroupReservationService $shiftGroupReservationService,
+        private readonly RecurringShiftService $recurringShiftService,
+        private readonly VolunteerCertificateService $volunteerCertificateService,
+        private readonly VolunteerExpenseService $volunteerExpenseService,
+        private readonly GuardianConsentService $guardianConsentService,
+        private readonly VolunteerFormService $volunteerFormService,
+        private readonly CommunityProjectService $communityProjectService,
+        private readonly VolunteerDonationService $volunteerDonationService,
+        private readonly WebhookDispatchService $webhookDispatchService,
+        private readonly VolunteerEmergencyAlertService $volunteerEmergencyAlertService,
+        private readonly VolunteerWellbeingService $volunteerWellbeingService,
     ) {}
 
     private function ensureFeature(): void
@@ -430,12 +456,12 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_waitlist_join', 20, 60);
 
-        $entryId = \Nexus\Services\ShiftWaitlistService::join((int) $id, $userId);
+        $entryId = $this->shiftWaitlistService->join((int) $id, $userId);
         if ($entryId === null) {
-            $errors = \Nexus\Services\ShiftWaitlistService::getErrors();
+            $errors = $this->shiftWaitlistService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        $position = \Nexus\Services\ShiftWaitlistService::getUserPosition((int) $id, $userId);
+        $position = $this->shiftWaitlistService->getUserPosition((int) $id, $userId);
         return $this->respondWithData(['id' => $entryId, 'position' => $position['position'] ?? 1, 'message' => 'Successfully joined the waitlist'], null, 201);
     }
 
@@ -445,9 +471,9 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_waitlist_leave', 20, 60);
 
-        $success = \Nexus\Services\ShiftWaitlistService::leave((int) $id, $userId);
+        $success = $this->shiftWaitlistService->leave((int) $id, $userId);
         if (!$success) {
-            $errors = \Nexus\Services\ShiftWaitlistService::getErrors();
+            $errors = $this->shiftWaitlistService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->noContent();
@@ -493,9 +519,9 @@ class VolunteerController extends BaseApiController
             'message'       => trim($this->input('message', '')),
         ];
 
-        $swapId = \Nexus\Services\ShiftSwapService::requestSwap($userId, $data);
+        $swapId = $this->shiftSwapService->requestSwap($userId, $data);
         if ($swapId === null) {
-            $errors = \Nexus\Services\ShiftSwapService::getErrors();
+            $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['id' => $swapId, 'message' => 'Swap request sent'], null, 201);
@@ -507,7 +533,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_swaps_list', 60, 60);
         $direction = $this->query('direction') ?? 'all';
-        $requests = \Nexus\Services\ShiftSwapService::getSwapRequests($userId, $direction);
+        $requests = $this->shiftSwapService->getSwapRequests($userId, $direction);
         return $this->respondWithData(['swaps' => $requests]);
     }
 
@@ -522,9 +548,9 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Action must be accept or reject', 'action', 400);
         }
 
-        $success = \Nexus\Services\ShiftSwapService::respond((int) $id, $userId, $action);
+        $success = $this->shiftSwapService->respond((int) $id, $userId, $action);
         if (!$success) {
-            $errors = \Nexus\Services\ShiftSwapService::getErrors();
+            $errors = $this->shiftSwapService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['id' => (int) $id, 'status' => $action === 'accept' ? 'accepted' : 'rejected']);
@@ -559,9 +585,9 @@ class VolunteerController extends BaseApiController
         $notes = trim($this->input('notes', ''));
         if (!$groupId) return $this->respondWithError('VALIDATION_ERROR', 'Group ID is required', 'group_id', 400);
 
-        $reservationId = \Nexus\Services\ShiftGroupReservationService::reserve((int) $id, $groupId, $userId, $slots, $notes ?: null);
+        $reservationId = $this->shiftGroupReservationService->reserve((int) $id, $groupId, $userId, $slots, $notes ?: null);
         if ($reservationId === null) {
-            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $errors = $this->shiftGroupReservationService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['id' => $reservationId, 'message' => "Reserved {$slots} slots"], null, 201);
@@ -576,9 +602,9 @@ class VolunteerController extends BaseApiController
         $memberUserId = $this->inputInt('user_id');
         if (!$memberUserId) return $this->respondWithError('VALIDATION_ERROR', 'User ID is required', 'user_id', 400);
 
-        $success = \Nexus\Services\ShiftGroupReservationService::addMember((int) $id, $memberUserId, $leaderId);
+        $success = $this->shiftGroupReservationService->addMember((int) $id, $memberUserId, $leaderId);
         if (!$success) {
-            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $errors = $this->shiftGroupReservationService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->respondWithData(['message' => 'Member added to group reservation']);
@@ -590,9 +616,9 @@ class VolunteerController extends BaseApiController
         $leaderId = $this->getUserId();
         $this->rateLimit('volunteering_group_member_remove', 20, 60);
 
-        $success = \Nexus\Services\ShiftGroupReservationService::removeMember((int) $id, (int) $userId, $leaderId);
+        $success = $this->shiftGroupReservationService->removeMember((int) $id, (int) $userId, $leaderId);
         if (!$success) {
-            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $errors = $this->shiftGroupReservationService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->noContent();
@@ -604,9 +630,9 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_group_cancel', 10, 60);
 
-        $success = \Nexus\Services\ShiftGroupReservationService::cancelReservation((int) $id, $userId);
+        $success = $this->shiftGroupReservationService->cancelReservation((int) $id, $userId);
         if (!$success) {
-            $errors = \Nexus\Services\ShiftGroupReservationService::getErrors();
+            $errors = $this->shiftGroupReservationService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
         return $this->noContent();
@@ -703,7 +729,7 @@ class VolunteerController extends BaseApiController
 
         if ($checkinUserId) {
             try {
-                \Nexus\Services\WebhookDispatchService::dispatch('shift.completed', [
+                $this->webhookDispatchService->dispatch('shift.completed', [
                     'user_id' => $checkinUserId,
                     'shift_id' => $shiftId,
                 ]);
@@ -741,9 +767,9 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_recurring_list', 60, 60);
         $oppId = (int) $id;
 
-        $patterns = \Nexus\Services\RecurringShiftService::getPatternsForOpportunity($oppId, $userId);
+        $patterns = $this->recurringShiftService->getPatternsForOpportunity($oppId, $userId);
 
-        $errors = \Nexus\Services\RecurringShiftService::getErrors();
+        $errors = $this->recurringShiftService->getErrors();
         if (!empty($errors)) {
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
@@ -770,10 +796,10 @@ class VolunteerController extends BaseApiController
             'max_occurrences' => $this->input('max_occurrences'),
         ];
 
-        $patternId = \Nexus\Services\RecurringShiftService::createPattern($oppId, $userId, $data);
+        $patternId = $this->recurringShiftService->createPattern($oppId, $userId, $data);
 
         if ($patternId === null) {
-            $errors = \Nexus\Services\RecurringShiftService::getErrors();
+            $errors = $this->recurringShiftService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
@@ -849,7 +875,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_certificates_list', 30, 60);
 
-        $certs = \Nexus\Services\VolunteerCertificateService::getUserCertificates($userId);
+        $certs = $this->volunteerCertificateService->getUserCertificates($userId);
         return $this->respondWithData(['certificates' => $certs]);
     }
 
@@ -864,10 +890,10 @@ class VolunteerController extends BaseApiController
             $options['organization_id'] = $this->inputInt('organization_id');
         }
 
-        $cert = \Nexus\Services\VolunteerCertificateService::generate($userId, $options);
+        $cert = $this->volunteerCertificateService->generate($userId, $options);
 
         if ($cert === null) {
-            $errors = \Nexus\Services\VolunteerCertificateService::getErrors();
+            $errors = $this->volunteerCertificateService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
@@ -878,7 +904,7 @@ class VolunteerController extends BaseApiController
     {
         $this->rateLimit('volunteering_cert_verify', 60, 60);
 
-        $cert = \Nexus\Services\VolunteerCertificateService::verify($code);
+        $cert = $this->volunteerCertificateService->verify($code);
 
         if ($cert === null) {
             return $this->respondWithError('NOT_FOUND', 'Certificate not found or invalid', null, 404);
@@ -892,7 +918,7 @@ class VolunteerController extends BaseApiController
     {
         $this->rateLimit('volunteering_cert_html', 10, 60);
 
-        $html = \Nexus\Services\VolunteerCertificateService::generateHtml($code);
+        $html = $this->volunteerCertificateService->generateHtml($code);
 
         if ($html === null) {
             return $this->respondWithError('NOT_FOUND', 'Certificate not found', null, 404);
@@ -1053,7 +1079,7 @@ class VolunteerController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 50),
         ];
 
-        $result = \Nexus\Services\VolunteerExpenseService::getExpenses($filters);
+        $result = $this->volunteerExpenseService->getExpenses($filters);
         return $this->respondWithData($result);
     }
 
@@ -1064,7 +1090,7 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('vol_expense_submit', 10, 60);
 
         $data = $this->getAllInput();
-        $result = \Nexus\Services\VolunteerExpenseService::submitExpense($userId, $data);
+        $result = $this->volunteerExpenseService->submitExpense($userId, $data);
 
         if (isset($result['error'])) {
             return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 422);
@@ -1079,7 +1105,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_expense_get', 30, 60);
 
-        $expense = \Nexus\Services\VolunteerExpenseService::getExpense((int) $id);
+        $expense = $this->volunteerExpenseService->getExpense((int) $id);
         if (!$expense || (int) $expense['user_id'] !== $userId) {
             return $this->respondWithError('NOT_FOUND', 'Expense not found', null, 404);
         }
@@ -1103,7 +1129,7 @@ class VolunteerController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 50),
         ];
 
-        $result = \Nexus\Services\VolunteerExpenseService::getExpenses($filters);
+        $result = $this->volunteerExpenseService->getExpenses($filters);
         return $this->respondWithData($result);
     }
 
@@ -1122,9 +1148,9 @@ class VolunteerController extends BaseApiController
         }
 
         if ($status === 'paid') {
-            $result = \Nexus\Services\VolunteerExpenseService::markPaid((int) $id, $adminId, $data['payment_reference'] ?? null);
+            $result = $this->volunteerExpenseService->markPaid((int) $id, $adminId, $data['payment_reference'] ?? null);
         } else {
-            $result = \Nexus\Services\VolunteerExpenseService::reviewExpense((int) $id, $adminId, $status, $data['review_notes'] ?? null);
+            $result = $this->volunteerExpenseService->reviewExpense((int) $id, $adminId, $status, $data['review_notes'] ?? null);
         }
 
         if (!$result) {
@@ -1201,7 +1227,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_guardian_consents', 30, 60);
 
-        $consents = \Nexus\Services\GuardianConsentService::getConsentsForMinor($userId);
+        $consents = $this->guardianConsentService->getConsentsForMinor($userId);
         return $this->respondWithData($consents);
     }
 
@@ -1215,7 +1241,7 @@ class VolunteerController extends BaseApiController
         $opportunityId = isset($data['opportunity_id']) ? (int) $data['opportunity_id'] : null;
 
         try {
-            $result = \Nexus\Services\GuardianConsentService::requestConsent($userId, $data, $opportunityId);
+            $result = $this->guardianConsentService->requestConsent($userId, $data, $opportunityId);
             return $this->respondWithData($result, null, 201);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1228,7 +1254,7 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('guardian_consent_verify', 10, 300);
 
         $ip = request()->ip() ?? '0.0.0.0';
-        $result = \Nexus\Services\GuardianConsentService::grantConsent($token, $ip);
+        $result = $this->guardianConsentService->grantConsent($token, $ip);
 
         if (!$result) {
             return $this->respondWithError('INVALID_TOKEN', 'Consent token is invalid or expired', null, 400);
@@ -1243,7 +1269,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('vol_guardian_consent_withdraw', 10, 60);
 
-        $result = \Nexus\Services\GuardianConsentService::withdrawConsent((int) $id, $userId);
+        $result = $this->guardianConsentService->withdrawConsent((int) $id, $userId);
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Consent not found', null, 404);
         }
@@ -1458,7 +1484,7 @@ class VolunteerController extends BaseApiController
         $orgId = $this->query('organization_id') ? (int) $this->query('organization_id') : null;
         $appliesTo = $this->query('applies_to') ?: 'application';
 
-        $fields = \Nexus\Services\VolunteerFormService::getCustomFields($orgId, $appliesTo);
+        $fields = $this->volunteerFormService->getCustomFields($orgId, $appliesTo);
         return $this->respondWithData($fields);
     }
 
@@ -1468,7 +1494,7 @@ class VolunteerController extends BaseApiController
         $this->requireAdmin();
 
         $orgId = $this->query('organization_id') ? (int) $this->query('organization_id') : null;
-        $fields = \Nexus\Services\VolunteerFormService::getCustomFields($orgId);
+        $fields = $this->volunteerFormService->getCustomFields($orgId);
         return $this->respondWithData($fields);
     }
 
@@ -1485,7 +1511,7 @@ class VolunteerController extends BaseApiController
         }
 
         try {
-            $result = \Nexus\Services\VolunteerFormService::createField($data);
+            $result = $this->volunteerFormService->createField($data);
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1501,7 +1527,7 @@ class VolunteerController extends BaseApiController
         $this->requireAdmin();
 
         $data = $this->getAllInput();
-        $result = \Nexus\Services\VolunteerFormService::updateField((int) $id, $data);
+        $result = $this->volunteerFormService->updateField((int) $id, $data);
 
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Custom field not found', null, 404);
@@ -1515,7 +1541,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $result = \Nexus\Services\VolunteerFormService::deleteField((int) $id);
+        $result = $this->volunteerFormService->deleteField((int) $id);
 
         if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Custom field not found', null, 404);
@@ -1566,7 +1592,7 @@ class VolunteerController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 50),
         ];
 
-        $result = \Nexus\Services\CommunityProjectService::getProposals($filters);
+        $result = $this->communityProjectService->getProposals($filters);
         return $this->respondWithData($result);
     }
 
@@ -1579,7 +1605,7 @@ class VolunteerController extends BaseApiController
         $data = $this->getAllInput();
 
         try {
-            $result = \Nexus\Services\CommunityProjectService::propose($userId, $data);
+            $result = $this->communityProjectService->propose($userId, $data);
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1592,7 +1618,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_public_read', 60, 30);
 
-        $project = \Nexus\Services\CommunityProjectService::getProposal((int) $id);
+        $project = $this->communityProjectService->getProposal((int) $id);
         if (!$project) {
             return $this->respondWithError('NOT_FOUND', 'Project not found', null, 404);
         }
@@ -1605,7 +1631,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
 
         $data = $this->getAllInput();
-        $result = \Nexus\Services\CommunityProjectService::updateProposal((int) $id, $userId, $data);
+        $result = $this->communityProjectService->updateProposal((int) $id, $userId, $data);
 
         if (!$result) {
             return $this->respondWithError('FORBIDDEN', 'Cannot update this project', null, 403);
@@ -1670,7 +1696,7 @@ class VolunteerController extends BaseApiController
             'limit' => $this->queryInt('per_page', 20, 1, 50),
         ];
 
-        $result = \Nexus\Services\VolunteerDonationService::getDonations($filters);
+        $result = $this->volunteerDonationService->getDonations($filters);
         return $this->respondWithData($result);
     }
 
@@ -1686,7 +1712,7 @@ class VolunteerController extends BaseApiController
         }
 
         try {
-            $result = \Nexus\Services\VolunteerDonationService::createDonation($userId ?: 0, $data);
+            $result = $this->volunteerDonationService->createDonation($userId ?: 0, $data);
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1720,7 +1746,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_giving_days', 30, 60);
 
-        $result = \Nexus\Services\VolunteerDonationService::getGivingDays();
+        $result = $this->volunteerDonationService->getGivingDays();
         return $this->respondWithData($result);
     }
 
@@ -1730,7 +1756,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_public_read', 60, 30);
 
-        $stats = \Nexus\Services\VolunteerDonationService::getGivingDayStats((int) $id);
+        $stats = $this->volunteerDonationService->getGivingDayStats((int) $id);
         if (!$stats) {
             return $this->respondWithError('NOT_FOUND', 'Giving day not found', null, 404);
         }
@@ -1742,7 +1768,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $result = \Nexus\Services\VolunteerDonationService::adminGetGivingDays();
+        $result = $this->volunteerDonationService->adminGetGivingDays();
         return $this->respondWithData($result);
     }
 
@@ -1780,7 +1806,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $webhooks = \Nexus\Services\WebhookDispatchService::getWebhooks();
+        $webhooks = $this->webhookDispatchService->getWebhooks();
         return $this->respondWithData($webhooks);
     }
 
@@ -1792,7 +1818,7 @@ class VolunteerController extends BaseApiController
         $data = $this->getAllInput();
 
         try {
-            $result = \Nexus\Services\WebhookDispatchService::createWebhook($adminId, $data);
+            $result = $this->webhookDispatchService->createWebhook($adminId, $data);
             return $this->respondWithData($result, null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
@@ -1805,7 +1831,7 @@ class VolunteerController extends BaseApiController
         $this->requireAdmin();
 
         $data = $this->getAllInput();
-        $result = \Nexus\Services\WebhookDispatchService::updateWebhook((int) $id, $data);
+        $result = $this->webhookDispatchService->updateWebhook((int) $id, $data);
         return $this->respondWithData(['success' => $result]);
     }
 
@@ -1814,7 +1840,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->requireAdmin();
 
-        $result = \Nexus\Services\WebhookDispatchService::deleteWebhook((int) $id);
+        $result = $this->webhookDispatchService->deleteWebhook((int) $id);
         return $this->respondWithData(['success' => $result]);
     }
 
@@ -1882,7 +1908,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_emergency_list', 60, 60);
 
-        $alerts = \Nexus\Services\VolunteerEmergencyAlertService::getUserAlerts($userId);
+        $alerts = $this->volunteerEmergencyAlertService->getUserAlerts($userId);
         return $this->respondWithData(['alerts' => $alerts]);
     }
 
@@ -1900,10 +1926,10 @@ class VolunteerController extends BaseApiController
             'expires_hours' => $this->inputInt('expires_hours') ?: 24,
         ];
 
-        $alertId = \Nexus\Services\VolunteerEmergencyAlertService::createAlert($userId, $data);
+        $alertId = $this->volunteerEmergencyAlertService->createAlert($userId, $data);
 
         if ($alertId === null) {
-            $errors = \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
+            $errors = $this->volunteerEmergencyAlertService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
@@ -1921,10 +1947,10 @@ class VolunteerController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Response must be accepted or declined', 'response', 400);
         }
 
-        $success = \Nexus\Services\VolunteerEmergencyAlertService::respond((int) $id, $userId, $response);
+        $success = $this->volunteerEmergencyAlertService->respond((int) $id, $userId, $response);
 
         if (!$success) {
-            $errors = \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
+            $errors = $this->volunteerEmergencyAlertService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
 
@@ -1957,7 +1983,7 @@ class VolunteerController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_wellbeing_status', 10, 60);
 
-        $assessment = \Nexus\Services\VolunteerWellbeingService::detectBurnoutRisk($userId);
+        $assessment = $this->volunteerWellbeingService->detectBurnoutRisk($userId);
         return $this->respondWithData($assessment);
     }
 
@@ -1970,7 +1996,7 @@ class VolunteerController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         // Burnout risk assessment
-        $assessment = \Nexus\Services\VolunteerWellbeingService::detectBurnoutRisk($userId);
+        $assessment = $this->volunteerWellbeingService->detectBurnoutRisk($userId);
         $score = max(0, min(100, 100 - (int) $assessment['risk_score']));
 
         // Hours this week

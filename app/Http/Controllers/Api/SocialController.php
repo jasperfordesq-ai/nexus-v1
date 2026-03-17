@@ -7,10 +7,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\FeedService;
+use App\Services\SocialNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Services\CommentService;
-use Nexus\Services\SocialNotificationService;
 use Nexus\Services\FeedRankingService;
 use Nexus\Services\FeedActivityService;
 use Nexus\Models\FeedPost;
@@ -33,6 +33,7 @@ class SocialController extends BaseApiController
 
     public function __construct(
         private readonly FeedService $feedService,
+        private readonly SocialNotificationService $socialNotificationService,
     ) {}
 
     /**
@@ -574,9 +575,9 @@ class SocialController extends BaseApiController
 
                 // Send notification to content owner
                 try {
-                    $contentOwnerId = SocialNotificationService::getContentOwnerId($targetType, $targetId);
+                    $contentOwnerId = $this->socialNotificationService->getContentOwnerId($targetType, $targetId);
                     if ($contentOwnerId && $contentOwnerId != $userId) {
-                        SocialNotificationService::notifyLike($contentOwnerId, $userId, $targetType, $targetId, '');
+                        $this->socialNotificationService->notifyLike($contentOwnerId, $userId, $targetType, $targetId, '');
                     }
                 } catch (\Throwable $e) {
                     error_log("notifyLike error (non-critical): " . $e->getMessage());
@@ -771,9 +772,9 @@ class SocialController extends BaseApiController
     private function notifyComment(int $userId, string $targetType, int $targetId, string $content): void
     {
         try {
-            $contentOwnerId = SocialNotificationService::getContentOwnerId($targetType, $targetId);
+            $contentOwnerId = $this->socialNotificationService->getContentOwnerId($targetType, $targetId);
             if ($contentOwnerId && $contentOwnerId != $userId) {
-                SocialNotificationService::notifyComment($contentOwnerId, $userId, $targetType, $targetId, $content);
+                $this->socialNotificationService->notifyComment($contentOwnerId, $userId, $targetType, $targetId, $content);
             }
         } catch (\Throwable $e) {
             error_log("notifyComment error (non-critical): " . $e->getMessage());
@@ -813,9 +814,9 @@ class SocialController extends BaseApiController
             }
 
             try {
-                $contentOwnerId = SocialNotificationService::getContentOwnerId($parentType, $parentId);
+                $contentOwnerId = $this->socialNotificationService->getContentOwnerId($parentType, $parentId);
                 if ($contentOwnerId && $contentOwnerId != $userId) {
-                    SocialNotificationService::notifyShare($contentOwnerId, $userId, $parentType, $parentId);
+                    $this->socialNotificationService->notifyShare($contentOwnerId, $userId, $parentType, $parentId);
                 }
             } catch (\Throwable $e) {
                 // Non-critical

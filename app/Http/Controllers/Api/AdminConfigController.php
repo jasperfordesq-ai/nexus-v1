@@ -13,8 +13,9 @@ use Nexus\Services\RedisCache;
 use Nexus\Services\TenantFeatureConfig;
 use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FeedRankingService;
-use Nexus\Services\ListingRankingService;
+use App\Services\ListingRankingService;
 use Nexus\Services\MemberRankingService;
+use App\Services\SmartMatchingEngine;
 use Nexus\Services\SearchService;
 
 /**
@@ -27,7 +28,10 @@ class AdminConfigController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly ListingRankingService $listingRankingService,
+        private readonly SmartMatchingEngine $smartMatchingEngine,
+    ) {}
 
     // ─────────────────────────────────────────────────────────────────────────
     // Constants (from legacy)
@@ -1048,7 +1052,7 @@ class AdminConfigController extends BaseApiController
                 : 'Showing newest posts first',
         ];
 
-        $listingsEnabled = ListingRankingService::isEnabled();
+        $listingsEnabled = $this->listingRankingService->isEnabled();
         $listings = [
             'name' => $listingsEnabled ? 'MatchRank' : 'Newest First',
             'key' => $listingsEnabled ? 'matchrank' : 'newest',
@@ -1066,7 +1070,7 @@ class AdminConfigController extends BaseApiController
                 : 'Sorted alphabetically by name',
         ];
 
-        $matchingConfig = \Nexus\Services\SmartMatchingEngine::getConfig();
+        $matchingConfig = $this->smartMatchingEngine->getConfig();
         $matchingEnabled = !empty($matchingConfig['enabled']);
         $matching = [
             'name' => $matchingEnabled ? 'SmartMatch' : 'Disabled',
@@ -1092,7 +1096,7 @@ class AdminConfigController extends BaseApiController
 
         return $this->respondWithData([
             'feed' => FeedRankingService::getConfig(),
-            'listings' => ListingRankingService::getConfig(),
+            'listings' => $this->listingRankingService->getConfig(),
             'members' => MemberRankingService::getConfig(),
         ]);
     }
@@ -1115,7 +1119,7 @@ class AdminConfigController extends BaseApiController
 
         $currentConfig = match ($area) {
             'feed' => FeedRankingService::getConfig(),
-            'listings' => ListingRankingService::getConfig(),
+            'listings' => $this->listingRankingService->getConfig(),
             'members' => MemberRankingService::getConfig(),
         };
 
@@ -1154,7 +1158,7 @@ class AdminConfigController extends BaseApiController
 
         match ($area) {
             'feed' => FeedRankingService::clearCache(),
-            'listings' => ListingRankingService::clearCache(),
+            'listings' => $this->listingRankingService->clearCache(),
             'members' => MemberRankingService::clearCache(),
             default => null,
         };
@@ -1229,7 +1233,7 @@ class AdminConfigController extends BaseApiController
 
         $enabled = [
             'edgerank' => FeedRankingService::isEnabled(),
-            'matchrank' => ListingRankingService::isEnabled(),
+            'matchrank' => $this->listingRankingService->isEnabled(),
             'communityrank' => MemberRankingService::isEnabled(),
         ];
 

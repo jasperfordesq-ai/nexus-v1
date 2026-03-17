@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\RedisCache;
+use App\Services\RedisCache;
 
 /**
  * AdminContentController -- Content moderation, pages, menus, plans, subscriptions.
@@ -20,7 +20,9 @@ class AdminContentController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly RedisCache $redisCache,
+    ) {}
 
     // ─────────────────────────────────────────────────────────────────────────
     // Content Reports (already converted)
@@ -184,7 +186,7 @@ class AdminContentController extends BaseApiController
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
 
-        try { RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
         return $this->respondWithData($row, null, 201);
     }
@@ -252,7 +254,7 @@ class AdminContentController extends BaseApiController
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
 
-        try { RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
         return $this->respondWithData($row);
     }
@@ -275,7 +277,7 @@ class AdminContentController extends BaseApiController
         DB::delete("DELETE FROM menu_items WHERE page_id = ? AND page_id IN (SELECT id FROM pages WHERE tenant_id = ?)", [$id, $tenantId]);
         DB::delete("DELETE FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
-        try { RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+        try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
         return $this->respondWithData(['deleted' => true]);
     }
