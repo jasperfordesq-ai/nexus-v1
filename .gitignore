@@ -96,6 +96,8 @@ _deprecated/
 /.phpunit.cache
 .snapshots
 
+/coverage/
+/bootstrap/cache/
 # ─── Logs ─────────────────────────────────────────────────────────────────────
 /logs
 *.log
@@ -166,3 +168,23 @@ firebase-service-account.json
 *-api-token*
 cloudflare-api-token.txt
 nexus_backup_2026-03-07.sql.gz
+
+# ─── Scratch Scripts & Debug Artifacts ───────────────────────────────────────
+_*.py
+_*.js
+_*.txt
+_*.php
+/tests/debug/
+/routes/_pysetup.py
+react-frontend/_nul
+react-frontend/fix_tests.py
+httpdocs/assets/css/admin-legacy-compat.css
+*.jpg
+!httpdocs/uploads/**/*.jpg
+
+# ─── Stray CLI Artifacts ────────────────────────────────────────────────────
+--help
+0
+test
+tests/Services/test_*.txt
+Ctemp*
