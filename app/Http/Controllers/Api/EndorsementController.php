@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\EndorsementService;
+use App\Services\EndorsementService;
 
 /**
  * EndorsementController -- Member endorsement management.
@@ -25,6 +25,10 @@ class EndorsementController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly EndorsementService $endorsementService,
+    ) {}
+
     /**
      * POST /api/v2/members/{id}/endorse
      *
@@ -39,10 +43,10 @@ class EndorsementController extends BaseApiController
         $skillId = $this->input('skill_id') ? (int) $this->input('skill_id') : null;
         $comment = $this->input('comment');
 
-        $endorsementId = EndorsementService::endorse($userId, $id, $skillName, $skillId, $comment);
+        $endorsementId = $this->endorsementService->endorse($userId, $id, $skillName, $skillId, $comment);
 
         if ($endorsementId === null) {
-            $errors = EndorsementService::getErrors();
+            $errors = $this->endorsementService->getErrors();
             $status = 422;
             if (!empty($errors) && $errors[0]['code'] === 'ALREADY_ENDORSED') {
                 $status = 409;
@@ -72,7 +76,7 @@ class EndorsementController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'skill_name is required', 'skill_name', 400);
         }
 
-        EndorsementService::removeEndorsement($userId, $id, $skillName);
+        $this->endorsementService->removeEndorsement($userId, $id, $skillName);
 
         return $this->respondWithData(['message' => 'Endorsement removed']);
     }
@@ -92,7 +96,7 @@ class EndorsementController extends BaseApiController
 
         if ($skillName) {
             // Detailed endorsements for one skill
-            $endorsements = EndorsementService::getSkillEndorsements($id, $skillName);
+            $endorsements = $this->endorsementService->getSkillEndorsements($id, $skillName);
             $data = [
                 'skill_name' => $skillName,
                 'endorsements' => $endorsements,
@@ -100,15 +104,15 @@ class EndorsementController extends BaseApiController
             ];
 
             if ($viewerId) {
-                $data['has_endorsed'] = EndorsementService::hasEndorsed($viewerId, $id, $skillName);
+                $data['has_endorsed'] = $this->endorsementService->hasEndorsed($viewerId, $id, $skillName);
             }
 
             return $this->respondWithData($data);
         }
 
         // All endorsements grouped by skill
-        $endorsements = EndorsementService::getEndorsementsForUser($id);
-        $stats = EndorsementService::getStats($id);
+        $endorsements = $this->endorsementService->getEndorsementsForUser($id);
+        $stats = $this->endorsementService->getStats($id);
 
         return $this->respondWithData([
             'endorsements' => $endorsements,
@@ -127,7 +131,7 @@ class EndorsementController extends BaseApiController
         $this->rateLimit('top_endorsed', 10, 60);
 
         $limit = $this->queryInt('limit', 10, 1, 50);
-        $members = EndorsementService::getTopEndorsedMembers($limit);
+        $members = $this->endorsementService->getTopEndorsedMembers($limit);
 
         return $this->respondWithData($members);
     }

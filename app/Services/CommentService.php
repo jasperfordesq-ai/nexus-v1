@@ -200,6 +200,22 @@ class CommentService
     }
 
     /**
+     * Get the list of available reaction emojis.
+     */
+    public function getAvailableReactions(): array
+    {
+        return \Nexus\Services\CommentService::getAvailableReactions();
+    }
+
+    /**
+     * Search users for @mention autocomplete.
+     */
+    public function searchUsersForMention(string $query, int $tenantId, int $limit = 10): array
+    {
+        return \Nexus\Services\CommentService::searchUsersForMention($query, $tenantId, $limit);
+    }
+
+    /**
      * Toggle an emoji reaction on a comment.
      */
     public function toggleReaction(int $userId, int $tenantId, int $commentId, string $emoji): array

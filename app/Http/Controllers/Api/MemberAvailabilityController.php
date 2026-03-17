@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\MemberAvailabilityService;
+use App\Services\MemberAvailabilityService;
 
 /**
  * MemberAvailabilityController -- Member availability slots.
@@ -18,12 +18,16 @@ class MemberAvailabilityController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly MemberAvailabilityService $memberAvailabilityService,
+    ) {}
+
     /** GET /api/v2/users/me/availability */
     public function getMyAvailability(): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $availability = MemberAvailabilityService::getUserAvailability($userId);
+        $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
         return $this->respondWithData($availability);
     }
@@ -41,13 +45,13 @@ class MemberAvailabilityController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'schedule is required and must be an object', 'schedule', 400);
         }
 
-        $success = MemberAvailabilityService::setBulkAvailability($userId, $schedule);
+        $success = $this->memberAvailabilityService->setBulkAvailability($userId, $schedule);
 
         if (!$success) {
-            return $this->respondWithErrors(MemberAvailabilityService::getErrors(), 422);
+            return $this->respondWithErrors($this->memberAvailabilityService->getErrors(), 422);
         }
 
-        $availability = MemberAvailabilityService::getUserAvailability($userId);
+        $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
         return $this->respondWithData($availability);
     }
@@ -61,13 +65,13 @@ class MemberAvailabilityController extends BaseApiController
         $data = $this->getAllInput();
         $slots = $data['slots'] ?? [];
 
-        $success = MemberAvailabilityService::setDayAvailability($userId, $day, $slots);
+        $success = $this->memberAvailabilityService->setDayAvailability($userId, $day, $slots);
 
         if (!$success) {
-            return $this->respondWithErrors(MemberAvailabilityService::getErrors(), 422);
+            return $this->respondWithErrors($this->memberAvailabilityService->getErrors(), 422);
         }
 
-        $availability = MemberAvailabilityService::getUserAvailability($userId);
+        $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
         return $this->respondWithData($availability);
     }
@@ -79,13 +83,13 @@ class MemberAvailabilityController extends BaseApiController
         $this->rateLimit('availability_add_date', 10, 60);
 
         $data = $this->getAllInput();
-        $slotId = MemberAvailabilityService::addSpecificDate($userId, $data);
+        $slotId = $this->memberAvailabilityService->addSpecificDate($userId, $data);
 
         if ($slotId === null) {
-            return $this->respondWithErrors(MemberAvailabilityService::getErrors(), 422);
+            return $this->respondWithErrors($this->memberAvailabilityService->getErrors(), 422);
         }
 
-        $availability = MemberAvailabilityService::getUserAvailability($userId);
+        $availability = $this->memberAvailabilityService->getUserAvailability($userId);
 
         return $this->respondWithData($availability, null, 201);
     }
@@ -95,7 +99,7 @@ class MemberAvailabilityController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        MemberAvailabilityService::deleteSlot($userId, $id);
+        $this->memberAvailabilityService->deleteSlot($userId, $id);
 
         return $this->respondWithData(['message' => 'Slot deleted']);
     }
@@ -105,7 +109,7 @@ class MemberAvailabilityController extends BaseApiController
     {
         $this->rateLimit('availability_view', 30, 60);
 
-        $availability = MemberAvailabilityService::getUserAvailability($id);
+        $availability = $this->memberAvailabilityService->getUserAvailability($id);
 
         return $this->respondWithData($availability);
     }
@@ -121,7 +125,7 @@ class MemberAvailabilityController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'user_id query parameter is required', 'user_id', 400);
         }
 
-        $compatible = MemberAvailabilityService::findCompatibleTimes($userId, $otherUserId);
+        $compatible = $this->memberAvailabilityService->findCompatibleTimes($userId, $otherUserId);
 
         return $this->respondWithData($compatible);
     }
@@ -139,7 +143,7 @@ class MemberAvailabilityController extends BaseApiController
         $time = $this->query('time');
         $limit = $this->queryInt('limit', 50, 1, 100);
 
-        $members = MemberAvailabilityService::getAvailableMembers($day, $time, $limit);
+        $members = $this->memberAvailabilityService->getAvailableMembers($day, $time, $limit);
 
         return $this->respondWithData($members);
     }

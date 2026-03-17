@@ -6,13 +6,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TokenService;
+use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\Csrf;
-use Nexus\Services\TokenService;
-use Nexus\Services\TotpService;
+use App\Core\Csrf;
 
 /**
  * TotpController -- TOTP two-factor authentication verify + status.
@@ -26,6 +26,8 @@ class TotpController extends BaseApiController
 
     public function __construct(
         private readonly TwoFactorChallengeManager $twoFactorChallengeManager,
+        private readonly TokenService $tokenService,
+        private readonly TotpService $totpService,
     ) {}
 
     /**
@@ -126,9 +128,9 @@ class TotpController extends BaseApiController
 
         // Verify the code
         if ($useBackupCode) {
-            $result = TotpService::verifyBackupCode($userId, $code);
+            $result = $this->totpService->verifyBackupCode($userId, $code);
         } else {
-            $result = TotpService::verifyLogin($userId, $code);
+            $result = $this->totpService->verifyLogin($userId, $code);
         }
 
         if (!$result['success']) {
@@ -153,7 +155,7 @@ class TotpController extends BaseApiController
 
         // Trust device if requested
         if ($trustDevice) {
-            TotpService::trustDevice($userId);
+            $this->totpService->trustDevice($userId);
         }
 
         // Fetch user data for response
@@ -183,14 +185,14 @@ class TotpController extends BaseApiController
         }
 
         // Generate tokens
-        $isMobile = TokenService::isMobileRequest();
-        $accessToken = TokenService::generateToken(
+        $isMobile = $this->tokenService->isMobileRequest();
+        $accessToken = $this->tokenService->generateToken(
             (int)$user['id'],
             (int)$user['tenant_id'],
             ['role' => $user['role'], 'email' => $user['email']],
             $isMobile
         );
-        $refreshToken = TokenService::generateRefreshToken(
+        $refreshToken = $this->tokenService->generateRefreshToken(
             (int)$user['id'],
             (int)$user['tenant_id'],
             $isMobile
@@ -236,8 +238,8 @@ class TotpController extends BaseApiController
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
             'token_type' => 'Bearer',
-            'expires_in' => TokenService::getAccessTokenExpiry($isMobile),
-            'refresh_expires_in' => TokenService::getRefreshTokenExpiry($isMobile),
+            'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
+            'refresh_expires_in' => $this->tokenService->getRefreshTokenExpiry($isMobile),
             'is_mobile' => $isMobile,
             // Legacy compatibility
             'token' => $accessToken
@@ -258,10 +260,10 @@ class TotpController extends BaseApiController
 
         return response()->json([
             'success' => true,
-            'enabled' => TotpService::isEnabled($userId),
-            'setup_required' => TotpService::isSetupRequired($userId),
-            'backup_codes_remaining' => TotpService::getBackupCodeCount($userId),
-            'trusted_devices' => TotpService::getTrustedDeviceCount($userId)
+            'enabled' => $this->totpService->isEnabled($userId),
+            'setup_required' => $this->totpService->isSetupRequired($userId),
+            'backup_codes_remaining' => $this->totpService->getBackupCodeCount($userId),
+            'trusted_devices' => $this->totpService->getTrustedDeviceCount($userId)
         ]);
     }
 }

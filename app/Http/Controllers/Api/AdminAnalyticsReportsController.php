@@ -12,8 +12,8 @@ use App\Services\InactiveMemberService;
 use App\Services\ReportExportService;
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\TenantContext;
-use Nexus\Services\MemberReportService;
-use Nexus\Services\ContentModerationService;
+use App\Services\MemberReportService;
+use App\Services\ContentModerationService;
 
 /**
  * AdminAnalyticsReportsController -- Admin analytics and reporting endpoints.
@@ -29,6 +29,8 @@ class AdminAnalyticsReportsController extends BaseApiController
         private readonly HoursReportService $hoursReportService,
         private readonly InactiveMemberService $inactiveMemberService,
         private readonly ReportExportService $reportExportService,
+        private readonly MemberReportService $memberReportService,
+        private readonly ContentModerationService $contentModerationService,
     ) {}
 
     // ============================================
@@ -100,12 +102,12 @@ class AdminAnalyticsReportsController extends BaseApiController
         $offset = ($page - 1) * $limit;
 
         $data = match ($type) {
-            'active' => MemberReportService::getActiveMembers($tenantId, $period, $limit, $offset),
-            'registrations' => MemberReportService::getNewRegistrations($tenantId, $this->query('group_by', 'monthly'), $months),
-            'retention' => MemberReportService::getMemberRetention($tenantId, $months),
-            'engagement' => MemberReportService::getEngagementMetrics($tenantId, $period),
-            'top_contributors' => ['contributors' => MemberReportService::getTopContributors($tenantId, $period, $limit)],
-            'least_active' => MemberReportService::getLeastActiveMembers($tenantId, $period, $limit, $offset),
+            'active' => $this->memberReportService->getActiveMembers($tenantId, $period, $limit, $offset),
+            'registrations' => $this->memberReportService->getNewRegistrations($tenantId, $this->query('group_by', 'monthly'), $months),
+            'retention' => $this->memberReportService->getMemberRetention($tenantId, $months),
+            'engagement' => $this->memberReportService->getEngagementMetrics($tenantId, $period),
+            'top_contributors' => ['contributors' => $this->memberReportService->getTopContributors($tenantId, $period, $limit)],
+            'least_active' => $this->memberReportService->getLeastActiveMembers($tenantId, $period, $limit, $offset),
             default => null,
         };
 
@@ -309,7 +311,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         $page = max(1, $this->queryInt('page', 1));
         $offset = ($page - 1) * $limit;
 
-        $result = ContentModerationService::getQueue($tenantId, $filters, $limit, $offset);
+        $result = $this->contentModerationService->getQueue($tenantId, $filters, $limit, $offset);
 
         return $this->respondWithPaginatedCollection($result['items'], $result['total'], $page, $limit);
     }
@@ -327,7 +329,7 @@ class AdminAnalyticsReportsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Decision is required (approved or rejected)', 'decision', 400);
         }
 
-        $result = ContentModerationService::review($id, $tenantId, $adminId, $decision, $rejectionReason);
+        $result = $this->contentModerationService->review($id, $tenantId, $adminId, $decision, $rejectionReason);
 
         if ($result['success']) {
             return $this->respondWithData($result);
@@ -342,7 +344,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $stats = ContentModerationService::getStats($tenantId);
+        $stats = $this->contentModerationService->getStats($tenantId);
 
         return $this->respondWithData($stats);
     }
@@ -353,7 +355,7 @@ class AdminAnalyticsReportsController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $settings = ContentModerationService::getModerationSettings($tenantId);
+        $settings = $this->contentModerationService->getModerationSettings($tenantId);
 
         return $this->respondWithData($settings);
     }
@@ -366,10 +368,10 @@ class AdminAnalyticsReportsController extends BaseApiController
 
         $settings = $this->getAllInput();
 
-        $success = ContentModerationService::updateSettings($tenantId, $settings);
+        $success = $this->contentModerationService->updateSettings($tenantId, $settings);
 
         if ($success) {
-            $updatedSettings = ContentModerationService::getModerationSettings($tenantId);
+            $updatedSettings = $this->contentModerationService->getModerationSettings($tenantId);
             return $this->respondWithData([
                 'message' => 'Moderation settings updated',
                 'settings' => $updatedSettings,

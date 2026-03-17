@@ -13,6 +13,9 @@ namespace App\Services;
  */
 class MemberVerificationBadgeService
 {
+    public const BADGE_TYPES = \Nexus\Services\MemberVerificationBadgeService::BADGE_TYPES;
+    public const BADGE_LABELS = \Nexus\Services\MemberVerificationBadgeService::BADGE_LABELS;
+
     public function __construct()
     {
     }
@@ -55,5 +58,13 @@ class MemberVerificationBadgeService
     public function getBatchUserBadges(array $userIds): array
     {
         return \Nexus\Services\MemberVerificationBadgeService::getBatchUserBadges($userIds);
+    }
+
+    /**
+     * Delegates to legacy MemberVerificationBadgeService::getAdminBadgeList().
+     */
+    public function getAdminBadgeList(int $userId): array
+    {
+        return \Nexus\Services\MemberVerificationBadgeService::getAdminBadgeList($userId);
     }
 }

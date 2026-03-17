@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\MemberVerificationBadgeService;
+use App\Services\MemberVerificationBadgeService;
 
 /**
  * MemberVerificationBadgeController -- Member verification badges.
@@ -24,6 +24,10 @@ class MemberVerificationBadgeController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly MemberVerificationBadgeService $memberVerificationBadgeService,
+    ) {}
+
     /**
      * GET /api/v2/users/{id}/verification-badges
      *
@@ -33,7 +37,7 @@ class MemberVerificationBadgeController extends BaseApiController
     {
         $this->rateLimit('verification_badges', 30, 60);
 
-        $badges = MemberVerificationBadgeService::getUserBadges($id);
+        $badges = $this->memberVerificationBadgeService->getUserBadges($id);
 
         return $this->respondWithData($badges);
     }
@@ -64,13 +68,13 @@ class MemberVerificationBadgeController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'badge_type is required', 'badge_type', 400);
         }
 
-        $badgeId = MemberVerificationBadgeService::grantBadge($id, $badgeType, $adminId, $note, $expiresAt);
+        $badgeId = $this->memberVerificationBadgeService->grantBadge($id, $badgeType, $adminId, $note, $expiresAt);
 
         if ($badgeId === null) {
-            return $this->respondWithErrors(MemberVerificationBadgeService::getErrors(), 422);
+            return $this->respondWithErrors($this->memberVerificationBadgeService->getErrors(), 422);
         }
 
-        $badges = MemberVerificationBadgeService::getUserBadges($id);
+        $badges = $this->memberVerificationBadgeService->getUserBadges($id);
 
         return $this->respondWithData($badges, null, 201);
     }
@@ -84,9 +88,9 @@ class MemberVerificationBadgeController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
 
-        MemberVerificationBadgeService::revokeBadge($id, $type, $adminId);
+        $this->memberVerificationBadgeService->revokeBadge($id, $type, $adminId);
 
-        $badges = MemberVerificationBadgeService::getUserBadges($id);
+        $badges = $this->memberVerificationBadgeService->getUserBadges($id);
 
         return $this->respondWithData($badges);
     }
@@ -101,7 +105,7 @@ class MemberVerificationBadgeController extends BaseApiController
         $this->requireAdmin();
         $this->rateLimit('admin_badge_list', 30, 60);
 
-        $badges = MemberVerificationBadgeService::getAdminBadgeList($id);
+        $badges = $this->memberVerificationBadgeService->getAdminBadgeList($id);
 
         return $this->respondWithData([
             'badges' => $badges,

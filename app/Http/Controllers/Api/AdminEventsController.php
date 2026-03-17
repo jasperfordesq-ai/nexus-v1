@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\EventService;
+use App\Services\EventService;
 
 /**
  * AdminEventsController -- Admin event management (list, view, approve, delete, cancel).
@@ -18,6 +18,10 @@ use Nexus\Services\EventService;
 class AdminEventsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly EventService $eventService,
+    ) {}
 
     /**
      * GET /api/v2/admin/events
@@ -114,12 +118,12 @@ class AdminEventsController extends BaseApiController
         $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $event = EventService::getById($id);
+        $event = $this->eventService->getById($id);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
 
-        $deleted = EventService::delete($id, $adminId);
+        $deleted = $this->eventService->delete($id, $adminId);
 
         if ($deleted) {
             return $this->respondWithData(['id' => $id, 'deleted' => true]);
@@ -136,7 +140,7 @@ class AdminEventsController extends BaseApiController
         $adminId = $this->requireAdmin();
 
         $reason = $this->input('reason', 'Cancelled by admin');
-        $cancelled = EventService::cancelEvent($id, $adminId, $reason);
+        $cancelled = $this->eventService->cancelEvent($id, $adminId, $reason);
 
         if ($cancelled) {
             return $this->respondWithData(['cancelled' => true, 'id' => $id]);

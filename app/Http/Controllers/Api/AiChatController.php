@@ -9,13 +9,13 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Models\AiConversation;
-use Nexus\Models\AiMessage;
-use Nexus\Models\AiUsage;
-use Nexus\Models\AiUserLimit;
-use Nexus\Models\Event;
-use Nexus\Models\Listing;
-use Nexus\Models\User;
+use App\Models\AiConversation;
+use App\Models\AiMessage;
+use App\Models\AiUsage;
+use App\Models\AiUserLimit;
+use App\Models\Event;
+use App\Models\Listing;
+use App\Models\User;
 use Nexus\Services\AI\AIServiceFactory;
 
 /**

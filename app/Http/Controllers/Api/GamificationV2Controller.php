@@ -11,7 +11,7 @@ use App\Services\LeaderboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Models\UserBadge;
+use App\Models\UserBadge;
 use Nexus\Services\ChallengeService;
 use Nexus\Services\DailyRewardService;
 use Nexus\Services\GamificationService;

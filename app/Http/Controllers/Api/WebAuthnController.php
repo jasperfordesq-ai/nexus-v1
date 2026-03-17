@@ -6,12 +6,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TokenService;
 use App\Services\WebAuthnChallengeStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\TenantContext;
-use Nexus\Services\TokenService;
 use lbuchs\WebAuthn\WebAuthn;
 use lbuchs\WebAuthn\WebAuthnException;
 
@@ -27,6 +27,7 @@ class WebAuthnController extends BaseApiController
 
     public function __construct(
         private readonly WebAuthnChallengeStore $webAuthnChallengeStore,
+        private readonly TokenService $tokenService,
     ) {}
 
     /** POST /api/webauthn/register-challenge */
@@ -396,21 +397,21 @@ class WebAuthnController extends BaseApiController
         }
 
         // Generate auth tokens
-        $isMobile = TokenService::isMobileRequest();
-        $accessToken = TokenService::generateToken(
+        $isMobile = $this->tokenService->isMobileRequest();
+        $accessToken = $this->tokenService->generateToken(
             (int)$credential['uid'],
             (int)$credential['tenant_id'],
             ['role' => $credential['role'], 'email' => $credential['email']],
             $isMobile
         );
-        $refreshToken = TokenService::generateRefreshToken(
+        $refreshToken = $this->tokenService->generateRefreshToken(
             (int)$credential['uid'],
             (int)$credential['tenant_id'],
             $isMobile
         );
 
         // Set up session for browser clients
-        $wantsStateless = TokenService::isMobileRequest() || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
+        $wantsStateless = $this->tokenService->isMobileRequest() || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
         if (!$wantsStateless) {
             $currentSessionUser = $_SESSION['user_id'] ?? null;
             if ($currentSessionUser === null) {
@@ -441,7 +442,7 @@ class WebAuthnController extends BaseApiController
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
             'token_type' => 'Bearer',
-            'expires_in' => TokenService::getAccessTokenExpiry($isMobile),
+            'expires_in' => $this->tokenService->getAccessTokenExpiry($isMobile),
             'is_mobile' => $isMobile,
         ]);
     }

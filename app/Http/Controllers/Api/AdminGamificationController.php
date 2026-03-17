@@ -9,8 +9,8 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\GamificationService;
-use Nexus\Services\AchievementCampaignService;
+use App\Services\GamificationService;
+use App\Services\AchievementCampaignService;
 
 /**
  * AdminGamificationController -- Admin gamification: stats, badges, campaigns, bulk awards.
@@ -21,7 +21,10 @@ class AdminGamificationController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly GamificationService $gamificationService,
+        private readonly AchievementCampaignService $achievementCampaignService,
+    ) {}
 
     /** GET /api/v2/admin/gamification/stats */
     public function stats(): JsonResponse
@@ -67,7 +70,7 @@ class AdminGamificationController extends BaseApiController
         $badges = [];
 
         try {
-            $definitions = GamificationService::getBadgeDefinitions();
+            $definitions = $this->gamificationService->getBadgeDefinitions();
             foreach ($definitions as $key => $def) {
                 $badges[] = ['id' => null, 'key' => $key, 'name' => $def['name'] ?? $key, 'description' => $def['description'] ?? '', 'icon' => $def['icon'] ?? 'award', 'type' => 'built_in', 'awarded_count' => 0];
             }
@@ -144,7 +147,7 @@ class AdminGamificationController extends BaseApiController
     {
         $this->requireAdmin();
         try {
-            $campaigns = AchievementCampaignService::getCampaigns();
+            $campaigns = $this->achievementCampaignService->getCampaigns();
             $formatted = array_map(fn($c) => [
                 'id' => (int) $c['id'], 'name' => $c['name'] ?? '', 'description' => $c['description'] ?? '', 'status' => $c['status'] ?? 'draft',
                 'badge_key' => $c['badge_key'] ?? null, 'badge_name' => $c['badge_key'] ?? '', 'target_audience' => $c['target_audience'] ?? 'all_users',
@@ -164,7 +167,7 @@ class AdminGamificationController extends BaseApiController
         if (empty($name)) return $this->respondWithError('VALIDATION_ERROR', 'Campaign name is required', 'name');
 
         try {
-            $id = AchievementCampaignService::createCampaign([
+            $id = $this->achievementCampaignService->createCampaign([
                 'name' => $name, 'description' => trim($this->input('description', '')), 'type' => $this->input('type', 'one_time'),
                 'badge_key' => $this->input('badge_key', ''), 'xp_amount' => (int) $this->input('xp_amount', 0),
                 'target_audience' => $this->input('target_audience', 'all_users'), 'audience_config' => $this->input('audience_config', []),
@@ -180,17 +183,17 @@ class AdminGamificationController extends BaseApiController
     public function updateCampaign(int $id): JsonResponse
     {
         $this->requireAdmin();
-        $campaign = AchievementCampaignService::getCampaign($id);
+        $campaign = $this->achievementCampaignService->getCampaign($id);
         if (!$campaign) return $this->respondWithError('NOT_FOUND', 'Campaign not found', null, 404);
 
         $newStatus = $this->input('status');
         if ($newStatus && $newStatus !== $campaign['status']) {
-            if ($newStatus === 'active') AchievementCampaignService::activateCampaign($id);
-            elseif ($newStatus === 'paused') AchievementCampaignService::pauseCampaign($id);
+            if ($newStatus === 'active') $this->achievementCampaignService->activateCampaign($id);
+            elseif ($newStatus === 'paused') $this->achievementCampaignService->pauseCampaign($id);
         }
 
         try {
-            AchievementCampaignService::updateCampaign($id, [
+            $this->achievementCampaignService->updateCampaign($id, [
                 'name' => trim($this->input('name', $campaign['name'])), 'description' => trim($this->input('description', $campaign['description'] ?? '')),
                 'type' => $this->input('type', $campaign['type'] ?? 'one_time'), 'badge_key' => $this->input('badge_key', $campaign['badge_key'] ?? ''),
                 'xp_amount' => (int) $this->input('xp_amount', $campaign['xp_amount'] ?? 0),
@@ -208,9 +211,9 @@ class AdminGamificationController extends BaseApiController
     public function deleteCampaign(int $id): JsonResponse
     {
         $this->requireAdmin();
-        $campaign = AchievementCampaignService::getCampaign($id);
+        $campaign = $this->achievementCampaignService->getCampaign($id);
         if (!$campaign) return $this->respondWithError('NOT_FOUND', 'Campaign not found', null, 404);
-        try { AchievementCampaignService::deleteCampaign($id); return $this->respondWithData(['deleted' => true]); }
+        try { $this->achievementCampaignService->deleteCampaign($id); return $this->respondWithData(['deleted' => true]); }
         catch (\Throwable $e) { return $this->respondWithError('SERVER_ERROR', 'Failed to delete campaign', null, 500); }
     }
 
@@ -222,7 +225,7 @@ class AdminGamificationController extends BaseApiController
         try {
             $users = DB::select("SELECT id FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId]);
             $checked = 0;
-            foreach ($users as $user) { GamificationService::runAllBadgeChecks((int) $user->id); $checked++; }
+            foreach ($users as $user) { $this->gamificationService->runAllBadgeChecks((int) $user->id); $checked++; }
             return $this->respondWithData(['users_checked' => $checked, 'message' => "Badge recheck completed for {$checked} users"]);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_ERROR', 'Badge recheck failed: ' . $e->getMessage(), null, 500);
@@ -241,7 +244,7 @@ class AdminGamificationController extends BaseApiController
 
         $awarded = 0; $errors = [];
         foreach ($userIds as $userId) {
-            try { GamificationService::awardBadgeByKey((int) $userId, $badgeSlug); $awarded++; }
+            try { $this->gamificationService->awardBadgeByKey((int) $userId, $badgeSlug); $awarded++; }
             catch (\Throwable $e) { $errors[] = "User {$userId}: " . $e->getMessage(); }
         }
 

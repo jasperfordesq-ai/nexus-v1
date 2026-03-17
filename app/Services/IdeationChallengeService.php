@@ -325,4 +325,12 @@ class IdeationChallengeService
     {
         return \Nexus\Services\IdeationChallengeService::getAllTags();
     }
+
+    /**
+     * Delegates to legacy IdeationChallengeService::getAllChallenges().
+     */
+    public function getAllChallenges(array $filters = []): array
+    {
+        return \Nexus\Services\IdeationChallengeService::getAllChallenges($filters);
+    }
 }

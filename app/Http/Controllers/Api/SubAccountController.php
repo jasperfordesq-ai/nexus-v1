@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\SubAccountService;
+use App\Services\SubAccountService;
 
 /**
  * SubAccountController -- Parent/child sub-account management.
@@ -18,12 +18,16 @@ class SubAccountController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly SubAccountService $subAccountService,
+    ) {}
+
     /** GET /api/v2/users/me/sub-accounts */
     public function getChildAccounts(): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $children = SubAccountService::getChildAccounts($userId);
+        $children = $this->subAccountService->getChildAccounts($userId);
 
         foreach ($children as &$child) {
             if (is_string($child['permissions'] ?? null)) {
@@ -39,7 +43,7 @@ class SubAccountController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $parents = SubAccountService::getParentAccounts($userId);
+        $parents = $this->subAccountService->getParentAccounts($userId);
 
         foreach ($parents as &$parent) {
             if (is_string($parent['permissions'] ?? null)) {
@@ -65,13 +69,13 @@ class SubAccountController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'child_user_id is required', 'child_user_id', 400);
         }
 
-        $relationshipId = SubAccountService::requestRelationship($userId, $childUserId, $relationshipType, $permissions);
+        $relationshipId = $this->subAccountService->requestRelationship($userId, $childUserId, $relationshipType, $permissions);
 
         if ($relationshipId === null) {
-            return $this->respondWithErrors(SubAccountService::getErrors(), 422);
+            return $this->respondWithErrors($this->subAccountService->getErrors(), 422);
         }
 
-        $children = SubAccountService::getChildAccounts($userId);
+        $children = $this->subAccountService->getChildAccounts($userId);
 
         return $this->respondWithData($children, null, 201);
     }
@@ -81,13 +85,13 @@ class SubAccountController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $success = SubAccountService::approveRelationship($userId, $id);
+        $success = $this->subAccountService->approveRelationship($userId, $id);
 
         if (!$success) {
-            return $this->respondWithErrors(SubAccountService::getErrors(), 422);
+            return $this->respondWithErrors($this->subAccountService->getErrors(), 422);
         }
 
-        $parents = SubAccountService::getParentAccounts($userId);
+        $parents = $this->subAccountService->getParentAccounts($userId);
 
         return $this->respondWithData($parents);
     }
@@ -104,13 +108,13 @@ class SubAccountController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'permissions object is required', 'permissions', 400);
         }
 
-        $success = SubAccountService::updatePermissions($userId, (int) $id, $permissions);
+        $success = $this->subAccountService->updatePermissions($userId, (int) $id, $permissions);
 
         if (!$success) {
-            return $this->respondWithErrors(SubAccountService::getErrors(), 422);
+            return $this->respondWithErrors($this->subAccountService->getErrors(), 422);
         }
 
-        $children = SubAccountService::getChildAccounts($userId);
+        $children = $this->subAccountService->getChildAccounts($userId);
 
         return $this->respondWithData($children);
     }
@@ -120,7 +124,7 @@ class SubAccountController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        SubAccountService::revokeRelationship($userId, $id);
+        $this->subAccountService->revokeRelationship($userId, $id);
 
         return $this->respondWithData(['message' => 'Relationship revoked']);
     }
@@ -131,10 +135,10 @@ class SubAccountController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('sub_account_activity', 10, 60);
 
-        $activity = SubAccountService::getChildActivitySummary($userId, (int) $childId);
+        $activity = $this->subAccountService->getChildActivitySummary($userId, (int) $childId);
 
         if ($activity === null) {
-            $errors = SubAccountService::getErrors();
+            $errors = $this->subAccountService->getErrors();
             $status = 403;
             if (!empty($errors) && ($errors[0]['code'] ?? '') === 'FORBIDDEN') {
                 $status = 403;

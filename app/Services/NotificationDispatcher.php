@@ -56,4 +56,12 @@ class NotificationDispatcher
     {
         return \Nexus\Services\NotificationDispatcher::dispatchMatchApprovalRequest($brokerId, $userName, $listingTitle, $requestId);
     }
+
+    /**
+     * Notify admin users about an event.
+     */
+    public function notifyAdmins(string $type, array $data = [], string $message = ''): void
+    {
+        \Nexus\Services\NotificationDispatcher::notifyAdmins($type, $data, $message);
+    }
 }

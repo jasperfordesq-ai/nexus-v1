@@ -11,7 +11,7 @@ use App\Services\SmartMatchingAnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\AdminAnalyticsService;
+use App\Services\AdminAnalyticsService;
 
 /**
  * AdminCommunityAnalyticsController -- Admin community-level analytics and export.
@@ -27,6 +27,7 @@ class AdminCommunityAnalyticsController extends BaseApiController
     public function __construct(
         private readonly AchievementAnalyticsService $achievementAnalyticsService,
         private readonly SmartMatchingAnalyticsService $smartMatchingAnalyticsService,
+        private readonly AdminAnalyticsService $adminAnalyticsService,
     ) {}
 
     /**
@@ -41,11 +42,11 @@ class AdminCommunityAnalyticsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         // Core analytics from AdminAnalyticsService
-        $overview = AdminAnalyticsService::getOverallStats();
-        $monthlyTrends = AdminAnalyticsService::getMonthlyTrends(12);
-        $weeklyTrends = AdminAnalyticsService::getWeeklyTrends(12);
-        $topEarners = AdminAnalyticsService::getTopEarners(30, 10);
-        $topSpenders = AdminAnalyticsService::getTopSpenders(30, 10);
+        $overview = $this->adminAnalyticsService->getOverallStats();
+        $monthlyTrends = $this->adminAnalyticsService->getMonthlyTrends(12);
+        $weeklyTrends = $this->adminAnalyticsService->getWeeklyTrends(12);
+        $topEarners = $this->adminAnalyticsService->getTopEarners(30, 10);
+        $topSpenders = $this->adminAnalyticsService->getTopSpenders(30, 10);
 
         // Enrich monthly trends with new_users count per month
         $monthlyTrends = $this->enrichMonthlyTrendsWithNewUsers($monthlyTrends, $tenantId);
@@ -180,7 +181,7 @@ class AdminCommunityAnalyticsController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $monthlyTrends = AdminAnalyticsService::getMonthlyTrends(12);
+        $monthlyTrends = $this->adminAnalyticsService->getMonthlyTrends(12);
         $monthlyTrends = $this->enrichMonthlyTrendsWithNewUsers($monthlyTrends, $tenantId);
 
         $activeTradersByMonth = $this->getActiveTradersByMonth($tenantId, 12);

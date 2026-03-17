@@ -10,11 +10,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Models\User;
-use Nexus\Models\Notification;
-use Nexus\Models\ActivityLog;
-use Nexus\Services\AuditLogService;
-use Nexus\Services\TenantSettingsService;
+use App\Models\User;
+use App\Models\Notification;
+use App\Models\ActivityLog;
+use App\Services\AuditLogService;
+use App\Services\TenantSettingsService;
 
 /**
  * AdminUsersController — Admin user management (list, view, create, update, approve, suspend, ban, etc.).
@@ -26,7 +26,9 @@ class AdminUsersController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly TenantSettingsService $tenantSettingsService,
+    ) {}
 
     // =========================================================================
     // List & Show
@@ -382,7 +384,7 @@ class AdminUsersController extends BaseApiController
                 $tenantName = $tenant['name'] ?? 'Project NEXUS';
                 $loginLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/login";
 
-                $html = \Nexus\Core\EmailTemplate::render(
+                $html = \App\Core\EmailTemplate::render(
                     "Your Account Has Been Created",
                     "Welcome to {$tenantName}!",
                     "<p>Hello <strong>" . htmlspecialchars($firstName) . "</strong>,</p>
@@ -398,7 +400,7 @@ class AdminUsersController extends BaseApiController
                     "Project NEXUS"
                 );
 
-                $mailer = new \Nexus\Core\Mailer();
+                $mailer = new \App\Core\Mailer();
                 $mailer->send($email, "Your account on {$tenantName}", $html);
             } catch (\Throwable $e) {
                 error_log("Welcome email failed for admin-created user: " . $e->getMessage());
@@ -779,7 +781,7 @@ class AdminUsersController extends BaseApiController
 
         // Check if target user is blocked by registration policy gates
         $userTenantId = (int) $user['tenant_id'];
-        $gateBlock = TenantSettingsService::checkLoginGates($user);
+        $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
 
         try {
             // Generate an access token for the target user with impersonation claim
@@ -933,14 +935,14 @@ class AdminUsersController extends BaseApiController
             // Build frontend URL with defensive fallback
             $appUrl = TenantContext::getFrontendUrl();
             if (!$appUrl || str_contains($appUrl, 'api.')) {
-                $appUrl = \Nexus\Core\Env::get('APP_URL', 'https://app.project-nexus.ie');
+                $appUrl = \App\Core\Env::get('APP_URL', 'https://app.project-nexus.ie');
                 if (str_contains($appUrl, 'api.')) {
                     $appUrl = str_replace('api.', 'app.', $appUrl);
                 }
             }
             $resetLink = $appUrl . $tenant['slug_prefix'] . "/password/reset?token={$token}";
 
-            $html = \Nexus\Core\EmailTemplate::render(
+            $html = \App\Core\EmailTemplate::render(
                 "Password Reset",
                 "Reset your password for {$tenantNameSafe}",
                 "<p>Hello <strong>" . htmlspecialchars($user['first_name'] ?? '', ENT_QUOTES, 'UTF-8') . "</strong>,</p>
@@ -951,7 +953,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            $mailer = new \Nexus\Core\Mailer();
+            $mailer = new \App\Core\Mailer();
             $mailer->send($user['email'], "Password Reset - {$tenantNameSafe}", $html);
 
             ActivityLog::log($adminId, 'admin_send_password_reset', "Sent password reset email to user #{$id} ({$user['email']})");
@@ -1003,7 +1005,7 @@ class AdminUsersController extends BaseApiController
             if (stripos($mainMessage, '<!DOCTYPE') !== false || stripos($mainMessage, '<html') !== false) {
                 $html = $mainMessage;
             } else {
-                $html = \Nexus\Core\EmailTemplate::render(
+                $html = \App\Core\EmailTemplate::render(
                     "Welcome!",
                     "You are a member of {$tenantNameSafe}",
                     $mainMessage,
@@ -1013,7 +1015,7 @@ class AdminUsersController extends BaseApiController
                 );
             }
 
-            $mailer = new \Nexus\Core\Mailer();
+            $mailer = new \App\Core\Mailer();
             $mailer->send($user['email'], $subject, $html);
 
             ActivityLog::log($adminId, 'admin_resend_welcome', "Resent welcome email to user #{$id} ({$user['email']})");
@@ -1255,7 +1257,7 @@ class AdminUsersController extends BaseApiController
             $userId = (int) $user['id'];
 
             // Read the welcome credits amount for the user's tenant (default: 5)
-            $creditAmount = (int) TenantSettingsService::get($userTenantId, 'welcome_credits', 5);
+            $creditAmount = (int) $this->tenantSettingsService->get($userTenantId, 'welcome_credits', 5);
             if ($creditAmount <= 0) {
                 return 0;
             }
@@ -1341,7 +1343,7 @@ class AdminUsersController extends BaseApiController
                     . '</ul>'
                     . "<p>We're glad to have you on board. Welcome to the community!</p>";
 
-            $html = \Nexus\Core\EmailTemplate::render(
+            $html = \App\Core\EmailTemplate::render(
                 'Welcome to the Community!',
                 "You're all set, {$firstName}!",
                 $body,
@@ -1354,7 +1356,7 @@ class AdminUsersController extends BaseApiController
                 ? "Welcome to {$tenantNameSafe} — {$creditsAwarded} time credits are waiting for you!"
                 : "Welcome to {$tenantNameSafe} — your account is approved!";
 
-            $result = (new \Nexus\Core\Mailer())->send($user['email'], $subject, $html);
+            $result = (new \App\Core\Mailer())->send($user['email'], $subject, $html);
 
             if ($result) {
                 error_log("[AdminUsers] Welcome email sent to {$user['email']} (user #{$user['id']}, credits: {$creditsAwarded})");
@@ -1385,7 +1387,7 @@ class AdminUsersController extends BaseApiController
                 $message .= " You've received {$creditsAwarded} welcome time credit" . ($creditsAwarded !== 1 ? 's' : '') . " to get started.";
             }
 
-            Notification::create(
+            Notification::createNotification(
                 (int) $user['id'],
                 $message,
                 '/dashboard',
@@ -1412,7 +1414,7 @@ class AdminUsersController extends BaseApiController
             $tenantNameSafe = htmlspecialchars($tenant['name'], ENT_QUOTES, 'UTF-8');
             $loginUrl = TenantContext::getFrontendUrl() . $tenant['slug_prefix'] . '/login';
 
-            $html = \Nexus\Core\EmailTemplate::render(
+            $html = \App\Core\EmailTemplate::render(
                 'Account Reactivated',
                 "Welcome back, {$firstName}!",
                 '<p>Your account on ' . $tenantNameSafe . ' has been reactivated by an administrator.</p>
@@ -1422,7 +1424,7 @@ class AdminUsersController extends BaseApiController
                 $tenant['name']
             );
 
-            $result = (new \Nexus\Core\Mailer())->send(
+            $result = (new \App\Core\Mailer())->send(
                 $user['email'],
                 "Your account has been reactivated - {$tenantNameSafe}",
                 $html
@@ -1451,7 +1453,7 @@ class AdminUsersController extends BaseApiController
         try {
             $tenant = $this->resolveUserTenant($user);
 
-            Notification::create(
+            Notification::createNotification(
                 (int) $user['id'],
                 "Your account has been reactivated. Welcome back to {$tenant['name']}!",
                 '/dashboard',

@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\GroupExchangeService;
+use App\Services\GroupExchangeService;
 
 /**
  * GroupExchangeController -- Group time exchanges.
@@ -17,6 +17,10 @@ use Nexus\Services\GroupExchangeService;
 class GroupExchangeController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly GroupExchangeService $groupExchangeService,
+    ) {}
 
     /** GET /api/v2/group-exchanges */
     public function index(): JsonResponse
@@ -29,7 +33,7 @@ class GroupExchangeController extends BaseApiController
             'offset' => $this->queryInt('offset', 0, 0),
         ];
 
-        $result = GroupExchangeService::listForUser($userId, $filters);
+        $result = $this->groupExchangeService->listForUser($userId, $filters);
 
         return $this->respondWithData([
             'data' => $result['items'],
@@ -52,7 +56,7 @@ class GroupExchangeController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Total hours must be greater than 0', 'total_hours', 400);
         }
 
-        $id = GroupExchangeService::create($userId, $data);
+        $id = $this->groupExchangeService->create($userId, $data);
 
         if (!$id) {
             return $this->respondWithError('INTERNAL_ERROR', 'Failed to create exchange', null, 500);
@@ -62,7 +66,7 @@ class GroupExchangeController extends BaseApiController
         $participants = $data['participants'] ?? [];
         foreach ($participants as $p) {
             if (!empty($p['user_id']) && !empty($p['role'])) {
-                GroupExchangeService::addParticipant(
+                $this->groupExchangeService->addParticipant(
                     $id,
                     (int) $p['user_id'],
                     $p['role'],
@@ -72,7 +76,7 @@ class GroupExchangeController extends BaseApiController
             }
         }
 
-        $exchange = GroupExchangeService::get($id);
+        $exchange = $this->groupExchangeService->get($id);
 
         return $this->respondWithData($exchange, null, 201);
     }
@@ -82,13 +86,13 @@ class GroupExchangeController extends BaseApiController
     {
         $this->requireAuth();
 
-        $exchange = GroupExchangeService::get($id);
+        $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
         }
 
-        $exchange['calculated_split'] = GroupExchangeService::calculateSplit($id);
+        $exchange['calculated_split'] = $this->groupExchangeService->calculateSplit($id);
 
         return $this->respondWithData($exchange);
     }
@@ -98,7 +102,7 @@ class GroupExchangeController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $exchange = GroupExchangeService::get($id);
+        $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
@@ -113,9 +117,9 @@ class GroupExchangeController extends BaseApiController
         }
 
         $data = $this->getAllInput();
-        GroupExchangeService::update($id, $data);
+        $this->groupExchangeService->update($id, $data);
 
-        $updated = GroupExchangeService::get($id);
+        $updated = $this->groupExchangeService->get($id);
 
         return $this->respondWithData($updated);
     }
@@ -125,7 +129,7 @@ class GroupExchangeController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $exchange = GroupExchangeService::get($id);
+        $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
@@ -135,7 +139,7 @@ class GroupExchangeController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'Only the organizer can cancel', null, 403);
         }
 
-        GroupExchangeService::updateStatus($id, 'cancelled');
+        $this->groupExchangeService->updateStatus($id, 'cancelled');
 
         return $this->respondWithData(['message' => 'Exchange cancelled']);
     }
@@ -145,7 +149,7 @@ class GroupExchangeController extends BaseApiController
     {
         $this->requireAuth();
 
-        $exchange = GroupExchangeService::get((int) $id);
+        $exchange = $this->groupExchangeService->get((int) $id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
@@ -157,7 +161,7 @@ class GroupExchangeController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'user_id and role are required', null, 400);
         }
 
-        $ok = GroupExchangeService::addParticipant(
+        $ok = $this->groupExchangeService->addParticipant(
             (int) $id,
             (int) $data['user_id'],
             $data['role'],
@@ -169,7 +173,7 @@ class GroupExchangeController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Failed to add participant (may already exist)', null, 400);
         }
 
-        $updated = GroupExchangeService::get((int) $id);
+        $updated = $this->groupExchangeService->get((int) $id);
 
         return $this->respondWithData($updated);
     }
@@ -179,9 +183,9 @@ class GroupExchangeController extends BaseApiController
     {
         $this->requireAuth();
 
-        GroupExchangeService::removeParticipant((int) $id, (int) $userId);
+        $this->groupExchangeService->removeParticipant((int) $id, (int) $userId);
 
-        $updated = GroupExchangeService::get((int) $id);
+        $updated = $this->groupExchangeService->get((int) $id);
 
         return $this->respondWithData($updated);
     }
@@ -191,15 +195,15 @@ class GroupExchangeController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $exchange = GroupExchangeService::get($id);
+        $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
         }
 
-        GroupExchangeService::confirmParticipation($id, $userId);
+        $this->groupExchangeService->confirmParticipation($id, $userId);
 
-        $updated = GroupExchangeService::get($id);
+        $updated = $this->groupExchangeService->get($id);
 
         return $this->respondWithData($updated);
     }
@@ -209,7 +213,7 @@ class GroupExchangeController extends BaseApiController
     {
         $userId = $this->requireAuth();
 
-        $exchange = GroupExchangeService::get($id);
+        $exchange = $this->groupExchangeService->get($id);
 
         if (!$exchange) {
             return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
@@ -219,7 +223,7 @@ class GroupExchangeController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'Only the organizer can complete', null, 403);
         }
 
-        $result = GroupExchangeService::complete($id);
+        $result = $this->groupExchangeService->complete($id);
 
         if (!$result['success']) {
             return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 400);

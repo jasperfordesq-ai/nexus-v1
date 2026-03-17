@@ -56,4 +56,20 @@ class AchievementCampaignService
     {
         return \Nexus\Services\AchievementCampaignService::activateCampaign($id);
     }
+
+    /**
+     * Delegates to legacy AchievementCampaignService::pauseCampaign().
+     */
+    public function pauseCampaign($id)
+    {
+        return \Nexus\Services\AchievementCampaignService::pauseCampaign($id);
+    }
+
+    /**
+     * Delegates to legacy AchievementCampaignService::deleteCampaign().
+     */
+    public function deleteCampaign($id)
+    {
+        return \Nexus\Services\AchievementCampaignService::deleteCampaign($id);
+    }
 }

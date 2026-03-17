@@ -111,7 +111,7 @@ class ListingsController extends BaseApiController
         // Track view (skip if viewer is the listing owner)
         if ($userId === null || $userId !== (int) ($listing['user_id'] ?? 0)) {
             try {
-                $ip = \Nexus\Core\ClientIp::get();
+                $ip = \App\Core\ClientIp::get();
                 ListingAnalyticsService::recordView($id, $userId, $ip);
             } catch (\Exception $e) {
                 // Non-critical
@@ -516,7 +516,7 @@ class ListingsController extends BaseApiController
                 'size'     => $file->getSize(),
             ];
 
-            $imageUrl = \Nexus\Core\ImageUploader::upload($fileArray);
+            $imageUrl = \App\Core\ImageUploader::upload($fileArray);
 
             // Update listing with new image
             ListingService::update($id, $userId, ['image_url' => $imageUrl]);

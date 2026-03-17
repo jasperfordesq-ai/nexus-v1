@@ -345,4 +345,12 @@ class SearchService
             default  => $query->orderByDesc('id'),
         };
     }
+
+    /**
+     * Check if the search service (Meilisearch) is available.
+     */
+    public function isAvailable(): bool
+    {
+        return \Nexus\Services\SearchService::isAvailable();
+    }
 }

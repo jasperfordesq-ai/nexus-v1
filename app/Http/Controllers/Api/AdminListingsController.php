@@ -10,9 +10,9 @@ use App\Services\SearchLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Models\ActivityLog;
-use Nexus\Services\ListingFeaturedService;
-use Nexus\Services\ListingModerationService;
+use App\Models\ActivityLog;
+use App\Services\ListingFeaturedService;
+use App\Services\ListingModerationService;
 
 /**
  * AdminListingsController -- Admin listing moderation (list, approve, reject, feature, search analytics).
@@ -25,6 +25,8 @@ class AdminListingsController extends BaseApiController
 
     public function __construct(
         private readonly SearchLogService $searchLogService,
+        private readonly ListingFeaturedService $listingFeaturedService,
+        private readonly ListingModerationService $listingModerationService,
     ) {}
 
     // =========================================================================
@@ -213,7 +215,7 @@ class AdminListingsController extends BaseApiController
         $adminId = $this->requireAdmin();
         $reason = $this->input('reason', '');
 
-        $result = ListingModerationService::reject($id, $adminId, $reason);
+        $result = $this->listingModerationService->reject($id, $adminId, $reason);
 
         if (!$result['success']) {
             $status = $result['error'] === 'Listing not found' ? 404 : 422;
@@ -255,7 +257,7 @@ class AdminListingsController extends BaseApiController
         $this->requireAdmin();
         $days = $this->inputInt('days', null, 1, 365);
 
-        $result = ListingFeaturedService::featureListing((int) $id, $days);
+        $result = $this->listingFeaturedService->featureListing((int) $id, $days);
 
         if (!$result['success']) {
             return $this->respondWithError('FEATURE_FAILED', $result['error'], null, 404);
@@ -273,7 +275,7 @@ class AdminListingsController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $result = ListingFeaturedService::unfeatureListing((int) $id);
+        $result = $this->listingFeaturedService->unfeatureListing((int) $id);
 
         if (!$result['success']) {
             return $this->respondWithError('UNFEATURE_FAILED', $result['error'], null, 404);
@@ -316,7 +318,7 @@ class AdminListingsController extends BaseApiController
         $limit = $this->queryInt('limit', 20, 1, 100);
         $type = $this->query('type');
 
-        $result = ListingModerationService::getReviewQueue($page, $limit, $type);
+        $result = $this->listingModerationService->getReviewQueue($page, $limit, $type);
 
         return $this->respondWithPaginatedCollection(
             $result['items'],
@@ -331,7 +333,7 @@ class AdminListingsController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $stats = ListingModerationService::getStats();
+        $stats = $this->listingModerationService->getStats();
 
         return $this->respondWithData($stats);
     }

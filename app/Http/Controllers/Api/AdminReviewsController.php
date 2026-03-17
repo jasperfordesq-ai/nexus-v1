@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Models\ActivityLog;
+use App\Models\ActivityLog;
 
 /**
  * AdminReviewsController -- Admin review moderation.

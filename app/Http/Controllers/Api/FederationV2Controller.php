@@ -12,7 +12,7 @@ use App\Services\FederationRealtimeService;
 use App\Services\FederationUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Models\Notification;
+use App\Models\Notification;
 use Nexus\Services\FederatedConnectionService;
 use Nexus\Services\FederationAuditService;
 use Nexus\Services\FederationFeatureService;
@@ -906,7 +906,7 @@ class FederationV2Controller extends BaseApiController
                     $notifMessage .= '...';
                 }
 
-                Notification::create(
+                Notification::createNotification(
                     (int)$receiverId,
                     $notifMessage,
                     '/federation/messages',

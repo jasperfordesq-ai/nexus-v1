@@ -8,10 +8,10 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\AudioUploader;
-use Nexus\Core\EmailTemplate;
-use Nexus\Core\Mailer;
+use App\Core\EmailTemplate;
+use App\Core\Mailer;
 use Nexus\Core\TenantContext;
-use Nexus\Models\Message;
+use App\Models\Message;
 use Illuminate\Support\Facades\DB;
 
 /**

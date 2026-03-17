@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Helpers\UrlHelper;
-use Nexus\Services\BrokerControlConfigService;
+use App\Services\BrokerControlConfigService;
 
 /**
  * TenantBootstrapController -- Tenant configuration bootstrap for SPA init.
@@ -31,6 +31,7 @@ class TenantBootstrapController extends BaseApiController
     public function __construct(
         private readonly RedisCache $redisCache,
         private readonly TenantFeatureConfig $tenantFeatureConfig,
+        private readonly BrokerControlConfigService $brokerControlConfigService,
     ) {}
 
     /** Cache TTL for tenant bootstrap data (10 minutes) */
@@ -294,8 +295,8 @@ class TenantBootstrapController extends BaseApiController
         $data['settings'] = $this->buildGeneralSettings((int) $tenant['id']);
 
         $data['compliance'] = [
-            'vetting_enabled' => BrokerControlConfigService::isVettingEnabled(),
-            'insurance_enabled' => BrokerControlConfigService::isInsuranceEnabled(),
+            'vetting_enabled' => $this->brokerControlConfigService->isVettingEnabled(),
+            'insurance_enabled' => $this->brokerControlConfigService->isInsuranceEnabled(),
         ];
 
         $data['supported_languages'] = $config['supported_languages'] ?? ['en', 'ga', 'de', 'fr', 'it', 'pt', 'es'];

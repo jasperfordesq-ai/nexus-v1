@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\KnowledgeBaseService;
+use App\Services\KnowledgeBaseService;
 
 /**
  * AdminResourcesController -- Admin resource / knowledge base management.
@@ -17,6 +17,10 @@ use Nexus\Services\KnowledgeBaseService;
 class AdminResourcesController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly KnowledgeBaseService $knowledgeBaseService,
+    ) {}
 
     /**
      * GET /api/v2/admin/resources
@@ -34,7 +38,7 @@ class AdminResourcesController extends BaseApiController
             'limit' => min(200, max(1, $this->queryInt('limit', 50))),
         ];
 
-        $result = KnowledgeBaseService::getAll($filters);
+        $result = $this->knowledgeBaseService->getAll($filters);
 
         $items = $result['data'] ?? $result['items'] ?? $result;
         $total = $result['total'] ?? (is_array($items) ? count($items) : 0);
@@ -57,7 +61,7 @@ class AdminResourcesController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $article = KnowledgeBaseService::getById($id);
+        $article = $this->knowledgeBaseService->getById($id);
 
         if (!$article) {
             return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
@@ -73,12 +77,12 @@ class AdminResourcesController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $article = KnowledgeBaseService::getById($id);
+        $article = $this->knowledgeBaseService->getById($id);
         if (!$article) {
             return $this->respondWithError('NOT_FOUND', 'Article not found', null, 404);
         }
 
-        $deleted = KnowledgeBaseService::delete($id);
+        $deleted = $this->knowledgeBaseService->delete($id);
 
         if ($deleted) {
             return $this->respondWithData(['deleted' => true, 'id' => $id]);

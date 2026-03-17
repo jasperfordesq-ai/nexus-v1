@@ -6,17 +6,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FederationFeatureService;
+use App\Services\FeedRankingService;
+use App\Services\ListingRankingService;
+use App\Services\MemberRankingService;
+use App\Services\RedisCache;
+use App\Services\SearchService;
+use App\Services\SmartMatchingEngine;
+use App\Services\TenantFeatureConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
-use Nexus\Services\RedisCache;
-use Nexus\Services\TenantFeatureConfig;
-use Nexus\Services\FederationFeatureService;
-use Nexus\Services\FeedRankingService;
-use App\Services\ListingRankingService;
-use Nexus\Services\MemberRankingService;
-use App\Services\SmartMatchingEngine;
-use Nexus\Services\SearchService;
 
 /**
  * AdminConfigController -- Admin system configuration, features, modules, cache, jobs,
@@ -31,6 +31,11 @@ class AdminConfigController extends BaseApiController
     public function __construct(
         private readonly ListingRankingService $listingRankingService,
         private readonly SmartMatchingEngine $smartMatchingEngine,
+        private readonly RedisCache $redisCache,
+        private readonly FederationFeatureService $federationFeatureService,
+        private readonly FeedRankingService $feedRankingService,
+        private readonly MemberRankingService $memberRankingService,
+        private readonly SearchService $searchService,
     ) {}
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -182,13 +187,13 @@ class AdminConfigController extends BaseApiController
 
         if ($featureName === 'federation') {
             if ((bool) $enabled) {
-                FederationFeatureService::enableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
+                $this->federationFeatureService->enableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
             } else {
-                FederationFeatureService::disableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
+                $this->federationFeatureService->disableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
             }
         }
 
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['feature' => $featureName, 'enabled' => (bool) $enabled]);
     }
@@ -220,7 +225,7 @@ class AdminConfigController extends BaseApiController
         $config['modules'][$moduleName] = (bool) $enabled;
 
         DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['module' => $moduleName, 'enabled' => (bool) $enabled]);
     }
@@ -233,7 +238,7 @@ class AdminConfigController extends BaseApiController
     public function cacheStats(): JsonResponse
     {
         $this->requireAdmin();
-        $stats = RedisCache::getStats();
+        $stats = $this->redisCache->getStats();
 
         return $this->respondWithData([
             'redis_connected' => $stats['enabled'] ?? false,
@@ -253,10 +258,10 @@ class AdminConfigController extends BaseApiController
         try {
             if ($type === 'all') {
                 foreach ([1, 2, 3, 4, 5] as $tid) {
-                    RedisCache::clearTenant($tid);
+                    $this->redisCache->clearTenant($tid);
                 }
             } else {
-                RedisCache::clearTenant($tenantId);
+                $this->redisCache->clearTenant($tenantId);
             }
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to clear cache', null, 500);
@@ -463,7 +468,7 @@ class AdminConfigController extends BaseApiController
                     define('CRON_INTERNAL_RUN', true);
                 }
 
-                $cronKey = \Nexus\Core\Env::get('CRON_KEY');
+                $cronKey = \App\Core\Env::get('CRON_KEY');
                 $methodMap = [
                     'daily-digest' => 'dailyDigest',
                     'weekly-digest' => 'weeklyDigest',
@@ -620,7 +625,7 @@ class AdminConfigController extends BaseApiController
             $this->upsertSetting($tenantId, 'general.' . $key, (string) $value, $adminId);
         }
 
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData([
             'updated' => true,
@@ -639,7 +644,7 @@ class AdminConfigController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $settings = \Nexus\Models\AiSettings::getAllForTenant($tenantId);
+        $settings = \App\Models\AiSettings::getAllForTenant($tenantId);
 
         return $this->respondWithData([
             'ai_enabled' => (bool) ($settings['ai_enabled'] ?? false),
@@ -651,14 +656,14 @@ class AdminConfigController extends BaseApiController
                 'ollama' => $settings['ollama_model'] ?? 'llama2',
             ],
             'api_keys' => [
-                'gemini' => \Nexus\Models\AiSettings::getMasked($tenantId, 'gemini_api_key'),
-                'openai' => \Nexus\Models\AiSettings::getMasked($tenantId, 'openai_api_key'),
-                'anthropic' => \Nexus\Models\AiSettings::getMasked($tenantId, 'anthropic_api_key'),
+                'gemini' => \App\Models\AiSettings::getMasked($tenantId, 'gemini_api_key'),
+                'openai' => \App\Models\AiSettings::getMasked($tenantId, 'openai_api_key'),
+                'anthropic' => \App\Models\AiSettings::getMasked($tenantId, 'anthropic_api_key'),
             ],
             'api_key_set' => [
-                'gemini' => \Nexus\Models\AiSettings::has($tenantId, 'gemini_api_key'),
-                'openai' => \Nexus\Models\AiSettings::has($tenantId, 'openai_api_key'),
-                'anthropic' => \Nexus\Models\AiSettings::has($tenantId, 'anthropic_api_key'),
+                'gemini' => \App\Models\AiSettings::has($tenantId, 'gemini_api_key'),
+                'openai' => \App\Models\AiSettings::has($tenantId, 'openai_api_key'),
+                'anthropic' => \App\Models\AiSettings::has($tenantId, 'anthropic_api_key'),
             ],
             'features' => [
                 'chat' => (bool) ($settings['ai_chat_enabled'] ?? false),
@@ -717,8 +722,8 @@ class AdminConfigController extends BaseApiController
             }
         }
 
-        \Nexus\Models\AiSettings::setMultiple($tenantId, $toSave);
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        \App\Models\AiSettings::setMultiple($tenantId, $toSave);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'keys_updated' => array_keys($toSave)]);
     }
@@ -784,7 +789,7 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No recognized feed algorithm settings provided', null, 422);
         }
 
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'keys_updated' => $updated]);
     }
@@ -861,7 +866,7 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No recognized image settings provided', null, 422);
         }
 
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'keys_updated' => $updated]);
     }
@@ -951,7 +956,7 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No recognized SEO settings provided', null, 422);
         }
 
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'keys_updated' => $updated]);
     }
@@ -1031,7 +1036,7 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No recognized native app settings provided', null, 422);
         }
 
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'keys_updated' => $updated]);
     }
@@ -1043,7 +1048,7 @@ class AdminConfigController extends BaseApiController
     /** GET /api/v2/admin/config/algorithm-info */
     public function getAlgorithmInfo(): JsonResponse
     {
-        $feedEnabled = FeedRankingService::isEnabled();
+        $feedEnabled = $this->feedRankingService->isEnabled();
         $feed = [
             'name' => $feedEnabled ? 'EdgeRank' : 'Chronological',
             'key' => $feedEnabled ? 'edgerank' : 'chronological',
@@ -1061,7 +1066,7 @@ class AdminConfigController extends BaseApiController
                 : 'Showing newest listings first',
         ];
 
-        $membersEnabled = MemberRankingService::isEnabled();
+        $membersEnabled = $this->memberRankingService->isEnabled();
         $members = [
             'name' => $membersEnabled ? 'CommunityRank' : 'Alphabetical',
             'key' => $membersEnabled ? 'communityrank' : 'alphabetical',
@@ -1095,9 +1100,9 @@ class AdminConfigController extends BaseApiController
         $this->requireAdmin();
 
         return $this->respondWithData([
-            'feed' => FeedRankingService::getConfig(),
+            'feed' => $this->feedRankingService->getConfig(),
             'listings' => $this->listingRankingService->getConfig(),
-            'members' => MemberRankingService::getConfig(),
+            'members' => $this->memberRankingService->getConfig(),
         ]);
     }
 
@@ -1118,9 +1123,9 @@ class AdminConfigController extends BaseApiController
         }
 
         $currentConfig = match ($area) {
-            'feed' => FeedRankingService::getConfig(),
+            'feed' => $this->feedRankingService->getConfig(),
             'listings' => $this->listingRankingService->getConfig(),
-            'members' => MemberRankingService::getConfig(),
+            'members' => $this->memberRankingService->getConfig(),
         };
 
         $updated = [];
@@ -1157,13 +1162,13 @@ class AdminConfigController extends BaseApiController
         DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
 
         match ($area) {
-            'feed' => FeedRankingService::clearCache(),
+            'feed' => $this->feedRankingService->clearCache(),
             'listings' => $this->listingRankingService->clearCache(),
-            'members' => MemberRankingService::clearCache(),
+            'members' => $this->memberRankingService->clearCache(),
             default => null,
         };
 
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['updated' => true, 'area' => $area, 'keys_updated' => array_keys($updated)]);
     }
@@ -1232,13 +1237,13 @@ class AdminConfigController extends BaseApiController
         }
 
         $enabled = [
-            'edgerank' => FeedRankingService::isEnabled(),
+            'edgerank' => $this->feedRankingService->isEnabled(),
             'matchrank' => $this->listingRankingService->isEnabled(),
-            'communityrank' => MemberRankingService::isEnabled(),
+            'communityrank' => $this->memberRankingService->isEnabled(),
         ];
 
         $searchHealth = [
-            'meilisearch_available' => SearchService::isAvailable(),
+            'meilisearch_available' => $this->searchService->isAvailable(),
             'listing_index_count' => 0,
         ];
 
@@ -1321,7 +1326,7 @@ class AdminConfigController extends BaseApiController
         }
 
         DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
-        RedisCache::delete('tenant_bootstrap', $tenantId);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData([
             'default_language' => $config['default_language'] ?? 'en',

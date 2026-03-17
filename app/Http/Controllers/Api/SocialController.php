@@ -6,14 +6,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\CommentService;
+use App\Services\FeedActivityService;
+use App\Services\FeedRankingService;
 use App\Services\FeedService;
 use App\Services\SocialNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\CommentService;
-use Nexus\Services\FeedRankingService;
-use Nexus\Services\FeedActivityService;
-use Nexus\Models\FeedPost;
+use App\Models\FeedPost;
 
 /**
  * SocialController -- Social feed posts, likes, polls, comments, reactions.
@@ -34,6 +34,9 @@ class SocialController extends BaseApiController
     public function __construct(
         private readonly FeedService $feedService,
         private readonly SocialNotificationService $socialNotificationService,
+        private readonly CommentService $commentService,
+        private readonly FeedRankingService $feedRankingService,
+        private readonly FeedActivityService $feedActivityService,
     ) {}
 
     /**
@@ -284,7 +287,7 @@ class SocialController extends BaseApiController
 
             // Record in feed_activity so post appears in the feed
             try {
-                FeedActivityService::recordActivity($tenantId, $userId, 'post', (int) $postId, [
+                $this->feedActivityService->recordActivity($tenantId, $userId, 'post', (int) $postId, [
                     'content'    => $content,
                     'image_url'  => $imageUrl,
                     'group_id'   => $groupId ?: null,
@@ -351,7 +354,7 @@ class SocialController extends BaseApiController
             ->delete();
 
         try {
-            FeedActivityService::removeActivity('post', $id);
+            $this->feedActivityService->removeActivity('post', $id);
         } catch (\Exception $e) {
             error_log("SocialController::deletePostV2 feed_activity remove failed: " . $e->getMessage());
         }
@@ -364,7 +367,7 @@ class SocialController extends BaseApiController
     {
         $userId = $this->requireAuth();
         if ($userId && $id > 0) {
-            FeedRankingService::recordImpression($id, $userId);
+            $this->feedRankingService->recordImpression($id, $userId);
         }
         return $this->respondWithData(['recorded' => true]);
     }
@@ -488,7 +491,7 @@ class SocialController extends BaseApiController
     {
         $userId = $this->requireAuth();
         if ($userId && (int) $id > 0) {
-            FeedRankingService::recordClick((int) $id, $userId);
+            $this->feedRankingService->recordClick((int) $id, $userId);
         }
         return $this->respondWithData(['recorded' => true]);
     }
@@ -682,13 +685,13 @@ class SocialController extends BaseApiController
         try {
             $userId = $this->getOptionalUserId() ?? 0;
 
-            if (class_exists(CommentService::class)) {
-                $comments = CommentService::fetchComments($targetType, $targetId, $userId);
+            if (true /* CommentService injected via DI */) {
+                $comments = $this->commentService->fetchComments($targetType, $targetId, $userId);
                 return response()->json([
                     'success'             => true,
                     'status'              => 'success',
                     'comments'            => $comments,
-                    'available_reactions' => CommentService::getAvailableReactions(),
+                    'available_reactions' => $this->commentService->getAvailableReactions(),
                 ]);
             }
 
@@ -727,8 +730,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (class_exists(CommentService::class)) {
-                $result = CommentService::addComment($userId, $tenantId, $targetType, $targetId, $content);
+            if (true /* CommentService injected via DI */) {
+                $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content);
 
                 if (($result['status'] ?? '') === 'success') {
                     $this->notifyComment($userId, $targetType, $targetId, $content);
@@ -897,7 +900,7 @@ class SocialController extends BaseApiController
 
             if ($targetType === 'post') {
                 try {
-                    FeedActivityService::removeActivity('post', $targetId);
+                    $this->feedActivityService->removeActivity('post', $targetId);
                 } catch (\Exception $e) {
                     error_log("SocialController::delete feed_activity remove failed: " . $e->getMessage());
                 }
@@ -930,8 +933,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (class_exists(CommentService::class)) {
-                $result = CommentService::toggleReaction($userId, $tenantId, $commentId, $emoji);
+            if (true /* CommentService injected via DI */) {
+                $result = $this->commentService->toggleReaction($userId, $tenantId, $commentId, $emoji);
                 return response()->json($result);
             }
 
@@ -981,8 +984,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (class_exists(CommentService::class)) {
-                $result = CommentService::addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
+            if (true /* CommentService injected via DI */) {
+                $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
                 return response()->json($result);
             }
 
@@ -1018,8 +1021,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (class_exists(CommentService::class)) {
-                $result = CommentService::editComment($commentId, $userId, $content);
+            if (true /* CommentService injected via DI */) {
+                $result = $this->commentService->editComment($commentId, $userId, $content);
                 return response()->json($result);
             }
 
@@ -1053,8 +1056,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (class_exists(CommentService::class)) {
-                $result = CommentService::deleteComment($commentId, $userId, $this->isUserAdmin());
+            if (true /* CommentService injected via DI */) {
+                $result = $this->commentService->deleteComment($commentId, $userId, $this->isUserAdmin());
                 return response()->json($result);
             }
 
@@ -1089,8 +1092,8 @@ class SocialController extends BaseApiController
         }
 
         try {
-            if (class_exists(CommentService::class)) {
-                $users = CommentService::searchUsersForMention($query, $tenantId, 10);
+            if (true /* CommentService injected via DI */) {
+                $users = $this->commentService->searchUsersForMention($query, $tenantId, 10);
             } else {
                 $searchTerm = "%{$query}%";
                 $users = DB::select(

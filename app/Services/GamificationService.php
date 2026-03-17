@@ -193,4 +193,32 @@ class GamificationService
 
         return ['claimed' => true, 'reward' => ['xp' => $xp]];
     }
+
+    // =========================================================================
+    // Legacy delegation methods — used by AdminGamificationController
+    // =========================================================================
+
+    /**
+     * Delegates to legacy GamificationService::getBadgeDefinitions().
+     */
+    public function getBadgeDefinitions(): array
+    {
+        return \Nexus\Services\GamificationService::getBadgeDefinitions();
+    }
+
+    /**
+     * Delegates to legacy GamificationService::runAllBadgeChecks().
+     */
+    public function runAllBadgeChecks(int $userId): void
+    {
+        \Nexus\Services\GamificationService::runAllBadgeChecks($userId);
+    }
+
+    /**
+     * Delegates to legacy GamificationService::awardBadgeByKey().
+     */
+    public function awardBadgeByKey(int $userId, string $badgeKey): void
+    {
+        \Nexus\Services\GamificationService::awardBadgeByKey($userId, $badgeKey);
+    }
 }

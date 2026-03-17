@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\UserInsightsService;
+use App\Services\UserInsightsService;
 
 /**
  * AdminDashboardController -- Admin analytics dashboard endpoints.
@@ -19,6 +19,10 @@ use Nexus\Services\UserInsightsService;
 class AdminDashboardController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly UserInsightsService $userInsightsService,
+    ) {}
 
     /**
      * GET /api/v2/admin/dashboard/stats
@@ -242,9 +246,9 @@ class AdminDashboardController extends BaseApiController
         $months = $this->queryInt('months', 6, 1, 24);
 
         return $this->respondWithData([
-            'insights' => UserInsightsService::getInsights($userId, $months),
-            'trends' => UserInsightsService::getMonthlyTrends($userId, $months),
-            'partnerStats' => UserInsightsService::getPartnerStats($userId, $months),
+            'insights' => $this->userInsightsService->getInsights($userId, $months),
+            'trends' => $this->userInsightsService->getMonthlyTrends($userId, $months),
+            'partnerStats' => $this->userInsightsService->getPartnerStats($userId, $months),
         ]);
     }
 }

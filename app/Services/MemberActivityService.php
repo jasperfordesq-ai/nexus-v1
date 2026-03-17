@@ -94,4 +94,36 @@ class MemberActivityService
             'balance'  => $received - $given,
         ];
     }
+
+    /**
+     * Delegates to legacy MemberActivityService::getDashboardData().
+     */
+    public function getDashboardData(int $userId): array
+    {
+        return \Nexus\Services\MemberActivityService::getDashboardData($userId);
+    }
+
+    /**
+     * Delegates to legacy MemberActivityService::getRecentTimeline().
+     */
+    public function getRecentTimeline(int $userId, ?int $tenantId = null, int $limit = 30): array
+    {
+        return \Nexus\Services\MemberActivityService::getRecentTimeline($userId, $tenantId, $limit);
+    }
+
+    /**
+     * Delegates to legacy MemberActivityService::getHoursSummary().
+     */
+    public function getHoursSummary(int $userId, ?int $tenantId = null): array
+    {
+        return \Nexus\Services\MemberActivityService::getHoursSummary($userId, $tenantId);
+    }
+
+    /**
+     * Delegates to legacy MemberActivityService::getMonthlyHours().
+     */
+    public function getMonthlyHours(int $userId, ?int $tenantId = null): array
+    {
+        return \Nexus\Services\MemberActivityService::getMonthlyHours($userId, $tenantId);
+    }
 }

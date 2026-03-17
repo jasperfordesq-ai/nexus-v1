@@ -10,9 +10,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\TenantContext;
-use Nexus\Core\RateLimiter;
-use Nexus\Core\Mailer;
-use Nexus\Core\EmailTemplate;
+use App\Core\RateLimiter;
+use App\Core\Mailer;
+use App\Core\EmailTemplate;
 
 /**
  * EmailVerificationController -- Email verification endpoints.
@@ -99,7 +99,7 @@ class EmailVerificationController extends BaseApiController
 
         // Log the verification
         try {
-            \Nexus\Models\ActivityLog::log(
+            \App\Models\ActivityLog::log(
                 $userId,
                 'email_verified',
                 'Email address verified via API'
@@ -110,8 +110,8 @@ class EmailVerificationController extends BaseApiController
 
         // Award gamification points if available
         try {
-            if (class_exists('\Nexus\Models\Gamification')) {
-                \Nexus\Models\Gamification::awardPoints($userId, 10, 'Verified email address');
+            if (class_exists('\App\Models\Gamification')) {
+                \App\Models\Gamification::awardPoints($userId, 10, 'Verified email address');
             }
         } catch (\Throwable $e) {
             // Gamification is optional
@@ -176,7 +176,7 @@ class EmailVerificationController extends BaseApiController
     public function resendVerificationByEmail(): JsonResponse
     {
         // Rate limit by IP — 3 per 5 minutes (aggressive since unauthenticated)
-        $ip = \Nexus\Core\ClientIp::get();
+        $ip = \App\Core\ClientIp::get();
         if (\Nexus\Services\RateLimitService::check("resend_verify:$ip", 3, 300)) {
             return $this->respondWithError(
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,

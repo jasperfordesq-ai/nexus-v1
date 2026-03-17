@@ -101,4 +101,40 @@ class ContentModerationService
             'total'    => array_sum(array_map('intval', $rows)),
         ];
     }
+
+    // =========================================================================
+    // Legacy delegation methods — used by AdminAnalyticsReportsController
+    // =========================================================================
+
+    /**
+     * Delegates to legacy ContentModerationService::getQueue().
+     */
+    public function getQueue(int $tenantId, array $filters = [], int $limit = 50, int $offset = 0): array
+    {
+        return \Nexus\Services\ContentModerationService::getQueue($tenantId, $filters, $limit, $offset);
+    }
+
+    /**
+     * Delegates to legacy ContentModerationService::review().
+     */
+    public function review(int $id, int $tenantId, int $adminId, string $decision, ?string $rejectionReason = null): array
+    {
+        return \Nexus\Services\ContentModerationService::review($id, $tenantId, $adminId, $decision, $rejectionReason);
+    }
+
+    /**
+     * Delegates to legacy ContentModerationService::getModerationSettings().
+     */
+    public function getModerationSettings(int $tenantId): array
+    {
+        return \Nexus\Services\ContentModerationService::getModerationSettings($tenantId);
+    }
+
+    /**
+     * Delegates to legacy ContentModerationService::updateSettings().
+     */
+    public function updateSettings(int $tenantId, array $settings): bool
+    {
+        return \Nexus\Services\ContentModerationService::updateSettings($tenantId, $settings);
+    }
 }

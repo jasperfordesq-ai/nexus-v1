@@ -56,4 +56,36 @@ class InsuranceCertificateService
     {
         return \Nexus\Services\InsuranceCertificateService::create($data);
     }
+
+    /**
+     * Delegates to legacy InsuranceCertificateService::update().
+     */
+    public function update(int $id, array $data): bool
+    {
+        return \Nexus\Services\InsuranceCertificateService::update($id, $data);
+    }
+
+    /**
+     * Delegates to legacy InsuranceCertificateService::verify().
+     */
+    public function verify(int $id, int $adminId): bool
+    {
+        return \Nexus\Services\InsuranceCertificateService::verify($id, $adminId);
+    }
+
+    /**
+     * Delegates to legacy InsuranceCertificateService::reject().
+     */
+    public function reject(int $id, int $adminId, string $reason): bool
+    {
+        return \Nexus\Services\InsuranceCertificateService::reject($id, $adminId, $reason);
+    }
+
+    /**
+     * Delegates to legacy InsuranceCertificateService::delete().
+     */
+    public function delete(int $id): bool
+    {
+        return \Nexus\Services\InsuranceCertificateService::delete($id);
+    }
 }

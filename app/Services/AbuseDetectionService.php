@@ -56,4 +56,12 @@ class AbuseDetectionService
     {
         return \Nexus\Services\AbuseDetectionService::checkInactiveHighBalances();
     }
+
+    /**
+     * Delegates to legacy AbuseDetectionService::updateAlertStatus().
+     */
+    public function updateAlertStatus(int $id, string $status, ?int $resolvedBy = null, ?string $notes = null): bool
+    {
+        return \Nexus\Services\AbuseDetectionService::updateAlertStatus($id, $status, $resolvedBy, $notes);
+    }
 }

@@ -6,18 +6,21 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TotpService;
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\TotpService;
 
 /**
  * TwoFactorController -- Two-factor authentication setup.
  *
- * Converted from delegation to direct service calls.
- * Legacy: src/Controllers/Api/TwoFactorApiController.php
+ * All methods use Laravel DI services.
  */
 class TwoFactorController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly TotpService $totpService,
+    ) {}
 
     /** GET auth/2fa/status */
     public function status(): JsonResponse
@@ -25,9 +28,9 @@ class TwoFactorController extends BaseApiController
         $userId = $this->requireAuth();
 
         return $this->respondWithData([
-            'enabled' => TotpService::isEnabled($userId),
-            'setup_required' => TotpService::isSetupRequired($userId),
-            'backup_codes_remaining' => TotpService::getBackupCodeCount($userId),
+            'enabled' => $this->totpService->isEnabled($userId),
+            'setup_required' => $this->totpService->isSetupRequired($userId),
+            'backup_codes_remaining' => $this->totpService->getBackupCodeCount($userId),
         ]);
     }
 
@@ -37,7 +40,7 @@ class TwoFactorController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('2fa_setup', 5, 300);
 
-        if (TotpService::isEnabled($userId)) {
+        if ($this->totpService->isEnabled($userId)) {
             return $this->respondWithError(
                 'ALREADY_ENABLED',
                 '2FA is already enabled on your account',
@@ -47,7 +50,7 @@ class TwoFactorController extends BaseApiController
         }
 
         try {
-            $result = TotpService::initializeSetup($userId);
+            $result = $this->totpService->initializeSetup($userId);
 
             // Convert raw SVG to data URI for use in <img src="...">
             $svgDataUri = 'data:image/svg+xml;base64,' . base64_encode($result['qr_code']);
@@ -85,7 +88,7 @@ class TwoFactorController extends BaseApiController
             );
         }
 
-        $result = TotpService::completeSetup($userId, $code);
+        $result = $this->totpService->completeSetup($userId, $code);
 
         if (!$result['success']) {
             return $this->respondWithError(
@@ -119,7 +122,7 @@ class TwoFactorController extends BaseApiController
             );
         }
 
-        $result = TotpService::disable($userId, $password);
+        $result = $this->totpService->disable($userId, $password);
 
         if (!$result['success']) {
             return $this->respondWithError(
