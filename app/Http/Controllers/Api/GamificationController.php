@@ -502,7 +502,7 @@ class GamificationController extends BaseApiController
         }
 
         try {
-            $db = \Nexus\Core\Database::getInstance();
+            $db = \Illuminate\Support\Facades\DB::getPdo();
             $scoreService = new NexusScoreService($db);
             $scoreData = $scoreService->calculateNexusScore($targetUserId, $tenantId);
             return response()->json($scoreData);

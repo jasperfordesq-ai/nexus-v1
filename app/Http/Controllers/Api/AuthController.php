@@ -7,8 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\TokenService;
 use Nexus\Services\TotpService;
@@ -93,24 +93,19 @@ class AuthController extends BaseApiController
             );
         }
 
-        $db = Database::getConnection();
-
         // Scope login by tenant when tenant context is available
         $tenantId = TenantContext::getId();
         if ($tenantId) {
-            $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ? AND u.tenant_id = ?");
-            $stmt->execute([$email, $tenantId]);
+            $userRow = DB::selectOne("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ? AND u.tenant_id = ?", [$email, $tenantId]);
         } else {
-            $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?");
-            $stmt->execute([$email]);
+            $userRow = DB::selectOne("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?", [$email]);
         }
-        $user = $stmt->fetch();
+        $user = $userRow ? (array)$userRow : null;
 
         // SUPER ADMIN CROSS-TENANT LOGIN fallback
         if (!$user && $tenantId) {
-            $stmt = $db->prepare("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?");
-            $stmt->execute([$email]);
-            $candidate = $stmt->fetch();
+            $candidateRow = DB::selectOne("SELECT u.*, t.configuration FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.email = ?", [$email]);
+            $candidate = $candidateRow ? (array)$candidateRow : null;
             if ($candidate && (!empty($candidate['is_super_admin']) || !empty($candidate['is_tenant_super_admin']) || ($candidate['role'] ?? '') === 'super_admin')) {
                 $user = $candidate;
             }
@@ -384,10 +379,8 @@ class AuthController extends BaseApiController
         }
 
         // Verify user still exists and is active
-        $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, email, role, status, is_super_admin, is_tenant_super_admin, tenant_id, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?");
-        $stmt->execute([$userId, $tenantId]);
-        $user = $stmt->fetch();
+        $userRow = DB::selectOne("SELECT id, email, role, status, is_super_admin, is_tenant_super_admin, tenant_id, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return $this->authError(
@@ -704,10 +697,8 @@ class AuthController extends BaseApiController
         }
 
         // Fetch user data to populate session
-        $db = Database::getConnection();
-        $stmt = $db->prepare("SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin, is_tenant_super_admin, email_verified_at, is_approved FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $user = $stmt->fetch();
+        $userRow = DB::selectOne("SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin, is_tenant_super_admin, email_verified_at, is_approved FROM users WHERE id = ?", [$userId]);
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return $this->authError(
@@ -902,10 +893,11 @@ class AuthController extends BaseApiController
         }
 
         // Load user from DB
-        $user = Database::query(
+        $userRow = DB::selectOne(
             "SELECT id, first_name, last_name, email, role, tenant_id, avatar_url, is_super_admin, is_tenant_super_admin, is_god, is_admin FROM users WHERE id = ?",
             [(int)$userId]
-        )->fetch();
+        );
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);

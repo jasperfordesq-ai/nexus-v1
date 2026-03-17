@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\DailyRewardService;
 use Nexus\Services\ChallengeService;
@@ -47,10 +46,11 @@ class GamificationV2Controller extends BaseApiController
 
         $tenantId = TenantContext::getId();
 
-        $user = Database::query(
+        $userRow = DB::selectOne(
             "SELECT id, first_name, last_name, avatar_url, xp, level FROM users WHERE id = ? AND tenant_id = ?",
             [$targetUserId, $tenantId]
-        )->fetch();
+        );
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'User not found', null, 404);
@@ -150,10 +150,11 @@ class GamificationV2Controller extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', 'Badge not found', null, 404);
         }
 
-        $userBadge = Database::query(
+        $userBadgeRow = DB::selectOne(
             "SELECT * FROM user_badges WHERE user_id = ? AND badge_key = ?",
             [$userId, $key]
-        )->fetch();
+        );
+        $userBadge = $userBadgeRow ? (array)$userBadgeRow : null;
 
         $badge = array_merge($definition, [
             'earned' => !empty($userBadge),
@@ -199,12 +200,12 @@ class GamificationV2Controller extends BaseApiController
 
         // NexusScore leaderboard
         if ($serviceType === 'nexus_score') {
-            $tableCheck = Database::query("SHOW TABLES LIKE 'nexus_score_cache'")->fetch();
-            if (!$tableCheck) {
+            $tableCheck = DB::select("SHOW TABLES LIKE 'nexus_score_cache'");
+            if (empty($tableCheck)) {
                 return $this->respondWithData([], ['period' => $period, 'type' => $type, 'your_position' => null, 'total_entries' => 0]);
             }
 
-            $rows = Database::query(
+            $rowResults = DB::select(
                 "SELECT n.user_id, n.total_score, n.percentile, u.name, u.avatar_url, u.xp, u.level,
                         @rownum := @rownum + 1 AS rank_pos
                  FROM nexus_score_cache n
@@ -214,7 +215,8 @@ class GamificationV2Controller extends BaseApiController
                  ORDER BY n.total_score DESC
                  LIMIT ?",
                 [$tenantId, $tenantId, $limit]
-            )->fetchAll();
+            );
+            $rows = array_map(fn($r) => (array)$r, $rowResults);
 
             $leaderboard = [];
             foreach ($rows as $pos => $row) {
@@ -240,12 +242,12 @@ class GamificationV2Controller extends BaseApiController
                 }
             }
 
-            $totalNexus = (int) (Database::query(
+            $totalNexus = (int) (DB::selectOne(
                 "SELECT COUNT(*) AS cnt FROM nexus_score_cache n
                  JOIN users u ON u.id = n.user_id
                  WHERE n.tenant_id = ? AND u.tenant_id = ? AND u.is_approved = 1",
                 [$tenantId, $tenantId]
-            )->fetch()['cnt'] ?? 0);
+            )->cnt ?? 0);
 
             return $this->respondWithData($leaderboard, [
                 'period' => $period,
@@ -294,21 +296,21 @@ class GamificationV2Controller extends BaseApiController
         }
 
         if ($currentUserPosition === null && $serviceType === 'xp') {
-            $positionResult = Database::query(
+            $positionResult = DB::selectOne(
                 "SELECT COUNT(*) + 1 AS position
                  FROM users
                  WHERE tenant_id = ? AND is_approved = 1 AND COALESCE(show_on_leaderboard, 1) = 1 AND xp > (
                      SELECT COALESCE(xp, 0) FROM users WHERE id = ?
                  )",
                 [$tenantId, $userId]
-            )->fetch();
-            $currentUserPosition = (int) ($positionResult['position'] ?? 0) ?: null;
+            );
+            $currentUserPosition = (int) ($positionResult->position ?? 0) ?: null;
         }
 
-        $totalMembers = (int) (Database::query(
+        $totalMembers = (int) (DB::selectOne(
             "SELECT COUNT(*) AS cnt FROM users WHERE tenant_id = ? AND is_approved = 1 AND COALESCE(show_on_leaderboard, 1) = 1",
             [$tenantId]
-        )->fetch()['cnt'] ?? 0);
+        )->cnt ?? 0);
 
         return $this->respondWithData($leaderboard, [
             'period' => $period,
@@ -349,10 +351,11 @@ class GamificationV2Controller extends BaseApiController
                 return $this->respondWithError('RESOURCE_NOT_FOUND', 'Challenge not found', null, 404);
             }
 
-            $progress = Database::query(
+            $progressRow = DB::selectOne(
                 "SELECT * FROM challenge_progress WHERE challenge_id = ? AND user_id = ?",
                 [$id, $userId]
-            )->fetch();
+            );
+            $progress = $progressRow ? (array)$progressRow : null;
 
             if (!$progress) {
                 return $this->respondWithError('CHALLENGE_NOT_STARTED', 'You have not started this challenge', null, 400);
@@ -362,7 +365,7 @@ class GamificationV2Controller extends BaseApiController
                 return $this->respondWithError('CHALLENGE_ALREADY_CLAIMED', 'You have already claimed this reward', null, 400);
             }
 
-            Database::query(
+            DB::update(
                 "UPDATE challenge_progress SET status = 'claimed', claimed_at = NOW() WHERE challenge_id = ? AND user_id = ?",
                 [$id, $userId]
             );
@@ -591,7 +594,7 @@ class GamificationV2Controller extends BaseApiController
         $this->rateLimit('nexus_score', 30, 60);
 
         try {
-            $db = Database::getInstance();
+            $db = DB::getPdo();
             $cacheService = new NexusScoreCacheService($db);
             $scoreData = $cacheService->getScore($userId, $tenantId);
 

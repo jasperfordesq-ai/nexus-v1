@@ -107,7 +107,7 @@ class AdminMatchingController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $row = Database::query(
+        $rowObj = DB::selectOne(
             "SELECT ma.*,
                     CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_1_name,
                     u.email as user_1_email, u.avatar_url as user_1_avatar, u.bio as user_1_bio, u.location as user_1_location,
@@ -124,7 +124,8 @@ class AdminMatchingController extends BaseApiController
              LEFT JOIN users r ON ma.reviewed_by = r.id
              WHERE ma.id = ? AND ma.tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
+        $row = $rowObj ? (array)$rowObj : null;
 
         if (!$row) {
             return $this->respondWithError('NOT_FOUND', 'Match approval not found', null, 404);
@@ -214,7 +215,8 @@ class AdminMatchingController extends BaseApiController
         $input = $this->getAllInput();
         $tenantId = $this->getTenantId();
 
-        $tenant = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
+        $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+        $tenant = $tenantRow ? (array)$tenantRow : null;
         $config = $tenant && $tenant['configuration'] ? json_decode($tenant['configuration'], true) : [];
         $config['algorithms'] = $config['algorithms'] ?? [];
         $existing = $config['algorithms']['smart_matching'] ?? [];
@@ -250,7 +252,7 @@ class AdminMatchingController extends BaseApiController
             'proximity' => $proximity,
         ];
 
-        Database::query("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+        DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
         SmartMatchingEngine::clearCache();
 
         return $this->respondWithData(['message' => 'Matching configuration updated successfully']);
@@ -290,9 +292,9 @@ class AdminMatchingController extends BaseApiController
             $rejectedCount = 0;
             try {
                 $tenantId = $this->getTenantId();
-                $pendingApprovals = (int) Database::query("SELECT COUNT(*) FROM match_approvals WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->fetchColumn();
-                $approvedCount = (int) Database::query("SELECT COUNT(*) FROM match_approvals WHERE tenant_id = ? AND status = 'approved'", [$tenantId])->fetchColumn();
-                $rejectedCount = (int) Database::query("SELECT COUNT(*) FROM match_approvals WHERE tenant_id = ? AND status = 'rejected'", [$tenantId])->fetchColumn();
+                $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->cnt;
+                $approvedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'approved'", [$tenantId])->cnt;
+                $rejectedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'rejected'", [$tenantId])->cnt;
             } catch (\Throwable $e) {}
 
             $totalReviewed = $approvedCount + $rejectedCount;

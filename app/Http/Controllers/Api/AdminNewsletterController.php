@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\Database;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 
 /**
@@ -40,7 +40,7 @@ class AdminNewsletterController extends BaseApiController
             return false;
         }
         try {
-            Database::query("SELECT 1 FROM `{$table}` LIMIT 1");
+            DB::select("SELECT 1 FROM `{$table}` LIMIT 1");
             return true;
         } catch (\Exception $e) {
             return false;
@@ -68,16 +68,16 @@ class AdminNewsletterController extends BaseApiController
                 $params[] = $status;
             }
 
-            $countStmt = Database::query("SELECT COUNT(*) as cnt FROM newsletters {$where}", $params);
-            $total = (int) $countStmt->fetch()['cnt'];
+            $countRow = DB::selectOne("SELECT COUNT(*) as cnt FROM newsletters {$where}", $params);
+            $total = (int) ($countRow->cnt ?? 0);
 
             $params[] = $perPage;
             $params[] = $offset;
-            $stmt = Database::query(
+            $rows = DB::select(
                 "SELECT * FROM newsletters {$where} ORDER BY created_at DESC LIMIT ? OFFSET ?",
                 $params
             );
-            $items = $stmt->fetchAll() ?: [];
+            $items = array_map(fn($r) => (array)$r, $rows);
 
             return $this->respondWithPaginatedCollection($items, $total, $page, $perPage);
         } catch (\Exception $e) {
@@ -95,15 +95,14 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $item = DB::selectOne(
                 "SELECT * FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
-            $item = $stmt->fetch();
             if (!$item) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
             }
-            return $this->respondWithData($item);
+            return $this->respondWithData((array)$item);
         } catch (\Exception $e) {
             return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
         }
@@ -148,7 +147,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, status,
                     target_audience, segment_id, scheduled_at, ab_test_enabled, subject_b, template_id,
                     ab_split_percentage, ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
@@ -165,7 +164,7 @@ class AdminNewsletterController extends BaseApiController
                  $recurringTime, $recurringEndDate,
                  $userId]
             );
-            $id = Database::lastInsertId();
+            $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $id, 'name' => $name, 'status' => $status], null, 201);
         } catch (\Exception $e) {
             return $this->respondWithError('CREATE_FAILED', 'Failed to create newsletter: ' . $e->getMessage());
@@ -224,7 +223,7 @@ class AdminNewsletterController extends BaseApiController
             }
             $params[] = $id;
             $params[] = $tenantId;
-            Database::query(
+            DB::update(
                 "UPDATE newsletters SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?",
                 $params
             );
@@ -244,7 +243,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            Database::query("DELETE FROM newsletters WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            DB::delete("DELETE FROM newsletters WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->noContent();
         } catch (\Exception $e) {
             return $this->respondWithError('DELETE_FAILED', 'Failed to delete newsletter');
@@ -265,7 +264,7 @@ class AdminNewsletterController extends BaseApiController
         if (!$this->tableExists('newsletter_subscribers')) {
             // Fallback to users table if newsletter_subscribers doesn't exist
             try {
-                $stmt = Database::query(
+                $subscribers = DB::select(
                     "SELECT u.id, u.first_name, u.last_name, u.email, u.status, u.created_at,
                             'member' as source
                      FROM users u
@@ -274,7 +273,7 @@ class AdminNewsletterController extends BaseApiController
                      LIMIT 100",
                     [$tenantId]
                 );
-                $subscribers = $stmt->fetchAll() ?: [];
+                $subscribers = array_map(fn($r) => (array)$r, $subscribers);
                 $total = count($subscribers);
                 $this->jsonResponse([
                     'data' => $subscribers,
@@ -300,7 +299,7 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Get stats
-            $statsStmt = Database::query(
+            $stats = DB::selectOne(
                 "SELECT
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
@@ -310,7 +309,6 @@ class AdminNewsletterController extends BaseApiController
                  WHERE tenant_id = ?",
                 [$tenantId]
             );
-            $stats = $statsStmt->fetch();
 
             // Build filtered query
             $where = 'WHERE ns.tenant_id = ?';
@@ -330,16 +328,16 @@ class AdminNewsletterController extends BaseApiController
             }
 
             // Count filtered
-            $countStmt = Database::query(
+            $countRow = DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM newsletter_subscribers ns {$where}",
                 $params
             );
-            $total = (int) $countStmt->fetch()['cnt'];
+            $total = (int) ($countRow->cnt ?? 0);
 
             // Fetch page
             $params[] = $perPage;
             $params[] = $offset;
-            $stmt = Database::query(
+            $subscribers = DB::select(
                 "SELECT ns.id, ns.email, ns.first_name, ns.last_name, ns.status,
                         ns.source, ns.created_at, ns.confirmed_at, ns.user_id
                  FROM newsletter_subscribers ns
@@ -348,7 +346,7 @@ class AdminNewsletterController extends BaseApiController
                  LIMIT ? OFFSET ?",
                 $params
             );
-            $subscribers = $stmt->fetchAll() ?: [];
+            $subscribers = array_map(fn($r) => (array)$r, $subscribers);
 
             $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 0;
 
@@ -362,10 +360,10 @@ class AdminNewsletterController extends BaseApiController
                     'has_more' => $page < $totalPages,
                 ],
                 'stats' => [
-                    'total' => (int) ($stats['total'] ?? 0),
-                    'active' => (int) ($stats['active'] ?? 0),
-                    'pending' => (int) ($stats['pending'] ?? 0),
-                    'unsubscribed' => (int) ($stats['unsubscribed'] ?? 0),
+                    'total' => (int) ($stats->total ?? 0),
+                    'active' => (int) ($stats->active ?? 0),
+                    'pending' => (int) ($stats->pending ?? 0),
+                    'unsubscribed' => (int) ($stats->unsubscribed ?? 0),
                 ],
             ]);
         } catch (\Exception $e) {
@@ -506,11 +504,11 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $segments = DB::select(
                 "SELECT * FROM newsletter_segments WHERE tenant_id = ? ORDER BY name ASC",
                 [$tenantId]
             );
-            return $this->respondWithData($stmt->fetchAll() ?: []);
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $segments));
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
@@ -526,11 +524,11 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $templates = DB::select(
                 "SELECT * FROM newsletter_templates WHERE tenant_id = ? ORDER BY name ASC",
                 [$tenantId]
             );
-            return $this->respondWithData($stmt->fetchAll() ?: []);
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $templates));
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
@@ -566,26 +564,26 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Summary counts
-            $stmt = Database::query(
+            $row = DB::selectOne(
                 "SELECT COUNT(*) as total, SUM(CASE WHEN status='sent' THEN 1 ELSE 0 END) as sent,
                         AVG(open_rate) as avg_open, AVG(click_rate) as avg_click
                  FROM newsletters WHERE tenant_id = ?",
                 [$tenantId]
             );
-            $row = $stmt->fetch();
+
             if ($row) {
-                $data['total_newsletters'] = (int) ($row['total'] ?? 0);
-                $data['total_sent'] = (int) ($row['sent'] ?? 0);
-                $data['avg_open_rate'] = round((float) ($row['avg_open'] ?? 0), 1);
-                $data['avg_click_rate'] = round((float) ($row['avg_click'] ?? 0), 1);
+                $data['total_newsletters'] = (int) ($row->total ?? 0);
+                $data['total_sent'] = (int) ($row->sent ?? 0);
+                $data['avg_open_rate'] = round((float) ($row->avg_open ?? 0), 1);
+                $data['avg_click_rate'] = round((float) ($row->avg_click ?? 0), 1);
             }
 
-            $subStmt = Database::query(
+            $subStmt = DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active'",
                 [$tenantId]
             );
-            $subRow = $subStmt->fetch();
-            $data['total_subscribers'] = (int) ($subRow['cnt'] ?? 0);
+            $subRow = $subStmt;
+            $data['total_subscribers'] = (int) ($subRow->cnt ?? 0);
 
             // Full analytics from sent newsletters (mirrors legacy PHP admin)
             $newsletters = \Nexus\Models\Newsletter::getAllSent();
@@ -668,21 +666,22 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $segment = DB::selectOne(
                 "SELECT * FROM newsletter_segments WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
-            $segment = $stmt->fetch();
+
             if (!$segment) {
                 return $this->respondWithError('NOT_FOUND', 'Segment not found', null, 404);
             }
 
             // Decode rules JSON if stored as string
-            if (!empty($segment['rules']) && is_string($segment['rules'])) {
-                $segment['rules'] = json_decode($segment['rules'], true) ?: [];
+            $segmentArr = (array)$segment;
+            if (!empty($segmentArr['rules']) && is_string($segmentArr['rules'])) {
+                $segmentArr['rules'] = json_decode($segmentArr['rules'], true) ?: [];
             }
 
-            return $this->respondWithData($segment);
+            return $this->respondWithData($segmentArr);
         } catch (\Exception $e) {
             return $this->respondWithError('FETCH_FAILED', 'Failed to fetch segment');
         }
@@ -717,13 +716,13 @@ class AdminNewsletterController extends BaseApiController
             // Count matching subscribers
             $subscriberCount = $this->countMatchingSubscribers($tenantId, $matchType, is_array($rules) ? $rules : (json_decode($rulesJson, true) ?: []));
 
-            Database::query(
+            DB::insert(
                 "INSERT INTO newsletter_segments (tenant_id, name, description, is_active, match_type, rules, subscriber_count, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                 [$tenantId, $name, $description, $isActive ? 1 : 0, $matchType, $rulesJson, $subscriberCount]
             );
 
-            $id = Database::lastInsertId();
+            $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData([
                 'id' => $id,
                 'name' => $name,
@@ -746,10 +745,10 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Check segment exists
-            $existing = Database::query(
+            $existing = DB::selectOne(
                 "SELECT id FROM newsletter_segments WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Segment not found', null, 404);
@@ -809,7 +808,7 @@ class AdminNewsletterController extends BaseApiController
             $params[] = $id;
             $params[] = $tenantId;
 
-            Database::query(
+            DB::update(
                 "UPDATE newsletter_segments SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?",
                 $params
             );
@@ -830,16 +829,16 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $existing = Database::query(
+            $existing = DB::selectOne(
                 "SELECT id FROM newsletter_segments WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Segment not found', null, 404);
             }
 
-            Database::query(
+            DB::delete(
                 "DELETE FROM newsletter_segments WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
@@ -882,11 +881,11 @@ class AdminNewsletterController extends BaseApiController
             // Suggestion 1: Active users (logged in within 30 days)
             $activeCount = 0;
             try {
-                $stmt = Database::query(
+                $stmt = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND last_login >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
                     [$tenantId]
                 );
-                $activeCount = (int) ($stmt->fetch()['cnt'] ?? 0);
+                $activeCount = (int) ($stmt->cnt ?? 0);
             } catch (\Exception $e) {
                 // Column may not exist
             }
@@ -906,11 +905,11 @@ class AdminNewsletterController extends BaseApiController
             // Suggestion 2: Inactive users (not logged in for 60+ days)
             $inactiveCount = 0;
             try {
-                $stmt = Database::query(
+                $stmt = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND (last_login IS NULL OR last_login < DATE_SUB(NOW(), INTERVAL 60 DAY))",
                     [$tenantId]
                 );
-                $inactiveCount = (int) ($stmt->fetch()['cnt'] ?? 0);
+                $inactiveCount = (int) ($stmt->cnt ?? 0);
             } catch (\Exception $e) {
                 // Column may not exist
             }
@@ -930,11 +929,11 @@ class AdminNewsletterController extends BaseApiController
             // Suggestion 3: Members with listings
             $withListingsCount = 0;
             try {
-                $stmt = Database::query(
+                $stmt = DB::selectOne(
                     "SELECT COUNT(DISTINCT u.id) as cnt FROM users u INNER JOIN listings l ON u.id = l.user_id AND l.tenant_id = ? WHERE u.tenant_id = ? AND u.status = 'active'",
                     [$tenantId, $tenantId]
                 );
-                $withListingsCount = (int) ($stmt->fetch()['cnt'] ?? 0);
+                $withListingsCount = (int) ($stmt->cnt ?? 0);
             } catch (\Exception $e) {
                 // Table may not exist
             }
@@ -954,11 +953,11 @@ class AdminNewsletterController extends BaseApiController
             // Suggestion 4: New members (joined in last 30 days)
             $newCount = 0;
             try {
-                $stmt = Database::query(
+                $stmt = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
                     [$tenantId]
                 );
-                $newCount = (int) ($stmt->fetch()['cnt'] ?? 0);
+                $newCount = (int) ($stmt->cnt ?? 0);
             } catch (\Exception $e) {
                 // Ignore
             }
@@ -978,11 +977,11 @@ class AdminNewsletterController extends BaseApiController
             // Suggestion 5: Admin users
             $adminCount = 0;
             try {
-                $stmt = Database::query(
+                $stmt = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active' AND role IN ('admin', 'broker')",
                     [$tenantId]
                 );
-                $adminCount = (int) ($stmt->fetch()['cnt'] ?? 0);
+                $adminCount = (int) ($stmt->cnt ?? 0);
             } catch (\Exception $e) {
                 // Ignore
             }
@@ -1014,11 +1013,11 @@ class AdminNewsletterController extends BaseApiController
         if (empty($rules)) {
             // No rules = match all active users
             try {
-                $stmt = Database::query(
+                $stmt = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active'",
                     [$tenantId]
                 );
-                return (int) ($stmt->fetch()['cnt'] ?? 0);
+                return (int) ($stmt->cnt ?? 0);
             } catch (\Exception $e) {
                 return 0;
             }
@@ -1153,11 +1152,11 @@ class AdminNewsletterController extends BaseApiController
 
         if (empty($conditions)) {
             try {
-                $stmt = Database::query(
+                $stmt = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active'",
                     [$tenantId]
                 );
-                return (int) ($stmt->fetch()['cnt'] ?? 0);
+                return (int) ($stmt->cnt ?? 0);
             } catch (\Exception $e) {
                 return 0;
             }
@@ -1175,8 +1174,8 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             $sql = "SELECT COUNT(DISTINCT u.id) as cnt FROM users u {$joinClause} WHERE u.tenant_id = ? AND u.status = 'active' AND {$whereClause}";
-            $stmt = Database::query($sql, $params);
-            return (int) ($stmt->fetch()['cnt'] ?? 0);
+            $stmt = DB::selectOne($sql, $params);
+            return (int) ($stmt->cnt ?? 0);
         } catch (\Exception $e) {
             return 0;
         }
@@ -1196,18 +1195,18 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $item = DB::selectOne(
                 "SELECT t.*,
                         (SELECT COUNT(*) FROM newsletters n WHERE n.template_id = t.id AND n.tenant_id = ?) as usage_count
                  FROM newsletter_templates t
                  WHERE t.id = ? AND t.tenant_id = ?",
                 [$tenantId, $id, $tenantId]
             );
-            $item = $stmt->fetch();
+
             if (!$item) {
                 return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
             }
-            return $this->respondWithData($item);
+            return $this->respondWithData((array)$item);
         } catch (\Exception $e) {
             return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
         }
@@ -1235,13 +1234,13 @@ class AdminNewsletterController extends BaseApiController
         $content = $this->input('content', '');
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO newsletter_templates
                     (tenant_id, name, description, category, is_active, subject, preview_text, content, created_by, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                 [$tenantId, $name, $description, $category, $isActive, $subject, $previewText, $content, $userId]
             );
-            $id = Database::lastInsertId();
+            $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $id, 'name' => $name], null, 201);
         } catch (\Exception $e) {
             return $this->respondWithError('CREATE_FAILED', 'Failed to create template: ' . $e->getMessage());
@@ -1286,7 +1285,7 @@ class AdminNewsletterController extends BaseApiController
             $params[] = $id;
             $params[] = $tenantId;
 
-            Database::query(
+            DB::update(
                 "UPDATE newsletter_templates SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?",
                 $params
             );
@@ -1306,7 +1305,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            Database::query(
+            DB::delete(
                 "DELETE FROM newsletter_templates WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
@@ -1326,35 +1325,35 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $original = DB::selectOne(
                 "SELECT * FROM newsletter_templates WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
-            $original = $stmt->fetch();
+
             if (!$original) {
                 return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
             }
 
-            $newName = $original['name'] . ' (Copy)';
+            $newName = $original->name . ' (Copy)';
 
-            Database::query(
+            DB::insert(
                 "INSERT INTO newsletter_templates
                     (tenant_id, name, description, category, is_active, subject, preview_text, content, created_by, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                 [
                     $tenantId,
                     $newName,
-                    $original['description'] ?? '',
-                    $original['category'] ?? 'custom',
-                    $original['is_active'] ?? 1,
-                    $original['subject'] ?? '',
-                    $original['preview_text'] ?? '',
-                    $original['content'] ?? '',
+                    $original->description ?? '',
+                    $original->category ?? 'custom',
+                    $original->is_active ?? 1,
+                    $original->subject ?? '',
+                    $original->preview_text ?? '',
+                    $original->content ?? '',
                     $userId,
                 ]
             );
 
-            $newId = Database::lastInsertId();
+            $newId = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $newId, 'name' => $newName], null, 201);
         } catch (\Exception $e) {
             return $this->respondWithError('DUPLICATE_FAILED', 'Failed to duplicate template: ' . $e->getMessage());
@@ -1371,18 +1370,18 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $item = DB::selectOne(
                 "SELECT content, subject, name FROM newsletter_templates WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
-            $item = $stmt->fetch();
+
             if (!$item) {
                 return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
             }
             return $this->respondWithData([
-                'html' => $item['content'] ?? '',
-                'subject' => $item['subject'] ?? '',
-                'name' => $item['name'] ?? '',
+                'html' => $item->content ?? '',
+                'subject' => $item->subject ?? '',
+                'name' => $item->name ?? '',
             ]);
         } catch (\Exception $e) {
             return $this->respondWithError('NOT_FOUND', 'Template not found', null, 404);
@@ -1404,20 +1403,19 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Get newsletter with author info
-            $stmt = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT n.*, u.first_name as author_first_name, u.last_name as author_last_name
                  FROM newsletters n
                  LEFT JOIN users u ON n.created_by = u.id
                  WHERE n.id = ? AND n.tenant_id = ?",
                 [$id, $tenantId]
             );
-            $newsletter = $stmt->fetch();
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
             }
 
-            $authorName = trim(($newsletter['author_first_name'] ?? '') . ' ' . ($newsletter['author_last_name'] ?? ''));
+            $authorName = trim(($newsletter->author_first_name ?? '') . ' ' . ($newsletter->author_last_name ?? ''));
 
             // ── Delivery stats ──
             $delivery = [
@@ -1430,16 +1428,16 @@ class AdminNewsletterController extends BaseApiController
 
             if ($this->tableExists('newsletter_queue')) {
                 try {
-                    $qStmt = Database::query(
+                    $qStmt = DB::select(
                         "SELECT status, COUNT(*) as cnt
                          FROM newsletter_queue
                          WHERE newsletter_id = ? AND tenant_id = ?
                          GROUP BY status",
                         [$id, $tenantId]
                     );
-                    foreach ($qStmt->fetchAll() ?: [] as $row) {
-                        $s = $row['status'] ?? '';
-                        $c = (int) ($row['cnt'] ?? 0);
+                    foreach ($qStmt as $row) {
+                        $s = $row->status ?? '';
+                        $c = (int) ($row->cnt ?? 0);
                         if ($s === 'sent') {
                             $delivery['delivered'] += $c;
                             $delivery['total_sent'] += $c;
@@ -1454,46 +1452,46 @@ class AdminNewsletterController extends BaseApiController
                         }
                     }
                 } catch (\Exception $e) {
-                    $delivery['total_sent'] = (int) ($newsletter['total_sent'] ?? 0);
-                    $delivery['delivered'] = $delivery['total_sent'] - (int) ($newsletter['total_failed'] ?? 0);
-                    $delivery['failed'] = (int) ($newsletter['total_failed'] ?? 0);
+                    $delivery['total_sent'] = (int) ($newsletter->total_sent ?? 0);
+                    $delivery['delivered'] = $delivery['total_sent'] - (int) ($newsletter->total_failed ?? 0);
+                    $delivery['failed'] = (int) ($newsletter->total_failed ?? 0);
                 }
             } else {
-                $delivery['total_sent'] = (int) ($newsletter['total_sent'] ?? 0);
-                $delivery['delivered'] = $delivery['total_sent'] - (int) ($newsletter['total_failed'] ?? 0);
-                $delivery['failed'] = (int) ($newsletter['total_failed'] ?? 0);
+                $delivery['total_sent'] = (int) ($newsletter->total_sent ?? 0);
+                $delivery['delivered'] = $delivery['total_sent'] - (int) ($newsletter->total_failed ?? 0);
+                $delivery['failed'] = (int) ($newsletter->total_failed ?? 0);
             }
 
             if ($this->tableExists('newsletter_bounces')) {
                 try {
-                    $bStmt = Database::query(
+                    $bStmt = DB::selectOne(
                         "SELECT COUNT(*) as cnt FROM newsletter_bounces
                          WHERE newsletter_id = ? AND tenant_id = ?",
                         [$id, $tenantId]
                     );
-                    $delivery['bounced'] = (int) ($bStmt->fetch()['cnt'] ?? 0);
+                    $delivery['bounced'] = (int) ($bStmt->cnt ?? 0);
                 } catch (\Exception $e) {
                     // Keep default
                 }
             }
 
             // ── Engagement stats ──
-            $uniqueOpens = (int) ($newsletter['unique_opens'] ?? 0);
-            $totalOpens = (int) ($newsletter['total_opens'] ?? 0);
-            $uniqueClicks = (int) ($newsletter['unique_clicks'] ?? 0);
-            $totalClicks = (int) ($newsletter['total_clicks'] ?? 0);
+            $uniqueOpens = (int) ($newsletter->unique_opens ?? 0);
+            $totalOpens = (int) ($newsletter->total_opens ?? 0);
+            $uniqueClicks = (int) ($newsletter->unique_clicks ?? 0);
+            $totalClicks = (int) ($newsletter->total_clicks ?? 0);
 
             if ($this->tableExists('newsletter_opens')) {
                 try {
-                    $oRow = Database::query(
+                    $oRow = DB::selectOne(
                         "SELECT COUNT(*) as total, COUNT(DISTINCT email) as uniq
                          FROM newsletter_opens
                          WHERE newsletter_id = ? AND tenant_id = ?",
                         [$id, $tenantId]
-                    )->fetch();
+                    );
                     if ($oRow) {
-                        $totalOpens = max($totalOpens, (int) $oRow['total']);
-                        $uniqueOpens = max($uniqueOpens, (int) $oRow['uniq']);
+                        $totalOpens = max($totalOpens, (int) $oRow->total);
+                        $uniqueOpens = max($uniqueOpens, (int) $oRow->uniq);
                     }
                 } catch (\Exception $e) {
                     // Keep newsletter-level data
@@ -1502,15 +1500,15 @@ class AdminNewsletterController extends BaseApiController
 
             if ($this->tableExists('newsletter_clicks')) {
                 try {
-                    $cRow = Database::query(
+                    $cRow = DB::selectOne(
                         "SELECT COUNT(*) as total, COUNT(DISTINCT email) as uniq
                          FROM newsletter_clicks
                          WHERE newsletter_id = ? AND tenant_id = ?",
                         [$id, $tenantId]
-                    )->fetch();
+                    );
                     if ($cRow) {
-                        $totalClicks = max($totalClicks, (int) $cRow['total']);
-                        $uniqueClicks = max($uniqueClicks, (int) $cRow['uniq']);
+                        $totalClicks = max($totalClicks, (int) $cRow->total);
+                        $uniqueClicks = max($uniqueClicks, (int) $cRow->uniq);
                     }
                 } catch (\Exception $e) {
                     // Keep newsletter-level data
@@ -1532,39 +1530,39 @@ class AdminNewsletterController extends BaseApiController
 
             // ── A/B test data ──
             $abTest = null;
-            if (!empty($newsletter['ab_test_enabled']) && !empty($newsletter['subject_b'])) {
+            if (!empty($newsletter->ab_test_enabled) && !empty($newsletter->subject_b)) {
                 $abTest = [
-                    'subject_a' => $newsletter['subject'] ?? '',
-                    'subject_b' => $newsletter['subject_b'] ?? '',
+                    'subject_a' => $newsletter->subject ?? '',
+                    'subject_b' => $newsletter->subject_b ?? '',
                     'subject_a_opens' => 0,
                     'subject_a_clicks' => 0,
                     'subject_b_opens' => 0,
                     'subject_b_clicks' => 0,
-                    'winner' => $newsletter['ab_winner'] ?? null,
+                    'winner' => $newsletter->ab_winner ?? null,
                     'winning_margin' => 0,
                 ];
 
                 if ($this->tableExists('newsletter_queue') && $this->tableExists('newsletter_opens')) {
                     try {
-                        $aOpens = Database::query(
+                        $aOpens = DB::selectOne(
                             "SELECT COUNT(DISTINCT o.email) as cnt
                              FROM newsletter_opens o
                              JOIN newsletter_queue q ON o.email = q.email AND o.newsletter_id = q.newsletter_id
                              WHERE o.newsletter_id = ? AND o.tenant_id = ?
                              AND (q.subject_variant = 'a' OR q.subject_variant IS NULL)",
                             [$id, $tenantId]
-                        )->fetch();
-                        $abTest['subject_a_opens'] = (int) ($aOpens['cnt'] ?? 0);
+                        );
+                        $abTest['subject_a_opens'] = (int) ($aOpens->cnt ?? 0);
 
-                        $bOpens = Database::query(
+                        $bOpens = DB::selectOne(
                             "SELECT COUNT(DISTINCT o.email) as cnt
                              FROM newsletter_opens o
                              JOIN newsletter_queue q ON o.email = q.email AND o.newsletter_id = q.newsletter_id
                              WHERE o.newsletter_id = ? AND o.tenant_id = ?
                              AND q.subject_variant = 'b'",
                             [$id, $tenantId]
-                        )->fetch();
-                        $abTest['subject_b_opens'] = (int) ($bOpens['cnt'] ?? 0);
+                        );
+                        $abTest['subject_b_opens'] = (int) ($bOpens->cnt ?? 0);
                     } catch (\Exception $e) {
                         $abTest['subject_a_opens'] = (int) ceil($uniqueOpens / 2);
                         $abTest['subject_b_opens'] = (int) floor($uniqueOpens / 2);
@@ -1573,25 +1571,25 @@ class AdminNewsletterController extends BaseApiController
 
                 if ($this->tableExists('newsletter_queue') && $this->tableExists('newsletter_clicks')) {
                     try {
-                        $aClicks = Database::query(
+                        $aClicks = DB::selectOne(
                             "SELECT COUNT(DISTINCT c.email) as cnt
                              FROM newsletter_clicks c
                              JOIN newsletter_queue q ON c.email = q.email AND c.newsletter_id = q.newsletter_id
                              WHERE c.newsletter_id = ? AND c.tenant_id = ?
                              AND (q.subject_variant = 'a' OR q.subject_variant IS NULL)",
                             [$id, $tenantId]
-                        )->fetch();
-                        $abTest['subject_a_clicks'] = (int) ($aClicks['cnt'] ?? 0);
+                        );
+                        $abTest['subject_a_clicks'] = (int) ($aClicks->cnt ?? 0);
 
-                        $bClicks = Database::query(
+                        $bClicks = DB::selectOne(
                             "SELECT COUNT(DISTINCT c.email) as cnt
                              FROM newsletter_clicks c
                              JOIN newsletter_queue q ON c.email = q.email AND c.newsletter_id = q.newsletter_id
                              WHERE c.newsletter_id = ? AND c.tenant_id = ?
                              AND q.subject_variant = 'b'",
                             [$id, $tenantId]
-                        )->fetch();
-                        $abTest['subject_b_clicks'] = (int) ($bClicks['cnt'] ?? 0);
+                        );
+                        $abTest['subject_b_clicks'] = (int) ($bClicks->cnt ?? 0);
                     } catch (\Exception $e) {
                         $abTest['subject_a_clicks'] = (int) ceil($uniqueClicks / 2);
                         $abTest['subject_b_clicks'] = (int) floor($uniqueClicks / 2);
@@ -1612,10 +1610,10 @@ class AdminNewsletterController extends BaseApiController
 
             // ── Timeline data (opens/clicks grouped by hour, first 48h) ──
             $timeline = [];
-            $sentAt = $newsletter['sent_at'] ?? $newsletter['created_at'];
+            $sentAt = $newsletter->sent_at ?? $newsletter->created_at;
             if ($sentAt && $this->tableExists('newsletter_opens')) {
                 try {
-                    $tStmt = Database::query(
+                    $tStmt = DB::select(
                         "SELECT TIMESTAMPDIFF(HOUR, ?, opened_at) as hour_offset, COUNT(*) as opens
                          FROM newsletter_opens
                          WHERE newsletter_id = ? AND tenant_id = ?
@@ -1625,17 +1623,17 @@ class AdminNewsletterController extends BaseApiController
                         [$sentAt, $id, $tenantId, $sentAt, $sentAt]
                     );
                     $opensMap = [];
-                    foreach ($tStmt->fetchAll() ?: [] as $row) {
-                        $h = (int) $row['hour_offset'];
+                    foreach ($tStmt as $row) {
+                        $h = (int) $row->hour_offset;
                         if ($h >= 0 && $h <= 48) {
-                            $opensMap[$h] = (int) $row['opens'];
+                            $opensMap[$h] = (int) $row->opens;
                         }
                     }
 
                     $clicksMap = [];
                     if ($this->tableExists('newsletter_clicks')) {
                         try {
-                            $tcStmt = Database::query(
+                            $tcStmt = DB::select(
                                 "SELECT TIMESTAMPDIFF(HOUR, ?, clicked_at) as hour_offset, COUNT(*) as clicks
                                  FROM newsletter_clicks
                                  WHERE newsletter_id = ? AND tenant_id = ?
@@ -1644,10 +1642,10 @@ class AdminNewsletterController extends BaseApiController
                                  ORDER BY hour_offset",
                                 [$sentAt, $id, $tenantId, $sentAt, $sentAt]
                             );
-                            foreach ($tcStmt->fetchAll() ?: [] as $row) {
-                                $h = (int) $row['hour_offset'];
+                            foreach ($tcStmt as $row) {
+                                $h = (int) $row->hour_offset;
                                 if ($h >= 0 && $h <= 48) {
-                                    $clicksMap[$h] = (int) $row['clicks'];
+                                    $clicksMap[$h] = (int) $row->clicks;
                                 }
                             }
                         } catch (\Exception $e) {
@@ -1673,7 +1671,7 @@ class AdminNewsletterController extends BaseApiController
             $topLinks = [];
             if ($this->tableExists('newsletter_clicks')) {
                 try {
-                    $lStmt = Database::query(
+                    $lStmt = DB::select(
                         "SELECT url, COUNT(*) as clicks, COUNT(DISTINCT email) as unique_clicks
                          FROM newsletter_clicks
                          WHERE newsletter_id = ? AND tenant_id = ?
@@ -1684,11 +1682,11 @@ class AdminNewsletterController extends BaseApiController
                     );
                     $topLinks = array_map(function ($link) {
                         return [
-                            'url' => $link['url'] ?? '',
-                            'clicks' => (int) ($link['clicks'] ?? 0),
-                            'unique_clicks' => (int) ($link['unique_clicks'] ?? 0),
+                            'url' => $link->url ?? '',
+                            'clicks' => (int) ($link->clicks ?? 0),
+                            'unique_clicks' => (int) ($link->unique_clicks ?? 0),
                         ];
-                    }, $lStmt->fetchAll() ?: []);
+                    }, $lStmt);
                 } catch (\Exception $e) {
                     // No link data
                 }
@@ -1698,13 +1696,13 @@ class AdminNewsletterController extends BaseApiController
             $deviceStats = ['desktop' => 0, 'mobile' => 0, 'tablet' => 0, 'unknown' => 0];
             if ($this->tableExists('newsletter_opens')) {
                 try {
-                    $uaRows = Database::query(
+                    $uaRows = DB::select(
                         "SELECT user_agent FROM newsletter_opens
                          WHERE tenant_id = ? AND newsletter_id = ? AND user_agent IS NOT NULL",
                         [$tenantId, $id]
-                    )->fetchAll() ?: [];
+                    );
                     foreach ($uaRows as $uaRow) {
-                        $ua = strtolower($uaRow['user_agent'] ?? '');
+                        $ua = strtolower($uaRow->user_agent ?? '');
                         if (strpos($ua, 'mobile') !== false || strpos($ua, 'android') !== false || strpos($ua, 'iphone') !== false) {
                             $deviceStats['mobile']++;
                         } elseif (strpos($ua, 'tablet') !== false || strpos($ua, 'ipad') !== false) {
@@ -1739,13 +1737,13 @@ class AdminNewsletterController extends BaseApiController
                         $params[] = $id;
                     }
                     $activitySql = implode(' UNION ALL ', $activityParts) . ' ORDER BY action_at DESC LIMIT 20';
-                    $recentActivity = Database::query($activitySql, $params)->fetchAll() ?: [];
+                    $recentActivity = DB::select($activitySql, $params);
                     $recentActivity = array_map(function ($row) {
                         return [
-                            'action_type' => $row['action_type'] ?? 'open',
-                            'email' => $row['email'] ?? '',
-                            'action_at' => $row['action_at'] ?? '',
-                            'url' => $row['url'] ?? null,
+                            'action_type' => $row->action_type ?? 'open',
+                            'email' => $row->email ?? '',
+                            'action_at' => $row->action_at ?? '',
+                            'url' => $row->url ?? null,
                         ];
                     }, $recentActivity);
                 }
@@ -1772,16 +1770,16 @@ class AdminNewsletterController extends BaseApiController
                 $bSent = 0;
                 if ($this->tableExists('newsletter_queue')) {
                     try {
-                        $variantCounts = Database::query(
+                        $variantCounts = DB::select(
                             "SELECT subject_variant, COUNT(*) as cnt
                              FROM newsletter_queue
                              WHERE newsletter_id = ? AND tenant_id = ? AND status IN ('sent', 'failed')
                              GROUP BY subject_variant",
                             [$id, $tenantId]
-                        )->fetchAll() ?: [];
+                        );
                         foreach ($variantCounts as $vc) {
-                            $v = $vc['subject_variant'] ?? 'a';
-                            $c = (int) ($vc['cnt'] ?? 0);
+                            $v = $vc->subject_variant ?? 'a';
+                            $c = (int) ($vc->cnt ?? 0);
                             if ($v === 'b') {
                                 $bSent = $c;
                             } else {
@@ -1790,7 +1788,7 @@ class AdminNewsletterController extends BaseApiController
                         }
                     } catch (\Exception $e) {
                         // Fallback: split total evenly
-                        $splitPct = (int) ($newsletter['ab_split_percentage'] ?? 50);
+                        $splitPct = (int) ($newsletter->ab_split_percentage ?? 50);
                         $aSent = (int) round($delivery['total_sent'] * $splitPct / 100);
                         $bSent = $delivery['total_sent'] - $aSent;
                     }
@@ -1801,24 +1799,24 @@ class AdminNewsletterController extends BaseApiController
                 $abTest['subject_b_open_rate'] = $bSent > 0 ? round(($abTest['subject_b_opens'] / $bSent) * 100, 1) : 0;
                 $abTest['subject_a_click_rate'] = $aSent > 0 ? round(($abTest['subject_a_clicks'] / $aSent) * 100, 1) : 0;
                 $abTest['subject_b_click_rate'] = $bSent > 0 ? round(($abTest['subject_b_clicks'] / $bSent) * 100, 1) : 0;
-                $abTest['split_percentage'] = (int) ($newsletter['ab_split_percentage'] ?? 50);
-                $abTest['winner_metric'] = $newsletter['ab_winner_metric'] ?? 'opens';
+                $abTest['split_percentage'] = (int) ($newsletter->ab_split_percentage ?? 50);
+                $abTest['winner_metric'] = $newsletter->ab_winner_metric ?? 'opens';
             }
 
             return $this->respondWithData([
                 'newsletter' => [
-                    'id' => (int) $newsletter['id'],
-                    'name' => $newsletter['name'] ?? '',
-                    'subject' => $newsletter['subject'] ?? '',
-                    'subject_b' => $newsletter['subject_b'] ?? null,
-                    'status' => $newsletter['status'] ?? 'draft',
-                    'ab_test_enabled' => !empty($newsletter['ab_test_enabled']),
-                    'ab_winner' => $newsletter['ab_winner'] ?? null,
-                    'ab_winner_metric' => $newsletter['ab_winner_metric'] ?? 'opens',
-                    'created_by' => (int) ($newsletter['created_by'] ?? 0),
+                    'id' => (int) $newsletter->id,
+                    'name' => $newsletter->name ?? '',
+                    'subject' => $newsletter->subject ?? '',
+                    'subject_b' => $newsletter->subject_b ?? null,
+                    'status' => $newsletter->status ?? 'draft',
+                    'ab_test_enabled' => !empty($newsletter->ab_test_enabled),
+                    'ab_winner' => $newsletter->ab_winner ?? null,
+                    'ab_winner_metric' => $newsletter->ab_winner_metric ?? 'opens',
+                    'created_by' => (int) ($newsletter->created_by ?? 0),
                     'author_name' => $authorName ?: null,
-                    'sent_at' => $newsletter['sent_at'] ?? null,
-                    'created_at' => $newsletter['created_at'] ?? null,
+                    'sent_at' => $newsletter->sent_at ?? null,
+                    'created_at' => $newsletter->created_at ?? null,
                 ],
                 'delivery' => $delivery,
                 'engagement' => $engagement,
@@ -1852,21 +1850,20 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT id, ab_test_enabled FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
-            $newsletter = $stmt->fetch();
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
             }
 
-            if (empty($newsletter['ab_test_enabled'])) {
+            if (empty($newsletter->ab_test_enabled)) {
                 return $this->respondWithError('VALIDATION_ERROR', 'Newsletter does not have A/B testing enabled');
             }
 
-            Database::query(
+            DB::update(
                 "UPDATE newsletters SET ab_winner = ? WHERE id = ? AND tenant_id = ?",
                 [$winner, $id, $tenantId]
             );
@@ -1914,7 +1911,7 @@ class AdminNewsletterController extends BaseApiController
                 $params[] = $endDate;
             }
 
-            $stmt = Database::query(
+            $bounces = DB::select(
                 "SELECT b.*, n.subject as newsletter_subject
                  FROM newsletter_bounces b
                  LEFT JOIN newsletters n ON b.newsletter_id = n.id
@@ -1924,8 +1921,7 @@ class AdminNewsletterController extends BaseApiController
                 array_merge($params, [$limit, $offset])
             );
 
-            $bounces = $stmt->fetchAll() ?: [];
-            return $this->respondWithData($bounces);
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $bounces));
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
@@ -1941,7 +1937,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $list = DB::select(
                 "SELECT email, reason, suppressed_at, bounce_count
                  FROM newsletter_suppression_list
                  WHERE tenant_id = ? AND (expires_at IS NULL OR expires_at > NOW())
@@ -1949,8 +1945,7 @@ class AdminNewsletterController extends BaseApiController
                 [$tenantId]
             );
 
-            $list = $stmt->fetchAll() ?: [];
-            return $this->respondWithData($list);
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $list));
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
@@ -1966,7 +1961,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            Database::query(
+            DB::delete(
                 "DELETE FROM newsletter_suppression_list WHERE tenant_id = ? AND email = ?",
                 [$tenantId, $email]
             );
@@ -1986,7 +1981,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO newsletter_suppression_list (tenant_id, email, reason, bounce_count)
                  VALUES (?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE suppressed_at = NOW()",
@@ -2013,17 +2008,17 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Get newsletter stats
-            $newsletter = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT id, total_sent, unique_opens, unique_clicks FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$newsletterId, $tenantId]
-            )->fetch();
+            );
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
             }
 
             // Count non-openers
-            $nonOpeners = Database::query(
+            $nonOpenersRow = DB::selectOne(
                 "SELECT COUNT(*) as cnt
                  FROM newsletter_queue q
                  INNER JOIN newsletters n ON n.id = q.newsletter_id AND n.tenant_id = ?
@@ -2033,10 +2028,11 @@ class AdminNewsletterController extends BaseApiController
                      WHERE newsletter_id = ?
                  )",
                 [$tenantId, $newsletterId, $newsletterId]
-            )->fetch()['cnt'] ?? 0;
+            );
+            $nonOpeners = (int) ($nonOpenersRow->cnt ?? 0);
 
             // Count non-clickers (opened but didn't click)
-            $nonClickers = Database::query(
+            $nonClickersRow = DB::selectOne(
                 "SELECT COUNT(DISTINCT o.email) as cnt
                  FROM newsletter_opens o
                  WHERE o.newsletter_id = ? AND o.tenant_id = ?
@@ -2045,13 +2041,14 @@ class AdminNewsletterController extends BaseApiController
                      WHERE newsletter_id = ? AND tenant_id = ?
                  )",
                 [$newsletterId, $tenantId, $newsletterId, $tenantId]
-            )->fetch()['cnt'] ?? 0;
+            );
+            $nonClickers = (int) ($nonClickersRow->cnt ?? 0);
 
             return $this->respondWithData([
-                'newsletter_id' => (int)$newsletter['id'],
-                'total_sent' => (int)($newsletter['total_sent'] ?? 0),
-                'total_opened' => (int)($newsletter['unique_opens'] ?? 0),
-                'total_clicked' => (int)($newsletter['unique_clicks'] ?? 0),
+                'newsletter_id' => (int)$newsletter->id,
+                'total_sent' => (int)($newsletter->total_sent ?? 0),
+                'total_opened' => (int)($newsletter->unique_opens ?? 0),
+                'total_clicked' => (int)($newsletter->unique_clicks ?? 0),
                 'non_openers_count' => (int)$nonOpeners,
                 'non_clickers_count' => (int)$nonClickers,
             ]);
@@ -2078,10 +2075,10 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Get newsletter
-            $newsletter = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT * FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$newsletterId, $tenantId]
-            )->fetch();
+            );
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
@@ -2090,7 +2087,7 @@ class AdminNewsletterController extends BaseApiController
             // Get recipient list based on target
             $recipients = [];
             if ($target === 'non_openers') {
-                $stmt = Database::query(
+                $stmt = DB::select(
                     "SELECT q.email
                      FROM newsletter_queue q
                      INNER JOIN newsletters n ON n.id = q.newsletter_id AND n.tenant_id = ?
@@ -2101,9 +2098,9 @@ class AdminNewsletterController extends BaseApiController
                      )",
                     [$tenantId, $newsletterId, $newsletterId]
                 );
-                $recipients = array_column($stmt->fetchAll(), 'email');
+                $recipients = array_column($stmt, 'email');
             } elseif ($target === 'non_clickers') {
-                $stmt = Database::query(
+                $stmt = DB::select(
                     "SELECT DISTINCT o.email
                      FROM newsletter_opens o
                      WHERE o.newsletter_id = ? AND o.tenant_id = ?
@@ -2113,7 +2110,7 @@ class AdminNewsletterController extends BaseApiController
                      )",
                     [$newsletterId, $tenantId, $newsletterId, $tenantId]
                 );
-                $recipients = array_column($stmt->fetchAll(), 'email');
+                $recipients = array_column($stmt, 'email');
             } elseif ($target === 'segment' && $segmentId) {
                 // TODO: Implement segment-based resend
                 $recipients = [];
@@ -2124,12 +2121,12 @@ class AdminNewsletterController extends BaseApiController
             }
 
             // Queue the resend
-            $subject = $subjectOverride ?: $newsletter['subject'];
+            $subject = $subjectOverride ?: $newsletter->subject;
             $queuedCount = 0;
 
             foreach ($recipients as $email) {
                 $trackingToken = bin2hex(random_bytes(16));
-                Database::query(
+                DB::insert(
                     "INSERT INTO newsletter_queue (tenant_id, newsletter_id, email, status, tracking_token, created_at)
                      VALUES (?, ?, ?, 'pending', ?, NOW())",
                     [$tenantId, $newsletterId, $email, $trackingToken]
@@ -2168,7 +2165,7 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Get heatmap data (day of week × hour)
-            $stmt = Database::query(
+            $heatmapRaw = DB::select(
                 "SELECT DAYOFWEEK(opened_at) as day_of_week, HOUR(opened_at) as hour,
                         COUNT(*) as opens, COUNT(DISTINCT email) as unique_opens
                  FROM newsletter_opens
@@ -2178,13 +2175,11 @@ class AdminNewsletterController extends BaseApiController
                 [$tenantId, $days]
             );
 
-            $heatmapRaw = $stmt->fetchAll() ?: [];
-
             // Also get click data for the same period
             $clicksBySlot = [];
             if ($this->tableExists('newsletter_clicks')) {
                 try {
-                    $clickStmt = Database::query(
+                    $clickStmt = DB::select(
                         "SELECT DAYOFWEEK(clicked_at) as day_of_week, HOUR(clicked_at) as hour,
                                 COUNT(*) as clicks
                          FROM newsletter_clicks
@@ -2192,8 +2187,8 @@ class AdminNewsletterController extends BaseApiController
                          GROUP BY DAYOFWEEK(clicked_at), HOUR(clicked_at)",
                         [$tenantId, $days]
                     );
-                    foreach ($clickStmt->fetchAll() ?: [] as $cRow) {
-                        $clicksBySlot[(int)$cRow['day_of_week'] . '_' . (int)$cRow['hour']] = (int)$cRow['clicks'];
+                    foreach ($clickStmt as $cRow) {
+                        $clicksBySlot[(int)$cRow->day_of_week . '_' . (int)$cRow->hour] = (int)$cRow->clicks;
                     }
                 } catch (\Exception $e) {
                     // No click data
@@ -2202,13 +2197,13 @@ class AdminNewsletterController extends BaseApiController
 
             $heatmap = [];
             foreach ($heatmapRaw as $row) {
-                $key = (int)$row['day_of_week'] . '_' . (int)$row['hour'];
+                $key = (int)$row->day_of_week . '_' . (int)$row->hour;
                 $clicks = $clicksBySlot[$key] ?? 0;
                 $heatmap[] = [
-                    'day_of_week' => (int)$row['day_of_week'],
-                    'hour' => (int)$row['hour'],
-                    'engagement_score' => (int)$row['opens'] + ($clicks * 2),
-                    'opens' => (int)$row['opens'],
+                    'day_of_week' => (int)$row->day_of_week,
+                    'hour' => (int)$row->hour,
+                    'engagement_score' => (int)$row->opens + ($clicks * 2),
+                    'opens' => (int)$row->opens,
                     'clicks' => $clicks,
                 ];
             }
@@ -2269,25 +2264,25 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $newsletter = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT id, status, target_audience, segment_id FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
             }
 
-            if ($newsletter['status'] === 'sent') {
+            if ($newsletter->status === 'sent') {
                 return $this->respondWithError('ALREADY_SENT', 'Newsletter has already been sent');
             }
 
-            if ($newsletter['status'] === 'sending') {
+            if ($newsletter->status === 'sending') {
                 return $this->respondWithError('ALREADY_SENDING', 'Newsletter is currently being sent');
             }
 
-            $targetAudience = $newsletter['target_audience'] ?? 'all_members';
-            $segmentId = $newsletter['segment_id'] ?? null;
+            $targetAudience = $newsletter->target_audience ?? 'all_members';
+            $segmentId = $newsletter->segment_id ?? null;
 
             $queued = \Nexus\Services\NewsletterService::sendNow($id, $targetAudience, $segmentId);
 
@@ -2314,48 +2309,48 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $newsletter = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT * FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
             }
 
-            $admin = Database::query(
+            $admin = DB::selectOne(
                 "SELECT email, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
-            )->fetch();
+            );
 
-            if (!$admin || empty($admin['email'])) {
+            if (!$admin || empty($admin->email)) {
                 return $this->respondWithError('NO_EMAIL', 'Admin user has no email address');
             }
 
             $tenantName = TenantContext::get()['name'] ?? 'Community';
 
             $sampleRecipient = [
-                'email' => $admin['email'],
-                'first_name' => $admin['first_name'] ?? 'Admin',
-                'last_name' => $admin['last_name'] ?? 'User',
-                'name' => trim(($admin['first_name'] ?? '') . ' ' . ($admin['last_name'] ?? '')),
+                'email' => $admin->email,
+                'first_name' => $admin->first_name ?? 'Admin',
+                'last_name' => $admin->last_name ?? 'User',
+                'name' => trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? '')),
             ];
 
             $html = \Nexus\Services\NewsletterService::renderEmail(
-                $newsletter,
+                (array)$newsletter,
                 $tenantName,
                 'test-unsubscribe-token',
                 $sampleRecipient
             );
 
-            $subject = '[TEST] ' . ($newsletter['subject'] ?? 'No Subject');
+            $subject = '[TEST] ' . ($newsletter->subject ?? 'No Subject');
 
-            $sent = (new \Nexus\Core\Mailer())->send($admin['email'], $subject, $html);
+            $sent = (new \Nexus\Core\Mailer())->send($admin->email, $subject, $html);
 
             if ($sent) {
                 return $this->respondWithData([
-                    'sent_to' => $admin['email'],
-                    'message' => "Test email sent to {$admin['email']}",
+                    'sent_to' => $admin->email,
+                    'message' => "Test email sent to {$admin->email}",
                 ]);
             } else {
                 return $this->respondWithError('SEND_FAILED', 'Failed to send test email. Check email configuration.');
@@ -2401,7 +2396,7 @@ class AdminNewsletterController extends BaseApiController
         }
 
         try {
-            $newsletter = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT name, subject, preview_text, content, target_audience, segment_id,
                         ab_test_enabled, subject_b, ab_split_percentage, ab_winner_metric,
                         ab_auto_select_winner, ab_auto_select_after_hours,
@@ -2410,16 +2405,16 @@ class AdminNewsletterController extends BaseApiController
                         recurring_time, recurring_end_date
                  FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
             }
 
-            $newSubject = ($newsletter['subject'] ?? 'Newsletter') . ' (Copy)';
-            $newName = ($newsletter['name'] ?? $newSubject) . ' (Copy)';
+            $newSubject = ($newsletter->subject ?? 'Newsletter') . ' (Copy)';
+            $newName = ($newsletter->name ?? $newSubject) . ' (Copy)';
 
-            Database::query(
+            DB::insert(
                 "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, status,
                     target_audience, segment_id, ab_test_enabled, subject_b, ab_split_percentage,
                     ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
@@ -2428,21 +2423,21 @@ class AdminNewsletterController extends BaseApiController
                     recurring_time, recurring_end_date, created_by, created_at)
                  VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [
-                    $tenantId, $newName, $newSubject, $newsletter['preview_text'], $newsletter['content'],
-                    $newsletter['target_audience'], $newsletter['segment_id'],
-                    $newsletter['ab_test_enabled'], $newsletter['subject_b'],
-                    $newsletter['ab_split_percentage'], $newsletter['ab_winner_metric'],
-                    $newsletter['ab_auto_select_winner'], $newsletter['ab_auto_select_after_hours'],
-                    $newsletter['target_counties'], $newsletter['target_towns'],
-                    $newsletter['target_groups'], $newsletter['template_id'],
-                    $newsletter['is_recurring'], $newsletter['recurring_frequency'],
-                    $newsletter['recurring_day'], $newsletter['recurring_day_of_month'],
-                    $newsletter['recurring_time'], $newsletter['recurring_end_date'],
+                    $tenantId, $newName, $newSubject, $newsletter->preview_text, $newsletter->content,
+                    $newsletter->target_audience, $newsletter->segment_id,
+                    $newsletter->ab_test_enabled, $newsletter->subject_b,
+                    $newsletter->ab_split_percentage, $newsletter->ab_winner_metric,
+                    $newsletter->ab_auto_select_winner, $newsletter->ab_auto_select_after_hours,
+                    $newsletter->target_counties, $newsletter->target_towns,
+                    $newsletter->target_groups, $newsletter->template_id,
+                    $newsletter->is_recurring, $newsletter->recurring_frequency,
+                    $newsletter->recurring_day, $newsletter->recurring_day_of_month,
+                    $newsletter->recurring_time, $newsletter->recurring_end_date,
                     $userId,
                 ]
             );
 
-            $newId = Database::lastInsertId();
+            $newId = DB::getPdo()->lastInsertId();
 
             return $this->respondWithData([
                 'id' => (int) $newId,
@@ -2467,10 +2462,10 @@ class AdminNewsletterController extends BaseApiController
         $type = $this->query('type', 'all');
 
         if ($this->tableExists('newsletters')) {
-            $newsletter = Database::query(
+            $newsletter = DB::selectOne(
                 "SELECT id FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$newsletter) {
                 return $this->respondWithError('NOT_FOUND', 'Newsletter not found', null, 404);
@@ -2482,31 +2477,34 @@ class AdminNewsletterController extends BaseApiController
         try {
             if ($type === 'all' || $type === 'open') {
                 if ($this->tableExists('newsletter_opens')) {
-                    $opens = Database::query(
+                    $opens = DB::select(
                         "SELECT o.id, o.email, 'open' as action_type, o.opened_at as action_at, o.user_agent, o.ip_address, NULL as url
                          FROM newsletter_opens o
                          INNER JOIN newsletters n ON n.id = o.newsletter_id AND n.tenant_id = ?
                          WHERE o.newsletter_id = ?
                          ORDER BY o.opened_at DESC",
                         [$tenantId, $id]
-                    )->fetchAll();
+                    );
                     $activities = array_merge($activities, $opens ?: []);
                 }
             }
 
             if ($type === 'all' || $type === 'click') {
                 if ($this->tableExists('newsletter_clicks')) {
-                    $clicks = Database::query(
+                    $clicks = DB::select(
                         "SELECT c.id, c.email, 'click' as action_type, c.clicked_at as action_at, c.user_agent, c.ip_address, c.url
                          FROM newsletter_clicks c
                          INNER JOIN newsletters n ON n.id = c.newsletter_id AND n.tenant_id = ?
                          WHERE c.newsletter_id = ?
                          ORDER BY c.clicked_at DESC",
                         [$tenantId, $id]
-                    )->fetchAll();
+                    );
                     $activities = array_merge($activities, $clicks ?: []);
                 }
             }
+
+            // Convert objects to arrays for sorting and manipulation
+            $activities = array_map(fn($r) => (array)$r, $activities);
 
             usort($activities, function ($a, $b) {
                 return strtotime($b['action_at'] ?? '0') - strtotime($a['action_at'] ?? '0');
@@ -2549,13 +2547,13 @@ class AdminNewsletterController extends BaseApiController
             $items = [];
 
             if ($this->tableExists('newsletter_opens')) {
-                $countRow = Database::query(
+                $countRow = DB::selectOne(
                     "SELECT COUNT(DISTINCT email) as cnt FROM newsletter_opens WHERE newsletter_id = ? AND tenant_id = ?",
                     [$id, $tenantId]
-                )->fetch();
-                $total = (int) ($countRow['cnt'] ?? 0);
+                );
+                $total = (int) ($countRow->cnt ?? 0);
 
-                $items = Database::query(
+                $items = DB::select(
                     "SELECT email, MIN(opened_at) as first_opened, COUNT(*) as open_count
                      FROM newsletter_opens
                      WHERE newsletter_id = ? AND tenant_id = ?
@@ -2563,13 +2561,13 @@ class AdminNewsletterController extends BaseApiController
                      ORDER BY first_opened DESC
                      LIMIT ? OFFSET ?",
                     [$id, $tenantId, $perPage, $offset]
-                )->fetchAll() ?: [];
+                );
 
                 $items = array_map(function ($row) {
                     return [
-                        'email' => $row['email'] ?? '',
-                        'first_opened' => $row['first_opened'] ?? '',
-                        'open_count' => (int) ($row['open_count'] ?? 0),
+                        'email' => $row->email ?? '',
+                        'first_opened' => $row->first_opened ?? '',
+                        'open_count' => (int) ($row->open_count ?? 0),
                     ];
                 }, $items);
             }
@@ -2596,13 +2594,13 @@ class AdminNewsletterController extends BaseApiController
             $items = [];
 
             if ($this->tableExists('newsletter_clicks')) {
-                $countRow = Database::query(
+                $countRow = DB::selectOne(
                     "SELECT COUNT(DISTINCT email) as cnt FROM newsletter_clicks WHERE newsletter_id = ? AND tenant_id = ?",
                     [$id, $tenantId]
-                )->fetch();
-                $total = (int) ($countRow['cnt'] ?? 0);
+                );
+                $total = (int) ($countRow->cnt ?? 0);
 
-                $items = Database::query(
+                $items = DB::select(
                     "SELECT email, MIN(clicked_at) as first_clicked, COUNT(*) as click_count, COUNT(DISTINCT url) as unique_links
                      FROM newsletter_clicks
                      WHERE newsletter_id = ? AND tenant_id = ?
@@ -2610,14 +2608,14 @@ class AdminNewsletterController extends BaseApiController
                      ORDER BY first_clicked DESC
                      LIMIT ? OFFSET ?",
                     [$id, $tenantId, $perPage, $offset]
-                )->fetchAll() ?: [];
+                );
 
                 $items = array_map(function ($row) {
                     return [
-                        'email' => $row['email'] ?? '',
-                        'first_clicked' => $row['first_clicked'] ?? '',
-                        'click_count' => (int) ($row['click_count'] ?? 0),
-                        'unique_links' => (int) ($row['unique_links'] ?? 0),
+                        'email' => $row->email ?? '',
+                        'first_clicked' => $row->first_clicked ?? '',
+                        'click_count' => (int) ($row->click_count ?? 0),
+                        'unique_links' => (int) ($row->unique_links ?? 0),
                     ];
                 }, $items);
             }
@@ -2644,7 +2642,7 @@ class AdminNewsletterController extends BaseApiController
             $items = [];
 
             if ($this->tableExists('newsletter_queue') && $this->tableExists('newsletter_opens')) {
-                $countRow = Database::query(
+                $countRow = DB::selectOne(
                     "SELECT COUNT(*) as cnt
                      FROM newsletter_queue q
                      WHERE q.newsletter_id = ? AND q.tenant_id = ? AND q.status = 'sent'
@@ -2653,10 +2651,10 @@ class AdminNewsletterController extends BaseApiController
                          WHERE newsletter_id = ? AND tenant_id = ?
                      )",
                     [$id, $tenantId, $id, $tenantId]
-                )->fetch();
-                $total = (int) ($countRow['cnt'] ?? 0);
+                );
+                $total = (int) ($countRow->cnt ?? 0);
 
-                $items = Database::query(
+                $items = DB::select(
                     "SELECT q.email, q.sent_at, u.first_name, u.last_name
                      FROM newsletter_queue q
                      LEFT JOIN users u ON q.user_id = u.id
@@ -2668,14 +2666,14 @@ class AdminNewsletterController extends BaseApiController
                      ORDER BY q.sent_at DESC
                      LIMIT ? OFFSET ?",
                     [$id, $tenantId, $id, $tenantId, $perPage, $offset]
-                )->fetchAll() ?: [];
+                );
 
                 $items = array_map(function ($row) {
-                    $name = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+                    $name = trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''));
                     return [
-                        'email' => $row['email'] ?? '',
+                        'email' => $row->email ?? '',
                         'name' => $name ?: null,
-                        'sent_at' => $row['sent_at'] ?? '',
+                        'sent_at' => $row->sent_at ?? '',
                     ];
                 }, $items);
             }
@@ -2702,7 +2700,7 @@ class AdminNewsletterController extends BaseApiController
             $items = [];
 
             if ($this->tableExists('newsletter_opens') && $this->tableExists('newsletter_clicks')) {
-                $countRow = Database::query(
+                $countRow = DB::selectOne(
                     "SELECT COUNT(DISTINCT o.email) as cnt
                      FROM newsletter_opens o
                      WHERE o.newsletter_id = ? AND o.tenant_id = ?
@@ -2711,10 +2709,10 @@ class AdminNewsletterController extends BaseApiController
                          WHERE newsletter_id = ? AND tenant_id = ?
                      )",
                     [$id, $tenantId, $id, $tenantId]
-                )->fetch();
-                $total = (int) ($countRow['cnt'] ?? 0);
+                );
+                $total = (int) ($countRow->cnt ?? 0);
 
-                $items = Database::query(
+                $items = DB::select(
                     "SELECT o.email, MIN(o.opened_at) as first_opened, COUNT(*) as open_count,
                             u.first_name, u.last_name
                      FROM newsletter_opens o
@@ -2729,15 +2727,15 @@ class AdminNewsletterController extends BaseApiController
                      ORDER BY first_opened DESC
                      LIMIT ? OFFSET ?",
                     [$id, $id, $tenantId, $id, $tenantId, $perPage, $offset]
-                )->fetchAll() ?: [];
+                );
 
                 $items = array_map(function ($row) {
-                    $name = trim(($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? ''));
+                    $name = trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''));
                     return [
-                        'email' => $row['email'] ?? '',
+                        'email' => $row->email ?? '',
                         'name' => $name ?: null,
-                        'first_opened' => $row['first_opened'] ?? '',
-                        'open_count' => (int) ($row['open_count'] ?? 0),
+                        'first_opened' => $row->first_opened ?? '',
+                        'open_count' => (int) ($row->open_count ?? 0),
                     ];
                 }, $items);
             }
@@ -2759,15 +2757,15 @@ class AdminNewsletterController extends BaseApiController
         $clients = [];
         if ($this->tableExists('newsletter_opens')) {
             try {
-                $opens = Database::query(
+                $opens = DB::select(
                     "SELECT user_agent FROM newsletter_opens
                      WHERE tenant_id = ? AND newsletter_id = ? AND user_agent IS NOT NULL",
                     [$tenantId, $id]
-                )->fetchAll() ?: [];
+                );
 
                 $counts = [];
                 foreach ($opens as $open) {
-                    $ua = strtolower($open['user_agent'] ?? '');
+                    $ua = strtolower($open->user_agent ?? '');
                     $client = 'Other';
                     if (strpos($ua, 'outlook') !== false) {
                         $client = 'Outlook';
@@ -2836,14 +2834,14 @@ class AdminNewsletterController extends BaseApiController
         // Queue status
         if ($this->tableExists('newsletter_queue')) {
             try {
-                $queueStats = Database::query(
+                $queueStats = DB::select(
                     "SELECT status, COUNT(*) as cnt FROM newsletter_queue WHERE tenant_id = ? GROUP BY status",
                     [$tenantId]
-                )->fetchAll();
+                );
 
                 foreach ($queueStats as $row) {
-                    $status = $row['status'] ?? 'unknown';
-                    $count = (int)$row['cnt'];
+                    $status = $row->status ?? 'unknown';
+                    $count = (int)$row->cnt;
                     $diagnostics['queue_status']['total'] += $count;
                     if (isset($diagnostics['queue_status'][$status])) {
                         $diagnostics['queue_status'][$status] = $count;
@@ -2859,15 +2857,15 @@ class AdminNewsletterController extends BaseApiController
         // Bounce rate + complaint count
         if ($this->tableExists('newsletter_bounces')) {
             try {
-                $bounceStats = Database::query(
+                $bounceStats = DB::select(
                     "SELECT bounce_type, COUNT(*) as cnt FROM newsletter_bounces WHERE tenant_id = ? GROUP BY bounce_type",
                     [$tenantId]
-                )->fetchAll();
+                );
 
                 foreach ($bounceStats as $row) {
-                    $count = (int)$row['cnt'];
+                    $count = (int)$row->cnt;
                     $totalBounces += $count;
-                    if (($row['bounce_type'] ?? '') === 'complaint') {
+                    if (($row->bounce_type ?? '') === 'complaint') {
                         $totalComplaints += $count;
                     }
                 }
@@ -2883,10 +2881,11 @@ class AdminNewsletterController extends BaseApiController
         // Suppression list size
         if ($this->tableExists('newsletter_suppression_list')) {
             try {
-                $totalSuppressed = (int)(Database::query(
+                $suppressedRow = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM newsletter_suppression_list WHERE tenant_id = ?",
                     [$tenantId]
-                )->fetch()['cnt'] ?? 0);
+                );
+                $totalSuppressed = (int)($suppressedRow->cnt ?? 0);
             } catch (\Exception $e) {
                 // Ignore
             }
@@ -2968,7 +2967,7 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             // Weekly breakdown by bounce type (last N weeks)
-            $trends = Database::query(
+            $trends = DB::select(
                 "SELECT
                     DATE_FORMAT(bounced_at, '%x-W%v') as week_label,
                     MIN(DATE(bounced_at)) as week_start,
@@ -2980,10 +2979,10 @@ class AdminNewsletterController extends BaseApiController
                  GROUP BY week_label, bounce_type
                  ORDER BY week_label ASC, bounce_type ASC",
                 [$tenantId, $weeks]
-            )->fetchAll() ?: [];
+            );
 
             // Top bounce reasons with counts
-            $summary = Database::query(
+            $summary = DB::select(
                 "SELECT
                     COALESCE(bounce_reason, 'Unknown') as reason,
                     bounce_type,
@@ -2995,11 +2994,11 @@ class AdminNewsletterController extends BaseApiController
                  ORDER BY count DESC
                  LIMIT ?",
                 [$tenantId, $weeks, 10]
-            )->fetchAll() ?: [];
+            );
 
             return $this->respondWithData([
-                'trends' => $trends,
-                'summary' => $summary,
+                'trends' => array_map(fn($r) => (array)$r, $trends),
+                'summary' => array_map(fn($r) => (array)$r, $summary),
             ]);
         } catch (\Exception $e) {
             return $this->respondWithData(['trends' => [], 'summary' => []]);

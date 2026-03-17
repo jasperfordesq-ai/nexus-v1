@@ -7,9 +7,9 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Csrf;
-use Nexus\Core\Database;
 use Nexus\Services\TokenService;
 use Nexus\Services\TotpService;
 use Nexus\Services\TwoFactorChallengeManager;
@@ -153,14 +153,12 @@ class TotpController extends BaseApiController
         }
 
         // Fetch user data for response
-        $db = Database::getConnection();
-        $stmt = $db->prepare("
+        $userRow = DB::selectOne("
             SELECT id, first_name, last_name, email, avatar_url, role, tenant_id,
                    is_super_admin, is_tenant_super_admin, email_verified_at, is_approved
             FROM users WHERE id = ?
-        ");
-        $stmt->execute([$userId]);
-        $user = $stmt->fetch();
+        ", [$userId]);
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return response()->json([

@@ -7,8 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\Database;
 use Nexus\Core\Env;
 use Nexus\Core\TenantContext;
 use Nexus\Core\RateLimiter;
@@ -155,13 +155,13 @@ class PasswordResetController extends BaseApiController
         }
 
         // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
-        Database::query(
+        DB::update(
             "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
             [$hashedPassword, $user['id'], $user['tenant_id']]
         );
 
         // Delete all reset tokens for this email
-        Database::query(
+        DB::delete(
             "DELETE FROM password_resets WHERE email = ?",
             [$email]
         );
@@ -205,13 +205,13 @@ class PasswordResetController extends BaseApiController
         $hashedToken = password_hash($token, PASSWORD_DEFAULT);
 
         // Delete any existing tokens for this email
-        Database::query(
+        DB::delete(
             "DELETE FROM password_resets WHERE email = ?",
             [$email]
         );
 
         // Store the hashed token
-        Database::query(
+        DB::insert(
             "INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW())",
             [$email, $hashedToken]
         );
@@ -256,21 +256,22 @@ class PasswordResetController extends BaseApiController
     private function findValidResetToken(string $token): ?array
     {
         // Clean up expired tokens
-        Database::query(
+        DB::delete(
             "DELETE FROM password_resets WHERE created_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
             [self::TOKEN_EXPIRY_SECONDS]
         );
 
         // Fetch all non-expired tokens
-        $records = Database::query(
+        $records = DB::select(
             "SELECT * FROM password_resets WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? SECOND) ORDER BY created_at DESC LIMIT 500",
             [self::TOKEN_EXPIRY_SECONDS]
-        )->fetchAll();
+        );
 
         // Check each record with password_verify (constant-time comparison)
         foreach ($records as $record) {
-            if (password_verify($token, $record['token'])) {
-                return $record;
+            $recordArr = (array)$record;
+            if (password_verify($token, $recordArr['token'])) {
+                return $recordArr;
             }
         }
 
@@ -339,12 +340,12 @@ class PasswordResetController extends BaseApiController
         }
 
         try {
-            $columns = Database::query(
+            $columns = DB::select(
                 "SHOW COLUMNS FROM users LIKE 'password_changed_at'"
-            )->fetchAll();
+            );
 
             if (!empty($columns)) {
-                Database::query(
+                DB::update(
                     "UPDATE users SET password_changed_at = NOW() WHERE id = ?",
                     [$userId]
                 );

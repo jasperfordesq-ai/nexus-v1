@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\FederationDirectoryService;
 use Nexus\Services\FederationPartnershipService;
@@ -33,7 +32,7 @@ class AdminFederationController extends BaseApiController
     private function tableExists(string $table): bool
     {
         if (!in_array($table, self::ALLOWED_TABLES, true)) { return false; }
-        try { Database::query("SELECT 1 FROM `{$table}` LIMIT 1"); return true; } catch (\Exception $e) { return false; }
+        try { DB::select("SELECT 1 FROM `{$table}` LIMIT 1"); return true; } catch (\Exception $e) { return false; }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -96,9 +95,9 @@ class AdminFederationController extends BaseApiController
         ];
 
         try {
-            $row = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
-            if ($row && !empty($row['configuration'])) {
-                $config = json_decode($row['configuration'], true);
+            $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+            if ($row && !empty($row->configuration)) {
+                $config = json_decode($row->configuration, true);
                 if (isset($config['federation']) && is_array($config['federation'])) {
                     $fc = $config['federation'];
                     if (isset($fc['federation_enabled'])) { $data['federation_enabled'] = (bool)$fc['federation_enabled']; }
@@ -117,8 +116,8 @@ class AdminFederationController extends BaseApiController
         $input = $this->getAllInput();
 
         try {
-            $row = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
-            $config = json_decode($row['configuration'] ?? '{}', true) ?: [];
+            $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+            $config = json_decode($row->configuration ?? '{}', true) ?: [];
 
             $federationSettings = $config['federation'] ?? [];
             if (isset($input['settings']) && is_array($input['settings'])) {
@@ -129,7 +128,7 @@ class AdminFederationController extends BaseApiController
             }
             $config['federation'] = $federationSettings;
 
-            Database::query("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+            DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
             try { \Nexus\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
             return $this->respondWithData([
@@ -154,11 +153,11 @@ class AdminFederationController extends BaseApiController
         if (!$this->tableExists('federation_partnerships')) { return $this->respondWithData([]); }
 
         try {
-            $items = Database::query(
+            $items = DB::select(
                 "SELECT fp.*, t.name as partner_name, t.slug as partner_slug FROM federation_partnerships fp LEFT JOIN tenants t ON (fp.partner_tenant_id = t.id) WHERE fp.tenant_id = ? OR fp.partner_tenant_id = ? ORDER BY fp.created_at DESC",
                 [$tenantId, $tenantId]
-            )->fetchAll();
-            return $this->respondWithData($items ?: []);
+            );
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $items) ?: []);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
 
@@ -171,9 +170,9 @@ class AdminFederationController extends BaseApiController
         if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
 
         try {
-            $partner = Database::query("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId])->fetch();
+            $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
-            Database::query("UPDATE federation_partnerships SET status = 'active', updated_at = NOW() WHERE id = ?", [$id]);
+            DB::update("UPDATE federation_partnerships SET status = 'active', updated_at = NOW() WHERE id = ?", [$id]);
             return $this->respondWithData(['message' => 'Partnership approved']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to approve partnership'); }
     }
@@ -187,9 +186,9 @@ class AdminFederationController extends BaseApiController
         if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
 
         try {
-            $partner = Database::query("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId])->fetch();
+            $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
-            Database::query("UPDATE federation_partnerships SET status = 'rejected', updated_at = NOW() WHERE id = ?", [$id]);
+            DB::update("UPDATE federation_partnerships SET status = 'rejected', updated_at = NOW() WHERE id = ?", [$id]);
             return $this->respondWithData(['message' => 'Partnership rejected']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to reject partnership'); }
     }
@@ -203,9 +202,9 @@ class AdminFederationController extends BaseApiController
         if (!$id || !$this->tableExists('federation_partnerships')) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
 
         try {
-            $partner = Database::query("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId])->fetch();
+            $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
-            Database::query("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ?", [$id]);
+            DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ?", [$id]);
             return $this->respondWithData(['message' => 'Partnership terminated']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to terminate partnership'); }
     }
@@ -250,11 +249,11 @@ class AdminFederationController extends BaseApiController
             return $this->respondWithData(['communities' => $communities, 'regions' => $regions, 'categories' => $categories]);
         } catch (\Exception $e) {
             try {
-                $fallback = Database::query(
+                $fallback = DB::select(
                     "SELECT t.id, t.name, t.slug, t.is_active, t.created_at, (SELECT COUNT(*) FROM users u WHERE u.tenant_id = t.id AND u.status = 'active') as member_count FROM tenants t WHERE t.is_active = 1 AND t.id != ? ORDER BY t.name ASC LIMIT 100",
                     [$tenantId]
-                )->fetchAll();
-                return $this->respondWithData(['communities' => $fallback ?: [], 'regions' => [], 'categories' => []]);
+                );
+                return $this->respondWithData(['communities' => array_map(fn($r) => (array)$r, $fallback) ?: [], 'regions' => [], 'categories' => []]);
             } catch (\Exception $e2) {
                 return $this->respondWithData(['communities' => [], 'regions' => [], 'categories' => []]);
             }
@@ -266,13 +265,16 @@ class AdminFederationController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
         try {
-            $tenant = Database::query("SELECT t.id, t.name, t.slug, t.is_active, t.configuration, t.created_at FROM tenants t WHERE t.id = ?", [$tenantId])->fetch();
-            if ($tenant) {
+            $tenantRow = DB::selectOne("SELECT t.id, t.name, t.slug, t.is_active, t.configuration, t.created_at FROM tenants t WHERE t.id = ?", [$tenantId]);
+            if ($tenantRow) {
+                $tenant = (array)$tenantRow;
                 $config = json_decode($tenant['configuration'] ?? '{}', true);
                 $tenant['federation_profile'] = $config['federation_profile'] ?? ['description' => '', 'contact_email' => '', 'website' => '', 'categories' => []];
                 unset($tenant['configuration']);
+            } else {
+                $tenant = [];
             }
-            return $this->respondWithData($tenant ?: []);
+            return $this->respondWithData($tenant);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
 
@@ -283,10 +285,10 @@ class AdminFederationController extends BaseApiController
         $input = $this->getAllInput();
 
         try {
-            $row = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
-            $config = json_decode($row['configuration'] ?? '{}', true) ?: [];
+            $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+            $config = json_decode($row->configuration ?? '{}', true) ?: [];
             $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $input);
-            Database::query("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+            DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
             try { \Nexus\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
             return $this->respondWithData($config['federation_profile']);
         } catch (\Exception $e) {
@@ -305,13 +307,13 @@ class AdminFederationController extends BaseApiController
         $data = ['total_partnerships' => 0, 'active_partnerships' => 0, 'pending_requests' => 0, 'cross_community_transactions' => 0, 'cross_community_messages' => 0];
 
         if ($this->tableExists('federation_partnerships')) {
-            try { $row = Database::query("SELECT COUNT(*) as total, SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) as active_count, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending FROM federation_partnerships WHERE tenant_id = ? OR partner_tenant_id = ?", [$tenantId, $tenantId])->fetch(); $data['total_partnerships'] = (int)($row['total'] ?? 0); $data['active_partnerships'] = (int)($row['active_count'] ?? 0); $data['pending_requests'] = (int)($row['pending'] ?? 0); } catch (\Exception $e) {}
+            try { $row = DB::selectOne("SELECT COUNT(*) as total, SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) as active_count, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending FROM federation_partnerships WHERE tenant_id = ? OR partner_tenant_id = ?", [$tenantId, $tenantId]); $data['total_partnerships'] = (int)($row->total ?? 0); $data['active_partnerships'] = (int)($row->active_count ?? 0); $data['pending_requests'] = (int)($row->pending ?? 0); } catch (\Exception $e) {}
         }
         if ($this->tableExists('federation_transactions')) {
-            try { $row = Database::query("SELECT COUNT(*) as total FROM federation_transactions WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId])->fetch(); $data['cross_community_transactions'] = (int)($row['total'] ?? 0); } catch (\Exception $e) {}
+            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_transactions WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_transactions'] = (int)($row->total ?? 0); } catch (\Exception $e) {}
         }
         if ($this->tableExists('federation_messages')) {
-            try { $row = Database::query("SELECT COUNT(*) as total FROM federation_messages WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId])->fetch(); $data['cross_community_messages'] = (int)($row['total'] ?? 0); } catch (\Exception $e) {}
+            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_messages WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_messages'] = (int)($row->total ?? 0); } catch (\Exception $e) {}
         }
         return $this->respondWithData($data);
     }
@@ -323,9 +325,8 @@ class AdminFederationController extends BaseApiController
         if (!$this->tableExists('federation_api_keys')) { return $this->respondWithData([]); }
 
         try {
-            $keys = Database::query("SELECT id, name, key_prefix, status, permissions, last_used_at, expires_at, created_at FROM federation_api_keys WHERE tenant_id = ? ORDER BY created_at DESC", [$tenantId])->fetchAll() ?: [];
-            foreach ($keys as &$key) { $key['scopes'] = !empty($key['permissions']) ? (json_decode($key['permissions'], true) ?: []) : []; unset($key['permissions']); }
-            unset($key);
+            $keyRows = DB::select("SELECT id, name, key_prefix, status, permissions, last_used_at, expires_at, created_at FROM federation_api_keys WHERE tenant_id = ? ORDER BY created_at DESC", [$tenantId]);
+            $keys = array_map(function($k) { $arr = (array)$k; $arr['scopes'] = !empty($arr['permissions']) ? (json_decode($arr['permissions'], true) ?: []) : []; unset($arr['permissions']); return $arr; }, $keyRows);
             return $this->respondWithData($keys);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
@@ -342,8 +343,8 @@ class AdminFederationController extends BaseApiController
         try {
             $keyValue = bin2hex(random_bytes(32));
             $prefix = substr($keyValue, 0, 8);
-            Database::query("INSERT INTO federation_api_keys (tenant_id, name, key_hash, key_prefix, permissions, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?, NOW())", [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $this->getUserId()]);
-            return $this->respondWithData(['id' => Database::lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'message' => 'Store this key securely. It will not be shown again.'], null, 201);
+            DB::insert("INSERT INTO federation_api_keys (tenant_id, name, key_hash, key_prefix, permissions, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?, NOW())", [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $this->getUserId()]);
+            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'message' => 'Store this key securely. It will not be shown again.'], null, 201);
         } catch (\Exception $e) { return $this->respondWithError('CREATE_FAILED', 'Failed to create API key'); }
     }
 
@@ -378,7 +379,7 @@ class AdminFederationController extends BaseApiController
                     if (!$this->tableExists('federation_user_settings')) {
                         return $this->respondWithError('NO_DATA', 'Federation user settings table not found', null, 404);
                     }
-                    $rows = Database::query("
+                    $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT u.id, u.first_name, u.last_name, u.email, u.username,
                                fus.federation_optin, fus.privacy_level, fus.service_reach,
                                fus.created_at, fus.updated_at
@@ -386,7 +387,7 @@ class AdminFederationController extends BaseApiController
                         JOIN users u ON u.id = fus.user_id
                         WHERE u.tenant_id = ? AND fus.federation_optin = 1
                         ORDER BY u.first_name, u.last_name
-                    ", [$tenantId])->fetchAll();
+                    ", [$tenantId]));
                     $headers = ['ID', 'First Name', 'Last Name', 'Email', 'Username', 'Opted In', 'Privacy Level', 'Service Reach', 'Created', 'Updated'];
                     break;
 
@@ -394,7 +395,7 @@ class AdminFederationController extends BaseApiController
                     if (!$this->tableExists('federation_partnerships')) {
                         return $this->respondWithError('NO_DATA', 'Federation partnerships table not found', null, 404);
                     }
-                    $rows = Database::query("
+                    $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT fp.id, t1.name AS tenant_name, t2.name AS partner_name,
                                fp.status, fp.level, fp.created_at, fp.updated_at
                         FROM federation_partnerships fp
@@ -402,7 +403,7 @@ class AdminFederationController extends BaseApiController
                         LEFT JOIN tenants t2 ON t2.id = fp.partner_tenant_id
                         WHERE fp.tenant_id = ? OR fp.partner_tenant_id = ?
                         ORDER BY fp.created_at DESC
-                    ", [$tenantId, $tenantId])->fetchAll();
+                    ", [$tenantId, $tenantId]));
                     $headers = ['ID', 'Tenant', 'Partner', 'Status', 'Level', 'Created', 'Updated'];
                     break;
 
@@ -410,14 +411,14 @@ class AdminFederationController extends BaseApiController
                     if (!$this->tableExists('federation_transactions')) {
                         return $this->respondWithError('NO_DATA', 'Federation transactions table not found', null, 404);
                     }
-                    $rows = Database::query("
+                    $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT ft.id, ft.sender_user_id, ft.receiver_user_id,
                                ft.amount, ft.description, ft.status,
                                ft.created_at, ft.completed_at
                         FROM federation_transactions ft
                         WHERE ft.sender_tenant_id = ? OR ft.receiver_tenant_id = ?
                         ORDER BY ft.created_at DESC
-                    ", [$tenantId, $tenantId])->fetchAll();
+                    ", [$tenantId, $tenantId]));
                     $headers = ['ID', 'Sender ID', 'Receiver ID', 'Amount', 'Description', 'Status', 'Created', 'Completed'];
                     break;
 
@@ -425,13 +426,13 @@ class AdminFederationController extends BaseApiController
                     if (!$this->tableExists('federation_audit_log')) {
                         return $this->respondWithError('NO_DATA', 'Federation audit log table not found', null, 404);
                     }
-                    $rows = Database::query("
+                    $rows = array_map(fn($r) => (array)$r, DB::select("
                         SELECT id, action, category, level, actor_user_id,
                                source_tenant_id, target_tenant_id, details, created_at
                         FROM federation_audit_log
                         WHERE source_tenant_id = ? OR target_tenant_id = ?
                         ORDER BY created_at DESC LIMIT 5000
-                    ", [$tenantId, $tenantId])->fetchAll();
+                    ", [$tenantId, $tenantId]));
                     $headers = ['ID', 'Action', 'Category', 'Level', 'Actor ID', 'Source Tenant', 'Target Tenant', 'Details', 'Created'];
                     break;
             }

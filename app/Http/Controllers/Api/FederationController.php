@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\Database;
+use Illuminate\Support\Facades\DB;
 use Nexus\Middleware\FederationApiMiddleware;
 use Nexus\Models\Notification;
 use Nexus\Services\BrokerMessageVisibilityService;
@@ -56,12 +56,12 @@ class FederationController extends BaseApiController
 
         $partnershipsCount = 0;
         try {
-            $result = Database::query(
+            $result = DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM federation_partnerships
                  WHERE (tenant_id = ? OR partner_tenant_id = ?) AND status = 'active'",
                 [$tenantId, $tenantId]
-            )->fetch(\PDO::FETCH_ASSOC);
-            $partnershipsCount = (int) ($result['cnt'] ?? 0);
+            );
+            $partnershipsCount = (int) ($result->cnt ?? 0);
         } catch (\Exception $e) {
             error_log("FederationV2Api::status partnerships count error: " . $e->getMessage());
         }
@@ -174,7 +174,7 @@ class FederationController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $partnerships = Database::query("
+            $partnershipResults = DB::select("
                 SELECT
                     fp.id as partnership_id,
                     fp.federation_level,
@@ -200,7 +200,8 @@ class FederationController extends BaseApiController
                 $tenantId, $tenantId, $tenantId, $tenantId,
                 $tenantId, $tenantId, $tenantId,
                 $tenantId, $tenantId,
-            ])->fetchAll(\PDO::FETCH_ASSOC);
+            ]);
+            $partnerships = array_map(fn($r) => (array)$r, $partnershipResults);
 
             $formatted = array_map(function ($p) {
                 $level = (int) ($p['federation_level'] ?? 1);
@@ -298,7 +299,7 @@ class FederationController extends BaseApiController
 
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
-        $db = Database::getInstance();
+        $db = DB::getPdo();
 
         if ($isExternal) {
             $stmt = $db->prepare("
@@ -343,7 +344,7 @@ class FederationController extends BaseApiController
 
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
-        $db = Database::getInstance();
+        $db = DB::getPdo();
 
         $query = $_GET['q'] ?? '';
         $timebankId = isset($_GET['timebank_id']) ? (int) $_GET['timebank_id'] : null;
@@ -404,7 +405,7 @@ class FederationController extends BaseApiController
 
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
-        $db = Database::getInstance();
+        $db = DB::getPdo();
 
         if ($isExternal) {
             $stmt = $db->prepare("
@@ -452,7 +453,7 @@ class FederationController extends BaseApiController
 
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
-        $db = Database::getInstance();
+        $db = DB::getPdo();
 
         $query = $_GET['q'] ?? '';
         $type = $_GET['type'] ?? '';
@@ -507,7 +508,7 @@ class FederationController extends BaseApiController
 
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
-        $db = Database::getInstance();
+        $db = DB::getPdo();
 
         if ($isExternal) {
             $stmt = $db->prepare("
@@ -549,7 +550,7 @@ class FederationController extends BaseApiController
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
-        $db = Database::getInstance();
+        $db = DB::getPdo();
 
         foreach (['recipient_id', 'subject', 'body', 'sender_id'] as $field) {
             if (empty($input[$field])) {
@@ -608,7 +609,7 @@ class FederationController extends BaseApiController
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
-        $db = Database::getInstance();
+        $db = DB::getPdo();
 
         foreach (['recipient_id', 'amount', 'description', 'sender_id'] as $field) {
             if (!isset($input[$field]) || $input[$field] === '') {
@@ -687,7 +688,7 @@ class FederationController extends BaseApiController
         $timeDiff = abs(time() - $requestTime);
         if ($timeDiff > 300) return $this->fedError(401, 'Timestamp expired (max 5 minutes)', 'TIMESTAMP_EXPIRED');
 
-        $db = Database::getInstance();
+        $db = DB::getPdo();
         $stmt = $db->prepare("SELECT id, name, signing_secret, platform_id FROM federation_api_keys WHERE platform_id = ? AND status = 'active'");
         $stmt->execute([$platformId]);
         $partner = $stmt->fetch(\PDO::FETCH_ASSOC);

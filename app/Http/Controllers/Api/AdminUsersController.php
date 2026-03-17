@@ -9,7 +9,6 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\User;
 use Nexus\Models\Notification;
@@ -826,10 +825,10 @@ class AdminUsersController extends BaseApiController
         $grant = (bool) ($this->input('grant', false));
 
         try {
-            $user = Database::query(
+            $user = DB::selectOne(
                 "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ?",
                 [$id]
-            )->fetch();
+            );
 
             if (!$user) {
                 return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
@@ -837,20 +836,20 @@ class AdminUsersController extends BaseApiController
 
             // Set is_tenant_super_admin (hierarchy-scoped) and role to tenant_admin
             if ($grant) {
-                Database::query(
+                DB::update(
                     "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
                     [$id]
                 );
             } else {
-                Database::query(
+                DB::update(
                     "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?",
                     [$id]
                 );
             }
 
             $action = $grant ? 'grant_tenant_super_admin' : 'revoke_tenant_super_admin';
-            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " tenant super admin for user #{$id}: {$user['email']} (tenant {$user['tenant_id']})");
-            AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user['email']]);
+            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " tenant super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
+            AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user->email]);
 
             return $this->respondWithData(['id' => $id, 'is_tenant_super_admin' => $grant]);
         } catch (\Exception $e) {
@@ -877,23 +876,23 @@ class AdminUsersController extends BaseApiController
         $grant = (bool) ($this->input('grant', false));
 
         try {
-            $user = Database::query(
+            $user = DB::selectOne(
                 "SELECT id, email, first_name, last_name, tenant_id FROM users WHERE id = ?",
                 [$id]
-            )->fetch();
+            );
 
             if (!$user) {
                 return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
             }
 
-            Database::query(
+            DB::update(
                 "UPDATE users SET is_super_admin = ? WHERE id = ?",
                 [$grant ? 1 : 0, $id]
             );
 
             $action = $grant ? 'grant_global_super_admin' : 'revoke_global_super_admin';
-            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " global super admin for user #{$id}: {$user['email']} (tenant {$user['tenant_id']})");
-            AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user['email']]);
+            ActivityLog::log($adminId, $action, ($grant ? 'Granted' : 'Revoked') . " global super admin for user #{$id}: {$user->email} (tenant {$user->tenant_id})");
+            AuditLogService::logAdminAction($action, $adminId, $id, ['email' => $user->email]);
 
             return $this->respondWithData(['id' => $id, 'is_super_admin' => $grant]);
         } catch (\Exception $e) {
@@ -922,8 +921,8 @@ class AdminUsersController extends BaseApiController
             $hashedToken = password_hash($token, PASSWORD_DEFAULT);
 
             // Store in password_resets table (same as user-initiated flow)
-            Database::query("DELETE FROM password_resets WHERE email = ?", [$user['email']]);
-            Database::query(
+            DB::delete("DELETE FROM password_resets WHERE email = ?", [$user['email']]);
+            DB::insert(
                 "INSERT INTO password_resets (email, token, created_at) VALUES (?, ?, NOW())",
                 [$user['email'], $hashedToken]
             );
@@ -983,8 +982,8 @@ class AdminUsersController extends BaseApiController
             $tenantNameSafe = htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8');
 
             // Read tenant configuration for custom welcome email content
-            $tenantRow = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$userTenantId])->fetch();
-            $config = json_decode($tenantRow['configuration'] ?? '{}', true);
+            $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$userTenantId]);
+            $config = json_decode($tenantRow->configuration ?? '{}', true);
             $welcomeConfig = $config['welcome_email'] ?? [];
 
             $subject = !empty($welcomeConfig['subject']) ? $welcomeConfig['subject'] : "Welcome to {$tenantNameSafe}";
@@ -1102,10 +1101,10 @@ class AdminUsersController extends BaseApiController
 
             // Check if user already exists in this tenant
             try {
-                $existing = Database::query(
+                $existing = DB::selectOne(
                     "SELECT id FROM users WHERE email = ? AND tenant_id = ?",
                     [$email, $tenantId]
-                )->fetch();
+                );
 
                 if ($existing) {
                     $results['errors'][] = "Row {$row}: User with email '{$email}' already exists";
@@ -1117,7 +1116,7 @@ class AdminUsersController extends BaseApiController
                 $password = bin2hex(random_bytes(16));
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-                Database::query(
+                DB::insert(
                     "INSERT INTO users (tenant_id, name, first_name, last_name, email, password_hash, phone, role, status, is_approved, created_at)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', 1, NOW())",
                     [
@@ -1133,7 +1132,7 @@ class AdminUsersController extends BaseApiController
                 );
 
                 // Seed federation settings for the new user
-                $newUserId = (int) Database::lastInsertId();
+                $newUserId = (int) DB::getPdo()->lastInsertId();
                 if ($newUserId > 0) {
                     User::seedFederationSettings($newUserId);
                 }
@@ -1198,16 +1197,16 @@ class AdminUsersController extends BaseApiController
      */
     private function isCallerSuperAdmin(int $adminId): bool
     {
-        $row = Database::query(
+        $row = DB::selectOne(
             "SELECT is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
             [$adminId]
-        )->fetch();
+        );
 
         if (!$row) {
             return false;
         }
 
-        return !empty($row['is_super_admin']) || !empty($row['is_tenant_super_admin']);
+        return !empty($row->is_super_admin) || !empty($row->is_tenant_super_admin);
     }
 
     /**
@@ -1226,10 +1225,10 @@ class AdminUsersController extends BaseApiController
         $tenantName = 'Project NEXUS';
         $slugPrefix = '';
 
-        $tenant = Database::query("SELECT name, slug FROM tenants WHERE id = ?", [$userTenantId])->fetch();
+        $tenant = DB::selectOne("SELECT name, slug FROM tenants WHERE id = ?", [$userTenantId]);
         if ($tenant) {
-            $tenantName = $tenant['name'];
-            $slug = $tenant['slug'] ?? '';
+            $tenantName = $tenant->name;
+            $slug = $tenant->slug ?? '';
             $slugPrefix = $slug ? '/' . $slug : '';
         }
 
@@ -1261,49 +1260,48 @@ class AdminUsersController extends BaseApiController
                 return 0;
             }
 
-            $pdo = Database::getConnection();
-            $pdo->beginTransaction();
+            DB::beginTransaction();
 
             try {
                 // Lock the user row to prevent concurrent double-credit (TOCTOU race)
-                Database::query(
+                DB::select(
                     "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
                     [$userId, $userTenantId]
                 );
 
                 // Check if a welcome bonus was already granted (true idempotency key)
-                $existing = Database::query(
+                $existing = DB::selectOne(
                     "SELECT id FROM transactions WHERE tenant_id = ? AND receiver_id = ? AND description LIKE '[Welcome Bonus]%' LIMIT 1",
                     [$userTenantId, $userId]
-                )->fetch();
+                );
 
                 if ($existing) {
-                    $pdo->rollBack();
+                    DB::rollBack();
                     error_log("[AdminUsers] Welcome credits already exist for user #{$userId} (tenant {$userTenantId}) — skipping");
                     return 0;
                 }
 
                 // Update user balance (scoped by user's tenant)
-                Database::query(
+                DB::update(
                     "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                     [$creditAmount, $userId, $userTenantId]
                 );
 
                 // Create transaction record for audit trail
-                Database::query(
+                DB::insert(
                     "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, created_at)
                      VALUES (?, ?, ?, ?, ?, 'completed', NOW())",
                     [$userTenantId, $userId, $userId, $creditAmount, "[Welcome Bonus] New member welcome credits (approved by admin #{$adminId})"]
                 );
 
-                $pdo->commit();
+                DB::commit();
 
                 ActivityLog::log($adminId, 'welcome_credits_issued', "Awarded {$creditAmount} welcome credits to user #{$userId} ({$user['email']}) on approval");
                 error_log("[AdminUsers] Granted {$creditAmount} welcome credits to user #{$userId} (tenant {$userTenantId})");
 
                 return $creditAmount;
             } catch (\Throwable $e) {
-                $pdo->rollBack();
+                DB::rollBack();
                 throw $e;
             }
         } catch (\Throwable $e) {
