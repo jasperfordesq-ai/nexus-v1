@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Models\ActivityLog;
+use App\Models\ActivityLog;
 
 /**
  * AdminBlogController -- Admin blog post management.
@@ -216,7 +216,7 @@ class AdminBlogController extends BaseApiController
             );
         }
 
-        ActivityLog::log($adminId, 'admin_create_blog_post', "Created blog post #{$newId}: {$title}");
+        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_create_blog_post', 'details' => "Created blog post #{$newId}: {$title}"]);
 
         return $this->respondWithData([
             'id' => (int) $newId,
@@ -331,7 +331,7 @@ class AdminBlogController extends BaseApiController
             );
         }
 
-        ActivityLog::log($adminId, 'admin_update_blog_post', "Updated blog post #{$id}: " . ($data['title'] ?? $post->title));
+        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_update_blog_post', 'details' => "Updated blog post #{$id}: " . ($data['title'] ?? $post->title)]);
 
         // Return updated post
         return $this->show($id);
@@ -356,7 +356,7 @@ class AdminBlogController extends BaseApiController
 
         DB::delete("DELETE FROM posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
-        ActivityLog::log($adminId, 'admin_delete_blog_post', "Deleted blog post #{$id}: {$post->title}");
+        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_delete_blog_post', 'details' => "Deleted blog post #{$id}: {$post->title}"]);
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
@@ -385,11 +385,7 @@ class AdminBlogController extends BaseApiController
             [$newStatus, $id, $tenantId]
         );
 
-        ActivityLog::log(
-            $adminId,
-            'admin_toggle_blog_status',
-            "Changed blog post #{$id} status: {$post->status} -> {$newStatus}"
-        );
+        ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_toggle_blog_status', 'details' => "Changed blog post #{$id} status: {$post->status} -> {$newStatus}"]);
 
         return $this->respondWithData([
             'id' => (int) $id,

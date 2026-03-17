@@ -6,6 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\RateLimitService;
+use App\Services\TenantSettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
@@ -23,6 +25,11 @@ use Nexus\Services\TwoFactorChallengeManager;
 class AuthController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly RateLimitService $rateLimitService,
+        private readonly TenantSettingsService $tenantSettingsService,
+    ) {}
 
     /**
      * Helper to return error response matching legacy format
@@ -57,7 +64,7 @@ class AuthController extends BaseApiController
 
         // SECURITY: Redis-based rate limiting (fast, per-IP, 10 attempts per minute)
         $ip = \Nexus\Core\ClientIp::get();
-        if (\Nexus\Services\RateLimitService::check("auth:login:$ip", 10, 60)) {
+        if (!$this->rateLimitService->increment("auth:login:$ip", 10, 60)) {
             return $this->authError(
                 'Too many login attempts. Please try again later.',
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
@@ -65,7 +72,6 @@ class AuthController extends BaseApiController
                 ['retry_after' => 60]
             );
         }
-        \Nexus\Services\RateLimitService::increment("auth:login:$ip", 60);
 
         // SECURITY: Database-based rate limiting for brute force protection (tracks failed attempts)
         if (!empty($email)) {
@@ -123,10 +129,10 @@ class AuthController extends BaseApiController
             \Nexus\Core\RateLimiter::recordAttempt($ip, 'ip', true);
 
             // Clear Redis rate limit counter on successful login
-            \Nexus\Services\RateLimitService::reset("auth:login:$ip");
+            $this->rateLimitService->reset("auth:login:$ip");
 
             // Registration policy enforcement
-            $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+            $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
             if ($gateBlock) {
                 return $this->authError(
                     $gateBlock['message'],
@@ -318,7 +324,7 @@ class AuthController extends BaseApiController
     {
         // Rate limiting
         $ip = \Nexus\Core\ClientIp::get();
-        if (\Nexus\Services\RateLimitService::check("auth:refresh:$ip", 10, 60)) {
+        if (!$this->rateLimitService->increment("auth:refresh:$ip", 10, 60)) {
             return $this->authError(
                 'Too many attempts. Please try again later.',
                 ApiErrorCodes::RATE_LIMIT_EXCEEDED,
@@ -326,7 +332,6 @@ class AuthController extends BaseApiController
                 ['retry_after' => 60]
             );
         }
-        \Nexus\Services\RateLimitService::increment("auth:refresh:$ip", 60);
 
         $data = $this->getAllInput();
         $refreshToken = $data['refresh_token'] ?? '';
@@ -399,7 +404,7 @@ class AuthController extends BaseApiController
         }
 
         // Enforce registration policy gates on token refresh
-        $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
         if ($gateBlock) {
             return $this->authError(
                 $gateBlock['message'],
@@ -709,7 +714,7 @@ class AuthController extends BaseApiController
         }
 
         // Enforce registration policy gates on session restore
-        $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        $gateBlock = $this->tenantSettingsService->checkLoginGatesForUser($user);
         if ($gateBlock) {
             return $this->authError(
                 $gateBlock['message'],
