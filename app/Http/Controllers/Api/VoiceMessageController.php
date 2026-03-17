@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use App\Core\AudioUploader;
 use App\Core\EmailTemplate;
 use App\Core\Mailer;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Models\Message;
 use Illuminate\Support\Facades\DB;
 

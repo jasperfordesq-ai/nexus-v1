@@ -28,7 +28,7 @@ use App\Services\VolunteerWellbeingService;
 use App\Services\VolunteerMatchingService;
 use App\Services\VolunteerReminderService;
 use App\Services\WebhookDispatchService;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * VolunteerController -- Volunteering opportunities, applications, shifts, hours, and organisations.

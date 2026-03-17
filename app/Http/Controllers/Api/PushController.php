@@ -10,7 +10,7 @@ use App\Services\FCMPushService;
 use App\Services\PushNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * PushController — Push notification subscription management.
@@ -107,8 +107,6 @@ class PushController extends BaseApiController
 
         $sent = 0;
         $failed = 0;
-
-        $pushController = new \Nexus\Controllers\Api\PushApiController();
 
         foreach ($subscriptions as $sub) {
             // Use reflection to call the private sendPush method, or call the service directly

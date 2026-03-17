@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\EmailMonitorService;
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Models\NewsletterBounce;
 
 /**

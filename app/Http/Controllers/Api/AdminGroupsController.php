@@ -12,7 +12,7 @@ use App\Services\GroupService;
 use App\Services\SmartGroupRankingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Models\ActivityLog;
 
 /**
@@ -494,7 +494,7 @@ class AdminGroupsController extends BaseApiController
             DB::insert(
                 "INSERT INTO group_types (tenant_id, name, slug, description, icon, color, created_at)
                  VALUES (?, ?, ?, ?, ?, ?, NOW())",
-                [$tenantId, $name, \Nexus\Helpers\TextHelper::slugify($name), $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1')]
+                [$tenantId, $name, \Illuminate\Support\Str::slug($name), $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1')]
             );
             $id = DB::getPdo()->lastInsertId();
             ActivityLog::log($adminId, 'admin_create_group_type', "Created group type: {$name}");

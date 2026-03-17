@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\Mailer;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Models\EmailSettings;
 use App\Services\EmailMonitorService;
 use App\Services\RedisCache;

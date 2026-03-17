@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use App\Services\MessageService;
 use App\Services\BrokerMessageVisibilityService;
 use App\Core\AudioUploader;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Models\Message;
 
 /**

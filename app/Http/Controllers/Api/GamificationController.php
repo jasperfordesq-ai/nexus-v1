@@ -17,7 +17,7 @@ use App\Services\LeaderboardService;
 use App\Services\NexusScoreService;
 use App\Services\StreakService;
 use App\Services\XPShopService;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Models\UserBadge;
 
 /**

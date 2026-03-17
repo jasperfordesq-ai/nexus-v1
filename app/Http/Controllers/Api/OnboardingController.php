@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Services\OnboardingService;
 
 /**
@@ -92,16 +92,16 @@ class OnboardingController extends BaseApiController
         $needs = is_array($needs) ? array_filter(array_map('intval', $needs), fn ($id) => $id > 0) : [];
 
         // All-or-nothing: wrap in transaction
-        \Nexus\Core\Database::beginTransaction();
+        DB::beginTransaction();
         try {
             $this->onboardingService->saveInterests($userId, $interests);
             $this->onboardingService->saveSkills($userId, $offers, $needs);
             $listingIds = $this->onboardingService->autoCreateListings($userId, $offers, $needs);
             $this->onboardingService->completeOnboarding($userId);
 
-            \Nexus\Core\Database::commit();
+            DB::commit();
         } catch (\Throwable $e) {
-            \Nexus\Core\Database::rollback();
+            DB::rollback();
             throw $e;
         }
 

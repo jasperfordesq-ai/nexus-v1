@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Services\CommunityFundService;
 use App\Services\TransactionCategoryService;
 use App\Services\ExchangeRatingService;

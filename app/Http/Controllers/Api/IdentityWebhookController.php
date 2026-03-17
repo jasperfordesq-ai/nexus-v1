@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\ApiErrorCodes;
+use App\Core\ApiErrorCodes;
 use App\Services\Identity\IdentityProviderRegistry;
 use App\Services\Identity\IdentityVerificationSessionService;
 use App\Services\Identity\RegistrationOrchestrationService;

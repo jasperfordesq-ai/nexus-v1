@@ -10,7 +10,7 @@ use App\Services\SmartMatchingAnalyticsService;
 use App\Services\SmartMatchingEngine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use App\Services\MatchApprovalWorkflowService;
 
 /**

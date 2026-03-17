@@ -10,7 +10,7 @@ use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Like;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * FeedService — Laravel DI-based service for social feed operations.

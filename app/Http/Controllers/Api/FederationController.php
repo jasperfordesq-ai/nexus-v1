@@ -14,7 +14,7 @@ use App\Services\FederationUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\CorsHelper;
-use Nexus\Middleware\FederationApiMiddleware;
+use App\Core\FederationApiMiddleware;
 use App\Models\Notification;
 use App\Services\BrokerMessageVisibilityService;
 use App\Services\FederationAuditService;
