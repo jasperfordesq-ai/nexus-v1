@@ -102,4 +102,39 @@ class ChallengeService
 
         return true;
     }
+
+    /**
+     * Delegates to legacy ChallengeService::getChallengesWithProgress().
+     *
+     * Returns active challenges with user progress data.
+     */
+    public function getChallengesWithProgress(int $userId): array
+    {
+        return \Nexus\Services\ChallengeService::getChallengesWithProgress($userId);
+    }
+
+    /**
+     * Delegates to legacy ChallengeService::getActiveChallenges().
+     */
+    public function getActiveChallenges(): array
+    {
+        return \Nexus\Services\ChallengeService::getActiveChallenges();
+    }
+
+    /**
+     * Delegates to legacy ChallengeService::updateProgress().
+     */
+    public function updateProgress(int $userId, string $actionType, int $increment = 1): array
+    {
+        return \Nexus\Services\ChallengeService::updateProgress($userId, $actionType, $increment);
+    }
+
+    /**
+     * Get a challenge by ID via legacy service (tenant-scoped).
+     */
+    public function getLegacyById(int $id): ?array
+    {
+        $result = \Nexus\Services\ChallengeService::getById($id);
+        return $result ?: null;
+    }
 }

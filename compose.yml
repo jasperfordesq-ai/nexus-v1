@@ -24,8 +24,6 @@ services:
     volumes:
       # Mount entire app for development (excludes vendor via .dockerignore)
       - .:/var/www/html:cached
-      # Keep vendor/ on a Docker volume (not Windows bind mount) to prevent I/O hangs
-      - nexus-vendor:/var/www/html/vendor
       # Persist uploads between rebuilds
       - nexus-uploads:/var/www/html/uploads
       - nexus-httpdocs-uploads:/var/www/html/httpdocs/uploads
@@ -172,7 +170,6 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - DOCKER_ENV=1
       - VITE_API_URL=http://app:80
       - VITE_DEFAULT_TENANT_ID=2
       # Google Maps key is loaded from react-frontend/.env.local (gitignored)
@@ -243,8 +240,6 @@ volumes:
     name: nexus-uploads
   nexus-httpdocs-uploads:
     name: nexus-httpdocs-uploads
-  nexus-vendor:
-    name: nexus-vendor
 
 # =============================================================================
 # Networks (Isolated - does NOT connect to external projects)

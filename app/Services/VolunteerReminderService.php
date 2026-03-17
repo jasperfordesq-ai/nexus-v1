@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright ï¿½ 2024ï¿½2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -7,7 +7,7 @@
 namespace App\Services;
 
 /**
- * VolunteerReminderService — Laravel DI wrapper for legacy \Nexus\Services\VolunteerReminderService.
+ * VolunteerReminderService ï¿½ Laravel DI wrapper for legacy \Nexus\Services\VolunteerReminderService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -39,5 +39,21 @@ class VolunteerReminderService
     public function cancelReminder(int $tenantId, int $reminderId): bool
     {
         return \Nexus\Services\VolunteerReminderService::cancelReminder($tenantId, $reminderId);
+    }
+
+    /**
+     * Delegates to legacy VolunteerReminderService::getSettings().
+     */
+    public function getSettings(): array
+    {
+        return \Nexus\Services\VolunteerReminderService::getSettings();
+    }
+
+    /**
+     * Delegates to legacy VolunteerReminderService::updateSetting().
+     */
+    public function updateSetting(string $type, array $data): bool
+    {
+        return \Nexus\Services\VolunteerReminderService::updateSetting($type, $data);
     }
 }

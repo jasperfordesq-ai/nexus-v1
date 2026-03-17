@@ -56,4 +56,12 @@ class GuardianConsentService
     {
         return \Nexus\Services\GuardianConsentService::getConsentsForMinor($minorUserId);
     }
+
+    /**
+     * Delegates to legacy GuardianConsentService::getConsentsForAdmin().
+     */
+    public function getConsentsForAdmin(array $filters = []): array
+    {
+        return \Nexus\Services\GuardianConsentService::getConsentsForAdmin($filters);
+    }
 }

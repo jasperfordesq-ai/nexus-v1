@@ -56,4 +56,12 @@ class ChallengeCategoryService
     {
         return \Nexus\Services\ChallengeCategoryService::update($id, $userId, $data);
     }
+
+    /**
+     * Delegates to legacy ChallengeCategoryService::delete().
+     */
+    public function delete(int $id, int $userId): bool
+    {
+        return \Nexus\Services\ChallengeCategoryService::delete($id, $userId);
+    }
 }

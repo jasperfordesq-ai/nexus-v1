@@ -56,4 +56,24 @@ class ListingSkillTagService
     {
         return \Nexus\Services\ListingSkillTagService::findListingsByTags($tags, $limit);
     }
+
+    /**
+     * Get popular/trending skill tags.
+     *
+     * Delegates to legacy ListingSkillTagService::getPopularTags().
+     */
+    public function getPopularTags(int $limit = 20): array
+    {
+        return \Nexus\Services\ListingSkillTagService::getPopularTags($limit);
+    }
+
+    /**
+     * Autocomplete skill tags by prefix.
+     *
+     * Delegates to legacy ListingSkillTagService::autocompleteTags().
+     */
+    public function autocompleteTags(string $prefix, int $limit = 10): array
+    {
+        return \Nexus\Services\ListingSkillTagService::autocompleteTags($prefix, $limit);
+    }
 }

@@ -56,4 +56,36 @@ class RecurringShiftService
     {
         return \Nexus\Services\RecurringShiftService::getPatternsForOpportunity($opportunityId, $userId);
     }
+
+    /**
+     * Delegates to legacy RecurringShiftService::getPattern().
+     */
+    public function getPattern(int $patternId): ?array
+    {
+        return \Nexus\Services\RecurringShiftService::getPattern($patternId);
+    }
+
+    /**
+     * Delegates to legacy RecurringShiftService::updatePattern().
+     */
+    public function updatePattern(int $patternId, array $data, int $userId): bool
+    {
+        return \Nexus\Services\RecurringShiftService::updatePattern($patternId, $data, $userId);
+    }
+
+    /**
+     * Delegates to legacy RecurringShiftService::deactivatePattern().
+     */
+    public function deactivatePattern(int $patternId, int $userId): bool
+    {
+        return \Nexus\Services\RecurringShiftService::deactivatePattern($patternId, $userId);
+    }
+
+    /**
+     * Delegates to legacy RecurringShiftService::deleteFutureShifts().
+     */
+    public function deleteFutureShifts(int $patternId, int $userId): int
+    {
+        return \Nexus\Services\RecurringShiftService::deleteFutureShifts($patternId, $userId);
+    }
 }

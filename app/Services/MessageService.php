@@ -228,4 +228,88 @@ class MessageService
             ->where('is_read', false)
             ->count();
     }
+
+    // -----------------------------------------------------------------
+    //  Delegated to legacy (static methods not yet migrated to Eloquent)
+    // -----------------------------------------------------------------
+
+    /**
+     * Get a single conversation summary with another user.
+     *
+     * Delegates to legacy MessageService::getConversation().
+     */
+    public function getConversation(int $otherUserId, int $userId): ?array
+    {
+        return \Nexus\Services\MessageService::getConversation($otherUserId, $userId);
+    }
+
+    /**
+     * Get validation errors from the last operation.
+     *
+     * Delegates to legacy MessageService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\MessageService::getErrors();
+    }
+
+    /**
+     * Archive a conversation with another user.
+     *
+     * Delegates to legacy MessageService::archiveConversation().
+     */
+    public function archiveConversation(int $otherUserId, int $userId): int
+    {
+        return \Nexus\Services\MessageService::archiveConversation($otherUserId, $userId);
+    }
+
+    /**
+     * Unarchive a conversation with another user.
+     *
+     * Delegates to legacy MessageService::unarchiveConversation().
+     */
+    public function unarchiveConversation(int $otherUserId, int $userId): int
+    {
+        return \Nexus\Services\MessageService::unarchiveConversation($otherUserId, $userId);
+    }
+
+    /**
+     * Edit a message body.
+     *
+     * Delegates to legacy MessageService::editMessage().
+     */
+    public function editMessage(int $messageId, int $userId, string $newBody): ?array
+    {
+        return \Nexus\Services\MessageService::editMessage($messageId, $userId, $newBody);
+    }
+
+    /**
+     * Delete a message.
+     *
+     * Delegates to legacy MessageService::deleteMessage().
+     */
+    public function deleteMessage(int $messageId, int $userId): bool
+    {
+        return \Nexus\Services\MessageService::deleteMessage($messageId, $userId);
+    }
+
+    /**
+     * Toggle a reaction emoji on a message.
+     *
+     * Delegates to legacy MessageService::toggleReaction().
+     */
+    public function toggleReaction(int $messageId, int $userId, string $emoji): ?bool
+    {
+        return \Nexus\Services\MessageService::toggleReaction($messageId, $userId, $emoji);
+    }
+
+    /**
+     * Set typing indicator for a conversation.
+     *
+     * Delegates to legacy MessageService::setTypingIndicator().
+     */
+    public function setTypingIndicator(int $recipientId, int $userId, bool $isTyping): bool
+    {
+        return \Nexus\Services\MessageService::setTypingIndicator($recipientId, $userId, $isTyping);
+    }
 }

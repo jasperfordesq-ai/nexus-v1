@@ -192,4 +192,138 @@ class GroupService
 
         return $detached > 0;
     }
+
+    // -----------------------------------------------------------------
+    //  Delegated to legacy (static methods not yet migrated to Eloquent)
+    // -----------------------------------------------------------------
+
+    /**
+     * Update a group.
+     *
+     * Delegates to legacy GroupService::update().
+     */
+    public function update(int $id, int $userId, array $data): bool
+    {
+        return \Nexus\Services\GroupService::update($id, $userId, $data);
+    }
+
+    /**
+     * Delete a group.
+     *
+     * Delegates to legacy GroupService::delete().
+     */
+    public function delete(int $id, int $userId): bool
+    {
+        return \Nexus\Services\GroupService::delete($id, $userId);
+    }
+
+    /**
+     * Get members of a group with filters/pagination.
+     *
+     * Delegates to legacy GroupService::getMembers().
+     */
+    public function getMembers(int $groupId, array $filters = []): array
+    {
+        return \Nexus\Services\GroupService::getMembers($groupId, $filters);
+    }
+
+    /**
+     * Update a member's role in a group.
+     *
+     * Delegates to legacy GroupService::updateMemberRole().
+     */
+    public function updateMemberRole(int $groupId, int $targetUserId, int $actingUserId, string $role): bool
+    {
+        return \Nexus\Services\GroupService::updateMemberRole($groupId, $targetUserId, $actingUserId, $role);
+    }
+
+    /**
+     * Remove a member from a group.
+     *
+     * Delegates to legacy GroupService::removeMember().
+     */
+    public function removeMember(int $groupId, int $targetUserId, int $actingUserId): bool
+    {
+        return \Nexus\Services\GroupService::removeMember($groupId, $targetUserId, $actingUserId);
+    }
+
+    /**
+     * Get pending join requests for a group.
+     *
+     * Delegates to legacy GroupService::getPendingRequests().
+     */
+    public function getPendingRequests(int $groupId, int $adminUserId): ?array
+    {
+        return \Nexus\Services\GroupService::getPendingRequests($groupId, $adminUserId);
+    }
+
+    /**
+     * Handle a join request (approve/deny).
+     *
+     * Delegates to legacy GroupService::handleJoinRequest().
+     */
+    public function handleJoinRequest(int $groupId, int $requesterId, int $adminUserId, string $action): bool
+    {
+        return \Nexus\Services\GroupService::handleJoinRequest($groupId, $requesterId, $adminUserId, $action);
+    }
+
+    /**
+     * Get discussions in a group.
+     *
+     * Delegates to legacy GroupService::getDiscussions().
+     */
+    public function getDiscussions(int $groupId, int $userId, array $filters = []): ?array
+    {
+        return \Nexus\Services\GroupService::getDiscussions($groupId, $userId, $filters);
+    }
+
+    /**
+     * Create a discussion in a group.
+     *
+     * Delegates to legacy GroupService::createDiscussion().
+     */
+    public function createDiscussion(int $groupId, int $userId, array $data): ?array
+    {
+        return \Nexus\Services\GroupService::createDiscussion($groupId, $userId, $data);
+    }
+
+    /**
+     * Get messages in a group discussion.
+     *
+     * Delegates to legacy GroupService::getDiscussionMessages().
+     */
+    public function getDiscussionMessages(int $groupId, int $discussionId, int $userId, array $filters = []): ?array
+    {
+        return \Nexus\Services\GroupService::getDiscussionMessages($groupId, $discussionId, $userId, $filters);
+    }
+
+    /**
+     * Post a message to a group discussion.
+     *
+     * Delegates to legacy GroupService::postToDiscussion().
+     */
+    public function postToDiscussion(int $groupId, int $discussionId, int $userId, array $data): ?array
+    {
+        return \Nexus\Services\GroupService::postToDiscussion($groupId, $discussionId, $userId, $data);
+    }
+
+    /**
+     * Get validation errors from the last operation.
+     *
+     * Delegates to legacy GroupService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\GroupService::getErrors();
+    }
+
+    /**
+     * Update a group's image (avatar or cover).
+     *
+     * Delegates to legacy GroupService::updateImage().
+     */
+    public function updateImage(int $groupId, int $userId, string $imageUrl, string $type = 'avatar'): bool
+    {
+        return \Nexus\Services\GroupService::updateImage($groupId, $userId, $imageUrl, $type);
+    }
 }

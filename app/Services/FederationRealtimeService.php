@@ -56,4 +56,12 @@ class FederationRealtimeService
     {
         return \Nexus\Services\FederationRealtimeService::broadcastMessageRead($readerId, $readerTenantId, $senderUserId, $senderTenantId);
     }
+
+    /**
+     * Delegates to legacy FederationRealtimeService::authFederationChannel().
+     */
+    public function authFederationChannel(string $channelName, string $socketId, int $userId, int $tenantId): ?string
+    {
+        return \Nexus\Services\FederationRealtimeService::authFederationChannel($channelName, $socketId, $userId, $tenantId);
+    }
 }

@@ -540,6 +540,30 @@ class ListingService
     }
 
     // -----------------------------------------------------------------
+    //  Permissions
+    // -----------------------------------------------------------------
+
+    /**
+     * Check if a user can modify a listing.
+     *
+     * Delegates to legacy ListingService::canModify().
+     */
+    public function canModify(array $listing, int $userId): bool
+    {
+        return \Nexus\Services\ListingService::canModify($listing, $userId);
+    }
+
+    /**
+     * Get validation errors from the last operation.
+     *
+     * Delegates to legacy ListingService::getErrors().
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\ListingService::getErrors();
+    }
+
+    // -----------------------------------------------------------------
     //  Validation
     // -----------------------------------------------------------------
 

@@ -56,4 +56,28 @@ class TenantVisibilityService
     {
         return \Nexus\Services\TenantVisibilityService::getTenantAdmins($tenantId);
     }
+
+    /**
+     * Delegates to legacy TenantVisibilityService::getHierarchyTree().
+     */
+    public function getHierarchyTree(): array
+    {
+        return \Nexus\Services\TenantVisibilityService::getHierarchyTree();
+    }
+
+    /**
+     * Delegates to legacy TenantVisibilityService::getDashboardStats().
+     */
+    public function getDashboardStats(): array
+    {
+        return \Nexus\Services\TenantVisibilityService::getDashboardStats();
+    }
+
+    /**
+     * Delegates to legacy TenantVisibilityService::getAvailableParents().
+     */
+    public function getAvailableParents(): array
+    {
+        return \Nexus\Services\TenantVisibilityService::getAvailableParents();
+    }
 }
