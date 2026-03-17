@@ -729,30 +729,23 @@ class FederationController extends BaseApiController
 
     /**
      * Authenticate federation API request. Returns partner array on success, JsonResponse on failure.
+     *
+     * Note: FederationApiMiddleware::authenticate() returns true on success or calls exit() on
+     * failure (legacy pattern). The !$authenticated branch is a safety net in case the middleware
+     * is later refactored to return false instead of exiting.
+     *
      * @return array|JsonResponse
      */
     private function fedAuth(string $permission): array|JsonResponse
     {
-        // Use output buffering to capture FederationApiMiddleware's exit-based auth
-        ob_start();
-        $previousCode = http_response_code();
-        $authenticated = false;
-
         try {
             $authenticated = FederationApiMiddleware::authenticate();
         } catch (\Throwable $e) {
-            ob_end_clean();
             return $this->fedError(500, 'Authentication error', 'AUTH_ERROR');
         }
 
-        $output = ob_get_clean();
-        $currentCode = http_response_code();
-
         if (!$authenticated) {
-            // Middleware already set status code and output
-            $decoded = json_decode($output, true);
-            http_response_code($previousCode); // Reset for Laravel
-            return response()->json($decoded ?: ['error' => true, 'message' => 'Authentication failed'], $currentCode ?: 401);
+            return $this->fedError(401, 'Authentication failed', 'AUTH_FAILED');
         }
 
         // Check permission

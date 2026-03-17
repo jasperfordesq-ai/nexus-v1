@@ -273,16 +273,4 @@ class AdminLegalDocController extends BaseApiController
         }
     }
 
-    /**
-     * @deprecated Unused - all methods now call services directly.
-     */
-    private function delegateLegacy_unused(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }

@@ -62,22 +62,178 @@ class AdminVolunteerController extends BaseApiController
         return null;
     }
 
-    /** GET /api/v2/admin/volunteering/opportunities -- kept as delegation (complex legacy query) */
+    /** GET /api/v2/admin/volunteering/opportunities */
     public function opportunities(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'opportunities');
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+        }
+        $tenantId = $this->getTenantId();
+
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+        $search = $this->query('search');
+        $status = $this->query('status');
+        $cursor = $this->query('cursor');
+
+        if (!$this->tableExists('vol_opportunities')) {
+            return $this->respondWithCollection([], null, $perPage, false);
+        }
+
+        try {
+            $sql = "SELECT opp.*, org.name as org_name, org.logo_url as org_logo,
+                           org.status as org_status, cat.name as category_name
+                    FROM vol_opportunities opp
+                    LEFT JOIN vol_organizations org ON opp.organization_id = org.id
+                    LEFT JOIN categories cat ON opp.category_id = cat.id
+                    WHERE opp.tenant_id = ?";
+            $params = [$tenantId];
+
+            if ($status && in_array($status, ['open', 'active', 'closed', 'draft'], true)) {
+                $sql .= " AND opp.status = ?";
+                $params[] = $status;
+            }
+
+            if ($search) {
+                $escapedSearch = addcslashes($search, '%_');
+                $searchTerm = '%' . $escapedSearch . '%';
+                $sql .= " AND (opp.title LIKE ? OR opp.description LIKE ?)";
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+            }
+
+            if ($cursor) {
+                $decoded = base64_decode($cursor, true);
+                if ($decoded && is_numeric($decoded)) {
+                    $sql .= " AND opp.id < ?";
+                    $params[] = (int) $decoded;
+                }
+            }
+
+            $sql .= " ORDER BY opp.created_at DESC, opp.id DESC LIMIT " . ($perPage + 1);
+
+            $stmt = Database::query($sql, $params);
+            $rows = $stmt->fetchAll() ?: [];
+
+            $hasMore = count($rows) > $perPage;
+            if ($hasMore) {
+                array_pop($rows);
+            }
+
+            $nextCursor = null;
+            if ($hasMore && !empty($rows)) {
+                $lastRow = end($rows);
+                $nextCursor = base64_encode((string) $lastRow['id']);
+            }
+
+            return $this->respondWithCollection($rows, $nextCursor, $perPage, $hasMore);
+        } catch (\Exception $e) {
+            return $this->respondWithCollection([], null, $perPage, false);
+        }
     }
 
-    /** GET /api/v2/admin/volunteering/applications -- kept as delegation (complex legacy query) */
+    /** GET /api/v2/admin/volunteering/applications */
     public function applications(): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'applications');
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+        }
+        $tenantId = $this->getTenantId();
+
+        $perPage = $this->queryInt('per_page', 20, 1, 50);
+        $status = $this->query('status');
+        $cursor = $this->query('cursor');
+
+        if (!$this->tableExists('vol_applications')) {
+            return $this->respondWithCollection([], null, $perPage, false);
+        }
+
+        try {
+            $sql = "SELECT a.*, u.first_name, u.last_name, u.email as user_email, u.avatar_url as user_avatar,
+                           vo.title as opportunity_title
+                    FROM vol_applications a
+                    INNER JOIN vol_opportunities vo ON a.opportunity_id = vo.id
+                    LEFT JOIN users u ON a.user_id = u.id
+                    WHERE vo.tenant_id = ?";
+            $params = [$tenantId];
+
+            if ($status && in_array($status, ['pending', 'approved', 'declined', 'withdrawn'], true)) {
+                $sql .= " AND a.status = ?";
+                $params[] = $status;
+            }
+
+            if ($cursor) {
+                $decoded = base64_decode($cursor, true);
+                if ($decoded && is_numeric($decoded)) {
+                    $sql .= " AND a.id < ?";
+                    $params[] = (int) $decoded;
+                }
+            }
+
+            $sql .= " ORDER BY a.created_at DESC, a.id DESC LIMIT " . ($perPage + 1);
+
+            $stmt = Database::query($sql, $params);
+            $rows = $stmt->fetchAll() ?: [];
+
+            $hasMore = count($rows) > $perPage;
+            if ($hasMore) {
+                array_pop($rows);
+            }
+
+            $nextCursor = null;
+            if ($hasMore && !empty($rows)) {
+                $lastRow = end($rows);
+                $nextCursor = base64_encode((string) $lastRow['id']);
+            }
+
+            return $this->respondWithCollection($rows, $nextCursor, $perPage, $hasMore);
+        } catch (\Exception $e) {
+            return $this->respondWithCollection([], null, $perPage, false);
+        }
     }
 
     /** POST /api/v2/admin/volunteering/hours/{id}/verify */
     public function verifyHours(int $id): JsonResponse
     {
-        return $this->delegateLegacy(\Nexus\Controllers\Api\AdminVolunteeringApiController::class, 'verifyHours', [$id]);
+        $this->requireAdmin();
+        if (!TenantContext::hasFeature('volunteering')) {
+            return $this->respondWithError('FEATURE_DISABLED', 'Feature not available', null, 403);
+        }
+        $tenantId = $this->getTenantId();
+
+        $action = $this->input('action');
+        if (!$action || !in_array($action, ['approve', 'decline'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Action is required (approve or decline)', 'action', 400);
+        }
+
+        if (!$this->tableExists('vol_logs')) {
+            return $this->respondWithError('NOT_FOUND', 'Hours log not found', null, 404);
+        }
+
+        try {
+            $log = Database::query(
+                "SELECT id, user_id, status FROM vol_logs WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch();
+
+            if (!$log) {
+                return $this->respondWithError('NOT_FOUND', 'Hours log not found', null, 404);
+            }
+
+            $newStatus = $action === 'approve' ? 'approved' : 'declined';
+            Database::query(
+                "UPDATE vol_logs SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$newStatus, $id, $tenantId]
+            );
+
+            return $this->respondWithData([
+                'id' => $id,
+                'status' => $newStatus,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('SERVER_ERROR', 'Failed to verify hours', null, 500);
+        }
     }
 
     /** GET /api/v2/admin/volunteering */
@@ -312,16 +468,4 @@ class AdminVolunteerController extends BaseApiController
         return $this->respondWithData(['reminders_sent' => $sent]);
     }
 
-    /**
-     * Delegate to legacy controller for methods not yet converted.
-     */
-    private function delegateLegacy(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }

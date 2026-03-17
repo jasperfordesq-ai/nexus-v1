@@ -13,13 +13,15 @@ use Nexus\Services\FederationUserService;
 use Nexus\Services\FederationAuditService;
 use Nexus\Services\FederationActivityService;
 use Nexus\Services\FederatedConnectionService;
+use Nexus\Services\FederationEmailService;
+use Nexus\Services\FederationPartnershipService;
+use Nexus\Services\FederationRealtimeService;
+use Nexus\Models\Notification;
 
 /**
  * FederationV2Controller -- Federation v2: cross-tenant discovery, messaging, connections.
  *
- * Most methods migrated from delegation to direct service/DB calls.
- * sendMessage is kept as delegation because it involves email sending,
- * Pusher realtime notifications, and in-app notification creation.
+ * All methods migrated from delegation to direct service/DB calls.
  */
 class FederationV2Controller extends BaseApiController
 {
@@ -746,16 +748,197 @@ class FederationV2Controller extends BaseApiController
     /**
      * POST /api/v2/federation/messages
      *
-     * Kept as delegation — involves email sending, Pusher realtime, and in-app notifications.
+     * Send a cross-tenant federated message. Inserts outbound + inbound copies,
+     * then dispatches email, realtime, and in-app notifications (non-blocking).
      */
     public function sendMessage(): JsonResponse
     {
-        $controller = new \Nexus\Controllers\Api\FederationV2ApiController();
-        ob_start();
-        $controller->sendMessage();
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        $input = request()->all();
+        $receiverId = $input['receiver_id'] ?? null;
+        $receiverTenantId = $input['receiver_tenant_id'] ?? null;
+        $subject = $input['subject'] ?? '';
+        $body = $input['body'] ?? '';
+        $referenceMessageId = $input['reference_message_id'] ?? null;
+
+        // Validate required fields
+        $errors = [];
+        if (empty($receiverId)) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'receiver_id is required.', 'field' => 'receiver_id'];
+        }
+        if (empty($receiverTenantId)) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'receiver_tenant_id is required.', 'field' => 'receiver_tenant_id'];
+        }
+        if (empty($body)) {
+            $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required.', 'field' => 'body'];
+        }
+        if (!empty($errors)) {
+            return $this->respondWithErrors($errors);
+        }
+
+        try {
+            // Verify the receiver exists and accepts federated messages
+            $receiver = Database::query("
+                SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.tenant_id,
+                       fus.messaging_enabled_federated, fus.federation_optin,
+                       t.name as tenant_name
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN tenants t ON t.id = u.tenant_id
+                WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active'
+            ", [(int)$receiverId, (int)$receiverTenantId])->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$receiver) {
+                return $this->respondWithError('RECIPIENT_NOT_FOUND', 'Recipient not found.', null, 404);
+            }
+
+            if (!$receiver['federation_optin'] || !$receiver['messaging_enabled_federated']) {
+                return $this->respondWithError('MESSAGING_DISABLED', 'This member does not accept federated messages.', null, 403);
+            }
+
+            // Verify an active partnership exists between the two tenants
+            $partnership = FederationPartnershipService::getPartnership($tenantId, (int)$receiverTenantId);
+            if (!$partnership || $partnership['status'] !== 'active') {
+                return $this->respondWithError('NO_PARTNERSHIP', 'No active partnership with the recipient\'s community.', null, 403);
+            }
+
+            if (!($partnership['messaging_enabled'] ?? false)) {
+                return $this->respondWithError('MESSAGING_NOT_ALLOWED', 'Messaging is not enabled for this partnership.', null, 403);
+            }
+
+            // Get sender info
+            $sender = Database::query("
+                SELECT u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
+                FROM users u
+                JOIN tenants t ON t.id = u.tenant_id
+                WHERE u.id = ?
+            ", [$userId])->fetch(\PDO::FETCH_ASSOC);
+
+            $senderName = trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
+
+            // Insert outbound message (sender's copy)
+            Database::query("
+                INSERT INTO federation_messages
+                (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
+                 subject, body, direction, status, reference_message_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'outbound', 'delivered', ?, NOW())
+            ", [
+                $tenantId, $userId,
+                (int)$receiverTenantId, (int)$receiverId,
+                $subject, $body,
+                $referenceMessageId ? (int)$referenceMessageId : null,
+            ]);
+            $outboundId = (int)Database::lastInsertId();
+
+            // Insert inbound message (receiver's copy)
+            Database::query("
+                INSERT INTO federation_messages
+                (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
+                 subject, body, direction, status, reference_message_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'inbound', 'unread', ?, NOW())
+            ", [
+                $tenantId, $userId,
+                (int)$receiverTenantId, (int)$receiverId,
+                $subject, $body,
+                $referenceMessageId ? (int)$referenceMessageId : null,
+            ]);
+
+            // Audit log
+            FederationAuditService::log(
+                'cross_tenant_message',
+                $tenantId,
+                (int)$receiverTenantId,
+                $userId,
+                ['message_id' => $outboundId, 'receiver_id' => (int)$receiverId],
+                FederationAuditService::LEVEL_INFO
+            );
+
+            // ── Notification dispatch (email + realtime + in-app + push) ──
+            // These are async/non-blocking: failures are logged but don't affect the response.
+
+            $senderTenantName = $sender['tenant_name'] ?? '';
+
+            // 1. Email notification to recipient
+            try {
+                FederationEmailService::sendNewMessageNotification(
+                    (int)$receiverId,
+                    $userId,
+                    $tenantId,
+                    substr($body, 0, 200)
+                );
+            } catch (\Exception $e) {
+                error_log("FederationV2: Failed to send federation message email: " . $e->getMessage());
+            }
+
+            // 2. Real-time notification via Pusher
+            try {
+                FederationRealtimeService::broadcastNewMessage(
+                    $userId,
+                    $tenantId,
+                    (int)$receiverId,
+                    (int)$receiverTenantId,
+                    [
+                        'message_id' => $outboundId,
+                        'sender_name' => $senderName,
+                        'sender_tenant_name' => $senderTenantName,
+                        'subject' => $subject,
+                        'body' => $body,
+                    ]
+                );
+            } catch (\Exception $e) {
+                error_log("FederationV2: Failed to send federation message realtime: " . $e->getMessage());
+            }
+
+            // 3. In-app notification + push notification
+            try {
+                $notifMessage = "New federated message from {$senderName} ({$senderTenantName}): " . substr($subject ?: '(no subject)', 0, 50);
+                if (strlen($subject) > 50) {
+                    $notifMessage .= '...';
+                }
+
+                Notification::create(
+                    (int)$receiverId,
+                    $notifMessage,
+                    '/federation/messages',
+                    'federation_message',
+                    true,
+                    (int)$receiverTenantId  // Receiver's tenant, not sender's
+                );
+            } catch (\Exception $e) {
+                error_log("FederationV2: Failed to send federation message in-app notification: " . $e->getMessage());
+            }
+
+            // Return the outbound message in the expected format
+            return $this->respondWithData([
+                'id' => $outboundId,
+                'subject' => $subject,
+                'body' => $body,
+                'direction' => 'outbound',
+                'status' => 'delivered',
+                'read_at' => null,
+                'created_at' => date('Y-m-d H:i:s'),
+                'sender' => [
+                    'id' => $userId,
+                    'name' => $senderName,
+                    'avatar' => $sender['avatar_url'] ?? null,
+                    'tenant_id' => $tenantId,
+                    'tenant_name' => $sender['tenant_name'] ?? '',
+                ],
+                'receiver' => [
+                    'id' => (int)$receiverId,
+                    'name' => trim($receiver['first_name'] . ' ' . $receiver['last_name']),
+                    'avatar' => $receiver['avatar_url'] ?: null,
+                    'tenant_id' => (int)$receiverTenantId,
+                    'tenant_name' => $receiver['tenant_name'] ?? '',
+                ],
+                'reference_message_id' => $referenceMessageId ? (int)$referenceMessageId : null,
+            ], null, 201);
+        } catch (\Exception $e) {
+            error_log("FederationV2Api::sendMessage error: " . $e->getMessage());
+            return $this->respondWithError('SEND_FAILED', 'Failed to send message. Please try again.', null, 500);
+        }
     }
 
     /** POST /api/v2/federation/messages/{id}/read */

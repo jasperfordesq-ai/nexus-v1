@@ -18,9 +18,8 @@ use Nexus\Models\FeedPost;
 /**
  * SocialController -- Social feed posts, likes, polls, comments, reactions.
  *
- * feedV2() and likeV2() are native Eloquent (no delegation).
- * createPostV2 and createPost delegate because they handle file uploads via $_FILES.
- * All other methods are now native — calling legacy static services directly.
+ * All methods are native — no legacy delegation. File uploads use Laravel's
+ * request()->file() instead of $_FILES.
  */
 class SocialController extends BaseApiController
 {
@@ -165,19 +164,144 @@ class SocialController extends BaseApiController
     }
 
     // ========================================================================
-    // Delegated endpoints — file uploads only
+    // Post creation endpoints — native (no delegation)
     // ========================================================================
 
-    /** POST feed/posts — delegates due to $_FILES image upload handling */
+    /**
+     * POST /api/v2/feed/posts — Create a new feed post (V2 format)
+     *
+     * Accepts multipart/form-data with optional image upload.
+     */
     public function createPostV2(): JsonResponse
     {
-        return $this->delegateToLegacy(\Nexus\Controllers\Api\SocialApiController::class, 'createPostV2');
+        $userId = $this->requireAuth();
+        $this->rateLimit('feed_create', 20, 60);
+
+        $data = $this->getAllInput();
+
+        // Handle image upload if present (multipart/form-data)
+        $imageUrl = $this->handleImageUpload();
+        if ($imageUrl) {
+            $data['image_url'] = $imageUrl;
+        }
+
+        $postId = \Nexus\Services\FeedService::createPost($userId, $data);
+
+        if ($postId === null) {
+            $errors = \Nexus\Services\FeedService::getErrors();
+            $status = 422;
+
+            foreach ($errors as $error) {
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        // Get the created post
+        $post = \Nexus\Services\FeedService::getItem('post', $postId, $userId);
+
+        return $this->respondWithData($post, null, 201);
     }
 
-    /** POST /api/social/create-post — delegates due to $_FILES image upload handling */
+    /**
+     * POST /api/social/create-post — Create a new feed post (V1 format)
+     *
+     * Accepts multipart/form-data with optional image upload.
+     */
     public function createPost(): JsonResponse
     {
-        return $this->delegateToLegacy(\Nexus\Controllers\Api\SocialApiController::class, 'createPost');
+        $this->rateLimit('social_create_post', 20, 60);
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        $content = trim($this->input('content', ''));
+        $emoji = $this->input('emoji');
+        $imageUrl = $this->input('image_url');
+        $visibility = $this->input('visibility', 'public');
+
+        // Validate visibility
+        $validVisibility = ['public', 'private', 'friends'];
+        if (! in_array($visibility, $validVisibility, true)) {
+            $visibility = 'public';
+        }
+        $groupId = $this->inputInt('group_id', 0);
+
+        if (empty($content) && empty($imageUrl)) {
+            return response()->json(['error' => 'Post content or image is required'], 400);
+        }
+
+        // If posting to a group, verify membership
+        if ($groupId > 0) {
+            $membership = DB::table('group_members')
+                ->where('group_id', $groupId)
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->first();
+
+            if (! $membership) {
+                return response()->json(['error' => 'You must be a member of this group to post'], 403);
+            }
+        }
+
+        try {
+            // Handle image upload if present (file upload takes precedence over URL)
+            $uploadedUrl = $this->handleImageUpload();
+            if ($uploadedUrl) {
+                $imageUrl = $uploadedUrl;
+            }
+
+            // Build insert data
+            $insertData = [
+                'user_id'     => $userId,
+                'tenant_id'   => $tenantId,
+                'content'     => $content,
+                'emoji'       => $emoji,
+                'image_url'   => $imageUrl,
+                'likes_count' => 0,
+                'visibility'  => $visibility,
+                'created_at'  => now(),
+            ];
+
+            // Check if group_id column exists (backward compatibility)
+            $hasGroupColumn = false;
+            try {
+                $columns = DB::select("SHOW COLUMNS FROM feed_posts LIKE 'group_id'");
+                $hasGroupColumn = ! empty($columns);
+            } catch (\Exception $e) {
+                // Column doesn't exist
+            }
+
+            if ($hasGroupColumn && $groupId > 0) {
+                $insertData['group_id'] = $groupId;
+            }
+
+            $postId = DB::table('feed_posts')->insertGetId($insertData);
+
+            // Record in feed_activity so post appears in the feed
+            try {
+                FeedActivityService::recordActivity($tenantId, $userId, 'post', (int) $postId, [
+                    'content'    => $content,
+                    'image_url'  => $imageUrl,
+                    'group_id'   => $groupId ?: null,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Exception $faEx) {
+                error_log('SocialController::createPost feed_activity failed: ' . $faEx->getMessage());
+            }
+
+            return response()->json([
+                'success' => true,
+                'status'  => 'success',
+                'post_id' => $postId,
+            ]);
+        } catch (\Exception $e) {
+            error_log("Create Post Error: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to create post'], 500);
+        }
     }
 
     // ========================================================================
@@ -983,10 +1107,51 @@ class SocialController extends BaseApiController
         }
     }
 
-    /** POST /api/social/feed — delegates to legacy for complex aggregated SQL */
+    /**
+     * POST /api/social/feed — Aggregated feed with posts, listings, events, polls, goals.
+     *
+     * Supports filtering by type, user_id, group_id. Offset/page pagination.
+     */
     public function feed(): JsonResponse
     {
-        return $this->delegateToLegacy(\Nexus\Controllers\Api\SocialApiController::class, 'feed');
+        $this->rateLimit('social_feed', 60, 60);
+        $currentUserId = $this->getOptionalUserId();
+        $tenantId = $this->getTenantId();
+
+        $page = max(1, $this->inputInt('page', 1));
+        $limit = min(50, max(5, $this->inputInt('limit', 20)));
+        $filter = $this->input('filter', 'all');
+        $profileUserId = $this->inputInt('user_id', 0);
+        $groupId = $this->inputInt('group_id', 0);
+
+        // Support offset-based pagination as well as page-based
+        $offset = $this->inputInt('offset', 0);
+        if ($offset === 0) {
+            $offset = ($page - 1) * $limit;
+        }
+
+        try {
+            $items = [];
+
+            if ($groupId > 0) {
+                $items = $this->loadGroupFeed($groupId, $currentUserId, $tenantId, $limit, $offset);
+            } elseif ($profileUserId > 0) {
+                $items = $this->loadUserPosts($profileUserId, $currentUserId, $tenantId, $limit, $offset);
+            } else {
+                $items = $this->loadAggregatedFeed($currentUserId, $tenantId, $filter, $limit, $offset);
+            }
+
+            return response()->json([
+                'success'  => true,
+                'status'   => 'success',
+                'items'    => $items,
+                'page'     => $page,
+                'has_more' => count($items) >= $limit,
+            ]);
+        } catch (\Exception $e) {
+            error_log("Feed Load Error: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to load feed'], 500);
+        }
     }
 
     // ========================================================================
@@ -1016,23 +1181,287 @@ class SocialController extends BaseApiController
     }
 
     /**
-     * Delegate to legacy controller via output buffering.
-     * Only used for file upload methods.
+     * Handle image upload from the request.
+     *
+     * Validates MIME type, file size, and extension. Returns the public URL
+     * path on success, or null if no file or validation fails.
      */
-    private function delegateToLegacy(string $legacyClass, string $method, array $params = []): JsonResponse
+    private function handleImageUpload(): ?string
     {
-        $controller = new $legacyClass();
-        ob_start();
-        try {
-            $controller->$method(...$params);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
+        $request = request();
+
+        if (! $request->hasFile('image') || ! $request->file('image')->isValid()) {
+            return null;
         }
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+
+        $file = $request->file('image');
+
+        // Enforce server-side file size limit (5MB)
+        $maxSize = 5 * 1024 * 1024;
+        if ($file->getSize() > $maxSize) {
+            return null;
+        }
+
+        // Validate actual MIME type
+        $allowedTypes = [
+            'image/jpeg' => ['jpg', 'jpeg'],
+            'image/png'  => ['png'],
+            'image/gif'  => ['gif'],
+            'image/webp' => ['webp'],
+        ];
+
+        $actualMime = $file->getMimeType();
+        if (! isset($allowedTypes[$actualMime])) {
+            return null;
+        }
+
+        // Validate extension matches MIME type
+        $ext = strtolower($file->getClientOriginalExtension());
+        if (! in_array($ext, $allowedTypes[$actualMime], true)) {
+            $ext = $allowedTypes[$actualMime][0];
+        }
+
+        // Verify it's a valid image
+        $imageInfo = @getimagesize($file->getPathname());
+        if ($imageInfo === false) {
+            return null;
+        }
+
+        $uploadDir = public_path('uploads/posts');
+        if (! is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Use cryptographically secure random filename
+        $filename = 'post_' . bin2hex(random_bytes(16)) . '.' . $ext;
+
+        $file->move($uploadDir, $filename);
+
+        return '/uploads/posts/' . $filename;
+    }
+
+    /**
+     * Load feed posts for a specific group.
+     */
+    private function loadGroupFeed(int $groupId, ?int $currentUserId, int $tenantId, int $limit, int $offset): array
+    {
+        // Check if group_id column exists
+        try {
+            $columns = DB::select("SHOW COLUMNS FROM feed_posts LIKE 'group_id'");
+            if (empty($columns)) {
+                return [];
+            }
+        } catch (\Exception $e) {
+            return [];
+        }
+
+        $currentUserId = (int) $currentUserId;
+        $isLikedSub = $currentUserId
+            ? "(SELECT COUNT(*) FROM likes lk WHERE lk.user_id = {$currentUserId} AND lk.target_type = 'post' AND lk.target_id = p.id AND lk.tenant_id = {$tenantId})"
+            : '0';
+
+        $rows = DB::select(
+            "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count, p.user_id,
+                    'post' as type,
+                    COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                    u.avatar_url as author_avatar,
+                    p.user_id as author_id,
+                    (SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'post' AND cm.target_id = p.id AND cm.tenant_id = ?) as comments_count,
+                    {$isLikedSub} as is_liked
+             FROM feed_posts p
+             JOIN users u ON p.user_id = u.id
+             WHERE p.group_id = ? AND p.tenant_id = ?
+             ORDER BY p.created_at DESC
+             LIMIT ? OFFSET ?",
+            [$tenantId, $groupId, $tenantId, $limit, $offset]
+        );
+
+        return array_map(fn ($r) => (array) $r, $rows);
+    }
+
+    /**
+     * Load feed posts for a specific user's profile.
+     */
+    private function loadUserPosts(int $userId, ?int $currentUserId, int $tenantId, int $limit, int $offset): array
+    {
+        $currentUserId = (int) $currentUserId;
+        $isLikedSub = $currentUserId
+            ? "(SELECT COUNT(*) FROM likes lk WHERE lk.user_id = {$currentUserId} AND lk.target_type = 'post' AND lk.target_id = p.id AND lk.tenant_id = {$tenantId})"
+            : '0';
+
+        $rows = DB::select(
+            "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
+                    'post' as type,
+                    COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                    u.avatar_url as author_avatar,
+                    p.user_id as author_id,
+                    (SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'post' AND cm.target_id = p.id AND cm.tenant_id = ?) as comments_count,
+                    {$isLikedSub} as is_liked
+             FROM feed_posts p
+             JOIN users u ON p.user_id = u.id
+             WHERE p.user_id = ? AND p.tenant_id = ? AND p.visibility = 'public'
+             ORDER BY p.created_at DESC
+             LIMIT ? OFFSET ?",
+            [$tenantId, $userId, $tenantId, $limit, $offset]
+        );
+
+        return array_map(fn ($r) => (array) $r, $rows);
+    }
+
+    /**
+     * Load aggregated feed combining posts, listings, events, polls, and goals.
+     *
+     * Fetches content from multiple tables, merges, sorts by created_at,
+     * and returns a paginated slice.
+     */
+    private function loadAggregatedFeed(?int $currentUserId, int $tenantId, string $filter, int $limit, int $offset): array
+    {
+        $currentUserId = (int) $currentUserId;
+        $items = [];
+
+        // Posts
+        if ($filter === 'all' || $filter === 'posts') {
+            $isLiked = $currentUserId
+                ? "(SELECT COUNT(*) FROM likes WHERE user_id = {$currentUserId} AND target_type = 'post' AND target_id = p.id AND tenant_id = {$tenantId})"
+                : '0';
+            $commentsSub = "(SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'post' AND cm.target_id = p.id AND cm.tenant_id = {$tenantId})";
+            $postLimit = ($filter === 'posts') ? $limit : 30;
+
+            $rows = DB::select(
+                "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
+                        'post' as type,
+                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                        u.avatar_url as author_avatar,
+                        p.user_id as author_id,
+                        {$commentsSub} as comments_count,
+                        {$isLiked} as is_liked
+                 FROM feed_posts p
+                 JOIN users u ON p.user_id = u.id
+                 WHERE p.tenant_id = ? AND p.visibility = 'public'
+                 ORDER BY p.created_at DESC
+                 LIMIT {$postLimit}",
+                [$tenantId]
+            );
+            $items = array_merge($items, array_map(fn ($r) => (array) $r, $rows));
+        }
+
+        // Listings
+        if ($filter === 'all' || $filter === 'listings') {
+            $isLiked = $currentUserId
+                ? "(SELECT COUNT(*) FROM likes WHERE user_id = {$currentUserId} AND target_type = 'listing' AND target_id = l.id AND tenant_id = {$tenantId})"
+                : '0';
+            $likesSub = "(SELECT COUNT(*) FROM likes lk WHERE lk.target_type = 'listing' AND lk.target_id = l.id AND lk.tenant_id = {$tenantId})";
+            $commentsSub = "(SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'listing' AND cm.target_id = l.id AND cm.tenant_id = {$tenantId})";
+            $listingLimit = ($filter === 'listings') ? $limit : 15;
+
+            $rows = DB::select(
+                "SELECT l.id, l.title, l.description as content, l.image_url, l.created_at,
+                        'listing' as type,
+                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                        u.avatar_url as author_avatar,
+                        l.user_id as author_id,
+                        {$likesSub} as likes_count,
+                        {$commentsSub} as comments_count,
+                        {$isLiked} as is_liked
+                 FROM listings l
+                 JOIN users u ON l.user_id = u.id
+                 WHERE l.tenant_id = ? AND l.status = 'active'
+                 ORDER BY l.created_at DESC
+                 LIMIT {$listingLimit}",
+                [$tenantId]
+            );
+            $items = array_merge($items, array_map(fn ($r) => (array) $r, $rows));
+        }
+
+        // Events
+        if ($filter === 'all' || $filter === 'events') {
+            $isLiked = $currentUserId
+                ? "(SELECT COUNT(*) FROM likes WHERE user_id = {$currentUserId} AND target_type = 'event' AND target_id = e.id AND tenant_id = {$tenantId})"
+                : '0';
+            $likesSub = "(SELECT COUNT(*) FROM likes lk WHERE lk.target_type = 'event' AND lk.target_id = e.id AND lk.tenant_id = {$tenantId})";
+            $commentsSub = "(SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'event' AND cm.target_id = e.id AND cm.tenant_id = {$tenantId})";
+            $eventLimit = ($filter === 'events') ? $limit : 10;
+
+            $rows = DB::select(
+                "SELECT e.id, e.title, e.description as content, e.cover_image as image_url, e.created_at, e.start_time as start_date,
+                        'event' as type,
+                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                        u.avatar_url as author_avatar,
+                        e.user_id as author_id,
+                        {$likesSub} as likes_count,
+                        {$commentsSub} as comments_count,
+                        {$isLiked} as is_liked
+                 FROM events e
+                 JOIN users u ON e.user_id = u.id
+                 WHERE e.tenant_id = ?
+                 ORDER BY e.created_at DESC
+                 LIMIT {$eventLimit}",
+                [$tenantId]
+            );
+            $items = array_merge($items, array_map(fn ($r) => (array) $r, $rows));
+        }
+
+        // Polls
+        if ($filter === 'all' || $filter === 'polls') {
+            $isLiked = $currentUserId
+                ? "(SELECT COUNT(*) FROM likes WHERE user_id = {$currentUserId} AND target_type = 'poll' AND target_id = po.id AND tenant_id = {$tenantId})"
+                : '0';
+            $likesSub = "(SELECT COUNT(*) FROM likes lk WHERE lk.target_type = 'poll' AND lk.target_id = po.id AND lk.tenant_id = {$tenantId})";
+            $commentsSub = "(SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'poll' AND cm.target_id = po.id AND cm.tenant_id = {$tenantId})";
+            $pollLimit = ($filter === 'polls') ? $limit : 10;
+
+            $rows = DB::select(
+                "SELECT po.id, po.question as title, po.question as content, po.created_at,
+                        'poll' as type,
+                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                        u.avatar_url as author_avatar,
+                        po.user_id as author_id,
+                        {$likesSub} as likes_count,
+                        {$commentsSub} as comments_count,
+                        {$isLiked} as is_liked
+                 FROM polls po
+                 JOIN users u ON po.user_id = u.id
+                 WHERE po.tenant_id = ? AND po.is_active = 1
+                 ORDER BY po.created_at DESC
+                 LIMIT {$pollLimit}",
+                [$tenantId]
+            );
+            $items = array_merge($items, array_map(fn ($r) => (array) $r, $rows));
+        }
+
+        // Goals
+        if ($filter === 'all' || $filter === 'goals') {
+            $isLiked = $currentUserId
+                ? "(SELECT COUNT(*) FROM likes WHERE user_id = {$currentUserId} AND target_type = 'goal' AND target_id = g.id AND tenant_id = {$tenantId})"
+                : '0';
+            $likesSub = "(SELECT COUNT(*) FROM likes lk WHERE lk.target_type = 'goal' AND lk.target_id = g.id AND lk.tenant_id = {$tenantId})";
+            $commentsSub = "(SELECT COUNT(*) FROM comments cm WHERE cm.target_type = 'goal' AND cm.target_id = g.id AND cm.tenant_id = {$tenantId})";
+            $goalLimit = ($filter === 'goals') ? $limit : 10;
+
+            $rows = DB::select(
+                "SELECT g.id, g.title, g.description as content, g.created_at,
+                        'goal' as type,
+                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                        u.avatar_url as author_avatar,
+                        g.user_id as author_id,
+                        {$likesSub} as likes_count,
+                        {$commentsSub} as comments_count,
+                        {$isLiked} as is_liked
+                 FROM goals g
+                 JOIN users u ON g.user_id = u.id
+                 WHERE g.tenant_id = ?
+                 ORDER BY g.created_at DESC
+                 LIMIT {$goalLimit}",
+                [$tenantId]
+            );
+            $items = array_merge($items, array_map(fn ($r) => (array) $r, $rows));
+        }
+
+        // Sort by created_at descending and apply pagination
+        usort($items, function ($a, $b) {
+            return strtotime($b['created_at']) - strtotime($a['created_at']);
+        });
+
+        return array_slice($items, $offset, $limit);
     }
 }
