@@ -7,164 +7,141 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\SubAccountService;
 
 /**
  * SubAccountController -- Parent/child sub-account management.
  *
- * Delegates to legacy: SubAccountApiController
+ * Converted from legacy delegation to direct static service calls.
  */
 class SubAccountController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET sub-accounts */
+    /** GET /api/v2/users/me/sub-accounts */
     public function getChildAccounts(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SubAccountApiController();
-            $controller->getChildAccounts();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $children = SubAccountService::getChildAccounts($userId);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        foreach ($children as &$child) {
+            if (is_string($child['permissions'] ?? null)) {
+                $child['permissions'] = json_decode($child['permissions'], true);
+            }
         }
 
-        return response()->json($data);
+        return $this->respondWithData($children);
     }
 
-    /** GET parent-accounts */
+    /** GET /api/v2/users/me/parent-accounts */
     public function getParentAccounts(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SubAccountApiController();
-            $controller->getParentAccounts();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $parents = SubAccountService::getParentAccounts($userId);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        foreach ($parents as &$parent) {
+            if (is_string($parent['permissions'] ?? null)) {
+                $parent['permissions'] = json_decode($parent['permissions'], true);
+            }
         }
 
-        return response()->json($data);
+        return $this->respondWithData($parents);
     }
 
-    /** POST sub-accounts */
+    /** POST /api/v2/users/me/sub-accounts */
     public function requestRelationship(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('sub_account_request', 5, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SubAccountApiController();
-            $controller->requestRelationship();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $data = $this->getAllInput();
+        $childUserId = (int) ($data['child_user_id'] ?? 0);
+        $relationshipType = $data['relationship_type'] ?? 'family';
+        $permissions = $data['permissions'] ?? [];
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if ($childUserId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'child_user_id is required', 'child_user_id', 400);
         }
 
-        return response()->json($data);
+        $relationshipId = SubAccountService::requestRelationship($userId, $childUserId, $relationshipType, $permissions);
+
+        if ($relationshipId === null) {
+            return $this->respondWithErrors(SubAccountService::getErrors(), 422);
+        }
+
+        $children = SubAccountService::getChildAccounts($userId);
+
+        return $this->respondWithData($children, null, 201);
     }
 
-    /** PUT sub-accounts/approve */
+    /** PUT /api/v2/users/me/sub-accounts/{id}/approve */
     public function approveRelationship(int $id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SubAccountApiController();
-            $controller->approveRelationship($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $success = SubAccountService::approveRelationship($userId, $id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (!$success) {
+            return $this->respondWithErrors(SubAccountService::getErrors(), 422);
         }
 
-        return response()->json($data);
+        $parents = SubAccountService::getParentAccounts($userId);
+
+        return $this->respondWithData($parents);
     }
 
-    /** DELETE sub-accounts/id */
-    public function revokeRelationship(int $id): JsonResponse
-    {
-        $this->requireAuth();
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SubAccountApiController();
-            $controller->revokeRelationship($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
+    /** PUT /api/v2/users/me/sub-accounts/{id}/permissions */
     public function updatePermissions($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SubAccountApiController::class, 'updatePermissions', [$id]);
+        $userId = $this->requireAuth();
+
+        $data = $this->getAllInput();
+        $permissions = $data['permissions'] ?? [];
+
+        if (empty($permissions)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'permissions object is required', 'permissions', 400);
+        }
+
+        $success = SubAccountService::updatePermissions($userId, (int) $id, $permissions);
+
+        if (!$success) {
+            return $this->respondWithErrors(SubAccountService::getErrors(), 422);
+        }
+
+        $children = SubAccountService::getChildAccounts($userId);
+
+        return $this->respondWithData($children);
     }
 
+    /** DELETE /api/v2/users/me/sub-accounts/{id} */
+    public function revokeRelationship(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
 
+        SubAccountService::revokeRelationship($userId, $id);
+
+        return $this->respondWithData(['message' => 'Relationship revoked']);
+    }
+
+    /** GET /api/v2/users/me/sub-accounts/{childId}/activity */
     public function getChildActivity($childId): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SubAccountApiController::class, 'getChildActivity', [$childId]);
-    }
+        $userId = $this->requireAuth();
+        $this->rateLimit('sub_account_activity', 10, 60);
 
+        $activity = SubAccountService::getChildActivitySummary($userId, (int) $childId);
+
+        if ($activity === null) {
+            $errors = SubAccountService::getErrors();
+            $status = 403;
+            if (!empty($errors) && ($errors[0]['code'] ?? '') === 'FORBIDDEN') {
+                $status = 403;
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($activity);
+    }
 }

@@ -6,48 +6,28 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\ListingService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
+use Nexus\Services\ListingService;
+use Nexus\Services\ListingAnalyticsService;
+use Nexus\Services\ListingExpiryService;
+use Nexus\Services\ListingRankingService;
+use Nexus\Services\ListingSkillTagService;
+use Nexus\Services\ListingFeaturedService;
 
 /**
- * ListingsController — Laravel reference implementation for listings CRUD.
+ * ListingsController - Listings CRUD, search, favorites, tags, analytics, renewal.
  *
- * This is the first fully-converted Laravel API controller, intended as a
- * reference for migrating the remaining legacy controllers. It demonstrates:
- *
- *   - Constructor dependency injection (ListingService)
- *   - Returning JsonResponse from every action (no echo+exit)
- *   - Using BaseApiController helpers: respondWithData, respondWithCollection,
- *     respondWithError, noContent, input(), getUserId(), requireAuth(), etc.
- *   - Rate limiting via $this->rateLimit()
- *   - Proper HTTP status codes (200, 201, 204, 403, 404, 422)
- *
- * Endpoints (v2):
- *   GET    /api/v2/listings          → index()
- *   GET    /api/v2/listings/{id}     → show()
- *   POST   /api/v2/listings          → store()
- *   PUT    /api/v2/listings/{id}     → update()
- *   DELETE /api/v2/listings/{id}     → destroy()
+ * Converted from delegation to direct static service calls.
+ * Only uploadImage() remains delegated (uses $_FILES).
  */
 class ListingsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly ListingService $listingService,
-    ) {}
-
     // -----------------------------------------------------------------
     //  GET /api/v2/listings
     // -----------------------------------------------------------------
 
-    /**
-     * List active listings with optional filtering and cursor-based pagination.
-     *
-     * Query params: type, category_id, q, skills, featured_first, user_id,
-     *               cursor, per_page (default 20, max 100).
-     */
     public function index(): JsonResponse
     {
         $userId = $this->getOptionalUserId();
@@ -62,6 +42,8 @@ class ListingsController extends BaseApiController
 
         if ($this->query('category_id')) {
             $filters['category_id'] = $this->queryInt('category_id');
+        } elseif ($this->query('category')) {
+            $filters['category_slug'] = $this->query('category');
         }
 
         if ($this->query('q')) {
@@ -90,7 +72,20 @@ class ListingsController extends BaseApiController
             $filters['current_user_id'] = $userId;
         }
 
-        $result = $this->listingService->getAll($filters);
+        $result = ListingService::getAll($filters);
+
+        // Apply MatchRank if enabled; skip when featured_first is set
+        if (ListingRankingService::isEnabled() && !empty($result['items']) && empty($filters['featured_first'])) {
+            $result['items'] = ListingRankingService::rankListings(
+                $result['items'],
+                $userId,
+                ['search' => $filters['search'] ?? null]
+            );
+            $result['items'] = array_map(static function (array $item): array {
+                unset($item['_match_rank'], $item['_score_breakdown']);
+                return $item;
+            }, $result['items']);
+        }
 
         return $this->respondWithCollection(
             $result['items'],
@@ -104,17 +99,33 @@ class ListingsController extends BaseApiController
     //  GET /api/v2/listings/{id}
     // -----------------------------------------------------------------
 
-    /**
-     * Get a single listing by ID.
-     */
     public function show(int $id): JsonResponse
     {
         $userId = $this->getOptionalUserId();
-        $listing = $this->listingService->getById($id, false, $userId);
+        $listing = ListingService::getById($id, false, $userId);
 
-        if ($listing === null) {
+        if (!$listing) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
         }
+
+        // Track view (skip if viewer is the listing owner)
+        if ($userId === null || $userId !== (int) ($listing['user_id'] ?? 0)) {
+            try {
+                $ip = \Nexus\Core\ClientIp::get();
+                ListingAnalyticsService::recordView($id, $userId, $ip);
+            } catch (\Exception $e) {
+                // Non-critical
+            }
+        }
+
+        // Attach skill tags
+        try {
+            $listing['skill_tags'] = ListingSkillTagService::getTags($id);
+        } catch (\Exception $e) {
+            $listing['skill_tags'] = [];
+        }
+
+        $listing['is_featured'] = (bool) ($listing['is_featured'] ?? false);
 
         return $this->respondWithData($listing);
     }
@@ -123,13 +134,6 @@ class ListingsController extends BaseApiController
     //  POST /api/v2/listings
     // -----------------------------------------------------------------
 
-    /**
-     * Create a new listing.
-     *
-     * Requires authentication. Body: title (required), description (required),
-     * type (offer|request), category_id, image_url, location, latitude,
-     * longitude, federated_visibility, sdg_goals.
-     */
     public function store(): JsonResponse
     {
         $userId = $this->requireAuth();
@@ -137,94 +141,78 @@ class ListingsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        try {
-            $listing = $this->listingService->create($userId, $data);
-        } catch (ValidationException $e) {
-            $errors = collect($e->errors())->flatMap(function (array $messages, string $field) {
-                return array_map(fn (string $msg) => [
-                    'code'    => 'VALIDATION_ERROR',
-                    'message' => $msg,
-                    'field'   => $field,
-                ], $messages);
-            })->values()->all();
+        $listingId = ListingService::create($userId, $data);
 
+        if ($listingId === null) {
+            $errors = ListingService::getErrors();
             return $this->respondWithErrors($errors, 422);
         }
 
-        // Return the freshly-created listing via getById for full formatting
-        $result = $this->listingService->getById($listing->id, false, $userId);
+        $listing = ListingService::getById($listingId);
 
-        return $this->respondWithData($result ?? $listing->toArray(), null, 201);
+        return $this->respondWithData($listing, null, 201);
     }
 
     // -----------------------------------------------------------------
     //  PUT /api/v2/listings/{id}
     // -----------------------------------------------------------------
 
-    /**
-     * Update an existing listing. Only the listing owner may update.
-     */
     public function update(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('listing_update', 20, 60);
 
-        // Verify the listing exists and the user owns it
-        $existing = $this->listingService->getById($id);
-
-        if ($existing === null) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
-        }
-
-        if ((int) ($existing['user_id'] ?? 0) !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You do not own this listing', null, 403);
-        }
-
         $data = $this->getAllInput();
 
-        try {
-            $listing = $this->listingService->update($id, $data);
-        } catch (ValidationException $e) {
-            $errors = collect($e->errors())->flatMap(function (array $messages, string $field) {
-                return array_map(fn (string $msg) => [
-                    'code'    => 'VALIDATION_ERROR',
-                    'message' => $msg,
-                    'field'   => $field,
-                ], $messages);
-            })->values()->all();
+        $success = ListingService::update($id, $userId, $data);
 
-            return $this->respondWithErrors($errors, 422);
+        if (!$success) {
+            $errors = ListingService::getErrors();
+            $status = 422;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
         }
 
-        $result = $this->listingService->getById($listing->id, false, $userId);
+        $listing = ListingService::getById($id);
 
-        return $this->respondWithData($result ?? $listing->toArray());
+        return $this->respondWithData($listing);
     }
 
     // -----------------------------------------------------------------
     //  DELETE /api/v2/listings/{id}
     // -----------------------------------------------------------------
 
-    /**
-     * Soft-delete a listing. Only the listing owner may delete.
-     */
     public function destroy(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('listing_delete', 10, 60);
 
-        // Verify ownership
-        $existing = $this->listingService->getById($id);
+        $success = ListingService::delete($id, $userId);
 
-        if ($existing === null) {
-            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        if (!$success) {
+            $errors = ListingService::getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
         }
-
-        if ((int) ($existing['user_id'] ?? 0) !== $userId) {
-            return $this->respondWithError('FORBIDDEN', 'You do not own this listing', null, 403);
-        }
-
-        $this->listingService->delete($id);
 
         return $this->noContent();
     }
@@ -233,12 +221,6 @@ class ListingsController extends BaseApiController
     //  GET /api/v2/listings/nearby
     // -----------------------------------------------------------------
 
-    /**
-     * Get listings near a geographic point using Haversine formula.
-     *
-     * Query params: lat (required), lon (required), radius_km (default 25),
-     *               type, category_id, per_page (default 20, max 100).
-     */
     public function nearby(): JsonResponse
     {
         $lat = $this->query('lat');
@@ -272,7 +254,7 @@ class ListingsController extends BaseApiController
             $filters['category_id'] = $this->queryInt('category_id');
         }
 
-        $result = $this->listingService->getNearby($lat, $lon, $filters);
+        $result = ListingService::getNearby($lat, $lon, $filters);
 
         return $this->respondWithData($result['items'], [
             'search' => [
@@ -290,14 +272,11 @@ class ListingsController extends BaseApiController
     //  GET /api/v2/listings/saved
     // -----------------------------------------------------------------
 
-    /**
-     * Get listing IDs saved by the authenticated user.
-     */
     public function getSavedListings(): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $savedIds = $this->listingService->getSavedListingIds($userId);
+        $savedIds = ListingService::getSavedListingIds($userId);
 
         return $this->respondWithData($savedIds);
     }
@@ -306,16 +285,11 @@ class ListingsController extends BaseApiController
     //  GET /api/v2/listings/featured
     // -----------------------------------------------------------------
 
-    /**
-     * Get currently featured listings.
-     *
-     * Query params: per_page (default 10, max 50).
-     */
     public function featured(): JsonResponse
     {
         $limit = $this->queryInt('per_page', 10, 1, 50);
 
-        $items = $this->listingService->getFeatured($limit);
+        $items = ListingFeaturedService::getFeaturedListings($limit);
 
         return $this->respondWithData($items);
     }
@@ -324,17 +298,20 @@ class ListingsController extends BaseApiController
     //  POST /api/v2/listings/{id}/save
     // -----------------------------------------------------------------
 
-    /**
-     * Save (favourite) a listing for the authenticated user.
-     */
     public function saveListing(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $result = $this->listingService->saveListing($userId, $id);
+        $result = ListingService::saveListing($userId, $id);
 
-        if (! $result) {
+        if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        try {
+            ListingAnalyticsService::updateSaveCount($id, true);
+        } catch (\Exception $e) {
+            // Non-critical
         }
 
         return $this->respondWithData(['saved' => true, 'listing_id' => $id]);
@@ -344,21 +321,171 @@ class ListingsController extends BaseApiController
     //  DELETE /api/v2/listings/{id}/save
     // -----------------------------------------------------------------
 
-    /**
-     * Unsave (un-favourite) a listing for the authenticated user.
-     */
     public function unsaveListing(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
 
-        $this->listingService->unsaveListing($userId, $id);
+        ListingService::unsaveListing($userId, $id);
+
+        try {
+            ListingAnalyticsService::updateSaveCount($id, false);
+        } catch (\Exception $e) {
+            // Non-critical
+        }
 
         return $this->respondWithData(['saved' => false, 'listing_id' => $id]);
     }
 
     // -----------------------------------------------------------------
-    //  Delegated endpoints (complex, kept on legacy for now)
+    //  GET /api/v2/listings/tags/popular
     // -----------------------------------------------------------------
+
+    public function popularTags(): JsonResponse
+    {
+        $limit = $this->queryInt('limit', 20, 1, 50);
+
+        $tags = ListingSkillTagService::getPopularTags($limit);
+
+        return $this->respondWithData($tags);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/listings/tags/autocomplete
+    // -----------------------------------------------------------------
+
+    public function autocompleteTags(): JsonResponse
+    {
+        $prefix = trim($this->query('q', ''));
+        if (strlen($prefix) < 2) {
+            return $this->respondWithData([]);
+        }
+
+        $limit = $this->queryInt('limit', 10, 1, 20);
+        $tags = ListingSkillTagService::autocompleteTags($prefix, $limit);
+
+        return $this->respondWithData($tags);
+    }
+
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/listings/{id}/image
+    // -----------------------------------------------------------------
+
+    public function deleteImage($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+
+        $listing = ListingService::getById($id);
+
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        if (!ListingService::canModify($listing, $userId)) {
+            return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+        }
+
+        ListingService::update($id, $userId, ['image_url' => null]);
+
+        return $this->respondWithData(['image_url' => null]);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/listings/{id}/renew
+    // -----------------------------------------------------------------
+
+    public function renew($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('listing_renew', 10, 60);
+
+        $result = ListingExpiryService::renewListing($id, $userId);
+
+        if (!$result['success']) {
+            $status = $result['error'] === 'Listing not found' ? 404
+                : ($result['error'] === 'You do not have permission to renew this listing' ? 403 : 422);
+            return $this->respondWithError('RENEWAL_FAILED', $result['error'], null, $status);
+        }
+
+        return $this->respondWithData([
+            'renewed'        => true,
+            'listing_id'     => $id,
+            'new_expires_at' => $result['new_expires_at'],
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/listings/{id}/analytics
+    // -----------------------------------------------------------------
+
+    public function analytics($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+
+        $listing = ListingService::getById($id);
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        if (!ListingService::canModify($listing, $userId)) {
+            return $this->respondWithError('FORBIDDEN', 'You do not have permission to view analytics', null, 403);
+        }
+
+        $days = $this->queryInt('days', 30, 1, 90);
+        $analytics = ListingAnalyticsService::getAnalytics($id, $days);
+
+        return $this->respondWithData($analytics);
+    }
+
+    // -----------------------------------------------------------------
+    //  PUT /api/v2/listings/{id}/tags
+    // -----------------------------------------------------------------
+
+    public function setSkillTags($id): JsonResponse
+    {
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+
+        $listing = ListingService::getById($id);
+        if (!$listing) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        if (!ListingService::canModify($listing, $userId)) {
+            return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
+        }
+
+        $data = $this->getAllInput();
+        $tags = $data['tags'] ?? [];
+
+        if (!is_array($tags)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Tags must be an array of strings', 'tags', 400);
+        }
+
+        $success = ListingSkillTagService::setTags($id, $tags);
+
+        if (!$success) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        $updatedTags = ListingSkillTagService::getTags($id);
+
+        return $this->respondWithData(['listing_id' => $id, 'tags' => $updatedTags]);
+    }
+
+    // -----------------------------------------------------------------
+    //  DELEGATED — file upload uses $_FILES
+    // -----------------------------------------------------------------
+
+    /**
+     * POST /api/v2/listings/{id}/image — uses $_FILES, kept as delegation
+     */
+    public function uploadImage($id): JsonResponse
+    {
+        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'uploadImage', [$id]);
+    }
 
     /**
      * Delegate to legacy controller via output buffering.
@@ -371,40 +498,5 @@ class ListingsController extends BaseApiController
         $output = ob_get_clean();
         $status = http_response_code();
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-    public function popularTags(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'popularTags');
-    }
-
-    public function autocompleteTags(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'autocompleteTags');
-    }
-
-    public function uploadImage($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'uploadImage', [$id]);
-    }
-
-    public function deleteImage($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'deleteImage', [$id]);
-    }
-
-    public function renew($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'renew', [$id]);
-    }
-
-    public function analytics($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'analytics', [$id]);
-    }
-
-    public function setSkillTags($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'setSkillTags', [$id]);
     }
 }

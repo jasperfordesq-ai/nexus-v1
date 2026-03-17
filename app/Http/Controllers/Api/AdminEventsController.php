@@ -8,9 +8,10 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Nexus\Services\EventService;
 
 /**
- * AdminEventsController -- Admin event management (list, view, approve, delete).
+ * AdminEventsController -- Admin event management (list, view, approve, delete, cancel).
  *
  * All methods require admin authentication.
  */
@@ -18,30 +19,56 @@ class AdminEventsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
-
-    /** GET /api/v2/admin/events */
+    /**
+     * GET /api/v2/admin/events
+     *
+     * Query params: page, per_page/limit, status, search
+     */
     public function index(): JsonResponse
     {
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
-        $page = $this->queryInt('page', 1, 1);
-        $perPage = $this->queryInt('per_page', 20, 1, 100);
-        $offset = ($page - 1) * $perPage;
 
-        $items = DB::select(
-            'SELECT * FROM events WHERE tenant_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-            [$tenantId, $perPage, $offset]
-        );
-        $total = DB::selectOne(
-            'SELECT COUNT(*) as cnt FROM events WHERE tenant_id = ?',
-            [$tenantId]
+        $page = $this->queryInt('page', 1, 1);
+        $limit = $this->queryInt('per_page', $this->queryInt('limit', 20, 1, 100), 1, 100);
+        $offset = ($page - 1) * $limit;
+
+        $status = $this->query('status');
+        $search = $this->query('search');
+
+        $conditions = ['tenant_id = ?'];
+        $params = [$tenantId];
+
+        if ($status) {
+            $conditions[] = 'status = ?';
+            $params[] = $status;
+        }
+
+        if ($search) {
+            $conditions[] = '(title LIKE ? OR description LIKE ?)';
+            $searchPattern = '%' . $search . '%';
+            $params[] = $searchPattern;
+            $params[] = $searchPattern;
+        }
+
+        $where = implode(' AND ', $conditions);
+
+        $total = (int) DB::selectOne(
+            "SELECT COUNT(*) as cnt FROM events WHERE {$where}",
+            $params
         )->cnt;
 
-        return $this->respondWithPaginatedCollection($items, (int) $total, $page, $perPage);
+        $items = DB::select(
+            "SELECT * FROM events WHERE {$where} ORDER BY created_at DESC LIMIT ? OFFSET ?",
+            array_merge($params, [$limit, $offset])
+        );
+
+        return $this->respondWithPaginatedCollection($items, $total, $page, $limit);
     }
 
-    /** GET /api/v2/admin/events/{id} */
+    /**
+     * GET /api/v2/admin/events/{id}
+     */
     public function show(int $id): JsonResponse
     {
         $this->requireAdmin();
@@ -59,7 +86,9 @@ class AdminEventsController extends BaseApiController
         return $this->respondWithData($event);
     }
 
-    /** POST /api/v2/admin/events/{id}/approve */
+    /**
+     * POST /api/v2/admin/events/{id}/approve
+     */
     public function approve(int $id): JsonResponse
     {
         $this->requireAdmin();
@@ -77,41 +106,42 @@ class AdminEventsController extends BaseApiController
         return $this->respondWithData(['id' => $id, 'status' => 'active']);
     }
 
-    /** DELETE /api/v2/admin/events/{id} */
+    /**
+     * DELETE /api/v2/admin/events/{id}
+     */
     public function destroy(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $affected = DB::delete(
-            'DELETE FROM events WHERE id = ? AND tenant_id = ?',
-            [$id, $tenantId]
-        );
-
-        if ($affected === 0) {
+        $event = EventService::getById($id);
+        if (!$event) {
             return $this->respondWithError('NOT_FOUND', 'Event not found', null, 404);
         }
 
-        return $this->respondWithData(['id' => $id, 'deleted' => true]);
+        $deleted = EventService::delete($id, $adminId);
+
+        if ($deleted) {
+            return $this->respondWithData(['id' => $id, 'deleted' => true]);
+        }
+
+        return $this->respondWithError('DELETE_FAILED', 'Failed to delete event', null, 400);
     }
 
     /**
-     * Delegate to legacy controller via output buffering.
+     * POST /api/v2/admin/events/{id}/cancel
      */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    public function cancel(int $id): JsonResponse
     {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $adminId = $this->requireAdmin();
+
+        $reason = $this->input('reason', 'Cancelled by admin');
+        $cancelled = EventService::cancelEvent($id, $adminId, $reason);
+
+        if ($cancelled) {
+            return $this->respondWithData(['cancelled' => true, 'id' => $id]);
+        }
+
+        return $this->respondWithError('CANCEL_FAILED', 'Failed to cancel event', null, 400);
     }
-
-
-    public function cancel($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\AdminEventsApiController::class, 'cancel', [$id]);
-    }
-
 }

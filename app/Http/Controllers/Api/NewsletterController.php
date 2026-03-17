@@ -8,9 +8,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\NewsletterService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
  * NewsletterController — Newsletter management and distribution.
+ *
+ * All endpoints migrated to native DB facade — no legacy delegation.
  */
 class NewsletterController extends BaseApiController
 {
@@ -87,22 +90,60 @@ class NewsletterController extends BaseApiController
     }
 
     /**
-     * Delegate to legacy controller via output buffering.
+     * POST /api/v2/newsletter/unsubscribe
+     *
+     * Processes a newsletter unsubscribe using a token from an email link.
+     * No authentication required — token acts as the credential.
+     *
+     * Body: { "token": "..." }
+     * Returns: { "success": true } or { "success": false, "message": "..." }
      */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
     public function unsubscribe(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\NewsletterApiController::class, 'unsubscribe');
-    }
+        $input = $this->getAllInput();
+        $token = trim($input['token'] ?? $this->query('token', ''));
 
+        if (empty($token)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unsubscribe token is required.',
+            ], 400);
+        }
+
+        $subscriber = DB::table('newsletter_subscribers')
+            ->where('unsubscribe_token', $token)
+            ->first();
+
+        if (! $subscriber) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This unsubscribe link is invalid or has already been used.',
+            ], 404);
+        }
+
+        if ($subscriber->status === 'unsubscribed') {
+            return response()->json([
+                'success' => true,
+                'message' => 'You are already unsubscribed.',
+                'already_done' => true,
+            ]);
+        }
+
+        $updated = DB::table('newsletter_subscribers')
+            ->where('unsubscribe_token', $token)
+            ->update([
+                'status'             => 'unsubscribed',
+                'unsubscribed_at'    => now(),
+                'unsubscribe_reason' => 'email_link',
+            ]);
+
+        if ($updated) {
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Unable to process your request. Please try again.',
+        ], 500);
+    }
 }

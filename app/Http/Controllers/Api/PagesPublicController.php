@@ -7,37 +7,55 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
- * PagesPublicController -- Public CMS page content.
+ * PagesPublicController — Eloquent-powered public CMS page endpoint.
  *
- * Delegates to legacy: PagesPublicApiController
+ * Fully migrated from legacy delegation to direct DB queries.
  */
 class PagesPublicController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET pages/slug */
+    /**
+     * GET /api/v2/pages/{slug}
+     *
+     * Returns a published page's content for public display.
+     * If the tenant resolves to master (1) and context_tenant query param
+     * is provided, uses that tenant instead (for unauthenticated public pages).
+     */
     public function show(string $slug): JsonResponse
     {
+        $tenantId = $this->getTenantId();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\PagesPublicApiController();
-            $controller->show($slug);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
+        // If resolved to master tenant (1) and an explicit context_tenant is provided by the
+        // React frontend, use it. This handles unauthenticated public page requests where
+        // the X-Tenant-ID header is unavailable (no JWT), but the React app knows the tenant
+        // from the URL (e.g. /hour-timebank/page/test) and passes it as a query param.
+        $contextTenant = $this->queryInt('context_tenant');
+        if ($tenantId === 1 && $contextTenant !== null && $contextTenant > 1) {
+            $tenantId = $contextTenant;
         }
 
-        return response()->json($data);
+        $page = DB::table('pages')
+            ->where('slug', $slug)
+            ->where('tenant_id', $tenantId)
+            ->where('is_published', 1)
+            ->first();
+
+        if (!$page) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Page not found', null, 404);
+        }
+
+        return $this->respondWithData([
+            'id' => (int) $page->id,
+            'title' => $page->title ?? '',
+            'slug' => $page->slug ?? '',
+            'content' => $page->content ?? '',
+            'meta_description' => $page->meta_description ?? '',
+            'created_at' => $page->created_at,
+            'updated_at' => $page->updated_at,
+        ]);
     }
 }

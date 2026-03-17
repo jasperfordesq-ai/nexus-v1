@@ -7,112 +7,137 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\GroupRecommendationEngine;
 
 /**
  * GroupRecommendController -- Group recommendation engine.
  *
- * Delegates to legacy: GroupRecommendationController
+ * Native implementation using legacy GroupRecommendationEngine static methods.
+ *
+ * Endpoints:
+ *   GET  /api/v2/groups/recommendations         index()
+ *   POST /api/v2/groups/recommendations/track    track()
+ *   GET  /api/v2/groups/recommendations/metrics  metrics()
+ *   GET  /api/v2/groups/similar/{groupId}        similar()
  */
 class GroupRecommendController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET groups/recommendations */
+    /**
+     * GET /api/v2/groups/recommendations
+     *
+     * Get personalized group recommendations for the authenticated user.
+     *
+     * Query Parameters:
+     * - limit: int (default 10, max 50)
+     * - type_id: int (optional, filter by group type)
+     */
     public function index(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupRecommendationController();
-            $controller->index();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $limit = $this->queryInt('limit', 10, 1, 50);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        $options = [];
+        $typeId = $this->queryInt('type_id');
+        if ($typeId !== null) {
+            $options['type_id'] = $typeId;
         }
 
-        return response()->json($data);
+        $recommendations = GroupRecommendationEngine::getRecommendations($userId, $limit, $options);
+
+        return $this->respondWithData($recommendations, [
+            'count' => count($recommendations),
+            'limit' => $limit,
+        ]);
     }
 
-    /** POST groups/recommendations/track */
+    /**
+     * POST /api/v2/groups/recommendations/track
+     *
+     * Track user interaction with a group recommendation.
+     *
+     * Body: { "group_id": int, "action": "viewed"|"clicked"|"joined"|"dismissed" }
+     */
     public function track(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('recommendation_track', 100, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupRecommendationController();
-            $controller->track();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        $groupId = $this->inputInt('group_id');
+        $action = $this->input('action');
+
+        if (!$groupId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'group_id is required', 'group_id', 400);
+        }
+
+        if (!$action) {
+            return $this->respondWithError('VALIDATION_ERROR', 'action is required', 'action', 400);
+        }
+
+        $validActions = ['viewed', 'clicked', 'joined', 'dismissed'];
+        if (!in_array($action, $validActions)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                'VALIDATION_ERROR',
+                'Invalid action. Valid actions: ' . implode(', ', $validActions),
+                'action',
+                400
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
+        GroupRecommendationEngine::trackInteraction($userId, $groupId, $action);
 
-        return response()->json($data);
+        return $this->respondWithData([
+            'tracked' => true,
+            'group_id' => $groupId,
+            'action' => $action,
+        ]);
     }
 
-    /** GET groups/recommendations/metrics */
+    /**
+     * GET /api/v2/groups/recommendations/metrics
+     *
+     * Get recommendation performance metrics (admin only).
+     *
+     * Query Parameters:
+     * - days: int (default 30, max 365)
+     */
     public function metrics(): JsonResponse
     {
-        $this->requireAuth();
+        $this->requireAdmin();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupRecommendationController();
-            $controller->metrics();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $days = $this->queryInt('days', 30, 1, 365);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
+        $metrics = GroupRecommendationEngine::getPerformanceMetrics($days);
 
-        return response()->json($data);
+        return $this->respondWithData($metrics, [
+            'period_days' => $days,
+        ]);
     }
 
-    /** GET groups/similar */
+    /**
+     * GET /api/v2/groups/similar/{groupId}
+     *
+     * Get groups similar to a specific group.
+     *
+     * Query Parameters:
+     * - limit: int (default 5, max 20)
+     */
     public function similar(int $groupId): JsonResponse
     {
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupRecommendationController();
-            $controller->similar($groupId);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $limit = $this->queryInt('limit', 5, 1, 20);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
+        $options = ['exclude_ids' => [$groupId]];
 
-        return response()->json($data);
+        $recommendations = GroupRecommendationEngine::getRecommendations($userId, $limit, $options);
+
+        return $this->respondWithData($recommendations, [
+            'source_group_id' => $groupId,
+            'count' => count($recommendations),
+            'limit' => $limit,
+        ]);
     }
 }

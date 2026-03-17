@@ -7,214 +7,227 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\GroupExchangeService;
 
 /**
  * GroupExchangeController -- Group time exchanges.
  *
- * Delegates to legacy: GroupExchangesApiController
+ * Converted from legacy delegation to direct static service calls.
  */
 class GroupExchangeController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET group-exchanges */
+    /** GET /api/v2/group-exchanges */
     public function index(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupExchangesApiController();
-            $controller->index();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $filters = [
+            'status' => $this->query('status'),
+            'limit' => $this->queryInt('limit', 20, 1, 100),
+            'offset' => $this->queryInt('offset', 0, 0),
+        ];
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
+        $result = GroupExchangeService::listForUser($userId, $filters);
 
-        return response()->json($data);
+        return $this->respondWithData([
+            'data' => $result['items'],
+            'has_more' => $result['has_more'],
+        ]);
     }
 
-    /** POST group-exchanges */
+    /** POST /api/v2/group-exchanges */
     public function store(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupExchangesApiController();
-            $controller->store();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $data = $this->getAllInput();
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (empty($data['title'])) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 400);
         }
 
-        return response()->json($data);
+        if (empty($data['total_hours']) || (float) $data['total_hours'] <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Total hours must be greater than 0', 'total_hours', 400);
+        }
+
+        $id = GroupExchangeService::create($userId, $data);
+
+        if (!$id) {
+            return $this->respondWithError('INTERNAL_ERROR', 'Failed to create exchange', null, 500);
+        }
+
+        // Add participants if provided inline
+        $participants = $data['participants'] ?? [];
+        foreach ($participants as $p) {
+            if (!empty($p['user_id']) && !empty($p['role'])) {
+                GroupExchangeService::addParticipant(
+                    $id,
+                    (int) $p['user_id'],
+                    $p['role'],
+                    (float) ($p['hours'] ?? 0),
+                    (float) ($p['weight'] ?? 1.0)
+                );
+            }
+        }
+
+        $exchange = GroupExchangeService::get($id);
+
+        return $this->respondWithData($exchange, null, 201);
     }
 
-    /** GET group-exchanges/id */
+    /** GET /api/v2/group-exchanges/{id} */
     public function show(int $id): JsonResponse
     {
         $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupExchangesApiController();
-            $controller->show($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $exchange = GroupExchangeService::get($id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
         }
 
-        return response()->json($data);
+        $exchange['calculated_split'] = GroupExchangeService::calculateSplit($id);
+
+        return $this->respondWithData($exchange);
     }
 
-    /** PUT group-exchanges/id */
+    /** PUT /api/v2/group-exchanges/{id} */
     public function update(int $id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupExchangesApiController();
-            $controller->update($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $exchange = GroupExchangeService::get($id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
         }
 
-        return response()->json($data);
+        if ((int) $exchange['organizer_id'] !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'Only the organizer can update', null, 403);
+        }
+
+        if (in_array($exchange['status'], ['completed', 'cancelled'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Cannot update a completed or cancelled exchange', null, 400);
+        }
+
+        $data = $this->getAllInput();
+        GroupExchangeService::update($id, $data);
+
+        $updated = GroupExchangeService::get($id);
+
+        return $this->respondWithData($updated);
     }
 
-    /** DELETE group-exchanges/id */
+    /** DELETE /api/v2/group-exchanges/{id} */
     public function destroy(int $id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupExchangesApiController();
-            $controller->destroy($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $exchange = GroupExchangeService::get($id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
         }
 
-        return response()->json($data);
+        if ((int) $exchange['organizer_id'] !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'Only the organizer can cancel', null, 403);
+        }
+
+        GroupExchangeService::updateStatus($id, 'cancelled');
+
+        return $this->respondWithData(['message' => 'Exchange cancelled']);
     }
 
-    /** POST group-exchanges/confirm */
-    public function confirm(int $id): JsonResponse
-    {
-        $this->requireAuth();
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupExchangesApiController();
-            $controller->confirm($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /** POST group-exchanges/complete */
-    public function complete(int $id): JsonResponse
-    {
-        $this->requireAuth();
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\GroupExchangesApiController();
-            $controller->complete($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
+    /** POST /api/v2/group-exchanges/{id}/participants */
     public function addParticipant($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GroupExchangesApiController::class, 'addParticipant', [$id]);
+        $this->requireAuth();
+
+        $exchange = GroupExchangeService::get((int) $id);
+
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+        }
+
+        $data = $this->getAllInput();
+
+        if (empty($data['user_id']) || empty($data['role'])) {
+            return $this->respondWithError('VALIDATION_ERROR', 'user_id and role are required', null, 400);
+        }
+
+        $ok = GroupExchangeService::addParticipant(
+            (int) $id,
+            (int) $data['user_id'],
+            $data['role'],
+            (float) ($data['hours'] ?? 0),
+            (float) ($data['weight'] ?? 1.0)
+        );
+
+        if (!$ok) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Failed to add participant (may already exist)', null, 400);
+        }
+
+        $updated = GroupExchangeService::get((int) $id);
+
+        return $this->respondWithData($updated);
     }
 
-
+    /** DELETE /api/v2/group-exchanges/{id}/participants/{userId} */
     public function removeParticipant($id, $userId): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\GroupExchangesApiController::class, 'removeParticipant', [$id, $userId]);
+        $this->requireAuth();
+
+        GroupExchangeService::removeParticipant((int) $id, (int) $userId);
+
+        $updated = GroupExchangeService::get((int) $id);
+
+        return $this->respondWithData($updated);
     }
 
+    /** POST /api/v2/group-exchanges/{id}/confirm */
+    public function confirm(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $exchange = GroupExchangeService::get($id);
+
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+        }
+
+        GroupExchangeService::confirmParticipation($id, $userId);
+
+        $updated = GroupExchangeService::get($id);
+
+        return $this->respondWithData($updated);
+    }
+
+    /** POST /api/v2/group-exchanges/{id}/complete */
+    public function complete(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $exchange = GroupExchangeService::get($id);
+
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', 'Not found', null, 404);
+        }
+
+        if ((int) $exchange['organizer_id'] !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'Only the organizer can complete', null, 403);
+        }
+
+        $result = GroupExchangeService::complete($id);
+
+        if (!$result['success']) {
+            return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 400);
+        }
+
+        return $this->respondWithData([
+            'message' => 'Exchange completed successfully',
+            'transaction_ids' => $result['transaction_ids'],
+        ]);
+    }
 }

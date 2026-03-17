@@ -7,210 +7,209 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\SkillTaxonomyService;
 
 /**
  * SkillTaxonomyController -- Skill taxonomy and user skills.
  *
- * Delegates to legacy: SkillTaxonomyApiController
+ * Converted from legacy delegation to direct static service calls.
  */
 class SkillTaxonomyController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET skills/categories */
+    // =============================================
+    // CATEGORY ENDPOINTS
+    // =============================================
+
+    /** GET /api/v2/skills/categories */
     public function getCategories(): JsonResponse
     {
+        $this->rateLimit('skills_categories', 30, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SkillTaxonomyApiController();
-            $controller->getCategories();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+        $parentId = $this->query('parent_id');
+        $format = $this->query('format', 'tree');
+
+        if ($format === 'flat') {
+            $categories = SkillTaxonomyService::getCategories(
+                $parentId !== null ? (int) $parentId : null
             );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
+            return $this->respondWithData($categories);
         }
 
-        return response()->json($data);
+        $tree = SkillTaxonomyService::getTree();
+
+        return $this->respondWithData($tree);
     }
 
-    /** GET skills/search */
-    public function search(): JsonResponse
-    {
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SkillTaxonomyApiController();
-            $controller->search();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /** GET skills/members */
-    public function getMembersWithSkill(): JsonResponse
-    {
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SkillTaxonomyApiController();
-            $controller->getMembersWithSkill();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /** GET users/me/skills */
-    public function getMySkills(): JsonResponse
-    {
-        $this->requireAuth();
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SkillTaxonomyApiController();
-            $controller->getMySkills();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /** POST users/me/skills */
-    public function addSkill(): JsonResponse
-    {
-        $this->requireAuth();
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SkillTaxonomyApiController();
-            $controller->addSkill();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /** DELETE users/me/skills/id */
-    public function removeSkill(int $id): JsonResponse
-    {
-        $this->requireAuth();
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\SkillTaxonomyApiController();
-            $controller->removeSkill($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
-
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
+    /** GET /api/v2/skills/categories/{id} */
     public function getCategoryById($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getCategoryById', [$id]);
+        $category = SkillTaxonomyService::getCategoryById((int) $id);
+
+        if (!$category) {
+            return $this->respondWithError('NOT_FOUND', 'Category not found', null, 404);
+        }
+
+        $category['skills'] = SkillTaxonomyService::getCategorySkills((int) $id);
+
+        return $this->respondWithData($category);
     }
 
-
+    /** POST /api/v2/skills/categories (admin) */
     public function createCategory(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'createCategory');
+        $this->requireAuth();
+        $this->rateLimit('skills_category_create', 10, 60);
+
+        $data = $this->getAllInput();
+        $id = SkillTaxonomyService::createCategory($data);
+
+        if ($id === null) {
+            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+        }
+
+        $category = SkillTaxonomyService::getCategoryById($id);
+
+        return $this->respondWithData($category, null, 201);
     }
 
-
+    /** PUT /api/v2/skills/categories/{id} (admin) */
     public function updateCategory($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'updateCategory', [$id]);
+        $this->requireAuth();
+        $this->rateLimit('skills_category_update', 10, 60);
+
+        $data = $this->getAllInput();
+        $success = SkillTaxonomyService::updateCategory((int) $id, $data);
+
+        if (!$success) {
+            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+        }
+
+        $category = SkillTaxonomyService::getCategoryById((int) $id);
+
+        return $this->respondWithData($category);
     }
 
-
+    /** DELETE /api/v2/skills/categories/{id} (admin) */
     public function deleteCategory($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'deleteCategory', [$id]);
+        $this->requireAuth();
+
+        $hard = $this->queryBool('hard', false);
+        $success = SkillTaxonomyService::deleteCategory((int) $id, $hard);
+
+        if (!$success) {
+            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+        }
+
+        return $this->respondWithData(['message' => 'Category deleted']);
     }
 
+    // =============================================
+    // SKILL SEARCH
+    // =============================================
 
-    public function updateSkill($id): JsonResponse
+    /** GET /api/v2/skills/search */
+    public function search(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'updateSkill', [$id]);
+        $this->rateLimit('skills_search', 60, 60);
+
+        $query = $this->query('q', '');
+        if (strlen($query) < 1) {
+            return $this->respondWithData([]);
+        }
+
+        $limit = $this->queryInt('limit', 20, 1, 50);
+        $results = SkillTaxonomyService::searchSkills($query, $limit);
+
+        return $this->respondWithData($results);
     }
 
+    /** GET /api/v2/skills/members */
+    public function getMembersWithSkill(): JsonResponse
+    {
+        $this->rateLimit('skills_members', 30, 60);
 
+        $skillName = $this->query('skill', '');
+        if (strlen($skillName) < 1) {
+            return $this->respondWithData([]);
+        }
+
+        $limit = $this->queryInt('limit', 30, 1, 50);
+        $members = SkillTaxonomyService::getMembersWithSkill($skillName, $limit);
+
+        return $this->respondWithData($members);
+    }
+
+    // =============================================
+    // USER SKILL ENDPOINTS
+    // =============================================
+
+    /** GET /api/v2/users/me/skills */
+    public function getMySkills(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $skills = SkillTaxonomyService::getUserSkills($userId);
+
+        return $this->respondWithData($skills);
+    }
+
+    /** GET /api/v2/users/{id}/skills */
     public function getUserSkills($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\SkillTaxonomyApiController::class, 'getUserSkills', [$id]);
+        $this->rateLimit('user_skills_view', 30, 60);
+
+        $skills = SkillTaxonomyService::getUserSkills((int) $id);
+
+        return $this->respondWithData($skills);
     }
 
+    /** POST /api/v2/users/me/skills */
+    public function addSkill(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('skills_add', 20, 60);
+
+        $data = $this->getAllInput();
+        $skillId = SkillTaxonomyService::addUserSkill($userId, $data);
+
+        if ($skillId === null) {
+            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+        }
+
+        $skills = SkillTaxonomyService::getUserSkills($userId);
+
+        return $this->respondWithData($skills, null, 201);
+    }
+
+    /** PUT /api/v2/users/me/skills/{id} */
+    public function updateSkill($id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('skills_update', 20, 60);
+
+        $data = $this->getAllInput();
+        $success = SkillTaxonomyService::updateUserSkill($userId, (int) $id, $data);
+
+        if (!$success) {
+            return $this->respondWithErrors(SkillTaxonomyService::getErrors(), 422);
+        }
+
+        $skills = SkillTaxonomyService::getUserSkills($userId);
+
+        return $this->respondWithData($skills);
+    }
+
+    /** DELETE /api/v2/users/me/skills/{id} */
+    public function removeSkill(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        SkillTaxonomyService::removeUserSkill($userId, $id);
+
+        return $this->respondWithData(['message' => 'Skill removed']);
+    }
 }

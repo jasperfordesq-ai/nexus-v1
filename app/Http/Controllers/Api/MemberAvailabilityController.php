@@ -7,188 +7,140 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\MemberAvailabilityService;
 
 /**
  * MemberAvailabilityController -- Member availability slots.
  *
- * Delegates to legacy: MemberAvailabilityApiController
+ * Converted from legacy delegation to direct static service calls.
  */
 class MemberAvailabilityController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /** GET availability */
+    /** GET /api/v2/users/me/availability */
     public function getMyAvailability(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberAvailabilityApiController();
-            $controller->getMyAvailability();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $availability = MemberAvailabilityService::getUserAvailability($userId);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData($availability);
     }
 
-    /** PUT availability */
+    /** PUT /api/v2/users/me/availability */
     public function setBulkAvailability(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('availability_update', 10, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberAvailabilityApiController();
-            $controller->setBulkAvailability();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $data = $this->getAllInput();
+        $schedule = $data['schedule'] ?? [];
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if (empty($schedule) || !is_array($schedule)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'schedule is required and must be an object', 'schedule', 400);
         }
 
-        return response()->json($data);
+        $success = MemberAvailabilityService::setBulkAvailability($userId, $schedule);
+
+        if (!$success) {
+            return $this->respondWithErrors(MemberAvailabilityService::getErrors(), 422);
+        }
+
+        $availability = MemberAvailabilityService::getUserAvailability($userId);
+
+        return $this->respondWithData($availability);
     }
 
-    /** PUT availability/day */
+    /** PUT /api/v2/users/me/availability/{day} */
     public function setDayAvailability(int $day): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('availability_update', 10, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberAvailabilityApiController();
-            $controller->setDayAvailability($day);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $data = $this->getAllInput();
+        $slots = $data['slots'] ?? [];
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        $success = MemberAvailabilityService::setDayAvailability($userId, $day, $slots);
+
+        if (!$success) {
+            return $this->respondWithErrors(MemberAvailabilityService::getErrors(), 422);
         }
 
-        return response()->json($data);
+        $availability = MemberAvailabilityService::getUserAvailability($userId);
+
+        return $this->respondWithData($availability);
     }
 
-    /** POST availability/date */
+    /** POST /api/v2/users/me/availability/date */
     public function addSpecificDate(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('availability_add_date', 10, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberAvailabilityApiController();
-            $controller->addSpecificDate();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $data = $this->getAllInput();
+        $slotId = MemberAvailabilityService::addSpecificDate($userId, $data);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if ($slotId === null) {
+            return $this->respondWithErrors(MemberAvailabilityService::getErrors(), 422);
         }
 
-        return response()->json($data);
+        $availability = MemberAvailabilityService::getUserAvailability($userId);
+
+        return $this->respondWithData($availability, null, 201);
     }
 
-    /** DELETE availability/id */
+    /** DELETE /api/v2/users/me/availability/{id} */
     public function deleteSlot(int $id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberAvailabilityApiController();
-            $controller->deleteSlot($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        MemberAvailabilityService::deleteSlot($userId, $id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData(['message' => 'Slot deleted']);
     }
 
-    /** GET availability/user */
+    /** GET /api/v2/users/{id}/availability */
     public function getUserAvailability(int $id): JsonResponse
     {
+        $this->rateLimit('availability_view', 30, 60);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\MemberAvailabilityApiController();
-            $controller->getUserAvailability($id);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        $availability = MemberAvailabilityService::getUserAvailability($id);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData($availability);
     }
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
+    /** GET /api/v2/members/availability/compatible */
     public function findCompatibleTimes(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'findCompatibleTimes');
+        $userId = $this->requireAuth();
+        $this->rateLimit('availability_compatible', 20, 60);
+
+        $otherUserId = $this->queryInt('user_id');
+        if (!$otherUserId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'user_id query parameter is required', 'user_id', 400);
+        }
+
+        $compatible = MemberAvailabilityService::findCompatibleTimes($userId, $otherUserId);
+
+        return $this->respondWithData($compatible);
     }
 
-
+    /** GET /api/v2/members/availability/available */
     public function getAvailableMembers(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\MemberAvailabilityApiController::class, 'getAvailableMembers');
-    }
+        $this->rateLimit('availability_search', 20, 60);
 
+        $day = $this->queryInt('day');
+        if ($day === null || $day < 0 || $day > 6) {
+            return $this->respondWithError('VALIDATION_ERROR', 'day query parameter is required (0-6)', 'day', 400);
+        }
+
+        $time = $this->query('time');
+        $limit = $this->queryInt('limit', 50, 1, 100);
+
+        $members = MemberAvailabilityService::getAvailableMembers($day, $time, $limit);
+
+        return $this->respondWithData($members);
+    }
 }
