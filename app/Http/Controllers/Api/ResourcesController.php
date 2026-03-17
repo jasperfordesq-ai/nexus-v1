@@ -10,12 +10,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Helpers\UrlHelper;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * ResourcesController — Community shared resources (files, links, documents).
  *
- * Native Eloquent implementation — no legacy delegation except for store() and
- * download() which involve raw file I/O via $_FILES and readfile()+exit.
+ * Native Eloquent implementation — fully converted to Laravel.
+ * File uploads use request()->file(), downloads use StreamedResponse.
  */
 class ResourcesController extends BaseApiController
 {
@@ -162,23 +163,140 @@ class ResourcesController extends BaseApiController
     /**
      * POST /api/v2/resources
      *
-     * Upload a new resource (multipart/form-data). Kept as delegation because
-     * it involves file upload via $_FILES which is tightly coupled to legacy PHP.
+     * Upload a new resource (multipart/form-data). Uses request()->file() (Laravel native).
+     * Field name: 'file'. Form fields: title, description, category_id.
      */
     public function store(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\ResourcesPublicApiController::class, 'store');
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        $title = trim(request()->input('title', ''));
+        if (empty($title)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Title is required', 'title', 400);
+        }
+
+        $file = request()->file('file');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'File is required', 'file', 400);
+        }
+
+        $maxSize = 10 * 1024 * 1024; // 10MB
+        $allowedExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'png', 'gif', 'svg'];
+
+        if ($file->getSize() > $maxSize) {
+            return $this->respondWithError('FILE_TOO_LARGE', 'File exceeds 10MB limit', 'file', 400);
+        }
+
+        $ext = strtolower($file->getClientOriginalExtension());
+        if (!in_array($ext, $allowedExts, true)) {
+            return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', 'File type not allowed', 'file', 400);
+        }
+
+        // Generate unique filename
+        $filename = md5(uniqid((string) $userId, true)) . '.' . $ext;
+
+        // Ensure upload directory exists
+        $uploadDir = base_path('httpdocs/uploads/' . $tenantId . '/resources');
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Move file to destination
+        $file->move($uploadDir, $filename);
+
+        $description = trim(request()->input('description', ''));
+        $categoryId = request()->input('category_id');
+        $categoryId = ($categoryId !== null && $categoryId !== '') ? (int) $categoryId : null;
+        $fileType = $file->getClientMimeType() ?? mime_content_type($uploadDir . '/' . $filename) ?? null;
+        $fileSize = (int) $file->getSize();
+
+        DB::table('resources')->insert([
+            'tenant_id'   => $tenantId,
+            'user_id'     => $userId,
+            'category_id' => $categoryId,
+            'title'       => $title,
+            'description' => $description,
+            'file_path'   => $filename,
+            'file_type'   => $fileType,
+            'file_size'   => $fileSize,
+            'created_at'  => now(),
+        ]);
+
+        $newId = (int) DB::getPdo()->lastInsertId();
+        $baseUrl = UrlHelper::getBaseUrl();
+
+        return $this->respondWithData([
+            'id'          => $newId,
+            'title'       => $title,
+            'description' => $description,
+            'file_url'    => $baseUrl . '/uploads/' . $tenantId . '/resources/' . $filename,
+            'file_path'   => $filename,
+            'file_type'   => $fileType,
+            'file_size'   => $fileSize,
+            'created_at'  => date('Y-m-d H:i:s'),
+        ], null, 201);
     }
 
     /**
      * GET /api/v2/resources/{id}/download
      *
-     * Stream a resource file and increment download counter. Kept as delegation
-     * because it uses readfile() + exit with raw headers (not a JsonResponse).
+     * Stream a resource file with Content-Disposition: attachment and increment
+     * the download counter. Uses Laravel StreamedResponse.
      */
-    public function download(int $id): JsonResponse
+    public function download(int $id): StreamedResponse|JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\ResourcesPublicApiController::class, 'download', [$id]);
+        $tenantId = $this->getTenantId();
+
+        $resource = DB::table('resources')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->select('id', 'file_path', 'file_type', 'title')
+            ->first();
+
+        if (!$resource) {
+            return $this->respondWithError('NOT_FOUND', 'Resource not found', null, 404);
+        }
+
+        $filePath = $resource->file_path ?? '';
+        if (empty($filePath)) {
+            return $this->respondWithError('NOT_FOUND', 'No file associated with this resource', null, 404);
+        }
+
+        // Resolve full filesystem path
+        if (str_starts_with($filePath, '/uploads/')) {
+            $fullPath = realpath(base_path('httpdocs' . $filePath));
+        } else {
+            $fullPath = realpath(base_path('httpdocs/uploads/' . $tenantId . '/resources/' . $filePath));
+        }
+
+        $uploadsDir = realpath(base_path('httpdocs/uploads'));
+        if (!$fullPath || !$uploadsDir || !str_starts_with($fullPath, $uploadsDir) || !file_exists($fullPath)) {
+            return $this->respondWithError('NOT_FOUND', 'File not found', null, 404);
+        }
+
+        // Increment download counter
+        DB::table('resources')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->increment('downloads');
+
+        // Build a friendly download filename from the title
+        $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+        $safeTitle = preg_replace('/[^a-zA-Z0-9_\-\s]/', '', $resource->title ?? 'download');
+        $safeTitle = preg_replace('/\s+/', '_', trim($safeTitle));
+        $downloadName = ($safeTitle ?: 'download') . '.' . $ext;
+
+        $mimeType = $resource->file_type ?: (mime_content_type($fullPath) ?: 'application/octet-stream');
+        $fileSize = filesize($fullPath);
+
+        return response()->streamDownload(function () use ($fullPath) {
+            readfile($fullPath);
+        }, $downloadName, [
+            'Content-Type'   => $mimeType,
+            'Content-Length' => $fileSize,
+            'Cache-Control'  => 'no-cache, must-revalidate',
+        ]);
     }
 
     /**
@@ -230,16 +348,4 @@ class ResourcesController extends BaseApiController
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
 
-    /**
-     * Delegate to legacy controller via output buffering (for store/download only).
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }

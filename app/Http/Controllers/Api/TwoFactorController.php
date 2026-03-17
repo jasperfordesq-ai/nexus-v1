@@ -7,11 +7,13 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Services\TotpService;
 
 /**
  * TwoFactorController -- Two-factor authentication setup.
  *
- * Delegates to legacy: TwoFactorApiController
+ * Converted from delegation to direct service calls.
+ * Legacy: src/Controllers/Api/TwoFactorApiController.php
  */
 class TwoFactorController extends BaseApiController
 {
@@ -20,100 +22,116 @@ class TwoFactorController extends BaseApiController
     /** GET auth/2fa/status */
     public function status(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\TwoFactorApiController();
-            $controller->status();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData([
+            'enabled' => TotpService::isEnabled($userId),
+            'setup_required' => TotpService::isSetupRequired($userId),
+            'backup_codes_remaining' => TotpService::getBackupCodeCount($userId),
+        ]);
     }
 
     /** POST auth/2fa/setup */
     public function setup(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('2fa_setup', 5, 300);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\TwoFactorApiController();
-            $controller->setup();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        if (TotpService::isEnabled($userId)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                'ALREADY_ENABLED',
+                '2FA is already enabled on your account',
+                null,
+                409
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        try {
+            $result = TotpService::initializeSetup($userId);
+
+            // Convert raw SVG to data URI for use in <img src="...">
+            $svgDataUri = 'data:image/svg+xml;base64,' . base64_encode($result['qr_code']);
+
+            return $this->respondWithData([
+                'qr_code_url' => $svgDataUri,
+                'secret' => $result['secret'],
+                'backup_codes' => [],
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError(
+                'SETUP_FAILED',
+                'Failed to initialize 2FA setup',
+                null,
+                500
+            );
         }
-
-        return response()->json($data);
     }
 
     /** POST auth/2fa/verify */
     public function verify(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('2fa_verify', 10, 300);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\TwoFactorApiController();
-            $controller->verify();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        $data = $this->getAllInput();
+        $code = trim($data['code'] ?? '');
+
+        if (empty($code)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                'VALIDATION_ERROR',
+                'Verification code is required',
+                'code',
+                400
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        $result = TotpService::completeSetup($userId, $code);
+
+        if (!$result['success']) {
+            return $this->respondWithError(
+                'VERIFICATION_FAILED',
+                $result['error'] ?? 'Invalid verification code',
+                'code',
+                400
+            );
         }
 
-        return response()->json($data);
+        return $this->respondWithData([
+            'backup_codes' => $result['backup_codes'] ?? [],
+        ]);
     }
 
     /** POST auth/2fa/disable */
     public function disable(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('2fa_disable', 3, 3600);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\TwoFactorApiController();
-            $controller->disable();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        $data = $this->getAllInput();
+        $password = $data['password'] ?? '';
+
+        if (empty($password)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                'VALIDATION_ERROR',
+                'Password is required',
+                'password',
+                400
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        $result = TotpService::disable($userId, $password);
+
+        if (!$result['success']) {
+            return $this->respondWithError(
+                'DISABLE_FAILED',
+                $result['error'] ?? 'Failed to disable 2FA',
+                'password',
+                403
+            );
         }
 
-        return response()->json($data);
+        return $this->respondWithData([
+            'message' => 'Two-factor authentication has been disabled',
+        ]);
     }
 }

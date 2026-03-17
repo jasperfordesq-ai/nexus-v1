@@ -8,13 +8,13 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
 /**
  * AdminDeliverabilityController -- Admin deliverability dashboard, analytics, and CRUD.
  *
- * All methods require admin authentication.
- * Uses legacy static services for complex operations (history logging, comment creation).
+ * Fully converted from legacy delegation to direct DB/service calls.
  */
 class AdminDeliverabilityController extends BaseApiController
 {
@@ -102,31 +102,394 @@ class AdminDeliverabilityController extends BaseApiController
     }
 
     // =========================================================================
-    // CRUD (delegate to legacy for complex history-logging operations)
+    // CRUD
     // =========================================================================
 
     /** GET /api/v2/admin/deliverability */
     public function getDeliverables(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminDeliverabilityApiController::class, 'getDeliverables');
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $page = max(1, $this->queryInt('page', 1));
+        $limit = min(100, max(1, $this->queryInt('limit', 20)));
+        $offset = ($page - 1) * $limit;
+        $status = $this->query('status');
+        $priority = $this->query('priority');
+        $assignedTo = $this->queryInt('assigned_to');
+        $search = $this->query('search');
+
+        $conditions = ['d.tenant_id = ?'];
+        $params = [$tenantId];
+
+        if ($status && in_array($status, self::VALID_STATUSES, true)) {
+            $conditions[] = 'd.status = ?';
+            $params[] = $status;
+        }
+        if ($priority && in_array($priority, self::VALID_PRIORITIES, true)) {
+            $conditions[] = 'd.priority = ?';
+            $params[] = $priority;
+        }
+        if ($assignedTo) {
+            $conditions[] = 'd.assigned_to = ?';
+            $params[] = $assignedTo;
+        }
+        if ($search) {
+            $conditions[] = '(d.title LIKE ? OR d.description LIKE ?)';
+            $searchTerm = '%' . $search . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        $where = implode(' AND ', $conditions);
+
+        $total = (int) Database::query("SELECT COUNT(*) as cnt FROM deliverables d WHERE {$where}", $params)->fetch()['cnt'];
+
+        $items = Database::query(
+            "SELECT d.id, d.title, d.description, d.category, d.priority,
+                    d.owner_id, d.assigned_to, d.assigned_group_id,
+                    d.start_date, d.due_date, d.completed_at,
+                    d.status, d.progress_percentage,
+                    d.estimated_hours, d.actual_hours,
+                    d.parent_deliverable_id, d.tags,
+                    d.delivery_confidence, d.risk_level, d.risk_notes,
+                    d.created_at, d.updated_at,
+                    CONCAT(COALESCE(owner.first_name, ''), ' ', COALESCE(owner.last_name, '')) as owner_name,
+                    CONCAT(COALESCE(assignee.first_name, ''), ' ', COALESCE(assignee.last_name, '')) as assignee_name
+             FROM deliverables d
+             LEFT JOIN users owner ON d.owner_id = owner.id
+             LEFT JOIN users assignee ON d.assigned_to = assignee.id
+             WHERE {$where}
+             ORDER BY d.created_at DESC
+             LIMIT ? OFFSET ?",
+            array_merge($params, [$limit, $offset])
+        )->fetchAll();
+
+        $formatted = array_map(function ($row) {
+            return [
+                'id' => (int) $row['id'],
+                'title' => $row['title'] ?? '',
+                'description' => $row['description'] ?? '',
+                'category' => $row['category'] ?? null,
+                'priority' => $row['priority'] ?? 'medium',
+                'owner_id' => $row['owner_id'] ? (int) $row['owner_id'] : null,
+                'owner_name' => trim($row['owner_name'] ?? ''),
+                'assigned_to' => $row['assigned_to'] ? (int) $row['assigned_to'] : null,
+                'assignee_name' => trim($row['assignee_name'] ?? ''),
+                'assigned_group_id' => $row['assigned_group_id'] ? (int) $row['assigned_group_id'] : null,
+                'start_date' => $row['start_date'] ?? null,
+                'due_date' => $row['due_date'] ?? null,
+                'completed_at' => $row['completed_at'] ?? null,
+                'status' => $row['status'] ?? 'draft',
+                'progress_percentage' => (int) ($row['progress_percentage'] ?? 0),
+                'estimated_hours' => $row['estimated_hours'] !== null ? (float) $row['estimated_hours'] : null,
+                'actual_hours' => $row['actual_hours'] !== null ? (float) $row['actual_hours'] : null,
+                'parent_deliverable_id' => $row['parent_deliverable_id'] ? (int) $row['parent_deliverable_id'] : null,
+                'tags' => json_decode($row['tags'] ?? '[]', true) ?: [],
+                'delivery_confidence' => $row['delivery_confidence'] !== null ? (int) $row['delivery_confidence'] : null,
+                'risk_level' => $row['risk_level'] ?? null,
+                'risk_notes' => $row['risk_notes'] ?? null,
+                'created_at' => $row['created_at'],
+                'updated_at' => $row['updated_at'] ?? null,
+            ];
+        }, $items);
+
+        return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
     }
 
     /** GET /api/v2/admin/deliverability/{id} */
     public function getDeliverable(int $id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminDeliverabilityApiController::class, 'getDeliverable', [$id]);
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $deliverable = Database::query(
+            "SELECT d.*,
+                    CONCAT(COALESCE(owner.first_name, ''), ' ', COALESCE(owner.last_name, '')) as owner_name,
+                    CONCAT(COALESCE(assignee.first_name, ''), ' ', COALESCE(assignee.last_name, '')) as assignee_name
+             FROM deliverables d
+             LEFT JOIN users owner ON d.owner_id = owner.id
+             LEFT JOIN users assignee ON d.assigned_to = assignee.id
+             WHERE d.id = ? AND d.tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
+
+        if (!$deliverable) {
+            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+        }
+
+        $milestones = Database::query(
+            "SELECT m.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as completed_by_name
+             FROM deliverable_milestones m LEFT JOIN users u ON m.completed_by = u.id
+             WHERE m.deliverable_id = ? AND m.tenant_id = ? ORDER BY m.order_position ASC",
+            [$id, $tenantId]
+        )->fetchAll();
+
+        $formattedMilestones = array_map(function ($row) {
+            return [
+                'id' => (int) $row['id'],
+                'title' => $row['title'] ?? '',
+                'description' => $row['description'] ?? '',
+                'order_position' => (int) ($row['order_position'] ?? 0),
+                'status' => $row['status'] ?? 'pending',
+                'completed_at' => $row['completed_at'] ?? null,
+                'completed_by' => $row['completed_by'] ? (int) $row['completed_by'] : null,
+                'completed_by_name' => trim($row['completed_by_name'] ?? ''),
+                'due_date' => $row['due_date'] ?? null,
+                'estimated_hours' => $row['estimated_hours'] !== null ? (float) $row['estimated_hours'] : null,
+                'depends_on_milestone_ids' => json_decode($row['depends_on_milestone_ids'] ?? '[]', true) ?: [],
+                'created_at' => $row['created_at'],
+                'updated_at' => $row['updated_at'] ?? null,
+            ];
+        }, $milestones);
+
+        $comments = Database::query(
+            "SELECT c.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name, u.avatar_url as user_avatar
+             FROM deliverable_comments c LEFT JOIN users u ON c.user_id = u.id
+             WHERE c.deliverable_id = ? AND c.tenant_id = ? AND c.is_deleted = 0
+             ORDER BY c.created_at DESC LIMIT 20",
+            [$id, $tenantId]
+        )->fetchAll();
+
+        $formattedComments = array_map(function ($row) {
+            return [
+                'id' => (int) $row['id'],
+                'user_id' => (int) ($row['user_id'] ?? 0),
+                'user_name' => trim($row['user_name'] ?? ''),
+                'user_avatar' => $row['user_avatar'] ?? null,
+                'comment_text' => $row['comment_text'] ?? '',
+                'comment_type' => $row['comment_type'] ?? 'comment',
+                'parent_comment_id' => $row['parent_comment_id'] ? (int) $row['parent_comment_id'] : null,
+                'reactions' => json_decode($row['reactions'] ?? '[]', true) ?: [],
+                'is_pinned' => (bool) ($row['is_pinned'] ?? false),
+                'is_edited' => (bool) ($row['is_edited'] ?? false),
+                'edited_at' => $row['edited_at'] ?? null,
+                'mentioned_user_ids' => json_decode($row['mentioned_user_ids'] ?? '[]', true) ?: [],
+                'created_at' => $row['created_at'],
+                'updated_at' => $row['updated_at'] ?? null,
+            ];
+        }, $comments);
+
+        $formatted = [
+            'id' => (int) $deliverable['id'],
+            'title' => $deliverable['title'] ?? '',
+            'description' => $deliverable['description'] ?? '',
+            'category' => $deliverable['category'] ?? null,
+            'priority' => $deliverable['priority'] ?? 'medium',
+            'owner_id' => $deliverable['owner_id'] ? (int) $deliverable['owner_id'] : null,
+            'owner_name' => trim($deliverable['owner_name'] ?? ''),
+            'assigned_to' => $deliverable['assigned_to'] ? (int) $deliverable['assigned_to'] : null,
+            'assignee_name' => trim($deliverable['assignee_name'] ?? ''),
+            'assigned_group_id' => $deliverable['assigned_group_id'] ? (int) $deliverable['assigned_group_id'] : null,
+            'start_date' => $deliverable['start_date'] ?? null,
+            'due_date' => $deliverable['due_date'] ?? null,
+            'completed_at' => $deliverable['completed_at'] ?? null,
+            'status' => $deliverable['status'] ?? 'draft',
+            'progress_percentage' => (int) ($deliverable['progress_percentage'] ?? 0),
+            'estimated_hours' => $deliverable['estimated_hours'] !== null ? (float) $deliverable['estimated_hours'] : null,
+            'actual_hours' => $deliverable['actual_hours'] !== null ? (float) $deliverable['actual_hours'] : null,
+            'parent_deliverable_id' => $deliverable['parent_deliverable_id'] ? (int) $deliverable['parent_deliverable_id'] : null,
+            'blocking_deliverable_ids' => json_decode($deliverable['blocking_deliverable_ids'] ?? '[]', true) ?: [],
+            'depends_on_deliverable_ids' => json_decode($deliverable['depends_on_deliverable_ids'] ?? '[]', true) ?: [],
+            'tags' => json_decode($deliverable['tags'] ?? '[]', true) ?: [],
+            'custom_fields' => json_decode($deliverable['custom_fields'] ?? '{}', true) ?: [],
+            'delivery_confidence' => $deliverable['delivery_confidence'] !== null ? (int) $deliverable['delivery_confidence'] : null,
+            'risk_level' => $deliverable['risk_level'] ?? null,
+            'risk_notes' => $deliverable['risk_notes'] ?? null,
+            'watchers' => json_decode($deliverable['watchers'] ?? '[]', true) ?: [],
+            'collaborators' => json_decode($deliverable['collaborators'] ?? '[]', true) ?: [],
+            'attachment_urls' => json_decode($deliverable['attachment_urls'] ?? '[]', true) ?: [],
+            'external_links' => json_decode($deliverable['external_links'] ?? '[]', true) ?: [],
+            'created_at' => $deliverable['created_at'],
+            'updated_at' => $deliverable['updated_at'] ?? null,
+            'milestones' => $formattedMilestones,
+            'comments' => $formattedComments,
+        ];
+
+        return $this->respondWithData($formatted);
     }
 
     /** POST /api/v2/admin/deliverability */
     public function createDeliverable(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminDeliverabilityApiController::class, 'createDeliverable');
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $data = $this->getAllInput();
+        $title = trim($data['title'] ?? '');
+
+        if (empty($title)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Title is required', 'title', 400);
+        }
+
+        $status = 'draft';
+        if (isset($data['status']) && in_array($data['status'], self::VALID_STATUSES, true)) {
+            $status = $data['status'];
+        }
+
+        $priority = 'medium';
+        if (isset($data['priority']) && in_array($data['priority'], self::VALID_PRIORITIES, true)) {
+            $priority = $data['priority'];
+        }
+
+        $tags = isset($data['tags']) ? json_encode($data['tags']) : '[]';
+        $customFields = isset($data['custom_fields']) ? json_encode($data['custom_fields']) : '{}';
+        $blockingIds = isset($data['blocking_deliverable_ids']) ? json_encode($data['blocking_deliverable_ids']) : '[]';
+        $dependsOnIds = isset($data['depends_on_deliverable_ids']) ? json_encode($data['depends_on_deliverable_ids']) : '[]';
+        $watchers = isset($data['watchers']) ? json_encode($data['watchers']) : '[]';
+        $collaborators = isset($data['collaborators']) ? json_encode($data['collaborators']) : '[]';
+        $attachmentUrls = isset($data['attachment_urls']) ? json_encode($data['attachment_urls']) : '[]';
+        $externalLinks = isset($data['external_links']) ? json_encode($data['external_links']) : '[]';
+
+        Database::query(
+            "INSERT INTO deliverables
+                (tenant_id, title, description, category, priority, owner_id, assigned_to,
+                 assigned_group_id, start_date, due_date, status, progress_percentage,
+                 estimated_hours, parent_deliverable_id, blocking_deliverable_ids,
+                 depends_on_deliverable_ids, tags, custom_fields, delivery_confidence,
+                 risk_level, risk_notes, watchers, collaborators, attachment_urls,
+                 external_links, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            [
+                $tenantId, $title, $data['description'] ?? null, $data['category'] ?? null, $priority,
+                $adminId, isset($data['assigned_to']) ? (int) $data['assigned_to'] : null,
+                isset($data['assigned_group_id']) ? (int) $data['assigned_group_id'] : null,
+                $data['start_date'] ?? null, $data['due_date'] ?? null, $status,
+                (int) ($data['progress_percentage'] ?? 0),
+                isset($data['estimated_hours']) ? (float) $data['estimated_hours'] : null,
+                isset($data['parent_deliverable_id']) ? (int) $data['parent_deliverable_id'] : null,
+                $blockingIds, $dependsOnIds, $tags, $customFields,
+                isset($data['delivery_confidence']) ? (int) $data['delivery_confidence'] : null,
+                $data['risk_level'] ?? null, $data['risk_notes'] ?? null,
+                $watchers, $collaborators, $attachmentUrls, $externalLinks,
+            ]
+        );
+
+        $newId = Database::lastInsertId();
+
+        $this->logHistory($tenantId, (int) $newId, 'created', $adminId, null, null, null, "Created deliverable: {$title}");
+
+        return $this->respondWithData([
+            'id' => (int) $newId, 'title' => $title, 'status' => $status, 'priority' => $priority,
+        ]);
     }
 
     /** PUT /api/v2/admin/deliverability/{id} */
     public function updateDeliverable(int $id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminDeliverabilityApiController::class, 'updateDeliverable', [$id]);
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $existing = Database::query(
+            "SELECT id, title, status, priority, assigned_to FROM deliverables WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
+
+        if (!$existing) {
+            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+        }
+
+        $data = $this->getAllInput();
+
+        $fields = [];
+        $params = [];
+
+        // Simple text/nullable fields
+        $simpleFields = ['title', 'description', 'category', 'risk_level', 'risk_notes', 'start_date', 'due_date'];
+        foreach ($simpleFields as $fieldName) {
+            if (array_key_exists($fieldName, $data)) {
+                $fields[] = "{$fieldName} = ?";
+                $value = $data[$fieldName];
+                $params[] = is_string($value) ? trim($value) : $value;
+            }
+        }
+
+        if (isset($data['title']) && trim($data['title']) === '') {
+            return $this->respondWithError('VALIDATION_ERROR', 'Title cannot be empty', 'title', 400);
+        }
+
+        // Status
+        if (isset($data['status'])) {
+            if (!in_array($data['status'], self::VALID_STATUSES, true)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Invalid status value', 'status', 400);
+            }
+            $fields[] = 'status = ?';
+            $params[] = $data['status'];
+
+            if ($data['status'] === 'completed' && $existing['status'] !== 'completed') {
+                $fields[] = 'completed_at = NOW()';
+            } elseif ($data['status'] !== 'completed' && $existing['status'] === 'completed') {
+                $fields[] = 'completed_at = NULL';
+            }
+
+            if ($data['status'] !== $existing['status']) {
+                $this->logHistory($tenantId, $id, 'status_changed', $adminId, 'status', $existing['status'], $data['status'],
+                    "Status changed from {$existing['status']} to {$data['status']}");
+            }
+        }
+
+        // Priority
+        if (isset($data['priority'])) {
+            if (!in_array($data['priority'], self::VALID_PRIORITIES, true)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Invalid priority value', 'priority', 400);
+            }
+            $fields[] = 'priority = ?';
+            $params[] = $data['priority'];
+
+            if ($data['priority'] !== $existing['priority']) {
+                $this->logHistory($tenantId, $id, 'priority_changed', $adminId, 'priority', $existing['priority'], $data['priority'],
+                    "Priority changed from {$existing['priority']} to {$data['priority']}");
+            }
+        }
+
+        // Assignment
+        if (array_key_exists('assigned_to', $data)) {
+            $newAssignee = $data['assigned_to'] !== null ? (int) $data['assigned_to'] : null;
+            $fields[] = 'assigned_to = ?';
+            $params[] = $newAssignee;
+
+            $oldAssignee = $existing['assigned_to'] ? (string) $existing['assigned_to'] : 'unassigned';
+            $newAssigneeStr = $newAssignee !== null ? (string) $newAssignee : 'unassigned';
+            if ($oldAssignee !== $newAssigneeStr) {
+                $this->logHistory($tenantId, $id, 'assignment_changed', $adminId, 'assigned_to', $oldAssignee, $newAssigneeStr, "Assignment changed");
+            }
+        }
+
+        // Integer fields
+        foreach (['assigned_group_id', 'progress_percentage', 'parent_deliverable_id', 'delivery_confidence'] as $fieldName) {
+            if (array_key_exists($fieldName, $data)) {
+                $fields[] = "{$fieldName} = ?";
+                $params[] = $data[$fieldName] !== null ? (int) $data[$fieldName] : null;
+            }
+        }
+
+        // Float fields
+        foreach (['estimated_hours', 'actual_hours'] as $fieldName) {
+            if (array_key_exists($fieldName, $data)) {
+                $fields[] = "{$fieldName} = ?";
+                $params[] = $data[$fieldName] !== null ? (float) $data[$fieldName] : null;
+            }
+        }
+
+        // JSON fields
+        foreach (['blocking_deliverable_ids', 'depends_on_deliverable_ids', 'tags', 'custom_fields', 'watchers', 'collaborators', 'attachment_urls', 'external_links'] as $fieldName) {
+            if (array_key_exists($fieldName, $data)) {
+                $fields[] = "{$fieldName} = ?";
+                $params[] = json_encode($data[$fieldName]);
+            }
+        }
+
+        if (empty($fields)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No fields provided to update', null, 400);
+        }
+
+        $fields[] = 'updated_at = NOW()';
+        $params[] = $id;
+        $params[] = $tenantId;
+
+        Database::query("UPDATE deliverables SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?", $params);
+
+        return $this->getDeliverable($id);
     }
 
     /** DELETE /api/v2/admin/deliverability/{id} */
@@ -151,16 +514,81 @@ class AdminDeliverabilityController extends BaseApiController
     /** POST /api/v2/admin/deliverability/{id}/comments */
     public function addComment(int $id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\AdminDeliverabilityApiController::class, 'addComment', [$id]);
+        $adminId = $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $deliverable = Database::query("SELECT id FROM deliverables WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        if (!$deliverable) {
+            return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
+        }
+
+        $commentText = trim($this->input('comment_text', ''));
+        if (empty($commentText)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Comment text is required', 'comment_text', 400);
+        }
+
+        $commentType = $this->input('comment_type', 'comment');
+        $parentCommentId = $this->input('parent_comment_id') ? (int) $this->input('parent_comment_id') : null;
+        $mentionedUserIds = $this->input('mentioned_user_ids') ? json_encode($this->input('mentioned_user_ids')) : '[]';
+
+        Database::query(
+            "INSERT INTO deliverable_comments
+                (tenant_id, deliverable_id, user_id, comment_text, comment_type,
+                 parent_comment_id, reactions, is_pinned, is_edited, is_deleted,
+                 mentioned_user_ids, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, '[]', 0, 0, 0, ?, NOW(), NOW())",
+            [$tenantId, $id, $adminId, $commentText, $commentType, $parentCommentId, $mentionedUserIds]
+        );
+
+        $commentId = Database::lastInsertId();
+
+        $this->logHistory($tenantId, $id, 'comment_added', $adminId, null, null, null, 'Comment added');
+
+        $comment = Database::query(
+            "SELECT c.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name, u.avatar_url as user_avatar
+             FROM deliverable_comments c LEFT JOIN users u ON c.user_id = u.id
+             WHERE c.id = ? AND c.tenant_id = ?",
+            [$commentId, $tenantId]
+        )->fetch();
+
+        return $this->respondWithData([
+            'id' => (int) $comment['id'],
+            'deliverable_id' => $id,
+            'user_id' => (int) ($comment['user_id'] ?? 0),
+            'user_name' => trim($comment['user_name'] ?? ''),
+            'user_avatar' => $comment['user_avatar'] ?? null,
+            'comment_text' => $comment['comment_text'] ?? '',
+            'comment_type' => $comment['comment_type'] ?? 'comment',
+            'parent_comment_id' => $comment['parent_comment_id'] ? (int) $comment['parent_comment_id'] : null,
+            'reactions' => json_decode($comment['reactions'] ?? '[]', true) ?: [],
+            'is_pinned' => (bool) ($comment['is_pinned'] ?? false),
+            'is_edited' => false,
+            'mentioned_user_ids' => json_decode($comment['mentioned_user_ids'] ?? '[]', true) ?: [],
+            'created_at' => $comment['created_at'],
+            'updated_at' => $comment['updated_at'] ?? null,
+        ]);
     }
 
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    // =========================================================================
+    // Helpers
+    // =========================================================================
+
+    private function logHistory(int $tenantId, int $deliverableId, string $actionType, ?int $userId, ?string $fieldName = null, ?string $oldValue = null, ?string $newValue = null, ?string $description = null): void
     {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        try {
+            Database::query(
+                "INSERT INTO deliverable_history
+                    (tenant_id, deliverable_id, action_type, user_id, action_timestamp,
+                     field_name, old_value, new_value, change_description, ip_address, user_agent, created_at)
+                 VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, NOW())",
+                [
+                    $tenantId, $deliverableId, $actionType, $userId,
+                    $fieldName, $oldValue, $newValue, $description,
+                    request()->ip(), request()->userAgent(),
+                ]
+            );
+        } catch (\Throwable $e) {
+            // History logging should not break the main operation
+        }
     }
 }

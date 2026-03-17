@@ -16,7 +16,7 @@ use Nexus\Services\VettingService;
  * AdminVettingController -- Admin member vetting and background check management.
  *
  * All methods require admin authentication.
- * File upload method delegates to legacy for $_FILES handling.
+ * All methods are native Laravel — no legacy delegation remains.
  */
 class AdminVettingController extends BaseApiController
 {
@@ -353,14 +353,58 @@ class AdminVettingController extends BaseApiController
         }
     }
 
-    /** POST /api/v2/admin/vetting/{id}/document (file upload -- delegate to legacy) */
+    /**
+     * POST /api/v2/admin/vetting/{id}/document
+     *
+     * Upload a supporting document for a vetting record. Uses request()->file() (Laravel native).
+     * Field name: 'file'. Allowed: PDF, JPEG, PNG, WebP. Max 10MB.
+     */
     public function uploadDocument(int $id): JsonResponse
     {
-        $controller = new \Nexus\Controllers\Api\AdminVettingApiController();
-        ob_start();
-        $controller->uploadDocument($id);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $adminId = $this->requireAdmin();
+
+        try {
+            $existing = VettingService::getById($id);
+            if (!$existing) {
+                return $this->respondWithError('NOT_FOUND', 'Vetting record not found', null, 404);
+            }
+
+            $file = request()->file('file');
+            if (!$file || !$file->isValid()) {
+                return $this->respondWithError('VALIDATION_ERROR', 'No file was uploaded or upload failed', 'file');
+            }
+
+            // Validate file type using file content
+            $allowedMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->file($file->getRealPath());
+            if (!in_array($mimeType, $allowedMimes, true)) {
+                return $this->respondWithError('VALIDATION_ERROR', 'Only PDF, JPEG, PNG, and WebP files are allowed', 'file');
+            }
+
+            // 10 MB limit
+            if ($file->getSize() > 10 * 1024 * 1024) {
+                return $this->respondWithError('VALIDATION_ERROR', 'File size must be under 10 MB', 'file');
+            }
+
+            // Build a $_FILES-compatible array for ImageUploader::upload()
+            $fileArray = [
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $mimeType,
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ];
+
+            $url = \Nexus\Core\ImageUploader::upload($fileArray, 'vetting/documents');
+            VettingService::updateDocumentUrl($id, $url);
+
+            ActivityLog::log($adminId, 'vetting_document_uploaded', "Uploaded document for vetting record #{$id} ({$existing['first_name']} {$existing['last_name']})", false, null, 'admin', 'vetting_record', $id);
+
+            $record = VettingService::getById($id);
+            return $this->respondWithData($record);
+        } catch (\Exception $e) {
+            return $this->respondWithError('SERVER_ERROR', 'Failed to upload document', null, 500);
+        }
     }
 }

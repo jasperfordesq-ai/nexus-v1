@@ -28,14 +28,32 @@ class EndorsementController extends BaseApiController
     /**
      * POST /api/v2/members/{id}/endorse
      *
-     * Endorse a member's skill. Kept as delegation because
-     * EndorsementService::endorse() sends email via Mailer/EmailTemplate.
+     * Endorse a member's skill.
      */
     public function endorse(int $id): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $this->rateLimit('endorse', 20, 60);
 
-        return $this->delegate(\Nexus\Controllers\Api\EndorsementApiController::class, 'endorse', [$id]);
+        $skillName = $this->input('skill_name', '');
+        $skillId = $this->input('skill_id') ? (int) $this->input('skill_id') : null;
+        $comment = $this->input('comment');
+
+        $endorsementId = EndorsementService::endorse($userId, $id, $skillName, $skillId, $comment);
+
+        if ($endorsementId === null) {
+            $errors = EndorsementService::getErrors();
+            $status = 422;
+            if (!empty($errors) && $errors[0]['code'] === 'ALREADY_ENDORSED') {
+                $status = 409;
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData([
+            'endorsement_id' => $endorsementId,
+            'message' => 'Endorsement added',
+        ]);
     }
 
     /**
@@ -114,27 +132,4 @@ class EndorsementController extends BaseApiController
         return $this->respondWithData($members);
     }
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     * Kept only for endorse() which sends email.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        try {
-            $controller->$method(...$params);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError('INTERNAL_ERROR', $e->getMessage(), null, 500);
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
-    }
 }

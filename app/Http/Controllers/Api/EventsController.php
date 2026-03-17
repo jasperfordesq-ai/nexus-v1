@@ -17,7 +17,7 @@ use Nexus\Models\EventRsvp;
  * EventsController - CRUD for community events, RSVPs, waitlist, series, recurring.
  *
  * Converted from legacy delegation to direct static service calls.
- * Only uploadImage() remains delegated (uses $_FILES).
+ * All methods are now native Laravel — no legacy delegation remains.
  */
 class EventsController extends BaseApiController
 {
@@ -866,27 +866,59 @@ class EventsController extends BaseApiController
     }
 
     // ================================================================
-    // DELEGATED — file upload uses $_FILES
+    // IMAGE UPLOAD
     // ================================================================
 
     /**
-     * POST /api/v2/events/{id}/image — uses $_FILES, kept as delegation
+     * POST /api/v2/events/{id}/image
+     *
+     * Upload an image for an event. Uses request()->file() (Laravel native).
+     * Field name: 'image'
      */
     public function uploadImage($id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'uploadImage', [$id]);
-    }
+        $id = (int) $id;
+        $userId = $this->requireAuth();
+        $this->rateLimit('events_image_upload', 10, 60);
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+        $file = request()->file('image');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No image file uploaded or upload error', 'image', 400);
+        }
+
+        try {
+            // Build a $_FILES-compatible array for ImageUploader::upload()
+            $fileArray = [
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ];
+
+            $imageUrl = \Nexus\Core\ImageUploader::upload($fileArray);
+
+            $success = EventService::updateImage($id, $userId, $imageUrl);
+
+            if (!$success) {
+                $errors = EventService::getErrors();
+                $status = 400;
+                foreach ($errors as $error) {
+                    if ($error['code'] === 'NOT_FOUND') {
+                        $status = 404;
+                        break;
+                    }
+                    if ($error['code'] === 'FORBIDDEN') {
+                        $status = 403;
+                        break;
+                    }
+                }
+                return $this->respondWithErrors($errors, $status);
+            }
+
+            return $this->respondWithData(['image_url' => $imageUrl]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image: ' . $e->getMessage(), 'image', 400);
+        }
     }
 }

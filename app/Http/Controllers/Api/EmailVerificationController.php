@@ -7,86 +7,366 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Nexus\Core\ApiErrorCodes;
+use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
+use Nexus\Core\RateLimiter;
+use Nexus\Core\Mailer;
+use Nexus\Core\EmailTemplate;
 
 /**
  * EmailVerificationController -- Email verification endpoints.
  *
- * Delegates to legacy: EmailVerificationApiController
+ * Converted from delegation to direct service calls.
+ * Legacy: src/Controllers/Api/EmailVerificationApiController.php
  */
 class EmailVerificationController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    /** Token expiry in seconds (24 hours) */
+    private const TOKEN_EXPIRY_SECONDS = 86400;
+
+    /** Minimum seconds between resend requests */
+    private const RESEND_COOLDOWN_SECONDS = 60;
+
     /** POST /api/auth/verify-email */
     public function verifyEmail(): JsonResponse
     {
+        // Rate limit by IP - 20 attempts per 15 minutes
+        $this->rateLimit('verify_email', 20, 900);
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\EmailVerificationApiController();
-            $controller->verifyEmail();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        $token = $this->input('token');
+        $tenantId = TenantContext::getId();
+
+        if (empty($token)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
+                'Verification token is required',
+                'token',
+                400
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        // Find and validate the verification token (tenant-scoped)
+        $verificationRecord = $this->findValidVerificationToken($token, $tenantId);
+
+        if (!$verificationRecord) {
+            return $this->respondWithError(
+                ApiErrorCodes::AUTH_TOKEN_INVALID,
+                'Invalid or expired verification token. Please request a new verification email.',
+                'token',
+                400
+            );
         }
 
-        return response()->json($data);
+        $userId = $verificationRecord['user_id'];
+
+        // Check if already verified (tenant-scoped)
+        $user = Database::query(
+            "SELECT id, email_verified_at, is_verified FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetch();
+
+        if (!$user) {
+            return $this->respondWithError(
+                ApiErrorCodes::RESOURCE_NOT_FOUND,
+                'User not found',
+                null,
+                404
+            );
+        }
+
+        if (!empty($user['email_verified_at'])) {
+            // Already verified - delete any remaining tokens and return success
+            $this->cleanupVerificationTokens($userId, $tenantId);
+
+            return $this->respondWithData([
+                'verified' => true,
+                'message' => 'Email address is already verified'
+            ]);
+        }
+
+        // Mark user as verified (tenant-scoped)
+        Database::query(
+            "UPDATE users SET email_verified_at = NOW(), is_verified = 1 WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+
+        // Delete all verification tokens for this user in this tenant
+        $this->cleanupVerificationTokens($userId, $tenantId);
+
+        // Log the verification
+        try {
+            \Nexus\Models\ActivityLog::log(
+                $userId,
+                'email_verified',
+                'Email address verified via API'
+            );
+        } catch (\Throwable $e) {
+            error_log("Failed to log email verification: " . $e->getMessage());
+        }
+
+        // Award gamification points if available
+        try {
+            if (class_exists('\Nexus\Models\Gamification')) {
+                \Nexus\Models\Gamification::awardPoints($userId, 10, 'Verified email address');
+            }
+        } catch (\Throwable $e) {
+            // Gamification is optional
+        }
+
+        return $this->respondWithData([
+            'verified' => true,
+            'message' => 'Email address verified successfully'
+        ]);
     }
 
     /** POST /api/auth/resend-verification */
     public function resendVerification(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\EmailVerificationApiController();
-            $controller->resendVerification();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        // Rate limit by user - 1 request per minute
+        $userKey = "resend_verification:user:{$userId}";
+        if (!RateLimiter::attempt($userKey, 1, self::RESEND_COOLDOWN_SECONDS)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                'Please wait at least 1 minute before requesting another verification email',
+                null,
+                429
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        // Get user details (tenant-scoped)
+        $tenantId = TenantContext::getId();
+        $user = Database::query(
+            "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        )->fetch();
+
+        if (!$user) {
+            return $this->respondWithError(
+                ApiErrorCodes::RESOURCE_NOT_FOUND,
+                'User not found',
+                null,
+                404
+            );
         }
 
-        return response()->json($data);
+        // Check if already verified
+        if (!empty($user['email_verified_at'])) {
+            return $this->respondWithData([
+                'message' => 'Email address is already verified',
+                'already_verified' => true
+            ]);
+        }
+
+        // Generate and send new verification email
+        $this->sendVerificationEmail($user);
+
+        return $this->respondWithData([
+            'message' => 'Verification email sent'
+        ]);
     }
 
     /** POST /api/auth/resend-verification-by-email */
     public function resendVerificationByEmail(): JsonResponse
     {
-
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\EmailVerificationApiController();
-            $controller->resendVerificationByEmail();
-        } catch (\Throwable $e) {
-            ob_end_clean();
+        // Rate limit by IP — 3 per 5 minutes (aggressive since unauthenticated)
+        $ip = \Nexus\Core\ClientIp::get();
+        if (\Nexus\Services\RateLimitService::check("resend_verify:$ip", 3, 300)) {
             return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
+                ApiErrorCodes::RATE_LIMIT_EXCEEDED,
+                'Too many requests. Please try again later.',
+                null,
+                429
             );
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
+        \Nexus\Services\RateLimitService::increment("resend_verify:$ip", 300);
 
-        if ($data === null) {
-            return $this->respondWithData([]);
+        $email = strtolower(trim($this->input('email', '')));
+        $tenantId = TenantContext::getId();
+
+        // Always return the same success message (prevents user enumeration)
+        $genericResponse = ['message' => 'If an account with that email exists and is unverified, a new verification email has been sent.'];
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->respondWithData($genericResponse);
         }
 
-        return response()->json($data);
+        // Look up user (tenant-scoped)
+        $user = Database::query(
+            "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE email = ? AND tenant_id = ?",
+            [$email, $tenantId]
+        )->fetch();
+
+        // Only send if user exists AND is not yet verified
+        if ($user && empty($user['email_verified_at'])) {
+            $this->sendVerificationEmail($user);
+        }
+
+        return $this->respondWithData($genericResponse);
+    }
+
+    /**
+     * Send verification email to user
+     */
+    private function sendVerificationEmail(array $user): bool
+    {
+        $tenantId = $user['tenant_id'] ?? TenantContext::getId();
+
+        // Generate a secure random token
+        $token = bin2hex(random_bytes(32));
+
+        // Hash the token before storing (bcrypt — constant-time verification)
+        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
+
+        // Calculate expiry time
+        $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_EXPIRY_SECONDS);
+
+        // Delete any existing tokens for this user in this tenant
+        $this->cleanupVerificationTokens($user['id'], $tenantId);
+
+        // Ensure the table exists (create if not)
+        $this->ensureTokenTableExists();
+
+        // Store the hashed token with tenant_id
+        Database::query(
+            "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
+            [$user['id'], $tenantId, $hashedToken, $expiresAt]
+        );
+
+        // Build verification URL — include tenant base path for correct routing
+        $appUrl = TenantContext::getFrontendUrl();
+        $basePath = TenantContext::getSlugPrefix();
+        $verifyUrl = $appUrl . $basePath . "/verify-email?token=" . $token;
+
+        // Send verification email
+        try {
+            $mailer = Mailer::forCurrentTenant();
+
+            // Get tenant name
+            $tenantName = 'Project NEXUS';
+            if ($tenantId) {
+                try {
+                    $tenant = Database::query(
+                        "SELECT name FROM tenants WHERE id = ?",
+                        [$tenantId]
+                    )->fetch();
+                    if ($tenant) {
+                        $tenantName = $tenant['name'];
+                    }
+                } catch (\Throwable $e) {
+                    // Use default tenant name
+                }
+            }
+
+            $firstName = $user['first_name'] ?? 'there';
+
+            $html = EmailTemplate::render(
+                "Verify Your Email Address",
+                "Hi {$firstName}, welcome to {$tenantName}!",
+                "Please verify your email address by clicking the button below. This link will expire in 24 hours.<br><br>If you did not create an account, please ignore this email.",
+                "Verify Email Address",
+                $verifyUrl,
+                $tenantName
+            );
+
+            return $mailer->send($user['email'], "Verify Your Email - " . $tenantName, $html);
+        } catch (\Throwable $e) {
+            error_log("Verification email failed for user {$user['id']}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Find a valid (non-expired) verification token, scoped to tenant
+     */
+    private function findValidVerificationToken(string $token, int $tenantId): ?array
+    {
+        if (!$this->tokenTableExists()) {
+            return null;
+        }
+
+        $records = Database::query(
+            "SELECT * FROM email_verification_tokens WHERE tenant_id = ? AND expires_at > NOW()",
+            [$tenantId]
+        )->fetchAll();
+
+        foreach ($records as $record) {
+            if (password_verify($token, $record['token'])) {
+                return $record;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Delete all verification tokens for a user in a specific tenant
+     */
+    private function cleanupVerificationTokens(int $userId, ?int $tenantId = null): void
+    {
+        if (!$this->tokenTableExists()) {
+            return;
+        }
+
+        $tenantId = $tenantId ?? TenantContext::getId();
+
+        Database::query(
+            "DELETE FROM email_verification_tokens WHERE user_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+    }
+
+    /**
+     * Check if the token table exists
+     */
+    private function tokenTableExists(): bool
+    {
+        static $exists = null;
+
+        if ($exists === null) {
+            try {
+                $result = Database::query(
+                    "SHOW TABLES LIKE 'email_verification_tokens'"
+                )->fetch();
+                $exists = !empty($result);
+            } catch (\Throwable $e) {
+                $exists = false;
+            }
+        }
+
+        return $exists;
+    }
+
+    /**
+     * Create the token table if it doesn't exist
+     */
+    private function ensureTokenTableExists(): void
+    {
+        if ($this->tokenTableExists()) {
+            return;
+        }
+
+        try {
+            Database::query("
+                CREATE TABLE IF NOT EXISTS `email_verification_tokens` (
+                    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    `user_id` INT UNSIGNED NOT NULL,
+                    `tenant_id` INT(11) NOT NULL,
+                    `token` VARCHAR(255) NOT NULL,
+                    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    `expires_at` TIMESTAMP NOT NULL,
+                    INDEX `idx_user_id` (`user_id`),
+                    INDEX `idx_tenant_id` (`tenant_id`),
+                    INDEX `idx_tenant_user` (`tenant_id`, `user_id`),
+                    INDEX `idx_expires_at` (`expires_at`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ");
+        } catch (\Throwable $e) {
+            error_log("Failed to create email_verification_tokens table: " . $e->getMessage());
+        }
     }
 }

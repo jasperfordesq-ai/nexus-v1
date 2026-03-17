@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Nexus\Services\MessageService;
 use Nexus\Services\BrokerMessageVisibilityService;
+use Nexus\Core\AudioUploader;
 use Nexus\Core\TenantContext;
 use Nexus\Models\Message;
 
@@ -16,7 +17,7 @@ use Nexus\Models\Message;
  * MessagesController - Conversations, direct messaging, reactions.
  *
  * Converted from delegation to direct static service calls.
- * Only uploadVoice() and sendVoice() remain delegated (use $_FILES).
+ * uploadVoice() and sendVoice() now use native Laravel request()->file().
  * typing() remains delegated (uses Pusher real-time events).
  */
 class MessagesController extends BaseApiController
@@ -384,43 +385,129 @@ class MessagesController extends BaseApiController
     }
 
     // ================================================================
-    // DELEGATED — file uploads ($_FILES), Pusher real-time
+    // TYPING INDICATOR (Pusher real-time)
     // ================================================================
 
     /**
-     * POST /api/v2/messages/typing — uses Pusher, kept as delegation
+     * POST /api/v2/messages/typing
      */
     public function typing(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'typing');
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_typing', 60, 60);
+
+        $recipientId = $this->inputInt('recipient_id', 0, 1);
+        $isTyping = $this->inputBool('is_typing', true);
+
+        if (!$recipientId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Recipient ID is required', 'recipient_id', 400);
+        }
+
+        MessageService::setTypingIndicator($recipientId, $userId, $isTyping);
+
+        return $this->respondWithData(['sent' => true]);
     }
 
+    // ================================================================
+    // VOICE UPLOADS (native Laravel)
+    // ================================================================
+
     /**
-     * POST /api/v2/messages/upload-voice — uses $_FILES, kept as delegation
+     * POST /api/v2/messages/upload-voice
+     *
+     * Upload an audio file for voice messaging without sending.
+     * Accepts file upload (field: 'audio') or base64 (field: 'audio_data' + 'mime_type').
+     * Returns the voice URL and duration for later use with send().
      */
     public function uploadVoice(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'uploadVoice');
+        $this->requireAuth();
+        $this->rateLimit('messages_voice_upload', 10, 60);
+
+        $duration = $this->inputInt('duration', 0, 0);
+
+        try {
+            $audioResult = null;
+
+            $file = request()->file('audio');
+            if ($file && $file->isValid()) {
+                // Standard file upload
+                $fileArray = [
+                    'name'     => $file->getClientOriginalName(),
+                    'type'     => $file->getMimeType(),
+                    'tmp_name' => $file->getRealPath(),
+                    'error'    => UPLOAD_ERR_OK,
+                    'size'     => $file->getSize(),
+                ];
+                $audioResult = AudioUploader::upload($fileArray, $duration);
+            } elseif (request()->input('audio_data')) {
+                // Base64 encoded audio (from MediaRecorder blob)
+                $mimeType = request()->input('mime_type', 'audio/webm');
+                $audioResult = AudioUploader::uploadFromBase64(request()->input('audio_data'), $mimeType, $duration);
+            } else {
+                return $this->respondWithError('VALIDATION_ERROR', 'No audio data provided', 'audio', 400);
+            }
+
+            return $this->respondWithData([
+                'voice_url' => $audioResult['url'],
+                'duration'  => $audioResult['duration'],
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload audio: ' . $e->getMessage(), 'audio', 400);
+        }
     }
 
     /**
-     * POST /api/v2/messages/voice — uses $_FILES, kept as delegation
+     * POST /api/v2/messages/voice
+     *
+     * Upload and send a voice message in one step. Uses request()->file() (Laravel native).
+     * Field name: 'voice_message'. Form field: 'recipient_id' (required).
      */
     public function sendVoice(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\MessagesApiController::class, 'sendVoice');
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_voice_upload', 10, 60);
+
+        $recipientId = (int) request()->input('recipient_id', 0);
+        if (!$recipientId) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Recipient ID is required', 'recipient_id', 400);
+        }
+
+        $file = request()->file('voice_message');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Voice message file is required', 'voice_message', 400);
+        }
+
+        try {
+            // Build a $_FILES-compatible array for AudioUploader::upload()
+            $fileArray = [
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ];
+
+            $audioResult = AudioUploader::upload($fileArray, 0);
+
+            // Send the message with voice attachment
+            $message = MessageService::send($userId, [
+                'recipient_id'   => $recipientId,
+                'body'           => '', // Voice messages have no text body
+                'is_voice'       => true,
+                'audio_url'      => $audioResult['url'],
+                'audio_duration' => $audioResult['duration'],
+            ]);
+
+            if (!$message) {
+                $errors = MessageService::getErrors();
+                return $this->respondWithErrors($errors, 422);
+            }
+
+            return $this->respondWithData($message, null, 201);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to send voice message: ' . $e->getMessage(), 'voice_message', 400);
+        }
     }
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
 }
