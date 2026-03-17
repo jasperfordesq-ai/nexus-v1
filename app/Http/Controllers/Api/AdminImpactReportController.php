@@ -6,9 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\ImpactReportingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\ImpactReportingService;
 
 /**
  * AdminImpactReportController -- Admin impact report configuration.
@@ -20,6 +20,10 @@ use Nexus\Services\ImpactReportingService;
 class AdminImpactReportController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly ImpactReportingService $impactReportingService,
+    ) {}
 
     /**
      * GET /api/v2/admin/impact-report
@@ -35,16 +39,16 @@ class AdminImpactReportController extends BaseApiController
 
         $months = $this->queryInt('months', 12, 1, 60);
 
-        $config = ImpactReportingService::getReportConfig();
+        $config = $this->impactReportingService->getReportConfig();
 
         return $this->respondWithData([
-            'sroi' => ImpactReportingService::calculateSROI([
+            'sroi' => $this->impactReportingService->calculateSROI([
                 'months' => $months,
                 'hourly_value' => $config['hourly_value'],
                 'social_multiplier' => $config['social_multiplier'],
             ]),
-            'health' => ImpactReportingService::getCommunityHealthMetrics(),
-            'timeline' => ImpactReportingService::getImpactTimeline($months),
+            'health' => $this->impactReportingService->getCommunityHealthMetrics(),
+            'timeline' => $this->impactReportingService->getImpactTimeline($months),
             'config' => $config,
         ]);
     }

@@ -6,8 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\GroupRecommendationEngine;
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\GroupRecommendationEngine;
 
 /**
  * GroupRecommendController -- Group recommendation engine.
@@ -23,6 +23,10 @@ use Nexus\Services\GroupRecommendationEngine;
 class GroupRecommendController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly GroupRecommendationEngine $groupRecommendationEngine,
+    ) {}
 
     /**
      * GET /api/v2/groups/recommendations
@@ -45,7 +49,7 @@ class GroupRecommendController extends BaseApiController
             $options['type_id'] = $typeId;
         }
 
-        $recommendations = GroupRecommendationEngine::getRecommendations($userId, $limit, $options);
+        $recommendations = $this->groupRecommendationEngine->getRecommendations($userId, $limit, $options);
 
         return $this->respondWithData($recommendations, [
             'count' => count($recommendations),
@@ -86,7 +90,7 @@ class GroupRecommendController extends BaseApiController
             );
         }
 
-        GroupRecommendationEngine::trackInteraction($userId, $groupId, $action);
+        $this->groupRecommendationEngine->trackInteraction($userId, $groupId, $action);
 
         return $this->respondWithData([
             'tracked' => true,
@@ -109,7 +113,7 @@ class GroupRecommendController extends BaseApiController
 
         $days = $this->queryInt('days', 30, 1, 365);
 
-        $metrics = GroupRecommendationEngine::getPerformanceMetrics($days);
+        $metrics = $this->groupRecommendationEngine->getPerformanceMetrics($days);
 
         return $this->respondWithData($metrics, [
             'period_days' => $days,
@@ -132,7 +136,7 @@ class GroupRecommendController extends BaseApiController
 
         $options = ['exclude_ids' => [$groupId]];
 
-        $recommendations = GroupRecommendationEngine::getRecommendations($userId, $limit, $options);
+        $recommendations = $this->groupRecommendationEngine->getRecommendations($userId, $limit, $options);
 
         return $this->respondWithData($recommendations, [
             'source_group_id' => $groupId,

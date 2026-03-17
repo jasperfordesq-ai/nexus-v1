@@ -6,13 +6,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\TwoFactorChallengeManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
 use Nexus\Core\Csrf;
 use Nexus\Services\TokenService;
 use Nexus\Services\TotpService;
-use Nexus\Services\TwoFactorChallengeManager;
 
 /**
  * TotpController -- TOTP two-factor authentication verify + status.
@@ -23,6 +23,10 @@ use Nexus\Services\TwoFactorChallengeManager;
 class TotpController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly TwoFactorChallengeManager $twoFactorChallengeManager,
+    ) {}
 
     /**
      * POST totp/verify
@@ -46,7 +50,7 @@ class TotpController extends BaseApiController
 
         if ($isStateless) {
             // Stateless flow - validate two_factor_token
-            $challengeData = TwoFactorChallengeManager::get($twoFactorToken);
+            $challengeData = $this->twoFactorChallengeManager->get($twoFactorToken);
 
             if (!$challengeData) {
                 return response()->json([
@@ -58,7 +62,7 @@ class TotpController extends BaseApiController
             }
 
             // Record attempt and check if we've exceeded max attempts
-            $attemptResult = TwoFactorChallengeManager::recordAttempt($twoFactorToken);
+            $attemptResult = $this->twoFactorChallengeManager->recordAttempt($twoFactorToken);
             if (!$attemptResult['allowed']) {
                 return response()->json([
                     'error' => 'Too many failed attempts. Please log in again.',
@@ -141,7 +145,7 @@ class TotpController extends BaseApiController
 
         // Consume the challenge token (single-use)
         if ($isStateless && $twoFactorToken) {
-            TwoFactorChallengeManager::consume($twoFactorToken);
+            $this->twoFactorChallengeManager->consume($twoFactorToken);
         }
 
         // Clear session-based pending state

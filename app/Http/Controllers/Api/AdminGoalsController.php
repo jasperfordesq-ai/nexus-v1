@@ -6,8 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\GoalService;
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\GoalService;
 
 /**
  * AdminGoalsController -- Admin goals management.
@@ -17,6 +17,10 @@ use Nexus\Services\GoalService;
 class AdminGoalsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly GoalService $goalService,
+    ) {}
 
     /**
      * GET /api/v2/admin/goals
@@ -33,7 +37,7 @@ class AdminGoalsController extends BaseApiController
             'limit' => min(200, max(1, $this->queryInt('limit', 50))),
         ];
 
-        $result = GoalService::getAll($filters);
+        $result = $this->goalService->getAll($filters);
 
         $items = $result['data'] ?? $result['items'] ?? $result;
         $total = $result['total'] ?? (is_array($items) ? count($items) : 0);
@@ -56,7 +60,7 @@ class AdminGoalsController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $goal = GoalService::getById($id);
+        $goal = $this->goalService->getById($id);
 
         if (!$goal) {
             return $this->respondWithError('NOT_FOUND', 'Goal not found', null, 404);
@@ -72,12 +76,12 @@ class AdminGoalsController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
 
-        $goal = GoalService::getById($id);
+        $goal = $this->goalService->getById($id);
         if (!$goal) {
             return $this->respondWithError('NOT_FOUND', 'Goal not found', null, 404);
         }
 
-        $deleted = GoalService::delete($id, $adminId);
+        $deleted = $this->goalService->delete($id, $adminId);
 
         if ($deleted) {
             return $this->respondWithData(['deleted' => true, 'id' => $id]);

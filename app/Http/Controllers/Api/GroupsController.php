@@ -6,10 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\GroupNotificationService;
 use Illuminate\Http\JsonResponse;
 use Nexus\Services\GroupService;
 use Nexus\Services\GroupAnnouncementService;
-use Nexus\Services\GroupNotificationService;
 
 /**
  * GroupsController - Groups CRUD, members, discussions, announcements.
@@ -20,6 +20,10 @@ use Nexus\Services\GroupNotificationService;
 class GroupsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly GroupNotificationService $groupNotificationService,
+    ) {}
 
     // ================================================================
     // LIST / SHOW
@@ -221,9 +225,9 @@ class GroupsController extends BaseApiController
         // Notify based on join result
         try {
             if ($status === 'active') {
-                GroupNotificationService::notifyJoined($id, $userId);
+                $this->groupNotificationService->notifyJoined($id, $userId);
             } elseif ($status === 'pending') {
-                GroupNotificationService::notifyJoinRequest($id, $userId);
+                $this->groupNotificationService->notifyJoinRequest($id, $userId);
             }
         } catch (\Throwable $e) {
             error_log("Group join notification error: " . $e->getMessage());
@@ -438,9 +442,9 @@ class GroupsController extends BaseApiController
         // Notify requester
         try {
             if ($action === 'accept') {
-                GroupNotificationService::notifyJoined($id, $requesterId);
+                $this->groupNotificationService->notifyJoined($id, $requesterId);
             } else {
-                GroupNotificationService::notifyJoinRejected($id, $requesterId);
+                $this->groupNotificationService->notifyJoinRejected($id, $requesterId);
             }
         } catch (\Throwable $e) {
             error_log("Group request notification error: " . $e->getMessage());
@@ -523,7 +527,7 @@ class GroupsController extends BaseApiController
         try {
             $discussionTitle = $discussion['title'] ?? $data['title'] ?? 'New Discussion';
             $discussionId = $discussion['id'] ?? 0;
-            GroupNotificationService::notifyNewDiscussion($id, $discussionId, $userId, $discussionTitle);
+            $this->groupNotificationService->notifyNewDiscussion($id, $discussionId, $userId, $discussionTitle);
         } catch (\Throwable $e) {
             error_log("Group discussion notification error: " . $e->getMessage());
         }
@@ -657,7 +661,7 @@ class GroupsController extends BaseApiController
         // Notify group members of new announcement
         try {
             $announcementTitle = $result['title'] ?? $data['title'] ?? 'New Announcement';
-            GroupNotificationService::notifyNewAnnouncement($id, $userId, $announcementTitle);
+            $this->groupNotificationService->notifyNewAnnouncement($id, $userId, $announcementTitle);
         } catch (\Throwable $e) {
             error_log("Group announcement notification error: " . $e->getMessage());
         }

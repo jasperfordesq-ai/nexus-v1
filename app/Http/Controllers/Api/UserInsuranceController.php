@@ -6,9 +6,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\InsuranceCertificateService;
 use Illuminate\Http\JsonResponse;
 use Nexus\Core\TenantContext;
-use Nexus\Services\InsuranceCertificateService;
 
 /**
  * UserInsuranceController -- User insurance certificate upload and listing.
@@ -23,6 +23,10 @@ class UserInsuranceController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly InsuranceCertificateService $insuranceCertificateService,
+    ) {}
+
     /**
      * GET /api/v2/users/me/insurance
      *
@@ -33,7 +37,7 @@ class UserInsuranceController extends BaseApiController
         $userId = $this->requireAuth();
 
         try {
-            $records = InsuranceCertificateService::getUserCertificates($userId);
+            $records = $this->insuranceCertificateService->getUserCertificates($userId);
             return $this->respondWithData($records);
         } catch (\Exception $e) {
             return $this->respondWithData([]);
@@ -108,8 +112,8 @@ class UserInsuranceController extends BaseApiController
                 'notes' => request()->input('notes'),
             ];
 
-            $id = InsuranceCertificateService::create($data);
-            $record = InsuranceCertificateService::getById($id);
+            $id = $this->insuranceCertificateService->create($data);
+            $record = $this->insuranceCertificateService->getById($id);
 
             return $this->respondWithData($record, null, 201);
         } catch (\Exception $e) {

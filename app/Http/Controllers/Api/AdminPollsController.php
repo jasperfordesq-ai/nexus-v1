@@ -6,8 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\PollService;
 use Illuminate\Http\JsonResponse;
-use Nexus\Services\PollService;
 
 /**
  * AdminPollsController -- Admin poll management.
@@ -17,6 +17,10 @@ use Nexus\Services\PollService;
 class AdminPollsController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly PollService $pollService,
+    ) {}
 
     /**
      * GET /api/v2/admin/polls
@@ -33,7 +37,7 @@ class AdminPollsController extends BaseApiController
             'limit' => min(200, max(1, $this->queryInt('limit', 50))),
         ];
 
-        $result = PollService::getAll($filters);
+        $result = $this->pollService->getAll($filters);
 
         $items = $result['data'] ?? $result['items'] ?? $result;
         $total = $result['total'] ?? (is_array($items) ? count($items) : 0);
@@ -56,7 +60,7 @@ class AdminPollsController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $poll = PollService::getById($id);
+        $poll = $this->pollService->getById($id);
 
         if (!$poll) {
             return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
@@ -72,12 +76,12 @@ class AdminPollsController extends BaseApiController
     {
         $adminId = $this->requireAdmin();
 
-        $poll = PollService::getById($id);
+        $poll = $this->pollService->getById($id);
         if (!$poll) {
             return $this->respondWithError('NOT_FOUND', 'Poll not found', null, 404);
         }
 
-        $deleted = PollService::delete($id, $adminId);
+        $deleted = $this->pollService->delete($id, $adminId);
 
         if ($deleted) {
             return $this->respondWithData(['deleted' => true, 'id' => $id]);

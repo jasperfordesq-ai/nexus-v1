@@ -6,12 +6,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\SmartMatchingAnalyticsService;
+use App\Services\SmartMatchingEngine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Services\MatchApprovalWorkflowService;
-use Nexus\Services\SmartMatchingEngine;
-use Nexus\Services\SmartMatchingAnalyticsService;
 
 /**
  * AdminMatchingController -- Admin matching approval, configuration, cache, and statistics.
@@ -22,7 +22,10 @@ class AdminMatchingController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct() {}
+    public function __construct(
+        private readonly SmartMatchingEngine $smartMatchingEngine,
+        private readonly SmartMatchingAnalyticsService $smartMatchingAnalyticsService,
+    ) {}
 
     /** GET /api/v2/admin/matching */
     public function index(): JsonResponse
@@ -182,7 +185,7 @@ class AdminMatchingController extends BaseApiController
     public function getConfig(): JsonResponse
     {
         $this->requireAdmin();
-        $config = SmartMatchingEngine::getConfig();
+        $config = $this->smartMatchingEngine->getConfig();
         $weights = $config['weights'] ?? [];
         $proximity = $config['proximity'] ?? [];
 
@@ -253,7 +256,7 @@ class AdminMatchingController extends BaseApiController
         ];
 
         DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
-        SmartMatchingEngine::clearCache();
+        $this->smartMatchingEngine->clearCache();
 
         return $this->respondWithData(['message' => 'Matching configuration updated successfully']);
     }
@@ -267,7 +270,7 @@ class AdminMatchingController extends BaseApiController
         try {
             $deleted = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_cache WHERE tenant_id = ?", [$tenantId])->cnt;
             DB::delete("DELETE FROM match_cache WHERE tenant_id = ?", [$tenantId]);
-            SmartMatchingEngine::clearCache();
+            $this->smartMatchingEngine->clearCache();
             return $this->respondWithData(['message' => 'Match cache cleared successfully', 'entries_cleared' => $deleted]);
         } catch (\Exception $e) {
             return $this->respondWithError('SERVER_ERROR', 'Failed to clear cache: ' . $e->getMessage(), null, 500);
@@ -280,11 +283,11 @@ class AdminMatchingController extends BaseApiController
         $this->requireAdmin();
 
         try {
-            $stats = SmartMatchingAnalyticsService::getOverallStats();
-            $scoreDistribution = SmartMatchingAnalyticsService::getScoreDistribution();
-            $distanceDistribution = SmartMatchingAnalyticsService::getDistanceDistribution();
+            $stats = $this->smartMatchingAnalyticsService->getOverallStats();
+            $scoreDistribution = $this->smartMatchingAnalyticsService->getScoreDistribution();
+            $distanceDistribution = $this->smartMatchingAnalyticsService->getDistanceDistribution();
 
-            $config = SmartMatchingEngine::getConfig();
+            $config = $this->smartMatchingEngine->getConfig();
             $brokerEnabled = (bool) ($config['broker_approval_enabled'] ?? true);
 
             $pendingApprovals = 0;

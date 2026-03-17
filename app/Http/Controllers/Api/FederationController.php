@@ -6,19 +6,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FederationActivityService;
+use App\Services\FederationEmailService;
+use App\Services\FederationJwtService;
+use App\Services\FederationRealtimeService;
+use App\Services\FederationUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Nexus\Core\CorsHelper;
 use Nexus\Middleware\FederationApiMiddleware;
 use Nexus\Models\Notification;
 use Nexus\Services\BrokerMessageVisibilityService;
-use Nexus\Services\FederationActivityService;
 use Nexus\Services\FederationAuditService;
-use Nexus\Services\FederationEmailService;
 use Nexus\Services\FederationFeatureService;
-use Nexus\Services\FederationJwtService;
-use Nexus\Services\FederationRealtimeService;
-use Nexus\Services\FederationUserService;
-use Nexus\Core\CorsHelper;
 
 /**
  * FederationController -- Federation cross-tenant features.
@@ -30,6 +30,14 @@ use Nexus\Core\CorsHelper;
 class FederationController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly FederationActivityService $federationActivityService,
+        private readonly FederationEmailService $federationEmailService,
+        private readonly FederationJwtService $federationJwtService,
+        private readonly FederationRealtimeService $federationRealtimeService,
+        private readonly FederationUserService $federationUserService,
+    ) {}
 
     private const LEVEL_NAMES = [
         1 => 'Discovery',
@@ -51,7 +59,7 @@ class FederationController extends BaseApiController
         $tenantFederationEnabled = FederationFeatureService::isGloballyEnabled()
             && FederationFeatureService::isTenantFederationEnabled($tenantId);
 
-        $userSettings = FederationUserService::getUserSettings($userId);
+        $userSettings = $this->federationUserService->getUserSettings($userId);
         $userOptedIn = (bool) ($userSettings['federation_optin'] ?? false);
 
         $partnershipsCount = 0;
@@ -87,7 +95,7 @@ class FederationController extends BaseApiController
             return $this->respondWithError('FEDERATION_NOT_AVAILABLE', 'Federation is not enabled for your community.', null, 403);
         }
 
-        $current = FederationUserService::getUserSettings($userId);
+        $current = $this->federationUserService->getUserSettings($userId);
 
         if ($current['federation_optin']) {
             return $this->respondWithData(['success' => true, 'message' => 'Already opted in to federation.']);
@@ -102,7 +110,7 @@ class FederationController extends BaseApiController
             'transactions_enabled_federated' => true,
         ]);
 
-        $success = FederationUserService::updateSettings($userId, $settings);
+        $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
             FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
@@ -141,7 +149,7 @@ class FederationController extends BaseApiController
             'travel_radius_km' => array_key_exists('travel_radius_km', $data) ? (int) $data['travel_radius_km'] : 25,
         ];
 
-        $success = FederationUserService::updateSettings($userId, $settings);
+        $success = $this->federationUserService->updateSettings($userId, $settings);
 
         if ($success) {
             FederationAuditService::log('user_federation_optin', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
@@ -157,7 +165,7 @@ class FederationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
-        $success = FederationUserService::optOut($userId);
+        $success = $this->federationUserService->optOut($userId);
 
         if ($success) {
             FederationAuditService::log('user_federation_optout', $tenantId, null, $userId, [], FederationAuditService::LEVEL_INFO);
@@ -241,7 +249,7 @@ class FederationController extends BaseApiController
         $userId = $this->requireAuth();
 
         try {
-            $rawActivity = FederationActivityService::getActivityFeed($userId, 20);
+            $rawActivity = $this->federationActivityService->getActivityFeed($userId, 20);
 
             $formatted = [];
             $id = 1;
@@ -593,8 +601,8 @@ class FederationController extends BaseApiController
             if ($sr) { $senderName = $sr['name'] ?: trim($sr['first_name'] . ' ' . $sr['last_name']); $senderTenantName = $sr['tenant_name'] ?: 'Partner Timebank'; }
         } catch (\Exception $e) {}
 
-        try { FederationEmailService::sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { error_log("FederationV1: email failed: " . $e->getMessage()); }
-        try { FederationRealtimeService::broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $input['subject'], 'body' => $input['body']]); } catch (\Exception $e) {}
+        try { $this->federationEmailService->sendNewMessageNotification((int) $input['recipient_id'], (int) $input['sender_id'], (int) $partnerTenantId, substr($input['body'], 0, 200)); } catch (\Exception $e) { error_log("FederationV1: email failed: " . $e->getMessage()); }
+        try { $this->federationRealtimeService->broadcastNewMessage((int) $input['sender_id'], (int) $partnerTenantId, (int) $input['recipient_id'], (int) $recipient['tenant_id'], ['message_id' => (int) $messageId, 'sender_name' => $senderName, 'sender_tenant_name' => $senderTenantName, 'subject' => $input['subject'], 'body' => $input['body']]); } catch (\Exception $e) {}
         try { Notification::create((int) $input['recipient_id'], "New federated message from {$senderName} ({$senderTenantName}): " . substr($input['subject'], 0, 50), '/federation/messages', 'federation_message', true, (int) $recipient['tenant_id']); } catch (\Exception $e) {}
 
         return $this->fedSuccess(['message_id' => (int) $messageId, 'status' => 'sent'], 201);
@@ -656,7 +664,7 @@ class FederationController extends BaseApiController
         CorsHelper::handlePreflight([], ['POST', 'OPTIONS'], ['Content-Type', 'Authorization']);
         CorsHelper::setHeaders([], ['POST', 'OPTIONS'], ['Content-Type', 'Authorization']);
 
-        $result = FederationJwtService::handleTokenRequest();
+        $result = $this->federationJwtService->handleTokenRequest();
 
         if (isset($result['error'])) {
             return response()->json($result, 400);
