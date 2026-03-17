@@ -6,8 +6,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\FeedSidebarService;
 use Illuminate\Http\JsonResponse;
+
 
 /**
  * FeedSidebarController — Feed sidebar widgets (stats, suggestions).
@@ -16,54 +16,31 @@ class FeedSidebarController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    public function __construct(
-        private readonly FeedSidebarService $sidebarService,
-    ) {}
-
     /**
-     * GET /api/v2/feed/sidebar/stats
-     *
-     * Get community statistics for the sidebar widget.
+     * Delegate to legacy controller via output buffering.
      */
+    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
+    {
+        $controller = new $legacyClass();
+        ob_start();
+        $controller->$method(...$params);
+        $output = ob_get_clean();
+        $status = http_response_code();
+        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
+    }
+
     public function communityStats(): JsonResponse
     {
-        $tenantId = $this->getTenantId();
-
-        $stats = $this->sidebarService->getCommunityStats($tenantId);
-
-        return $this->respondWithData($stats);
+        return $this->delegate(\Nexus\Controllers\Api\FeedSidebarApiController::class, 'communityStats');
     }
 
-    /**
-     * GET /api/v2/feed/sidebar/suggested-members
-     *
-     * Get suggested members to connect with.
-     * Query params: limit (default 5).
-     */
     public function suggestedMembers(): JsonResponse
     {
-        $userId = $this->requireAuth();
-        $tenantId = $this->getTenantId();
-
-        $limit = $this->queryInt('limit', 5, 1, 20);
-
-        $members = $this->sidebarService->getSuggestedMembers($userId, $tenantId, $limit);
-
-        return $this->respondWithData($members);
+        return $this->delegate(\Nexus\Controllers\Api\FeedSidebarApiController::class, 'suggestedMembers');
     }
 
-    /**
-     * GET /api/v2/feed/sidebar
-     *
-     * Get all sidebar data in a single request (stats + suggestions + trending).
-     */
     public function sidebar(): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
-        $tenantId = $this->getTenantId();
-
-        $data = $this->sidebarService->getFullSidebar($userId, $tenantId);
-
-        return $this->respondWithData($data);
+        return $this->delegate(\Nexus\Controllers\Api\FeedSidebarApiController::class, 'sidebar');
     }
 }
