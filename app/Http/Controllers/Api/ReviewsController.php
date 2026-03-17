@@ -8,14 +8,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\ReviewService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 /**
  * ReviewsController - User reviews for completed exchanges.
  *
  * Endpoints (v2):
- *   GET    /api/v2/reviews/user/{userId}  userReviews()
- *   POST   /api/v2/reviews                store()
- *   DELETE /api/v2/reviews/{id}           destroy()
+ *   GET    /api/v2/reviews/user/{userId}        userReviews()
+ *   GET    /api/v2/reviews/user/{userId}/stats   userStats()
+ *   GET    /api/v2/reviews/{id}                  show()
+ *   POST   /api/v2/reviews                       store()
+ *   DELETE /api/v2/reviews/{id}                  destroy()
  */
 class ReviewsController extends BaseApiController
 {
@@ -25,11 +28,32 @@ class ReviewsController extends BaseApiController
         private readonly ReviewService $reviewService,
     ) {}
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/reviews/pending
+    // -----------------------------------------------------------------
+
+    public function pending(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $reviews = $this->reviewService->getForUser($userId, [
+            'per_page' => $this->queryInt('per_page', 20, 1, 100),
+        ]);
+        return $this->respondWithData($reviews['items'] ?? [], $reviews['meta'] ?? null);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/reviews/user/{userId}
+    // -----------------------------------------------------------------
+
     /**
-     * List reviews for a specific user.
+     * List reviews for a specific user with cursor pagination.
+     *
+     * Query params: per_page (default 20, max 100), cursor.
      */
     public function userReviews(int $userId): JsonResponse
     {
+        $this->rateLimit('reviews_list', 60, 60);
+
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
         ];
@@ -47,18 +71,88 @@ class ReviewsController extends BaseApiController
         );
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/reviews/user/{userId}/stats
+    // -----------------------------------------------------------------
+
+    /**
+     * Get review statistics for a user (average, total, distribution).
+     */
+    public function userStats(int $userId): JsonResponse
+    {
+        $this->rateLimit('reviews_stats', 120, 60);
+
+        $stats = $this->reviewService->getStats($userId);
+
+        return $this->respondWithData($stats);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/reviews/{id}
+    // -----------------------------------------------------------------
+
+    /**
+     * Get a single review by ID.
+     */
+    public function show(int $id): JsonResponse
+    {
+        $this->rateLimit('reviews_show', 120, 60);
+
+        $review = $this->reviewService->getById($id);
+
+        if ($review === null) {
+            return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
+        }
+
+        return $this->respondWithData($review);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/reviews
+    // -----------------------------------------------------------------
+
     /**
      * Create a review. Requires authentication.
+     *
+     * Body: receiver_id, rating (1-5), comment, transaction_id (optional).
      */
     public function store(): JsonResponse
     {
         $userId = $this->requireAuth();
         $this->rateLimit('review_create', 10, 60);
 
-        $review = $this->reviewService->create($userId, $this->getAllInput());
+        try {
+            $review = $this->reviewService->create($userId, $this->getAllInput());
+        } catch (ValidationException $e) {
+            $errors = collect($e->errors())->flatMap(function (array $messages, string $field) {
+                return array_map(fn (string $msg) => [
+                    'code'    => 'VALIDATION_ERROR',
+                    'message' => $msg,
+                    'field'   => $field,
+                ], $messages);
+            })->values()->all();
+
+            return $this->respondWithErrors($errors, 422);
+        } catch (\RuntimeException $e) {
+            $msg = $e->getMessage();
+            $code = 'VALIDATION_ERROR';
+            $status = 400;
+
+            if (str_contains($msg, 'yourself')) {
+                $status = 400;
+            } elseif (str_contains($msg, 'already reviewed')) {
+                $status = 409;
+            }
+
+            return $this->respondWithError($code, $msg, null, $status);
+        }
 
         return $this->respondWithData($review, null, 201);
     }
+
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/reviews/{id}
+    // -----------------------------------------------------------------
 
     /**
      * Delete a review. Only the review author may delete.
@@ -66,12 +160,14 @@ class ReviewsController extends BaseApiController
     public function destroy(int $id): JsonResponse
     {
         $userId = $this->requireAuth();
+        $this->rateLimit('reviews_delete', 10, 60);
 
         $existing = $this->reviewService->getById($id);
 
         if ($existing === null) {
             return $this->respondWithError('NOT_FOUND', 'Review not found', null, 404);
         }
+
         if ((int) ($existing['reviewer_id'] ?? 0) !== $userId) {
             return $this->respondWithError('FORBIDDEN', 'You did not author this review', null, 403);
         }
@@ -80,42 +176,4 @@ class ReviewsController extends BaseApiController
 
         return $this->noContent();
     }
-
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
-
-
-    public function pending(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ReviewsApiController::class, 'pending');
-    }
-
-
-    public function userStats($userId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ReviewsApiController::class, 'userStats', [$userId]);
-    }
-
-
-    public function userTrust($userId): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ReviewsApiController::class, 'userTrust', [$userId]);
-    }
-
-
-    public function show($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ReviewsApiController::class, 'show', [$id]);
-    }
-
 }

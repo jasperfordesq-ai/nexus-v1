@@ -229,6 +229,137 @@ class ListingsController extends BaseApiController
         return $this->noContent();
     }
 
+    // -----------------------------------------------------------------
+    //  GET /api/v2/listings/nearby
+    // -----------------------------------------------------------------
+
+    /**
+     * Get listings near a geographic point using Haversine formula.
+     *
+     * Query params: lat (required), lon (required), radius_km (default 25),
+     *               type, category_id, per_page (default 20, max 100).
+     */
+    public function nearby(): JsonResponse
+    {
+        $lat = $this->query('lat');
+        $lon = $this->query('lon');
+
+        if ($lat === null || $lon === null) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Latitude and longitude are required', null, 400);
+        }
+
+        $lat = (float) $lat;
+        $lon = (float) $lon;
+
+        if ($lat < -90 || $lat > 90) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Latitude must be between -90 and 90', 'lat', 400);
+        }
+        if ($lon < -180 || $lon > 180) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Longitude must be between -180 and 180', 'lon', 400);
+        }
+
+        $filters = [
+            'radius_km' => (float) $this->query('radius_km', '25'),
+            'limit'     => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        $type = $this->query('type');
+        if ($type) {
+            $filters['type'] = str_contains($type, ',') ? explode(',', $type) : $type;
+        }
+
+        if ($this->query('category_id')) {
+            $filters['category_id'] = $this->queryInt('category_id');
+        }
+
+        $result = $this->listingService->getNearby($lat, $lon, $filters);
+
+        return $this->respondWithData($result['items'], [
+            'search' => [
+                'type'      => 'nearby',
+                'lat'       => $lat,
+                'lon'       => $lon,
+                'radius_km' => $filters['radius_km'],
+            ],
+            'per_page' => $filters['limit'],
+            'has_more' => $result['has_more'],
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/listings/saved
+    // -----------------------------------------------------------------
+
+    /**
+     * Get listing IDs saved by the authenticated user.
+     */
+    public function getSavedListings(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $savedIds = $this->listingService->getSavedListingIds($userId);
+
+        return $this->respondWithData($savedIds);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/listings/featured
+    // -----------------------------------------------------------------
+
+    /**
+     * Get currently featured listings.
+     *
+     * Query params: per_page (default 10, max 50).
+     */
+    public function featured(): JsonResponse
+    {
+        $limit = $this->queryInt('per_page', 10, 1, 50);
+
+        $items = $this->listingService->getFeatured($limit);
+
+        return $this->respondWithData($items);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/listings/{id}/save
+    // -----------------------------------------------------------------
+
+    /**
+     * Save (favourite) a listing for the authenticated user.
+     */
+    public function saveListing(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $result = $this->listingService->saveListing($userId, $id);
+
+        if (! $result) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+
+        return $this->respondWithData(['saved' => true, 'listing_id' => $id]);
+    }
+
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/listings/{id}/save
+    // -----------------------------------------------------------------
+
+    /**
+     * Unsave (un-favourite) a listing for the authenticated user.
+     */
+    public function unsaveListing(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $this->listingService->unsaveListing($userId, $id);
+
+        return $this->respondWithData(['saved' => false, 'listing_id' => $id]);
+    }
+
+    // -----------------------------------------------------------------
+    //  Delegated endpoints (complex, kept on legacy for now)
+    // -----------------------------------------------------------------
+
     /**
      * Delegate to legacy controller via output buffering.
      */
@@ -242,82 +373,38 @@ class ListingsController extends BaseApiController
         return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
     }
 
-
-    public function nearby(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'nearby');
-    }
-
-
-    public function getSavedListings(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'getSavedListings');
-    }
-
-
-    public function featured(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'featured');
-    }
-
-
     public function popularTags(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'popularTags');
     }
-
 
     public function autocompleteTags(): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'autocompleteTags');
     }
 
-
-    public function saveListing($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'saveListing', [$id]);
-    }
-
-
-    public function unsaveListing($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'unsaveListing', [$id]);
-    }
-
-
     public function uploadImage($id): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'uploadImage', [$id]);
     }
-
 
     public function deleteImage($id): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'deleteImage', [$id]);
     }
 
-
     public function renew($id): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'renew', [$id]);
     }
-
 
     public function analytics($id): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'analytics', [$id]);
     }
 
-
     public function setSkillTags($id): JsonResponse
     {
         return $this->delegate(\Nexus\Controllers\Api\ListingsApiController::class, 'setSkillTags', [$id]);
     }
-
-
-    public function delete(): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\ListingController::class, 'delete');
-    }
-
 }

@@ -251,6 +251,170 @@ class ListingService
     }
 
     // -----------------------------------------------------------------
+    //  Nearby (Haversine geospatial query)
+    // -----------------------------------------------------------------
+
+    /**
+     * Get listings near a geographic point using the Haversine formula.
+     *
+     * @param float $lat Latitude of search centre
+     * @param float $lon Longitude of search centre
+     * @param array{radius_km?: float, limit?: int, type?: string|string[], category_id?: int} $filters
+     * @return array{items: array, has_more: bool}
+     */
+    public function getNearby(float $lat, float $lon, array $filters = []): array
+    {
+        $radiusKm = (float) ($filters['radius_km'] ?? 25);
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+
+        $haversine = '(6371 * acos(LEAST(1.0, GREATEST(-1.0, '
+            . 'cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + '
+            . 'sin(radians(?)) * sin(radians(latitude))'
+            . '))))';
+
+        $query = $this->listing->newQuery()
+            ->with([
+                'user:id,first_name,last_name,organization_name,profile_type,avatar_url',
+                'category:id,name,color',
+            ])
+            ->selectRaw("listings.*, {$haversine} AS distance_km", [$lat, $lon, $lat])
+            ->where('status', 'active')
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->having('distance_km', '<=', $radiusKm)
+            ->orderBy('distance_km');
+
+        // Type filter
+        if (! empty($filters['type'])) {
+            $type = $filters['type'];
+            is_array($type)
+                ? $query->whereIn('type', $type)
+                : $query->where('type', $type);
+        }
+
+        // Category filter
+        if (! empty($filters['category_id'])) {
+            $query->where('category_id', (int) $filters['category_id']);
+        }
+
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        $result = $items->map(function (Listing $listing) {
+            $data = $listing->toArray();
+            $user = $listing->user;
+            $data['author_name'] = ($user && $user->profile_type === 'organisation' && $user->organization_name)
+                ? $user->organization_name
+                : trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+            $data['author_avatar'] = $user->avatar_url ?? null;
+            $data['category_name'] = $listing->category?->name;
+            $data['category_color'] = $listing->category?->color;
+            $data['distance_km'] = round((float) $listing->distance_km, 2);
+            return $data;
+        })->all();
+
+        return [
+            'items'    => array_values($result),
+            'has_more' => $hasMore,
+        ];
+    }
+
+    // -----------------------------------------------------------------
+    //  Featured listings
+    // -----------------------------------------------------------------
+
+    /**
+     * Get currently featured listings.
+     *
+     * @param int $limit Max listings to return
+     * @return array Featured listings
+     */
+    public function getFeatured(int $limit = 10): array
+    {
+        return $this->listing->newQuery()
+            ->with([
+                'user:id,first_name,last_name,organization_name,profile_type,avatar_url',
+                'category:id,name,color',
+            ])
+            ->where('status', 'active')
+            ->where('is_featured', true)
+            ->where(function (Builder $q) {
+                $q->whereNull('featured_until')
+                   ->orWhere('featured_until', '>', now());
+            })
+            ->orderByDesc('created_at')
+            ->limit($limit)
+            ->get()
+            ->map(function (Listing $listing) {
+                $data = $listing->toArray();
+                $user = $listing->user;
+                $data['author_name'] = ($user && $user->profile_type === 'organisation' && $user->organization_name)
+                    ? $user->organization_name
+                    : trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+                $data['author_avatar'] = $user->avatar_url ?? null;
+                $data['category_name'] = $listing->category?->name;
+                $data['category_color'] = $listing->category?->color;
+                return $data;
+            })
+            ->all();
+    }
+
+    // -----------------------------------------------------------------
+    //  Saved / Favourite Listings
+    // -----------------------------------------------------------------
+
+    /**
+     * Get listing IDs saved by the user in the current tenant.
+     *
+     * @return int[]
+     */
+    public function getSavedListingIds(int $userId): array
+    {
+        return DB::table('user_saved_listings')
+            ->where('user_id', $userId)
+            ->pluck('listing_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    /**
+     * Save (favourite) a listing. Idempotent via INSERT IGNORE.
+     *
+     * @return bool False if listing not found in tenant
+     */
+    public function saveListing(int $userId, int $listingId): bool
+    {
+        // Verify listing exists in tenant
+        $exists = $this->listing->newQuery()->where('id', $listingId)->exists();
+
+        if (! $exists) {
+            return false;
+        }
+
+        DB::table('user_saved_listings')->insertOrIgnore([
+            'user_id'    => $userId,
+            'listing_id' => $listingId,
+            'tenant_id'  => \Nexus\Core\TenantContext::getId(),
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Unsave (un-favourite) a listing. Always succeeds (idempotent).
+     */
+    public function unsaveListing(int $userId, int $listingId): void
+    {
+        DB::table('user_saved_listings')
+            ->where('user_id', $userId)
+            ->where('listing_id', $listingId)
+            ->delete();
+    }
+
+    // -----------------------------------------------------------------
     //  Write
     // -----------------------------------------------------------------
 
