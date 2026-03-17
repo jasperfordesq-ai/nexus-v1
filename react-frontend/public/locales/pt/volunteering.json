@@ -57,5 +57,219 @@
   "status_approved": "Approved",
   "status_declined": "Declined",
   "hour": "hour",
-  "hours": "hours"
+  "hours": "hours",
+  "expenses": {
+    "heading": "My Expenses",
+    "submit": "Submit Expense",
+    "stats": {
+      "total_claimed": "Total Claimed",
+      "approved": "Approved",
+      "paid": "Paid"
+    },
+    "load_error": "Unable to load expenses. Please try again.",
+    "try_again": "Try Again",
+    "empty_title": "No expenses yet",
+    "empty_description": "You have not submitted any expense claims. Click Submit Expense to get started.",
+    "note_prefix": "Note:",
+    "modal_title": "Submit Expense",
+    "form": {
+      "type": "Expense Type",
+      "amount": "Amount",
+      "currency": "Currency",
+      "description": "Description"
+    },
+    "cancel": "Cancel",
+    "submit_button": "Submit",
+    "fill_required": "Please fill in all required fields.",
+    "submit_success": "Expense submitted successfully.",
+    "submit_error": "Failed to submit expense.",
+    "types": {
+      "travel": "Travel",
+      "meals": "Meals",
+      "supplies": "Supplies",
+      "equipment": "Equipment",
+      "parking": "Parking",
+      "other": "Other"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "paid": "Paid"
+    }
+  },
+  "community_projects": {
+    "heading": "Community Projects",
+    "propose": "Propose a Project",
+    "load_error": "Unable to load community projects.",
+    "try_again": "Try Again",
+    "empty_title": "No community projects yet",
+    "empty_description": "Be the first to propose a volunteer project for the community!",
+    "volunteers_needed": "{{count}} needed",
+    "support_failed": "Failed to update support.",
+    "modal_title": "Propose a Project",
+    "form": {
+      "title": "Title",
+      "title_placeholder": "Project title",
+      "description": "Description",
+      "description_placeholder": "Describe the project and its goals",
+      "category": "Category",
+      "category_placeholder": "e.g. Environment, Education",
+      "location": "Location",
+      "location_placeholder": "Where will this take place?",
+      "target_volunteers": "Target Volunteers",
+      "target_volunteers_placeholder": "Number of volunteers needed",
+      "proposed_date": "Proposed Date"
+    },
+    "cancel": "Cancel",
+    "propose_button": "Propose",
+    "title_required": "Title and description are required.",
+    "propose_success": "Project proposed successfully!",
+    "propose_error": "Failed to propose project.",
+    "status": {
+      "proposed": "Proposed",
+      "under_review": "Under Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "donations": {
+    "heading": "Donations",
+    "refresh": "Refresh",
+    "donate": "Donate",
+    "load_error": "Unable to load donations data.",
+    "try_again": "Try Again",
+    "empty_title": "No giving days or donations",
+    "empty_description": "When a giving day is active, you can make donations to support your community.",
+    "make_donation": "Make a Donation",
+    "active_giving_days": "Active Giving Days",
+    "donors_count": "{{count}} donors",
+    "my_donations": "My Donations",
+    "anonymous": "Anonymous",
+    "modal_title": "Make a Donation",
+    "form": {
+      "amount": "Amount",
+      "message": "Message (optional)"
+    },
+    "anonymous_toggle_on": "Donating anonymously",
+    "anonymous_toggle_off": "Donate anonymously",
+    "cancel": "Cancel",
+    "confirm": "Confirm Donation",
+    "invalid_amount": "Please enter a valid amount.",
+    "submit_success": "Donation recorded!",
+    "submit_error": "Failed to record donation.",
+    "submit_error_retry": "Failed to record donation. Please try again.",
+    "payment_methods": {
+      "card": "card",
+      "bank_transfer": "bank transfer",
+      "paypal": "paypal"
+    },
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    },
+    "stats": {
+      "total_raised": "Total Raised",
+      "total_donors": "Total Donors",
+      "active_campaigns": "Active Campaigns"
+    },
+    "day_status": {
+      "active": "Active",
+      "upcoming": "Upcoming",
+      "ended": "Ended"
+    }
+  },
+  "safeguarding": {
+    "heading": "Safeguarding",
+    "add_training": "Add Training",
+    "report_incident": "Report Incident",
+    "training_records": "Training Records",
+    "incident_reports": "Incident Reports",
+    "load_error": "Unable to load safeguarding data.",
+    "try_again": "Try Again",
+    "fill_required": "Please fill in all required fields.",
+    "no_training_title": "No training records",
+    "no_training_desc": "Add your safeguarding training records to get started.",
+    "completed": "Completed",
+    "expires": "Expires",
+    "no_incidents_title": "No incidents reported",
+    "no_incidents_desc": "No safeguarding incidents have been reported.",
+    "add_training_title": "Add Training Record",
+    "training_type": "Training Type",
+    "training_name": "Training Name",
+    "provider": "Provider",
+    "completed_at": "Date Completed",
+    "expires_at": "Expiry Date",
+    "cancel": "Cancel",
+    "submit_training": "Submit",
+    "training_added": "Training record submitted.",
+    "training_failed": "Failed to submit training record.",
+    "report_incident_title": "Report Incident",
+    "incident_title": "Title",
+    "incident_description": "Description",
+    "severity": "Severity",
+    "category": "Category",
+    "submit_incident": "Report",
+    "incident_reported": "Incident reported.",
+    "incident_failed": "Failed to report incident.",
+    "training_types": {
+      "children_first": "Children First",
+      "vulnerable_adults": "Vulnerable Adults",
+      "first_aid": "First Aid",
+      "manual_handling": "Manual Handling",
+      "other": "Other"
+    },
+    "severity_options": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "status_pending": "Pending",
+    "status_verified": "Verified",
+    "status_expired": "Expired",
+    "status_rejected": "Rejected",
+    "incident_status": {
+      "open": "Open",
+      "investigating": "Investigating",
+      "resolved": "Resolved",
+      "escalated": "Escalated",
+      "closed": "Closed"
+    }
+  },
+  "accessibility": {
+    "heading": "Accessibility & Accommodations",
+    "save": "Save Changes",
+    "info_banner": "This information helps organizations provide appropriate support and accommodations for your volunteer activities. All data is kept confidential.",
+    "load_error": "Unable to load accessibility needs.",
+    "try_again": "Try Again",
+    "saved": "Accessibility needs saved successfully.",
+    "save_error": "Failed to save changes.",
+    "no_needs_title": "No accessibility needs added",
+    "no_needs_desc": "Add your accessibility requirements so organizations can provide the right support.",
+    "add_first": "Add Your First Need",
+    "add_need": "Add Another Need",
+    "remove": "Remove need",
+    "need_type_label": "Need Type",
+    "description_label": "Description",
+    "description_placeholder": "Describe your accessibility need...",
+    "accommodations_label": "Accommodations Required",
+    "accommodations_placeholder": "What accommodations would help you participate?",
+    "emergency_name": "Emergency Contact Name",
+    "emergency_phone": "Emergency Contact Phone",
+    "types": {
+      "mobility": "Mobility",
+      "visual": "Visual",
+      "hearing": "Hearing",
+      "cognitive": "Cognitive",
+      "dietary": "Dietary",
+      "language": "Language",
+      "other": "Other"
+    }
+  }
 }
