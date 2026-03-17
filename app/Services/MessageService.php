@@ -92,24 +92,118 @@ class MessageService
     }
 
     /**
-     * Send a message.
+     * Get messages in a conversation with a specific user, with cursor-based pagination.
+     *
+     * @param int $partnerId The other user's ID
+     * @param int $userId The authenticated user's ID
+     * @param array $filters Pagination filters (limit, cursor, direction)
+     * @return array{items: array, cursor: string|null, has_more: bool}|null Null if partner user not found
      */
-    public function send(int $senderId, int $receiverId, array $data): Message
+    public function getMessages(int $partnerId, int $userId, array $filters = []): ?array
     {
+        // Verify the partner user exists
+        $partner = User::find($partnerId);
+        if ($partner === null) {
+            return null;
+        }
+
+        $limit = min((int) ($filters['limit'] ?? 50), 100);
+        $cursor = $filters['cursor'] ?? null;
+        $direction = $filters['direction'] ?? 'older';
+
+        $query = $this->message->newQuery()
+            ->with([
+                'sender:id,first_name,last_name,avatar_url',
+                'receiver:id,first_name,last_name,avatar_url',
+            ])
+            ->betweenUsers($userId, $partnerId);
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                if ($direction === 'newer') {
+                    $query->where('id', '>', (int) $cursorId);
+                } else {
+                    $query->where('id', '<', (int) $cursorId);
+                }
+            }
+        }
+
+        if ($direction === 'newer') {
+            $query->orderBy('id');
+        } else {
+            $query->orderByDesc('id');
+        }
+
+        $messages = $query->limit($limit + 1)->get();
+        $hasMore = $messages->count() > $limit;
+        if ($hasMore) {
+            $messages->pop();
+        }
+
+        // Mark messages as read when viewing (older direction or no cursor)
+        if ($direction !== 'newer' || $cursor === null) {
+            $this->markRead($userId, $partnerId);
+        }
+
+        $items = $messages->map(fn (Message $msg) => $msg->toArray())->all();
+
+        return [
+            'items'    => array_values($items),
+            'cursor'   => $hasMore && $messages->isNotEmpty() ? base64_encode((string) $messages->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
+     * Send a message.
+     *
+     * Accepts either (senderId, receiverId, data) or (senderId, data) where
+     * data contains 'recipient_id'. The second form is used by controllers
+     * passing getAllInput() directly.
+     *
+     * @param int $senderId
+     * @param int|array $receiverIdOrData
+     * @param array|null $data
+     * @return array The created message as an array
+     */
+    public function send(int $senderId, int|array $receiverIdOrData, ?array $data = null): array
+    {
+        if (is_array($receiverIdOrData)) {
+            // Controller-style call: send($userId, $allInput)
+            $data = $receiverIdOrData;
+            $receiverId = (int) ($data['recipient_id'] ?? 0);
+        } else {
+            // Direct call: send($senderId, $receiverId, $data)
+            $receiverId = $receiverIdOrData;
+            $data = $data ?? [];
+        }
+
+        if ($receiverId <= 0) {
+            return ['error' => 'recipient_id is required'];
+        }
+
+        $body = trim($data['body'] ?? '');
+        $voiceUrl = $data['voice_url'] ?? ($data['audio_url'] ?? null);
+
+        if (empty($body) && empty($voiceUrl)) {
+            return ['error' => 'Message body or voice message is required'];
+        }
+
         $message = $this->message->newInstance([
             'sender_id'      => $senderId,
             'receiver_id'    => $receiverId,
             'subject'        => $data['subject'] ?? null,
-            'body'           => trim($data['body']),
-            'audio_url'      => $data['audio_url'] ?? null,
-            'audio_duration' => $data['audio_duration'] ?? null,
+            'body'           => $body,
+            'audio_url'      => $voiceUrl,
+            'audio_duration' => $data['voice_duration'] ?? ($data['audio_duration'] ?? null),
             'is_read'        => false,
             'created_at'     => now(),
         ]);
 
         $message->save();
 
-        return $message->fresh(['sender', 'receiver']);
+        return $message->fresh(['sender', 'receiver'])->toArray();
     }
 
     /**

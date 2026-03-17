@@ -12,12 +12,8 @@ use Illuminate\Http\JsonResponse;
 /**
  * EventsController - CRUD for community events.
  *
- * Endpoints (v2):
- *   GET    /api/v2/events          index()
- *   GET    /api/v2/events/{id}     show()
- *   POST   /api/v2/events          store()
- *   PUT    /api/v2/events/{id}     update()
- *   DELETE /api/v2/events/{id}     destroy()
+ * Native Eloquent methods: index, show, store, update, destroy.
+ * Complex features (RSVP, waitlist, series, recurring, etc.) delegate to legacy.
  */
 class EventsController extends BaseApiController
 {
@@ -28,9 +24,10 @@ class EventsController extends BaseApiController
     ) {}
 
     /**
-     * List events with optional filtering and pagination.
+     * GET /api/v2/events
      *
-     * Query params: category_id, q, upcoming, cursor, per_page.
+     * List events with optional filtering and cursor-based pagination.
+     * Supports: when=upcoming|past|all, category_id, group_id, user_id, q, cursor, per_page.
      */
     public function index(): JsonResponse
     {
@@ -38,16 +35,20 @@ class EventsController extends BaseApiController
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'when'  => $this->query('when', 'upcoming'),
         ];
 
         if ($this->query('category_id')) {
             $filters['category_id'] = $this->queryInt('category_id');
         }
+        if ($this->query('group_id')) {
+            $filters['group_id'] = $this->queryInt('group_id');
+        }
+        if ($this->query('user_id')) {
+            $filters['user_id'] = $this->queryInt('user_id');
+        }
         if ($this->query('q')) {
             $filters['search'] = $this->query('q');
-        }
-        if ($this->queryBool('upcoming')) {
-            $filters['upcoming'] = true;
         }
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
@@ -67,7 +68,9 @@ class EventsController extends BaseApiController
     }
 
     /**
-     * Get a single event by ID.
+     * GET /api/v2/events/{id}
+     *
+     * Get a single event by ID with full details, RSVP counts, and user's RSVP status.
      */
     public function show(int $id): JsonResponse
     {
@@ -82,6 +85,8 @@ class EventsController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/events
+     *
      * Create a new event. Requires authentication.
      */
     public function store(): JsonResponse
@@ -95,6 +100,8 @@ class EventsController extends BaseApiController
     }
 
     /**
+     * PUT /api/v2/events/{id}
+     *
      * Update an existing event. Only the creator may update.
      */
     public function update(int $id): JsonResponse
@@ -117,6 +124,8 @@ class EventsController extends BaseApiController
     }
 
     /**
+     * DELETE /api/v2/events/{id}
+     *
      * Delete an event. Only the creator may delete.
      */
     public function destroy(int $id): JsonResponse
@@ -137,6 +146,10 @@ class EventsController extends BaseApiController
 
         return $this->noContent();
     }
+
+    // ================================================================
+    // Delegated methods — complex features that still use legacy services
+    // ================================================================
 
     /**
      * Delegate to legacy controller via output buffering.
@@ -276,5 +289,4 @@ class EventsController extends BaseApiController
     {
         return $this->delegate(\Nexus\Controllers\Api\EventsApiController::class, 'linkToSeries', [$id]);
     }
-
 }

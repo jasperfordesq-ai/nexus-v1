@@ -41,6 +41,10 @@ class GroupService
             $query->where('visibility', $filters['visibility']);
         }
 
+        if (! empty($filters['type_id'])) {
+            $query->where('type_id', (int) $filters['type_id']);
+        }
+
         if (! empty($filters['user_id'])) {
             $query->whereHas('activeMembers', function (Builder $q) use ($filters) {
                 $q->where('users.id', (int) $filters['user_id']);

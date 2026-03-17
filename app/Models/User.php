@@ -93,6 +93,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'receiver_id');
     }
 
+    public function badges(): HasMany
+    {
+        return $this->hasMany(UserBadge::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
