@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\RedisCache;
 use Nexus\Services\TenantFeatureConfig;
@@ -300,7 +299,7 @@ class AdminConfigController extends BaseApiController
 
         $lastRuns = [];
         try {
-            $results = Database::query("
+            $results = DB::select("
                 SELECT cl1.job_id, cl1.status, cl1.executed_at
                 FROM cron_logs cl1
                 INNER JOIN (
@@ -308,12 +307,12 @@ class AdminConfigController extends BaseApiController
                     FROM cron_logs
                     GROUP BY job_id
                 ) cl2 ON cl1.job_id = cl2.job_id AND cl1.executed_at = cl2.max_date
-            ")->fetchAll();
+            ");
 
             foreach ($results as $row) {
-                $lastRuns[$row['job_id']] = [
-                    'last_run_at' => $row['executed_at'],
-                    'last_status' => $row['status'] === 'running' ? null : $row['status'],
+                $lastRuns[$row->job_id] = [
+                    'last_run_at' => $row->executed_at,
+                    'last_status' => $row->status === 'running' ? null : $row->status,
                 ];
             }
         } catch (\Throwable $e) {
@@ -322,9 +321,9 @@ class AdminConfigController extends BaseApiController
 
         $jobSettings = [];
         try {
-            $results = Database::query("SELECT job_id, is_enabled FROM cron_job_settings")->fetchAll();
+            $results = DB::select("SELECT job_id, is_enabled FROM cron_job_settings");
             foreach ($results as $row) {
-                $jobSettings[$row['job_id']] = (int) $row['is_enabled'];
+                $jobSettings[$row->job_id] = (int) $row->is_enabled;
             }
         } catch (\Throwable $e) {
             // Table may not exist yet
@@ -381,8 +380,8 @@ class AdminConfigController extends BaseApiController
         $jobSlug = $job['id'];
 
         try {
-            $setting = Database::query("SELECT is_enabled FROM cron_job_settings WHERE job_id = ?", [$jobSlug])->fetch();
-            if ($setting && !$setting['is_enabled']) {
+            $setting = DB::selectOne("SELECT is_enabled FROM cron_job_settings WHERE job_id = ?", [$jobSlug]);
+            if ($setting && !$setting->is_enabled) {
                 return $this->respondWithError('VALIDATION_ERROR', 'Cannot run disabled job. Enable it first.', 'status', 422);
             }
         } catch (\Throwable $e) {
@@ -391,7 +390,7 @@ class AdminConfigController extends BaseApiController
 
         // Ensure cron_logs table exists
         try {
-            Database::query("
+            DB::statement("
                 CREATE TABLE IF NOT EXISTS cron_logs (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     job_id VARCHAR(100) NOT NULL,
@@ -413,11 +412,11 @@ class AdminConfigController extends BaseApiController
         $logId = null;
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, 'running', 'Job started via API...', 0, ?, ?)",
                 [$jobSlug, $adminId, $tenantId]
             );
-            $logId = Database::getConnection()->lastInsertId();
+            $logId = DB::getPdo()->lastInsertId();
         } catch (\Throwable $e) {
             // Ignore log creation failure
         }
@@ -510,7 +509,7 @@ class AdminConfigController extends BaseApiController
 
         if ($logId) {
             try {
-                Database::query(
+                DB::update(
                     "UPDATE cron_logs SET status = ?, output = ?, duration_seconds = ? WHERE id = ?",
                     [$status, substr($output, 0, 65000), round($duration, 2), $logId]
                 );
@@ -539,10 +538,11 @@ class AdminConfigController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $tenant = Database::query("SELECT * FROM tenants WHERE id = ?", [$tenantId])->fetch();
-        if (!$tenant) {
+        $tenantRow = DB::selectOne("SELECT * FROM tenants WHERE id = ?", [$tenantId]);
+        if (!$tenantRow) {
             return $this->respondWithError('NOT_FOUND', 'Tenant not found', null, 404);
         }
+        $tenant = (array)$tenantRow;
 
         $directSettings = [];
         foreach (self::TENANT_DIRECT_COLUMNS as $col) {
@@ -601,7 +601,7 @@ class AdminConfigController extends BaseApiController
                 $params[] = $val;
             }
             $params[] = $tenantId;
-            Database::query("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
+            DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
         }
 
         if (isset($kvUpdates['welcome_credits'])) {
@@ -797,10 +797,10 @@ class AdminConfigController extends BaseApiController
 
         $stored = $this->readSettingsByPrefix($tenantId, 'image_');
 
-        $tenant = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
+        $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
         $legacyConfig = [];
-        if ($tenant && !empty($tenant['configuration'])) {
-            $config = json_decode($tenant['configuration'], true) ?: [];
+        if ($tenantRow && !empty($tenantRow->configuration)) {
+            $config = json_decode($tenantRow->configuration, true) ?: [];
             $legacyConfig = $config['image_optimization'] ?? [];
         }
 
@@ -874,7 +874,7 @@ class AdminConfigController extends BaseApiController
 
         $stored = $this->readSettingsByPrefix($tenantId, 'seo_');
 
-        $tenant = Database::query("SELECT meta_title, meta_description, h1_headline, hero_intro FROM tenants WHERE id = ?", [$tenantId])->fetch();
+        $tenantRow = DB::selectOne("SELECT meta_title, meta_description, h1_headline, hero_intro FROM tenants WHERE id = ?", [$tenantId]);
 
         $config = [];
         foreach (self::SEO_DEFAULTS as $key => $defaultValue) {
@@ -886,10 +886,10 @@ class AdminConfigController extends BaseApiController
             }
         }
 
-        $config['tenant_meta_title'] = $tenant['meta_title'] ?? '';
-        $config['tenant_meta_description'] = $tenant['meta_description'] ?? '';
-        $config['tenant_h1_headline'] = $tenant['h1_headline'] ?? '';
-        $config['tenant_hero_intro'] = $tenant['hero_intro'] ?? '';
+        $config['tenant_meta_title'] = $tenantRow->meta_title ?? '';
+        $config['tenant_meta_description'] = $tenantRow->meta_description ?? '';
+        $config['tenant_h1_headline'] = $tenantRow->h1_headline ?? '';
+        $config['tenant_hero_intro'] = $tenantRow->hero_intro ?? '';
 
         return $this->respondWithData(['tenant_id' => $tenantId, 'seo' => $config]);
     }
@@ -940,7 +940,7 @@ class AdminConfigController extends BaseApiController
                 $params[] = $val;
             }
             $params[] = $tenantId;
-            Database::query("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
+            DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
         }
 
         if (empty($updated)) {
@@ -1137,10 +1137,10 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'No recognized algorithm settings provided', null, 422);
         }
 
-        $tenant = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
+        $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
         $config = [];
-        if ($tenant && !empty($tenant['configuration'])) {
-            $config = json_decode($tenant['configuration'], true) ?: [];
+        if ($tenantRow && !empty($tenantRow->configuration)) {
+            $config = json_decode($tenantRow->configuration, true) ?: [];
         }
 
         if (!isset($config['algorithms'])) { $config['algorithms'] = []; }
@@ -1150,7 +1150,7 @@ class AdminConfigController extends BaseApiController
             $config['algorithms'][$area][$key] = $value;
         }
 
-        Database::query("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+        DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
 
         match ($area) {
             'feed' => FeedRankingService::clearCache(),
@@ -1179,11 +1179,11 @@ class AdminConfigController extends BaseApiController
 
         foreach ($indexChecks as $check) {
             try {
-                $exists = Database::query(
-                    "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?",
+                $row = DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM information_schema.STATISTICS WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?",
                     [$check['table'], $check['index']]
-                )->fetchColumn();
-                $fulltextIndexes[$check['table']] = (int) $exists > 0;
+                );
+                $fulltextIndexes[$check['table']] = (int) ($row->cnt ?? 0) > 0;
             } catch (\Throwable $e) {
                 $fulltextIndexes[$check['table']] = false;
             }
@@ -1191,32 +1191,34 @@ class AdminConfigController extends BaseApiController
 
         $cfData = [];
         try {
-            $listingSaves = Database::query(
-                "SELECT COUNT(*) FROM listing_favorites lf JOIN listings l ON lf.listing_id = l.id WHERE l.tenant_id = ?",
+            $row = DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM listing_favorites lf JOIN listings l ON lf.listing_id = l.id WHERE l.tenant_id = ?",
                 [$tenantId]
-            )->fetchColumn();
-            $cfData['listing_interactions'] = (int) $listingSaves;
+            );
+            $cfData['listing_interactions'] = (int) ($row->cnt ?? 0);
         } catch (\Throwable $e) {
             $cfData['listing_interactions'] = 0;
         }
 
         try {
-            $memberTxns = Database::query(
-                "SELECT COUNT(DISTINCT CONCAT(LEAST(sender_id, receiver_id), '-', GREATEST(sender_id, receiver_id)))
+            $row = DB::selectOne(
+                "SELECT COUNT(DISTINCT CONCAT(LEAST(sender_id, receiver_id), '-', GREATEST(sender_id, receiver_id))) as cnt
                  FROM transactions WHERE tenant_id = ? AND status = 'completed'",
                 [$tenantId]
-            )->fetchColumn();
-            $cfData['member_interactions'] = (int) $memberTxns;
+            );
+            $cfData['member_interactions'] = (int) ($row->cnt ?? 0);
         } catch (\Throwable $e) {
             $cfData['member_interactions'] = 0;
         }
 
         $embeddings = [];
         try {
-            $embRows = Database::query(
+            $embResults = DB::select(
                 "SELECT content_type, COUNT(*) as cnt FROM content_embeddings WHERE tenant_id = ? GROUP BY content_type",
                 [$tenantId]
-            )->fetchAll(\PDO::FETCH_KEY_PAIR);
+            );
+            $embRows = [];
+            foreach ($embResults as $r) { $embRows[$r->content_type] = $r->cnt; }
 
             $embeddings['listing_count'] = (int) ($embRows['listing'] ?? 0);
             $embeddings['user_count'] = (int) ($embRows['user'] ?? 0);
@@ -1255,11 +1257,11 @@ class AdminConfigController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $tenant = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
+        $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
 
         $config = [];
-        if ($tenant && !empty($tenant['configuration'])) {
-            $config = json_decode($tenant['configuration'], true) ?: [];
+        if ($tenantRow && !empty($tenantRow->configuration)) {
+            $config = json_decode($tenantRow->configuration, true) ?: [];
         }
 
         return $this->respondWithData([
@@ -1295,10 +1297,10 @@ class AdminConfigController extends BaseApiController
             }
         }
 
-        $tenant = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
+        $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
         $config = [];
-        if ($tenant && !empty($tenant['configuration'])) {
-            $config = json_decode($tenant['configuration'], true) ?: [];
+        if ($tenantRow && !empty($tenantRow->configuration)) {
+            $config = json_decode($tenantRow->configuration, true) ?: [];
         }
 
         if (isset($input['supported_languages'])) {
@@ -1314,7 +1316,7 @@ class AdminConfigController extends BaseApiController
             }
         }
 
-        Database::query("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+        DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
         RedisCache::delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData([
@@ -1330,7 +1332,7 @@ class AdminConfigController extends BaseApiController
     private function ensureTenantSettingsTable(): void
     {
         try {
-            Database::query("
+            DB::statement("
                 CREATE TABLE IF NOT EXISTS `tenant_settings` (
                     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                     `tenant_id` INT UNSIGNED NOT NULL,
@@ -1358,21 +1360,21 @@ class AdminConfigController extends BaseApiController
     {
         $this->ensureTenantSettingsTable();
 
-        $rows = Database::query(
+        $rows = DB::select(
             "SELECT setting_key, setting_value FROM tenant_settings WHERE tenant_id = ? AND setting_key LIKE ?",
             [$tenantId, $prefix . '%']
-        )->fetchAll();
+        );
 
         $result = [];
         foreach ($rows as $row) {
-            $result[$row['setting_key']] = $row['setting_value'];
+            $result[$row->setting_key] = $row->setting_value;
         }
         return $result;
     }
 
     private function upsertSetting(int $tenantId, string $key, ?string $value, int $userId, string $type = 'string'): void
     {
-        Database::query(
+        DB::statement(
             "INSERT INTO tenant_settings (tenant_id, setting_key, setting_value, setting_type, created_by, updated_by)
              VALUES (?, ?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), setting_type = VALUES(setting_type), updated_by = VALUES(updated_by), updated_at = CURRENT_TIMESTAMP",

@@ -7,8 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\RateLimiter;
 use Nexus\Core\Mailer;
@@ -63,10 +63,11 @@ class EmailVerificationController extends BaseApiController
         $userId = $verificationRecord['user_id'];
 
         // Check if already verified (tenant-scoped)
-        $user = Database::query(
+        $userRow = DB::selectOne(
             "SELECT id, email_verified_at, is_verified FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
-        )->fetch();
+        );
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return $this->respondWithError(
@@ -88,7 +89,7 @@ class EmailVerificationController extends BaseApiController
         }
 
         // Mark user as verified (tenant-scoped)
-        Database::query(
+        DB::update(
             "UPDATE users SET email_verified_at = NOW(), is_verified = 1 WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
@@ -140,10 +141,11 @@ class EmailVerificationController extends BaseApiController
 
         // Get user details (tenant-scoped)
         $tenantId = TenantContext::getId();
-        $user = Database::query(
+        $userRow = DB::selectOne(
             "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
-        )->fetch();
+        );
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return $this->respondWithError(
@@ -196,10 +198,11 @@ class EmailVerificationController extends BaseApiController
         }
 
         // Look up user (tenant-scoped)
-        $user = Database::query(
+        $userRow = DB::selectOne(
             "SELECT id, email, first_name, email_verified_at, tenant_id FROM users WHERE email = ? AND tenant_id = ?",
             [$email, $tenantId]
-        )->fetch();
+        );
+        $user = $userRow ? (array)$userRow : null;
 
         // Only send if user exists AND is not yet verified
         if ($user && empty($user['email_verified_at'])) {
@@ -232,7 +235,7 @@ class EmailVerificationController extends BaseApiController
         $this->ensureTokenTableExists();
 
         // Store the hashed token with tenant_id
-        Database::query(
+        DB::insert(
             "INSERT INTO email_verification_tokens (user_id, tenant_id, token, expires_at) VALUES (?, ?, ?, ?)",
             [$user['id'], $tenantId, $hashedToken, $expiresAt]
         );
@@ -250,12 +253,12 @@ class EmailVerificationController extends BaseApiController
             $tenantName = 'Project NEXUS';
             if ($tenantId) {
                 try {
-                    $tenant = Database::query(
+                    $tenantRow = DB::selectOne(
                         "SELECT name FROM tenants WHERE id = ?",
                         [$tenantId]
-                    )->fetch();
-                    if ($tenant) {
-                        $tenantName = $tenant['name'];
+                    );
+                    if ($tenantRow) {
+                        $tenantName = $tenantRow->name;
                     }
                 } catch (\Throwable $e) {
                     // Use default tenant name
@@ -289,14 +292,15 @@ class EmailVerificationController extends BaseApiController
             return null;
         }
 
-        $records = Database::query(
+        $records = DB::select(
             "SELECT * FROM email_verification_tokens WHERE tenant_id = ? AND expires_at > NOW()",
             [$tenantId]
-        )->fetchAll();
+        );
 
         foreach ($records as $record) {
-            if (password_verify($token, $record['token'])) {
-                return $record;
+            $recordArr = (array)$record;
+            if (password_verify($token, $recordArr['token'])) {
+                return $recordArr;
             }
         }
 
@@ -314,7 +318,7 @@ class EmailVerificationController extends BaseApiController
 
         $tenantId = $tenantId ?? TenantContext::getId();
 
-        Database::query(
+        DB::delete(
             "DELETE FROM email_verification_tokens WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
@@ -329,9 +333,9 @@ class EmailVerificationController extends BaseApiController
 
         if ($exists === null) {
             try {
-                $result = Database::query(
+                $result = DB::select(
                     "SHOW TABLES LIKE 'email_verification_tokens'"
-                )->fetch();
+                );
                 $exists = !empty($result);
             } catch (\Throwable $e) {
                 $exists = false;
@@ -351,7 +355,7 @@ class EmailVerificationController extends BaseApiController
         }
 
         try {
-            Database::query("
+            DB::statement("
                 CREATE TABLE IF NOT EXISTS `email_verification_tokens` (
                     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     `user_id` INT UNSIGNED NOT NULL,

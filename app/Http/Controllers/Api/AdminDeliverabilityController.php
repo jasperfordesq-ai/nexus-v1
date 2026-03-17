@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
 /**
@@ -143,9 +142,9 @@ class AdminDeliverabilityController extends BaseApiController
 
         $where = implode(' AND ', $conditions);
 
-        $total = (int) Database::query("SELECT COUNT(*) as cnt FROM deliverables d WHERE {$where}", $params)->fetch()['cnt'];
+        $total = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM deliverables d WHERE {$where}", $params)->cnt;
 
-        $items = Database::query(
+        $itemResults = DB::select(
             "SELECT d.id, d.title, d.description, d.category, d.priority,
                     d.owner_id, d.assigned_to, d.assigned_group_id,
                     d.start_date, d.due_date, d.completed_at,
@@ -163,7 +162,8 @@ class AdminDeliverabilityController extends BaseApiController
              ORDER BY d.created_at DESC
              LIMIT ? OFFSET ?",
             array_merge($params, [$limit, $offset])
-        )->fetchAll();
+        );
+        $items = array_map(fn($r) => (array)$r, $itemResults);
 
         $formatted = array_map(function ($row) {
             return [
@@ -203,7 +203,7 @@ class AdminDeliverabilityController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $deliverable = Database::query(
+        $deliverableRow = DB::selectOne(
             "SELECT d.*,
                     CONCAT(COALESCE(owner.first_name, ''), ' ', COALESCE(owner.last_name, '')) as owner_name,
                     CONCAT(COALESCE(assignee.first_name, ''), ' ', COALESCE(assignee.last_name, '')) as assignee_name
@@ -212,18 +212,20 @@ class AdminDeliverabilityController extends BaseApiController
              LEFT JOIN users assignee ON d.assigned_to = assignee.id
              WHERE d.id = ? AND d.tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
+        $deliverable = $deliverableRow ? (array)$deliverableRow : null;
 
         if (!$deliverable) {
             return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
         }
 
-        $milestones = Database::query(
+        $milestoneResults = DB::select(
             "SELECT m.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as completed_by_name
              FROM deliverable_milestones m LEFT JOIN users u ON m.completed_by = u.id
              WHERE m.deliverable_id = ? AND m.tenant_id = ? ORDER BY m.order_position ASC",
             [$id, $tenantId]
-        )->fetchAll();
+        );
+        $milestones = array_map(fn($r) => (array)$r, $milestoneResults);
 
         $formattedMilestones = array_map(function ($row) {
             return [
@@ -243,13 +245,14 @@ class AdminDeliverabilityController extends BaseApiController
             ];
         }, $milestones);
 
-        $comments = Database::query(
+        $commentResults = DB::select(
             "SELECT c.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name, u.avatar_url as user_avatar
              FROM deliverable_comments c LEFT JOIN users u ON c.user_id = u.id
              WHERE c.deliverable_id = ? AND c.tenant_id = ? AND c.is_deleted = 0
              ORDER BY c.created_at DESC LIMIT 20",
             [$id, $tenantId]
-        )->fetchAll();
+        );
+        $comments = array_map(fn($r) => (array)$r, $commentResults);
 
         $formattedComments = array_map(function ($row) {
             return [
@@ -341,7 +344,7 @@ class AdminDeliverabilityController extends BaseApiController
         $attachmentUrls = isset($data['attachment_urls']) ? json_encode($data['attachment_urls']) : '[]';
         $externalLinks = isset($data['external_links']) ? json_encode($data['external_links']) : '[]';
 
-        Database::query(
+        DB::insert(
             "INSERT INTO deliverables
                 (tenant_id, title, description, category, priority, owner_id, assigned_to,
                  assigned_group_id, start_date, due_date, status, progress_percentage,
@@ -365,7 +368,7 @@ class AdminDeliverabilityController extends BaseApiController
             ]
         );
 
-        $newId = Database::lastInsertId();
+        $newId = DB::getPdo()->lastInsertId();
 
         $this->logHistory($tenantId, (int) $newId, 'created', $adminId, null, null, null, "Created deliverable: {$title}");
 
@@ -380,10 +383,11 @@ class AdminDeliverabilityController extends BaseApiController
         $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $existing = Database::query(
+        $existingRow = DB::selectOne(
             "SELECT id, title, status, priority, assigned_to FROM deliverables WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
+        $existing = $existingRow ? (array)$existingRow : null;
 
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
@@ -487,7 +491,7 @@ class AdminDeliverabilityController extends BaseApiController
         $params[] = $id;
         $params[] = $tenantId;
 
-        Database::query("UPDATE deliverables SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?", $params);
+        DB::update("UPDATE deliverables SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?", $params);
 
         return $this->getDeliverable($id);
     }
@@ -517,7 +521,7 @@ class AdminDeliverabilityController extends BaseApiController
         $adminId = $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        $deliverable = Database::query("SELECT id FROM deliverables WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $deliverable = DB::selectOne("SELECT id FROM deliverables WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$deliverable) {
             return $this->respondWithError('NOT_FOUND', 'Deliverable not found', null, 404);
         }
@@ -531,7 +535,7 @@ class AdminDeliverabilityController extends BaseApiController
         $parentCommentId = $this->input('parent_comment_id') ? (int) $this->input('parent_comment_id') : null;
         $mentionedUserIds = $this->input('mentioned_user_ids') ? json_encode($this->input('mentioned_user_ids')) : '[]';
 
-        Database::query(
+        DB::insert(
             "INSERT INTO deliverable_comments
                 (tenant_id, deliverable_id, user_id, comment_text, comment_type,
                  parent_comment_id, reactions, is_pinned, is_edited, is_deleted,
@@ -540,16 +544,17 @@ class AdminDeliverabilityController extends BaseApiController
             [$tenantId, $id, $adminId, $commentText, $commentType, $parentCommentId, $mentionedUserIds]
         );
 
-        $commentId = Database::lastInsertId();
+        $commentId = DB::getPdo()->lastInsertId();
 
         $this->logHistory($tenantId, $id, 'comment_added', $adminId, null, null, null, 'Comment added');
 
-        $comment = Database::query(
+        $commentRow = DB::selectOne(
             "SELECT c.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name, u.avatar_url as user_avatar
              FROM deliverable_comments c LEFT JOIN users u ON c.user_id = u.id
              WHERE c.id = ? AND c.tenant_id = ?",
             [$commentId, $tenantId]
-        )->fetch();
+        );
+        $comment = (array)$commentRow;
 
         return $this->respondWithData([
             'id' => (int) $comment['id'],
@@ -576,7 +581,7 @@ class AdminDeliverabilityController extends BaseApiController
     private function logHistory(int $tenantId, int $deliverableId, string $actionType, ?int $userId, ?string $fieldName = null, ?string $oldValue = null, ?string $newValue = null, ?string $description = null): void
     {
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO deliverable_history
                     (tenant_id, deliverable_id, action_type, user_id, action_timestamp,
                      field_name, old_value, new_value, change_description, ip_address, user_agent, created_at)

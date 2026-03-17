@@ -782,13 +782,13 @@ abstract class BaseApiController extends Controller
         // Legacy fallback: build a minimal user object from session + DB
         if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
             $userId = (int) $_SESSION['user_id'];
-            $row = \Nexus\Core\Database::query(
+            $row = \Illuminate\Support\Facades\DB::selectOne(
                 "SELECT id, role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
                 [$userId]
-            )->fetch();
+            );
 
             if ($row) {
-                return (object) $row;
+                return $row;
             }
         }
 

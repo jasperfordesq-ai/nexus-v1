@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\Database;
+use Illuminate\Support\Facades\DB;
 use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FederationUserService;
 use Nexus\Services\FederationAuditService;
@@ -54,12 +54,12 @@ class FederationV2Controller extends BaseApiController
 
         $partnershipsCount = 0;
         try {
-            $result = Database::query(
+            $result = DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM federation_partnerships
                  WHERE (tenant_id = ? OR partner_tenant_id = ?) AND status = 'active'",
                 [$tenantId, $tenantId]
-            )->fetch(\PDO::FETCH_ASSOC);
-            $partnershipsCount = (int) ($result['cnt'] ?? 0);
+            );
+            $partnershipsCount = (int) ($result->cnt ?? 0);
         } catch (\Exception $e) {
             error_log("FederationV2Api::status partnerships count error: " . $e->getMessage());
         }
@@ -176,7 +176,7 @@ class FederationV2Controller extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $partnerships = Database::query("
+            $partnershipResults = DB::select("
                 SELECT
                     fp.id as partnership_id, fp.federation_level,
                     fp.created_at as partnership_since,
@@ -196,8 +196,8 @@ class FederationV2Controller extends BaseApiController
                 LEFT JOIN federation_directory_profiles dp2 ON dp2.tenant_id = fp.partner_tenant_id
                 WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'
                 ORDER BY partner_name ASC
-            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]
-            )->fetchAll(\PDO::FETCH_ASSOC);
+            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
+            $partnerships = array_map(fn($r) => (array)$r, $partnershipResults);
 
             $formatted = array_map(function ($p) {
                 $level = (int) ($p['federation_level'] ?? 1);
@@ -323,7 +323,7 @@ class FederationV2Controller extends BaseApiController
             $sql .= " ORDER BY e.id DESC LIMIT :limit";
             $params[':limit'] = $perPage + 1;
 
-            $stmt = Database::getInstance()->prepare($sql);
+            $stmt = DB::getPdo()->prepare($sql);
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
             }
@@ -431,7 +431,7 @@ class FederationV2Controller extends BaseApiController
             $sql .= " ORDER BY l.id DESC LIMIT :limit";
             $params[':limit'] = $perPage + 1;
 
-            $stmt = Database::getInstance()->prepare($sql);
+            $stmt = DB::getPdo()->prepare($sql);
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
             }
@@ -559,7 +559,7 @@ class FederationV2Controller extends BaseApiController
             $sql .= " ORDER BY u.id DESC LIMIT :limit";
             $params[':limit'] = $perPage + 1;
 
-            $stmt = Database::getInstance()->prepare($sql);
+            $stmt = DB::getPdo()->prepare($sql);
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
             }
@@ -639,7 +639,7 @@ class FederationV2Controller extends BaseApiController
 
             $sql .= " LIMIT 1";
 
-            $stmt = Database::getInstance()->prepare($sql);
+            $stmt = DB::getPdo()->prepare($sql);
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
             }
@@ -689,7 +689,7 @@ class FederationV2Controller extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $rows = Database::query("
+            $rowResults = DB::select("
                 SELECT fm.id, fm.subject, fm.body, fm.direction, fm.status, fm.read_at,
                     fm.created_at, fm.sender_tenant_id, fm.sender_user_id,
                     fm.receiver_tenant_id, fm.receiver_user_id, fm.reference_message_id,
@@ -709,7 +709,8 @@ class FederationV2Controller extends BaseApiController
                     OR (fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
                 )
                 ORDER BY fm.created_at DESC LIMIT 200
-            ", [$tenantId, $userId, $tenantId, $userId])->fetchAll(\PDO::FETCH_ASSOC);
+            ", [$tenantId, $userId, $tenantId, $userId]);
+            $rows = array_map(fn($r) => (array)$r, $rowResults);
 
             $formatted = array_map(function ($msg) {
                 return [
@@ -780,7 +781,7 @@ class FederationV2Controller extends BaseApiController
 
         try {
             // Verify the receiver exists and accepts federated messages
-            $receiver = Database::query("
+            $receiverRow = DB::selectOne("
                 SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.tenant_id,
                        fus.messaging_enabled_federated, fus.federation_optin,
                        t.name as tenant_name
@@ -788,7 +789,8 @@ class FederationV2Controller extends BaseApiController
                 JOIN federation_user_settings fus ON fus.user_id = u.id
                 JOIN tenants t ON t.id = u.tenant_id
                 WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active'
-            ", [(int)$receiverId, (int)$receiverTenantId])->fetch(\PDO::FETCH_ASSOC);
+            ", [(int)$receiverId, (int)$receiverTenantId]);
+            $receiver = $receiverRow ? (array)$receiverRow : null;
 
             if (!$receiver) {
                 return $this->respondWithError('RECIPIENT_NOT_FOUND', 'Recipient not found.', null, 404);
@@ -809,17 +811,18 @@ class FederationV2Controller extends BaseApiController
             }
 
             // Get sender info
-            $sender = Database::query("
+            $senderRow = DB::selectOne("
                 SELECT u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
                 FROM users u
                 JOIN tenants t ON t.id = u.tenant_id
                 WHERE u.id = ?
-            ", [$userId])->fetch(\PDO::FETCH_ASSOC);
+            ", [$userId]);
+            $sender = $senderRow ? (array)$senderRow : [];
 
             $senderName = trim(($sender['first_name'] ?? '') . ' ' . ($sender['last_name'] ?? ''));
 
             // Insert outbound message (sender's copy)
-            Database::query("
+            DB::insert("
                 INSERT INTO federation_messages
                 (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
                  subject, body, direction, status, reference_message_id, created_at)
@@ -830,10 +833,10 @@ class FederationV2Controller extends BaseApiController
                 $subject, $body,
                 $referenceMessageId ? (int)$referenceMessageId : null,
             ]);
-            $outboundId = (int)Database::lastInsertId();
+            $outboundId = (int)DB::getPdo()->lastInsertId();
 
             // Insert inbound message (receiver's copy)
-            Database::query("
+            DB::insert("
                 INSERT INTO federation_messages
                 (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
                  subject, body, direction, status, reference_message_id, created_at)
@@ -948,18 +951,19 @@ class FederationV2Controller extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $message = Database::query("
+            $messageRow = DB::selectOne("
                 SELECT id, status FROM federation_messages
                 WHERE id = ? AND receiver_tenant_id = ? AND receiver_user_id = ?
                 AND direction = 'inbound'
-            ", [$id, $tenantId, $userId])->fetch(\PDO::FETCH_ASSOC);
+            ", [$id, $tenantId, $userId]);
+            $message = $messageRow ? (array)$messageRow : null;
 
             if (!$message) {
                 return $this->respondWithError('MESSAGE_NOT_FOUND', 'Message not found.', null, 404);
             }
 
             if ($message['status'] !== 'read') {
-                Database::query(
+                DB::update(
                     "UPDATE federation_messages SET status = 'read', read_at = NOW() WHERE id = ?",
                     [$id]
                 );

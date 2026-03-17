@@ -7,8 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\Database;
 use Nexus\Core\Validator;
 use Nexus\Middleware\SuperPanelAccess;
 use Nexus\Models\Tenant;
@@ -624,7 +624,7 @@ class AdminSuperController extends BaseApiController
             }
         }
 
-        Database::query(
+        DB::update(
             "UPDATE users SET first_name = ?, last_name = ?, email = ?, role = ?, location = ?, phone = ?, updated_at = NOW() WHERE id = ?",
             [$firstName, $lastName, $email, $role, $location ?: null, $phone ?: null, $id]
         );
@@ -713,7 +713,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
-        Database::query(
+        DB::update(
             "UPDATE users SET is_super_admin = 1, role = CASE WHEN role = 'member' THEN 'admin' ELSE role END WHERE id = ?",
             [$id]
         );
@@ -743,7 +743,7 @@ class AdminSuperController extends BaseApiController
             );
         }
 
-        Database::query("UPDATE users SET is_super_admin = 0 WHERE id = ?", [$id]);
+        DB::update("UPDATE users SET is_super_admin = 0 WHERE id = ?", [$id]);
 
         return $this->respondWithData(['revoked' => true, 'user_id' => $id, 'level' => 'global']);
     }
@@ -784,7 +784,7 @@ class AdminSuperController extends BaseApiController
         // Revoke super admin if moving to a tenant without sub-tenant capability
         $newTenant = Tenant::find($newTenantId);
         if ($newTenant && !$newTenant['allows_subtenants']) {
-            Database::query("UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?", [$id]);
+            DB::update("UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?", [$id]);
         }
 
         // Audit
@@ -855,7 +855,7 @@ class AdminSuperController extends BaseApiController
         }
 
         // Step 2: Grant super admin
-        Database::query(
+        DB::update(
             "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
             [$id]
         );
@@ -968,12 +968,12 @@ class AdminSuperController extends BaseApiController
                 }
 
                 if ($grantSuperAdmin) {
-                    Database::query(
+                    DB::update(
                         "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
                         [$uid]
                     );
                 } elseif (!$targetTenant['allows_subtenants']) {
-                    Database::query("UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?", [$uid]);
+                    DB::update("UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?", [$uid]);
                 }
 
                 $movedCount++;
@@ -1042,16 +1042,16 @@ class AdminSuperController extends BaseApiController
             try {
                 switch ($action) {
                     case 'activate':
-                        Database::query("UPDATE tenants SET is_active = 1 WHERE id = ?", [$tid]);
+                        DB::update("UPDATE tenants SET is_active = 1 WHERE id = ?", [$tid]);
                         break;
                     case 'deactivate':
-                        Database::query("UPDATE tenants SET is_active = 0 WHERE id = ?", [$tid]);
+                        DB::update("UPDATE tenants SET is_active = 0 WHERE id = ?", [$tid]);
                         break;
                     case 'enable_hub':
-                        Database::query("UPDATE tenants SET allows_subtenants = 1, max_depth = 2 WHERE id = ?", [$tid]);
+                        DB::update("UPDATE tenants SET allows_subtenants = 1, max_depth = 2 WHERE id = ?", [$tid]);
                         break;
                     case 'disable_hub':
-                        Database::query("UPDATE tenants SET allows_subtenants = 0, max_depth = 0 WHERE id = ?", [$tid]);
+                        DB::update("UPDATE tenants SET allows_subtenants = 0, max_depth = 0 WHERE id = ?", [$tid]);
                         break;
                 }
                 $updatedCount++;
@@ -1203,7 +1203,7 @@ class AdminSuperController extends BaseApiController
         $updates[] = "updated_by = ?";
         $params[] = $userId;
 
-        Database::query(
+        DB::update(
             "UPDATE federation_system_control SET " . implode(', ', $updates) . " WHERE id = 1",
             $params
         );

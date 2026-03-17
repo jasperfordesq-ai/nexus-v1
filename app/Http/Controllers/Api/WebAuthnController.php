@@ -7,8 +7,8 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\ApiErrorCodes;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\TokenService;
 use Nexus\Services\WebAuthnChallengeStore;
@@ -64,15 +64,15 @@ class WebAuthnController extends BaseApiController
 
         // Get existing credentials to exclude (prevent re-registration)
         $tenantId = TenantContext::getId();
-        $existingCredentials = Database::query(
+        $existingCredentials = DB::select(
             "SELECT credential_id FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
-        )->fetchAll();
+        );
 
         $excludeCredentials = array_map(function ($row) {
             return [
                 'type' => 'public-key',
-                'id' => $row['credential_id'],
+                'id' => $row->credential_id,
             ];
         }, $existingCredentials);
 
@@ -186,7 +186,7 @@ class WebAuthnController extends BaseApiController
 
         $tenantId = TenantContext::getId();
 
-        Database::query(
+        DB::insert(
             "INSERT INTO webauthn_credentials
                 (user_id, tenant_id, credential_id, public_key, sign_count, transports, device_name, authenticator_type, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
@@ -232,24 +232,24 @@ class WebAuthnController extends BaseApiController
 
         if ($authUserId) {
             $userId = $authUserId;
-            $credentials = Database::query(
+            $credentials = DB::select(
                 "SELECT credential_id, transports FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
-            )->fetchAll();
+            );
 
-            $allowCredentials = $this->formatAllowCredentials($credentials);
+            $allowCredentials = $this->formatAllowCredentials(array_map(fn($r) => (array)$r, $credentials));
         } elseif ($email) {
-            $results = Database::query(
+            $results = DB::select(
                 "SELECT wc.credential_id, wc.transports, u.id as user_id
                  FROM webauthn_credentials wc
                  JOIN users u ON wc.user_id = u.id
                  WHERE u.email = ? AND u.tenant_id = ?",
                 [$email, $tenantId]
-            )->fetchAll();
+            );
 
             if (!empty($results)) {
-                $userId = $results[0]['user_id'];
-                $allowCredentials = $this->formatAllowCredentials($results);
+                $userId = $results[0]->user_id;
+                $allowCredentials = $this->formatAllowCredentials(array_map(fn($r) => (array)$r, $results));
             }
         }
 
@@ -308,21 +308,23 @@ class WebAuthnController extends BaseApiController
 
         // Find credential by ID
         $tenantId = TenantContext::getId();
-        $credential = Database::query(
+        $credentialRow = DB::selectOne(
             "SELECT wc.*, u.id as uid, u.first_name, u.last_name, u.email, u.role, u.tenant_id
              FROM webauthn_credentials wc
              JOIN users u ON wc.user_id = u.id
              WHERE wc.credential_id = ? AND wc.tenant_id = ?",
             [$input['id'], $tenantId]
-        )->fetch();
+        );
 
-        if (!$credential) {
+        if (!$credentialRow) {
             return response()->json([
                 'error' => 'Credential not found',
                 'code' => ApiErrorCodes::AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND,
                 'success' => false,
             ], 401);
         }
+
+        $credential = (array)$credentialRow;
 
         // Decode binary data from base64url
         $clientDataJSON = $this->base64UrlDecode($input['response']['clientDataJSON']);
@@ -359,7 +361,7 @@ class WebAuthnController extends BaseApiController
 
         // Update sign count
         $newSignCount = $webAuthn->getSignatureCounter();
-        Database::query(
+        DB::update(
             "UPDATE webauthn_credentials SET sign_count = ?, last_used_at = NOW() WHERE id = ? AND tenant_id = ?",
             [$newSignCount ?? 0, $credential['id'], $tenantId]
         );
@@ -373,13 +375,13 @@ class WebAuthnController extends BaseApiController
         );
 
         // Enforce login gates (email verified, approved, etc.)
-        $webauthnUser = Database::query(
+        $webauthnUser = DB::selectOne(
             "SELECT id, role, is_super_admin, is_tenant_super_admin, tenant_id, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?",
             [(int)$credential['uid'], (int)$credential['tenant_id']]
-        )->fetch();
+        );
 
         if ($webauthnUser) {
-            $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates($webauthnUser);
+            $gateBlock = \Nexus\Services\TenantSettingsService::checkLoginGates((array)$webauthnUser);
             if ($gateBlock) {
                 return response()->json([
                     'error' => $gateBlock['message'],
@@ -449,12 +451,12 @@ class WebAuthnController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         if ($credentialId) {
-            Database::query(
+            DB::delete(
                 "DELETE FROM webauthn_credentials WHERE credential_id = ? AND user_id = ? AND tenant_id = ?",
                 [$credentialId, $userId, $tenantId]
             );
         } else {
-            Database::query(
+            DB::delete(
                 "DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
             );
@@ -489,12 +491,12 @@ class WebAuthnController extends BaseApiController
         }
 
         $tenantId = TenantContext::getId();
-        $stmt = Database::query(
+        $affected = DB::update(
             "UPDATE webauthn_credentials SET device_name = ? WHERE credential_id = ? AND user_id = ? AND tenant_id = ?",
             [$newName, $credentialId, $userId, $tenantId]
         );
 
-        if ($stmt->rowCount() === 0) {
+        if ($affected === 0) {
             return response()->json([
                 'error' => 'Credential not found',
                 'code' => ApiErrorCodes::RESOURCE_NOT_FOUND,
@@ -511,13 +513,13 @@ class WebAuthnController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
-        $result = Database::query(
+        $result = DB::selectOne(
             "SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
-        )->fetch();
-        $count = (int)$result['count'];
+        );
+        $count = (int)$result->count;
 
-        Database::query(
+        DB::delete(
             "DELETE FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
@@ -537,13 +539,14 @@ class WebAuthnController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = TenantContext::getId();
 
-        $credentials = Database::query(
+        $results = DB::select(
             "SELECT credential_id, device_name, authenticator_type, created_at, last_used_at
              FROM webauthn_credentials
              WHERE user_id = ? AND tenant_id = ?
              ORDER BY created_at DESC",
             [$userId, $tenantId]
-        )->fetchAll();
+        );
+        $credentials = array_map(fn($r) => (array)$r, $results);
 
         return response()->json([
             'credentials' => $credentials,
@@ -561,14 +564,14 @@ class WebAuthnController extends BaseApiController
         }
 
         $tenantId = TenantContext::getId();
-        $result = Database::query(
+        $result = DB::selectOne(
             "SELECT COUNT(*) as count FROM webauthn_credentials WHERE user_id = ? AND tenant_id = ?",
             [$userId, $tenantId]
-        )->fetch();
+        );
 
         return response()->json([
-            'registered' => $result['count'] > 0,
-            'count' => (int)$result['count'],
+            'registered' => $result->count > 0,
+            'count' => (int)$result->count,
         ]);
     }
 
@@ -578,10 +581,11 @@ class WebAuthnController extends BaseApiController
 
     private function getWebAuthnUser(int $userId): ?array
     {
-        return Database::query(
+        $row = DB::selectOne(
             "SELECT id, CONCAT(first_name, ' ', last_name) as name, email FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, TenantContext::getId()]
-        )->fetch() ?: null;
+        );
+        return $row ? (array)$row : null;
     }
 
     /**

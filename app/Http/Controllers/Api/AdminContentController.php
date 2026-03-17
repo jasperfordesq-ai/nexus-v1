@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\RedisCache;
 
@@ -94,11 +93,11 @@ class AdminContentController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $rows = Database::query(
+        $rows = array_map(fn($r) => (array)$r, DB::select(
             "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE tenant_id = ? ORDER BY sort_order ASC, created_at DESC",
             [$tenantId]
-        )->fetchAll();
+        ));
 
         $pages = array_map(function ($row) {
             $row['status'] = $row['is_published'] ? 'published' : 'draft';
@@ -119,16 +118,17 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid page ID', 'id', 400);
         }
 
-        $row = Database::query(
+        $result = DB::selectOne(
             "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
 
-        if (!$row) {
+        if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Page not found', 'id', 404);
         }
 
+        $row = (array)$result;
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
 
@@ -167,19 +167,20 @@ class AdminContentController extends BaseApiController
         $isPublished = ($status === 'published') ? 1 : 0;
         $slug = $this->ensureUniqueSlug('pages', $slug, $tenantId);
 
-        Database::query(
+        DB::insert(
             "INSERT INTO pages (tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
             [$tenantId, $title, $slug, $content, $metaDescription, $isPublished, $sortOrder, $showInMenu, $menuLocation, $menuOrder]
         );
 
-        $newId = Database::lastInsertId();
+        $newId = DB::getPdo()->lastInsertId();
 
-        $row = Database::query(
+        $result = DB::selectOne(
             "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ?", [$newId]
-        )->fetch();
+        );
 
+        $row = (array)$result;
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
 
@@ -198,7 +199,7 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid page ID', 'id', 400);
         }
 
-        $existing = Database::query("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $existing = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', 'Page not found', 'id', 404);
         }
@@ -213,7 +214,7 @@ class AdminContentController extends BaseApiController
             if ($this->isReservedPageSlug($slug)) {
                 return $this->respondWithError('VALIDATION_ERROR', "The slug \"{$slug}\" is reserved.", 'slug', 422);
             }
-            $conflict = Database::query("SELECT id FROM pages WHERE slug = ? AND tenant_id = ? AND id != ?", [$slug, $tenantId, $id])->fetch();
+            $conflict = DB::selectOne("SELECT id FROM pages WHERE slug = ? AND tenant_id = ? AND id != ?", [$slug, $tenantId, $id]);
             if ($conflict) {
                 return $this->respondWithError('VALIDATION_ERROR', 'Slug already in use', 'slug', 422);
             }
@@ -240,13 +241,14 @@ class AdminContentController extends BaseApiController
         $params[] = $id;
         $params[] = $tenantId;
 
-        Database::query("UPDATE pages SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        DB::update("UPDATE pages SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
 
-        $row = Database::query(
+        $result = DB::selectOne(
             "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]
-        )->fetch();
+        );
 
+        $row = (array)$result;
         $row['status'] = $row['is_published'] ? 'published' : 'draft';
         unset($row['is_published']);
 
@@ -265,13 +267,13 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid page ID', 'id', 400);
         }
 
-        $existing = Database::query("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $existing = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', 'Page not found', 'id', 404);
         }
 
-        Database::query("DELETE FROM menu_items WHERE page_id = ? AND page_id IN (SELECT id FROM pages WHERE tenant_id = ?)", [$id, $tenantId]);
-        Database::query("DELETE FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        DB::delete("DELETE FROM menu_items WHERE page_id = ? AND page_id IN (SELECT id FROM pages WHERE tenant_id = ?)", [$id, $tenantId]);
+        DB::delete("DELETE FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         try { RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
 
@@ -287,13 +289,13 @@ class AdminContentController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $menus = Database::query(
+        $menus = array_map(fn($r) => (array)$r, DB::select(
             "SELECT m.id, m.tenant_id, m.name, m.slug, m.description, m.location, m.layout,
                     m.min_plan_tier, m.is_active, m.created_at, m.updated_at, COUNT(mi.id) AS item_count
              FROM menus m LEFT JOIN menu_items mi ON mi.menu_id = m.id
              WHERE m.tenant_id = ? GROUP BY m.id ORDER BY m.name ASC",
             [$tenantId]
-        )->fetchAll();
+        ));
 
         return $this->respondWithData($menus);
     }
@@ -308,16 +310,17 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400);
         }
 
-        $menu = Database::query(
+        $result = DB::selectOne(
             "SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at
              FROM menus WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
 
-        if (!$menu) {
+        if (!$result) {
             return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404);
         }
 
+        $menu = (array)$result;
         $menu['items'] = $this->buildMenuItemTree($id);
 
         return $this->respondWithData($menu);
@@ -338,13 +341,14 @@ class AdminContentController extends BaseApiController
         $slug = $this->generateSlug($name);
         $slug = $this->ensureUniqueSlug('menus', $slug, $tenantId);
 
-        Database::query(
+        DB::insert(
             "INSERT INTO menus (tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
             [$tenantId, $name, $slug, $input['description'] ?? '', $location, $input['layout'] ?? null, (int)($input['min_plan_tier'] ?? 0), (int)($input['is_active'] ?? 1)]
         );
 
-        $menu = Database::query("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ?", [Database::lastInsertId()])->fetch();
+        $result = DB::selectOne("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ?", [DB::getPdo()->lastInsertId()]);
+        $menu = (array)$result;
 
         return $this->respondWithData($menu, null, 201);
     }
@@ -357,7 +361,7 @@ class AdminContentController extends BaseApiController
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
 
-        $existing = Database::query("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $existing = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
 
         $input = $this->getAllInput();
@@ -367,7 +371,7 @@ class AdminContentController extends BaseApiController
         if (isset($input['name'])) { $updates[] = 'name = ?'; $params[] = trim($input['name']); }
         if (isset($input['slug'])) {
             $slug = $this->generateSlug($input['slug']);
-            $conflict = Database::query("SELECT id FROM menus WHERE slug = ? AND tenant_id = ? AND id != ?", [$slug, $tenantId, $id])->fetch();
+            $conflict = DB::selectOne("SELECT id FROM menus WHERE slug = ? AND tenant_id = ? AND id != ?", [$slug, $tenantId, $id]);
             if ($conflict) { return $this->respondWithError('VALIDATION_ERROR', 'Slug already in use', 'slug', 422); }
             $updates[] = 'slug = ?'; $params[] = $slug;
         }
@@ -383,9 +387,10 @@ class AdminContentController extends BaseApiController
         $params[] = $id;
         $params[] = $tenantId;
 
-        Database::query("UPDATE menus SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        DB::update("UPDATE menus SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
 
-        $menu = Database::query("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $result = DB::selectOne("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $menu = (array)$result;
 
         return $this->respondWithData($menu);
     }
@@ -398,11 +403,11 @@ class AdminContentController extends BaseApiController
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
 
-        $existing = Database::query("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $existing = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
 
-        Database::query("DELETE FROM menu_items WHERE menu_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
-        Database::query("DELETE FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        DB::delete("DELETE FROM menu_items WHERE menu_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
+        DB::delete("DELETE FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -419,7 +424,7 @@ class AdminContentController extends BaseApiController
 
         if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
 
-        $menu = Database::query("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId])->fetch();
+        $menu = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId]);
         if (!$menu) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
 
         return $this->respondWithData($this->buildMenuItemTree($menuId));
@@ -433,7 +438,7 @@ class AdminContentController extends BaseApiController
 
         if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
 
-        $menu = Database::query("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId])->fetch();
+        $menu = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId]);
         if (!$menu) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
 
         $input = $this->getAllInput();
@@ -443,7 +448,7 @@ class AdminContentController extends BaseApiController
         $parentId = isset($input['parent_id']) ? (int)$input['parent_id'] : null;
         $visibilityRules = isset($input['visibility_rules']) ? json_encode($input['visibility_rules']) : null;
 
-        Database::query(
+        DB::insert(
             "INSERT INTO menu_items (menu_id, parent_id, type, label, url, route_name, page_id, icon, css_class, target, sort_order, visibility_rules, is_active, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
             [$menuId, $parentId, $input['type'] ?? 'link', $label, $input['url'] ?? null, $input['route_name'] ?? null,
@@ -451,11 +456,12 @@ class AdminContentController extends BaseApiController
              $input['target'] ?? '_self', (int)($input['sort_order'] ?? 0), $visibilityRules, (int)($input['is_active'] ?? 1)]
         );
 
-        $item = Database::query(
+        $result = DB::selectOne(
             "SELECT id, menu_id, parent_id, type, label, url, route_name, page_id, icon, css_class, target, sort_order, visibility_rules, is_active, created_at, updated_at
-             FROM menu_items WHERE id = ?", [Database::lastInsertId()]
-        )->fetch();
+             FROM menu_items WHERE id = ?", [DB::getPdo()->lastInsertId()]
+        );
 
+        $item = (array)$result;
         if ($item && $item['visibility_rules']) {
             $item['visibility_rules'] = json_decode($item['visibility_rules'], true);
         }
@@ -471,7 +477,7 @@ class AdminContentController extends BaseApiController
 
         if ($menuId < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu ID', 'id', 400); }
 
-        $menu = Database::query("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId])->fetch();
+        $menu = DB::selectOne("SELECT id FROM menus WHERE id = ? AND tenant_id = ?", [$menuId, $tenantId]);
         if (!$menu) { return $this->respondWithError('NOT_FOUND', 'Menu not found', 'id', 404); }
 
         $input = $this->getAllInput();
@@ -484,7 +490,7 @@ class AdminContentController extends BaseApiController
             $itemId = (int)($item['id'] ?? 0);
             if ($itemId < 1) continue;
             $parentId = isset($item['parent_id']) ? (int)$item['parent_id'] : null;
-            Database::query("UPDATE menu_items SET sort_order = ?, parent_id = ?, updated_at = NOW() WHERE id = ? AND menu_id = ?",
+            DB::update("UPDATE menu_items SET sort_order = ?, parent_id = ?, updated_at = NOW() WHERE id = ? AND menu_id = ?",
                 [(int)($item['sort_order'] ?? 0), $parentId, $itemId, $menuId]);
         }
 
@@ -499,10 +505,10 @@ class AdminContentController extends BaseApiController
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu item ID', 'id', 400); }
 
-        $existing = Database::query(
+        $existing = DB::selectOne(
             "SELECT mi.id, mi.menu_id FROM menu_items mi JOIN menus m ON m.id = mi.menu_id WHERE mi.id = ? AND m.tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
         if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu item not found', 'id', 404); }
 
         $input = $this->getAllInput();
@@ -531,13 +537,14 @@ class AdminContentController extends BaseApiController
         $params[] = $id;
         $params[] = $tenantId;
 
-        Database::query("UPDATE menu_items SET " . implode(', ', $updates) . " WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", $params);
+        DB::update("UPDATE menu_items SET " . implode(', ', $updates) . " WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", $params);
 
-        $item = Database::query(
+        $result = DB::selectOne(
             "SELECT id, menu_id, parent_id, type, label, url, route_name, page_id, icon, css_class, target, sort_order, visibility_rules, is_active, created_at, updated_at
              FROM menu_items WHERE id = ?", [$id]
-        )->fetch();
+        );
 
+        $item = (array)$result;
         if ($item && $item['visibility_rules']) {
             $item['visibility_rules'] = json_decode($item['visibility_rules'], true);
         }
@@ -553,14 +560,14 @@ class AdminContentController extends BaseApiController
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid menu item ID', 'id', 400); }
 
-        $existing = Database::query(
+        $existing = DB::selectOne(
             "SELECT mi.id FROM menu_items mi JOIN menus m ON m.id = mi.menu_id WHERE mi.id = ? AND m.tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
         if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Menu item not found', 'id', 404); }
 
-        Database::query("DELETE FROM menu_items WHERE parent_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
-        Database::query("DELETE FROM menu_items WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
+        DB::delete("DELETE FROM menu_items WHERE parent_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
+        DB::delete("DELETE FROM menu_items WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -573,11 +580,11 @@ class AdminContentController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $plans = Database::query(
+        $plans = array_map(fn($r) => (array)$r, DB::select(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts,
                     max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans ORDER BY tier_level ASC, name ASC"
-        )->fetchAll();
+        ));
 
         foreach ($plans as &$plan) {
             if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
@@ -595,14 +602,15 @@ class AdminContentController extends BaseApiController
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid plan ID', 'id', 400); }
 
-        $plan = Database::query(
+        $result = DB::selectOne(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts,
                     max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$id]
-        )->fetch();
+        );
 
-        if (!$plan) { return $this->respondWithError('NOT_FOUND', 'Plan not found', 'id', 404); }
+        if (!$result) { return $this->respondWithError('NOT_FOUND', 'Plan not found', 'id', 404); }
 
+        $plan = (array)$result;
         if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
         if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
 
@@ -620,12 +628,12 @@ class AdminContentController extends BaseApiController
         $slug = $this->generateSlug($name);
         $counter = 0;
         $originalSlug = $slug;
-        while (Database::query("SELECT id FROM pay_plans WHERE slug = ?", [$slug])->fetch()) {
+        while (DB::selectOne("SELECT id FROM pay_plans WHERE slug = ?", [$slug])) {
             $counter++;
             $slug = $originalSlug . '-' . $counter;
         }
 
-        Database::query(
+        DB::insert(
             "INSERT INTO pay_plans (name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
             [$name, $slug, $input['description'] ?? '', (int)($input['tier_level'] ?? 0),
@@ -638,11 +646,12 @@ class AdminContentController extends BaseApiController
              (int)($input['is_active'] ?? 1)]
         );
 
-        $plan = Database::query(
+        $result = DB::selectOne(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
-             FROM pay_plans WHERE id = ?", [Database::lastInsertId()]
-        )->fetch();
+             FROM pay_plans WHERE id = ?", [DB::getPdo()->lastInsertId()]
+        );
 
+        $plan = $result ? (array)$result : null;
         if ($plan) {
             if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
             if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
@@ -658,7 +667,7 @@ class AdminContentController extends BaseApiController
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid plan ID', 'id', 400); }
 
-        $existing = Database::query("SELECT id FROM pay_plans WHERE id = ?", [$id])->fetch();
+        $existing = DB::selectOne("SELECT id FROM pay_plans WHERE id = ?", [$id]);
         if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Plan not found', 'id', 404); }
 
         $input = $this->getAllInput();
@@ -668,7 +677,7 @@ class AdminContentController extends BaseApiController
         if (isset($input['name'])) { $updates[] = 'name = ?'; $params[] = trim($input['name']); }
         if (isset($input['slug'])) {
             $slug = $this->generateSlug($input['slug']);
-            $conflict = Database::query("SELECT id FROM pay_plans WHERE slug = ? AND id != ?", [$slug, $id])->fetch();
+            $conflict = DB::selectOne("SELECT id FROM pay_plans WHERE slug = ? AND id != ?", [$slug, $id]);
             if ($conflict) { return $this->respondWithError('VALIDATION_ERROR', 'Slug already in use', 'slug', 422); }
             $updates[] = 'slug = ?'; $params[] = $slug;
         }
@@ -687,13 +696,14 @@ class AdminContentController extends BaseApiController
         $updates[] = 'updated_at = NOW()';
         $params[] = $id;
 
-        Database::query("UPDATE pay_plans SET " . implode(', ', $updates) . " WHERE id = ?", $params);
+        DB::update("UPDATE pay_plans SET " . implode(', ', $updates) . " WHERE id = ?", $params);
 
-        $plan = Database::query(
+        $result = DB::selectOne(
             "SELECT id, name, slug, description, tier_level, features, allowed_layouts, max_menus, max_menu_items, price_monthly, price_yearly, is_active, created_at, updated_at
              FROM pay_plans WHERE id = ?", [$id]
-        )->fetch();
+        );
 
+        $plan = $result ? (array)$result : null;
         if ($plan) {
             if (isset($plan['features'])) { $plan['features'] = json_decode($plan['features'], true) ?: []; }
             if (isset($plan['allowed_layouts'])) { $plan['allowed_layouts'] = json_decode($plan['allowed_layouts'], true) ?: []; }
@@ -709,15 +719,15 @@ class AdminContentController extends BaseApiController
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', 'Invalid plan ID', 'id', 400); }
 
-        $existing = Database::query("SELECT id FROM pay_plans WHERE id = ?", [$id])->fetch();
+        $existing = DB::selectOne("SELECT id FROM pay_plans WHERE id = ?", [$id]);
         if (!$existing) { return $this->respondWithError('NOT_FOUND', 'Plan not found', 'id', 404); }
 
-        $activeAssignments = Database::query("SELECT COUNT(*) AS cnt FROM tenant_plan_assignments WHERE pay_plan_id = ? AND status = 'active'", [$id])->fetch();
-        if ($activeAssignments && (int)$activeAssignments['cnt'] > 0) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Cannot delete plan with active tenant assignments (' . $activeAssignments['cnt'] . ' active)', 'id', 422);
+        $activeAssignments = DB::selectOne("SELECT COUNT(*) AS cnt FROM tenant_plan_assignments WHERE pay_plan_id = ? AND status = 'active'", [$id]);
+        if ($activeAssignments && (int)$activeAssignments->cnt > 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Cannot delete plan with active tenant assignments (' . $activeAssignments->cnt . ' active)', 'id', 422);
         }
 
-        Database::query("DELETE FROM pay_plans WHERE id = ?", [$id]);
+        DB::delete("DELETE FROM pay_plans WHERE id = ?", [$id]);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -730,7 +740,7 @@ class AdminContentController extends BaseApiController
     {
         $this->requireAdmin();
 
-        $subscriptions = Database::query(
+        $subscriptions = array_map(fn($r) => (array)$r, DB::select(
             "SELECT tpa.id, tpa.tenant_id, tpa.pay_plan_id, tpa.status, tpa.starts_at, tpa.expires_at,
                     tpa.trial_ends_at, tpa.created_at, tpa.updated_at,
                     pp.name AS plan_name, pp.slug AS plan_slug, pp.tier_level AS plan_tier_level,
@@ -739,7 +749,7 @@ class AdminContentController extends BaseApiController
              JOIN pay_plans pp ON pp.id = tpa.pay_plan_id
              LEFT JOIN tenants t ON t.id = tpa.tenant_id
              ORDER BY tpa.created_at DESC"
-        )->fetchAll();
+        ));
 
         return $this->respondWithData($subscriptions);
     }
@@ -775,7 +785,7 @@ class AdminContentController extends BaseApiController
     {
         $counter = 0;
         $originalSlug = $slug;
-        while (Database::query("SELECT id FROM {$table} WHERE slug = ? AND tenant_id = ?", [$slug, $tenantId])->fetch()) {
+        while (DB::selectOne("SELECT id FROM {$table} WHERE slug = ? AND tenant_id = ?", [$slug, $tenantId])) {
             $counter++;
             $slug = $originalSlug . '-' . $counter;
         }
@@ -784,11 +794,11 @@ class AdminContentController extends BaseApiController
 
     private function buildMenuItemTree(int $menuId): array
     {
-        $items = Database::query(
+        $items = array_map(fn($r) => (array)$r, DB::select(
             "SELECT id, menu_id, parent_id, type, label, url, route_name, page_id, icon, css_class, target, sort_order, visibility_rules, is_active, created_at, updated_at
              FROM menu_items WHERE menu_id = ? ORDER BY sort_order ASC, id ASC",
             [$menuId]
-        )->fetchAll();
+        ));
 
         foreach ($items as &$item) {
             if (isset($item['visibility_rules']) && $item['visibility_rules']) {

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 /**
  * SkillsController -- Skill categories and search for matching.
@@ -20,12 +21,12 @@ class SkillsController extends BaseApiController
     {
         $tenantId = $this->getTenantId();
 
-        $categories = \Nexus\Core\Database::query(
+        $results = DB::select(
             "SELECT id, name, slug, icon FROM skill_categories WHERE tenant_id = ? ORDER BY name",
             [$tenantId]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        );
 
-        return $this->respondWithData($categories);
+        return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
     }
 
     /** GET /api/v2/skills/search?q= */
@@ -35,11 +36,11 @@ class SkillsController extends BaseApiController
         $limit = $this->queryInt('limit', 20, 1, 100);
         $tenantId = $this->getTenantId();
 
-        $skills = \Nexus\Core\Database::query(
+        $results = DB::select(
             "SELECT id, name, category_id FROM skills WHERE tenant_id = ? AND name LIKE ? ORDER BY name LIMIT ?",
             [$tenantId, '%' . $q . '%', $limit]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        );
 
-        return $this->respondWithData($skills);
+        return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
     }
 }

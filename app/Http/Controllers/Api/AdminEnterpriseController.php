@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\Database;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 use Nexus\Services\LegalDocumentService;
 
@@ -44,16 +44,16 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        try { $userCount = (int)(Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'] ?? 0); } catch (\Exception $e) { $userCount = 0; }
+        try { $userCount = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { $userCount = 0; }
 
         $roleCount = 0;
-        try { $roleCount = (int)(Database::query("SELECT COUNT(*) as cnt FROM roles WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'] ?? 0); } catch (\Exception $e) { $roleCount = 4; }
+        try { $roleCount = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM roles WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { $roleCount = 4; }
 
         $pendingGdpr = 0;
-        try { $pendingGdpr = (int)(Database::query("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->fetch()['cnt'] ?? 0); } catch (\Exception $e) {}
+        try { $pendingGdpr = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->cnt ?? 0); } catch (\Exception $e) {}
 
         $dbConnected = true;
-        try { Database::query("SELECT 1"); } catch (\Exception $e) { $dbConnected = false; }
+        try { DB::select("SELECT 1"); } catch (\Exception $e) { $dbConnected = false; }
 
         $redisConnected = false;
         try { $stats = \Nexus\Services\RedisCache::getStats(); $redisConnected = !empty($stats['enabled']); } catch (\Exception $e) {}
@@ -74,14 +74,14 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $roles = Database::query(
+            $roles = array_map(fn($r) => (array)$r, DB::select(
                 "SELECT r.id, r.name, r.display_name, r.description, r.is_system, r.level, r.created_at, r.updated_at,
                         (SELECT COUNT(*) FROM user_roles ur WHERE ur.role_id = r.id) as users_count,
                         GROUP_CONCAT(p.name) as permission_names
                  FROM roles r LEFT JOIN role_permissions rp ON r.id = rp.role_id LEFT JOIN permissions p ON rp.permission_id = p.id
                  WHERE r.tenant_id = ? GROUP BY r.id ORDER BY r.name ASC",
                 [$tenantId]
-            )->fetchAll();
+            ));
 
             foreach ($roles as &$role) {
                 $role['permissions'] = $role['permission_names'] ? explode(',', $role['permission_names']) : [];
@@ -102,12 +102,13 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $role = Database::query(
+            $result = DB::selectOne(
                 "SELECT r.*, (SELECT COUNT(*) FROM user_roles ur WHERE ur.role_id = r.id) as users_count FROM roles r WHERE r.id = ? AND r.tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
-            if (!$role) { return $this->respondWithError('NOT_FOUND', 'Role not found', null, 404); }
+            if (!$result) { return $this->respondWithError('NOT_FOUND', 'Role not found', null, 404); }
+            $role = (array)$result;
             $role['permissions'] = json_decode($role['permissions'] ?? '[]', true) ?: [];
             return $this->respondWithData($role);
         } catch (\Exception $e) {
@@ -131,30 +132,31 @@ class AdminEnterpriseController extends BaseApiController
         $permissions = $data['permissions'] ?? [];
 
         try {
-            Database::beginTransaction();
-            Database::query("INSERT INTO roles (name, display_name, description, level, tenant_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [$name, $displayName, $description, $level, $tenantId]);
-            $roleId = Database::lastInsertId();
+            DB::beginTransaction();
+            DB::insert("INSERT INTO roles (name, display_name, description, level, tenant_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [$name, $displayName, $description, $level, $tenantId]);
+            $roleId = DB::getPdo()->lastInsertId();
 
             if (!empty($permissions)) {
                 foreach ($permissions as $permName) {
-                    $perm = Database::query("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName])->fetch();
+                    $perm = DB::selectOne("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName]);
                     if (!empty($perm)) {
-                        Database::query("INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)", [$roleId, $perm['id']]);
+                        DB::insert("INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)", [$roleId, $perm->id]);
                     }
                 }
             }
-            Database::commit();
+            DB::commit();
 
-            $result = Database::query(
+            $result = DB::selectOne(
                 "SELECT r.*, GROUP_CONCAT(p.name) as permission_names FROM roles r LEFT JOIN role_permissions rp ON r.id = rp.role_id LEFT JOIN permissions p ON rp.permission_id = p.id WHERE r.id = ? AND r.tenant_id = ? GROUP BY r.id",
                 [$roleId, $tenantId]
-            )->fetch() ?? [];
-            $result['permissions'] = !empty($result['permission_names']) ? explode(',', $result['permission_names']) : [];
-            unset($result['permission_names']);
+            );
+            $resultArr = $result ? (array)$result : [];
+            $resultArr['permissions'] = !empty($resultArr['permission_names']) ? explode(',', $resultArr['permission_names']) : [];
+            unset($resultArr['permission_names']);
 
-            return $this->respondWithData($result, null, 201);
+            return $this->respondWithData($resultArr, null, 201);
         } catch (\Exception $e) {
-            Database::rollback();
+            DB::rollBack();
             return $this->respondWithError('CREATE_FAILED', 'Failed to create role', null, 500);
         }
     }
@@ -167,7 +169,7 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         try {
-            Database::beginTransaction();
+            DB::beginTransaction();
             $setParts = []; $params = [];
             if (isset($data['name'])) { $setParts[] = 'name = ?'; $params[] = $data['name']; }
             if (isset($data['display_name'])) { $setParts[] = 'display_name = ?'; $params[] = $data['display_name']; }
@@ -176,33 +178,34 @@ class AdminEnterpriseController extends BaseApiController
 
             if (!empty($setParts)) {
                 $setParts[] = 'updated_at = NOW()'; $params[] = $id; $params[] = $tenantId;
-                Database::query("UPDATE roles SET " . implode(', ', $setParts) . " WHERE id = ? AND tenant_id = ?", $params);
+                DB::update("UPDATE roles SET " . implode(', ', $setParts) . " WHERE id = ? AND tenant_id = ?", $params);
             }
 
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                $roleCheck = Database::query("SELECT id FROM roles WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
-                if (!$roleCheck) { Database::rollback(); return $this->respondWithError('NOT_FOUND', 'Role not found for this tenant', null, 404); }
-                Database::query("DELETE FROM role_permissions WHERE role_id = ? AND tenant_id = ?", [$id, $tenantId]);
+                $roleCheck = DB::selectOne("SELECT id FROM roles WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+                if (!$roleCheck) { DB::rollBack(); return $this->respondWithError('NOT_FOUND', 'Role not found for this tenant', null, 404); }
+                DB::delete("DELETE FROM role_permissions WHERE role_id = ? AND tenant_id = ?", [$id, $tenantId]);
                 foreach ($data['permissions'] as $permName) {
-                    $perm = Database::query("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName])->fetch();
+                    $perm = DB::selectOne("SELECT id FROM permissions WHERE name = ? LIMIT 1", [$permName]);
                     if (!empty($perm)) {
-                        Database::query("INSERT INTO role_permissions (role_id, permission_id, tenant_id) VALUES (?, ?, ?)", [$id, $perm['id'], $tenantId]);
+                        DB::insert("INSERT INTO role_permissions (role_id, permission_id, tenant_id) VALUES (?, ?, ?)", [$id, $perm->id, $tenantId]);
                     }
                 }
             }
-            Database::commit();
+            DB::commit();
 
-            $result = Database::query(
+            $result = DB::selectOne(
                 "SELECT r.*, GROUP_CONCAT(p.name) as permission_names FROM roles r LEFT JOIN role_permissions rp ON r.id = rp.role_id LEFT JOIN permissions p ON rp.permission_id = p.id WHERE r.id = ? AND r.tenant_id = ? GROUP BY r.id",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (empty($result)) { return $this->respondWithError('NOT_FOUND', 'Role not found', null, 404); }
-            $result['permissions'] = !empty($result['permission_names']) ? explode(',', $result['permission_names']) : [];
-            unset($result['permission_names']);
-            return $this->respondWithData($result);
+            $resultArr = (array)$result;
+            $resultArr['permissions'] = !empty($resultArr['permission_names']) ? explode(',', $resultArr['permission_names']) : [];
+            unset($resultArr['permission_names']);
+            return $this->respondWithData($resultArr);
         } catch (\Exception $e) {
-            Database::rollback();
+            DB::rollBack();
             return $this->respondWithError('UPDATE_FAILED', 'Failed to update role', null, 500);
         }
     }
@@ -213,7 +216,7 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            Database::query("DELETE FROM roles WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            DB::delete("DELETE FROM roles WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             return $this->respondWithError('DELETE_FAILED', 'Failed to delete role', null, 500);
@@ -234,13 +237,13 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $pending = 0; $total = 0;
-        try { $row = Database::query("SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending FROM gdpr_requests WHERE tenant_id = ?", [$tenantId])->fetch(); $pending = (int)($row['pending'] ?? 0); $total = (int)($row['total'] ?? 0); } catch (\Exception $e) {}
+        try { $row = DB::selectOne("SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending FROM gdpr_requests WHERE tenant_id = ?", [$tenantId]); $pending = (int)($row->pending ?? 0); $total = (int)($row->total ?? 0); } catch (\Exception $e) {}
 
         $consents = 0;
-        try { $consents = (int)(Database::query("SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'] ?? 0); } catch (\Exception $e) {}
+        try { $consents = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) {}
 
         $breaches = 0;
-        try { $breaches = (int)(Database::query("SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'] ?? 0); } catch (\Exception $e) {}
+        try { $breaches = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) {}
 
         return $this->respondWithData(['total_requests' => $total, 'pending_requests' => $pending, 'total_consents' => $consents, 'total_breaches' => $breaches]);
     }
@@ -259,12 +262,12 @@ class AdminEnterpriseController extends BaseApiController
             $where = "gr.tenant_id = ?"; $params = [$tenantId];
             if ($status && $status !== 'all') { $where .= " AND gr.status = ?"; $params[] = $status; }
 
-            $total = (int)(Database::query("SELECT COUNT(*) as cnt FROM gdpr_requests gr WHERE $where", $params)->fetch()['cnt'] ?? 0);
+            $total = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests gr WHERE $where", $params)->cnt ?? 0);
             $fetchParams = array_merge($params, [$perPage, $offset]);
-            $requests = Database::query(
+            $requests = array_map(fn($r) => (array)$r, DB::select(
                 "SELECT gr.*, gr.request_type as type, u.name as user_name, u.email as user_email FROM gdpr_requests gr LEFT JOIN users u ON u.id = gr.user_id WHERE $where ORDER BY gr.created_at DESC LIMIT ? OFFSET ?",
                 $fetchParams
-            )->fetchAll();
+            ));
             return $this->respondWithPaginatedCollection($requests, $total, $page, $perPage);
         } catch (\Exception $e) {
             return $this->respondWithPaginatedCollection([], 0, 1, $perPage);
@@ -284,7 +287,7 @@ class AdminEnterpriseController extends BaseApiController
             if ($notes !== null) { $updates[] = "notes = ?"; $params[] = $notes; }
             if ($status === 'completed') { $updates[] = "completed_at = NOW()"; }
             $params[] = $id; $params[] = $tenantId;
-            Database::query("UPDATE gdpr_requests SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+            DB::update("UPDATE gdpr_requests SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
             return $this->respondWithData(['id' => $id, 'status' => $status, 'updated' => true]);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', 'Failed to update GDPR request', null, 500);
@@ -297,7 +300,7 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            $consents = Database::query("SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name FROM user_consents uc LEFT JOIN users u ON u.id = uc.user_id WHERE uc.tenant_id = ? ORDER BY uc.created_at DESC LIMIT 100", [$tenantId])->fetchAll();
+            $consents = array_map(fn($r) => (array)$r, DB::select("SELECT uc.*, uc.consent_given as consented, uc.given_at as consented_at, u.name as user_name FROM user_consents uc LEFT JOIN users u ON u.id = uc.user_id WHERE uc.tenant_id = ? ORDER BY uc.created_at DESC LIMIT 100", [$tenantId]));
             return $this->respondWithData($consents);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
@@ -308,7 +311,7 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            $breaches = Database::query("SELECT *, breach_type as title, detected_at as reported_at FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT 100", [$tenantId])->fetchAll();
+            $breaches = array_map(fn($r) => (array)$r, DB::select("SELECT *, breach_type as title, detected_at as reported_at FROM data_breach_log WHERE tenant_id = ? ORDER BY detected_at DESC LIMIT 100", [$tenantId]));
             return $this->respondWithData($breaches);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
@@ -323,11 +326,11 @@ class AdminEnterpriseController extends BaseApiController
         if (!$breachType) { return $this->respondWithError('VALIDATION_ERROR', 'Breach type is required', 'breach_type', 422); }
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO data_breach_log (tenant_id, breach_type, description, severity, status, detected_at, created_by, created_at) VALUES (?, ?, ?, ?, 'open', NOW(), ?, NOW())",
                 [$tenantId, $breachType, $input['description'] ?? '', $input['severity'] ?? 'medium', $this->getUserId()]
             );
-            return $this->respondWithData(['id' => Database::lastInsertId(), 'message' => 'Breach reported successfully'], null, 201);
+            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'message' => 'Breach reported successfully'], null, 201);
         } catch (\Exception $e) {
             return $this->respondWithError('CREATE_FAILED', 'Failed to report breach', null, 500);
         }
@@ -339,10 +342,10 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            $entries = Database::query(
+            $entries = array_map(fn($r) => (array)$r, DB::select(
                 "SELECT gal.id, gal.tenant_id, gal.admin_id, gal.action, gal.entity_type, gal.entity_id, gal.old_value, gal.new_value, gal.ip_address, gal.created_at, u.name as user_name FROM gdpr_audit_log gal LEFT JOIN users u ON u.id = gal.admin_id WHERE gal.tenant_id = ? ORDER BY gal.created_at DESC LIMIT 100",
                 [$tenantId]
-            )->fetchAll();
+            ));
             return $this->respondWithData($entries);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
@@ -354,10 +357,10 @@ class AdminEnterpriseController extends BaseApiController
         $memUsage = memory_get_usage(true);
 
         $dbSize = '0 MB';
-        try { $dbName = getenv('DB_NAME') ?: 'nexus'; $row = Database::query("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb FROM information_schema.tables WHERE table_schema = ?", [$dbName])->fetch(); $dbSize = ($row['size_mb'] ?? '0') . ' MB'; } catch (\Exception $e) {}
+        try { $dbName = getenv('DB_NAME') ?: 'nexus'; $row = DB::selectOne("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb FROM information_schema.tables WHERE table_schema = ?", [$dbName]); $dbSize = ($row->size_mb ?? '0') . ' MB'; } catch (\Exception $e) {}
 
         $uptime = 'N/A';
-        try { $row = Database::query("SHOW GLOBAL STATUS LIKE 'Uptime'")->fetch(); if ($row) { $s = (int)($row['Value'] ?? 0); $uptime = floor($s/86400) . 'd ' . floor(($s%86400)/3600) . 'h'; } } catch (\Exception $e) {}
+        try { $rows = DB::select("SHOW GLOBAL STATUS LIKE 'Uptime'"); $row = $rows[0] ?? null; if ($row) { $s = (int)($row->Value ?? 0); $uptime = floor($s/86400) . 'd ' . floor(($s%86400)/3600) . 'h'; } } catch (\Exception $e) {}
 
         $redisConnected = false; $redisMemory = 'N/A';
         try { $stats = \Nexus\Services\RedisCache::getStats(); $redisConnected = !empty($stats['enabled']); if ($redisConnected) { $redisMemory = $stats['memory_used'] ?? 'N/A'; } } catch (\Exception $e) {}
@@ -374,7 +377,7 @@ class AdminEnterpriseController extends BaseApiController
     public function healthCheck(): JsonResponse
     {
         $this->requireAdmin();
-        $dbOk = false; try { Database::query("SELECT 1"); $dbOk = true; } catch (\Exception $e) {}
+        $dbOk = false; try { DB::select("SELECT 1"); $dbOk = true; } catch (\Exception $e) {}
         $redisOk = false; try { $stats = \Nexus\Services\RedisCache::getStats(); $redisOk = !empty($stats['enabled']); } catch (\Exception $e) {}
 
         $diskFree = 'N/A'; $diskTotal = 'N/A';
@@ -406,8 +409,8 @@ class AdminEnterpriseController extends BaseApiController
         $offset = ($page - 1) * $perPage;
 
         try {
-            $total = (int)(Database::query("SELECT COUNT(*) as cnt FROM activity_log WHERE tenant_id = ? AND (action LIKE '%error%' OR action LIKE '%fail%' OR action LIKE '%exception%')", [$tenantId])->fetch()['cnt'] ?? 0);
-            $logs = Database::query("SELECT al.*, u.name as user_name FROM activity_log al LEFT JOIN users u ON u.id = al.user_id WHERE al.tenant_id = ? AND (al.action LIKE '%error%' OR al.action LIKE '%fail%' OR al.action LIKE '%exception%') ORDER BY al.created_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset])->fetchAll();
+            $total = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM activity_log WHERE tenant_id = ? AND (action LIKE '%error%' OR action LIKE '%fail%' OR action LIKE '%exception%')", [$tenantId])->cnt ?? 0);
+            $logs = array_map(fn($r) => (array)$r, DB::select("SELECT al.*, u.name as user_name FROM activity_log al LEFT JOIN users u ON u.id = al.user_id WHERE al.tenant_id = ? AND (al.action LIKE '%error%' OR al.action LIKE '%fail%' OR al.action LIKE '%exception%') ORDER BY al.created_at DESC LIMIT ? OFFSET ?", [$tenantId, $perPage, $offset]));
             return $this->respondWithPaginatedCollection($logs, $total, $page, $perPage);
         } catch (\Exception $e) {
             return $this->respondWithPaginatedCollection([], 0, 1, $perPage);
@@ -420,8 +423,8 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
         try {
-            $row = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
-            return $this->respondWithData(json_decode($row['configuration'] ?? '{}', true) ?: []);
+            $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+            return $this->respondWithData(json_decode($row->configuration ?? '{}', true) ?: []);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
 
@@ -434,10 +437,10 @@ class AdminEnterpriseController extends BaseApiController
         if (empty($newConfig)) { return $this->respondWithError('VALIDATION_ERROR', 'No configuration data provided', null, 422); }
 
         try {
-            $row = Database::query("SELECT configuration FROM tenants WHERE id = ?", [$tenantId])->fetch();
-            $existing = json_decode($row['configuration'] ?? '{}', true) ?: [];
+            $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+            $existing = json_decode($row->configuration ?? '{}', true) ?: [];
             $merged = array_merge($existing, $newConfig);
-            Database::query("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($merged), $tenantId]);
+            DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($merged), $tenantId]);
             try { \Nexus\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
             return $this->respondWithData($merged);
         } catch (\Exception $e) {
@@ -496,8 +499,9 @@ class AdminEnterpriseController extends BaseApiController
         $id = (int) $id;
         $tenantId = $this->getTenantId();
         try {
-            $doc = Database::query("SELECT *, document_type as type FROM legal_documents WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
-            if (!$doc) { return $this->respondWithError('NOT_FOUND', 'Legal document not found', null, 404); }
+            $result = DB::selectOne("SELECT *, document_type as type FROM legal_documents WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            if (!$result) { return $this->respondWithError('NOT_FOUND', 'Legal document not found', null, 404); }
+            $doc = (array)$result;
             return $this->respondWithData($doc);
         } catch (\Exception $e) {
             return $this->respondWithError('NOT_FOUND', 'Legal document not found', null, 404);
@@ -537,7 +541,7 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = $this->getTenantId();
         $id = (int) $id;
         try {
-            Database::query("DELETE FROM legal_documents WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            DB::delete("DELETE FROM legal_documents WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return $this->respondWithData(['deleted' => true]);
         } catch (\Exception $e) {
             return $this->respondWithError('DELETE_FAILED', 'Failed to delete legal document', null, 500);

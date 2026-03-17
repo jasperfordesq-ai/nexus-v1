@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -95,22 +94,22 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $totalMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'];
-        $activeMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->fetch()['cnt'];
-        $newThisMonth = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->fetch()['cnt'];
-        $pendingApprovals = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->fetch()['cnt'];
+        $totalMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
+        $activeMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->cnt;
+        $newThisMonth = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->cnt;
+        $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->cnt;
 
         $openTasks = 0; $overdueTasks = 0;
         try {
-            $openTasks = (int) Database::query("SELECT COUNT(*) as cnt FROM coordinator_tasks WHERE tenant_id = ? AND status IN ('pending','in_progress')", [$tenantId])->fetch()['cnt'];
-            $overdueTasks = (int) Database::query("SELECT COUNT(*) as cnt FROM coordinator_tasks WHERE tenant_id = ? AND status IN ('pending','in_progress') AND due_date < CURDATE()", [$tenantId])->fetch()['cnt'];
+            $openTasks = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM coordinator_tasks WHERE tenant_id = ? AND status IN ('pending','in_progress')", [$tenantId])->cnt;
+            $overdueTasks = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM coordinator_tasks WHERE tenant_id = ? AND status IN ('pending','in_progress') AND due_date < CURDATE()", [$tenantId])->cnt;
         } catch (\Throwable $e) {}
 
         $totalNotes = 0;
-        try { $totalNotes = (int) Database::query("SELECT COUNT(*) as cnt FROM member_notes WHERE tenant_id = ?", [$tenantId])->fetch()['cnt']; } catch (\Throwable $e) {}
+        try { $totalNotes = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM member_notes WHERE tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) {}
 
-        $neverLoggedIn = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at IS NULL AND is_approved = 1", [$tenantId])->fetch()['cnt'];
-        $approvedMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->fetch()['cnt'];
+        $neverLoggedIn = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at IS NULL AND is_approved = 1", [$tenantId])->cnt;
+        $approvedMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->cnt;
         $retentionRate = $approvedMembers > 0 ? round(($activeMembers / $approvedMembers) * 100, 1) : 0;
 
         return $this->respondWithData([
@@ -131,33 +130,34 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $registered = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'];
-        $emailVerified = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND email_verified_at IS NOT NULL", [$tenantId])->fetch()['cnt'];
-        $profileCompleted = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND (bio IS NOT NULL AND bio != '') AND (location IS NOT NULL AND location != '')", [$tenantId])->fetch()['cnt'];
+        $registered = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
+        $emailVerified = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND email_verified_at IS NOT NULL", [$tenantId])->cnt;
+        $profileCompleted = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND (bio IS NOT NULL AND bio != '') AND (location IS NOT NULL AND location != '')", [$tenantId])->cnt;
 
         $firstListing = 0;
-        try { $firstListing = (int) Database::query("SELECT COUNT(DISTINCT user_id) as cnt FROM listings WHERE tenant_id = ?", [$tenantId])->fetch()['cnt']; } catch (\Throwable $e) {}
+        try { $firstListing = (int) DB::selectOne("SELECT COUNT(DISTINCT user_id) as cnt FROM listings WHERE tenant_id = ?", [$tenantId])->cnt; } catch (\Throwable $e) {}
 
         $firstExchange = 0;
         try {
-            $firstExchange = (int) Database::query(
+            $firstExchange = (int) DB::selectOne(
                 "SELECT COUNT(DISTINCT u) as cnt FROM (SELECT sender_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed' UNION SELECT receiver_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed') AS combined",
                 [$tenantId, $tenantId]
-            )->fetch()['cnt'];
+            )->cnt;
         } catch (\Throwable $e) {}
 
         $repeatUser = 0;
         try {
-            $repeatUser = (int) Database::query(
+            $repeatUser = (int) DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM (SELECT u, COUNT(*) as tx_count FROM (SELECT sender_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed' UNION ALL SELECT receiver_id as u FROM transactions WHERE tenant_id = ? AND status = 'completed') AS all_tx GROUP BY u HAVING tx_count >= 2) AS repeat_users",
                 [$tenantId, $tenantId]
-            )->fetch()['cnt'];
+            )->cnt;
         } catch (\Throwable $e) {}
 
-        $monthlyRegistrations = Database::query(
+        $monthlyRegistrations = DB::select(
             "SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count FROM users WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(created_at, '%Y-%m') ORDER BY month ASC",
             [$tenantId]
-        )->fetchAll();
+        );
+        $monthlyRegistrations = array_map(fn($r) => (array)$r, $monthlyRegistrations);
 
         return $this->respondWithData([
             'stages' => [
@@ -181,10 +181,11 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $admins = Database::query(
+        $admins = DB::select(
             "SELECT id, name, email, avatar_url, role FROM users WHERE tenant_id = ? AND (role IN ('admin','moderator','tenant_admin','super_admin') OR is_admin = 1) ORDER BY name ASC",
             [$tenantId]
-        )->fetchAll();
+        );
+        $admins = array_map(fn($r) => (array)$r, $admins);
 
         return $this->respondWithCollection($admins);
     }
@@ -227,13 +228,13 @@ class AdminCrmController extends BaseApiController
             $params[] = $searchTerm;
         }
 
-        $total = (int) Database::query(
+        $total = (int) DB::selectOne(
             "SELECT COUNT(*) as cnt FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id WHERE {$where}",
             $params
-        )->fetch()['cnt'];
+        )->cnt;
 
         $dataParams = array_merge($params, [$limit, $offset]);
-        $notes = Database::query(
+        $notes = DB::select(
             "SELECT mn.*, u.name as user_name, u.avatar_url as user_avatar, a.name as author_name
              FROM member_notes mn
              LEFT JOIN users u ON u.id = mn.user_id
@@ -242,7 +243,8 @@ class AdminCrmController extends BaseApiController
              ORDER BY mn.is_pinned DESC, mn.created_at DESC
              LIMIT ? OFFSET ?",
             $dataParams
-        )->fetchAll();
+        );
+        $notes = array_map(fn($r) => (array)$r, $notes);
 
         return $this->respondWithPaginatedCollection($notes, $total, $page, $limit);
     }
@@ -261,7 +263,7 @@ class AdminCrmController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'user_id and content are required', null, 400);
         }
 
-        $user = Database::query("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
+        $user = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
         if (!$user) {
             return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
         }
@@ -271,19 +273,19 @@ class AdminCrmController extends BaseApiController
             $category = 'general';
         }
 
-        Database::query(
+        DB::insert(
             "INSERT INTO member_notes (tenant_id, user_id, author_id, content, category, is_pinned) VALUES (?, ?, ?, ?, ?, ?)",
             [$tenantId, $userId, $adminId, $content, $category, (int) $this->input('is_pinned', 0)]
         );
 
-        $noteId = Database::lastInsertId();
+        $noteId = (int) DB::getPdo()->lastInsertId();
 
-        $note = Database::query(
+        $note = DB::selectOne(
             "SELECT mn.*, u.name as user_name, u.avatar_url as user_avatar, a.name as author_name
              FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
              WHERE mn.id = ? AND mn.tenant_id = ?",
             [$noteId, $tenantId]
-        )->fetch();
+        );
 
         return $this->respondWithData($note);
     }
@@ -295,7 +297,7 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        $note = Database::query("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $note = DB::selectOne("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$note) {
             return $this->respondWithError('NOT_FOUND', 'Note not found', null, 404);
         }
@@ -328,14 +330,14 @@ class AdminCrmController extends BaseApiController
 
         $params[] = $id;
         $params[] = $tenantId;
-        Database::query("UPDATE member_notes SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        DB::update("UPDATE member_notes SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
 
-        $updated = Database::query(
+        $updated = DB::selectOne(
             "SELECT mn.*, u.name as user_name, u.avatar_url as user_avatar, a.name as author_name
              FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
              WHERE mn.id = ? AND mn.tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
 
         return $this->respondWithData($updated);
     }
@@ -347,12 +349,12 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        $note = Database::query("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $note = DB::selectOne("SELECT id FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$note) {
             return $this->respondWithError('NOT_FOUND', 'Note not found', null, 404);
         }
 
-        Database::query("DELETE FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        DB::delete("DELETE FROM member_notes WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -402,10 +404,10 @@ class AdminCrmController extends BaseApiController
             $params[] = $searchTerm;
         }
 
-        $total = (int) Database::query("SELECT COUNT(*) as cnt FROM coordinator_tasks ct WHERE {$where}", $params)->fetch()['cnt'];
+        $total = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM coordinator_tasks ct WHERE {$where}", $params)->cnt;
 
         $dataParams = array_merge($params, [$limit, $offset]);
-        $tasks = Database::query(
+        $tasks = DB::select(
             "SELECT ct.*, assigned.name as assigned_to_name, creator.name as created_by_name,
                     member.name as user_name, member.avatar_url as user_avatar
              FROM coordinator_tasks ct
@@ -419,7 +421,8 @@ class AdminCrmController extends BaseApiController
                 ct.due_date ASC, ct.created_at DESC
              LIMIT ? OFFSET ?",
             $dataParams
-        )->fetchAll();
+        );
+        $tasks = array_map(fn($r) => (array)$r, $tasks);
 
         return $this->respondWithPaginatedCollection($tasks, $total, $page, $limit);
     }
@@ -448,15 +451,15 @@ class AdminCrmController extends BaseApiController
             $dueDate = null;
         }
 
-        Database::query(
+        DB::insert(
             "INSERT INTO coordinator_tasks (tenant_id, assigned_to, user_id, title, description, priority, status, due_date, created_by)
              VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?)",
             [$tenantId, $assignedTo, $userId, $title, $description, $priority, $dueDate, $adminId]
         );
 
-        $taskId = Database::lastInsertId();
+        $taskId = (int) DB::getPdo()->lastInsertId();
 
-        $task = Database::query(
+        $task = DB::selectOne(
             "SELECT ct.*, assigned.name as assigned_to_name, creator.name as created_by_name,
                     member.name as user_name, member.avatar_url as user_avatar
              FROM coordinator_tasks ct
@@ -465,7 +468,7 @@ class AdminCrmController extends BaseApiController
              LEFT JOIN users member ON member.id = ct.user_id
              WHERE ct.id = ? AND ct.tenant_id = ?",
             [$taskId, $tenantId]
-        )->fetch();
+        );
 
         return $this->respondWithData($task);
     }
@@ -477,7 +480,7 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        $task = Database::query("SELECT id, status FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $task = DB::selectOne("SELECT id, status FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$task) {
             return $this->respondWithError('NOT_FOUND', 'Task not found', null, 404);
         }
@@ -527,9 +530,9 @@ class AdminCrmController extends BaseApiController
 
         $params[] = $id;
         $params[] = $tenantId;
-        Database::query("UPDATE coordinator_tasks SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        DB::update("UPDATE coordinator_tasks SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
 
-        $updated = Database::query(
+        $updated = DB::selectOne(
             "SELECT ct.*, assigned.name as assigned_to_name, creator.name as created_by_name,
                     member.name as user_name, member.avatar_url as user_avatar
              FROM coordinator_tasks ct
@@ -538,7 +541,7 @@ class AdminCrmController extends BaseApiController
              LEFT JOIN users member ON member.id = ct.user_id
              WHERE ct.id = ? AND ct.tenant_id = ?",
             [$id, $tenantId]
-        )->fetch();
+        );
 
         return $this->respondWithData($updated);
     }
@@ -550,12 +553,12 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        $task = Database::query("SELECT id FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $task = DB::selectOne("SELECT id FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$task) {
             return $this->respondWithError('NOT_FOUND', 'Task not found', null, 404);
         }
 
-        Database::query("DELETE FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        DB::delete("DELETE FROM coordinator_tasks WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -574,22 +577,25 @@ class AdminCrmController extends BaseApiController
         $tagFilter = $this->query('tag');
 
         if ($userId) {
-            $tags = Database::query(
+            $tags = DB::select(
                 "SELECT mt.*, u.name as user_name FROM member_tags mt LEFT JOIN users u ON u.id = mt.user_id
                  WHERE mt.tenant_id = ? AND mt.user_id = ? ORDER BY mt.tag ASC",
                 [$tenantId, $userId]
-            )->fetchAll();
+            );
+            $tags = array_map(fn($r) => (array)$r, $tags);
         } elseif ($tagFilter) {
-            $tags = Database::query(
+            $tags = DB::select(
                 "SELECT mt.*, u.name as user_name, u.avatar_url as user_avatar FROM member_tags mt LEFT JOIN users u ON u.id = mt.user_id
                  WHERE mt.tenant_id = ? AND mt.tag = ? ORDER BY mt.created_at DESC",
                 [$tenantId, $tagFilter]
-            )->fetchAll();
+            );
+            $tags = array_map(fn($r) => (array)$r, $tags);
         } else {
-            $tags = Database::query(
+            $tags = DB::select(
                 "SELECT tag, COUNT(*) as member_count FROM member_tags WHERE tenant_id = ? GROUP BY tag ORDER BY member_count DESC",
                 [$tenantId]
-            )->fetchAll();
+            );
+            $tags = array_map(fn($r) => (array)$r, $tags);
         }
 
         return $this->respondWithCollection($tags);
@@ -612,13 +618,13 @@ class AdminCrmController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Tag must be 50 characters or less', null, 400);
         }
 
-        $user = Database::query("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
+        $user = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
         if (!$user) {
             return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
         }
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO member_tags (tenant_id, user_id, tag, created_by) VALUES (?, ?, ?, ?)",
                 [$tenantId, $userId, $tag, $adminId]
             );
@@ -629,7 +635,7 @@ class AdminCrmController extends BaseApiController
             throw $e;
         }
 
-        $tagId = Database::lastInsertId();
+        $tagId = (int) DB::getPdo()->lastInsertId();
 
         return $this->respondWithData([
             'id' => $tagId, 'tenant_id' => $tenantId,
@@ -648,12 +654,12 @@ class AdminCrmController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'tag parameter is required', null, 400);
         }
 
-        $count = (int) Database::query("SELECT COUNT(*) as cnt FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag])->fetch()['cnt'];
+        $count = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag])->cnt;
         if ($count === 0) {
             return $this->respondWithError('NOT_FOUND', 'Tag not found', null, 404);
         }
 
-        Database::query("DELETE FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag]);
+        DB::delete("DELETE FROM member_tags WHERE tenant_id = ? AND tag = ?", [$tenantId, $tag]);
 
         return $this->respondWithData(['deleted' => $count]);
     }
@@ -665,12 +671,12 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
-        $tag = Database::query("SELECT id FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+        $tag = DB::selectOne("SELECT id FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$tag) {
             return $this->respondWithError('NOT_FOUND', 'Tag not found', null, 404);
         }
 
-        Database::query("DELETE FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        DB::delete("DELETE FROM member_tags WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -721,7 +727,7 @@ class AdminCrmController extends BaseApiController
         // 3. Listings created
         if (!$type || $type === 'listing_created') {
             try {
-                Database::query("SELECT 1 FROM listings LIMIT 1");
+                DB::selectOne("SELECT 1 FROM listings LIMIT 1");
                 $sql = "SELECT 'listing_created' as activity_type, l.user_id, u.name as user_name, u.avatar_url as user_avatar,
                          CONCAT('Created listing: ', l.title) as description, NULL as metadata, l.created_at
                          FROM listings l LEFT JOIN users u ON u.id = l.user_id WHERE l.tenant_id = ?";
@@ -735,7 +741,7 @@ class AdminCrmController extends BaseApiController
         // 4. Exchanges completed
         if (!$type || $type === 'exchange_completed') {
             try {
-                Database::query("SELECT 1 FROM transactions LIMIT 1");
+                DB::selectOne("SELECT 1 FROM transactions LIMIT 1");
                 $sql = "SELECT 'exchange_completed' as activity_type, t.sender_id as user_id, u.name as user_name, u.avatar_url as user_avatar,
                          CONCAT('Completed exchange with ', r.name) as description, NULL as metadata, t.created_at
                          FROM transactions t LEFT JOIN users u ON u.id = t.sender_id LEFT JOIN users r ON r.id = t.receiver_id
@@ -750,7 +756,7 @@ class AdminCrmController extends BaseApiController
         // 5. Notes added
         if (!$type || $type === 'note_added') {
             try {
-                Database::query("SELECT 1 FROM member_notes LIMIT 1");
+                DB::selectOne("SELECT 1 FROM member_notes LIMIT 1");
                 $sql = "SELECT 'note_added' as activity_type, mn.user_id, u.name as user_name, u.avatar_url as user_avatar,
                          CONCAT('Note added by ', a.name, ': ', LEFT(mn.content, 80)) as description, NULL as metadata, mn.created_at
                          FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
@@ -765,7 +771,7 @@ class AdminCrmController extends BaseApiController
         // 6. Tasks created
         if (!$type || $type === 'task_created') {
             try {
-                Database::query("SELECT 1 FROM coordinator_tasks LIMIT 1");
+                DB::selectOne("SELECT 1 FROM coordinator_tasks LIMIT 1");
                 $sql = "SELECT 'task_created' as activity_type, ct.created_by as user_id, u.name as user_name, u.avatar_url as user_avatar,
                          CONCAT('Created task: ', ct.title) as description, NULL as metadata, ct.created_at
                          FROM coordinator_tasks ct LEFT JOIN users u ON u.id = ct.created_by WHERE ct.tenant_id = ?";
@@ -779,7 +785,7 @@ class AdminCrmController extends BaseApiController
         // 7. Group joins
         if (!$type || $type === 'group_joined') {
             try {
-                Database::query("SELECT 1 FROM group_members LIMIT 1");
+                DB::selectOne("SELECT 1 FROM group_members LIMIT 1");
                 $sql = "SELECT 'group_joined' as activity_type, gm.user_id, u.name as user_name, u.avatar_url as user_avatar,
                          CONCAT('Joined group: ', g.name) as description, NULL as metadata, gm.created_at
                          FROM group_members gm LEFT JOIN users u ON u.id = gm.user_id
@@ -808,10 +814,11 @@ class AdminCrmController extends BaseApiController
 
         $unionSql = implode(" UNION ALL ", $unions);
 
-        $total = (int) Database::query("SELECT COUNT(*) as cnt FROM ({$unionSql}) AS timeline", $countParams)->fetch()['cnt'];
+        $total = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM ({$unionSql}) AS timeline", $countParams)->cnt;
 
         $dataParams = array_merge($params, [$limit, $offset]);
-        $entries = Database::query("SELECT * FROM ({$unionSql}) AS timeline ORDER BY created_at DESC LIMIT ? OFFSET ?", $dataParams)->fetchAll();
+        $entries = DB::select("SELECT * FROM ({$unionSql}) AS timeline ORDER BY created_at DESC LIMIT ? OFFSET ?", $dataParams);
+        $entries = array_map(fn($r) => (array)$r, $entries);
 
         foreach ($entries as $i => &$entry) {
             $entry['id'] = ($page - 1) * $limit + $i + 1;
@@ -830,13 +837,14 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $notes = Database::query(
+        $notes = DB::select(
             "SELECT mn.id, mn.user_id, u.name as user_name, mn.content, mn.category,
                     mn.is_pinned, a.name as author_name, mn.created_at, mn.updated_at
              FROM member_notes mn LEFT JOIN users u ON u.id = mn.user_id LEFT JOIN users a ON a.id = mn.author_id
              WHERE mn.tenant_id = ? ORDER BY mn.created_at DESC",
             [$tenantId]
-        )->fetchAll();
+        );
+        $notes = array_map(fn($r) => (array)$r, $notes);
 
         return $this->streamCsv('crm-notes', ['ID', 'User ID', 'User Name', 'Content', 'Category', 'Pinned', 'Author', 'Created', 'Updated'], $notes);
     }
@@ -847,7 +855,7 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $tasks = Database::query(
+        $tasks = DB::select(
             "SELECT ct.id, ct.title, ct.description, ct.priority, ct.status,
                     assigned.name as assigned_to_name, member.name as related_member,
                     ct.due_date, ct.completed_at, creator.name as created_by_name, ct.created_at
@@ -857,7 +865,8 @@ class AdminCrmController extends BaseApiController
              LEFT JOIN users member ON member.id = ct.user_id
              WHERE ct.tenant_id = ? ORDER BY ct.created_at DESC",
             [$tenantId]
-        )->fetchAll();
+        );
+        $tasks = array_map(fn($r) => (array)$r, $tasks);
 
         return $this->streamCsv('crm-tasks', ['ID', 'Title', 'Description', 'Priority', 'Status', 'Assigned To', 'Related Member', 'Due Date', 'Completed At', 'Created By', 'Created'], $tasks);
     }
@@ -868,11 +877,11 @@ class AdminCrmController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $totalMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'];
-        $activeMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->fetch()['cnt'];
-        $newThisMonth = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->fetch()['cnt'];
-        $pendingApprovals = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->fetch()['cnt'];
-        $approvedMembers = (int) Database::query("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->fetch()['cnt'];
+        $totalMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt;
+        $activeMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND last_login_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)", [$tenantId])->cnt;
+        $newThisMonth = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')", [$tenantId])->cnt;
+        $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 0", [$tenantId])->cnt;
+        $approvedMembers = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->cnt;
         $retentionRate = $approvedMembers > 0 ? round(($activeMembers / $approvedMembers) * 100, 1) : 0;
 
         $rows = [

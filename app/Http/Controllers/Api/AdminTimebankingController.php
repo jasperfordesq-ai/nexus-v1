@@ -200,7 +200,7 @@ class AdminTimebankingController extends BaseApiController
         $wallets = [];
 
         try {
-            $rows = \Nexus\Core\Database::query(
+            $rowResults = DB::select(
                 "SELECT ow.id, ow.organization_id as org_id, ow.balance,
                         ow.created_at, vo.name as org_name,
                         COUNT(om.id) as member_count
@@ -211,7 +211,8 @@ class AdminTimebankingController extends BaseApiController
                  GROUP BY ow.id
                  ORDER BY ow.balance DESC",
                 [$tenantId]
-            )->fetchAll();
+            );
+            $rows = array_map(fn($r) => (array)$r, $rowResults);
 
             foreach ($rows as $row) {
                 $orgId = (int) $row['org_id'];
@@ -219,21 +220,21 @@ class AdminTimebankingController extends BaseApiController
                 $totalIn = 0;
                 $totalOut = 0;
                 try {
-                    $inRow = \Nexus\Core\Database::query(
+                    $inRow = DB::selectOne(
                         "SELECT COALESCE(SUM(amount), 0) as total FROM org_transactions
                          WHERE tenant_id = ? AND organization_id = ? AND receiver_type = 'organization' AND receiver_id = ?",
                         [$tenantId, $orgId, $orgId]
-                    )->fetch();
-                    $totalIn = round((float) ($inRow['total'] ?? 0), 1);
+                    );
+                    $totalIn = round((float) ($inRow->total ?? 0), 1);
                 } catch (\Throwable $e) {}
 
                 try {
-                    $outRow = \Nexus\Core\Database::query(
+                    $outRow = DB::selectOne(
                         "SELECT COALESCE(SUM(amount), 0) as total FROM org_transactions
                          WHERE tenant_id = ? AND organization_id = ? AND sender_type = 'organization' AND sender_id = ?",
                         [$tenantId, $orgId, $orgId]
-                    )->fetch();
-                    $totalOut = round((float) ($outRow['total'] ?? 0), 1);
+                    );
+                    $totalOut = round((float) ($outRow->total ?? 0), 1);
                 } catch (\Throwable $e) {}
 
                 $wallets[] = [
@@ -273,12 +274,12 @@ class AdminTimebankingController extends BaseApiController
             $params[] = $searchTerm;
         }
 
-        $total = (int) \Nexus\Core\Database::query(
+        $total = (int) DB::selectOne(
             "SELECT COUNT(*) as cnt FROM users u WHERE {$where}",
             $params
-        )->fetch()['cnt'];
+        )->cnt;
 
-        $users = \Nexus\Core\Database::query(
+        $userResults = DB::select(
             "SELECT u.id, u.first_name, u.last_name, u.email, u.avatar_url, u.balance,
                     COALESCE(earned.total, 0) as total_earned,
                     COALESCE(spent.total, 0) as total_spent,
@@ -296,7 +297,8 @@ class AdminTimebankingController extends BaseApiController
              ORDER BY u.balance DESC
              LIMIT {$perPage} OFFSET {$offset}",
             array_merge([$tenantId, $tenantId], $params)
-        )->fetchAll();
+        );
+        $users = array_map(fn($r) => (array)$r, $userResults);
 
         $formatted = array_map(fn($row) => [
             'id' => (int) $row['id'],
@@ -329,16 +331,17 @@ class AdminTimebankingController extends BaseApiController
         $endDate = $this->query('end_date', date('Y-m-d'));
         $format = $this->query('format', 'json');
 
-        $user = \Nexus\Core\Database::query(
+        $userRow = DB::selectOne(
             "SELECT id, first_name, last_name, email, balance FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
-        )->fetch();
+        );
+        $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
             return $this->respondWithError('NOT_FOUND', 'User not found', null, 404);
         }
 
-        $transactions = \Nexus\Core\Database::query(
+        $txResults = DB::select(
             "SELECT t.*,
                     sender.first_name as sender_first_name, sender.last_name as sender_last_name,
                     receiver.first_name as receiver_first_name, receiver.last_name as receiver_last_name,
@@ -352,7 +355,8 @@ class AdminTimebankingController extends BaseApiController
                AND t.created_at BETWEEN ? AND ?
              ORDER BY t.created_at DESC",
             [$tenantId, $userId, $userId, $startDate . ' 00:00:00', $endDate . ' 23:59:59']
-        )->fetchAll();
+        );
+        $transactions = array_map(fn($r) => (array)$r, $txResults);
 
         $earned = 0;
         $spent = 0;
@@ -401,7 +405,7 @@ class AdminTimebankingController extends BaseApiController
         $tenantId = $this->getTenantId();
         $searchTerm = '%' . $query . '%';
 
-        $users = \Nexus\Core\Database::query(
+        $userResults = DB::select(
             "SELECT id, first_name, last_name, email, balance
              FROM users
              WHERE tenant_id = ?
@@ -409,7 +413,8 @@ class AdminTimebankingController extends BaseApiController
              ORDER BY first_name, last_name
              LIMIT 20",
             [$tenantId, $searchTerm, $searchTerm, (int) $query]
-        )->fetchAll();
+        );
+        $users = array_map(fn($r) => (array)$r, $userResults);
 
         return response()->json(['success' => true, 'users' => $users]);
     }

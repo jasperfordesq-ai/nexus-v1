@@ -8,7 +8,6 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\ActivityLog;
 
@@ -435,7 +434,7 @@ class AdminGroupsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $types = Database::query(
+            $types = DB::select(
                 "SELECT gt.*, t.name as tenant_name,
                     (SELECT COUNT(*) FROM `groups` g WHERE g.type_id = gt.id AND g.tenant_id = ?) as member_count
                  FROM group_types gt
@@ -443,25 +442,25 @@ class AdminGroupsController extends BaseApiController
                  WHERE gt.tenant_id = ?
                  ORDER BY gt.sort_order ASC, gt.name ASC",
                 [$tenantId, $tenantId]
-            )->fetchAll();
+            );
 
             $formatted = array_map(function ($row) use ($tenantId) {
                 $policyCount = 0;
                 try {
-                    $policyCount = (int) Database::query("SELECT COUNT(*) as cnt FROM group_policies WHERE tenant_id = ?", [$tenantId])->fetch()['cnt'];
+                    $policyCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_policies WHERE tenant_id = ?", [$tenantId])->cnt ?? 0);
                 } catch (\Throwable $e) {}
 
                 return [
-                    'id' => (int) $row['id'],
-                    'tenant_id' => (int) $row['tenant_id'],
-                    'tenant_name' => $row['tenant_name'] ?? 'Unknown',
-                    'name' => $row['name'],
-                    'description' => $row['description'] ?? '',
-                    'icon' => $row['icon'] ?? 'fa-layer-group',
-                    'color' => $row['color'] ?? '#6366f1',
-                    'member_count' => (int) $row['member_count'],
+                    'id' => (int) $row->id,
+                    'tenant_id' => (int) $row->tenant_id,
+                    'tenant_name' => $row->tenant_name ?? 'Unknown',
+                    'name' => $row->name,
+                    'description' => $row->description ?? '',
+                    'icon' => $row->icon ?? 'fa-layer-group',
+                    'color' => $row->color ?? '#6366f1',
+                    'member_count' => (int) $row->member_count,
                     'policy_count' => $policyCount,
-                    'created_at' => $row['created_at'],
+                    'created_at' => $row->created_at,
                 ];
             }, $types);
 
@@ -483,12 +482,12 @@ class AdminGroupsController extends BaseApiController
         }
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO group_types (tenant_id, name, slug, description, icon, color, created_at)
                  VALUES (?, ?, ?, ?, ?, ?, NOW())",
                 [$tenantId, $name, \Nexus\Helpers\TextHelper::slugify($name), $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1')]
             );
-            $id = Database::lastInsertId();
+            $id = DB::getPdo()->lastInsertId();
             ActivityLog::log($adminId, 'admin_create_group_type', "Created group type: {$name}");
             return $this->respondWithData(['id' => $id, 'name' => $name]);
         } catch (\Throwable $e) {
@@ -504,13 +503,13 @@ class AdminGroupsController extends BaseApiController
         $id = (int) $id;
 
         try {
-            $existing = Database::query("SELECT id, name, tenant_id FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            $existing = DB::selectOne("SELECT id, name, tenant_id FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$existing) {
                 return $this->respondWithError('NOT_FOUND', 'Group type not found', null, 404);
             }
 
-            $name = trim($this->input('name', $existing['name']));
-            Database::query(
+            $name = trim($this->input('name', $existing->name));
+            DB::update(
                 "UPDATE group_types SET name = ?, description = ?, icon = ?, color = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
                 [$name, $this->input('description'), $this->input('icon', 'fa-layer-group'), $this->input('color', '#6366f1'), $id, $tenantId]
             );
@@ -529,18 +528,18 @@ class AdminGroupsController extends BaseApiController
         $id = (int) $id;
 
         try {
-            $type = Database::query("SELECT id, name FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            $type = DB::selectOne("SELECT id, name FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$type) {
                 return $this->respondWithError('NOT_FOUND', 'Group type not found', null, 404);
             }
 
-            $count = (int) Database::query("SELECT COUNT(*) as cnt FROM `groups` WHERE type_id = ? AND tenant_id = ?", [$id, $tenantId])->fetch()['cnt'];
+            $count = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM `groups` WHERE type_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0);
             if ($count > 0) {
                 return $this->respondWithError('GROUP_TYPE_IN_USE', "Cannot delete group type: {$count} groups are using it", null, 422);
             }
 
-            Database::query("DELETE FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
-            ActivityLog::log($adminId, 'admin_delete_group_type', "Deleted group type #{$id}: {$type['name']}");
+            DB::delete("DELETE FROM group_types WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            ActivityLog::log($adminId, 'admin_delete_group_type', "Deleted group type #{$id}: {$type->name}");
             return $this->respondWithData(['deleted' => true, 'id' => $id]);
         } catch (\Throwable $e) {
             return $this->respondWithError('GROUP_TYPE_DELETE_ERROR', 'Failed to delete group type: ' . $e->getMessage(), null, 500);
@@ -749,21 +748,21 @@ class AdminGroupsController extends BaseApiController
         $id = (int) $id;
 
         try {
-            $group = Database::query("SELECT id, name, location, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            $group = DB::selectOne("SELECT id, name, location, tenant_id FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$group) {
                 return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
             }
-            if (empty($group['location'])) {
+            if (empty($group->location)) {
                 return $this->respondWithError('VALIDATION_ERROR', 'Group has no location to geocode', null, 422);
             }
 
-            $coords = \Nexus\Services\GeocodingService::geocode($group['location']);
+            $coords = \Nexus\Services\GeocodingService::geocode($group->location);
             if (!$coords) {
                 return $this->respondWithError('GEOCODING_FAILED', 'Failed to geocode location', null, 500);
             }
 
-            Database::query("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?", [$coords['latitude'], $coords['longitude'], $id, $tenantId]);
-            ActivityLog::log($adminId, 'admin_geocode_group', "Geocoded group #{$id}: {$group['name']}");
+            DB::update("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?", [$coords['latitude'], $coords['longitude'], $id, $tenantId]);
+            ActivityLog::log($adminId, 'admin_geocode_group', "Geocoded group #{$id}: {$group->name}");
             return $this->respondWithData(['latitude' => $coords['latitude'], 'longitude' => $coords['longitude']]);
         } catch (\Throwable $e) {
             return $this->respondWithError('GEOCODE_ERROR', 'Failed to geocode group: ' . $e->getMessage(), null, 500);
@@ -777,18 +776,18 @@ class AdminGroupsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         try {
-            $groups = Database::query(
+            $groups = DB::select(
                 "SELECT id, location FROM `groups` WHERE tenant_id = ? AND location IS NOT NULL AND location != '' AND (latitude IS NULL OR longitude IS NULL) LIMIT 50",
                 [$tenantId]
-            )->fetchAll();
+            );
 
             $success = 0;
             $failed = 0;
 
             foreach ($groups as $group) {
-                $coords = \Nexus\Services\GeocodingService::geocode($group['location']);
+                $coords = \Nexus\Services\GeocodingService::geocode($group->location);
                 if ($coords) {
-                    Database::query("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ?", [$coords['latitude'], $coords['longitude'], $group['id']]);
+                    DB::update("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ?", [$coords['latitude'], $coords['longitude'], $group->id]);
                     $success++;
                 } else {
                     $failed++;
@@ -820,7 +819,7 @@ class AdminGroupsController extends BaseApiController
             $stats = ['total' => 0, 'avg_score' => 0, 'joined_count' => 0];
 
             try {
-                $recommendations = Database::query(
+                $recommendations = array_map(fn($r) => (array)$r, DB::select(
                     "SELECT gr.user_id, gr.group_id, gr.score, gr.created_at, g.tenant_id, t.name as tenant_name,
                         CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as user_name,
                         g.name as group_name,
@@ -832,14 +831,15 @@ class AdminGroupsController extends BaseApiController
                      WHERE g.tenant_id = ?
                      ORDER BY gr.created_at DESC LIMIT ? OFFSET ?",
                     [$tenantId, $limit, $offset]
-                )->fetchAll();
+                ));
 
-                $stats = Database::query(
+                $statsRow = DB::selectOne(
                     "SELECT COUNT(*) as total, AVG(score) as avg_score,
                         SUM(CASE WHEN EXISTS(SELECT 1 FROM group_members gm WHERE gm.user_id = gr.user_id AND gm.group_id = gr.group_id) THEN 1 ELSE 0 END) as joined_count
                      FROM group_recommendations gr JOIN `groups` g ON gr.group_id = g.id WHERE g.tenant_id = ?",
                     [$tenantId]
-                )->fetch();
+                );
+                $stats = $statsRow ? (array)$statsRow : ['total' => 0, 'avg_score' => 0, 'joined_count' => 0];
             } catch (\Throwable $e) {
                 // Table doesn't exist
             }
@@ -925,20 +925,20 @@ class AdminGroupsController extends BaseApiController
         $id = (int) $id;
 
         try {
-            $group = Database::query("SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId])->fetch();
+            $group = DB::selectOne("SELECT id, name FROM `groups` WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             if (!$group) {
                 return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
             }
 
-            $memberCount = (int) Database::query("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ?", [$id])->fetch()['cnt'];
+            $memberCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ?", [$id])->cnt ?? 0);
             $postsCount = 0;
-            try { $postsCount = (int) Database::query("SELECT COUNT(*) as cnt FROM group_posts WHERE group_id = ?", [$id])->fetch()['cnt']; } catch (\Throwable $e) {}
+            try { $postsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_posts WHERE group_id = ?", [$id])->cnt ?? 0); } catch (\Throwable $e) {}
             $eventsCount = 0;
-            try { $eventsCount = (int) Database::query("SELECT COUNT(*) as cnt FROM events WHERE group_id = ?", [$id])->fetch()['cnt']; } catch (\Throwable $e) {}
+            try { $eventsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM events WHERE group_id = ?", [$id])->cnt ?? 0); } catch (\Throwable $e) {}
 
             return $this->respondWithData([
                 'group_id' => $id,
-                'group_name' => $group['name'],
+                'group_name' => $group->name,
                 'member_count' => $memberCount,
                 'posts_count' => $postsCount,
                 'events_count' => $eventsCount,

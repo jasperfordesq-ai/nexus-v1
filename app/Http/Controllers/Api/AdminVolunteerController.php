@@ -7,7 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use Nexus\Core\Database;
+use Illuminate\Support\Facades\DB;
 use Nexus\Core\TenantContext;
 
 /**
@@ -31,7 +31,7 @@ class AdminVolunteerController extends BaseApiController
             return false;
         }
         try {
-            Database::query("SELECT 1 FROM `{$table}` LIMIT 1");
+            DB::select("SELECT 1 FROM `{$table}` LIMIT 1");
             return true;
         } catch (\Exception $e) {
             return false;
@@ -45,11 +45,11 @@ class AdminVolunteerController extends BaseApiController
             return false;
         }
         try {
-            $result = Database::query(
+            $result = DB::selectOne(
                 "SELECT COUNT(*) as cnt FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
                 [$table, $column]
-            )->fetch();
-            return ((int)($result['cnt'] ?? 0)) > 0;
+            );
+            return ((int)($result->cnt ?? 0)) > 0;
         } catch (\Throwable $e) {
             return false;
         }
@@ -112,8 +112,8 @@ class AdminVolunteerController extends BaseApiController
 
             $sql .= " ORDER BY opp.created_at DESC, opp.id DESC LIMIT " . ($perPage + 1);
 
-            $stmt = Database::query($sql, $params);
-            $rows = $stmt->fetchAll() ?: [];
+            $results = DB::select($sql, $params);
+            $rows = array_map(fn($r) => (array)$r, $results);
 
             $hasMore = count($rows) > $perPage;
             if ($hasMore) {
@@ -173,8 +173,8 @@ class AdminVolunteerController extends BaseApiController
 
             $sql .= " ORDER BY a.created_at DESC, a.id DESC LIMIT " . ($perPage + 1);
 
-            $stmt = Database::query($sql, $params);
-            $rows = $stmt->fetchAll() ?: [];
+            $results = DB::select($sql, $params);
+            $rows = array_map(fn($r) => (array)$r, $results);
 
             $hasMore = count($rows) > $perPage;
             if ($hasMore) {
@@ -212,17 +212,17 @@ class AdminVolunteerController extends BaseApiController
         }
 
         try {
-            $log = Database::query(
+            $log = DB::selectOne(
                 "SELECT id, user_id, status FROM vol_logs WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$log) {
                 return $this->respondWithError('NOT_FOUND', 'Hours log not found', null, 404);
             }
 
             $newStatus = $action === 'approve' ? 'approved' : 'declined';
-            Database::query(
+            DB::update(
                 "UPDATE vol_logs SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
                 [$newStatus, $id, $tenantId]
             );
@@ -259,47 +259,44 @@ class AdminVolunteerController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $row = DB::selectOne(
                 "SELECT COUNT(*) as total,
                         SUM(CASE WHEN status IN ('open', 'active') AND is_active=1 THEN 1 ELSE 0 END) as active_count
                  FROM vol_opportunities WHERE tenant_id = ?",
                 [$tenantId]
             );
-            $row = $stmt->fetch();
-            $data['stats']['total_opportunities'] = (int) ($row['total'] ?? 0);
-            $data['stats']['active_opportunities'] = (int) ($row['active_count'] ?? 0);
+            $data['stats']['total_opportunities'] = (int) ($row->total ?? 0);
+            $data['stats']['active_opportunities'] = (int) ($row->active_count ?? 0);
         } catch (\Exception $e) {}
 
         if ($this->tableExists('vol_applications')) {
             try {
-                $stmt = Database::query(
+                $row = DB::selectOne(
                     "SELECT COUNT(*) as total, SUM(CASE WHEN va.status='pending' THEN 1 ELSE 0 END) as pending
                      FROM vol_applications va WHERE va.tenant_id = ?",
                     [$tenantId]
                 );
-                $row = $stmt->fetch();
-                $data['stats']['total_applications'] = (int) ($row['total'] ?? 0);
-                $data['stats']['pending_applications'] = (int) ($row['pending'] ?? 0);
+                $data['stats']['total_applications'] = (int) ($row->total ?? 0);
+                $data['stats']['pending_applications'] = (int) ($row->pending ?? 0);
             } catch (\Exception $e) {}
         }
 
         if ($this->tableExists('vol_logs')) {
             try {
-                $stmt = Database::query(
+                $row = DB::selectOne(
                     "SELECT COALESCE(SUM(vl.hours), 0) as total_hours, COUNT(DISTINCT vl.user_id) as volunteers
                      FROM vol_logs vl WHERE vl.tenant_id = ?",
                     [$tenantId]
                 );
-                $row = $stmt->fetch();
-                $data['stats']['total_hours_logged'] = round((float) ($row['total_hours'] ?? 0), 1);
-                $data['stats']['active_volunteers'] = (int) ($row['volunteers'] ?? 0);
+                $data['stats']['total_hours_logged'] = round((float) ($row->total_hours ?? 0), 1);
+                $data['stats']['active_volunteers'] = (int) ($row->volunteers ?? 0);
             } catch (\Exception $e) {}
         }
 
         try {
             $authorColumn = $this->getOpportunityAuthorColumn();
             if ($authorColumn !== null) {
-                $stmt = Database::query(
+                $results = DB::select(
                     "SELECT vo.id, vo.title, vo.status, vo.is_active, vo.created_at,
                             CASE WHEN vo.is_active = 1 AND (vo.status = 'open' OR vo.status = 'active') THEN 'active' ELSE vo.status END as ui_status,
                             u.first_name, u.last_name
@@ -308,7 +305,7 @@ class AdminVolunteerController extends BaseApiController
                     [$tenantId]
                 );
             } else {
-                $stmt = Database::query(
+                $results = DB::select(
                     "SELECT vo.id, vo.title, vo.status, vo.is_active, vo.created_at,
                             CASE WHEN vo.is_active = 1 AND (vo.status = 'open' OR vo.status = 'active') THEN 'active' ELSE vo.status END as ui_status,
                             NULL as first_name, NULL as last_name
@@ -316,7 +313,7 @@ class AdminVolunteerController extends BaseApiController
                     [$tenantId]
                 );
             }
-            $rows = $stmt->fetchAll() ?: [];
+            $rows = array_map(fn($r) => (array)$r, $results);
             $data['recent_opportunities'] = array_map(static function (array $row): array {
                 $row['status'] = $row['ui_status'] ?? $row['status'];
                 unset($row['ui_status']);
@@ -341,7 +338,7 @@ class AdminVolunteerController extends BaseApiController
         }
 
         try {
-            $stmt = Database::query(
+            $results = DB::select(
                 "SELECT va.*, u.first_name, u.last_name, u.email, vo.title as opportunity_title
                  FROM vol_applications va
                  INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
@@ -350,7 +347,7 @@ class AdminVolunteerController extends BaseApiController
                  ORDER BY va.created_at DESC LIMIT 50",
                 [$tenantId]
             );
-            return $this->respondWithData($stmt->fetchAll() ?: []);
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
@@ -367,7 +364,7 @@ class AdminVolunteerController extends BaseApiController
 
         if ($this->tableExists('vol_organizations')) {
             try {
-                $stmt = Database::query(
+                $results = DB::select(
                     "SELECT vo.id, vo.id as org_id, vo.name as org_name, vo.status, vo.created_at,
                             COALESCE((SELECT COUNT(*) FROM org_members om WHERE om.tenant_id = vo.tenant_id AND om.organization_id = vo.id AND om.status = 'active'), 0) as member_count,
                             COALESCE((SELECT COUNT(*) FROM vol_opportunities opp WHERE opp.tenant_id = vo.tenant_id AND opp.organization_id = vo.id AND opp.is_active = 1), 0) as opportunity_count,
@@ -376,17 +373,17 @@ class AdminVolunteerController extends BaseApiController
                      FROM vol_organizations vo WHERE vo.tenant_id = ? ORDER BY vo.name ASC LIMIT 100",
                     [$tenantId]
                 );
-                return $this->respondWithData($stmt->fetchAll() ?: []);
+                return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
             } catch (\Throwable $e) {}
         }
 
         try {
-            $stmt = Database::query(
+            $results = DB::select(
                 "SELECT ow.*, o.name as org_name FROM org_wallets ow LEFT JOIN organizations o ON ow.org_id = o.id
                  WHERE ow.tenant_id = ? ORDER BY o.name ASC LIMIT 50",
                 [$tenantId]
             );
-            return $this->respondWithData($stmt->fetchAll() ?: []);
+            return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
         } catch (\Exception $e) {
             return $this->respondWithData([]);
         }
@@ -407,18 +404,18 @@ class AdminVolunteerController extends BaseApiController
         }
 
         try {
-            $app = Database::query(
+            $app = DB::selectOne(
                 "SELECT va.id, va.status, va.user_id, vo.title as opportunity_title
                  FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
                  WHERE va.id = ? AND vo.tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$app) {
                 return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
             }
 
-            Database::query("UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            DB::update("UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
             return $this->respondWithData(['message' => 'Application approved']);
         } catch (\Exception $e) {
@@ -441,17 +438,17 @@ class AdminVolunteerController extends BaseApiController
         }
 
         try {
-            $app = Database::query(
+            $app = DB::selectOne(
                 "SELECT va.id FROM vol_applications va INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
                  WHERE va.id = ? AND vo.tenant_id = ?",
                 [$id, $tenantId]
-            )->fetch();
+            );
 
             if (!$app) {
                 return $this->respondWithError('NOT_FOUND', 'Application not found', null, 404);
             }
 
-            Database::query("UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            DB::update("UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
             return $this->respondWithData(['message' => 'Application declined']);
         } catch (\Exception $e) {

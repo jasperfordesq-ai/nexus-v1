@@ -88,19 +88,16 @@ class PushController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Title and body are required', null, 400);
         }
 
-        $db = Database::getConnection();
         $targetUserIds = $this->input('user_ids');
 
         if ($targetUserIds && is_array($targetUserIds)) {
             $placeholders = str_repeat('?,', count($targetUserIds) - 1) . '?';
-            $stmt = $db->prepare("SELECT * FROM push_subscriptions WHERE tenant_id = ? AND user_id IN ($placeholders)");
-            $stmt->execute(array_merge([$tenantId], $targetUserIds));
+            $subscriptionResults = DB::select("SELECT * FROM push_subscriptions WHERE tenant_id = ? AND user_id IN ($placeholders)", array_merge([$tenantId], $targetUserIds));
         } else {
-            $stmt = $db->prepare("SELECT * FROM push_subscriptions WHERE tenant_id = ?");
-            $stmt->execute([$tenantId]);
+            $subscriptionResults = DB::select("SELECT * FROM push_subscriptions WHERE tenant_id = ?", [$tenantId]);
         }
 
-        $subscriptions = $stmt->fetchAll();
+        $subscriptions = array_map(fn($r) => (array)$r, $subscriptionResults);
 
         if (empty($subscriptions)) {
             return $this->respondWithData(['sent' => 0, 'failed' => 0, 'message' => 'No subscribers found']);
@@ -151,7 +148,7 @@ class PushController extends BaseApiController
                     } else {
                         $failed++;
                         if ($report->isSubscriptionExpired()) {
-                            $db->prepare("DELETE FROM push_subscriptions WHERE endpoint = ?")->execute([$sub['endpoint']]);
+                            DB::delete("DELETE FROM push_subscriptions WHERE endpoint = ?", [$sub['endpoint']]);
                         }
                     }
                 }
