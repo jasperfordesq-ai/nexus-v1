@@ -7,85 +7,67 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use App\Services\BlogService;
 
 /**
- * BlogPublicController -- Public blog posts and categories.
+ * BlogPublicController — Eloquent-powered public blog endpoints.
  *
- * Delegates to legacy: BlogPublicApiController
+ * Fully migrated from legacy delegation to Eloquent via BlogService.
+ * This controller mirrors BlogController for routes that may be
+ * registered under a different prefix.
  */
 class BlogPublicController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    public function __construct(
+        private readonly BlogService $blogService,
+    ) {}
+
     /** GET /api/v2/blog */
     public function index(): JsonResponse
     {
+        $filters = [
+            'limit' => $this->queryInt('per_page', 12, 1, 50),
+        ];
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\BlogPublicApiController();
-            $controller->index();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
         }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if ($this->query('search')) {
+            $filters['search'] = $this->query('search');
+        }
+        if ($this->query('category_id')) {
+            $filters['category_id'] = $this->queryInt('category_id');
         }
 
-        return response()->json($data);
+        $result = $this->blogService->getAll($filters);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
+        );
     }
 
     /** GET /api/v2/blog/categories */
     public function categories(): JsonResponse
     {
+        $categories = $this->blogService->getCategories($this->getTenantId());
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\BlogPublicApiController();
-            $controller->categories();
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
-        }
-
-        return response()->json($data);
+        return $this->respondWithData($categories);
     }
 
-    /** GET /api/v2/blog/slug */
+    /** GET /api/v2/blog/{slug} */
     public function show(string $slug): JsonResponse
     {
+        $post = $this->blogService->getBySlug($slug, $this->getTenantId());
 
-        ob_start();
-        try {
-            $controller = new \Nexus\Controllers\Api\BlogPublicApiController();
-            $controller->show($slug);
-        } catch (\Throwable $e) {
-            ob_end_clean();
-            return $this->respondWithError(
-                'INTERNAL_ERROR', $e->getMessage(), null, 500
-            );
-        }
-        $output = ob_get_clean();
-        $data = json_decode($output, true);
-
-        if ($data === null) {
-            return $this->respondWithData([]);
+        if ($post === null) {
+            return $this->respondWithError('NOT_FOUND', 'Blog post not found', null, 404);
         }
 
-        return response()->json($data);
+        return $this->respondWithData($post);
     }
 }

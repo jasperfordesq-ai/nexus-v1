@@ -6,54 +6,117 @@
 
 namespace App\Services;
 
+use App\Models\Goal;
+use App\Models\GoalTemplate;
+
 /**
- * GoalTemplateService — Laravel DI wrapper for legacy \Nexus\Services\GoalTemplateService.
+ * GoalTemplateService — Eloquent-based service for goal templates.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Replaces the legacy DI wrapper that delegated to
+ * \Nexus\Services\GoalTemplateService.
  */
 class GoalTemplateService
 {
-    public function __construct()
-    {
-    }
+    public function __construct(
+        private readonly GoalTemplate $template,
+    ) {}
 
     /**
-     * Delegates to legacy GoalTemplateService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        return \Nexus\Services\GoalTemplateService::getErrors();
-    }
-
-    /**
-     * Delegates to legacy GoalTemplateService::getAll().
+     * List templates with cursor pagination.
      */
     public function getAll(array $filters = []): array
     {
-        return \Nexus\Services\GoalTemplateService::getAll($filters);
+        $limit = min((int) ($filters['limit'] ?? 50), 100);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = $this->template->newQuery()->where('is_public', true);
+
+        if (! empty($filters['category'])) {
+            $query->where('category', $filters['category']);
+        }
+
+        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+            $query->where('id', '<', (int) $cid);
+        }
+
+        $query->orderByDesc('id');
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        return [
+            'items'    => $items->toArray(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
-     * Delegates to legacy GoalTemplateService::getById().
+     * Get available template categories.
      */
-    public function getById(int $id): ?array
+    public function getCategories(): array
     {
-        return \Nexus\Services\GoalTemplateService::getById($id);
+        return $this->template->newQuery()
+            ->where('is_public', true)
+            ->whereNotNull('category')
+            ->distinct()
+            ->pluck('category')
+            ->sort()
+            ->values()
+            ->all();
     }
 
     /**
-     * Delegates to legacy GoalTemplateService::create().
+     * Get a template by ID.
      */
-    public function create(int $userId, array $data): ?int
+    public function getById(int $id): ?GoalTemplate
     {
-        return \Nexus\Services\GoalTemplateService::create($userId, $data);
+        return $this->template->newQuery()->find($id);
     }
 
     /**
-     * Delegates to legacy GoalTemplateService::createGoalFromTemplate().
+     * Create a template (admin only).
      */
-    public function createGoalFromTemplate(int $templateId, int $userId, array $overrides = []): ?int
+    public function create(int $userId, array $data): GoalTemplate
     {
-        return \Nexus\Services\GoalTemplateService::createGoalFromTemplate($templateId, $userId, $overrides);
+        $template = $this->template->newInstance([
+            'created_by'           => $userId,
+            'title'                => trim($data['title']),
+            'description'          => trim($data['description'] ?? ''),
+            'category'             => $data['category'] ?? null,
+            'default_target_value' => $data['default_target_value'] ?? null,
+            'default_milestones'   => $data['default_milestones'] ?? null,
+            'is_public'            => $data['is_public'] ?? true,
+        ]);
+
+        $template->save();
+
+        return $template;
+    }
+
+    /**
+     * Create a goal from a template.
+     */
+    public function createGoalFromTemplate(int $templateId, int $userId, array $overrides = []): ?Goal
+    {
+        $template = $this->template->newQuery()->find($templateId);
+
+        if (! $template) {
+            return null;
+        }
+
+        $goal = Goal::create([
+            'user_id'      => $userId,
+            'title'        => trim($overrides['title'] ?? $template->title),
+            'description'  => trim($overrides['description'] ?? $template->description ?? ''),
+            'target_value' => $overrides['target_value'] ?? $template->default_target_value,
+            'deadline'     => $overrides['deadline'] ?? null,
+            'is_public'    => $overrides['is_public'] ?? true,
+            'status'       => 'active',
+        ]);
+
+        return $goal->fresh(['user']);
     }
 }

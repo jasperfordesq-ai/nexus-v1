@@ -37,6 +37,11 @@ class Category extends Model
         return $this->hasMany(Event::class);
     }
 
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');

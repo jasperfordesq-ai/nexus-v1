@@ -11,21 +11,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Poll extends Model
+class Comment extends Model
 {
     use HasTenantScope;
 
-    protected $table = 'polls';
+    protected $table = 'comments';
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'question', 'description',
-        'end_date', 'is_active', 'category', 'poll_type',
+        'tenant_id', 'user_id', 'target_type', 'target_id',
+        'content', 'parent_id',
     ];
 
     protected $casts = [
         'user_id'   => 'integer',
-        'end_date'  => 'datetime',
-        'is_active' => 'boolean',
+        'target_id' => 'integer',
+        'parent_id' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -33,8 +33,13 @@ class Poll extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function options(): HasMany
+    public function parent(): BelongsTo
     {
-        return $this->hasMany(PollOption::class);
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function replies(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 }

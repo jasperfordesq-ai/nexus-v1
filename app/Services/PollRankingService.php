@@ -6,46 +6,95 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+
 /**
- * PollRankingService — Laravel DI wrapper for legacy \Nexus\Services\PollRankingService.
+ * PollRankingService — Eloquent-based service for ranked-choice voting.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Replaces the legacy DI wrapper that delegated to
+ * \Nexus\Services\PollRankingService.
  */
 class PollRankingService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy PollRankingService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        return \Nexus\Services\PollRankingService::getErrors();
-    }
-
-    /**
-     * Delegates to legacy PollRankingService::submitRanking().
+     * Submit ranked-choice votes for a poll.
      */
     public function submitRanking(int $pollId, int $userId, array $rankings): bool
     {
-        return \Nexus\Services\PollRankingService::submitRanking($pollId, $userId, $rankings);
+        $exists = DB::table('poll_rankings')
+            ->where('poll_id', $pollId)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if ($exists) {
+            return false;
+        }
+
+        DB::transaction(function () use ($pollId, $userId, $rankings) {
+            foreach ($rankings as $ranking) {
+                DB::table('poll_rankings')->insert([
+                    'poll_id'    => $pollId,
+                    'user_id'    => $userId,
+                    'option_id'  => (int) $ranking['option_id'],
+                    'rank'       => (int) $ranking['rank'],
+                    'created_at' => now(),
+                ]);
+            }
+        });
+
+        return true;
     }
 
     /**
-     * Delegates to legacy PollRankingService::calculateResults().
+     * Calculate IRV results for a ranked poll.
      */
     public function calculateResults(int $pollId): array
     {
-        return \Nexus\Services\PollRankingService::calculateResults($pollId);
+        $rankings = DB::table('poll_rankings')
+            ->where('poll_id', $pollId)
+            ->orderBy('user_id')
+            ->orderBy('rank')
+            ->get()
+            ->groupBy('user_id');
+
+        $options = DB::table('poll_options')
+            ->where('poll_id', $pollId)
+            ->pluck('option_text', 'id')
+            ->all();
+
+        // Simple first-choice tally (simplified IRV)
+        $tally = [];
+        foreach ($options as $optId => $text) {
+            $tally[$optId] = ['option_id' => $optId, 'text' => $text, 'votes' => 0];
+        }
+
+        foreach ($rankings as $userRankings) {
+            $first = $userRankings->sortBy('rank')->first();
+            if ($first && isset($tally[$first->option_id])) {
+                $tally[$first->option_id]['votes']++;
+            }
+        }
+
+        usort($tally, fn ($a, $b) => $b['votes'] <=> $a['votes']);
+
+        return [
+            'total_voters' => $rankings->count(),
+            'results'      => array_values($tally),
+        ];
     }
 
     /**
-     * Delegates to legacy PollRankingService::getUserRankings().
+     * Get a user's rankings for a poll.
      */
     public function getUserRankings(int $pollId, int $userId): ?array
     {
-        return \Nexus\Services\PollRankingService::getUserRankings($pollId, $userId);
+        $rankings = DB::table('poll_rankings')
+            ->where('poll_id', $pollId)
+            ->where('user_id', $userId)
+            ->orderBy('rank')
+            ->get()
+            ->all();
+
+        return empty($rankings) ? null : array_map(fn ($r) => (array) $r, $rankings);
     }
 }

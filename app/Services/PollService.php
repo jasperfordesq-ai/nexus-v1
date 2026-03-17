@@ -1,5 +1,5 @@
 <?php
-// Copyright (c) 2024-2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -10,9 +10,8 @@ use App\Models\Poll;
 use Illuminate\Support\Facades\DB;
 
 /**
- * PollService — Laravel DI-based service for poll operations.
+ * PollService — Eloquent-based service for poll operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\PollService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class PollService
@@ -42,6 +41,14 @@ class PollService
             $query->where('end_date', '<=', now());
         }
 
+        if (! empty($filters['user_id'])) {
+            $query->where('user_id', (int) $filters['user_id']);
+        }
+
+        if (! empty($filters['category'])) {
+            $query->where('category', $filters['category']);
+        }
+
         if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
             $query->where('id', '<', (int) $cid);
         }
@@ -61,7 +68,7 @@ class PollService
     }
 
     /**
-     * Get a single poll by ID with vote counts.
+     * Get a single poll by ID with vote counts and user-voted flag.
      */
     public function getById(int $id, ?int $currentUserId = null): ?array
     {
@@ -81,9 +88,22 @@ class PollService
                 'votes' => (int) DB::table('poll_votes')->where('option_id', $o->id)->count(),
             ])->all();
 
-        $data['user_voted'] = $currentUserId
+        $data['total_votes'] = array_sum(array_column($data['options'], 'votes'));
+
+        $data['has_voted'] = $currentUserId
             ? DB::table('poll_votes')->where('poll_id', $id)->where('user_id', $currentUserId)->exists()
             : false;
+
+        $data['user_voted_option'] = null;
+        if ($currentUserId) {
+            $vote = DB::table('poll_votes')
+                ->where('poll_id', $id)
+                ->where('user_id', $currentUserId)
+                ->first();
+            $data['user_voted_option'] = $vote ? (int) $vote->option_id : null;
+        }
+
+        $data['poll_type'] = $data['poll_type'] ?? 'standard';
 
         return $data;
     }
@@ -98,8 +118,10 @@ class PollService
                 'user_id'     => $userId,
                 'question'    => trim($data['question']),
                 'description' => trim($data['description'] ?? ''),
-                'end_date'    => $data['end_date'] ?? null,
+                'end_date'    => $data['expires_at'] ?? $data['end_date'] ?? null,
                 'is_active'   => true,
+                'category'    => $data['category'] ?? null,
+                'poll_type'   => $data['poll_type'] ?? 'standard',
             ]);
             $poll->save();
 
@@ -118,7 +140,46 @@ class PollService
     }
 
     /**
+     * Update a poll (owner only, no votes yet).
+     */
+    public function update(int $id, int $userId, array $data): ?Poll
+    {
+        $poll = $this->poll->newQuery()->find($id);
+
+        if (! $poll || (int) $poll->user_id !== $userId) {
+            return null;
+        }
+
+        $allowed = ['question', 'description', 'end_date', 'expires_at', 'category'];
+        $updates = collect($data)->only($allowed)->all();
+        if (isset($updates['expires_at'])) {
+            $updates['end_date'] = $updates['expires_at'];
+            unset($updates['expires_at']);
+        }
+        $poll->fill($updates);
+        $poll->save();
+
+        return $poll->fresh(['user']);
+    }
+
+    /**
+     * Delete a poll (owner only).
+     */
+    public function delete(int $id, int $userId): bool
+    {
+        $poll = $this->poll->newQuery()->find($id);
+
+        if (! $poll || (int) $poll->user_id !== $userId) {
+            return false;
+        }
+
+        return (bool) $poll->delete();
+    }
+
+    /**
      * Cast a vote on a poll option.
+     *
+     * @return bool true if vote was cast, false if already voted
      */
     public function vote(int $pollId, int $optionId, int $userId): bool
     {
@@ -139,5 +200,20 @@ class PollService
         ]);
 
         return true;
+    }
+
+    /**
+     * Get distinct poll categories for the current tenant.
+     */
+    public function getCategories(): array
+    {
+        return $this->poll->newQuery()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category')
+            ->sort()
+            ->values()
+            ->all();
     }
 }

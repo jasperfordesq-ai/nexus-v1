@@ -10,7 +10,9 @@ use Illuminate\Http\JsonResponse;
 use App\Services\BlogService;
 
 /**
- * BlogController -- Public blog posts and categories.
+ * BlogController — Eloquent-powered public blog posts and categories.
+ *
+ * Fully migrated from legacy delegation to Eloquent via BlogService.
  */
 class BlogController extends BaseApiController
 {
@@ -20,39 +22,59 @@ class BlogController extends BaseApiController
         private readonly BlogService $blogService,
     ) {}
 
-    /** GET /api/v2/blog */
+    // -----------------------------------------------------------------
+    //  GET /api/v2/blog
+    // -----------------------------------------------------------------
+
     public function index(): JsonResponse
     {
-        $tenantId = $this->getTenantId();
-        $page = $this->queryInt('page', 1, 1);
-        $perPage = $this->queryInt('per_page', 20, 1, 100);
-        $categoryId = $this->queryInt('category_id');
-        
-        $result = $this->blogService->getPosts($tenantId, $page, $perPage, $categoryId);
-        
-        return $this->respondWithPaginatedCollection(
-            $result['items'], $result['total'], $page, $perPage
+        $filters = [
+            'limit' => $this->queryInt('per_page', 12, 1, 50),
+        ];
+
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+        if ($this->query('search')) {
+            $filters['search'] = $this->query('search');
+        }
+        if ($this->query('category_id')) {
+            $filters['category_id'] = $this->queryInt('category_id');
+        }
+
+        $result = $this->blogService->getAll($filters);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $filters['limit'],
+            $result['has_more']
         );
     }
 
-    /** GET /api/v2/blog/{slug} */
+    // -----------------------------------------------------------------
+    //  GET /api/v2/blog/{slug}
+    // -----------------------------------------------------------------
+
     public function show(string $slug): JsonResponse
     {
         $post = $this->blogService->getBySlug($slug, $this->getTenantId());
-        
+
         if ($post === null) {
             return $this->respondWithError('NOT_FOUND', 'Blog post not found', null, 404);
         }
-        
+
         return $this->respondWithData($post);
     }
 
-    /** GET /api/v2/blog/categories */
+    // -----------------------------------------------------------------
+    //  GET /api/v2/blog/categories
+    // -----------------------------------------------------------------
+
     public function categories(): JsonResponse
     {
         $categories = $this->blogService->getCategories($this->getTenantId());
-        
+
         return $this->respondWithData($categories);
     }
-
 }
