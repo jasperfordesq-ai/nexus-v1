@@ -6,54 +6,69 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+
 /**
- * GoalReminderService — Laravel DI wrapper for legacy \Nexus\Services\GoalReminderService.
+ * GoalReminderService — Eloquent-based service for goal reminders.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Replaces the legacy DI wrapper that delegated to
+ * \Nexus\Services\GoalReminderService.
  */
 class GoalReminderService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy GoalReminderService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        return \Nexus\Services\GoalReminderService::getErrors();
-    }
-
-    /**
-     * Delegates to legacy GoalReminderService::setReminder().
-     */
-    public function setReminder(int $goalId, int $userId, array $data): ?array
-    {
-        return \Nexus\Services\GoalReminderService::setReminder($goalId, $userId, $data);
-    }
-
-    /**
-     * Delegates to legacy GoalReminderService::getReminder().
+     * Get reminder settings for a goal.
      */
     public function getReminder(int $goalId, int $userId): ?array
     {
-        return \Nexus\Services\GoalReminderService::getReminder($goalId, $userId);
+        $row = DB::table('goal_reminders')
+            ->where('goal_id', $goalId)
+            ->where('user_id', $userId)
+            ->first();
+
+        return $row ? (array) $row : null;
     }
 
     /**
-     * Delegates to legacy GoalReminderService::deleteReminder().
+     * Set or update a reminder.
+     */
+    public function setReminder(int $goalId, int $userId, array $data): array
+    {
+        $existing = DB::table('goal_reminders')
+            ->where('goal_id', $goalId)
+            ->where('user_id', $userId)
+            ->first();
+
+        $values = [
+            'frequency'  => $data['frequency'] ?? 'weekly',
+            'enabled'    => $data['enabled'] ?? true,
+            'updated_at' => now(),
+        ];
+
+        if ($existing) {
+            DB::table('goal_reminders')
+                ->where('id', $existing->id)
+                ->update($values);
+            $id = $existing->id;
+        } else {
+            $id = DB::table('goal_reminders')->insertGetId(array_merge($values, [
+                'goal_id'    => $goalId,
+                'user_id'    => $userId,
+                'created_at' => now(),
+            ]));
+        }
+
+        return (array) DB::table('goal_reminders')->find($id);
+    }
+
+    /**
+     * Delete a reminder.
      */
     public function deleteReminder(int $goalId, int $userId): bool
     {
-        return \Nexus\Services\GoalReminderService::deleteReminder($goalId, $userId);
-    }
-
-    /**
-     * Delegates to legacy GoalReminderService::sendDueReminders().
-     */
-    public function sendDueReminders(): int
-    {
-        return \Nexus\Services\GoalReminderService::sendDueReminders();
+        return (bool) DB::table('goal_reminders')
+            ->where('goal_id', $goalId)
+            ->where('user_id', $userId)
+            ->delete();
     }
 }

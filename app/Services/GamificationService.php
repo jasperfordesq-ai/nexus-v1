@@ -1,5 +1,5 @@
 <?php
-// Copyright (c) 2024-2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -11,10 +11,9 @@ use App\Models\UserBadge;
 use Illuminate\Support\Facades\DB;
 
 /**
- * GamificationService — Laravel DI-based service for gamification.
+ * GamificationService — Eloquent-based service for gamification.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\GamificationService.
- * XP is tracked on the users table (points column). Badges in user_badges.
+ * XP is tracked on the users table (xp/points column). Badges in user_badges.
  */
 class GamificationService
 {
@@ -44,18 +43,21 @@ class GamificationService
     ) {}
 
     /**
-     * Get gamification profile for a user (XP, level, badge count).
+     * Get gamification profile for a user (XP, level, badge count, showcased badges).
      */
-    public function getProfile(int $userId): array
+    public function getProfile(int $userId, ?int $tenantId = null): array
     {
-        $user = $this->user->newQuery()->find($userId, ['id', 'points', 'first_name', 'last_name', 'avatar_url']);
+        $user = $this->user->newQuery()
+            ->find($userId, ['id', 'first_name', 'last_name', 'avatar_url', 'xp', 'level', 'points']);
 
         if (! $user) {
             return [];
         }
 
-        $xp = (int) ($user->points ?? 0);
-        $level = 1;
+        $xp = (int) ($user->xp ?? $user->points ?? 0);
+        $level = (int) ($user->level ?? 1);
+
+        // Recalculate level from XP
         foreach (self::LEVEL_THRESHOLDS as $lvl => $threshold) {
             if ($xp >= $threshold) {
                 $level = $lvl;
@@ -63,53 +65,108 @@ class GamificationService
         }
 
         $nextThreshold = self::LEVEL_THRESHOLDS[$level + 1] ?? null;
+        $currentThreshold = self::LEVEL_THRESHOLDS[$level] ?? 0;
+        $progress = $nextThreshold
+            ? min(100, round(($xp - $currentThreshold) / ($nextThreshold - $currentThreshold) * 100, 1))
+            : 100;
+
+        $badgeCount = $this->userBadge->where('user_id', $userId)->count();
+        $showcased = $this->userBadge->newQuery()
+            ->where('user_id', $userId)
+            ->where('is_showcased', true)
+            ->orderBy('showcase_order')
+            ->get()
+            ->toArray();
+
+        // Enrich showcased with definitions from legacy service if available
+        foreach ($showcased as &$badge) {
+            if (class_exists('\Nexus\Services\GamificationService')) {
+                $def = \Nexus\Services\GamificationService::getBadgeByKey($badge['badge_key']);
+                if ($def) {
+                    $badge = array_merge($badge, $def);
+                }
+            }
+        }
 
         return [
-            'user_id'       => $userId,
-            'xp'            => $xp,
-            'level'         => $level,
-            'next_level_xp' => $nextThreshold,
-            'badge_count'   => $this->userBadge->where('user_id', $userId)->count(),
+            'user' => [
+                'id'         => $user->id,
+                'name'       => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+                'avatar_url' => $user->avatar_url,
+            ],
+            'xp'               => $xp,
+            'level'            => $level,
+            'level_progress'   => [
+                'current_xp'       => $xp,
+                'current_level'    => $level,
+                'next_level_xp'    => $nextThreshold,
+                'progress_percent' => $progress,
+            ],
+            'badges_count'     => $badgeCount,
+            'showcased_badges' => $showcased,
+            'xp_values'        => self::XP_VALUES,
+            'level_thresholds' => self::LEVEL_THRESHOLDS,
         ];
     }
 
     /**
-     * Get all badges earned by a user.
+     * Get all badges earned by a user, enriched with definitions.
      */
-    public function getBadges(int $userId): array
+    public function getBadges(int $userId, ?int $tenantId = null): array
     {
-        return $this->userBadge->newQuery()
+        $badges = $this->userBadge->newQuery()
             ->where('user_id', $userId)
             ->orderByDesc('awarded_at')
             ->get()
             ->toArray();
+
+        foreach ($badges as &$badge) {
+            if (class_exists('\Nexus\Services\GamificationService')) {
+                $def = \Nexus\Services\GamificationService::getBadgeByKey($badge['badge_key']);
+                if ($def) {
+                    $badge = array_merge($badge, $def);
+                    $badge['description'] = $badge['msg'] ?? $badge['description'] ?? null;
+                }
+            }
+        }
+
+        return $badges;
     }
 
     /**
      * Get XP leaderboard for the current tenant.
      */
-    public function getLeaderboard(int $limit = 20): array
+    public function getLeaderboard(?int $tenantId = null, string $period = 'all_time', int $limit = 20): array
     {
-        return $this->user->newQuery()
-            ->select(['id', 'first_name', 'last_name', 'avatar_url', 'points'])
-            ->where('status', 'active')
-            ->orderByDesc('points')
-            ->limit($limit)
-            ->get()
+        $query = $this->user->newQuery()
+            ->select(['id', 'first_name', 'last_name', 'avatar_url', 'xp', 'level', 'points'])
+            ->where('is_approved', true);
+
+        $query->orderByRaw('COALESCE(xp, points, 0) DESC')
+              ->limit($limit);
+
+        return $query->get()
             ->map(fn (User $u, int $i) => [
-                'rank'       => $i + 1,
-                'user_id'    => $u->id,
-                'name'       => trim($u->first_name . ' ' . $u->last_name),
-                'avatar_url' => $u->avatar_url,
-                'xp'         => (int) ($u->points ?? 0),
+                'position'        => $i + 1,
+                'user'            => [
+                    'id'         => $u->id,
+                    'name'       => trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')),
+                    'avatar_url' => $u->avatar_url,
+                ],
+                'xp'              => (int) ($u->xp ?? $u->points ?? 0),
+                'level'           => (int) ($u->level ?? 1),
+                'score'           => (float) ($u->xp ?? $u->points ?? 0),
+                'is_current_user' => false,
             ])
             ->all();
     }
 
     /**
      * Claim daily login reward (idempotent per calendar day).
+     *
+     * @return array|null Reward data, or null if already claimed
      */
-    public function claimDailyReward(int $userId): array
+    public function claimDailyReward(int $userId, ?int $tenantId = null): ?array
     {
         $today = now()->toDateString();
 
@@ -120,11 +177,11 @@ class GamificationService
             ->exists();
 
         if ($alreadyClaimed) {
-            return ['claimed' => false, 'reason' => 'already_claimed'];
+            return null;
         }
 
         $xp = self::XP_VALUES['daily_login'];
-        DB::table('users')->where('id', $userId)->increment('points', $xp);
+        DB::table('users')->where('id', $userId)->increment('xp', $xp);
 
         DB::table('activity_log')->insert([
             'user_id'     => $userId,
@@ -134,6 +191,6 @@ class GamificationService
             'updated_at'  => now(),
         ]);
 
-        return ['claimed' => true, 'xp_awarded' => $xp];
+        return ['claimed' => true, 'reward' => ['xp' => $xp]];
     }
 }

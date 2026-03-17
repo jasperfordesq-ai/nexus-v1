@@ -6,76 +6,261 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\PollService;
+use App\Services\PollRankingService;
+use App\Services\PollExportService;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Http\Response;
 
 /**
- * PollsController -- Community polls with voting support.
+ * PollsController — Eloquent-powered community polls with voting support.
+ *
+ * Fully migrated from legacy delegation to Eloquent via PollService.
  */
 class PollsController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    /**
-     * Delegate to legacy controller via output buffering.
-     */
-    private function delegate(string $legacyClass, string $method, array $params = []): JsonResponse
-    {
-        $controller = new $legacyClass();
-        ob_start();
-        $controller->$method(...$params);
-        $output = ob_get_clean();
-        $status = http_response_code();
-        return response()->json(json_decode($output, true) ?: $output, $status ?: 200);
-    }
+    public function __construct(
+        private readonly PollService $pollService,
+        private readonly PollRankingService $rankingService,
+        private readonly PollExportService $exportService,
+    ) {}
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/polls
+    // -----------------------------------------------------------------
 
     public function index(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'index');
+        $userId = $this->getUserId();
+
+        $filters = [
+            'status' => $this->query('status', 'open'),
+            'limit'  => $this->queryInt('per_page', 20, 1, 100),
+        ];
+
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+        if ($this->query('user_id')) {
+            $filters['user_id'] = $this->queryInt('user_id');
+        }
+        if ($this->query('mine') === '1') {
+            $filters['user_id'] = $userId;
+        }
+        if ($this->query('category')) {
+            $filters['category'] = $this->query('category');
+        }
+
+        $result = $this->pollService->getAll($filters);
+
+        // Enrich with has_voted
+        $items = array_map(function (array $poll) use ($userId) {
+            if (! isset($poll['has_voted'])) {
+                $enriched = $this->pollService->getById((int) $poll['id'], $userId);
+                return $enriched ?? $poll;
+            }
+            return $poll;
+        }, $result['items']);
+
+        return $this->respondWithCollection($items, $result['cursor'], $filters['limit'], $result['has_more']);
     }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/polls/{id}
+    // -----------------------------------------------------------------
 
     public function show(int $id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'show', func_get_args());
+        $userId = $this->getUserId();
+
+        $poll = $this->pollService->getById($id, $userId);
+
+        if (! $poll) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found', null, 404);
+        }
+
+        return $this->respondWithData($poll);
     }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/polls
+    // -----------------------------------------------------------------
 
     public function store(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'store');
+        $userId = $this->getUserId();
+        $this->rateLimit('poll_create', 5, 60);
+
+        $data = $this->getAllInput();
+
+        if (empty(trim($data['question'] ?? ''))) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Question is required', 'question', 400);
+        }
+
+        if (empty($data['options']) || ! is_array($data['options']) || count($data['options']) < 2) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'At least 2 options are required', 'options', 400);
+        }
+
+        $poll = $this->pollService->create($userId, $data);
+        $result = $this->pollService->getById($poll->id, $userId);
+
+        return $this->respondWithData($result, null, 201);
     }
+
+    // -----------------------------------------------------------------
+    //  PUT /api/v2/polls/{id}
+    // -----------------------------------------------------------------
+
+    public function update(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('poll_update', 10, 60);
+
+        $poll = $this->pollService->update($id, $userId, $this->getAllInput());
+
+        if (! $poll) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found or not owned', null, 404);
+        }
+
+        $result = $this->pollService->getById($id, $userId);
+
+        return $this->respondWithData($result);
+    }
+
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/polls/{id}
+    // -----------------------------------------------------------------
+
+    public function destroy(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('poll_delete', 5, 60);
+
+        $deleted = $this->pollService->delete($id, $userId);
+
+        if (! $deleted) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found or not owned', null, 404);
+        }
+
+        return $this->noContent();
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/polls/{id}/vote
+    // -----------------------------------------------------------------
 
     public function vote(int $id): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'vote', func_get_args());
+        $userId = $this->getUserId();
+        $this->rateLimit('poll_vote', 20, 60);
+
+        $optionId = $this->input('option_id');
+
+        if (empty($optionId)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Option ID is required', 'option_id', 400);
+        }
+
+        $success = $this->pollService->vote($id, (int) $optionId, $userId);
+
+        if (! $success) {
+            return $this->respondWithError('RESOURCE_CONFLICT', 'Already voted on this poll', null, 409);
+        }
+
+        $poll = $this->pollService->getById($id, $userId);
+
+        return $this->respondWithData($poll);
     }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/polls/{id}/rank
+    // -----------------------------------------------------------------
+
+    public function rank(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('poll_rank', 20, 60);
+
+        $rankings = $this->input('rankings');
+
+        if (empty($rankings) || ! is_array($rankings)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Rankings array is required', 'rankings', 400);
+        }
+
+        $success = $this->rankingService->submitRanking($id, $userId, $rankings);
+
+        if (! $success) {
+            return $this->respondWithError('RESOURCE_CONFLICT', 'Already submitted rankings', null, 409);
+        }
+
+        $results = $this->rankingService->calculateResults($id);
+        $poll = $this->pollService->getById($id, $userId);
+
+        return $this->respondWithData([
+            'poll'           => $poll,
+            'ranked_results' => $results,
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/polls/{id}/ranked-results
+    // -----------------------------------------------------------------
+
+    public function rankedResults(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+
+        $poll = $this->pollService->getById($id, $userId);
+        if (! $poll) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found', null, 404);
+        }
+
+        if (($poll['poll_type'] ?? 'standard') !== 'ranked') {
+            return $this->respondWithError('VALIDATION_INVALID_VALUE', 'This is not a ranked-choice poll', null, 400);
+        }
+
+        $results = $this->rankingService->calculateResults($id);
+        $userRankings = $this->rankingService->getUserRankings($id, $userId);
+
+        return $this->respondWithData([
+            'poll'           => $poll,
+            'ranked_results' => $results,
+            'my_rankings'    => $userRankings,
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/polls/{id}/export
+    // -----------------------------------------------------------------
+
+    public function export(int $id): JsonResponse|Response
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('poll_export', 10, 60);
+
+        $csv = $this->exportService->exportToCsv($id, $userId);
+
+        if ($csv === null) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Poll not found or not authorized', null, 404);
+        }
+
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="poll-' . $id . '-export.csv"',
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/polls/categories
+    // -----------------------------------------------------------------
 
     public function categories(): JsonResponse
     {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'categories');
-    }
+        $this->getUserId();
 
-    public function update($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'update', func_get_args());
-    }
+        $categories = $this->pollService->getCategories();
 
-    public function destroy($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'destroy', func_get_args());
-    }
-
-    public function rank($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'rank', func_get_args());
-    }
-
-    public function rankedResults($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'rankedResults', func_get_args());
-    }
-
-    public function export($id): JsonResponse
-    {
-        return $this->delegate(\Nexus\Controllers\Api\PollsApiController::class, 'export', func_get_args());
+        return $this->respondWithData($categories);
     }
 }

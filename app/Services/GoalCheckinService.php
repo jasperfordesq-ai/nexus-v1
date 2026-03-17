@@ -6,38 +6,56 @@
 
 namespace App\Services;
 
+use App\Models\GoalCheckin;
+
 /**
- * GoalCheckinService — Laravel DI wrapper for legacy \Nexus\Services\GoalCheckinService.
+ * GoalCheckinService — Eloquent-based service for goal check-ins.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Replaces the legacy DI wrapper that delegated to
+ * \Nexus\Services\GoalCheckinService.
  */
 class GoalCheckinService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy GoalCheckinService::getErrors().
+     * Create a check-in for a goal.
      */
-    public function getErrors(): array
+    public function create(int $goalId, int $userId, array $data): GoalCheckin
     {
-        return \Nexus\Services\GoalCheckinService::getErrors();
+        return GoalCheckin::create([
+            'goal_id'          => $goalId,
+            'user_id'          => $userId,
+            'progress_percent' => $data['progress_percent'] ?? null,
+            'note'             => trim($data['note'] ?? ''),
+            'mood'             => $data['mood'] ?? null,
+        ]);
     }
 
     /**
-     * Delegates to legacy GoalCheckinService::create().
-     */
-    public function create(int $goalId, int $userId, array $data): ?int
-    {
-        return \Nexus\Services\GoalCheckinService::create($goalId, $userId, $data);
-    }
-
-    /**
-     * Delegates to legacy GoalCheckinService::getByGoalId().
+     * Get check-ins for a goal with cursor pagination.
      */
     public function getByGoalId(int $goalId, array $filters = []): array
     {
-        return \Nexus\Services\GoalCheckinService::getByGoalId($goalId, $filters);
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = GoalCheckin::where('goal_id', $goalId)
+            ->with(['user:id,first_name,last_name,avatar_url']);
+
+        if ($cursor !== null && ($cid = base64_decode($cursor, true)) !== false) {
+            $query->where('id', '<', (int) $cid);
+        }
+
+        $query->orderByDesc('id');
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        return [
+            'items'    => $items->toArray(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 }

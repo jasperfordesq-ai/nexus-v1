@@ -6,30 +6,51 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+
 /**
- * PollExportService — Laravel DI wrapper for legacy \Nexus\Services\PollExportService.
+ * PollExportService — Eloquent-based service for poll export.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Replaces the legacy DI wrapper that delegated to
+ * \Nexus\Services\PollExportService.
  */
 class PollExportService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy PollExportService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        return \Nexus\Services\PollExportService::getErrors();
-    }
-
-    /**
-     * Delegates to legacy PollExportService::exportToCsv().
+     * Export poll results as CSV string.
+     *
+     * @return string|null CSV content, or null if poll not found / not authorized
      */
     public function exportToCsv(int $pollId, int $userId): ?string
     {
-        return \Nexus\Services\PollExportService::exportToCsv($pollId, $userId);
+        $poll = DB::table('polls')->find($pollId);
+
+        if (! $poll) {
+            return null;
+        }
+
+        // Only creator or admin can export
+        if ((int) $poll->user_id !== $userId) {
+            return null;
+        }
+
+        $options = DB::table('poll_options')
+            ->where('poll_id', $pollId)
+            ->get();
+
+        $lines = [];
+        $lines[] = implode(',', ['Option', 'Votes']);
+
+        foreach ($options as $option) {
+            $votes = DB::table('poll_votes')
+                ->where('option_id', $option->id)
+                ->count();
+            $lines[] = implode(',', [
+                '"' . str_replace('"', '""', $option->option_text) . '"',
+                $votes,
+            ]);
+        }
+
+        return implode("\n", $lines);
     }
 }
