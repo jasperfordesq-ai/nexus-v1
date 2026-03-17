@@ -11,6 +11,8 @@ use App\Services\CategoryService;
 
 /**
  * CategoriesController -- Tenant-scoped listing and service categories.
+ *
+ * Uses Eloquent via CategoryService with automatic tenant scoping from HasTenantScope.
  */
 class CategoriesController extends BaseApiController
 {
@@ -20,15 +22,24 @@ class CategoriesController extends BaseApiController
         private readonly CategoryService $categoryService,
     ) {}
 
-    /** GET /api/v2/categories */
+    /**
+     * GET /api/v2/categories
+     *
+     * List categories, optionally filtered by type (listing, event, blog, resource, volunteering).
+     *
+     * Query Parameters:
+     * - type: string (optional) — filter by category type
+     */
     public function index(): JsonResponse
     {
-        $tenantId = $this->getTenantId();
         $type = $this->query('type');
-        
-        $categories = $this->categoryService->getAll($tenantId, $type);
-        
+
+        if ($type) {
+            $categories = $this->categoryService->getByType($type);
+        } else {
+            $categories = $this->categoryService->getAll();
+        }
+
         return $this->respondWithData($categories);
     }
-
 }

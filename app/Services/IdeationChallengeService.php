@@ -101,6 +101,51 @@ class IdeationChallengeService
     }
 
     /**
+     * Get ideas for a challenge with cursor-based pagination.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
+     */
+    public function getIdeas(int $challengeId, array $filters = []): array
+    {
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $cursor = $filters['cursor'] ?? null;
+        $sort = $filters['sort'] ?? 'votes';
+
+        $query = DB::table('ideation_ideas as i')
+            ->leftJoin('users as u', 'i.user_id', '=', 'u.id')
+            ->where('i.challenge_id', $challengeId)
+            ->select('i.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
+
+        // Add vote count subquery
+        $query->selectSub(
+            DB::table('ideation_votes')->whereColumn('idea_id', 'i.id')->selectRaw('COUNT(*)'),
+            'vote_count'
+        );
+
+        if ($cursor !== null) {
+            $query->where('i.id', '<', (int) base64_decode($cursor));
+        }
+
+        if ($sort === 'votes') {
+            $query->orderByDesc('vote_count')->orderByDesc('i.id');
+        } else {
+            $query->orderByDesc('i.id');
+        }
+
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        return [
+            'items'    => $items->map(fn ($i) => (array) $i)->values()->all(),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
      * Toggle a vote on an idea.
      *
      * @return array{voted: bool, vote_count: int}
