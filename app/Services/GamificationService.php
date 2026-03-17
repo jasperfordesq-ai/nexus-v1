@@ -221,4 +221,58 @@ class GamificationService
     {
         \Nexus\Services\GamificationService::awardBadgeByKey($userId, $badgeKey);
     }
+
+    /**
+     * Delegates to legacy GamificationService::getBadgeProgress().
+     *
+     * Returns badge progress data for a user (earned vs. available badges).
+     */
+    public function getBadgeProgress(int $userId): array
+    {
+        return \Nexus\Services\GamificationService::getBadgeProgress($userId);
+    }
+
+    /**
+     * Delegates to legacy GamificationService::getLevelProgress().
+     *
+     * Returns level progress details (current XP, next level threshold, percentage).
+     */
+    public function getLevelProgress(int $xp, int $level): array
+    {
+        return \Nexus\Services\GamificationService::getLevelProgress($xp, $level);
+    }
+
+    /**
+     * Delegates to legacy GamificationService::getBadgeByKey().
+     *
+     * Returns a single badge definition array by its key, or null if not found.
+     */
+    public function getBadgeByKey(string $key): ?array
+    {
+        return \Nexus\Services\GamificationService::getBadgeByKey($key);
+    }
+
+    /**
+     * Delegates to legacy GamificationService::awardXP().
+     */
+    public function awardXP(int $userId, int $amount, string $action, string $description = ''): void
+    {
+        \Nexus\Services\GamificationService::awardXP($userId, $amount, $action, $description);
+    }
+
+    /**
+     * Delegates to legacy GamificationService::awardBadge().
+     */
+    public function awardBadge(int $userId, $badge): void
+    {
+        \Nexus\Services\GamificationService::awardBadge($userId, $badge);
+    }
+
+    /**
+     * Delegates to legacy GamificationService::checkStreakBadges().
+     */
+    public function checkStreakBadges(int $userId, int $streakLength): void
+    {
+        \Nexus\Services\GamificationService::checkStreakBadges($userId, $streakLength);
+    }
 }

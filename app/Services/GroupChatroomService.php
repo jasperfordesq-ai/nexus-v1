@@ -56,4 +56,36 @@ class GroupChatroomService
     {
         return \Nexus\Services\GroupChatroomService::ensureDefaultChatroom($groupId, $userId);
     }
+
+    /**
+     * Delegates to legacy GroupChatroomService::delete().
+     */
+    public function delete(int $chatroomId, int $userId): bool
+    {
+        return \Nexus\Services\GroupChatroomService::delete($chatroomId, $userId);
+    }
+
+    /**
+     * Delegates to legacy GroupChatroomService::getMessages().
+     */
+    public function getMessages(int $chatroomId, array $filters = []): array
+    {
+        return \Nexus\Services\GroupChatroomService::getMessages($chatroomId, $filters);
+    }
+
+    /**
+     * Delegates to legacy GroupChatroomService::postMessage().
+     */
+    public function postMessage(int $chatroomId, int $userId, string $body): ?int
+    {
+        return \Nexus\Services\GroupChatroomService::postMessage($chatroomId, $userId, $body);
+    }
+
+    /**
+     * Delegates to legacy GroupChatroomService::deleteMessage().
+     */
+    public function deleteMessage(int $messageId, int $userId): bool
+    {
+        return \Nexus\Services\GroupChatroomService::deleteMessage($messageId, $userId);
+    }
 }

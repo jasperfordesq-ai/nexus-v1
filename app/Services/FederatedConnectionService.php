@@ -56,4 +56,20 @@ class FederatedConnectionService
     {
         return \Nexus\Services\FederatedConnectionService::getStatus($userId, $otherUserId, $otherTenantId);
     }
+
+    /**
+     * Delegates to legacy FederatedConnectionService::getConnections().
+     */
+    public function getConnections(int $userId, string $statusFilter = 'accepted', int $limit = 50, int $offset = 0): array
+    {
+        return \Nexus\Services\FederatedConnectionService::getConnections($userId, $statusFilter, $limit, $offset);
+    }
+
+    /**
+     * Delegates to legacy FederatedConnectionService::getPendingCount().
+     */
+    public function getPendingCount(int $userId): int
+    {
+        return \Nexus\Services\FederatedConnectionService::getPendingCount($userId);
+    }
 }

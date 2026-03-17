@@ -56,4 +56,36 @@ class PusherService
     {
         return \Nexus\Services\PusherService::isConfigured();
     }
+
+    /**
+     * Delegates to legacy PusherService::getUserChannel().
+     */
+    public function getUserChannel(int $userId): string
+    {
+        return \Nexus\Services\PusherService::getUserChannel($userId);
+    }
+
+    /**
+     * Delegates to legacy PusherService::getPresenceChannel().
+     */
+    public function getPresenceChannel(): string
+    {
+        return \Nexus\Services\PusherService::getPresenceChannel();
+    }
+
+    /**
+     * Delegates to legacy PusherService::authPrivateChannel().
+     */
+    public function authPrivateChannel(string $channelName, string $socketId, int $userId): ?string
+    {
+        return \Nexus\Services\PusherService::authPrivateChannel($channelName, $socketId, $userId);
+    }
+
+    /**
+     * Delegates to legacy PusherService::authPresenceChannel().
+     */
+    public function authPresenceChannel(string $channelName, string $socketId, int $userId, array $userInfo = []): ?string
+    {
+        return \Nexus\Services\PusherService::authPresenceChannel($channelName, $socketId, $userId, $userInfo);
+    }
 }

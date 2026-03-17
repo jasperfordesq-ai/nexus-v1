@@ -56,4 +56,12 @@ class VolunteerCertificateService
     {
         return \Nexus\Services\VolunteerCertificateService::generateHtml($code);
     }
+
+    /**
+     * Delegates to legacy VolunteerCertificateService::markDownloaded().
+     */
+    public function markDownloaded(string $code): void
+    {
+        \Nexus\Services\VolunteerCertificateService::markDownloaded($code);
+    }
 }

@@ -56,4 +56,20 @@ class TeamTaskService
     {
         return \Nexus\Services\TeamTaskService::update($taskId, $userId, $data);
     }
+
+    /**
+     * Delegates to legacy TeamTaskService::delete().
+     */
+    public function delete(int $taskId, int $userId): bool
+    {
+        return \Nexus\Services\TeamTaskService::delete($taskId, $userId);
+    }
+
+    /**
+     * Delegates to legacy TeamTaskService::getStats().
+     */
+    public function getStats(int $groupId): array
+    {
+        return \Nexus\Services\TeamTaskService::getStats($groupId);
+    }
 }

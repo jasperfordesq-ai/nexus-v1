@@ -56,4 +56,14 @@ class GroupAnnouncementService
     {
         return \Nexus\Services\GroupAnnouncementService::update($groupId, $announcementId, $userId, $data);
     }
+
+    /**
+     * Delete a group announcement.
+     *
+     * Delegates to legacy GroupAnnouncementService::delete().
+     */
+    public function delete(int $groupId, int $announcementId, int $userId): bool
+    {
+        return \Nexus\Services\GroupAnnouncementService::delete($groupId, $announcementId, $userId);
+    }
 }

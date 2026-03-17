@@ -56,4 +56,20 @@ class TenantHierarchyService
     {
         return \Nexus\Services\TenantHierarchyService::toggleSubtenantCapability($tenantId, $enable);
     }
+
+    /**
+     * Delegates to legacy TenantHierarchyService::assignTenantSuperAdmin().
+     */
+    public function assignTenantSuperAdmin(int $userId, int $tenantId): array
+    {
+        return \Nexus\Services\TenantHierarchyService::assignTenantSuperAdmin($userId, $tenantId);
+    }
+
+    /**
+     * Delegates to legacy TenantHierarchyService::revokeTenantSuperAdmin().
+     */
+    public function revokeTenantSuperAdmin(int $userId): array
+    {
+        return \Nexus\Services\TenantHierarchyService::revokeTenantSuperAdmin($userId);
+    }
 }

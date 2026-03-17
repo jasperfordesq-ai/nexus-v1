@@ -64,4 +64,24 @@ class BrokerMessageVisibilityService
     {
         return \Nexus\Services\BrokerMessageVisibilityService::isMessagingDisabledForUser($userId);
     }
+
+    /**
+     * Get the messaging restriction status for a user.
+     *
+     * Delegates to legacy BrokerMessageVisibilityService::getUserRestrictionStatus().
+     */
+    public function getUserRestrictionStatus(int $userId): array
+    {
+        return \Nexus\Services\BrokerMessageVisibilityService::getUserRestrictionStatus($userId);
+    }
+
+    /**
+     * Count unreviewed broker message copies.
+     *
+     * Delegates to legacy BrokerMessageVisibilityService::countUnreviewed().
+     */
+    public function countUnreviewed(): int
+    {
+        return \Nexus\Services\BrokerMessageVisibilityService::countUnreviewed();
+    }
 }

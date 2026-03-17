@@ -56,4 +56,28 @@ class CampaignService
     {
         return \Nexus\Services\CampaignService::update($id, $userId, $data);
     }
+
+    /**
+     * Delegates to legacy CampaignService::delete().
+     */
+    public function delete(int $id, int $userId): bool
+    {
+        return \Nexus\Services\CampaignService::delete($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy CampaignService::linkChallenge().
+     */
+    public function linkChallenge(int $campaignId, int $challengeId, int $userId, int $sortOrder = 0): bool
+    {
+        return \Nexus\Services\CampaignService::linkChallenge($campaignId, $challengeId, $userId, $sortOrder);
+    }
+
+    /**
+     * Delegates to legacy CampaignService::unlinkChallenge().
+     */
+    public function unlinkChallenge(int $campaignId, int $challengeId, int $userId): bool
+    {
+        return \Nexus\Services\CampaignService::unlinkChallenge($campaignId, $challengeId, $userId);
+    }
 }

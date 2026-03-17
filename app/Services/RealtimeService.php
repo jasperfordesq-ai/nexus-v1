@@ -61,4 +61,12 @@ class RealtimeService
     {
         return "private-tenant.{$tenantId}.{$suffix}";
     }
+
+    /**
+     * Delegates to legacy RealtimeService::getFrontendConfig().
+     */
+    public function getFrontendConfig(): array
+    {
+        return \Nexus\Services\RealtimeService::getFrontendConfig();
+    }
 }

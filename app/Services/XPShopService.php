@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright ï¿½ 2024ï¿½2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -7,7 +7,7 @@
 namespace App\Services;
 
 /**
- * XPShopService — Laravel DI wrapper for legacy \Nexus\Services\XPShopService.
+ * XPShopService ï¿½ Laravel DI wrapper for legacy \Nexus\Services\XPShopService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -47,5 +47,41 @@ class XPShopService
     public function getBalance(int $tenantId, int $userId): int
     {
         return \Nexus\Services\XPShopService::getBalance($tenantId, $userId);
+    }
+
+    /**
+     * Delegates to legacy XPShopService::getItemsWithUserStatus().
+     *
+     * Returns items array with user purchase status and user XP.
+     */
+    public function getItemsWithUserStatus(int $userId): array
+    {
+        return \Nexus\Services\XPShopService::getItemsWithUserStatus($userId);
+    }
+
+    /**
+     * Delegates to legacy XPShopService::purchaseItem().
+     *
+     * Purchase an item for a user (uses TenantContext for tenant scoping).
+     */
+    public function purchaseItem(int $userId, $itemId): array
+    {
+        return \Nexus\Services\XPShopService::purchase($userId, $itemId);
+    }
+
+    /**
+     * Delegates to legacy XPShopService::getAvailableItems().
+     */
+    public function getAvailableItems(): array
+    {
+        return \Nexus\Services\XPShopService::getAvailableItems();
+    }
+
+    /**
+     * Delegates to legacy XPShopService::getUserActivePerks().
+     */
+    public function getUserActivePerks(int $userId): array
+    {
+        return \Nexus\Services\XPShopService::getUserActivePerks($userId);
     }
 }

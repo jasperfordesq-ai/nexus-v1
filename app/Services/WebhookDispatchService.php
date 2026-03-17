@@ -56,4 +56,20 @@ class WebhookDispatchService
     {
         return \Nexus\Services\WebhookDispatchService::deleteWebhook($id);
     }
+
+    /**
+     * Delegates to legacy WebhookDispatchService::testWebhook().
+     */
+    public function testWebhook(int $id): array
+    {
+        return \Nexus\Services\WebhookDispatchService::testWebhook($id);
+    }
+
+    /**
+     * Delegates to legacy WebhookDispatchService::getLogs().
+     */
+    public function getLogs(int $id, array $filters = []): array
+    {
+        return \Nexus\Services\WebhookDispatchService::getLogs($id, $filters);
+    }
 }

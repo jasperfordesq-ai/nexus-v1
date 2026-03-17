@@ -56,4 +56,20 @@ class ChallengeTemplateService
     {
         return \Nexus\Services\ChallengeTemplateService::update($id, $userId, $data);
     }
+
+    /**
+     * Delegates to legacy ChallengeTemplateService::delete().
+     */
+    public function delete(int $id, int $userId): bool
+    {
+        return \Nexus\Services\ChallengeTemplateService::delete($id, $userId);
+    }
+
+    /**
+     * Delegates to legacy ChallengeTemplateService::getTemplateData().
+     */
+    public function getTemplateData(int $id): ?array
+    {
+        return \Nexus\Services\ChallengeTemplateService::getTemplateData($id);
+    }
 }
