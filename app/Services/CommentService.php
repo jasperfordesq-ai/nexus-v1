@@ -156,6 +156,50 @@ class CommentService
     }
 
     /**
+     * Fetch threaded comments for a target — delegates to legacy CommentService.
+     */
+    public function fetchComments(string $targetType, int $targetId, int $currentUserId = 0): array
+    {
+        return \Nexus\Services\CommentService::fetchComments($targetType, $targetId, $currentUserId);
+    }
+
+    /**
+     * Add a comment or reply — delegates to legacy CommentService.
+     */
+    public function addComment(int $userId, int $tenantId, string $targetType, int $targetId, string $content, ?int $parentId = null): array
+    {
+        return \Nexus\Services\CommentService::addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
+    }
+
+    /**
+     * Delete a comment (owner only) — delegates to legacy CommentService.
+     */
+    public function deleteComment(int $commentId, int $userId, bool $isSuperAdmin = false): array
+    {
+        return \Nexus\Services\CommentService::deleteComment($commentId, $userId, $isSuperAdmin);
+    }
+
+    /**
+     * Edit a comment (owner only) — delegates to legacy CommentService.
+     */
+    public function editComment(int $commentId, int $userId, string $newContent): array
+    {
+        return \Nexus\Services\CommentService::editComment($commentId, $userId, $newContent);
+    }
+
+    /**
+     * Get validation errors — delegates to legacy CommentService.
+     *
+     * Note: Legacy CommentService uses inline error arrays in return values
+     * rather than a dedicated $errors array. This returns an empty array
+     * for interface compatibility.
+     */
+    public function getErrors(): array
+    {
+        return [];
+    }
+
+    /**
      * Toggle an emoji reaction on a comment.
      */
     public function toggleReaction(int $userId, int $tenantId, int $commentId, string $emoji): array

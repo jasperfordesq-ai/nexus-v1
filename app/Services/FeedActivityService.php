@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright ï¿½ 2024ï¿½2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -7,7 +7,7 @@
 namespace App\Services;
 
 /**
- * FeedActivityService — Laravel DI wrapper for legacy \Nexus\Services\FeedActivityService.
+ * FeedActivityService ï¿½ Laravel DI wrapper for legacy \Nexus\Services\FeedActivityService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -39,5 +39,21 @@ class FeedActivityService
     public function getTimeline(int $tenantId, int $limit = 50): array
     {
         return \Nexus\Services\FeedActivityService::getTimeline($tenantId, $limit);
+    }
+
+    /**
+     * Record a feed activity entry â€” delegates to legacy FeedActivityService.
+     */
+    public function recordActivity(int $tenantId, int $userId, string $sourceType, int $sourceId, array $data = []): void
+    {
+        \Nexus\Services\FeedActivityService::recordActivity($tenantId, $userId, $sourceType, $sourceId, $data);
+    }
+
+    /**
+     * Hard-delete an activity row â€” delegates to legacy FeedActivityService.
+     */
+    public function removeActivity(string $sourceType, int $sourceId): void
+    {
+        \Nexus\Services\FeedActivityService::removeActivity($sourceType, $sourceId);
     }
 }

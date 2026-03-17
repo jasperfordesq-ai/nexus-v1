@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright ï¿½ 2024ï¿½2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -7,7 +7,7 @@
 namespace App\Services;
 
 /**
- * FeedRankingService — Laravel DI wrapper for legacy \Nexus\Services\FeedRankingService.
+ * FeedRankingService ï¿½ Laravel DI wrapper for legacy \Nexus\Services\FeedRankingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -39,5 +39,45 @@ class FeedRankingService
     public function boostPost(int $tenantId, int $postId, float $factor = 1.5): bool
     {
         return \Nexus\Services\FeedRankingService::boostPost($tenantId, $postId, $factor);
+    }
+
+    /**
+     * Record a feed post impression â€” delegates to legacy FeedRankingService.
+     */
+    public function recordImpression(int $postId, int $userId): void
+    {
+        \Nexus\Services\FeedRankingService::recordImpression($postId, $userId);
+    }
+
+    /**
+     * Record a feed post click â€” delegates to legacy FeedRankingService.
+     */
+    public function recordClick(int $postId, int $userId): void
+    {
+        \Nexus\Services\FeedRankingService::recordClick($postId, $userId);
+    }
+
+    /**
+     * Check if the EdgeRank algorithm is enabled â€” delegates to legacy FeedRankingService.
+     */
+    public function isEnabled(): bool
+    {
+        return \Nexus\Services\FeedRankingService::isEnabled();
+    }
+
+    /**
+     * Get the EdgeRank configuration â€” delegates to legacy FeedRankingService.
+     */
+    public function getConfig(): array
+    {
+        return \Nexus\Services\FeedRankingService::getConfig();
+    }
+
+    /**
+     * Clear the cached EdgeRank config â€” delegates to legacy FeedRankingService.
+     */
+    public function clearCache(): void
+    {
+        \Nexus\Services\FeedRankingService::clearCache();
     }
 }

@@ -8,6 +8,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class ActivityLog extends Model
 {
@@ -27,5 +28,37 @@ class ActivityLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Log an activity entry.
+     * Legacy-compatible static method.
+     */
+    public static function log(
+        int $userId,
+        string $action,
+        string $details = '',
+        bool $isPublic = false,
+        ?string $linkUrl = null,
+        string $actionType = 'system',
+        ?string $entityType = null,
+        ?int $entityId = null
+    ): int {
+        $ip = \Nexus\Core\ClientIp::get();
+
+        $id = DB::table('activity_log')->insertGetId([
+            'user_id' => $userId,
+            'action' => $action,
+            'details' => $details,
+            'is_public' => $isPublic ? 1 : 0,
+            'link_url' => $linkUrl,
+            'ip_address' => $ip,
+            'action_type' => $actionType,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
+            'created_at' => now(),
+        ]);
+
+        return (int) $id;
     }
 }

@@ -208,4 +208,212 @@ class EventService
 
         return true;
     }
+
+    // ================================================================
+    // LEGACY DELEGATION METHODS
+    // These delegate to Nexus\Services\EventService (static) for
+    // features not yet ported to Eloquent.
+    // ================================================================
+
+    /**
+     * Get validation errors — delegates to legacy EventService.
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\EventService::getErrors();
+    }
+
+    /**
+     * Get user's RSVP status for an event — delegates to legacy EventService.
+     */
+    public function getUserRsvp(int $eventId, int $userId): ?string
+    {
+        return \Nexus\Services\EventService::getUserRsvp($eventId, $userId);
+    }
+
+    /**
+     * RSVP to an event — delegates to legacy EventService.
+     */
+    public function rsvp(int $eventId, int $userId, string $status): bool
+    {
+        return \Nexus\Services\EventService::rsvp($eventId, $userId, $status);
+    }
+
+    /**
+     * Remove RSVP from an event — delegates to legacy EventService.
+     */
+    public function removeRsvp(int $eventId, int $userId): bool
+    {
+        return \Nexus\Services\EventService::removeRsvp($eventId, $userId);
+    }
+
+    /**
+     * Get attendees for an event — delegates to legacy EventService.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
+     */
+    public function getAttendees(int $eventId, array $filters = []): array
+    {
+        return \Nexus\Services\EventService::getAttendees($eventId, $filters);
+    }
+
+    /**
+     * Get nearby events — delegates to legacy EventService.
+     *
+     * @return array{items: array, has_more: bool}
+     */
+    public function getNearby(float $lat, float $lon, array $filters = []): array
+    {
+        return \Nexus\Services\EventService::getNearby($lat, $lon, $filters);
+    }
+
+    /**
+     * Update event image — delegates to legacy EventService.
+     */
+    public function updateImage(int $eventId, int $userId, string $imageUrl): bool
+    {
+        return \Nexus\Services\EventService::updateImage($eventId, $userId, $imageUrl);
+    }
+
+    /**
+     * Cancel an event — delegates to legacy EventService.
+     */
+    public function cancelEvent(int $eventId, int $userId, string $reason = ''): bool
+    {
+        return \Nexus\Services\EventService::cancelEvent($eventId, $userId, $reason);
+    }
+
+    /**
+     * Add user to event waitlist — delegates to legacy EventService.
+     */
+    public function addToWaitlist(int $eventId, int $userId): bool
+    {
+        return \Nexus\Services\EventService::addToWaitlist($eventId, $userId);
+    }
+
+    /**
+     * Remove user from event waitlist — delegates to legacy EventService.
+     */
+    public function removeFromWaitlist(int $eventId, int $userId): void
+    {
+        \Nexus\Services\EventService::removeFromWaitlist($eventId, $userId);
+    }
+
+    /**
+     * Get event waitlist — delegates to legacy EventService.
+     *
+     * @return array{items: array, has_more: bool}
+     */
+    public function getWaitlist(int $eventId, array $filters = []): array
+    {
+        return \Nexus\Services\EventService::getWaitlist($eventId, $filters);
+    }
+
+    /**
+     * Get user's waitlist position — delegates to legacy EventService.
+     */
+    public function getUserWaitlistPosition(int $eventId, int $userId): ?int
+    {
+        return \Nexus\Services\EventService::getUserWaitlistPosition($eventId, $userId);
+    }
+
+    /**
+     * Get user's reminders for an event — delegates to legacy EventService.
+     */
+    public function getUserReminders(int $eventId, int $userId): array
+    {
+        return \Nexus\Services\EventService::getUserReminders($eventId, $userId);
+    }
+
+    /**
+     * Update reminders for an event — delegates to legacy EventService.
+     */
+    public function updateReminders(int $eventId, int $userId, array $reminders): bool
+    {
+        return \Nexus\Services\EventService::updateReminders($eventId, $userId, $reminders);
+    }
+
+    /**
+     * Get attendance records for an event — delegates to legacy EventService.
+     */
+    public function getAttendanceRecords(int $eventId): array
+    {
+        return \Nexus\Services\EventService::getAttendanceRecords($eventId);
+    }
+
+    /**
+     * Mark a user as attended at an event — delegates to legacy EventService.
+     */
+    public function markAttended(int $eventId, int $attendeeId, int $markedById, ?float $hoursOverride = null, ?string $notes = null): bool
+    {
+        return \Nexus\Services\EventService::markAttended($eventId, $attendeeId, $markedById, $hoursOverride, $notes);
+    }
+
+    /**
+     * Bulk mark users as attended — delegates to legacy EventService.
+     */
+    public function bulkMarkAttended(int $eventId, array $attendeeIds, int $markedById): array
+    {
+        return \Nexus\Services\EventService::bulkMarkAttended($eventId, $attendeeIds, $markedById);
+    }
+
+    /**
+     * Get all event series — delegates to legacy EventService.
+     *
+     * @return array{items: array, has_more: bool}
+     */
+    public function getAllSeries(array $filters = []): array
+    {
+        return \Nexus\Services\EventService::getAllSeries($filters);
+    }
+
+    /**
+     * Create an event series — delegates to legacy EventService.
+     */
+    public function createSeries(int $userId, string $title, ?string $description = null): ?int
+    {
+        return \Nexus\Services\EventService::createSeries($userId, $title, $description);
+    }
+
+    /**
+     * Get series info — delegates to legacy EventService.
+     */
+    public function getSeriesInfo(int $seriesId): ?array
+    {
+        return \Nexus\Services\EventService::getSeriesInfo($seriesId);
+    }
+
+    /**
+     * Get events in a series — delegates to legacy EventService.
+     */
+    public function getSeriesEvents(int $seriesId): array
+    {
+        return \Nexus\Services\EventService::getSeriesEvents($seriesId);
+    }
+
+    /**
+     * Link an event to a series — delegates to legacy EventService.
+     */
+    public function linkToSeries(int $eventId, int $seriesId, int $userId): bool
+    {
+        return \Nexus\Services\EventService::linkToSeries($eventId, $seriesId, $userId);
+    }
+
+    /**
+     * Create recurring event instances — delegates to legacy EventService.
+     *
+     * @return array|null {template_id: int, occurrences: int} or null on failure
+     */
+    public function createRecurring(int $userId, array $data): ?array
+    {
+        return \Nexus\Services\EventService::createRecurring($userId, $data);
+    }
+
+    /**
+     * Update recurring event(s) — delegates to legacy EventService.
+     */
+    public function updateRecurring(int $eventId, int $userId, array $data, string $scope = 'single'): bool
+    {
+        return \Nexus\Services\EventService::updateRecurring($eventId, $userId, $data, $scope);
+    }
 }

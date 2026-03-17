@@ -173,4 +173,156 @@ class IdeationChallengeService
 
         return ['voted' => $voted, 'vote_count' => $count];
     }
+
+    // ================================================================
+    // LEGACY DELEGATION METHODS
+    // These delegate to Nexus\Services\IdeationChallengeService (static)
+    // for features not yet ported to Eloquent.
+    // ================================================================
+
+    /**
+     * Get validation errors — delegates to legacy IdeationChallengeService.
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\IdeationChallengeService::getErrors();
+    }
+
+    /**
+     * Get a challenge by ID (legacy) — delegates to legacy IdeationChallengeService.
+     */
+    public function getChallengeById(int $id, ?int $userId = null): ?array
+    {
+        return \Nexus\Services\IdeationChallengeService::getChallengeById($id, $userId);
+    }
+
+    /**
+     * Update a challenge — delegates to legacy IdeationChallengeService.
+     */
+    public function updateChallenge(int $id, int $userId, array $data): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::updateChallenge($id, $userId, $data);
+    }
+
+    /**
+     * Delete a challenge — delegates to legacy IdeationChallengeService.
+     */
+    public function deleteChallenge(int $id, int $userId): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::deleteChallenge($id, $userId);
+    }
+
+    /**
+     * Update challenge status — delegates to legacy IdeationChallengeService.
+     */
+    public function updateChallengeStatus(int $id, int $userId, string $status): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::updateChallengeStatus($id, $userId, $status);
+    }
+
+    /**
+     * Toggle favorite on a challenge — delegates to legacy IdeationChallengeService.
+     */
+    public function toggleFavorite(int $challengeId, int $userId): array
+    {
+        return \Nexus\Services\IdeationChallengeService::toggleFavorite($challengeId, $userId);
+    }
+
+    /**
+     * Duplicate a challenge — delegates to legacy IdeationChallengeService.
+     */
+    public function duplicateChallenge(int $challengeId, int $userId): ?int
+    {
+        return \Nexus\Services\IdeationChallengeService::duplicateChallenge($challengeId, $userId);
+    }
+
+    /**
+     * Get an idea by ID — delegates to legacy IdeationChallengeService.
+     */
+    public function getIdeaById(int $id, ?int $userId = null): ?array
+    {
+        return \Nexus\Services\IdeationChallengeService::getIdeaById($id, $userId);
+    }
+
+    /**
+     * Update an idea — delegates to legacy IdeationChallengeService.
+     */
+    public function updateIdea(int $id, int $userId, array $data): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::updateIdea($id, $userId, $data);
+    }
+
+    /**
+     * Update a draft idea — delegates to legacy IdeationChallengeService.
+     */
+    public function updateDraftIdea(int $ideaId, int $userId, array $data): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::updateDraftIdea($ideaId, $userId, $data);
+    }
+
+    /**
+     * Delete an idea — delegates to legacy IdeationChallengeService.
+     */
+    public function deleteIdea(int $id, int $userId): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::deleteIdea($id, $userId);
+    }
+
+    /**
+     * Vote on an idea (legacy) — delegates to legacy IdeationChallengeService.
+     */
+    public function voteIdea(int $ideaId, int $userId): ?array
+    {
+        return \Nexus\Services\IdeationChallengeService::voteIdea($ideaId, $userId);
+    }
+
+    /**
+     * Update idea status — delegates to legacy IdeationChallengeService.
+     */
+    public function updateIdeaStatus(int $ideaId, int $userId, string $status): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::updateIdeaStatus($ideaId, $userId, $status);
+    }
+
+    /**
+     * Get user's draft ideas for a challenge — delegates to legacy IdeationChallengeService.
+     */
+    public function getUserDrafts(int $challengeId, int $userId): array
+    {
+        return \Nexus\Services\IdeationChallengeService::getUserDrafts($challengeId, $userId);
+    }
+
+    /**
+     * Get comments for an idea — delegates to legacy IdeationChallengeService.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
+     */
+    public function getComments(int $ideaId, array $filters = []): array
+    {
+        return \Nexus\Services\IdeationChallengeService::getComments($ideaId, $filters);
+    }
+
+    /**
+     * Add a comment to an idea — delegates to legacy IdeationChallengeService.
+     */
+    public function addComment(int $ideaId, int $userId, string $body): ?int
+    {
+        return \Nexus\Services\IdeationChallengeService::addComment($ideaId, $userId, $body);
+    }
+
+    /**
+     * Delete a comment — delegates to legacy IdeationChallengeService.
+     */
+    public function deleteComment(int $commentId, int $userId): bool
+    {
+        return \Nexus\Services\IdeationChallengeService::deleteComment($commentId, $userId);
+    }
+
+    /**
+     * Get all tags — delegates to legacy IdeationChallengeService.
+     */
+    public function getAllTags(): array
+    {
+        return \Nexus\Services\IdeationChallengeService::getAllTags();
+    }
 }

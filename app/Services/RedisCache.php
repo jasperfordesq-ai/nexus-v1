@@ -13,6 +13,9 @@ namespace App\Services;
  */
 class RedisCache
 {
+    /** Default cache TTL in seconds (5 minutes) — matches legacy. */
+    private const DEFAULT_TTL = 300;
+
     public function __construct()
     {
     }
@@ -55,5 +58,23 @@ class RedisCache
     public function has(string $key, ?int $tenantId = null): bool
     {
         return \Nexus\Services\RedisCache::has($key, $tenantId);
+    }
+
+    /**
+     * Clear all cache for a tenant — delegates to legacy RedisCache.
+     *
+     * @return int Number of keys deleted
+     */
+    public function clearTenant(?int $tenantId = null): int
+    {
+        return \Nexus\Services\RedisCache::clearTenant($tenantId);
+    }
+
+    /**
+     * Get cache statistics — delegates to legacy RedisCache.
+     */
+    public function getStats(): array
+    {
+        return \Nexus\Services\RedisCache::getStats();
     }
 }

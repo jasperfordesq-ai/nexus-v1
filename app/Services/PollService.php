@@ -203,6 +203,14 @@ class PollService
     }
 
     /**
+     * Get validation errors — delegates to legacy PollService.
+     */
+    public function getErrors(): array
+    {
+        return \Nexus\Services\PollService::getErrors();
+    }
+
+    /**
      * Get distinct poll categories for the current tenant.
      */
     public function getCategories(): array
