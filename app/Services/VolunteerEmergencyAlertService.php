@@ -56,4 +56,52 @@ class VolunteerEmergencyAlertService
     {
         return \Nexus\Services\VolunteerEmergencyAlertService::getCoordinatorAlerts($coordinatorId);
     }
+
+    /**
+     * Cancel an active emergency alert.
+     *
+     * @param int $alertId  Alert ID
+     * @param int $userId   User cancelling (must be the creator)
+     * @param int $tenantId Tenant ID
+     * @return bool Success
+     */
+    public function cancelAlert(int $alertId, int $userId, int $tenantId): bool
+    {
+        $this->errors = [];
+
+        $alert = \Illuminate\Support\Facades\DB::selectOne(
+            "SELECT * FROM vol_emergency_alerts WHERE id = ? AND created_by = ? AND status = 'active' AND tenant_id = ?",
+            [$alertId, $userId, $tenantId]
+        );
+
+        if (!$alert) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Alert not found or cannot be cancelled'];
+            return false;
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::update(
+                "UPDATE vol_emergency_alerts SET status = 'cancelled' WHERE id = ? AND tenant_id = ?",
+                [$alertId, $tenantId]
+            );
+            return true;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('VolunteerEmergencyAlertService::cancelAlert error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel alert'];
+            return false;
+        }
+    }
+
+    /** @var array */
+    private array $errors = [];
+
+    /**
+     * Get errors from the last cancelAlert() call.
+     *
+     * @return array
+     */
+    public function getCancelErrors(): array
+    {
+        return $this->errors;
+    }
 }
