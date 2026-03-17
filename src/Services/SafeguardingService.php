@@ -9,6 +9,7 @@ namespace Nexus\Services;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\Notification;
+use Nexus\Services\WebhookDispatchService;
 
 /**
  * SafeguardingService - Guardian angel / safeguarding system
@@ -735,6 +736,20 @@ class SafeguardingService
                 "SELECT * FROM vol_safeguarding_incidents WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             )->fetch(\PDO::FETCH_ASSOC);
+
+            // Webhook: safeguarding.incident
+            try {
+                WebhookDispatchService::dispatch('safeguarding.incident', [
+                    'incident_id' => $id,
+                    'reported_by' => $reportedBy,
+                    'severity' => $severity,
+                    'incident_type' => $incidentType,
+                    'title' => $data['title'] ?? '',
+                    'organization_id' => $data['organization_id'] ?? null,
+                ]);
+            } catch (\Throwable $e) {
+                error_log("Webhook dispatch failed for safeguarding.incident: " . $e->getMessage());
+            }
 
             return $record ?: [];
         } catch (\Exception $e) {

@@ -9,6 +9,7 @@ namespace Nexus\Services;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\NotificationDispatcher;
+use Nexus\Services\WebhookDispatchService;
 
 /**
  * VolunteerReminderService - Automated volunteer reminders and nudges
@@ -385,6 +386,19 @@ class VolunteerReminderService
                     '<p>' . htmlspecialchars($message) . '</p>'
                 );
 
+                // Webhook: credential.expiring
+                try {
+                    WebhookDispatchService::dispatch('credential.expiring', [
+                        'user_id' => $userId,
+                        'user_name' => $cred['user_name'] ?? '',
+                        'credential_id' => (int)$cred['id'],
+                        'credential_type' => $cred['credential_type'] ?? '',
+                        'expires_at' => $cred['expires_at'],
+                    ]);
+                } catch (\Throwable $e) {
+                    error_log("Webhook dispatch failed for credential.expiring: " . $e->getMessage());
+                }
+
                 self::recordSent($userId, 'credential_expiry', (int)$cred['id'], 'email');
                 $count++;
             }
@@ -446,6 +460,20 @@ class VolunteerReminderService
                     '/volunteering/training',
                     '<p>' . htmlspecialchars($message) . '</p>'
                 );
+
+                // Webhook: training.expired
+                try {
+                    WebhookDispatchService::dispatch('training.expired', [
+                        'user_id' => $userId,
+                        'user_name' => $training['user_name'] ?? '',
+                        'training_id' => (int)$training['id'],
+                        'training_name' => $training['training_name'] ?? '',
+                        'training_type' => $training['training_type'] ?? '',
+                        'expires_at' => $training['expires_at'],
+                    ]);
+                } catch (\Throwable $e) {
+                    error_log("Webhook dispatch failed for training.expired: " . $e->getMessage());
+                }
 
                 self::recordSent($userId, 'training_expiry', (int)$training['id'], 'email');
                 $count++;
