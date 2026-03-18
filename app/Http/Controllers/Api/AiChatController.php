@@ -53,13 +53,26 @@ class AiChatController extends BaseApiController
             [$tenantId, $userId, $conversationId, 'user', $message]
         );
 
-        $response = [
-            'role' => 'assistant',
-            'content' => 'AI chat is not yet configured for this tenant.',
-            'conversation_id' => $conversationId,
-        ];
+        $content = 'AI chat is not yet configured for this tenant.';
 
-        return $this->respondWithData($response);
+        // Store the assistant reply
+        DB::insert(
+            'INSERT INTO ai_chat_messages (tenant_id, user_id, conversation_id, role, content, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
+            [$tenantId, $userId, $conversationId, 'assistant', $content]
+        );
+        $messageId = (int) DB::getPdo()->lastInsertId();
+
+        return $this->respondWithData([
+            'success' => true,
+            'conversation_id' => $conversationId,
+            'message' => [
+                'id' => $messageId,
+                'role' => 'assistant',
+                'content' => $content,
+            ],
+            'tokens_used' => null,
+            'model' => null,
+        ]);
     }
 
     /** POST /api/v2/ai/chat/stream — SSE streaming, kept as delegation */

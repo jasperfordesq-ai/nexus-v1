@@ -227,7 +227,7 @@ class NotificationsController extends BaseApiController
         $userId = $this->getOptionalUserId();
 
         if (!$userId) {
-            return response()->json(['success' => false, 'count' => 0]);
+            return $this->respondWithData(['count' => 0]);
         }
 
         $unreadCount = (int) DB::table('notifications')
@@ -236,10 +236,7 @@ class NotificationsController extends BaseApiController
             ->whereNull('deleted_at')
             ->count();
 
-        return response()->json([
-            'success' => true,
-            'count' => $unreadCount,
-        ]);
+        return $this->respondWithData(['count' => $unreadCount]);
     }
 
     /**
@@ -266,9 +263,9 @@ class NotificationsController extends BaseApiController
                 ->where('user_id', $userId)
                 ->delete();
         } else {
-            return response()->json(['success' => false, 'error' => 'Missing ID or Action']);
+            return $this->respondWithError('VALIDATION_ERROR', 'Missing ID or Action', null, 400);
         }
 
-        return response()->json(['success' => true]);
+        return $this->respondWithData(['message' => 'Notification deleted']);
     }
 }

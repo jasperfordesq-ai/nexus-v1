@@ -235,7 +235,7 @@ class HelpController extends BaseApiController
             }
 
             if ($exists) {
-                return response()->json(['success' => false, 'message' => 'Feedback already submitted']);
+                return $this->respondWithError('DUPLICATE_ERROR', 'Feedback already submitted');
             }
 
             DB::table('help_article_feedback')->insert([
@@ -246,10 +246,10 @@ class HelpController extends BaseApiController
                 'created_at' => now(),
             ]);
 
-            return response()->json(['success' => true, 'message' => 'Feedback recorded']);
+            return $this->respondWithData(['message' => 'Feedback recorded']);
         } catch (\Exception $e) {
             // Feedback table may not exist yet
-            return response()->json(['success' => true, 'message' => 'Feedback recorded']);
+            return $this->respondWithData(['message' => 'Feedback recorded']);
         }
     }
 }

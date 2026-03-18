@@ -158,7 +158,7 @@ class OrgWalletController extends BaseApiController
             'role'       => $m->role,
         ])->all();
 
-        return response()->json(['success' => true, 'members' => $result]);
+        return $this->respondWithData(['members' => $result]);
     }
 
     /**
@@ -189,7 +189,7 @@ class OrgWalletController extends BaseApiController
                 ->exists();
 
             if (! $isMember) {
-                return response()->json(['success' => false, 'error' => 'Access denied'], 403);
+                return $this->respondWithError('FORBIDDEN', 'Access denied', null, 403);
             }
         }
 
@@ -206,8 +206,7 @@ class OrgWalletController extends BaseApiController
             ->where('status', 'pending')
             ->count();
 
-        return response()->json([
-            'success'       => true,
+        return $this->respondWithData([
             'balance'       => $balance,
             'pending_count' => $pendingCount,
             'timestamp'     => time(),

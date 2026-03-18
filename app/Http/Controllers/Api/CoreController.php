@@ -209,7 +209,7 @@ class CoreController extends BaseApiController
         if (empty($message)) $errors[] = 'Message is required.';
 
         if (!empty($errors)) {
-            return response()->json(['success' => false, 'error' => implode(' ', $errors)], 400);
+            return $this->respondWithError('VALIDATION_ERROR', implode(' ', $errors), null, 400);
         }
 
         $tenant = TenantContext::get();
@@ -217,7 +217,7 @@ class CoreController extends BaseApiController
         $tenantEmail = $tenant['contact_email'] ?? '';
 
         if (empty($tenantEmail)) {
-            return response()->json(['success' => false, 'error' => 'No contact email configured for this community.'], 500);
+            return $this->respondWithError('SERVER_ERROR', 'No contact email configured for this community.', null, 500);
         }
 
         $emailSubject = "[{$tenantName}] Contact Form: {$subject}";
@@ -242,7 +242,7 @@ class CoreController extends BaseApiController
             // Table may not exist — non-critical
         }
 
-        return response()->json(['success' => true, 'message' => $sent ? 'Message sent successfully.' : "Message received. We'll get back to you soon."]);
+        return $this->respondWithData(['message' => $sent ? 'Message sent successfully.' : "Message received. We'll get back to you soon."]);
     }
 
     // ──────────────────────────────────────────────

@@ -51,7 +51,7 @@ class OnboardingController extends BaseApiController
 
         $tenantId = TenantContext::getId();
         $categories = DB::select(
-            "SELECT id, name, slug, color FROM categories WHERE tenant_id = ? ORDER BY name",
+            "SELECT id, name, slug, color, icon FROM categories WHERE tenant_id = ? ORDER BY name",
             [$tenantId]
         );
 

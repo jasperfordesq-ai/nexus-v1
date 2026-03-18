@@ -63,6 +63,8 @@ class SearchService
                     'name' => ($u->profile_type === 'organisation' && $u->organization_name)
                         ? $u->organization_name
                         : trim($u->first_name . ' ' . $u->last_name),
+                    'avatar' => $u->avatar_url,
+                    'tagline' => $u->bio,
                 ])
                 ->all();
         }
@@ -80,7 +82,11 @@ class SearchService
                 ->orderByDesc('id')
                 ->limit($limit)
                 ->get()
-                ->map(fn (Listing $l) => [...$l->toArray(), 'result_type' => 'listing'])
+                ->map(fn (Listing $l) => [
+                    ...$l->toArray(),
+                    'result_type' => 'listing',
+                    'category_name' => $l->category?->name,
+                ])
                 ->all();
         }
 
@@ -110,7 +116,11 @@ class SearchService
                 ->orderByDesc('id')
                 ->limit($limit)
                 ->get()
-                ->map(fn (Group $g) => [...$g->toArray(), 'result_type' => 'group'])
+                ->map(fn (Group $g) => [
+                    ...$g->toArray(),
+                    'result_type' => 'group',
+                    'members_count' => $g->active_members_count,
+                ])
                 ->all();
         }
 
@@ -169,7 +179,11 @@ class SearchService
             $this->applySortOrder($lq, $sort);
             $listings = $lq->limit($limit)->get();
             foreach ($listings as $l) {
-                $allItems[] = [...$l->toArray(), 'result_type' => 'listing'];
+                $allItems[] = [
+                    ...$l->toArray(),
+                    'result_type' => 'listing',
+                    'category_name' => $l->category?->name,
+                ];
             }
         }
 
@@ -191,7 +205,13 @@ class SearchService
                 $name = ($u->profile_type === 'organisation' && $u->organization_name)
                     ? $u->organization_name
                     : trim($u->first_name . ' ' . $u->last_name);
-                $allItems[] = [...$u->toArray(), 'result_type' => 'user', 'name' => $name];
+                $allItems[] = [
+                    ...$u->toArray(),
+                    'result_type' => 'user',
+                    'name' => $name,
+                    'avatar' => $u->avatar_url,
+                    'tagline' => $u->bio,
+                ];
             }
         }
 
@@ -225,7 +245,11 @@ class SearchService
             $this->applySortOrder($gq, $sort);
             $groups = $gq->limit($limit)->get();
             foreach ($groups as $g) {
-                $allItems[] = [...$g->toArray(), 'result_type' => 'group'];
+                $allItems[] = [
+                    ...$g->toArray(),
+                    'result_type' => 'group',
+                    'members_count' => $g->active_members_count,
+                ];
             }
         }
 

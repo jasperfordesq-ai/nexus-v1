@@ -66,9 +66,12 @@ class ConnectionService
         // Map to include the partner user info
         $result = $items->map(function (Connection $conn) use ($userId) {
             $data = $conn->toArray();
-            $data['partner'] = $conn->requester_id === $userId
+            $partner = $conn->requester_id === $userId
                 ? $conn->receiver?->toArray()
                 : $conn->requester?->toArray();
+            $data['partner'] = $partner;
+            $data['user'] = $partner;               // Alias: frontend expects 'user'
+            $data['connection_id'] = $conn->id;      // Alias: frontend expects 'connection_id'
             return $data;
         })->all();
 

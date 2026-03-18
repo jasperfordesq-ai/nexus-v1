@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 
@@ -21,6 +22,9 @@ use App\Core\TenantContext;
  */
 class UserService
 {
+    /** @var array<int, array{code: string, message: string}> */
+    private array $errors = [];
+
     public function __construct(
         private readonly User $user,
     ) {}
@@ -241,6 +245,249 @@ class UserService
             'requests_count'  => $requestsCount,
             'wallet_balance'  => round($balance, 2),
         ];
+    }
+
+    /**
+     * Update a user profile (alias for update()).
+     *
+     * @return bool True on success, false on failure (check getErrors()).
+     */
+    public function updateProfile(int $userId, array $data): bool
+    {
+        try {
+            $this->update($userId, $data);
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Profile update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            $this->setError('UPDATE_FAILED', $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update user password after verifying the current one.
+     */
+    public function updatePassword(int $userId, string $currentPassword, string $newPassword): bool
+    {
+        $user = $this->user->newQuery()->find($userId);
+
+        if (! $user) {
+            $this->setError('NOT_FOUND', 'User not found');
+            return false;
+        }
+
+        if (! Hash::check($currentPassword, $user->password_hash)) {
+            $this->setError('INVALID_PASSWORD', 'Current password is incorrect');
+            return false;
+        }
+
+        if (strlen($newPassword) < 8) {
+            $this->setError('VALIDATION_ERROR', 'New password must be at least 8 characters');
+            return false;
+        }
+
+        $user->password_hash = Hash::make($newPassword);
+        $user->save();
+
+        return true;
+    }
+
+    /**
+     * Upload and update user avatar.
+     *
+     * @param array $fileArray $_FILES-compatible array
+     * @return string|null The new avatar URL, or null on failure (check getErrors()).
+     */
+    public function updateAvatar(int $userId, array $fileArray): ?string
+    {
+        try {
+            $avatarUrl = \App\Core\ImageUploader::upload($fileArray, 'profiles', [
+                'crop'   => true,
+                'width'  => 400,
+                'height' => 400,
+            ]);
+
+            if (! $avatarUrl) {
+                $this->setError('UPLOAD_FAILED', 'Avatar upload returned empty result');
+                return null;
+            }
+
+            $user = $this->user->newQuery()->findOrFail($userId);
+            $user->avatar_url = $avatarUrl;
+            $user->save();
+
+            return $avatarUrl;
+        } catch (\Throwable $e) {
+            Log::warning('Avatar upload failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            $this->setError('UPLOAD_FAILED', $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Soft-delete a user account: set status to 'deleted' and anonymize PII.
+     */
+    public function deleteAccount(int $userId): bool
+    {
+        $user = $this->user->newQuery()->find($userId);
+
+        if (! $user) {
+            $this->setError('NOT_FOUND', 'User not found');
+            return false;
+        }
+
+        try {
+            $user->status     = 'deleted';
+            $user->email      = 'deleted_' . $userId . '@anonymized.invalid';
+            $user->first_name = 'Deleted';
+            $user->last_name  = 'User';
+            $user->bio        = null;
+            $user->tagline    = null;
+            $user->phone      = null;
+            $user->avatar_url = null;
+            $user->location   = null;
+            $user->latitude   = null;
+            $user->longitude  = null;
+            $user->save();
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('Account deletion failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            $this->setError('DELETE_FAILED', $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update user privacy settings.
+     */
+    public function updatePrivacy(int $userId, array $privacyData): bool
+    {
+        $user = $this->user->newQuery()->find($userId);
+
+        if (! $user) {
+            $this->setError('NOT_FOUND', 'User not found');
+            return false;
+        }
+
+        try {
+            $allowed = ['privacy_profile', 'privacy_search', 'privacy_contact'];
+            $filtered = collect($privacyData)->only($allowed)->all();
+
+            if (empty($filtered)) {
+                $this->setError('VALIDATION_ERROR', 'No valid privacy fields provided');
+                return false;
+            }
+
+            $user->fill($filtered);
+            $user->save();
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Privacy update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            $this->setError('UPDATE_FAILED', $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update notification preferences for a user.
+     */
+    public function updateNotificationPreferences(int $userId, array $prefs): bool
+    {
+        try {
+            DB::table('user_notification_preferences')->updateOrInsert(
+                ['user_id' => $userId],
+                $prefs
+            );
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Notification preferences update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            $this->setError('UPDATE_FAILED', $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get nearby users using Haversine distance formula.
+     *
+     * @return array{items: array, has_more: bool}
+     */
+    public function getNearby(float $lat, float $lon, array $filters = [], ?int $currentUserId = null): array
+    {
+        $radiusKm = (float) ($filters['radius_km'] ?? 50);
+        $limit    = (int) ($filters['limit'] ?? 20);
+        $limit    = min($limit, 100);
+
+        // Haversine formula (result in km) — tenant scoping via HasTenantScope on User model
+        $haversine = "(
+            6371 * acos(
+                cos(radians(?)) * cos(radians(latitude)) *
+                cos(radians(longitude) - radians(?)) +
+                sin(radians(?)) * sin(radians(latitude))
+            )
+        )";
+
+        $query = $this->user->newQuery()
+            ->selectRaw("*, $haversine AS distance", [$lat, $lon, $lat])
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('status', '!=', 'banned')
+            ->where('status', '!=', 'deleted')
+            ->havingRaw('distance <= ?', [$radiusKm])
+            ->orderBy('distance');
+
+        if ($currentUserId) {
+            $query->where('id', '!=', $currentUserId);
+        }
+
+        $items = $query->limit($limit + 1)->get();
+
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        $result = $items->map(function (User $user) {
+            return [
+                'id'         => $user->id,
+                'name'       => ($user->profile_type === 'organisation' && $user->organization_name)
+                                    ? $user->organization_name
+                                    : trim($user->first_name . ' ' . $user->last_name),
+                'first_name' => $user->first_name,
+                'last_name'  => $user->last_name,
+                'avatar_url' => $user->avatar_url,
+                'bio'        => $user->bio,
+                'tagline'    => $user->tagline,
+                'location'   => $user->location,
+                'latitude'   => $user->latitude,
+                'longitude'  => $user->longitude,
+                'distance'   => round((float) $user->distance, 1),
+            ];
+        })->all();
+
+        return [
+            'items'    => $result,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
+     * Get accumulated errors from the last operation.
+     *
+     * @return array<int, array{code: string, message: string}>
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Record an error for the current operation.
+     */
+    protected function setError(string $code, string $message): void
+    {
+        $this->errors[] = ['code' => $code, 'message' => $message];
     }
 
     // ================================================================

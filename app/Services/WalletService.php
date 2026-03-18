@@ -44,6 +44,16 @@ class WalletService
             ->completed()
             ->sum('amount');
 
+        $pendingIncoming = (float) $this->transaction->newQuery()
+            ->where('receiver_id', $userId)
+            ->where('status', 'pending')
+            ->sum('amount');
+
+        $pendingOutgoing = (float) $this->transaction->newQuery()
+            ->where('sender_id', $userId)
+            ->where('status', 'pending')
+            ->sum('amount');
+
         return [
             'balance'           => (float) ($user->balance ?? 0),
             'total_earned'      => $totalEarned,
@@ -53,6 +63,8 @@ class WalletService
                 ->completed()
                 ->count(),
             'currency'          => 'hours',
+            'pending_incoming'  => $pendingIncoming,
+            'pending_outgoing'  => $pendingOutgoing,
         ];
     }
 
@@ -275,7 +287,7 @@ class WalletService
                     'name'       => $name,
                     'first_name' => $u->first_name,
                     'last_name'  => $u->last_name,
-                    'avatar_url' => $u->avatar_url,
+                    'avatar'     => $u->avatar_url,
                 ];
             })
             ->all();
@@ -292,7 +304,7 @@ class WalletService
 
         $formatUser = function (?User $u): array {
             if (! $u) {
-                return ['id' => 0, 'name' => 'Unknown', 'avatar_url' => null];
+                return ['id' => 0, 'name' => 'Unknown', 'avatar' => null];
             }
             $name = ($u->profile_type === 'organisation' && $u->organization_name)
                 ? $u->organization_name
@@ -300,7 +312,7 @@ class WalletService
             return [
                 'id'         => $u->id,
                 'name'       => $name,
-                'avatar_url' => $u->avatar_url,
+                'avatar'     => $u->avatar_url,
             ];
         };
 
@@ -314,6 +326,7 @@ class WalletService
             'sender'           => $formatUser($sender),
             'receiver'         => $formatUser($receiver),
             'other_user'       => $formatUser($isSender ? $receiver : $sender),
+            'balance_after'    => null,
             'created_at'       => $txn->created_at?->toIso8601String(),
         ];
     }
