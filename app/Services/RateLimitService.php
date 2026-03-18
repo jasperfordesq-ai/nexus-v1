@@ -52,8 +52,8 @@ class RateLimitService
     /**
      * Increment the attempt counter for a given key.
      *
-     * Checks if the limit has been exceeded first, then increments.
-     * Returns true if the request is ALLOWED, false if rate-limited.
+     * Delegates to the legacy tenant-aware RateLimitService which uses
+     * RedisCache with tenant-prefixed keys (nexus:t{tenantId}:ratelimit:{key}).
      *
      * @param string $key    Unique identifier (e.g., "auth:login:192.168.1.1")
      * @param int    $limit  Maximum number of attempts allowed in the window
@@ -62,23 +62,11 @@ class RateLimitService
      */
     public function increment(string $key, int $limit, int $window): bool
     {
-        $cacheKey = 'ratelimit:' . $key;
-
-        // Check current count
-        $count = \Illuminate\Support\Facades\Cache::get($cacheKey);
-
-        if ($count !== null && (int) $count >= $limit) {
-            return false; // Rate limited
+        if (\Nexus\Services\RateLimitService::check($key, $limit, $window)) {
+            return false;
         }
-
-        // Increment (or create with TTL)
-        if ($count === null) {
-            \Illuminate\Support\Facades\Cache::put($cacheKey, 1, $window);
-        } else {
-            \Illuminate\Support\Facades\Cache::increment($cacheKey);
-        }
-
-        return true; // Allowed
+        \Nexus\Services\RateLimitService::increment($key, $window);
+        return true;
     }
 
     /**
@@ -89,7 +77,6 @@ class RateLimitService
      */
     public function reset(string $key): void
     {
-        $cacheKey = 'ratelimit:' . $key;
-        \Illuminate\Support\Facades\Cache::forget($cacheKey);
+        \Nexus\Services\RateLimitService::reset($key);
     }
 }
