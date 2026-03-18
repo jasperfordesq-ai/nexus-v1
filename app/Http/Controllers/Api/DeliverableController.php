@@ -135,8 +135,8 @@ class DeliverableController extends BaseApiController
         $content = $this->requireInput('content');
 
         DB::insert(
-            'INSERT INTO deliverable_comments (deliverable_id, user_id, content, created_at) VALUES (?, ?, ?, NOW())',
-            [$id, $userId, $content]
+            'INSERT INTO deliverable_comments (tenant_id, deliverable_id, user_id, content, created_at) VALUES (?, ?, ?, ?, NOW())',
+            [$tenantId, $id, $userId, $content]
         );
 
         $commentId = (int) DB::getPdo()->lastInsertId();
