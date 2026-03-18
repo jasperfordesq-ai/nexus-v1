@@ -33,10 +33,18 @@ services:
       - ./views:/var/www/html/views:ro
       - ./config:/var/www/html/config:ro
       - ./vendor:/var/www/html/vendor:ro
+      # Laravel framework files (read-only)
+      - ./artisan:/var/www/html/artisan:ro
+      - ./bootstrap:/var/www/html/bootstrap:ro
+      - ./routes:/var/www/html/routes:ro
+      - ./app:/var/www/html/app:ro
       # Writable uploads directory
       - nexus-php-uploads:/var/www/html/httpdocs/uploads
       # Writable logs
       - nexus-php-logs:/var/log
+      # Laravel writable directories
+      - nexus-php-storage:/var/www/html/storage
+      - nexus-php-bootstrap-cache:/var/www/html/bootstrap/cache
     env_file:
       - .env
     environment:
@@ -246,3 +254,7 @@ volumes:
     name: nexus-php-uploads
   nexus-php-logs:
     name: nexus-php-logs
+  nexus-php-storage:
+    name: nexus-php-storage
+  nexus-php-bootstrap-cache:
+    name: nexus-php-bootstrap-cache

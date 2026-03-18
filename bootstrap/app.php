@@ -9,6 +9,14 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 $app = Application::configure(basePath: dirname(__DIR__))
+    ->withProviders([
+        \App\Providers\RouteServiceProvider::class,
+        \App\Providers\EventServiceProvider::class,
+        \App\Providers\BroadcastServiceProvider::class,
+    ])
+    ->withCommands([
+        __DIR__ . '/../app/Console/Commands',
+    ])
     ->withRouting(
         api: __DIR__ . '/../routes/api.php',
         health: '/up',
@@ -17,9 +25,51 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \App\Http\Middleware\ResolveTenant::class,
         ]);
+
+        $middleware->alias([
+            'auth' => \App\Http\Middleware\Authenticate::class,
+            'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
+            'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Sentry integration will be handled here
+        // JSON error responses for API — see App\Exceptions\Handler
+        $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'messages' => $e->errors(),
+            ], 422);
+        });
+
+        $exceptions->renderable(function (\Illuminate\Auth\AuthenticationException $e) {
+            return response()->json([
+                'error' => 'Unauthenticated',
+                'message' => 'You must be logged in to access this resource.',
+            ], 401);
+        });
+
+        $exceptions->renderable(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $model = class_basename($e->getModel());
+            return response()->json([
+                'error' => 'Not found',
+                'message' => "{$model} not found.",
+            ], 404);
+        });
+
+        $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException $e) {
+            return response()->json([
+                'error' => 'Too many requests',
+                'message' => 'Rate limit exceeded. Please try again later.',
+                'retry_after' => $e->getHeaders()['Retry-After'] ?? null,
+            ], 429);
+        });
+
+        // Sentry integration — report to Sentry in production
+        $exceptions->reportable(function (\Throwable $e) {
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+        });
     })
     ->create();
 

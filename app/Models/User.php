@@ -8,14 +8,16 @@ namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\HasApiTokens;
 use App\Core\TenantContext;
 
 class User extends Authenticatable
 {
-    use HasTenantScope;
+    use HasApiTokens, HasFactory, HasTenantScope;
 
     protected $table = 'users';
 

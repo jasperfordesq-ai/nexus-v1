@@ -172,6 +172,17 @@ RUN mkdir -p /var/www/html/httpdocs && \
     > /var/www/html/httpdocs/health.php
 
 # =============================================================================
+# Laravel Directory Structure
+# =============================================================================
+# Create storage directories required by Laravel framework
+RUN mkdir -p /var/www/html/storage/app/public \
+             /var/www/html/storage/framework/cache/data \
+             /var/www/html/storage/framework/sessions \
+             /var/www/html/storage/framework/views \
+             /var/www/html/storage/logs \
+             /var/www/html/bootstrap/cache
+
+# =============================================================================
 # Permissions
 # =============================================================================
 RUN chown -R www-data:www-data /var/www/html
@@ -181,6 +192,9 @@ RUN chown -R www-data:www-data /var/www/html
 RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/uploads \
     && chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads \
     && chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads
+
+# Ensure Laravel storage and bootstrap/cache are writable by www-data
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # =============================================================================
 # Expose Port
@@ -192,4 +206,4 @@ EXPOSE 80
 # Ensure upload dirs are writable by www-data at each startup (handles volume
 # re-mounts that reset ownership) then start Apache.
 # =============================================================================
-CMD ["sh", "-c", "chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; apache2-foreground"]
+CMD ["sh", "-c", "chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; apache2-foreground"]
