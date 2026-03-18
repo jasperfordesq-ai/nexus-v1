@@ -446,8 +446,8 @@ class TotpService
             );
 
             DB::update(
-                "UPDATE users SET totp_enabled = 1, totp_setup_required = 0 WHERE id = ?",
-                [$userId]
+                "UPDATE users SET totp_enabled = 1, totp_setup_required = 0 WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
 
             $backupCodes = $this->generateBackupCodes($userId);
@@ -482,7 +482,7 @@ class TotpService
         try {
             DB::delete("DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
             DB::delete("DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
-            DB::update("UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ?", [$userId]);
+            DB::update("UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
 
             DB::commit();
             return ['success' => true];
@@ -604,7 +604,7 @@ class TotpService
 
             DB::delete("DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
             DB::delete("DELETE FROM user_backup_codes WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
-            DB::update("UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ?", [$userId]);
+            DB::update("UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
 
             DB::commit();
             return ['success' => true];

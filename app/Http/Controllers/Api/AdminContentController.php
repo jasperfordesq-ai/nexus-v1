@@ -179,7 +179,7 @@ class AdminContentController extends BaseApiController
 
         $result = DB::selectOne(
             "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
-             FROM pages WHERE id = ?", [$newId]
+             FROM pages WHERE id = ? AND tenant_id = ?", [$newId, $tenantId]
         );
 
         $row = (array)$result;
@@ -349,7 +349,7 @@ class AdminContentController extends BaseApiController
             [$tenantId, $name, $slug, $input['description'] ?? '', $location, $input['layout'] ?? null, (int)($input['min_plan_tier'] ?? 0), (int)($input['is_active'] ?? 1)]
         );
 
-        $result = DB::selectOne("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ?", [DB::getPdo()->lastInsertId()]);
+        $result = DB::selectOne("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ? AND tenant_id = ?", [DB::getPdo()->lastInsertId(), $tenantId]);
         $menu = (array)$result;
 
         return $this->respondWithData($menu, null, 201);
@@ -460,7 +460,7 @@ class AdminContentController extends BaseApiController
 
         $result = DB::selectOne(
             "SELECT id, menu_id, parent_id, type, label, url, route_name, page_id, icon, css_class, target, sort_order, visibility_rules, is_active, created_at, updated_at
-             FROM menu_items WHERE id = ?", [DB::getPdo()->lastInsertId()]
+             FROM menu_items WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [DB::getPdo()->lastInsertId(), $tenantId]
         );
 
         $item = (array)$result;
@@ -543,7 +543,7 @@ class AdminContentController extends BaseApiController
 
         $result = DB::selectOne(
             "SELECT id, menu_id, parent_id, type, label, url, route_name, page_id, icon, css_class, target, sort_order, visibility_rules, is_active, created_at, updated_at
-             FROM menu_items WHERE id = ?", [$id]
+             FROM menu_items WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]
         );
 
         $item = (array)$result;

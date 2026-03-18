@@ -193,7 +193,7 @@ class User extends Authenticatable
     public static function updateLastActive(int $userId): void
     {
         try {
-            DB::table('users')->where('id', $userId)->update(['last_active_at' => now()]);
+            DB::table('users')->where('id', $userId)->where('tenant_id', TenantContext::getId())->update(['last_active_at' => now()]);
         } catch (\Exception $e) {
             // Column may not exist yet - silently fail
         }

@@ -2,6 +2,7 @@
     "name": "nexus/timebank",
     "description": "Project NEXUS Timebanking Platform",
     "type": "project",
+    "version": "1.5.0",
     "autoload": {
         "psr-4": {
             "Nexus\\": "src/",
