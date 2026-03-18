@@ -11,6 +11,12 @@ namespace Nexus\Core;
  *
  * Validates and stores audio files (WebM, MP3, OGG, WAV) for voice messaging.
  */
+/**
+ *  Use AppCoreAudioUploader instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreAudioUploader instead. Maintained for backward compatibility.
+ */
 class AudioUploader
 {
     private static $allowedTypes = [

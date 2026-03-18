@@ -6,10 +6,13 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+
 /**
- * GamificationEmailService — Laravel DI wrapper for legacy \Nexus\Services\GamificationEmailService.
+ * GamificationEmailService — Sends weekly progress digests and achievement notifications.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Complex email template rendering — methods kept as TODO delegation to legacy
+ * since they involve EmailTemplateBuilder and Mailer which are not yet in Laravel.
  */
 class GamificationEmailService
 {
@@ -18,7 +21,9 @@ class GamificationEmailService
     }
 
     /**
-     * Delegates to legacy GamificationEmailService::sendWeeklyDigests().
+     * Send weekly progress digests to users who actually have activity.
+     *
+     * // TODO: Convert to Eloquent — complex email template rendering with EmailTemplateBuilder
      */
     public function sendWeeklyDigests(): array
     {
@@ -26,7 +31,9 @@ class GamificationEmailService
     }
 
     /**
-     * Delegates to legacy GamificationEmailService::generateUserDigest().
+     * Generate a user's weekly digest data.
+     *
+     * // TODO: Convert to Eloquent — complex email template rendering with EmailTemplateBuilder
      */
     public function generateUserDigest(int $userId): array
     {
@@ -34,7 +41,9 @@ class GamificationEmailService
     }
 
     /**
-     * Delegates to legacy GamificationEmailService::sendMilestoneEmail().
+     * Send a milestone achievement email.
+     *
+     * // TODO: Convert to Eloquent — complex email template rendering with EmailTemplateBuilder
      */
     public function sendMilestoneEmail(int $userId, string $type, array $data): bool
     {

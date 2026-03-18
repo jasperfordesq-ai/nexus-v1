@@ -25,6 +25,13 @@
     <testsuite name="Middleware">
       <directory suffix="Test.php">tests/Middleware</directory>
     </testsuite>
+    <testsuite name="Laravel">
+      <directory suffix="Test.php">tests/Laravel</directory>
+      <exclude>tests/Laravel/Migrated</exclude>
+    </testsuite>
+    <testsuite name="LaravelMigrated">
+      <directory suffix="Test.php">tests/Laravel/Migrated</directory>
+    </testsuite>
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
@@ -47,6 +54,7 @@
   <source>
     <include>
       <directory suffix=".php">src</directory>
+      <directory suffix=".php">app</directory>
     </include>
     <exclude>
       <directory suffix=".php">src/Config</directory>

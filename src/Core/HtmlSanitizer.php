@@ -12,6 +12,12 @@ namespace Nexus\Core;
  * Provides safe HTML output by allowing only specific tags and attributes.
  * Used for page builder content, blog posts, and other user-generated HTML.
  */
+/**
+ *  Use AppCoreHtmlSanitizer instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreHtmlSanitizer instead. Maintained for backward compatibility.
+ */
 class HtmlSanitizer
 {
     /**

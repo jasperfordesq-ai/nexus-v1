@@ -24,6 +24,12 @@ namespace Nexus\Core;
  *
  * @package Nexus\Core
  */
+/**
+ *  Use AppCoreApiErrorCodes instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreApiErrorCodes instead. Maintained for backward compatibility.
+ */
 class ApiErrorCodes
 {
     // ============================================

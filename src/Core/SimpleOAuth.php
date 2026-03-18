@@ -6,6 +6,12 @@
 
 namespace Nexus\Core;
 
+/**
+ *  Use AppCoreSimpleOAuth instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreSimpleOAuth instead. Maintained for backward compatibility.
+ */
 class SimpleOAuth
 {
     private $clientId;

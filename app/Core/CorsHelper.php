@@ -6,16 +6,55 @@
 
 namespace App\Core;
 
-use Nexus\Helpers\CorsHelper as LegacyCorsHelper;
+use Illuminate\Support\Facades\DB;
 
 /**
- * App-namespace wrapper for Nexus\Helpers\CorsHelper.
- *
- * Delegates to the legacy implementation. Once the Laravel migration is
- * complete this can be replaced with Laravel's CORS middleware.
+ * CORS header management with origin allowlisting.
+ * Direct implementation replacing Nexus\Helpers\CorsHelper delegation.
  */
 class CorsHelper
 {
+    /**
+     * Default allowed origins for CORS requests.
+     */
+    private static array $defaultOrigins = [
+        'https://project-nexus.ie',
+        'https://www.project-nexus.ie',
+        'https://app.project-nexus.ie',
+        'https://api.project-nexus.ie',
+        'https://hour-timebank.ie',
+        'https://www.hour-timebank.ie',
+        'https://nexuscivic.ie',
+        'https://www.nexuscivic.ie',
+        'https://timebank.global',
+        'https://www.timebank.global',
+        'http://staging.timebank.local',
+        'http://localhost:5173',
+        'http://localhost:8090',
+        'http://127.0.0.1:5173',
+    ];
+
+    /** Cached tenant domain origins */
+    private static ?array $tenantDomainOrigins = null;
+
+    private static ?array $allowedOrigins = null;
+
+    /**
+     * Get allowed origins from environment or defaults.
+     */
+    private static function getConfiguredOrigins(): array
+    {
+        if (self::$allowedOrigins === null) {
+            $envOrigins = getenv('ALLOWED_ORIGINS') ?: ($_ENV['ALLOWED_ORIGINS'] ?? '');
+            if (!empty($envOrigins)) {
+                self::$allowedOrigins = array_map('trim', explode(',', $envOrigins));
+            } else {
+                self::$allowedOrigins = self::$defaultOrigins;
+            }
+        }
+        return self::$allowedOrigins;
+    }
+
     /**
      * Set CORS headers for the current request.
      *
@@ -29,7 +68,25 @@ class CorsHelper
         array $methods = ['GET', 'POST', 'OPTIONS'],
         array $headers = ['Content-Type', 'Authorization']
     ): bool {
-        return LegacyCorsHelper::setHeaders($additionalOrigins, $methods, $headers);
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+        if (empty($origin)) {
+            return true;
+        }
+
+        $allowedOrigins = array_merge(self::getConfiguredOrigins(), $additionalOrigins);
+
+        if (!self::isOriginAllowed($origin, $allowedOrigins)) {
+            return false;
+        }
+
+        header('Access-Control-Allow-Origin: ' . $origin);
+        header('Access-Control-Allow-Methods: ' . implode(', ', $methods));
+        header('Access-Control-Allow-Headers: ' . implode(', ', $headers));
+        header('Access-Control-Allow-Credentials: true');
+        header('Vary: Origin');
+
+        return true;
     }
 
     /**
@@ -41,7 +98,16 @@ class CorsHelper
         array $headers = ['Content-Type', 'Authorization'],
         int $maxAge = 86400
     ): void {
-        LegacyCorsHelper::handlePreflight($additionalOrigins, $methods, $headers, $maxAge);
+        if ($_SERVER['REQUEST_METHOD'] !== 'OPTIONS') {
+            return;
+        }
+
+        if (self::setHeaders($additionalOrigins, $methods, $headers)) {
+            header('Access-Control-Max-Age: ' . $maxAge);
+        }
+
+        http_response_code(204);
+        exit;
     }
 
     /**
@@ -49,7 +115,98 @@ class CorsHelper
      */
     public static function isOriginAllowed(string $origin, array $allowedOrigins = []): bool
     {
-        return LegacyCorsHelper::isOriginAllowed($origin, $allowedOrigins);
+        if (empty($allowedOrigins)) {
+            $allowedOrigins = self::getConfiguredOrigins();
+        }
+
+        // Direct match
+        if (in_array($origin, $allowedOrigins, true)) {
+            return true;
+        }
+
+        // Parse origin for subdomain checks
+        $originHost = parse_url($origin, PHP_URL_HOST);
+        if ($originHost === null) {
+            return false;
+        }
+
+        $originScheme = parse_url($origin, PHP_URL_SCHEME) ?: 'https';
+
+        // Check subdomain matches
+        foreach ($allowedOrigins as $allowed) {
+            $allowedHost = parse_url($allowed, PHP_URL_HOST);
+            if ($allowedHost && str_ends_with($originHost, '.' . $allowedHost)) {
+                $allowedScheme = parse_url($allowed, PHP_URL_SCHEME);
+                if ($allowedScheme === $originScheme) {
+                    return true;
+                }
+            }
+        }
+
+        // Dynamic check: tenant custom domains
+        $tenantDomains = self::getTenantDomainOrigins();
+        if (in_array($origin, $tenantDomains, true)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get HTTPS origins for all active tenant custom domains.
+     */
+    private static function getTenantDomainOrigins(): array
+    {
+        if (self::$tenantDomainOrigins !== null) {
+            return self::$tenantDomainOrigins;
+        }
+
+        $cacheKey = 'cors:tenant_domain_origins';
+        $cacheTtl = 600;
+
+        // Try Redis cache first
+        try {
+            if (class_exists('\Nexus\Services\RedisCache') && \Nexus\Services\RedisCache::has($cacheKey, null)) {
+                $cached = \Nexus\Services\RedisCache::get($cacheKey, null);
+                if (is_array($cached)) {
+                    self::$tenantDomainOrigins = $cached;
+                    return $cached;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Redis unavailable
+        }
+
+        // Query all active tenant custom domains
+        $origins = [];
+        try {
+            $rows = DB::select(
+                "SELECT domain FROM tenants WHERE domain IS NOT NULL AND domain != '' AND is_active = 1"
+            );
+
+            foreach ($rows as $row) {
+                $domain = trim($row->domain);
+                if (empty($domain)) continue;
+                $origins[] = 'https://' . $domain;
+                if (!str_starts_with($domain, 'www.')) {
+                    $origins[] = 'https://www.' . $domain;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Database unavailable
+        }
+
+        // Cache the result
+        try {
+            if (class_exists('\Nexus\Services\RedisCache')) {
+                \Nexus\Services\RedisCache::set($cacheKey, $origins, $cacheTtl, null);
+            }
+        } catch (\Throwable $e) {
+            // Cache write failure is non-fatal
+        }
+
+        self::$tenantDomainOrigins = $origins;
+        return $origins;
     }
 
     /**
@@ -57,7 +214,11 @@ class CorsHelper
      */
     public static function addAllowedOrigin(string $origin): void
     {
-        LegacyCorsHelper::addAllowedOrigin($origin);
+        $origin = rtrim($origin, '/');
+        $origins = self::getConfiguredOrigins();
+        if (!empty($origin) && !in_array($origin, $origins, true)) {
+            self::$allowedOrigins[] = $origin;
+        }
     }
 
     /**
@@ -65,6 +226,6 @@ class CorsHelper
      */
     public static function getAllowedOrigins(): array
     {
-        return LegacyCorsHelper::getAllowedOrigins();
+        return self::getConfiguredOrigins();
     }
 }

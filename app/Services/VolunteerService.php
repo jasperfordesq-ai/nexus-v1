@@ -1223,7 +1223,7 @@ class VolunteerService
      */
     private function getTenantId(): int
     {
-        return \Nexus\Core\TenantContext::getId();
+        return \App\Core\TenantContext::getId();
     }
 
     /**

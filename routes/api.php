@@ -47,6 +47,13 @@ Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapContr
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);
 
 // ============================================
+
+// ============================================
+// Authenticated routes — Sanctum token authentication required
+// Controllers also enforce auth via $this->requireAuth() as a fallback
+// ============================================
+Route::middleware('auth:sanctum')->group(function () {
+
 // MIGRATED ROUTES — Exchanges
 // Source: httpdocs/routes/exchanges.php
 // ============================================
@@ -84,7 +91,19 @@ Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController
 // ============================================
 // MIGRATED ROUTES — Listings (controller routes only)
 // Source: httpdocs/routes/listings.php
-// Note: /api/v2/categories closure stays in legacy router
+// Categories endpoint (migrated from legacy closure)
+Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
+    $type = $request->query('type', 'listing');
+    $allowed = ['listing', 'event', 'volunteering', 'resource'];
+    if (!in_array($type, $allowed, true)) {
+        $type = 'listing';
+    }
+    $categories = \App\Models\Category::where('type', $type)
+        ->where('tenant_id', \App\Core\TenantContext::getId())
+        ->orderBy('name')
+        ->get();
+    return response()->json(['data' => $categories]);
+});
 // ============================================
 // FUTURE: When ready to use new Laravel controllers, replace:
 //   [\Nexus\Controllers\Api\ListingsApiController::class, 'index']
@@ -133,7 +152,9 @@ Route::post('/v2/messages/conversations/{id}/restore', [\App\Http\Controllers\Ap
 // ============================================
 // MIGRATED ROUTES — Groups & Connections
 // Source: httpdocs/routes/groups.php
-// Note: /api/v2/connections/status/me closure stays in legacy router
+Route::get('/v2/connections/status/me', function () {
+    return response()->json(['errors' => [['code' => 'invalid_user', 'message' => 'Cannot check connection status with yourself']]], 422);
+}); // Guard: reject literal "me" before {userId} param
 // ============================================
 Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index']);
 Route::post('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'store']);
@@ -170,7 +191,7 @@ Route::delete('/v2/connections/{id}', [\App\Http\Controllers\Api\ConnectionsCont
 // ============================================
 // MIGRATED ROUTES — Users (controller routes only)
 // Source: httpdocs/routes/users.php
-// Note: /api/v2/users (directory listing) closure stays in legacy router
+Route::get('/v2/users', [\App\Http\Controllers\Api\UsersController::class, 'index']); // Member directory
 // ============================================
 Route::get('/v2/me/stats', [\App\Http\Controllers\Api\UsersController::class, 'stats']);
 Route::get('/v2/users/me', [\App\Http\Controllers\Api\UsersController::class, 'me']);
@@ -462,6 +483,15 @@ Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController:
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
 
 // ============================================
+
+}); // End Route::middleware('auth:sanctum')
+
+// ============================================
+// Admin routes — Sanctum auth + admin middleware
+// Controllers also enforce auth via $this->requireAdmin() as a fallback
+// ============================================
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+
 // MIGRATED ROUTES — Admin API (Dashboard, Users, Listings, Config, Cache, Jobs, Federation, CRM, Super Admin)
 // Source: httpdocs/routes/admin-api.php
 // ============================================
@@ -908,6 +938,14 @@ Route::get('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeli
 Route::put('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'updateDeliverable']);
 Route::delete('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'deleteDeliverable']);
 Route::post('/v2/admin/deliverability/{id}/comments', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'addComment']);
+
+}); // End Route::middleware(['auth:sanctum', 'admin'])
+
+// ============================================
+// Super Admin routes — Sanctum auth + super-admin middleware
+// ============================================
+Route::middleware(['auth:sanctum', 'super-admin'])->group(function () {
+
 Route::get('/v2/admin/super/dashboard', [\App\Http\Controllers\Api\AdminSuperController::class, 'dashboard']);
 Route::get('/v2/admin/super/tenants', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantList']);
 Route::get('/v2/admin/super/tenants/hierarchy', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantHierarchy']);
@@ -944,6 +982,14 @@ Route::post('/v2/admin/super/federation/partnerships/{id}/suspend', [\App\Http\C
 Route::post('/v2/admin/super/federation/partnerships/{id}/terminate', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationTerminatePartnership']);
 Route::get('/v2/admin/super/federation/tenant/{id}/features', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationGetTenantFeatures']);
 Route::put('/v2/admin/super/federation/tenant/{id}/features', [\App\Http\Controllers\Api\AdminSuperController::class, 'federationUpdateTenantFeature']);
+
+}); // End Route::middleware(['auth:sanctum', 'super-admin'])
+
+// ============================================
+// Admin CRM routes — Sanctum auth + admin middleware
+// ============================================
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+
 Route::get('/v2/admin/crm/dashboard', [\App\Http\Controllers\Api\AdminCrmController::class, 'dashboard']);
 Route::get('/v2/admin/crm/funnel', [\App\Http\Controllers\Api\AdminCrmController::class, 'funnel']);
 Route::get('/v2/admin/crm/admins', [\App\Http\Controllers\Api\AdminCrmController::class, 'listAdmins']);
@@ -965,6 +1011,34 @@ Route::get('/v2/admin/crm/export/tasks', [\App\Http\Controllers\Api\AdminCrmCont
 Route::get('/v2/admin/crm/export/dashboard', [\App\Http\Controllers\Api\AdminCrmController::class, 'exportDashboard']);
 
 // ============================================
+
+}); // End Route::middleware(['auth:sanctum', 'admin']) — CRM
+
+// ============================================
+// Public routes (auth, CSRF, VAPID — no auth required)
+// ============================================
+Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
+Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
+Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class, 'heartbeat']);
+Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
+Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
+Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
+Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
+Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
+Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
+Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
+Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
+
+// ============================================
+// Misc/legacy/federation routes — Sanctum auth required
+// Controllers also enforce auth internally as a fallback
+// ============================================
+Route::middleware('auth:sanctum')->group(function () {
+
 // MIGRATED ROUTES — Misc API (Social, Auth, Push, AI, Menus, Wallet Features, Events, Volunteering, Ideation, Matching)
 // Source: httpdocs/routes/misc-api.php
 // ============================================
@@ -982,31 +1056,16 @@ Route::post('/social/mention-search', [\App\Http\Controllers\Api\SocialControlle
 Route::post('/social/feed', [\App\Http\Controllers\Api\SocialController::class, 'feed']);
 Route::post('/social/create-post', [\App\Http\Controllers\Api\SocialController::class, 'createPost']);
 Route::post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
-Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
-Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
 Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
 Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushController::class, 'unsubscribe']);
 Route::post('/push/send', [\App\Http\Controllers\Api\PushController::class, 'send']);
 Route::get('/push/status', [\App\Http\Controllers\Api\PushController::class, 'status']);
 Route::post('/push/register-device', [\App\Http\Controllers\Api\PushController::class, 'registerDevice']);
 Route::post('/push/unregister-device', [\App\Http\Controllers\Api\PushController::class, 'unregisterDevice']);
-Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class, 'heartbeat']);
-Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
-Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
-Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
-Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
-Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
-Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
-Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
-Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
 Route::post('/auth/revoke', [\App\Http\Controllers\Api\AuthController::class, 'revokeToken']);
 Route::post('/auth/revoke-all', [\App\Http\Controllers\Api\AuthController::class, 'revokeAllTokens']);
 Route::post('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
 Route::get('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
-Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
 Route::get('/v2/auth/verification-status', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getVerificationStatus']);
 Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification']);
 Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode']);
@@ -1112,11 +1171,13 @@ Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterC
 Route::post('/gdpr/consent', [\App\Http\Controllers\Api\GdprController::class, 'updateConsent']);
 Route::post('/gdpr/request', [\App\Http\Controllers\Api\GdprController::class, 'createRequest']);
 Route::post('/gdpr/delete-account', [\App\Http\Controllers\Api\GdprController::class, 'deleteAccount']);
-Route::get('/v2/admin/community-analytics', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'index']);
-Route::get('/v2/admin/community-analytics/export', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'export']);
-Route::get('/v2/admin/community-analytics/geography', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'geography']);
-Route::get('/v2/admin/impact-report', [\App\Http\Controllers\Api\AdminImpactReportController::class, 'index']);
-Route::put('/v2/admin/impact-report/config', [\App\Http\Controllers\Api\AdminImpactReportController::class, 'updateConfig']);
+Route::middleware('admin')->group(function () {
+    Route::get('/v2/admin/community-analytics', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'index']);
+    Route::get('/v2/admin/community-analytics/export', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'export']);
+    Route::get('/v2/admin/community-analytics/geography', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'geography']);
+    Route::get('/v2/admin/impact-report', [\App\Http\Controllers\Api\AdminImpactReportController::class, 'index']);
+    Route::put('/v2/admin/impact-report/config', [\App\Http\Controllers\Api\AdminImpactReportController::class, 'updateConfig']);
+});
 Route::get('/v2/onboarding/status', [\App\Http\Controllers\Api\OnboardingController::class, 'status']);
 Route::get('/v2/onboarding/categories', [\App\Http\Controllers\Api\OnboardingController::class, 'categories']);
 Route::post('/v2/onboarding/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete']);
@@ -1265,28 +1326,34 @@ Route::get('/v2/groups/{id}/task-stats', [\App\Http\Controllers\Api\IdeationChal
 Route::get('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listDocuments']);
 Route::post('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'uploadDocument']);
 Route::delete('/v2/team-documents/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteDocument']);
-Route::get('/v2/admin/members/inactive', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'inactiveMembers']);
-Route::post('/v2/admin/members/inactive/detect', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'detectInactive']);
-Route::post('/v2/admin/members/inactive/notify', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'markInactiveNotified']);
-Route::get('/v2/admin/moderation/queue', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationQueue']);
-Route::post('/v2/admin/moderation/{id}/review', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationReview']);
-Route::get('/v2/admin/moderation/stats', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationStats']);
-Route::get('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationSettings']);
-Route::put('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'updateModerationSettings']);
+Route::middleware('admin')->group(function () {
+    Route::get('/v2/admin/members/inactive', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'inactiveMembers']);
+    Route::post('/v2/admin/members/inactive/detect', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'detectInactive']);
+    Route::post('/v2/admin/members/inactive/notify', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'markInactiveNotified']);
+    Route::get('/v2/admin/moderation/queue', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationQueue']);
+    Route::post('/v2/admin/moderation/{id}/review', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationReview']);
+    Route::get('/v2/admin/moderation/stats', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationStats']);
+    Route::get('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationSettings']);
+    Route::put('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'updateModerationSettings']);
+});
 Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
 Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
 Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
-Route::post('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'feature']);
-Route::delete('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'unfeature']);
-Route::post('/v2/admin/listings/{id}/reject', [\App\Http\Controllers\Api\AdminListingsController::class, 'reject']);
+Route::middleware('admin')->group(function () {
+    Route::post('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'feature']);
+    Route::delete('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'unfeature']);
+    Route::post('/v2/admin/listings/{id}/reject', [\App\Http\Controllers\Api\AdminListingsController::class, 'reject']);
+});
 Route::get('/v2/search/saved', [\App\Http\Controllers\Api\SearchController::class, 'savedSearches']);
 Route::post('/v2/search/saved', [\App\Http\Controllers\Api\SearchController::class, 'saveSearch']);
 Route::delete('/v2/search/saved/{id}', [\App\Http\Controllers\Api\SearchController::class, 'deleteSavedSearch']);
 Route::post('/v2/search/saved/{id}/run', [\App\Http\Controllers\Api\SearchController::class, 'runSavedSearch']);
 Route::get('/v2/search/trending', [\App\Http\Controllers\Api\SearchController::class, 'trending']);
-Route::get('/v2/admin/search/analytics', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchAnalytics']);
-Route::get('/v2/admin/search/trending', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchTrending']);
-Route::get('/v2/admin/search/zero-results', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchZeroResults']);
+Route::middleware('admin')->group(function () {
+    Route::get('/v2/admin/search/analytics', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchAnalytics']);
+    Route::get('/v2/admin/search/trending', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchTrending']);
+    Route::get('/v2/admin/search/zero-results', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchZeroResults']);
+});
 Route::get('/v2/matches/all', [\App\Http\Controllers\Api\MatchingController::class, 'allMatches']);
 Route::post('/v2/matches/{id}/dismiss', [\App\Http\Controllers\Api\MatchingController::class, 'dismiss']);
 Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events']);
@@ -1352,3 +1419,5 @@ Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationCont
 Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
 Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken']);
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
+
+}); // End Route::middleware('auth:sanctum') — Misc/legacy routes

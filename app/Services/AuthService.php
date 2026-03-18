@@ -10,12 +10,15 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Core\TenantContext;
 
 /**
  * AuthService — Laravel DI-based service for authentication operations.
  *
  * Eloquent/DI counterpart to legacy static authentication logic.
- * All queries are tenant-scoped automatically via the HasTenantScope trait.
+ * Eloquent queries on User are tenant-scoped via HasTenantScope.
+ * Raw DB::table() queries on api_tokens are tenant-scoped by joining
+ * through the users table to verify tenant ownership.
  */
 class AuthService
 {
@@ -53,8 +56,12 @@ class AuthService
      */
     public function logout(string $token): bool
     {
+        $tenantId = TenantContext::getId();
+
         return DB::table('api_tokens')
-            ->where('token', hash('sha256', $token))
+            ->join('users', 'api_tokens.user_id', '=', 'users.id')
+            ->where('api_tokens.token', hash('sha256', $token))
+            ->where('users.tenant_id', $tenantId)
             ->delete() > 0;
     }
 
@@ -63,15 +70,21 @@ class AuthService
      */
     public function validateToken(string $token): ?User
     {
+        $tenantId = TenantContext::getId();
+
         $record = DB::table('api_tokens')
-            ->where('token', hash('sha256', $token))
-            ->where('expires_at', '>', now())
+            ->join('users', 'api_tokens.user_id', '=', 'users.id')
+            ->where('api_tokens.token', hash('sha256', $token))
+            ->where('api_tokens.expires_at', '>', now())
+            ->where('users.tenant_id', $tenantId)
+            ->select('api_tokens.*')
             ->first();
 
         if (! $record) {
             return null;
         }
 
+        // User model query is already tenant-scoped via HasTenantScope
         return $this->user->newQuery()->find($record->user_id);
     }
 
@@ -82,11 +95,15 @@ class AuthService
      */
     public function refreshToken(string $currentToken): ?array
     {
+        $tenantId = TenantContext::getId();
         $hashed = hash('sha256', $currentToken);
 
         $record = DB::table('api_tokens')
-            ->where('token', $hashed)
-            ->where('expires_at', '>', now())
+            ->join('users', 'api_tokens.user_id', '=', 'users.id')
+            ->where('api_tokens.token', $hashed)
+            ->where('api_tokens.expires_at', '>', now())
+            ->where('users.tenant_id', $tenantId)
+            ->select('api_tokens.*')
             ->first();
 
         if (! $record) {
@@ -98,6 +115,7 @@ class AuthService
 
         DB::table('api_tokens')
             ->where('token', $hashed)
+            ->where('user_id', $record->user_id)
             ->update([
                 'token'      => hash('sha256', $newToken),
                 'expires_at' => $expiresAt,

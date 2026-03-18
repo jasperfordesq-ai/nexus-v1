@@ -12,6 +12,7 @@ use App\Services\TokenService;
 use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Core\ApiErrorCodes;
 use App\Core\TenantContext;
@@ -35,17 +36,28 @@ class AuthController extends BaseApiController
     ) {}
 
     /**
-     * Helper to return error response matching legacy format
+     * Helper to return auth error response.
+     *
+     * Uses respondWithError() from BaseApiController for standard cases.
+     * Falls back to a direct response when extra fields are needed to
+     * preserve the auth-specific response contract (retry_after, etc.).
      */
     private function authError(string $message, string $code, int $status = 400, array $extra = []): JsonResponse
     {
+        if (empty($extra)) {
+            return $this->respondWithError($code, $message, null, $status);
+        }
+
+        // When extra fields are present, build a combined error envelope
+        // that includes both the standard error structure and auth-specific fields.
         $response = array_merge([
-            'error' => $message,
-            'code' => $code,
+            'errors' => [['code' => $code, 'message' => $message]],
             'success' => false,
         ], $extra);
 
-        return response()->json($response, $status);
+        return response()->json($response, $status, [
+            'API-Version' => '2.0',
+        ]);
     }
 
     /**
@@ -210,7 +222,7 @@ class AuthController extends BaseApiController
                 $_SESSION['is_logged_in'] = true;
             }
 
-            // Generate secure tokens
+            // Generate secure tokens (legacy JWT-based)
             $accessToken = $this->tokenService->generateToken((int)$user['id'], (int)$user['tenant_id'], [
                 'role' => $user['role'],
                 'email' => $user['email'],
@@ -221,6 +233,23 @@ class AuthController extends BaseApiController
 
             $accessTokenExpiry = $this->tokenService->getAccessTokenExpiry($isMobile);
             $refreshTokenExpiry = $this->tokenService->getRefreshTokenExpiry($isMobile);
+
+            // Issue Sanctum token alongside legacy JWT for gradual migration
+            $sanctumToken = null;
+            try {
+                $eloquentUser = \App\Models\User::find((int)$user['id']);
+                if ($eloquentUser) {
+                    $tokenAbilities = ['*'];
+                    $sanctumToken = $eloquentUser->createToken(
+                        $isMobile ? 'mobile-api' : 'web-api',
+                        $tokenAbilities
+                    )->plainTextToken;
+                }
+            } catch (\Throwable $e) {
+                // Sanctum token creation may fail if personal_access_tokens table
+                // doesn't exist yet — fall back gracefully to legacy tokens only
+                error_log('[AuthController] Sanctum token creation failed: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,
@@ -244,7 +273,8 @@ class AuthController extends BaseApiController
                 'expires_in' => $accessTokenExpiry,
                 'refresh_expires_in' => $refreshTokenExpiry,
                 'is_mobile' => $isMobile,
-                'token' => $accessToken,
+                'token' => $sanctumToken ?? $accessToken,
+                'sanctum_token' => $sanctumToken,
                 'config' => json_decode($user['configuration'] ?? '{"modules": {"events": true, "polls": true, "goals": true, "volunteering": true, "resources": true}}', true)
             ]);
         }
@@ -265,7 +295,7 @@ class AuthController extends BaseApiController
     /**
      * POST /api/auth/logout
      */
-    public function logout(): JsonResponse
+    public function logout(Request $request): JsonResponse
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
@@ -279,7 +309,19 @@ class AuthController extends BaseApiController
             $userId = $this->getOptionalUserId();
         }
 
-        // If a refresh token is provided, revoke it
+        // Revoke the current Sanctum token if present
+        $sanctumTokenRevoked = false;
+        try {
+            if ($request->user() && $request->user()->currentAccessToken()) {
+                $request->user()->currentAccessToken()->delete();
+                $sanctumTokenRevoked = true;
+            }
+        } catch (\Throwable $e) {
+            // Sanctum may not be fully set up yet — ignore gracefully
+            error_log('[AuthController] Sanctum token revocation failed: ' . $e->getMessage());
+        }
+
+        // If a refresh token is provided, revoke it (legacy JWT)
         $data = $this->getAllInput();
         $refreshToken = $data['refresh_token'] ?? '';
         $tokenRevoked = false;
@@ -315,6 +357,10 @@ class AuthController extends BaseApiController
 
         if ($tokenRevoked) {
             $response['refresh_token_revoked'] = true;
+        }
+
+        if ($sanctumTokenRevoked) {
+            $response['sanctum_token_revoked'] = true;
         }
 
         return response()->json($response);

@@ -15,6 +15,12 @@ namespace Nexus\Core;
  * output-buffered JSON to be captured and the HTTP status code (set before the throw)
  * to be preserved — giving the test the first response that the controller sent.
  */
+/**
+ *  Use AppCoreApiResponseSentException instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreApiResponseSentException instead. Maintained for backward compatibility.
+ */
 class ApiResponseSentException extends \RuntimeException
 {
     public function __construct(int $httpStatus = 200)

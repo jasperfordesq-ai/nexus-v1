@@ -73,7 +73,7 @@ class TenantSettingsService
         // minimal user array from the authenticated user context.
         $user = null;
         try {
-            $user = \Nexus\Core\Auth::user();
+            $user = \App\Core\Auth::user();
         } catch (\Throwable $e) {
             // No authenticated user available
         }

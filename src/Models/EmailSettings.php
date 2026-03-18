@@ -15,6 +15,9 @@ use Nexus\Core\Env;
  * Manages per-tenant email provider configuration stored in the database.
  * Supports encryption for sensitive values like API keys.
  * Mirrors AiSettings pattern.
+ *
+ * @deprecated Still referenced by App\Core\Mailer. Migrate to App\Models\EmailSettings
+ *             (Eloquent) and remove this legacy model.
  */
 class EmailSettings
 {

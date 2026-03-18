@@ -16,6 +16,12 @@ namespace Nexus\Core;
  * If a view doesn't exist in the active layout, it shows an error rather than
  * loading from another layout (which could cause styling/functionality issues).
  */
+/**
+ *  Use AppCoreView instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreView instead. Maintained for backward compatibility.
+ */
 class View
 {
     /**

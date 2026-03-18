@@ -11,6 +11,12 @@ use Meilisearch\Client;
 use Nexus\Services\SearchAnalyzerService;
 use Nexus\Services\PersonalizedSearchService;
 
+/**
+ *  Use AppCoreSearchService instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreSearchService instead. Maintained for backward compatibility.
+ */
 class SearchService
 {
     private $client;

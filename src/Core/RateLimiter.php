@@ -15,6 +15,12 @@ namespace Nexus\Core;
  *
  * Security: Prevents brute force attacks and API abuse
  */
+/**
+ *  Use AppCoreRateLimiter instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreRateLimiter instead. Maintained for backward compatibility.
+ */
 class RateLimiter
 {
     // ============================================

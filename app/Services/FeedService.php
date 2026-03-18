@@ -147,11 +147,13 @@ class FeedService
 
         // Batch load like counts
         $likeCounts = [];
+        $tenantId = TenantContext::getId();
         foreach ($sourcesByType as $sType => $sIds) {
             $counts = DB::table('likes')
                 ->selectRaw('target_id, COUNT(*) as cnt')
                 ->where('target_type', $sType)
                 ->whereIn('target_id', $sIds)
+                ->where('tenant_id', $tenantId)
                 ->groupBy('target_id')
                 ->pluck('cnt', 'target_id');
             foreach ($counts as $targetId => $cnt) {
@@ -391,30 +393,184 @@ class FeedService
         return $post->fresh(['user']);
     }
 
+    /** @var array Validation error messages */
+    private array $errors = [];
+
     /**
-     * Create a feed post — delegates to legacy FeedService.
+     * Create a feed post via direct DB insert.
      *
      * @return int|null Post ID or null on failure
      */
     public function createPostLegacy(int $userId, array $data): ?int
     {
-        return \Nexus\Services\FeedService::createPost($userId, $data);
+        $this->errors = [];
+
+        $rawContent = trim($data['content'] ?? '');
+        $content = $rawContent;
+        $imageUrl = $data['image_url'] ?? null;
+        $visibility = $data['visibility'] ?? 'public';
+        $groupId = (int) ($data['group_id'] ?? 0);
+
+        $validVisibility = ['public', 'private', 'friends'];
+        if (!in_array($visibility, $validVisibility, true)) {
+            $visibility = 'public';
+        }
+
+        if (empty($content) && empty($imageUrl)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content or image is required', 'field' => 'content'];
+            return null;
+        }
+
+        // Validate group membership if posting to group
+        if ($groupId > 0) {
+            $isMember = DB::selectOne(
+                "SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ? AND status = 'active'",
+                [$groupId, $userId]
+            );
+            if (!$isMember) {
+                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a group member to post'];
+                return null;
+            }
+        }
+
+        try {
+            $tenantId = TenantContext::getId();
+
+            if ($groupId > 0) {
+                DB::insert(
+                    "INSERT INTO feed_posts (user_id, tenant_id, content, image_url, likes_count, visibility, group_id, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, NOW())",
+                    [$userId, $tenantId, $content, $imageUrl, $visibility, $groupId]
+                );
+            } else {
+                DB::insert(
+                    "INSERT INTO feed_posts (user_id, tenant_id, content, image_url, likes_count, visibility, created_at) VALUES (?, ?, ?, ?, 0, ?, NOW())",
+                    [$userId, $tenantId, $content, $imageUrl, $visibility]
+                );
+            }
+
+            $postId = (int) DB::getPdo()->lastInsertId();
+
+            // Record in feed_activity table
+            try {
+                DB::statement(
+                    "INSERT INTO feed_activity
+                        (tenant_id, user_id, source_type, source_id, group_id, title, content, image_url, metadata, is_visible, created_at)
+                    VALUES (?, ?, 'post', ?, ?, NULL, ?, ?, NULL, 1, NOW())
+                    ON DUPLICATE KEY UPDATE
+                        content = VALUES(content), image_url = VALUES(image_url), is_visible = 1, created_at = VALUES(created_at)",
+                    [$tenantId, $userId, $postId, $groupId ?: null, $content, $imageUrl]
+                );
+            } catch (\Exception $faEx) {
+                \Illuminate\Support\Facades\Log::warning("FeedService::createPostLegacy feed_activity record failed: " . $faEx->getMessage());
+            }
+
+            return $postId;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("FeedService::createPostLegacy error: " . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create post'];
+            return null;
+        }
     }
 
     /**
-     * Get a single feed item by type and ID — delegates to legacy FeedService.
+     * Get a single feed item by type and ID.
      */
     public function getItem(string $type, int $id, ?int $userId): ?array
     {
-        return \Nexus\Services\FeedService::getItem($type, $id, $userId);
+        $tenantId = TenantContext::getId();
+        $items = [];
+
+        switch ($type) {
+            case 'post':
+                $rows = DB::select(
+                    "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count, p.user_id,
+                           'post' as type,
+                           COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                           u.avatar_url as author_avatar,
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = p.id) as comments_count
+                    FROM feed_posts p
+                    JOIN users u ON p.user_id = u.id
+                    WHERE p.id = ? AND p.tenant_id = ?",
+                    [$id, $tenantId]
+                );
+                $items = array_map(fn($r) => (array) $r, $rows);
+                break;
+
+            case 'blog':
+                $rows = DB::select(
+                    "SELECT p.id, p.title, p.content, p.featured_image as image_url, p.created_at,
+                           0 as likes_count, p.author_id as user_id, 'blog' as type,
+                           COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                           u.avatar_url as author_avatar,
+                           (SELECT COUNT(*) FROM comments WHERE target_type = 'blog' AND target_id = p.id) as comments_count
+                    FROM posts p
+                    JOIN users u ON p.author_id = u.id
+                    WHERE p.id = ? AND p.tenant_id = ? AND p.status = 'published'",
+                    [$id, $tenantId]
+                );
+                $items = array_map(fn($r) => (array) $r, $rows);
+                break;
+
+            case 'discussion':
+                $rows = DB::select(
+                    "SELECT gd.id, gd.title, gp_first.content, NULL as image_url, gd.created_at,
+                           0 as likes_count, gd.user_id, 'discussion' as type,
+                           COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
+                           u.avatar_url as author_avatar,
+                           (SELECT COUNT(*) FROM group_posts gpc WHERE gpc.discussion_id = gd.id AND gpc.tenant_id = gd.tenant_id) as comments_count
+                    FROM group_discussions gd
+                    JOIN users u ON gd.user_id = u.id
+                    LEFT JOIN group_posts gp_first ON gp_first.discussion_id = gd.id AND gp_first.tenant_id = gd.tenant_id
+                        AND gp_first.id = (SELECT MIN(gpm.id) FROM group_posts gpm WHERE gpm.discussion_id = gd.id AND gpm.tenant_id = gd.tenant_id)
+                    WHERE gd.id = ? AND gd.tenant_id = ?",
+                    [$id, $tenantId]
+                );
+                $items = array_map(fn($r) => (array) $r, $rows);
+                break;
+        }
+
+        if (empty($items)) {
+            return null;
+        }
+
+        // Format like the feed does — enrich with like status
+        $item = $items[0];
+        $contentResult = $this->truncateWithFlag($item['content'] ?? '', 500);
+
+        $isLiked = false;
+        if ($userId) {
+            $liked = DB::selectOne(
+                "SELECT 1 FROM likes WHERE user_id = ? AND target_type = ? AND target_id = ? AND tenant_id = ?",
+                [$userId, $type, $id, $tenantId]
+            );
+            $isLiked = (bool) $liked;
+        }
+
+        return [
+            'id' => (int) $item['id'],
+            'type' => $item['type'],
+            'title' => $item['title'] ?? null,
+            'content' => $contentResult['text'],
+            'content_truncated' => $contentResult['truncated'],
+            'image_url' => $item['image_url'] ?? null,
+            'author' => [
+                'id' => (int) $item['user_id'],
+                'name' => $item['author_name'],
+                'avatar_url' => $item['author_avatar'] ?? '/assets/img/defaults/default_avatar.png',
+            ],
+            'likes_count' => (int) ($item['likes_count'] ?? 0),
+            'comments_count' => (int) ($item['comments_count'] ?? 0),
+            'is_liked' => $isLiked,
+            'created_at' => $item['created_at'],
+        ];
     }
 
     /**
-     * Get validation errors — delegates to legacy FeedService.
+     * Get validation errors from the last operation.
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\FeedService::getErrors();
+        return $this->errors;
     }
 
     /**
@@ -424,10 +580,13 @@ class FeedService
      */
     public function like(int $postId, int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
         $existing = DB::table('likes')
             ->where('target_type', 'feed_post')
             ->where('target_id', $postId)
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->first();
 
         if ($existing) {
@@ -435,6 +594,7 @@ class FeedService
                 ->where('target_type', 'feed_post')
                 ->where('target_id', $postId)
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->delete();
             $liked = false;
         } else {
@@ -442,6 +602,7 @@ class FeedService
                 'target_type' => 'feed_post',
                 'target_id'   => $postId,
                 'user_id'     => $userId,
+                'tenant_id'   => $tenantId,
                 'created_at'  => now(),
             ]);
             $liked = true;
@@ -450,6 +611,7 @@ class FeedService
         $count = (int) DB::table('likes')
             ->where('target_type', 'feed_post')
             ->where('target_id', $postId)
+            ->where('tenant_id', $tenantId)
             ->count();
 
         return ['liked' => $liked, 'likes_count' => $count];
