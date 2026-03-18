@@ -22,6 +22,7 @@ class ContextualMessageService
      */
     public function sendWithContext(int $senderId, int $receiverId, string $body, ?string $contextType = null, ?int $contextId = null, string $subject = ''): ?int
     {
+        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return null; }
         return \Nexus\Services\ContextualMessageService::sendWithContext($senderId, $receiverId, $body, $contextType, $contextId, $subject);
     }
 
@@ -30,6 +31,7 @@ class ContextualMessageService
      */
     public function getContextInfo(string $contextType, int $contextId): ?array
     {
+        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return null; }
         return \Nexus\Services\ContextualMessageService::getContextInfo($contextType, $contextId);
     }
 
@@ -38,6 +40,7 @@ class ContextualMessageService
      */
     public function getContextInfoBatch(array $contextPairs): array
     {
+        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return []; }
         return \Nexus\Services\ContextualMessageService::getContextInfoBatch($contextPairs);
     }
 
@@ -46,6 +49,7 @@ class ContextualMessageService
      */
     public function enrichMessagesWithContext(array $messages): array
     {
+        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return []; }
         return \Nexus\Services\ContextualMessageService::enrichMessagesWithContext($messages);
     }
 }

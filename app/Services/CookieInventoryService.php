@@ -22,6 +22,7 @@ class CookieInventoryService
      */
     public function getCookiesByCategory(string $category, ?int $tenantId = null): array
     {
+        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return []; }
         return \Nexus\Services\CookieInventoryService::getCookiesByCategory($category, $tenantId);
     }
 
@@ -30,6 +31,7 @@ class CookieInventoryService
      */
     public function getAllCookies(?int $tenantId = null): array
     {
+        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return []; }
         return \Nexus\Services\CookieInventoryService::getAllCookies($tenantId);
     }
 
@@ -38,6 +40,7 @@ class CookieInventoryService
      */
     public function getBannerCookieList(?int $tenantId = null): array
     {
+        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return []; }
         return \Nexus\Services\CookieInventoryService::getBannerCookieList($tenantId);
     }
 
@@ -46,6 +49,7 @@ class CookieInventoryService
      */
     public function addCookie(array $data): int
     {
+        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return 0; }
         return \Nexus\Services\CookieInventoryService::addCookie($data);
     }
 
@@ -54,6 +58,7 @@ class CookieInventoryService
      */
     public function updateCookie(int $id, array $data): bool
     {
+        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return false; }
         return \Nexus\Services\CookieInventoryService::updateCookie($id, $data);
     }
 }

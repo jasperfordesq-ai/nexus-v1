@@ -237,7 +237,7 @@ class SocialController extends BaseApiController
         $groupId = $this->inputInt('group_id', 0);
 
         if (empty($content) && empty($imageUrl)) {
-            return response()->json(['error' => 'Post content or image is required'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Post content or image is required', null, 400);
         }
 
         // If posting to a group, verify membership
@@ -249,7 +249,7 @@ class SocialController extends BaseApiController
                 ->first();
 
             if (! $membership) {
-                return response()->json(['error' => 'You must be a member of this group to post'], 403);
+                return $this->respondWithError('FORBIDDEN', 'You must be a member of this group to post', null, 403);
             }
         }
 
@@ -299,14 +299,13 @@ class SocialController extends BaseApiController
                 error_log('SocialController::createPost feed_activity failed: ' . $faEx->getMessage());
             }
 
-            return response()->json([
-                'success' => true,
+            return $this->respondWithData([
                 'status'  => 'success',
                 'post_id' => $postId,
             ]);
         } catch (\Exception $e) {
             error_log("Create Post Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to create post'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to create post', null, 500);
         }
     }
 
@@ -516,7 +515,7 @@ class SocialController extends BaseApiController
             $debug['likes_error'] = 'Database error';
         }
 
-        return response()->json($debug);
+        return $this->respondWithData($debug);
     }
 
     // ========================================================================
@@ -534,11 +533,11 @@ class SocialController extends BaseApiController
         $targetId = $this->inputInt('target_id');
 
         if (empty($targetType) || ! $targetId || $targetId <= 0) {
-            return response()->json(['error' => 'Invalid target'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target', null, 400);
         }
 
         if (! in_array($targetType, self::VALID_LIKE_TARGETS, true)) {
-            return response()->json(['error' => 'Invalid target_type'], 400);
+            return $this->respondWithError('INVALID_INPUT', 'Invalid target_type', 'target_type', 400);
         }
 
         try {
@@ -595,13 +594,13 @@ class SocialController extends BaseApiController
                 ->where('tenant_id', $tenantId)
                 ->count();
 
-            return response()->json([
+            return $this->respondWithData([
                 'status'      => $action,
                 'likes_count' => $count,
             ]);
         } catch (\Exception $e) {
             error_log("Social Like Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to process like'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to process like', null, 500);
         }
     }
 
@@ -616,7 +615,7 @@ class SocialController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if (empty($targetType) || ! $targetId || $targetId <= 0) {
-            return response()->json(['error' => 'Invalid target'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target', null, 400);
         }
 
         try {
@@ -644,9 +643,7 @@ class SocialController extends BaseApiController
                 ->where('tenant_id', $tenantId)
                 ->count();
 
-            return response()->json([
-                'success'     => true,
-                'status'      => 'success',
+            return $this->respondWithData([
                 'likers'      => $likers,
                 'total_count' => $totalCount,
                 'page'        => $page,
@@ -654,7 +651,7 @@ class SocialController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             error_log("Get Likers Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch likers'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to fetch likers', null, 500);
         }
     }
 
@@ -667,7 +664,7 @@ class SocialController extends BaseApiController
         $targetId = $this->inputInt('target_id');
 
         if (empty($targetType) || ! $targetId || $targetId <= 0) {
-            return response()->json(['error' => 'Invalid target'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target', null, 400);
         }
 
         switch ($action) {
@@ -678,7 +675,7 @@ class SocialController extends BaseApiController
             case 'submit_comment':
                 return $this->submitComment($targetType, $targetId);
             default:
-                return response()->json(['error' => 'Invalid action'], 400);
+                return $this->respondWithError('INVALID_INPUT', 'Invalid action', 'action', 400);
         }
     }
 
@@ -689,9 +686,7 @@ class SocialController extends BaseApiController
 
             if (true /* CommentService injected via DI */) {
                 $comments = $this->commentService->fetchComments($targetType, $targetId, $userId);
-                return response()->json([
-                    'success'             => true,
-                    'status'              => 'success',
+                return $this->respondWithData([
                     'comments'            => $comments,
                     'available_reactions' => $this->commentService->getAvailableReactions(),
                 ]);
@@ -714,10 +709,10 @@ class SocialController extends BaseApiController
                 return $c;
             }, $comments);
 
-            return response()->json(['success' => true, 'status' => 'success', 'comments' => $comments]);
+            return $this->respondWithData(['comments' => $comments]);
         } catch (\Exception $e) {
             error_log("Fetch Comments Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch comments'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to fetch comments', null, 500);
         }
     }
 
@@ -728,7 +723,7 @@ class SocialController extends BaseApiController
         $content = trim($this->input('content', ''));
 
         if (empty($content)) {
-            return response()->json(['error' => 'Comment cannot be empty'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Comment cannot be empty', 'content', 400);
         }
 
         try {
@@ -739,7 +734,7 @@ class SocialController extends BaseApiController
                     $this->notifyComment($userId, $targetType, $targetId, $content);
                 }
 
-                return response()->json($result);
+                return $this->respondWithData($result);
             }
 
             DB::table('comments')->insert([
@@ -759,9 +754,7 @@ class SocialController extends BaseApiController
                 [$userId]
             );
 
-            return response()->json([
-                'success' => true,
-                'status'  => 'success',
+            return $this->respondWithData([
                 'comment' => [
                     'author_name'   => $user->name ?? 'Me',
                     'author_avatar' => $user->avatar_url ?? '/assets/img/defaults/default_avatar.png',
@@ -770,7 +763,7 @@ class SocialController extends BaseApiController
             ]);
         } catch (\Exception $e) {
             error_log("Submit Comment Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to post comment'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to post comment', null, 500);
         }
     }
 
@@ -797,7 +790,7 @@ class SocialController extends BaseApiController
         $parentId = $this->inputInt('parent_id');
 
         if (empty($parentType) || ! $parentId || $parentId <= 0) {
-            return response()->json(['error' => 'Invalid content to share'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid content to share', null, 400);
         }
 
         $content = trim($this->input('content', ''));
@@ -827,10 +820,10 @@ class SocialController extends BaseApiController
                 // Non-critical
             }
 
-            return response()->json(['status' => 'success']);
+            return $this->respondWithData(['message' => 'Shared successfully']);
         } catch (\Exception $e) {
             error_log("Share Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to share'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to share', null, 500);
         }
     }
 
@@ -844,7 +837,7 @@ class SocialController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if (empty($targetType) || ! $targetId || $targetId <= 0) {
-            return response()->json(['error' => 'Invalid target'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid target', null, 400);
         }
 
         try {
@@ -858,7 +851,7 @@ class SocialController extends BaseApiController
             ];
 
             if (! isset($tableMap[$targetType])) {
-                return response()->json(['error' => 'Unsupported target type for deletion'], 400);
+                return $this->respondWithError('INVALID_INPUT', 'Unsupported target type for deletion', 'target_type', 400);
             }
 
             $config = $tableMap[$targetType];
@@ -868,14 +861,14 @@ class SocialController extends BaseApiController
                 ->first();
 
             if (! $record) {
-                return response()->json(['error' => ucfirst($targetType) . ' not found'], 404);
+                return $this->respondWithError('NOT_FOUND', ucfirst($targetType) . ' not found', null, 404);
             }
 
             $ownerId = $record->{$config['owner_col']};
             $isAdmin = $this->isUserAdmin();
 
             if ($ownerId != $userId && ! $isAdmin) {
-                return response()->json(['error' => 'Unauthorized'], 403);
+                return $this->respondWithError('FORBIDDEN', 'Unauthorized to delete this content', null, 403);
             }
 
             // Delete associated likes and comments
@@ -908,10 +901,10 @@ class SocialController extends BaseApiController
                 }
             }
 
-            return response()->json(['success' => true, 'status' => 'deleted']);
+            return $this->respondWithData(['status' => 'deleted']);
         } catch (\Exception $e) {
             error_log("Delete Post Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to delete'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to delete', null, 500);
         }
     }
 
@@ -931,13 +924,13 @@ class SocialController extends BaseApiController
         }
 
         if (! $commentId || $commentId <= 0 || empty($emoji)) {
-            return response()->json(['error' => 'Invalid reaction data'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid reaction data', null, 400);
         }
 
         try {
             if (true /* CommentService injected via DI */) {
                 $result = $this->commentService->toggleReaction($userId, $tenantId, $commentId, $emoji);
-                return response()->json($result);
+                return $this->respondWithData($result);
             }
 
             $existing = DB::table('reactions')
@@ -962,10 +955,10 @@ class SocialController extends BaseApiController
                 $action = 'added';
             }
 
-            return response()->json(['success' => true, 'status' => 'success', 'action' => $action]);
+            return $this->respondWithData(['action' => $action]);
         } catch (\Exception $e) {
             error_log("Reaction Error: " . $e->getMessage());
-            return response()->json(['success' => false, 'error' => 'Failed to toggle reaction'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to toggle reaction', null, 500);
         }
     }
 
@@ -982,13 +975,13 @@ class SocialController extends BaseApiController
         $content = trim($this->input('content', ''));
 
         if (! $parentId || $parentId <= 0 || empty($content)) {
-            return response()->json(['error' => 'Invalid reply data'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid reply data', null, 400);
         }
 
         try {
             if (true /* CommentService injected via DI */) {
                 $result = $this->commentService->addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
-                return response()->json($result);
+                return $this->respondWithData($result);
             }
 
             DB::table('comments')->insert([
@@ -1002,10 +995,10 @@ class SocialController extends BaseApiController
                 'updated_at'  => now(),
             ]);
 
-            return response()->json(['success' => true, 'status' => 'success']);
+            return $this->respondWithData(['message' => 'Reply posted successfully']);
         } catch (\Exception $e) {
             error_log("Reply Comment Error: " . $e->getMessage());
-            return response()->json(['success' => false, 'error' => 'Failed to post reply'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to post reply', null, 500);
         }
     }
 
@@ -1019,18 +1012,18 @@ class SocialController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if (! $commentId || $commentId <= 0 || empty($content)) {
-            return response()->json(['error' => 'Invalid edit data'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid edit data', null, 400);
         }
 
         try {
             if (true /* CommentService injected via DI */) {
                 $result = $this->commentService->editComment($commentId, $userId, $content);
-                return response()->json($result);
+                return $this->respondWithData($result);
             }
 
             $comment = DB::table('comments')->where('id', $commentId)->where('tenant_id', $tenantId)->first();
             if (! $comment || $comment->user_id != $userId) {
-                return response()->json(['error' => 'Unauthorized'], 403);
+                return $this->respondWithError('FORBIDDEN', 'Unauthorized to edit this comment', null, 403);
             }
 
             DB::table('comments')
@@ -1038,10 +1031,10 @@ class SocialController extends BaseApiController
                 ->where('tenant_id', $tenantId)
                 ->update(['content' => $content, 'updated_at' => now()]);
 
-            return response()->json(['success' => true, 'status' => 'success', 'is_edited' => true]);
+            return $this->respondWithData(['is_edited' => true]);
         } catch (\Exception $e) {
             error_log("Edit Comment Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to edit comment'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to edit comment', null, 500);
         }
     }
 
@@ -1054,29 +1047,29 @@ class SocialController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if (! $commentId || $commentId <= 0) {
-            return response()->json(['error' => 'Invalid comment ID'], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid comment ID', 'comment_id', 400);
         }
 
         try {
             if (true /* CommentService injected via DI */) {
                 $result = $this->commentService->deleteComment($commentId, $userId, $this->isUserAdmin());
-                return response()->json($result);
+                return $this->respondWithData($result);
             }
 
             $comment = DB::table('comments')->where('id', $commentId)->where('tenant_id', $tenantId)->first();
             if (! $comment) {
-                return response()->json(['error' => 'Comment not found'], 404);
+                return $this->respondWithError('NOT_FOUND', 'Comment not found', null, 404);
             }
             if ($comment->user_id != $userId && ! $this->isUserAdmin()) {
-                return response()->json(['error' => 'Unauthorized'], 403);
+                return $this->respondWithError('FORBIDDEN', 'Unauthorized to delete this comment', null, 403);
             }
 
             DB::table('comments')->where('id', $commentId)->where('tenant_id', $tenantId)->delete();
 
-            return response()->json(['success' => true, 'status' => 'success']);
+            return $this->respondWithData(['message' => 'Comment deleted successfully']);
         } catch (\Exception $e) {
             error_log("Delete Comment Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to delete comment'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to delete comment', null, 500);
         }
     }
 
@@ -1090,7 +1083,7 @@ class SocialController extends BaseApiController
         $query = trim($this->input('query', ''));
 
         if (strlen($query) < 1) {
-            return response()->json(['status' => 'success', 'users' => []]);
+            return $this->respondWithData(['users' => []]);
         }
 
         try {
@@ -1106,10 +1099,10 @@ class SocialController extends BaseApiController
                 $users = array_map(fn ($u) => (array) $u, $users);
             }
 
-            return response()->json(['status' => 'success', 'users' => $users]);
+            return $this->respondWithData(['users' => $users]);
         } catch (\Exception $e) {
             error_log("Mention Search Error: " . $e->getMessage());
-            return response()->json(['error' => 'Search failed'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Search failed', null, 500);
         }
     }
 
@@ -1147,16 +1140,14 @@ class SocialController extends BaseApiController
                 $items = $this->loadAggregatedFeed($currentUserId, $tenantId, $filter, $limit, $offset);
             }
 
-            return response()->json([
-                'success'  => true,
-                'status'   => 'success',
+            return $this->respondWithData([
                 'items'    => $items,
                 'page'     => $page,
                 'has_more' => count($items) >= $limit,
             ]);
         } catch (\Exception $e) {
             error_log("Feed Load Error: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to load feed'], 500);
+            return $this->respondWithError('OPERATION_FAILED', 'Failed to load feed', null, 500);
         }
     }
 
