@@ -88,6 +88,44 @@ class AdminFederationCreditAgreementsController extends BaseApiController
     }
 
     /**
+     * POST /api/v2/admin/federation/credit-agreements/{id}/{action}
+     *
+     * Approve, reject, suspend, or activate a credit agreement.
+     */
+    public function action(int $id, string $action): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $validActions = ['approve', 'reject', 'suspend', 'activate'];
+        if (!in_array($action, $validActions, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Invalid action. Must be one of: ' . implode(', ', $validActions), 'action');
+        }
+
+        $statusMap = [
+            'approve'  => 'active',
+            'reject'   => 'rejected',
+            'suspend'  => 'suspended',
+            'activate' => 'active',
+        ];
+
+        try {
+            $updated = DB::update(
+                "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW() WHERE id = ? AND (tenant_a_id = ? OR tenant_b_id = ?)",
+                [$statusMap[$action], $id, $tenantId, $tenantId]
+            );
+
+            if ($updated === 0) {
+                return $this->respondWithError('NOT_FOUND', 'Credit agreement not found', null, 404);
+            }
+
+            return $this->respondWithData(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('UPDATE_FAILED', 'Failed to update credit agreement', null, 500);
+        }
+    }
+
+    /**
      * GET /api/v2/admin/federation/partners
      *
      * List active federation partners for the current tenant.

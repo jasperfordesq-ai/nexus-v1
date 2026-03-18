@@ -22,6 +22,7 @@ class NexusScoreService
      */
     public function calculate(int $tenantId, int $userId): float
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreService')) { return 0.0; }
         return \Nexus\Services\NexusScoreService::calculate($tenantId, $userId);
     }
 
@@ -30,6 +31,7 @@ class NexusScoreService
      */
     public function getScore(int $tenantId, int $userId): ?float
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreService')) { return null; }
         return \Nexus\Services\NexusScoreService::getScore($tenantId, $userId);
     }
 
@@ -38,6 +40,7 @@ class NexusScoreService
      */
     public function getBreakdown(int $tenantId, int $userId): array
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreService')) { return []; }
         return \Nexus\Services\NexusScoreService::getBreakdown($tenantId, $userId);
     }
 
@@ -46,6 +49,7 @@ class NexusScoreService
      */
     public function recalculateAll(int $tenantId): int
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreService')) { return 0; }
         return \Nexus\Services\NexusScoreService::recalculateAll($tenantId);
     }
 
@@ -57,6 +61,7 @@ class NexusScoreService
      */
     public function calculateNexusScore(int $userId, int $tenantId): array
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreService')) { return []; }
         $db = \Illuminate\Support\Facades\DB::getPdo();
         $legacyService = new \Nexus\Services\NexusScoreService($db);
         return $legacyService->calculateNexusScore($userId, $tenantId);
@@ -67,6 +72,7 @@ class NexusScoreService
      */
     public function calculateTier(float $score): array
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreService')) { return []; }
         $db = \Illuminate\Support\Facades\DB::getPdo();
         $legacyService = new \Nexus\Services\NexusScoreService($db);
         return $legacyService->calculateTier($score);
@@ -77,6 +83,7 @@ class NexusScoreService
      */
     public function getCommunityStats(int $tenantId): array
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreService')) { return []; }
         $db = \Illuminate\Support\Facades\DB::getPdo();
         $legacyService = new \Nexus\Services\NexusScoreService($db);
         return $legacyService->getCommunityStats($tenantId);

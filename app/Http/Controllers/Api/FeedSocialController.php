@@ -246,8 +246,15 @@ class FeedSocialController extends BaseApiController
             ->first();
 
         if (! $hashtag) {
-            return $this->respondWithCollection([], null, $limit, false);
+            return $this->respondWithCollection([], null, $limit, false, ['total_items' => 0]);
         }
+
+        // Count total posts for this hashtag (without cursor/limit)
+        $totalCount = (int) DB::table('post_hashtags as ph')
+            ->join('feed_posts as fp', 'ph.post_id', '=', 'fp.id')
+            ->where('ph.hashtag_id', $hashtag->id)
+            ->where('ph.tenant_id', $tenantId)
+            ->count();
 
         $query = DB::table('post_hashtags as ph')
             ->join('feed_posts as fp', 'ph.post_id', '=', 'fp.id')
@@ -277,7 +284,8 @@ class FeedSocialController extends BaseApiController
             $items->map(fn ($i) => (array) $i)->values()->all(),
             $nextCursor,
             $limit,
-            $hasMore
+            $hasMore,
+            ['total_items' => $totalCount]
         );
     }
 
