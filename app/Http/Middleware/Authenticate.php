@@ -103,7 +103,10 @@ class Authenticate
 
             auth()->guard('sanctum')->setUser($eloquentUser);
 
-            // Set legacy session so delegation controllers' Auth::check() works
+            // TODO(post-migration): Remove this legacy session bridge once all delegation
+            // controllers are replaced with pure Laravel controllers. The $_SESSION writes
+            // enable legacy Nexus\Core\Auth::check() / Auth::user() calls in delegated code.
+            // Risk: session state can leak between requests in long-lived workers (e.g. Octane).
             if (session_status() === PHP_SESSION_NONE) {
                 @session_start();
             }

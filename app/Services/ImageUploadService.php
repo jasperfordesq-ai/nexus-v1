@@ -38,8 +38,12 @@ class ImageUploadService
             throw new \InvalidArgumentException('Invalid file type. Allowed: JPEG, PNG, GIF, WebP.');
         }
 
+        // Scope uploads by tenant to prevent cross-tenant file access
+        $tenantId = \App\Core\TenantContext::getId();
+        $tenantDir = $tenantId ? "tenant_{$tenantId}/{$directory}" : $directory;
+
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs($directory, $filename, 'public');
+        $path = $file->storeAs($tenantDir, $filename, 'public');
 
         return [
             'path'     => $path,
