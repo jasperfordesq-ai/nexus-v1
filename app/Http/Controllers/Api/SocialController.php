@@ -1165,7 +1165,7 @@ class SocialController extends BaseApiController
             if (! $userId) {
                 return false;
             }
-            $user = DB::table('users')->where('id', $userId)->first(['role', 'is_super_admin', 'is_tenant_super_admin']);
+            $user = DB::table('users')->where('id', $userId)->where('tenant_id', \App\Core\TenantContext::getId())->first(['role', 'is_super_admin', 'is_tenant_super_admin']);
             if (! $user) {
                 return false;
             }
