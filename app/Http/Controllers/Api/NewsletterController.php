@@ -104,10 +104,7 @@ class NewsletterController extends BaseApiController
         $token = trim($input['token'] ?? $this->query('token', ''));
 
         if (empty($token)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unsubscribe token is required.',
-            ], 400);
+            return $this->respondWithError('VALIDATION_ERROR', 'Unsubscribe token is required.', 'token', 400);
         }
 
         $subscriber = DB::table('newsletter_subscribers')
@@ -115,15 +112,11 @@ class NewsletterController extends BaseApiController
             ->first();
 
         if (! $subscriber) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This unsubscribe link is invalid or has already been used.',
-            ], 404);
+            return $this->respondWithError('NOT_FOUND', 'This unsubscribe link is invalid or has already been used.', null, 404);
         }
 
         if ($subscriber->status === 'unsubscribed') {
-            return response()->json([
-                'success' => true,
+            return $this->respondWithData([
                 'message' => 'You are already unsubscribed.',
                 'already_done' => true,
             ]);
@@ -138,12 +131,9 @@ class NewsletterController extends BaseApiController
             ]);
 
         if ($updated) {
-            return response()->json(['success' => true]);
+            return $this->respondWithData(['unsubscribed' => true]);
         }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Unable to process your request. Please try again.',
-        ], 500);
+        return $this->respondWithError('SERVER_ERROR', 'Unable to process your request. Please try again.', null, 500);
     }
 }

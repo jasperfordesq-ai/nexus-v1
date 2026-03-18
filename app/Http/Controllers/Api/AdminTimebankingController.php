@@ -401,7 +401,7 @@ class AdminTimebankingController extends BaseApiController
         $query = trim($this->query('q', ''));
 
         if (strlen($query) < 2) {
-            return response()->json(['success' => true, 'users' => []]);
+            return $this->respondWithData(['users' => []]);
         }
 
         $tenantId = $this->getTenantId();
@@ -418,7 +418,7 @@ class AdminTimebankingController extends BaseApiController
         );
         $users = array_map(fn($r) => (array)$r, $userResults);
 
-        return response()->json(['success' => true, 'users' => $users]);
+        return $this->respondWithData(['users' => $users]);
     }
 
     /** Generate CSV response for user statement */
@@ -435,7 +435,7 @@ class AdminTimebankingController extends BaseApiController
             $csv .= "\"{$t['created_at']}\",\"{$type}\",\"{$desc}\",\"{$amount}\",\"{$runningBalance}\"\n";
         }
 
-        return response()->json([
+        return $this->respondWithData([
             'csv' => $csv,
             'filename' => "statement_{$statement['user']['id']}_{$statement['period']['start']}_{$statement['period']['end']}.csv",
         ]);

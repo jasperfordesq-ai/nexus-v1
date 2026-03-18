@@ -295,7 +295,7 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('volunteering_shifts', 120, 60);
         $shifts = $this->volunteerService->getShiftsForOpportunity((int) $id);
-        return $this->respondWithData(['shifts' => $shifts]);
+        return $this->respondWithData($shifts);
     }
 
     public function signUp($id): JsonResponse
@@ -543,7 +543,7 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_swaps_list', 60, 60);
         $direction = $this->query('direction') ?? 'all';
         $requests = $this->shiftSwapService->getSwapRequests($userId, $direction);
-        return $this->respondWithData(['swaps' => $requests]);
+        return $this->respondWithData($requests);
     }
 
     public function respondToSwap($id): JsonResponse
@@ -871,7 +871,7 @@ class VolunteerController extends BaseApiController
             'min_match_score' => $this->queryInt('min_score', 20, 0, 100),
         ]);
 
-        return $this->respondWithData(['shifts' => $shifts]);
+        return $this->respondWithData($shifts);
     }
 
     // ========================================
@@ -885,7 +885,7 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_certificates_list', 30, 60);
 
         $certs = $this->volunteerCertificateService->getUserCertificates($userId);
-        return $this->respondWithData(['certificates' => $certs]);
+        return $this->respondWithData($certs);
     }
 
     public function generateCertificate(): JsonResponse

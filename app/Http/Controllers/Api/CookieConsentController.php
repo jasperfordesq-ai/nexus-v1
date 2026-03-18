@@ -153,18 +153,14 @@ class CookieConsentController extends BaseApiController
                 $tenantSettings = (array) $settings;
             }
 
-            return response()->json([
-                'success'  => true,
+            return $this->respondWithData([
                 'cookies'  => $grouped,
                 'counts'   => $counts,
                 'settings' => $tenantSettings,
             ]);
         } catch (\Exception $e) {
             report($e);
-            return response()->json([
-                'success' => false,
-                'error'   => 'Failed to retrieve cookie inventory',
-            ], 500);
+            return $this->respondWithError('SERVER_ERROR', 'Failed to retrieve cookie inventory', null, 500);
         }
     }
 
@@ -206,23 +202,16 @@ class CookieConsentController extends BaseApiController
                     } catch (\Exception $e) { /* activity_logs may not exist */ }
                 }
 
-                return response()->json([
-                    'success' => true,
+                return $this->respondWithData([
                     'message' => 'Consent preferences updated successfully',
                     'consent' => array_merge(['id' => (int) $id], $categories),
                 ]);
             }
 
-            return response()->json([
-                'success' => false,
-                'error'   => 'Consent record not found',
-            ], 404);
+            return $this->respondWithError('NOT_FOUND', 'Consent record not found', null, 404);
         } catch (\Exception $e) {
             report($e);
-            return response()->json([
-                'success' => false,
-                'error'   => 'Failed to update consent preferences',
-            ], 500);
+            return $this->respondWithError('SERVER_ERROR', 'Failed to update consent preferences', null, 500);
         }
     }
 
@@ -256,22 +245,15 @@ class CookieConsentController extends BaseApiController
                     } catch (\Exception $e) { /* activity_logs may not exist */ }
                 }
 
-                return response()->json([
-                    'success' => true,
+                return $this->respondWithData([
                     'message' => 'Consent withdrawn successfully',
                 ]);
             }
 
-            return response()->json([
-                'success' => false,
-                'error'   => 'Consent record not found',
-            ], 404);
+            return $this->respondWithError('NOT_FOUND', 'Consent record not found', null, 404);
         } catch (\Exception $e) {
             report($e);
-            return response()->json([
-                'success' => false,
-                'error'   => 'Failed to withdraw consent',
-            ], 500);
+            return $this->respondWithError('SERVER_ERROR', 'Failed to withdraw consent', null, 500);
         }
     }
 }

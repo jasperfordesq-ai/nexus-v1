@@ -510,7 +510,7 @@ class GamificationController extends BaseApiController
 
         try {
             $scoreData = $this->nexusScoreService->calculateNexusScore($targetUserId, $tenantId);
-            return response()->json($scoreData);
+            return $this->respondWithData($scoreData);
         } catch (\Throwable $e) {
             return $this->error('Failed to calculate score', 500, 'SERVER_ERROR');
         }

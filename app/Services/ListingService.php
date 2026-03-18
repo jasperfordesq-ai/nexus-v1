@@ -41,6 +41,7 @@ class ListingService
      * @param array{
      *   type?: string|string[],
      *   category_id?: int,
+     *   category_slug?: string,
      *   user_id?: int,
      *   search?: string,
      *   skills?: string|string[],
@@ -82,6 +83,17 @@ class ListingService
         // Category filter
         if (! empty($filters['category_id'])) {
             $query->where('category_id', (int) $filters['category_id']);
+        }
+
+        // Category slug filter (resolve slug → id)
+        if (!empty($filters['category_slug'])) {
+            $catId = DB::table('categories')
+                ->where('slug', $filters['category_slug'])
+                ->where('type', 'listings')
+                ->value('id');
+            if ($catId) {
+                $query->where('category_id', $catId);
+            }
         }
 
         // User filter
@@ -212,6 +224,17 @@ class ListingService
         // Category filter
         if (! empty($filters['category_id'])) {
             $query->where('category_id', (int) $filters['category_id']);
+        }
+
+        // Category slug filter (resolve slug → id)
+        if (!empty($filters['category_slug'])) {
+            $catId = DB::table('categories')
+                ->where('slug', $filters['category_slug'])
+                ->where('type', 'listings')
+                ->value('id');
+            if ($catId) {
+                $query->where('category_id', $catId);
+            }
         }
 
         // User filter

@@ -87,7 +87,7 @@ class AppController extends BaseApiController
                 : 'A new version is available with improvements and bug fixes.';
         }
 
-        return response()->json($response);
+        return $this->respondWithData($response);
     }
 
     /**
@@ -97,7 +97,7 @@ class AppController extends BaseApiController
      */
     public function version(): JsonResponse
     {
-        return response()->json([
+        return $this->respondWithData([
             'version' => self::CURRENT_VERSION,
             'min_version' => self::MIN_REQUIRED_VERSION,
             'update_url' => self::UPDATE_URL,
@@ -133,6 +133,6 @@ class AppController extends BaseApiController
             json_encode($data)
         ));
 
-        return response()->json(['success' => true]);
+        return $this->respondWithData(['message' => 'Log recorded']);
     }
 }
