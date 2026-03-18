@@ -18,11 +18,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
         __DIR__ . '/../app/Console/Commands',
     ])
     ->withRouting(
-        api: __DIR__ . '/../routes/api.php',
+        // Routes loaded by RouteServiceProvider (no /api prefix).
+        // Only register the health-check here to avoid double-loading.
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
+            \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\ResolveTenant::class,
         ]);
 

@@ -147,10 +147,17 @@ session.cookie_httponly = 1\n\
 ; Timezone\n\
 date.timezone = UTC\n\
 \n\
-; OPcache (less aggressive for dev)\n\
+; OPcache - tuned for Laravel\n\
 opcache.enable = 1\n\
 opcache.validate_timestamps = 1\n\
 opcache.revalidate_freq = 0\n\
+opcache.memory_consumption = 256\n\
+opcache.max_accelerated_files = 30000\n\
+opcache.interned_strings_buffer = 32\n\
+opcache.jit = tracing\n\
+opcache.jit_buffer_size = 100M\n\
+opcache.preload = /var/www/html/scripts/opcache-preload.php\n\
+opcache.preload_user = www-data\n\
 " >> "$PHP_INI_DIR/php.ini"
 
 # =============================================================================

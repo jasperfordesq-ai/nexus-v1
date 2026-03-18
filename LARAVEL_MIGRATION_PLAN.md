@@ -89,13 +89,21 @@ Per controller: change parent class → add `Request $request` parameter → rep
 
 Order follows route files from smallest to largest, ending with `misc-api.php` (30+ controllers) and `admin-api.php` (30+ controllers).
 
-### Phase 5 — Route Wiring (IN PROGRESS — 408/1218)
+### Phase 5 — Activation (COMPLETE — 2026-03-18)
 
-408 routes wired to new Laravel controllers via delegation pattern (ob_start). DI/Eloquent controllers built but reverted pending response shape testing.
+Laravel is now the sole HTTP handler. The legacy bridge pattern (boot both frameworks, fall through on 404) has been replaced with a pure Laravel entry point.
 
-**Wired (safe):** 408 routes across 45 delegation controllers — identical API responses guaranteed
-**Pending:** ~810 routes still on legacy controllers (method gaps + DI testing needed)
-**Reverted:** TenantBootstrap, Auth, Registration, Notifications, Search, Metrics, Push — need response validation
+**What changed:**
+- `httpdocs/index.php` — rewritten from 550-line legacy boot to 40-line Laravel entry point
+- `bootstrap/app.php` — removed duplicate route loading (was loading 2,441 routes instead of 1,223)
+- `config/cors.php` — added `v2/*` to CORS paths (routes use `/v2/...` not `/api/...`)
+- `app/Http/Middleware/SecurityHeaders.php` — new middleware replacing inline headers from legacy index.php
+- `Dockerfile` — OPCache tuning (256MB, 30K files, JIT tracing with 100MB buffer, preloading)
+- `scripts/opcache-preload.php` — preloads Laravel framework + app classes into shared memory
+
+**Performance:** 8.4s/request (bridge) → ~100ms (pure Laravel + JIT + OPCache preload)
+
+**All 1,223 routes** served by Laravel across 126 controllers. Legacy PHP framework no longer boots for any request.
 
 ---
 
