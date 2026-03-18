@@ -6,12 +6,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
 class UserBadge extends Model
 {
+    use HasTenantScope;
     protected $table = 'user_badges';
 
     public $timestamps = true;
@@ -43,9 +45,15 @@ class UserBadge extends Model
      */
     public static function getForUser(int $userId): array
     {
-        return DB::table('user_badges')
-            ->where('user_id', $userId)
-            ->orderByDesc('awarded_at')
+        $query = DB::table('user_badges')
+            ->where('user_id', $userId);
+
+        $tenantId = \App\Core\TenantContext::getId();
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
+
+        return $query->orderByDesc('awarded_at')
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
@@ -56,18 +64,21 @@ class UserBadge extends Model
      */
     public static function updateShowcase(int $userId, array $badgeKeys): bool
     {
+        $tenantId = \App\Core\TenantContext::getId();
+
         // Clear all showcased
-        DB::table('user_badges')
-            ->where('user_id', $userId)
-            ->update(['is_showcased' => 0, 'showcase_order' => 0]);
+        $query = DB::table('user_badges')->where('user_id', $userId);
+        if ($tenantId) { $query->where('tenant_id', $tenantId); }
+        $query->update(['is_showcased' => 0, 'showcase_order' => 0]);
 
         // Set new showcased (max 3)
         $order = 0;
         foreach (array_slice($badgeKeys, 0, 3) as $key) {
-            DB::table('user_badges')
+            $q = DB::table('user_badges')
                 ->where('user_id', $userId)
-                ->where('badge_key', $key)
-                ->update(['is_showcased' => 1, 'showcase_order' => $order++]);
+                ->where('badge_key', $key);
+            if ($tenantId) { $q->where('tenant_id', $tenantId); }
+            $q->update(['is_showcased' => 1, 'showcase_order' => $order++]);
         }
 
         return true;
@@ -78,10 +89,16 @@ class UserBadge extends Model
      */
     public static function getShowcased(int $userId): array
     {
-        return DB::table('user_badges')
+        $query = DB::table('user_badges')
             ->where('user_id', $userId)
-            ->where('is_showcased', 1)
-            ->orderBy('showcase_order')
+            ->where('is_showcased', 1);
+
+        $tenantId = \App\Core\TenantContext::getId();
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
+
+        return $query->orderBy('showcase_order')
             ->limit(3)
             ->get()
             ->map(fn ($r) => (array) $r)

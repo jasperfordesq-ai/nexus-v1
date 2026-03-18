@@ -6,12 +6,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
 class ActivityLog extends Model
 {
+    use HasTenantScope;
     protected $table = 'activity_log';
 
     protected $fillable = [
@@ -47,6 +49,7 @@ class ActivityLog extends Model
         $ip = \App\Core\ClientIp::get();
 
         $id = DB::table('activity_log')->insertGetId([
+            'tenant_id' => \App\Core\TenantContext::getId(),
             'user_id' => $userId,
             'action' => $action,
             'details' => $details,

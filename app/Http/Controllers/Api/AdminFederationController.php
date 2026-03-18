@@ -175,7 +175,7 @@ class AdminFederationController extends BaseApiController
         try {
             $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
-            DB::update("UPDATE federation_partnerships SET status = 'active', updated_at = NOW() WHERE id = ?", [$id]);
+            DB::update("UPDATE federation_partnerships SET status = 'active', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             return $this->respondWithData(['message' => 'Partnership approved']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to approve partnership'); }
     }
@@ -191,7 +191,7 @@ class AdminFederationController extends BaseApiController
         try {
             $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
-            DB::update("UPDATE federation_partnerships SET status = 'rejected', updated_at = NOW() WHERE id = ?", [$id]);
+            DB::update("UPDATE federation_partnerships SET status = 'rejected', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             return $this->respondWithData(['message' => 'Partnership rejected']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to reject partnership'); }
     }
@@ -207,7 +207,7 @@ class AdminFederationController extends BaseApiController
         try {
             $partner = DB::selectOne("SELECT * FROM federation_partnerships WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             if (!$partner) { return $this->respondWithError('NOT_FOUND', 'Partnership not found', null, 404); }
-            DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ?", [$id]);
+            DB::update("UPDATE federation_partnerships SET status = 'terminated', updated_at = NOW() WHERE id = ? AND (tenant_id = ? OR partner_tenant_id = ?)", [$id, $tenantId, $tenantId]);
             return $this->respondWithData(['message' => 'Partnership terminated']);
         } catch (\Exception $e) { return $this->respondWithError('UPDATE_FAILED', 'Failed to terminate partnership'); }
     }
