@@ -46,7 +46,8 @@
     "nexus_score": "NexusScore",
     "knowledge_base": "Wissensdatenbank",
     "federation_settings": "Föderationseinstellungen",
-    "unread_notifications": "{{count}} ungelesene Benachrichtigungen"
+    "unread_notifications": "{{count}} ungelesene Benachrichtigungen",
+    "timebanking": "Zeitbank"
   },
   "nav_desc": {
     "members": "Community-Mitglieder durchsuchen",
@@ -86,7 +87,10 @@
     "our_impact": "Community-Wirkungsübersicht",
     "impact_report": "Detaillierte Wirkungsdaten",
     "strategic_plan": "Unsere strategische Ausrichtung",
-    "federation_settings": "Verwalten Sie Ihre Föderationseinstellungen"
+    "federation_settings": "Verwalten Sie Ihre Föderationseinstellungen",
+    "feed": "Community-Feed",
+    "timebanking_listings": "Angebote & Gesuche",
+    "messages": "Ihre Nachrichten"
   },
   "user_menu": {
     "my_profile": "Mein Profil",
@@ -164,7 +168,11 @@
     "legal": "Rechtliches",
     "admin": "Admin",
     "account": "Konto",
-    "language": "Sprache"
+    "language": "Sprache",
+    "engage": "Engagieren",
+    "progress": "Fortschritt",
+    "tools": "Werkzeuge",
+    "impact": "Wirkung"
   },
   "accessibility": {
     "open_menu": "Menü öffnen",
