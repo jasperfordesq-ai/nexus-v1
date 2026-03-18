@@ -16,7 +16,7 @@ class GoalCheckin extends Model
     protected $table = 'goal_checkins';
 
     protected $fillable = [
-        'goal_id', 'user_id', 'progress_percent', 'note', 'mood',
+        'goal_id', 'user_id', 'tenant_id', 'progress_percent', 'note', 'mood',
     ];
 
     protected $casts = [

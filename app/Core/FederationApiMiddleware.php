@@ -64,6 +64,10 @@ class FederationApiMiddleware
         }
 
         $token = $matches[1];
+        if (!class_exists(FederationJwtService::class)) {
+            self::sendError(500, 'JWT service unavailable', 'SERVICE_UNAVAILABLE');
+            return false;
+        }
         $payload = FederationJwtService::validateToken($token);
 
         if (!$payload) {

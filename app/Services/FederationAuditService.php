@@ -13,23 +13,23 @@ namespace App\Services;
  */
 class FederationAuditService
 {
-    /** Log levels — mirrored from legacy */
-    public const LEVEL_DEBUG = \Nexus\Services\FederationAuditService::LEVEL_DEBUG;
-    public const LEVEL_INFO = \Nexus\Services\FederationAuditService::LEVEL_INFO;
-    public const LEVEL_WARNING = \Nexus\Services\FederationAuditService::LEVEL_WARNING;
-    public const LEVEL_CRITICAL = \Nexus\Services\FederationAuditService::LEVEL_CRITICAL;
+    /** Log levels */
+    public const LEVEL_DEBUG = 'debug';
+    public const LEVEL_INFO = 'info';
+    public const LEVEL_WARNING = 'warning';
+    public const LEVEL_CRITICAL = 'critical';
 
-    /** Action categories — mirrored from legacy */
-    public const CATEGORY_SYSTEM = \Nexus\Services\FederationAuditService::CATEGORY_SYSTEM;
-    public const CATEGORY_TENANT = \Nexus\Services\FederationAuditService::CATEGORY_TENANT;
-    public const CATEGORY_PARTNERSHIP = \Nexus\Services\FederationAuditService::CATEGORY_PARTNERSHIP;
-    public const CATEGORY_PROFILE = \Nexus\Services\FederationAuditService::CATEGORY_PROFILE;
-    public const CATEGORY_MESSAGING = \Nexus\Services\FederationAuditService::CATEGORY_MESSAGING;
-    public const CATEGORY_TRANSACTION = \Nexus\Services\FederationAuditService::CATEGORY_TRANSACTION;
-    public const CATEGORY_LISTING = \Nexus\Services\FederationAuditService::CATEGORY_LISTING;
-    public const CATEGORY_EVENT = \Nexus\Services\FederationAuditService::CATEGORY_EVENT;
-    public const CATEGORY_GROUP = \Nexus\Services\FederationAuditService::CATEGORY_GROUP;
-    public const CATEGORY_SEARCH = \Nexus\Services\FederationAuditService::CATEGORY_SEARCH;
+    /** Action categories */
+    public const CATEGORY_SYSTEM = 'system';
+    public const CATEGORY_TENANT = 'tenant';
+    public const CATEGORY_PARTNERSHIP = 'partnership';
+    public const CATEGORY_PROFILE = 'profile';
+    public const CATEGORY_MESSAGING = 'messaging';
+    public const CATEGORY_TRANSACTION = 'transaction';
+    public const CATEGORY_LISTING = 'listing';
+    public const CATEGORY_EVENT = 'event';
+    public const CATEGORY_GROUP = 'group';
+    public const CATEGORY_SEARCH = 'search';
 
     public function __construct()
     {
@@ -40,6 +40,9 @@ class FederationAuditService
      */
     public function log(string $actionType, ?int $sourceTenantId = null, ?int $targetTenantId = null, ?int $actorUserId = null, array $data = [], string $level = self::LEVEL_INFO): bool
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return false;
+        }
         return \Nexus\Services\FederationAuditService::log($actionType, $sourceTenantId, $targetTenantId, $actorUserId, $data, $level);
     }
 
@@ -48,6 +51,9 @@ class FederationAuditService
      */
     public function logSearch(string $searchType, array $filters, int $resultsCount, ?int $actorUserId = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return false;
+        }
         return \Nexus\Services\FederationAuditService::logSearch($searchType, $filters, $resultsCount, $actorUserId);
     }
 
@@ -56,6 +62,9 @@ class FederationAuditService
      */
     public function logProfileView(int $viewerUserId, int $viewerTenantId, int $viewedUserId, int $viewedTenantId): bool
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return false;
+        }
         return \Nexus\Services\FederationAuditService::logProfileView($viewerUserId, $viewerTenantId, $viewedUserId, $viewedTenantId);
     }
 
@@ -64,6 +73,9 @@ class FederationAuditService
      */
     public function logMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId, ?int $messageId = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return false;
+        }
         return \Nexus\Services\FederationAuditService::logMessage($senderUserId, $senderTenantId, $recipientUserId, $recipientTenantId, $messageId);
     }
 
@@ -72,6 +84,9 @@ class FederationAuditService
      */
     public function logTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId, int $transactionId, string $transactionType, float $amount): bool
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return false;
+        }
         return \Nexus\Services\FederationAuditService::logTransaction($initiatorUserId, $initiatorTenantId, $counterpartyUserId, $counterpartyTenantId, $transactionId, $transactionType, $amount);
     }
 
@@ -80,6 +95,9 @@ class FederationAuditService
      */
     public function logPartnershipChange(int $tenantId, int $partnerTenantId, string $newStatus, ?int $actorUserId = null, ?string $reason = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return false;
+        }
         return \Nexus\Services\FederationAuditService::logPartnershipChange($tenantId, $partnerTenantId, $newStatus, $actorUserId, $reason);
     }
 
@@ -88,6 +106,9 @@ class FederationAuditService
      */
     public function getLog(array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return [];
+        }
         return \Nexus\Services\FederationAuditService::getLog($filters);
     }
 
@@ -96,6 +117,9 @@ class FederationAuditService
      */
     public function getStats(int $days = 30): array
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return [];
+        }
         return \Nexus\Services\FederationAuditService::getStats($days);
     }
 
@@ -104,6 +128,9 @@ class FederationAuditService
      */
     public function getRecentCritical(int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return [];
+        }
         return \Nexus\Services\FederationAuditService::getRecentCritical($limit);
     }
 
@@ -112,6 +139,9 @@ class FederationAuditService
      */
     public function purgeOld(int $retentionDays = 365): int
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return 0;
+        }
         return \Nexus\Services\FederationAuditService::purgeOld($retentionDays);
     }
 
@@ -120,6 +150,9 @@ class FederationAuditService
      */
     public function getActionLabel(string $actionType): string
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return ucwords(str_replace('_', ' ', $actionType));
+        }
         return \Nexus\Services\FederationAuditService::getActionLabel($actionType);
     }
 
@@ -128,6 +161,9 @@ class FederationAuditService
      */
     public function getActionIcon(string $actionType): string
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return 'fa-circle';
+        }
         return \Nexus\Services\FederationAuditService::getActionIcon($actionType);
     }
 
@@ -136,6 +172,9 @@ class FederationAuditService
      */
     public function getLevelBadge(string $level): string
     {
+        if (!class_exists('\Nexus\Services\FederationAuditService')) {
+            return 'badge-secondary';
+        }
         return \Nexus\Services\FederationAuditService::getLevelBadge($level);
     }
 }

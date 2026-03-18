@@ -24,6 +24,9 @@ class IdentityVerificationSessionService
      */
     public function create(int $tenantId, int $userId, string $providerSlug, string $verificationLevel, array $providerData): int
     {
+        if (!class_exists(LegacyService::class)) {
+            return 0;
+        }
         return LegacyService::create($tenantId, $userId, $providerSlug, $verificationLevel, $providerData);
     }
 
@@ -32,6 +35,9 @@ class IdentityVerificationSessionService
      */
     public function getById(int $sessionId): ?array
     {
+        if (!class_exists(LegacyService::class)) {
+            return null;
+        }
         return LegacyService::getById($sessionId);
     }
 
@@ -40,6 +46,9 @@ class IdentityVerificationSessionService
      */
     public function findByProviderSession(string $providerSlug, string $providerSessionId): ?array
     {
+        if (!class_exists(LegacyService::class)) {
+            return null;
+        }
         return LegacyService::findByProviderSession($providerSlug, $providerSessionId);
     }
 
@@ -48,6 +57,9 @@ class IdentityVerificationSessionService
      */
     public function getLatestForUser(int $tenantId, int $userId): ?array
     {
+        if (!class_exists(LegacyService::class)) {
+            return null;
+        }
         return LegacyService::getLatestForUser($tenantId, $userId);
     }
 
@@ -56,6 +68,9 @@ class IdentityVerificationSessionService
      */
     public function getAllForUser(int $tenantId, int $userId): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getAllForUser($tenantId, $userId);
     }
 
@@ -64,6 +79,9 @@ class IdentityVerificationSessionService
      */
     public function updateStatus(int $sessionId, string $status, ?string $resultSummary = null, ?string $providerReference = null, ?string $failureReason = null): void
     {
+        if (!class_exists(LegacyService::class)) {
+            return;
+        }
         LegacyService::updateStatus($sessionId, $status, $resultSummary, $providerReference, $failureReason);
     }
 
@@ -72,6 +90,9 @@ class IdentityVerificationSessionService
      */
     public function getPendingForTenant(int $tenantId, int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getPendingForTenant($tenantId, $limit, $offset);
     }
 
@@ -80,6 +101,9 @@ class IdentityVerificationSessionService
      */
     public function getAbandoned(int $hoursOld = 24, int $limit = 100): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getAbandoned($hoursOld, $limit);
     }
 
@@ -88,6 +112,9 @@ class IdentityVerificationSessionService
      */
     public function markReminderSent(int $sessionId): void
     {
+        if (!class_exists(LegacyService::class)) {
+            return;
+        }
         LegacyService::markReminderSent($sessionId);
     }
 
@@ -96,6 +123,9 @@ class IdentityVerificationSessionService
      */
     public function expireAbandoned(int $hoursOld = 72): int
     {
+        if (!class_exists(LegacyService::class)) {
+            return 0;
+        }
         return LegacyService::expireAbandoned($hoursOld);
     }
 
@@ -104,6 +134,9 @@ class IdentityVerificationSessionService
      */
     public function purgeOldSessions(int $retentionDays = 180): int
     {
+        if (!class_exists(LegacyService::class)) {
+            return 0;
+        }
         return LegacyService::purgeOldSessions($retentionDays);
     }
 }

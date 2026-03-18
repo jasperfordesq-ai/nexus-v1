@@ -16,23 +16,24 @@ use Nexus\Core\MenuManager as LegacyMenuManager;
  */
 class MenuManager
 {
-    /** Menu location constants */
-    const LOCATION_HEADER_MAIN = LegacyMenuManager::LOCATION_HEADER_MAIN;
-    const LOCATION_HEADER_SECONDARY = LegacyMenuManager::LOCATION_HEADER_SECONDARY;
-    const LOCATION_FOOTER = LegacyMenuManager::LOCATION_FOOTER;
-    const LOCATION_SIDEBAR = LegacyMenuManager::LOCATION_SIDEBAR;
-    const LOCATION_MOBILE = LegacyMenuManager::LOCATION_MOBILE;
+    /** Menu location constants (inlined — safe when legacy is removed) */
+    const LOCATION_HEADER_MAIN = 'header-main';
+    const LOCATION_HEADER_SECONDARY = 'header-secondary';
+    const LOCATION_FOOTER = 'footer';
+    const LOCATION_SIDEBAR = 'sidebar';
+    const LOCATION_MOBILE = 'mobile';
 
     /** Legacy support */
-    const MENU_ABOUT = LegacyMenuManager::MENU_ABOUT;
-    const MENU_MAIN = LegacyMenuManager::MENU_MAIN;
-    const MENU_FOOTER = LegacyMenuManager::MENU_FOOTER;
+    const MENU_ABOUT = 'about';
+    const MENU_MAIN = 'main';
+    const MENU_FOOTER = 'footer';
 
     /**
      * Get menu for a specific location and layout.
      */
     public static function getMenu($location, $layout = null, $useCache = true)
     {
+        if (!class_exists(LegacyMenuManager::class)) { return []; }
         return LegacyMenuManager::getMenu($location, $layout, $useCache);
     }
 
@@ -41,6 +42,7 @@ class MenuManager
      */
     public static function getMenuBySlug($slug, $layout = null, $useCache = true)
     {
+        if (!class_exists(LegacyMenuManager::class)) { return null; }
         return LegacyMenuManager::getMenuBySlug($slug, $layout, $useCache);
     }
 
@@ -49,6 +51,7 @@ class MenuManager
      */
     public static function renderMenu($location, $layout = null, $cssClass = 'menu')
     {
+        if (!class_exists(LegacyMenuManager::class)) { return ''; }
         return LegacyMenuManager::renderMenu($location, $layout, $cssClass);
     }
 
@@ -57,6 +60,7 @@ class MenuManager
      */
     public static function clearCache($tenantId = null)
     {
+        if (!class_exists(LegacyMenuManager::class)) { return null; }
         return LegacyMenuManager::clearCache($tenantId);
     }
 
@@ -65,6 +69,7 @@ class MenuManager
      */
     public static function renderAboutMenu()
     {
+        if (!class_exists(LegacyMenuManager::class)) { return ''; }
         return LegacyMenuManager::renderAboutMenu();
     }
 
@@ -73,6 +78,7 @@ class MenuManager
      */
     public static function getMainNavPages()
     {
+        if (!class_exists(LegacyMenuManager::class)) { return []; }
         return LegacyMenuManager::getMainNavPages();
     }
 
@@ -81,6 +87,7 @@ class MenuManager
      */
     public static function getFooterPages()
     {
+        if (!class_exists(LegacyMenuManager::class)) { return []; }
         return LegacyMenuManager::getFooterPages();
     }
 
@@ -89,6 +96,7 @@ class MenuManager
      */
     public static function hasMenuPages($location)
     {
+        if (!class_exists(LegacyMenuManager::class)) { return false; }
         return LegacyMenuManager::hasMenuPages($location);
     }
 
@@ -97,6 +105,7 @@ class MenuManager
      */
     public static function isEnabled()
     {
+        if (!class_exists(LegacyMenuManager::class)) { return false; }
         return LegacyMenuManager::isEnabled();
     }
 
@@ -105,6 +114,7 @@ class MenuManager
      */
     public static function getConfig()
     {
+        if (!class_exists(LegacyMenuManager::class)) { return []; }
         return LegacyMenuManager::getConfig();
     }
 
@@ -113,6 +123,7 @@ class MenuManager
      */
     public static function getTenantModuleFeatures($tenantId = null)
     {
+        if (!class_exists(LegacyMenuManager::class)) { return []; }
         return LegacyMenuManager::getTenantModuleFeatures($tenantId);
     }
 }

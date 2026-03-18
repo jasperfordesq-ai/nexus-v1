@@ -24,6 +24,9 @@ class TenantProviderCredentialService
      */
     public function get(int $tenantId, string $providerSlug): ?array
     {
+        if (!class_exists(LegacyService::class)) {
+            return null;
+        }
         return LegacyService::get($tenantId, $providerSlug);
     }
 
@@ -32,6 +35,9 @@ class TenantProviderCredentialService
      */
     public function save(int $tenantId, string $providerSlug, array $credentials): bool
     {
+        if (!class_exists(LegacyService::class)) {
+            return false;
+        }
         return LegacyService::save($tenantId, $providerSlug, $credentials);
     }
 
@@ -40,6 +46,9 @@ class TenantProviderCredentialService
      */
     public function delete(int $tenantId, string $providerSlug): bool
     {
+        if (!class_exists(LegacyService::class)) {
+            return false;
+        }
         return LegacyService::delete($tenantId, $providerSlug);
     }
 
@@ -48,6 +57,9 @@ class TenantProviderCredentialService
      */
     public function hasCredentials(int $tenantId, string $providerSlug): bool
     {
+        if (!class_exists(LegacyService::class)) {
+            return false;
+        }
         return LegacyService::hasCredentials($tenantId, $providerSlug);
     }
 
@@ -58,6 +70,9 @@ class TenantProviderCredentialService
      */
     public function listConfigured(int $tenantId): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::listConfigured($tenantId);
     }
 
@@ -66,6 +81,9 @@ class TenantProviderCredentialService
      */
     public function getRequiredFields(string $providerSlug): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getRequiredFields($providerSlug);
     }
 }

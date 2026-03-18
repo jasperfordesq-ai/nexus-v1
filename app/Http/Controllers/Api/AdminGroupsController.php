@@ -954,11 +954,11 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', 'Group not found', null, 404);
             }
 
-            $memberCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ?", [$id])->cnt ?? 0);
+            $memberCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_members WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0);
             $postsCount = 0;
-            try { $postsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_posts WHERE group_id = ?", [$id])->cnt ?? 0); } catch (\Throwable $e) {}
+            try { $postsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM group_posts WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) {}
             $eventsCount = 0;
-            try { $eventsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM events WHERE group_id = ?", [$id])->cnt ?? 0); } catch (\Throwable $e) {}
+            try { $eventsCount = (int) (DB::selectOne("SELECT COUNT(*) as cnt FROM events WHERE group_id = ? AND tenant_id = ?", [$id, $tenantId])->cnt ?? 0); } catch (\Throwable $e) {}
 
             return $this->respondWithData([
                 'group_id' => $id,

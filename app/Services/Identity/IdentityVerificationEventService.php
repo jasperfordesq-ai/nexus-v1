@@ -15,26 +15,26 @@ use Nexus\Services\Identity\IdentityVerificationEventService as LegacyService;
  */
 class IdentityVerificationEventService
 {
-    /** Event types — mirrored from legacy */
-    public const EVENT_REGISTRATION_STARTED = LegacyService::EVENT_REGISTRATION_STARTED;
-    public const EVENT_VERIFICATION_CREATED = LegacyService::EVENT_VERIFICATION_CREATED;
-    public const EVENT_VERIFICATION_STARTED = LegacyService::EVENT_VERIFICATION_STARTED;
-    public const EVENT_VERIFICATION_PROCESSING = LegacyService::EVENT_VERIFICATION_PROCESSING;
-    public const EVENT_VERIFICATION_PASSED = LegacyService::EVENT_VERIFICATION_PASSED;
-    public const EVENT_VERIFICATION_FAILED = LegacyService::EVENT_VERIFICATION_FAILED;
-    public const EVENT_VERIFICATION_EXPIRED = LegacyService::EVENT_VERIFICATION_EXPIRED;
-    public const EVENT_VERIFICATION_CANCELLED = LegacyService::EVENT_VERIFICATION_CANCELLED;
-    public const EVENT_ADMIN_REVIEW_STARTED = LegacyService::EVENT_ADMIN_REVIEW_STARTED;
-    public const EVENT_ADMIN_APPROVED = LegacyService::EVENT_ADMIN_APPROVED;
-    public const EVENT_ADMIN_REJECTED = LegacyService::EVENT_ADMIN_REJECTED;
-    public const EVENT_ACCOUNT_ACTIVATED = LegacyService::EVENT_ACCOUNT_ACTIVATED;
-    public const EVENT_FALLBACK_TRIGGERED = LegacyService::EVENT_FALLBACK_TRIGGERED;
+    /** Event types (inlined — safe when legacy is removed) */
+    public const EVENT_REGISTRATION_STARTED = 'registration_started';
+    public const EVENT_VERIFICATION_CREATED = 'verification_created';
+    public const EVENT_VERIFICATION_STARTED = 'verification_started';
+    public const EVENT_VERIFICATION_PROCESSING = 'verification_processing';
+    public const EVENT_VERIFICATION_PASSED = 'verification_passed';
+    public const EVENT_VERIFICATION_FAILED = 'verification_failed';
+    public const EVENT_VERIFICATION_EXPIRED = 'verification_expired';
+    public const EVENT_VERIFICATION_CANCELLED = 'verification_cancelled';
+    public const EVENT_ADMIN_REVIEW_STARTED = 'admin_review_started';
+    public const EVENT_ADMIN_APPROVED = 'admin_approved';
+    public const EVENT_ADMIN_REJECTED = 'admin_rejected';
+    public const EVENT_ACCOUNT_ACTIVATED = 'account_activated';
+    public const EVENT_FALLBACK_TRIGGERED = 'fallback_triggered';
 
-    /** Actor types — mirrored from legacy */
-    public const ACTOR_SYSTEM = LegacyService::ACTOR_SYSTEM;
-    public const ACTOR_USER = LegacyService::ACTOR_USER;
-    public const ACTOR_ADMIN = LegacyService::ACTOR_ADMIN;
-    public const ACTOR_WEBHOOK = LegacyService::ACTOR_WEBHOOK;
+    /** Actor types (inlined — safe when legacy is removed) */
+    public const ACTOR_SYSTEM = 'system';
+    public const ACTOR_USER = 'user';
+    public const ACTOR_ADMIN = 'admin';
+    public const ACTOR_WEBHOOK = 'webhook';
 
     public function __construct()
     {
@@ -54,6 +54,9 @@ class IdentityVerificationEventService
         ?string $ipAddress = null,
         ?string $userAgent = null
     ): void {
+        if (!class_exists(LegacyService::class)) {
+            return;
+        }
         LegacyService::log($tenantId, $userId, $eventType, $sessionId, $actorId, $actorType, $details, $ipAddress, $userAgent);
     }
 
@@ -62,6 +65,9 @@ class IdentityVerificationEventService
      */
     public function getForUser(int $tenantId, int $userId, int $limit = 50): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getForUser($tenantId, $userId, $limit);
     }
 
@@ -70,6 +76,9 @@ class IdentityVerificationEventService
      */
     public function getForSession(int $sessionId): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getForSession($sessionId);
     }
 
@@ -80,6 +89,9 @@ class IdentityVerificationEventService
      */
     public function getForTenant(int $tenantId, int $limit = 50, int $offset = 0, ?string $eventType = null): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getForTenant($tenantId, $limit, $offset, $eventType);
     }
 }

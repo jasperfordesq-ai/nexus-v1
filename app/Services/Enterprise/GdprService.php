@@ -44,6 +44,9 @@ class GdprService
      */
     public function createRequest(int $userId, string $type, array $options = []): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->createRequest($userId, $type, $options);
     }
 
@@ -52,6 +55,9 @@ class GdprService
      */
     public function getRequest(int $requestId): ?array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return null;
+        }
         return $this->legacy()->getRequest($requestId);
     }
 
@@ -60,6 +66,9 @@ class GdprService
      */
     public function getPendingRequests(int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getPendingRequests($limit, $offset);
     }
 
@@ -68,6 +77,9 @@ class GdprService
      */
     public function getUserRequests(int $userId): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getUserRequests($userId);
     }
 
@@ -76,6 +88,9 @@ class GdprService
      */
     public function processRequest(int $requestId, int $adminId): bool
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return false;
+        }
         return $this->legacy()->processRequest($requestId, $adminId);
     }
 
@@ -84,6 +99,9 @@ class GdprService
      */
     public function generateDataExport(int $userId, int $requestId = null): string
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return '';
+        }
         return $this->legacy()->generateDataExport($userId, $requestId);
     }
 
@@ -92,6 +110,9 @@ class GdprService
      */
     public function executeAccountDeletion(int $userId, ?int $adminId = null, ?int $requestId = null): void
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return;
+        }
         $this->legacy()->executeAccountDeletion($userId, $adminId, $requestId);
     }
 
@@ -104,6 +125,9 @@ class GdprService
      */
     public function recordConsent(int $userId, string $consentType, bool $consented, string $consentText, string $version): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->recordConsent($userId, $consentType, $consented, $consentText, $version);
     }
 
@@ -112,6 +136,9 @@ class GdprService
      */
     public function withdrawConsent(int $userId, string $consentType): bool
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return false;
+        }
         return $this->legacy()->withdrawConsent($userId, $consentType);
     }
 
@@ -120,6 +147,9 @@ class GdprService
      */
     public function getUserConsents(int $userId): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getUserConsents($userId);
     }
 
@@ -128,6 +158,9 @@ class GdprService
      */
     public function hasConsent(int $userId, string $consentType): bool
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return false;
+        }
         return $this->legacy()->hasConsent($userId, $consentType);
     }
 
@@ -136,6 +169,9 @@ class GdprService
      */
     public function hasCurrentVersionConsent(int $userId, string $consentType): bool
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return false;
+        }
         return $this->legacy()->hasCurrentVersionConsent($userId, $consentType);
     }
 
@@ -144,6 +180,9 @@ class GdprService
      */
     public function getOutdatedRequiredConsents(int $userId): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getOutdatedRequiredConsents($userId);
     }
 
@@ -152,6 +191,9 @@ class GdprService
      */
     public function needsReConsent(int $userId): bool
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return false;
+        }
         return $this->legacy()->needsReConsent($userId);
     }
 
@@ -160,6 +202,9 @@ class GdprService
      */
     public function acceptMultipleConsents(int $userId, array $consentSlugs): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->acceptMultipleConsents($userId, $consentSlugs);
     }
 
@@ -168,6 +213,9 @@ class GdprService
      */
     public function backfillConsentsForExistingUsers(string $consentType, string $version, string $consentText): int
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return 0;
+        }
         return $this->legacy()->backfillConsentsForExistingUsers($consentType, $version, $consentText);
     }
 
@@ -176,6 +224,9 @@ class GdprService
      */
     public function getEffectiveConsentVersion(string $consentSlug): ?array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return null;
+        }
         return $this->legacy()->getEffectiveConsentVersion($consentSlug);
     }
 
@@ -184,6 +235,9 @@ class GdprService
      */
     public function setTenantConsentVersion(string $consentSlug, string $version, ?string $text = null): bool
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return false;
+        }
         return $this->legacy()->setTenantConsentVersion($consentSlug, $version, $text);
     }
 
@@ -192,6 +246,9 @@ class GdprService
      */
     public function removeTenantConsentOverride(string $consentSlug): bool
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return false;
+        }
         return $this->legacy()->removeTenantConsentOverride($consentSlug);
     }
 
@@ -200,6 +257,9 @@ class GdprService
      */
     public function getTenantConsentOverrides(): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getTenantConsentOverrides();
     }
 
@@ -208,6 +268,9 @@ class GdprService
      */
     public function getConsentTypes(): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getConsentTypes();
     }
 
@@ -216,6 +279,9 @@ class GdprService
      */
     public function getActiveConsentTypes(): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getActiveConsentTypes();
     }
 
@@ -224,6 +290,9 @@ class GdprService
      */
     public function updateUserConsent(int $userId, string $slug, bool $given): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->updateUserConsent($userId, $slug, $given);
     }
 
@@ -236,6 +305,9 @@ class GdprService
      */
     public function reportBreach(array $data, int $reportedBy): int
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return 0;
+        }
         return $this->legacy()->reportBreach($data, $reportedBy);
     }
 
@@ -244,6 +316,9 @@ class GdprService
      */
     public function getBreachDeadline(int $breachLogId): \DateTime
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            throw new \RuntimeException('Legacy GdprService is not available');
+        }
         return $this->legacy()->getBreachDeadline($breachLogId);
     }
 
@@ -261,6 +336,9 @@ class GdprService
         ?string $details = null,
         ?string $ipAddress = null
     ): void {
+        if (!class_exists(LegacyGdprService::class)) {
+            return;
+        }
         $this->legacy()->logAction($actionType, $userId, $adminId, $details, $ipAddress);
     }
 
@@ -269,6 +347,9 @@ class GdprService
      */
     public function getAuditLog(int $userId, int $limit = 100): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getAuditLog($userId, $limit);
     }
 
@@ -277,6 +358,9 @@ class GdprService
      */
     public function getStatistics(): array
     {
+        if (!class_exists(LegacyGdprService::class)) {
+            return [];
+        }
         return $this->legacy()->getStatistics();
     }
 }

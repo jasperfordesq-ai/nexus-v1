@@ -13,28 +13,28 @@ namespace App\Services;
  */
 class FederationFeatureService
 {
-    /** System-level constants — mirrored from legacy */
-    public const SYSTEM_FEDERATION_ENABLED = \Nexus\Services\FederationFeatureService::SYSTEM_FEDERATION_ENABLED;
-    public const SYSTEM_WHITELIST_MODE = \Nexus\Services\FederationFeatureService::SYSTEM_WHITELIST_MODE;
-    public const SYSTEM_EMERGENCY_LOCKDOWN = \Nexus\Services\FederationFeatureService::SYSTEM_EMERGENCY_LOCKDOWN;
-    public const SYSTEM_MAX_FEDERATION_LEVEL = \Nexus\Services\FederationFeatureService::SYSTEM_MAX_FEDERATION_LEVEL;
-    public const SYSTEM_PROFILES_ENABLED = \Nexus\Services\FederationFeatureService::SYSTEM_PROFILES_ENABLED;
-    public const SYSTEM_MESSAGING_ENABLED = \Nexus\Services\FederationFeatureService::SYSTEM_MESSAGING_ENABLED;
-    public const SYSTEM_TRANSACTIONS_ENABLED = \Nexus\Services\FederationFeatureService::SYSTEM_TRANSACTIONS_ENABLED;
-    public const SYSTEM_LISTINGS_ENABLED = \Nexus\Services\FederationFeatureService::SYSTEM_LISTINGS_ENABLED;
-    public const SYSTEM_EVENTS_ENABLED = \Nexus\Services\FederationFeatureService::SYSTEM_EVENTS_ENABLED;
-    public const SYSTEM_GROUPS_ENABLED = \Nexus\Services\FederationFeatureService::SYSTEM_GROUPS_ENABLED;
+    /** System-level constants */
+    public const SYSTEM_FEDERATION_ENABLED = 'system_federation_enabled';
+    public const SYSTEM_WHITELIST_MODE = 'system_whitelist_mode';
+    public const SYSTEM_EMERGENCY_LOCKDOWN = 'system_emergency_lockdown';
+    public const SYSTEM_MAX_FEDERATION_LEVEL = 'system_max_federation_level';
+    public const SYSTEM_PROFILES_ENABLED = 'system_cross_tenant_profiles';
+    public const SYSTEM_MESSAGING_ENABLED = 'system_cross_tenant_messaging';
+    public const SYSTEM_TRANSACTIONS_ENABLED = 'system_cross_tenant_transactions';
+    public const SYSTEM_LISTINGS_ENABLED = 'system_cross_tenant_listings';
+    public const SYSTEM_EVENTS_ENABLED = 'system_cross_tenant_events';
+    public const SYSTEM_GROUPS_ENABLED = 'system_cross_tenant_groups';
 
-    /** Tenant-level constants — mirrored from legacy */
-    public const TENANT_FEDERATION_ENABLED = \Nexus\Services\FederationFeatureService::TENANT_FEDERATION_ENABLED;
-    public const TENANT_APPEAR_IN_DIRECTORY = \Nexus\Services\FederationFeatureService::TENANT_APPEAR_IN_DIRECTORY;
-    public const TENANT_AUTO_ACCEPT_HIERARCHY = \Nexus\Services\FederationFeatureService::TENANT_AUTO_ACCEPT_HIERARCHY;
-    public const TENANT_PROFILES_ENABLED = \Nexus\Services\FederationFeatureService::TENANT_PROFILES_ENABLED;
-    public const TENANT_MESSAGING_ENABLED = \Nexus\Services\FederationFeatureService::TENANT_MESSAGING_ENABLED;
-    public const TENANT_TRANSACTIONS_ENABLED = \Nexus\Services\FederationFeatureService::TENANT_TRANSACTIONS_ENABLED;
-    public const TENANT_LISTINGS_ENABLED = \Nexus\Services\FederationFeatureService::TENANT_LISTINGS_ENABLED;
-    public const TENANT_EVENTS_ENABLED = \Nexus\Services\FederationFeatureService::TENANT_EVENTS_ENABLED;
-    public const TENANT_GROUPS_ENABLED = \Nexus\Services\FederationFeatureService::TENANT_GROUPS_ENABLED;
+    /** Tenant-level constants */
+    public const TENANT_FEDERATION_ENABLED = 'tenant_federation_enabled';
+    public const TENANT_APPEAR_IN_DIRECTORY = 'tenant_appear_in_directory';
+    public const TENANT_AUTO_ACCEPT_HIERARCHY = 'tenant_auto_accept_hierarchy';
+    public const TENANT_PROFILES_ENABLED = 'tenant_profiles_enabled';
+    public const TENANT_MESSAGING_ENABLED = 'tenant_messaging_enabled';
+    public const TENANT_TRANSACTIONS_ENABLED = 'tenant_transactions_enabled';
+    public const TENANT_LISTINGS_ENABLED = 'tenant_listings_enabled';
+    public const TENANT_EVENTS_ENABLED = 'tenant_events_enabled';
+    public const TENANT_GROUPS_ENABLED = 'tenant_groups_enabled';
 
     public function __construct()
     {
@@ -45,6 +45,9 @@ class FederationFeatureService
      */
     public function getSystemControls(): array
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return [];
+        }
         return \Nexus\Services\FederationFeatureService::getSystemControls();
     }
 
@@ -53,6 +56,9 @@ class FederationFeatureService
      */
     public function isGloballyEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::isGloballyEnabled();
     }
 
@@ -61,6 +67,9 @@ class FederationFeatureService
      */
     public function isWhitelistModeActive(): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::isWhitelistModeActive();
     }
 
@@ -69,6 +78,9 @@ class FederationFeatureService
      */
     public function isTenantWhitelisted(int $tenantId): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::isTenantWhitelisted($tenantId);
     }
 
@@ -77,6 +89,9 @@ class FederationFeatureService
      */
     public function isSystemFeatureEnabled(string $feature): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::isSystemFeatureEnabled($feature);
     }
 
@@ -85,6 +100,9 @@ class FederationFeatureService
      */
     public function getMaxFederationLevel(): int
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return 0;
+        }
         return \Nexus\Services\FederationFeatureService::getMaxFederationLevel();
     }
 
@@ -93,6 +111,9 @@ class FederationFeatureService
      */
     public function isTenantFederationEnabled(?int $tenantId = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::isTenantFederationEnabled($tenantId);
     }
 
@@ -101,6 +122,9 @@ class FederationFeatureService
      */
     public function isTenantFeatureEnabled(string $feature, ?int $tenantId = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::isTenantFeatureEnabled($feature, $tenantId);
     }
 
@@ -109,6 +133,9 @@ class FederationFeatureService
      */
     public function enableTenantFeature(string $feature, ?int $tenantId = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::enableTenantFeature($feature, $tenantId);
     }
 
@@ -117,6 +144,9 @@ class FederationFeatureService
      */
     public function disableTenantFeature(string $feature, ?int $tenantId = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::disableTenantFeature($feature, $tenantId);
     }
 
@@ -125,6 +155,9 @@ class FederationFeatureService
      */
     public function getAllTenantFeatures(?int $tenantId = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return [];
+        }
         return \Nexus\Services\FederationFeatureService::getAllTenantFeatures($tenantId);
     }
 
@@ -133,6 +166,9 @@ class FederationFeatureService
      */
     public function isOperationAllowed(string $operation, ?int $tenantId = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return ['allowed' => false, 'reason' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationFeatureService::isOperationAllowed($operation, $tenantId);
     }
 
@@ -141,6 +177,9 @@ class FederationFeatureService
      */
     public function triggerEmergencyLockdown(int $adminId, string $reason): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::triggerEmergencyLockdown($adminId, $reason);
     }
 
@@ -149,6 +188,9 @@ class FederationFeatureService
      */
     public function liftEmergencyLockdown(int $adminId): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::liftEmergencyLockdown($adminId);
     }
 
@@ -157,6 +199,9 @@ class FederationFeatureService
      */
     public function addToWhitelist(int $tenantId, int $adminId, ?string $notes = null): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::addToWhitelist($tenantId, $adminId, $notes);
     }
 
@@ -165,6 +210,9 @@ class FederationFeatureService
      */
     public function removeFromWhitelist(int $tenantId, int $adminId): bool
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return false;
+        }
         return \Nexus\Services\FederationFeatureService::removeFromWhitelist($tenantId, $adminId);
     }
 
@@ -173,6 +221,9 @@ class FederationFeatureService
      */
     public function getWhitelistedTenants(): array
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return [];
+        }
         return \Nexus\Services\FederationFeatureService::getWhitelistedTenants();
     }
 
@@ -181,6 +232,9 @@ class FederationFeatureService
      */
     public function clearCache(): void
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return;
+        }
         \Nexus\Services\FederationFeatureService::clearCache();
     }
 
@@ -189,6 +243,9 @@ class FederationFeatureService
      */
     public function getTenantFeatureDefinitions(): array
     {
+        if (!class_exists('\Nexus\Services\FederationFeatureService')) {
+            return [];
+        }
         return \Nexus\Services\FederationFeatureService::getTenantFeatureDefinitions();
     }
 }

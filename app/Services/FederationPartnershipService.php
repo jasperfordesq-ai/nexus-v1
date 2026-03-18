@@ -13,11 +13,11 @@ namespace App\Services;
  */
 class FederationPartnershipService
 {
-    /** Partnership level constants — mirrored from legacy */
-    public const LEVEL_DISCOVERY = \Nexus\Services\FederationPartnershipService::LEVEL_DISCOVERY;
-    public const LEVEL_SOCIAL = \Nexus\Services\FederationPartnershipService::LEVEL_SOCIAL;
-    public const LEVEL_ECONOMIC = \Nexus\Services\FederationPartnershipService::LEVEL_ECONOMIC;
-    public const LEVEL_INTEGRATED = \Nexus\Services\FederationPartnershipService::LEVEL_INTEGRATED;
+    /** Partnership level constants */
+    public const LEVEL_DISCOVERY = 1;
+    public const LEVEL_SOCIAL = 2;
+    public const LEVEL_ECONOMIC = 3;
+    public const LEVEL_INTEGRATED = 4;
 
     public function __construct()
     {
@@ -28,6 +28,9 @@ class FederationPartnershipService
      */
     public function requestPartnership(int $requestingTenantId, int $targetTenantId, int $requestedBy, int $federationLevel = self::LEVEL_DISCOVERY, ?string $notes = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::requestPartnership($requestingTenantId, $targetTenantId, $requestedBy, $federationLevel, $notes);
     }
 
@@ -36,6 +39,9 @@ class FederationPartnershipService
      */
     public function approvePartnership(int $partnershipId, int $approvedBy, array $permissions = []): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::approvePartnership($partnershipId, $approvedBy, $permissions);
     }
 
@@ -44,6 +50,9 @@ class FederationPartnershipService
      */
     public function counterPropose(int $partnershipId, int $proposedBy, int $newLevel, array $proposedPermissions = [], ?string $message = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::counterPropose($partnershipId, $proposedBy, $newLevel, $proposedPermissions, $message);
     }
 
@@ -52,6 +61,9 @@ class FederationPartnershipService
      */
     public function acceptCounterProposal(int $partnershipId, int $acceptedBy): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::acceptCounterProposal($partnershipId, $acceptedBy);
     }
 
@@ -60,6 +72,9 @@ class FederationPartnershipService
      */
     public function rejectPartnership(int $partnershipId, int $rejectedBy, ?string $reason = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::rejectPartnership($partnershipId, $rejectedBy, $reason);
     }
 
@@ -68,6 +83,9 @@ class FederationPartnershipService
      */
     public function suspendPartnership(int $partnershipId, int $suspendedBy, ?string $reason = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::suspendPartnership($partnershipId, $suspendedBy, $reason);
     }
 
@@ -76,6 +94,9 @@ class FederationPartnershipService
      */
     public function reactivatePartnership(int $partnershipId, int $reactivatedBy): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::reactivatePartnership($partnershipId, $reactivatedBy);
     }
 
@@ -84,6 +105,9 @@ class FederationPartnershipService
      */
     public function terminatePartnership(int $partnershipId, int $terminatedBy, ?string $reason = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::terminatePartnership($partnershipId, $terminatedBy, $reason);
     }
 
@@ -92,6 +116,9 @@ class FederationPartnershipService
      */
     public function updatePermissions(int $partnershipId, int $updatedBy, array $permissions): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['success' => false, 'error' => 'Legacy service unavailable'];
+        }
         return \Nexus\Services\FederationPartnershipService::updatePermissions($partnershipId, $updatedBy, $permissions);
     }
 
@@ -100,6 +127,9 @@ class FederationPartnershipService
      */
     public function getPartnershipById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return null;
+        }
         return \Nexus\Services\FederationPartnershipService::getPartnershipById($id);
     }
 
@@ -108,6 +138,9 @@ class FederationPartnershipService
      */
     public function getPartnership(int $tenantId1, int $tenantId2): ?array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return null;
+        }
         return \Nexus\Services\FederationPartnershipService::getPartnership($tenantId1, $tenantId2);
     }
 
@@ -116,6 +149,9 @@ class FederationPartnershipService
      */
     public function getTenantPartnerships(int $tenantId, ?string $status = null): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return [];
+        }
         return \Nexus\Services\FederationPartnershipService::getTenantPartnerships($tenantId, $status);
     }
 
@@ -124,6 +160,9 @@ class FederationPartnershipService
      */
     public function getPendingRequests(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return [];
+        }
         return \Nexus\Services\FederationPartnershipService::getPendingRequests($tenantId);
     }
 
@@ -132,6 +171,9 @@ class FederationPartnershipService
      */
     public function getCounterProposals(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return [];
+        }
         return \Nexus\Services\FederationPartnershipService::getCounterProposals($tenantId);
     }
 
@@ -140,6 +182,9 @@ class FederationPartnershipService
      */
     public function getOutgoingRequests(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return [];
+        }
         return \Nexus\Services\FederationPartnershipService::getOutgoingRequests($tenantId);
     }
 
@@ -148,6 +193,9 @@ class FederationPartnershipService
      */
     public function getAllPartnerships(?string $status = null, int $limit = 100): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return [];
+        }
         return \Nexus\Services\FederationPartnershipService::getAllPartnerships($status, $limit);
     }
 
@@ -156,6 +204,9 @@ class FederationPartnershipService
      */
     public function getStats(): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['total' => 0, 'active' => 0, 'pending' => 0, 'suspended' => 0, 'terminated' => 0, 'recent' => []];
+        }
         return \Nexus\Services\FederationPartnershipService::getStats();
     }
 
@@ -164,6 +215,9 @@ class FederationPartnershipService
      */
     public function getDefaultPermissions(int $level): array
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return ['profiles' => false, 'messaging' => false, 'transactions' => false, 'listings' => false, 'events' => false, 'groups' => false];
+        }
         return \Nexus\Services\FederationPartnershipService::getDefaultPermissions($level);
     }
 
@@ -172,6 +226,9 @@ class FederationPartnershipService
      */
     public function getLevelName(int $level): string
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return 'Unknown';
+        }
         return \Nexus\Services\FederationPartnershipService::getLevelName($level);
     }
 
@@ -180,6 +237,9 @@ class FederationPartnershipService
      */
     public function getLevelDescription(int $level): string
     {
+        if (!class_exists('\Nexus\Services\FederationPartnershipService')) {
+            return '';
+        }
         return \Nexus\Services\FederationPartnershipService::getLevelDescription($level);
     }
 }

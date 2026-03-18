@@ -118,6 +118,7 @@ class Mailer
     private function loadTenantConfig(int $tenantId): void
     {
         try {
+            if (!class_exists(EmailSettings::class)) { return; }
             $provider = EmailSettings::get($tenantId, 'email_provider');
 
             if (!$provider || $provider === 'platform_default') {
@@ -285,16 +286,16 @@ class Mailer
 
             $statusCode = $response->statusCode();
             if ($statusCode >= 200 && $statusCode < 300) {
-                EmailMonitorService::recordEmailSend('sendgrid', true, $this->tenantId);
+                if (class_exists(EmailMonitorService::class)) { EmailMonitorService::recordEmailSend('sendgrid', true, $this->tenantId); }
                 return true;
             }
 
             error_log("SendGrid error ({$statusCode}): " . $response->body());
-            EmailMonitorService::recordEmailSend('sendgrid', false, $this->tenantId);
+            if (class_exists(EmailMonitorService::class)) { EmailMonitorService::recordEmailSend('sendgrid', false, $this->tenantId); }
             return false;
         } catch (\Exception $e) {
             error_log("SendGrid Error: " . $e->getMessage());
-            EmailMonitorService::recordEmailSend('sendgrid', false, $this->tenantId);
+            if (class_exists(EmailMonitorService::class)) { EmailMonitorService::recordEmailSend('sendgrid', false, $this->tenantId); }
             return false;
         }
     }
@@ -357,25 +358,28 @@ class Mailer
      */
     private function getGmailAccessToken()
     {
-        $circuitBreakerExpiry = RedisCache::get(self::CACHE_KEY_CIRCUIT_BREAKER, null);
-        if ($circuitBreakerExpiry && time() < $circuitBreakerExpiry) {
-            $remainingSeconds = $circuitBreakerExpiry - time();
-            error_log("Gmail API circuit breaker is open. Blocked for {$remainingSeconds}s more.");
-            return null;
-        }
+        $hasRedis = class_exists(RedisCache::class);
+        if ($hasRedis) {
+            $circuitBreakerExpiry = RedisCache::get(self::CACHE_KEY_CIRCUIT_BREAKER, null);
+            if ($circuitBreakerExpiry && time() < $circuitBreakerExpiry) {
+                $remainingSeconds = $circuitBreakerExpiry - time();
+                error_log("Gmail API circuit breaker is open. Blocked for {$remainingSeconds}s more.");
+                return null;
+            }
 
-        $cachedToken = RedisCache::get(self::CACHE_KEY_ACCESS_TOKEN, null);
-        $cachedExpiry = RedisCache::get(self::CACHE_KEY_TOKEN_EXPIRY, null);
+            $cachedToken = RedisCache::get(self::CACHE_KEY_ACCESS_TOKEN, null);
+            $cachedExpiry = RedisCache::get(self::CACHE_KEY_TOKEN_EXPIRY, null);
 
-        if ($cachedToken && $cachedExpiry && $cachedExpiry > time()) {
-            return $cachedToken;
-        }
+            if ($cachedToken && $cachedExpiry && $cachedExpiry > time()) {
+                return $cachedToken;
+            }
 
-        $refreshAttempts = RedisCache::increment(self::CACHE_KEY_REFRESH_ATTEMPTS, 3600, null);
+            $refreshAttempts = RedisCache::increment(self::CACHE_KEY_REFRESH_ATTEMPTS, 3600, null);
 
-        if ($refreshAttempts > self::MAX_REFRESH_ATTEMPTS_PER_HOUR) {
-            error_log("Gmail API rate limit exceeded: {$refreshAttempts} refresh attempts in the last hour");
-            return null;
+            if ($refreshAttempts > self::MAX_REFRESH_ATTEMPTS_PER_HOUR) {
+                error_log("Gmail API rate limit exceeded: {$refreshAttempts} refresh attempts in the last hour");
+                return null;
+            }
         }
 
         if (empty($this->gmailClientId) || empty($this->gmailClientSecret) || empty($this->gmailRefreshToken)) {
@@ -386,16 +390,18 @@ class Mailer
         $token = $this->refreshGmailToken();
 
         if ($token) {
-            RedisCache::delete(self::CACHE_KEY_FAILURE_COUNT, null);
+            if ($hasRedis) { RedisCache::delete(self::CACHE_KEY_FAILURE_COUNT, null); }
             return $token;
         }
 
-        $failureCount = RedisCache::increment(self::CACHE_KEY_FAILURE_COUNT, 3600, null);
+        if ($hasRedis) {
+            $failureCount = RedisCache::increment(self::CACHE_KEY_FAILURE_COUNT, 3600, null);
 
-        if ($failureCount >= self::CIRCUIT_BREAKER_THRESHOLD) {
-            $breakerExpiry = time() + self::CIRCUIT_BREAKER_TIMEOUT;
-            RedisCache::set(self::CACHE_KEY_CIRCUIT_BREAKER, $breakerExpiry, self::CIRCUIT_BREAKER_TIMEOUT, null);
-            error_log("Gmail API circuit breaker opened after {$failureCount} consecutive failures.");
+            if ($failureCount >= self::CIRCUIT_BREAKER_THRESHOLD) {
+                $breakerExpiry = time() + self::CIRCUIT_BREAKER_TIMEOUT;
+                RedisCache::set(self::CACHE_KEY_CIRCUIT_BREAKER, $breakerExpiry, self::CIRCUIT_BREAKER_TIMEOUT, null);
+                error_log("Gmail API circuit breaker opened after {$failureCount} consecutive failures.");
+            }
         }
 
         return null;
@@ -462,8 +468,10 @@ class Mailer
         $expiresIn = $data['expires_in'] ?? 3600;
         $expiryTimestamp = time() + $expiresIn;
 
-        RedisCache::set(self::CACHE_KEY_ACCESS_TOKEN, $accessToken, self::TOKEN_TTL, null);
-        RedisCache::set(self::CACHE_KEY_TOKEN_EXPIRY, $expiryTimestamp, self::TOKEN_TTL, null);
+        if (class_exists(RedisCache::class)) {
+            RedisCache::set(self::CACHE_KEY_ACCESS_TOKEN, $accessToken, self::TOKEN_TTL, null);
+            RedisCache::set(self::CACHE_KEY_TOKEN_EXPIRY, $expiryTimestamp, self::TOKEN_TTL, null);
+        }
 
         error_log("Gmail token refreshed successfully. Expires in {$expiresIn}s.");
 

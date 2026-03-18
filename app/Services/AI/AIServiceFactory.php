@@ -20,8 +20,9 @@ class AIServiceFactory
     /**
      * Delegates to legacy AIServiceFactory::getProvider().
      */
-    public function getProvider(?string $providerId = null): NexusServicesAIAIProviderInterface
+    public function getProvider(?string $providerId = null): mixed
     {
+        if (!class_exists('\Nexus\Services\AI\AIServiceFactory')) { return null; }
         return \Nexus\Services\AI\AIServiceFactory::getProvider($providerId);
     }
 
@@ -30,6 +31,7 @@ class AIServiceFactory
      */
     public function getProviderWithFallback(?string $preferredId = null): array
     {
+        if (!class_exists('\Nexus\Services\AI\AIServiceFactory')) { return []; }
         return \Nexus\Services\AI\AIServiceFactory::getProviderWithFallback($preferredId);
     }
 
@@ -38,6 +40,7 @@ class AIServiceFactory
      */
     public function chatWithFallback(array $messages, array $options = [], ?string $preferredProvider = null): array
     {
+        if (!class_exists('\Nexus\Services\AI\AIServiceFactory')) { return []; }
         return \Nexus\Services\AI\AIServiceFactory::chatWithFallback($messages, $options, $preferredProvider);
     }
 
@@ -46,6 +49,7 @@ class AIServiceFactory
      */
     public function getProviderConfig(string $providerId): array
     {
+        if (!class_exists('\Nexus\Services\AI\AIServiceFactory')) { return []; }
         return \Nexus\Services\AI\AIServiceFactory::getProviderConfig($providerId);
     }
 
@@ -54,6 +58,7 @@ class AIServiceFactory
      */
     public function getDefaultProvider(): string
     {
+        if (!class_exists('\Nexus\Services\AI\AIServiceFactory')) { return ''; }
         return \Nexus\Services\AI\AIServiceFactory::getDefaultProvider();
     }
 }
