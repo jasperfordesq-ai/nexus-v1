@@ -702,6 +702,8 @@ Route::post('/v2/admin/timebanking/adjust-balance', [\App\Http\Controllers\Api\A
 Route::get('/v2/admin/timebanking/org-wallets', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'orgWallets']);
 Route::get('/v2/admin/timebanking/user-report', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userReport']);
 Route::get('/v2/admin/timebanking/user-statement', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userStatement']);
+Route::get('/v2/admin/wallet/grants', [\App\Http\Controllers\Api\AdminWalletGrantController::class, 'index']);
+Route::post('/v2/admin/wallet/grant', [\App\Http\Controllers\Api\AdminWalletGrantController::class, 'store']);
 Route::get('/v2/admin/enterprise/dashboard', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'dashboard']);
 Route::get('/v2/admin/enterprise/roles', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'roles']);
 Route::post('/v2/admin/enterprise/roles', [\App\Http\Controllers\Api\AdminEnterpriseController::class, 'createRole']);
@@ -899,6 +901,12 @@ Route::get('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFede
 Route::post('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFederationController::class, 'createApiKey']);
 Route::get('/v2/admin/federation/data', [\App\Http\Controllers\Api\AdminFederationController::class, 'dataManagement']);
 Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\AdminFederationController::class, 'exportData']);
+Route::get('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'index']);
+Route::post('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'store']);
+Route::get('/v2/admin/federation/available-tenants', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'availableTenants']);
+Route::get('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'index']);
+Route::post('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'store']);
+Route::get('/v2/admin/federation/partners', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'partners']);
 // NOTE: Federation user routes moved to auth-only group (not admin-only)
 Route::get('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'getPages']);
 Route::post('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'createPage']);

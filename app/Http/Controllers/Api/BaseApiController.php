@@ -140,7 +140,7 @@ abstract class BaseApiController extends Controller
      * @param bool $hasMore Whether more items exist
      * @return JsonResponse
      */
-    protected function respondWithCollection(array $items, ?string $cursor = null, int $perPage = 20, bool $hasMore = false): JsonResponse
+    protected function respondWithCollection(array $items, ?string $cursor = null, int $perPage = 20, bool $hasMore = false, array $extraMeta = []): JsonResponse
     {
         $meta = [
             'base_url' => UrlHelper::getBaseUrl(),
@@ -150,6 +150,10 @@ abstract class BaseApiController extends Controller
 
         if ($cursor !== null) {
             $meta['cursor'] = $cursor;
+        }
+
+        if ($extraMeta) {
+            $meta = array_merge($meta, $extraMeta);
         }
 
         return $this->buildJsonResponse([
