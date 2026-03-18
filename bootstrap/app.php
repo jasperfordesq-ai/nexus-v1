@@ -38,32 +38,40 @@ $app = Application::configure(basePath: dirname(__DIR__))
         // JSON error responses for API — see App\Exceptions\Handler
         $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'error' => 'Validation failed',
-                'messages' => $e->errors(),
-            ], 422);
+                'errors' => [
+                    ['code' => 'validation_failed', 'message' => 'Validation failed', 'details' => $e->errors()],
+                ],
+                'success' => false,
+            ], 422, ['API-Version' => '2.0']);
         });
 
         $exceptions->renderable(function (\Illuminate\Auth\AuthenticationException $e) {
             return response()->json([
-                'error' => 'Unauthenticated',
-                'message' => 'You must be logged in to access this resource.',
-            ], 401);
+                'errors' => [
+                    ['code' => 'auth_required', 'message' => 'You must be logged in to access this resource.'],
+                ],
+                'success' => false,
+            ], 401, ['API-Version' => '2.0']);
         });
 
         $exceptions->renderable(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             $model = class_basename($e->getModel());
             return response()->json([
-                'error' => 'Not found',
-                'message' => "{$model} not found.",
-            ], 404);
+                'errors' => [
+                    ['code' => 'not_found', 'message' => "{$model} not found."],
+                ],
+                'success' => false,
+            ], 404, ['API-Version' => '2.0']);
         });
 
         $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException $e) {
             return response()->json([
-                'error' => 'Too many requests',
-                'message' => 'Rate limit exceeded. Please try again later.',
+                'errors' => [
+                    ['code' => 'rate_limited', 'message' => 'Rate limit exceeded. Please try again later.'],
+                ],
+                'success' => false,
                 'retry_after' => $e->getHeaders()['Retry-After'] ?? null,
-            ], 429);
+            ], 429, ['API-Version' => '2.0']);
         });
 
         // Sentry integration — report to Sentry in production

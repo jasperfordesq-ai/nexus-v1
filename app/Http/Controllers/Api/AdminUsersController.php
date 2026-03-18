@@ -1077,7 +1077,7 @@ class AdminUsersController extends BaseApiController
 
         $results = ['imported' => 0, 'skipped' => 0, 'errors' => []];
         $row = 1;
-        $defaultRole = $_POST['default_role'] ?? 'member';
+        $defaultRole = request()->input('default_role', 'member');
 
         while (($data = fgetcsv($handle)) !== false) {
             $row++;

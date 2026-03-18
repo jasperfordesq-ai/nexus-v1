@@ -148,6 +148,7 @@ class CoreController extends BaseApiController
 
         $query = DB::table('messages')
             ->select('id', 'sender_id', 'body', 'audio_url', 'audio_duration', 'created_at')
+            ->where('tenant_id', $this->getTenantId())
             ->where(function ($q) use ($userId, $otherUserId) {
                 $q->where(function ($inner) use ($userId, $otherUserId) {
                     $inner->where('sender_id', $userId)->where('receiver_id', $otherUserId);
@@ -343,6 +344,7 @@ class CoreController extends BaseApiController
         $messages = DB::table('messages as m')
             ->join('users as u', 'm.sender_id', '=', 'u.id')
             ->select('m.*', 'u.name as sender_name', 'u.avatar_url as sender_avatar')
+            ->where('m.tenant_id', $this->getTenantId())
             ->where('m.recipient_id', $userId)
             ->groupBy('m.sender_id')
             ->orderByDesc('m.created_at')

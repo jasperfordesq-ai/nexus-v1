@@ -221,11 +221,13 @@ class ListingService
 
         // Engagement counts
         $data['likes_count'] = (int) DB::table('likes')
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->where('target_type', 'listing')
             ->where('target_id', $id)
             ->count();
 
         $data['comments_count'] = (int) DB::table('comments')
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->where('target_type', 'listing')
             ->where('target_id', $id)
             ->count();
@@ -241,6 +243,7 @@ class ListingService
                 ->exists();
 
             $data['is_liked'] = DB::table('likes')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->where('target_type', 'listing')
                 ->where('target_id', $id)
                 ->where('user_id', $currentUserId)

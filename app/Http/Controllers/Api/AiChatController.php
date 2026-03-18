@@ -661,7 +661,7 @@ class AiChatController extends BaseApiController
         try {
             $tenantId = $this->getTenantId();
 
-            $user = DB::selectOne("SELECT name, bio, location FROM users WHERE id = ?", [$userId]);
+            $user = DB::selectOne("SELECT name, bio, location FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
 
             if ($user) {
                 if (!empty($user->name)) {

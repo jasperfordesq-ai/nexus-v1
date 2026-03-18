@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,8 +27,11 @@ class GroupRecommendationService
             ->pluck('group_id')
             ->all();
 
+        $tenantId = TenantContext::getId();
+
         $query = DB::table('groups as g')
             ->leftJoin(DB::raw('(SELECT group_id, COUNT(*) as member_count FROM group_members GROUP BY group_id) as gm'), 'g.id', '=', 'gm.group_id')
+            ->where('g.tenant_id', $tenantId)
             ->where('g.status', 'active')
             ->select('g.*', DB::raw('COALESCE(gm.member_count, 0) as member_count'));
 
@@ -62,7 +66,8 @@ class GroupRecommendationService
      */
     public function similar(int $groupId, int $limit = 5): array
     {
-        $group = DB::table('groups')->find($groupId);
+        $tenantId = TenantContext::getId();
+        $group = DB::table('groups')->where('tenant_id', $tenantId)->where('id', $groupId)->first();
         if (! $group) {
             return [];
         }
@@ -73,6 +78,7 @@ class GroupRecommendationService
 
         if ($memberIds->isEmpty()) {
             return DB::table('groups')
+                ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
                 ->where('id', '!=', $groupId)
                 ->limit($limit)
@@ -83,6 +89,7 @@ class GroupRecommendationService
 
         return DB::table('groups as g')
             ->join('group_members as gm', 'g.id', '=', 'gm.group_id')
+            ->where('g.tenant_id', $tenantId)
             ->where('g.id', '!=', $groupId)
             ->where('g.status', 'active')
             ->whereIn('gm.user_id', $memberIds)

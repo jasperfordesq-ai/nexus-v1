@@ -50,6 +50,14 @@ class UserService
      * Get the authenticated user's own profile (for /me endpoint).
      * Matches the legacy UserService::getOwnProfile() response shape.
      */
+    public function getOwnProfile(int $userId): ?array
+    {
+        return $this->getMe($userId);
+    }
+
+    /**
+     * Get the authenticated user's own profile (alias).
+     */
     public function getMe(int $userId): ?array
     {
         $user = $this->user->newQuery()

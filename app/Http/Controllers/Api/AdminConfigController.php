@@ -492,6 +492,11 @@ class AdminConfigController extends BaseApiController
                 if (isset($methodMap[$jobSlug])) {
                     // TODO: Replace legacy CronController delegation with direct service calls
                     // once App\Services equivalents exist for all 12 cron jobs.
+                    if (!class_exists('\Nexus\Controllers\CronController')) {
+                        $output = "Legacy CronController not available — job '{$jobSlug}' requires migration to App\\Services";
+                        $status = 'error';
+                        break;
+                    }
                     $controller = new \Nexus\Controllers\CronController();
                     $method = $methodMap[$jobSlug];
                     ob_start();

@@ -130,6 +130,7 @@ class MatchingController extends BaseApiController
         if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
             $row = DB::table('users')
                 ->where('id', (int) $_SESSION['user_id'])
+                ->where('tenant_id', $this->getTenantId())
                 ->select('role')
                 ->first();
             return $row->role ?? 'member';

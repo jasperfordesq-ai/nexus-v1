@@ -13,6 +13,7 @@ use App\Services\AuditLogService;
 use App\Services\BrokerControlConfigService;
 use App\Services\ExchangeWorkflowService;
 use App\Services\ListingRiskTagService;
+use App\Services\BrokerMessageVisibilityService;
 use App\Services\NotificationDispatcher;
 use App\Models\Notification;
 
@@ -27,6 +28,7 @@ class AdminBrokerController extends BaseApiController
 
     public function __construct(
         private readonly BrokerControlConfigService $brokerControlConfigService,
+        private readonly BrokerMessageVisibilityService $brokerMessageVisibilityService,
         private readonly ExchangeWorkflowService $exchangeWorkflowService,
         private readonly NotificationDispatcher $notificationDispatcher,
     ) {}
@@ -769,7 +771,7 @@ class AdminBrokerController extends BaseApiController
                 return $this->respondWithError('ALREADY_ARCHIVED', 'This message copy has already been archived', null, 409);
             }
 
-            $adminRow = DB::selectOne("SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ?", [$adminId]);
+            $adminRow = DB::selectOne("SELECT CONCAT(first_name, ' ', last_name) as name FROM users WHERE id = ? AND tenant_id = ?", [$adminId, $this->getTenantId()]);
             $adminName = $adminRow->name ?? 'Unknown';
 
             $conversationRows = DB::select(
