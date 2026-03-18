@@ -182,6 +182,10 @@ RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/uploads \
     && chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads \
     && chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads
 
+# Create Laravel storage directories
+RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
+
 # =============================================================================
 # Expose Port
 # =============================================================================
