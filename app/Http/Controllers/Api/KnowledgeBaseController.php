@@ -139,7 +139,7 @@ class KnowledgeBaseController extends BaseApiController
         }
 
         // Increment view count
-        DB::table('knowledge_base_articles')->where('id', $article->id)->increment('view_count');
+        DB::table('knowledge_base_articles')->where('id', $article->id)->where('tenant_id', \App\Core\TenantContext::getId())->increment('view_count');
 
         return $this->respondWithData($articleArr);
     }

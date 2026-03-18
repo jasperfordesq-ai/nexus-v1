@@ -22,6 +22,7 @@ class UserInsightsService
      */
     public function getInsights($userId, $months = null)
     {
+        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
         return \Nexus\Services\UserInsightsService::getInsights($userId, $months);
     }
 
@@ -30,6 +31,7 @@ class UserInsightsService
      */
     public function getSummary($userId)
     {
+        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
         return \Nexus\Services\UserInsightsService::getSummary($userId);
     }
 
@@ -38,6 +40,7 @@ class UserInsightsService
      */
     public function getTotalSpent($userId)
     {
+        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
         return \Nexus\Services\UserInsightsService::getTotalSpent($userId);
     }
 
@@ -46,6 +49,7 @@ class UserInsightsService
      */
     public function getMonthlyTrends($userId, $months = 12)
     {
+        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
         return \Nexus\Services\UserInsightsService::getMonthlyTrends($userId, $months);
     }
 
@@ -54,6 +58,7 @@ class UserInsightsService
      */
     public function getWeeklyTrends($userId, $weeks = 12)
     {
+        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
         return \Nexus\Services\UserInsightsService::getWeeklyTrends($userId, $weeks);
     }
 
@@ -62,6 +67,7 @@ class UserInsightsService
      */
     public function getPartnerStats($userId, $months = null)
     {
+        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
         return \Nexus\Services\UserInsightsService::getPartnerStats($userId, $months);
     }
 }

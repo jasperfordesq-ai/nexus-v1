@@ -22,6 +22,7 @@ class ChallengeTagService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeTagService')) { return []; }
         return \Nexus\Services\ChallengeTagService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class ChallengeTagService
      */
     public function getAll(?string $tagType = null): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeTagService')) { return []; }
         return \Nexus\Services\ChallengeTagService::getAll($tagType);
     }
 
@@ -38,6 +40,7 @@ class ChallengeTagService
      */
     public function getById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\ChallengeTagService')) { return null; }
         return \Nexus\Services\ChallengeTagService::getById($id);
     }
 
@@ -46,6 +49,7 @@ class ChallengeTagService
      */
     public function create(int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\ChallengeTagService')) { return null; }
         return \Nexus\Services\ChallengeTagService::create($userId, $data);
     }
 
@@ -54,6 +58,7 @@ class ChallengeTagService
      */
     public function delete(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\ChallengeTagService')) { return false; }
         return \Nexus\Services\ChallengeTagService::delete($id, $userId);
     }
 }

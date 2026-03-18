@@ -22,6 +22,7 @@ class LeaderboardSeasonService
      */
     public function getCurrentSeason(int $tenantId): ?array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
         return \Nexus\Services\LeaderboardSeasonService::getCurrentSeason($tenantId);
     }
 
@@ -30,6 +31,7 @@ class LeaderboardSeasonService
      */
     public function getSeasonLeaderboard(int $tenantId, int $seasonId, int $limit = 20): array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return []; }
         return \Nexus\Services\LeaderboardSeasonService::getSeasonLeaderboard($tenantId, $seasonId, $limit);
     }
 
@@ -38,6 +40,7 @@ class LeaderboardSeasonService
      */
     public function endSeason(int $tenantId, int $seasonId): bool
     {
+        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return false; }
         return \Nexus\Services\LeaderboardSeasonService::endSeason($tenantId, $seasonId);
     }
 
@@ -48,6 +51,7 @@ class LeaderboardSeasonService
      */
     public function getAllSeasons(int $limit = 12): array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return []; }
         return \Nexus\Services\LeaderboardSeasonService::getAllSeasons($limit);
     }
 
@@ -58,6 +62,7 @@ class LeaderboardSeasonService
      */
     public function getSeasonWithUserData(int $userId): ?array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
         return \Nexus\Services\LeaderboardSeasonService::getSeasonWithUserData($userId);
     }
 
@@ -66,6 +71,7 @@ class LeaderboardSeasonService
      */
     public function getOrCreateCurrentSeason(): ?array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
         return \Nexus\Services\LeaderboardSeasonService::getOrCreateCurrentSeason();
     }
 
@@ -74,6 +80,7 @@ class LeaderboardSeasonService
      */
     public function getUserSeasonRank(int $userId, ?int $seasonId = null): ?array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
         return \Nexus\Services\LeaderboardSeasonService::getUserSeasonRank($userId, $seasonId);
     }
 }

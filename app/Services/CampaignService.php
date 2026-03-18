@@ -22,6 +22,7 @@ class CampaignService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return []; }
         return \Nexus\Services\CampaignService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class CampaignService
      */
     public function getAll(array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return []; }
         return \Nexus\Services\CampaignService::getAll($filters);
     }
 
@@ -38,6 +40,7 @@ class CampaignService
      */
     public function getById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return null; }
         return \Nexus\Services\CampaignService::getById($id);
     }
 
@@ -46,6 +49,7 @@ class CampaignService
      */
     public function create(int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return null; }
         return \Nexus\Services\CampaignService::create($userId, $data);
     }
 
@@ -54,6 +58,7 @@ class CampaignService
      */
     public function update(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return false; }
         return \Nexus\Services\CampaignService::update($id, $userId, $data);
     }
 
@@ -62,6 +67,7 @@ class CampaignService
      */
     public function delete(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return false; }
         return \Nexus\Services\CampaignService::delete($id, $userId);
     }
 
@@ -70,6 +76,7 @@ class CampaignService
      */
     public function linkChallenge(int $campaignId, int $challengeId, int $userId, int $sortOrder = 0): bool
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return false; }
         return \Nexus\Services\CampaignService::linkChallenge($campaignId, $challengeId, $userId, $sortOrder);
     }
 
@@ -78,6 +85,7 @@ class CampaignService
      */
     public function unlinkChallenge(int $campaignId, int $challengeId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\CampaignService')) { return false; }
         return \Nexus\Services\CampaignService::unlinkChallenge($campaignId, $challengeId, $userId);
     }
 }

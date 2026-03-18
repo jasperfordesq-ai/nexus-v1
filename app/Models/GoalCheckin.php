@@ -6,11 +6,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GoalCheckin extends Model
 {
+    use HasTenantScope;
     protected $table = 'goal_checkins';
 
     protected $fillable = [

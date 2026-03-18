@@ -79,8 +79,8 @@ class VoiceMessageController extends BaseApiController
             );
 
             // Send email notification for voice message
-            $sender = DB::table('users')->where('id', $senderId)->select('name')->first();
-            $receiver = DB::table('users')->where('id', $receiverId)->select('name', 'email')->first();
+            $sender = DB::table('users')->where('id', $senderId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name')->first();
+            $receiver = DB::table('users')->where('id', $receiverId)->where('tenant_id', \App\Core\TenantContext::getId())->select('name', 'email')->first();
 
             if ($receiver && $receiver->email) {
                 $replyLink = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . "/messages/" . $senderId;

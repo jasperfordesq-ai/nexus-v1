@@ -22,6 +22,7 @@ class ListingSkillTagService
      */
     public function setTags(int $listingId, array $tags): bool
     {
+        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return false; }
         return \Nexus\Services\ListingSkillTagService::setTags($listingId, $tags);
     }
 
@@ -30,6 +31,7 @@ class ListingSkillTagService
      */
     public function getTags(int $listingId): array
     {
+        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
         return \Nexus\Services\ListingSkillTagService::getTags($listingId);
     }
 
@@ -38,6 +40,7 @@ class ListingSkillTagService
      */
     public function addTag(int $listingId, string $tag): bool
     {
+        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return false; }
         return \Nexus\Services\ListingSkillTagService::addTag($listingId, $tag);
     }
 
@@ -46,6 +49,7 @@ class ListingSkillTagService
      */
     public function removeTag(int $listingId, string $tag): void
     {
+        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return; }
         \Nexus\Services\ListingSkillTagService::removeTag($listingId, $tag);
     }
 
@@ -54,6 +58,7 @@ class ListingSkillTagService
      */
     public function findListingsByTags(array $tags, int $limit = 100): array
     {
+        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
         return \Nexus\Services\ListingSkillTagService::findListingsByTags($tags, $limit);
     }
 
@@ -64,6 +69,7 @@ class ListingSkillTagService
      */
     public function getPopularTags(int $limit = 20): array
     {
+        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
         return \Nexus\Services\ListingSkillTagService::getPopularTags($limit);
     }
 
@@ -74,6 +80,7 @@ class ListingSkillTagService
      */
     public function autocompleteTags(string $prefix, int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
         return \Nexus\Services\ListingSkillTagService::autocompleteTags($prefix, $limit);
     }
 }

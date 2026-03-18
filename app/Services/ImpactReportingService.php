@@ -22,6 +22,7 @@ class ImpactReportingService
      */
     public function calculateSROI(array $config = []): array
     {
+        if (!class_exists('\Nexus\Services\ImpactReportingService')) { return []; }
         return \Nexus\Services\ImpactReportingService::calculateSROI($config);
     }
 
@@ -30,6 +31,7 @@ class ImpactReportingService
      */
     public function getCommunityHealthMetrics(): array
     {
+        if (!class_exists('\Nexus\Services\ImpactReportingService')) { return []; }
         return \Nexus\Services\ImpactReportingService::getCommunityHealthMetrics();
     }
 
@@ -38,6 +40,7 @@ class ImpactReportingService
      */
     public function getImpactTimeline(int $months = 12): array
     {
+        if (!class_exists('\Nexus\Services\ImpactReportingService')) { return []; }
         return \Nexus\Services\ImpactReportingService::getImpactTimeline($months);
     }
 
@@ -46,6 +49,7 @@ class ImpactReportingService
      */
     public function getReportConfig(): array
     {
+        if (!class_exists('\Nexus\Services\ImpactReportingService')) { return []; }
         return \Nexus\Services\ImpactReportingService::getReportConfig();
     }
 }

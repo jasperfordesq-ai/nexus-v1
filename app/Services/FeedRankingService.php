@@ -31,6 +31,7 @@ class FeedRankingService
      */
     public function rankPosts(int $tenantId, array $postIds, int $userId): array
     {
+        if (!class_exists('\Nexus\Services\FeedRankingService')) { return []; }
         return \Nexus\Services\FeedRankingService::rankPosts($tenantId, $postIds, $userId);
     }
 
@@ -40,6 +41,7 @@ class FeedRankingService
      */
     public function getEdgeRankScore(int $tenantId, int $postId, int $userId): float
     {
+        if (!class_exists('\Nexus\Services\FeedRankingService')) { return 0.0; }
         return \Nexus\Services\FeedRankingService::getEdgeRankScore($tenantId, $postId, $userId);
     }
 
@@ -49,6 +51,7 @@ class FeedRankingService
      */
     public function boostPost(int $tenantId, int $postId, float $factor = 1.5): bool
     {
+        if (!class_exists('\Nexus\Services\FeedRankingService')) { return false; }
         return \Nexus\Services\FeedRankingService::boostPost($tenantId, $postId, $factor);
     }
 

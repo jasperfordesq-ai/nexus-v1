@@ -111,6 +111,7 @@ class ContentModerationService
      */
     public function getQueue(int $tenantId, array $filters = [], int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists('\Nexus\Services\ContentModerationService')) { return []; }
         return \Nexus\Services\ContentModerationService::getQueue($tenantId, $filters, $limit, $offset);
     }
 
@@ -119,6 +120,7 @@ class ContentModerationService
      */
     public function review(int $id, int $tenantId, int $adminId, string $decision, ?string $rejectionReason = null): array
     {
+        if (!class_exists('\Nexus\Services\ContentModerationService')) { return []; }
         return \Nexus\Services\ContentModerationService::review($id, $tenantId, $adminId, $decision, $rejectionReason);
     }
 
@@ -127,6 +129,7 @@ class ContentModerationService
      */
     public function getModerationSettings(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\ContentModerationService')) { return []; }
         return \Nexus\Services\ContentModerationService::getModerationSettings($tenantId);
     }
 
@@ -135,6 +138,7 @@ class ContentModerationService
      */
     public function updateSettings(int $tenantId, array $settings): bool
     {
+        if (!class_exists('\Nexus\Services\ContentModerationService')) { return false; }
         return \Nexus\Services\ContentModerationService::updateSettings($tenantId, $settings);
     }
 }

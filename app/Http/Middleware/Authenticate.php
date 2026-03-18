@@ -95,7 +95,7 @@ class Authenticate
             // Tenant is already resolved by ResolveTenant middleware (runs before this)
 
             // Also set Laravel's auth user for any code using auth()
-            $eloquentUser = \App\Models\User::find($userId);
+            $eloquentUser = \App\Models\User::withoutGlobalScopes()->find($userId);
             if (!$eloquentUser) {
                 \Illuminate\Support\Facades\Log::debug('[Auth] User not found in DB', ['user_id' => $userId]);
                 return false;

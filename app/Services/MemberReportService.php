@@ -22,6 +22,7 @@ class MemberReportService
      */
     public function getActiveMembers(int $tenantId, int $days = 30, int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
         return \Nexus\Services\MemberReportService::getActiveMembers($tenantId, $days, $limit, $offset);
     }
 
@@ -30,6 +31,7 @@ class MemberReportService
      */
     public function getNewRegistrations(int $tenantId, string $period = 'monthly', int $months = 12): array
     {
+        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
         return \Nexus\Services\MemberReportService::getNewRegistrations($tenantId, $period, $months);
     }
 
@@ -38,6 +40,7 @@ class MemberReportService
      */
     public function getMemberRetention(int $tenantId, int $months = 12): array
     {
+        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
         return \Nexus\Services\MemberReportService::getMemberRetention($tenantId, $months);
     }
 
@@ -46,6 +49,7 @@ class MemberReportService
      */
     public function getEngagementMetrics(int $tenantId, int $days = 30): array
     {
+        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
         return \Nexus\Services\MemberReportService::getEngagementMetrics($tenantId, $days);
     }
 
@@ -54,6 +58,7 @@ class MemberReportService
      */
     public function getTopContributors(int $tenantId, int $days = 30, int $limit = 20): array
     {
+        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
         return \Nexus\Services\MemberReportService::getTopContributors($tenantId, $days, $limit);
     }
 
@@ -62,6 +67,7 @@ class MemberReportService
      */
     public function getLeastActiveMembers(int $tenantId, int $days = 30, int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
         return \Nexus\Services\MemberReportService::getLeastActiveMembers($tenantId, $days, $limit, $offset);
     }
 }

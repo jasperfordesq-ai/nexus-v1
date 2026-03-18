@@ -33,6 +33,7 @@ class EventNotificationService
      */
     public function notifyAttendees(int $tenantId, int $eventId, string $message): int
     {
+        if (!class_exists('\Nexus\Services\EventNotificationService')) { return 0; }
         return \Nexus\Services\EventNotificationService::notifyAttendees($tenantId, $eventId, $message);
     }
 
@@ -42,6 +43,7 @@ class EventNotificationService
      */
     public function sendReminder(int $tenantId, int $eventId): int
     {
+        if (!class_exists('\Nexus\Services\EventNotificationService')) { return 0; }
         return \Nexus\Services\EventNotificationService::sendReminder($tenantId, $eventId);
     }
 
@@ -51,6 +53,7 @@ class EventNotificationService
      */
     public function notifyCancellation(int $tenantId, int $eventId, ?string $reason = null): int
     {
+        if (!class_exists('\Nexus\Services\EventNotificationService')) { return 0; }
         return \Nexus\Services\EventNotificationService::notifyCancellation($tenantId, $eventId, $reason);
     }
 

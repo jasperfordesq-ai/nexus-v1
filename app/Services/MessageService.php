@@ -240,6 +240,7 @@ class MessageService
      */
     public function getConversation(int $otherUserId, int $userId): ?array
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return null; }
         return \Nexus\Services\MessageService::getConversation($otherUserId, $userId);
     }
 
@@ -250,6 +251,7 @@ class MessageService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return []; }
         return \Nexus\Services\MessageService::getErrors();
     }
 
@@ -260,6 +262,7 @@ class MessageService
      */
     public function archiveConversation(int $otherUserId, int $userId): int
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return 0; }
         return \Nexus\Services\MessageService::archiveConversation($otherUserId, $userId);
     }
 
@@ -270,6 +273,7 @@ class MessageService
      */
     public function unarchiveConversation(int $otherUserId, int $userId): int
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return 0; }
         return \Nexus\Services\MessageService::unarchiveConversation($otherUserId, $userId);
     }
 
@@ -280,6 +284,7 @@ class MessageService
      */
     public function editMessage(int $messageId, int $userId, string $newBody): ?array
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return null; }
         return \Nexus\Services\MessageService::editMessage($messageId, $userId, $newBody);
     }
 
@@ -290,6 +295,7 @@ class MessageService
      */
     public function deleteMessage(int $messageId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return false; }
         return \Nexus\Services\MessageService::deleteMessage($messageId, $userId);
     }
 
@@ -300,6 +306,7 @@ class MessageService
      */
     public function toggleReaction(int $messageId, int $userId, string $emoji): ?bool
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return null; }
         return \Nexus\Services\MessageService::toggleReaction($messageId, $userId, $emoji);
     }
 
@@ -310,6 +317,7 @@ class MessageService
      */
     public function setTypingIndicator(int $recipientId, int $userId, bool $isTyping): bool
     {
+        if (!class_exists('\Nexus\Services\MessageService')) { return false; }
         return \Nexus\Services\MessageService::setTypingIndicator($recipientId, $userId, $isTyping);
     }
 }

@@ -105,6 +105,7 @@ class SkillTaxonomyService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return []; }
         return \Nexus\Services\SkillTaxonomyService::getErrors();
     }
 
@@ -113,6 +114,7 @@ class SkillTaxonomyService
      */
     public function getTree(bool $activeOnly = true): array
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return []; }
         return \Nexus\Services\SkillTaxonomyService::getTree($activeOnly);
     }
 
@@ -121,6 +123,7 @@ class SkillTaxonomyService
      */
     public function getCategoryById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return null; }
         return \Nexus\Services\SkillTaxonomyService::getCategoryById($id);
     }
 
@@ -129,6 +132,7 @@ class SkillTaxonomyService
      */
     public function createCategory(array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return null; }
         return \Nexus\Services\SkillTaxonomyService::createCategory($data);
     }
 
@@ -137,6 +141,7 @@ class SkillTaxonomyService
      */
     public function updateCategory(int $id, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return false; }
         return \Nexus\Services\SkillTaxonomyService::updateCategory($id, $data);
     }
 
@@ -145,6 +150,7 @@ class SkillTaxonomyService
      */
     public function deleteCategory(int $id, bool $hard = false): bool
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return false; }
         return \Nexus\Services\SkillTaxonomyService::deleteCategory($id, $hard);
     }
 
@@ -153,6 +159,7 @@ class SkillTaxonomyService
      */
     public function getUserSkills(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return []; }
         return \Nexus\Services\SkillTaxonomyService::getUserSkills($userId);
     }
 
@@ -161,6 +168,7 @@ class SkillTaxonomyService
      */
     public function addUserSkill(int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return null; }
         return \Nexus\Services\SkillTaxonomyService::addUserSkill($userId, $data);
     }
 
@@ -169,6 +177,7 @@ class SkillTaxonomyService
      */
     public function updateUserSkill(int $userId, int $skillId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return false; }
         return \Nexus\Services\SkillTaxonomyService::updateUserSkill($userId, $skillId, $data);
     }
 
@@ -177,6 +186,7 @@ class SkillTaxonomyService
      */
     public function removeUserSkill(int $userId, int $skillId): bool
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return false; }
         return \Nexus\Services\SkillTaxonomyService::removeUserSkill($userId, $skillId);
     }
 
@@ -185,6 +195,7 @@ class SkillTaxonomyService
      */
     public function searchSkills(string $query, int $limit = 20): array
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return []; }
         return \Nexus\Services\SkillTaxonomyService::searchSkills($query, $limit);
     }
 
@@ -193,6 +204,7 @@ class SkillTaxonomyService
      */
     public function getCategorySkills(int $categoryId): array
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return []; }
         return \Nexus\Services\SkillTaxonomyService::getCategorySkills($categoryId);
     }
 
@@ -201,6 +213,7 @@ class SkillTaxonomyService
      */
     public function getMembersWithSkill(string $skillName, int $limit = 30): array
     {
+        if (!class_exists('\Nexus\Services\SkillTaxonomyService')) { return []; }
         return \Nexus\Services\SkillTaxonomyService::getMembersWithSkill($skillName, $limit);
     }
 }

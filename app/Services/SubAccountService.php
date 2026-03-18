@@ -109,6 +109,7 @@ class SubAccountService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\SubAccountService')) { return []; }
         return \Nexus\Services\SubAccountService::getErrors();
     }
 
@@ -117,6 +118,7 @@ class SubAccountService
      */
     public function getChildAccounts(int $parentUserId): array
     {
+        if (!class_exists('\Nexus\Services\SubAccountService')) { return []; }
         return \Nexus\Services\SubAccountService::getChildAccounts($parentUserId);
     }
 
@@ -125,6 +127,7 @@ class SubAccountService
      */
     public function getParentAccounts(int $childUserId): array
     {
+        if (!class_exists('\Nexus\Services\SubAccountService')) { return []; }
         return \Nexus\Services\SubAccountService::getParentAccounts($childUserId);
     }
 
@@ -133,6 +136,7 @@ class SubAccountService
      */
     public function approveRelationship(int $childUserId, int $relationshipId): bool
     {
+        if (!class_exists('\Nexus\Services\SubAccountService')) { return false; }
         return \Nexus\Services\SubAccountService::approveRelationship($childUserId, $relationshipId);
     }
 
@@ -141,6 +145,7 @@ class SubAccountService
      */
     public function revokeRelationship(int $userId, int $relationshipId): bool
     {
+        if (!class_exists('\Nexus\Services\SubAccountService')) { return false; }
         return \Nexus\Services\SubAccountService::revokeRelationship($userId, $relationshipId);
     }
 
@@ -149,6 +154,7 @@ class SubAccountService
      */
     public function updatePermissions(int $parentUserId, int $relationshipId, array $permissions): bool
     {
+        if (!class_exists('\Nexus\Services\SubAccountService')) { return false; }
         return \Nexus\Services\SubAccountService::updatePermissions($parentUserId, $relationshipId, $permissions);
     }
 
@@ -157,6 +163,7 @@ class SubAccountService
      */
     public function getChildActivitySummary(int $parentUserId, int $childUserId): ?array
     {
+        if (!class_exists('\Nexus\Services\SubAccountService')) { return null; }
         return \Nexus\Services\SubAccountService::getChildActivitySummary($parentUserId, $childUserId);
     }
 }

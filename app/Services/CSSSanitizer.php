@@ -26,6 +26,7 @@ class CSSSanitizer
      */
     public function __call(string $method, array $args): mixed
     {
+        if (!class_exists('\Nexus\Services\CSSSanitizer')) { return null; }
         return \Nexus\Services\CSSSanitizer::$method(...$args);
     }
 }

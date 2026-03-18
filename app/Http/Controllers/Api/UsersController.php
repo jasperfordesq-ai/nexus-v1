@@ -256,6 +256,7 @@ class UsersController extends BaseApiController
 
         $success = DB::table('users')
             ->where('id', $userId)
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->update(['preferred_theme' => $theme]);
 
         if ($success === false) {
@@ -291,6 +292,7 @@ class UsersController extends BaseApiController
 
         $success = DB::table('users')
             ->where('id', $userId)
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->update(['preferred_language' => $language]);
 
         if ($success === false) {

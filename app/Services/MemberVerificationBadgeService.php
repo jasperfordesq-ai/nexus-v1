@@ -13,8 +13,21 @@ namespace App\Services;
  */
 class MemberVerificationBadgeService
 {
-    public const BADGE_TYPES = \Nexus\Services\MemberVerificationBadgeService::BADGE_TYPES;
-    public const BADGE_LABELS = \Nexus\Services\MemberVerificationBadgeService::BADGE_LABELS;
+    public const BADGE_TYPES = [
+        'email_verified',
+        'phone_verified',
+        'id_verified',
+        'address_verified',
+        'admin_verified',
+    ];
+
+    public const BADGE_LABELS = [
+        'email_verified' => 'Email Verified',
+        'phone_verified' => 'Phone Verified',
+        'id_verified' => 'ID Verified',
+        'address_verified' => 'Address Verified',
+        'admin_verified' => 'Admin Verified',
+    ];
 
     public function __construct()
     {
@@ -25,6 +38,7 @@ class MemberVerificationBadgeService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
         return \Nexus\Services\MemberVerificationBadgeService::getErrors();
     }
 
@@ -33,6 +47,7 @@ class MemberVerificationBadgeService
      */
     public function grantBadge(int $userId, string $badgeType, int $adminId, ?string $note = null, ?string $expiresAt = null): ?int
     {
+        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return null; }
         return \Nexus\Services\MemberVerificationBadgeService::grantBadge($userId, $badgeType, $adminId, $note, $expiresAt);
     }
 
@@ -41,6 +56,7 @@ class MemberVerificationBadgeService
      */
     public function revokeBadge(int $userId, string $badgeType, int $adminId): bool
     {
+        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return false; }
         return \Nexus\Services\MemberVerificationBadgeService::revokeBadge($userId, $badgeType, $adminId);
     }
 
@@ -49,6 +65,7 @@ class MemberVerificationBadgeService
      */
     public function getUserBadges(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
         return \Nexus\Services\MemberVerificationBadgeService::getUserBadges($userId);
     }
 
@@ -57,6 +74,7 @@ class MemberVerificationBadgeService
      */
     public function getBatchUserBadges(array $userIds): array
     {
+        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
         return \Nexus\Services\MemberVerificationBadgeService::getBatchUserBadges($userIds);
     }
 
@@ -65,6 +83,7 @@ class MemberVerificationBadgeService
      */
     public function getAdminBadgeList(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
         return \Nexus\Services\MemberVerificationBadgeService::getAdminBadgeList($userId);
     }
 }

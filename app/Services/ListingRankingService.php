@@ -22,6 +22,7 @@ class ListingRankingService
      */
     public function getConfig(): array
     {
+        if (!class_exists('\Nexus\Services\ListingRankingService')) { return []; }
         return \Nexus\Services\ListingRankingService::getConfig();
     }
 
@@ -30,6 +31,7 @@ class ListingRankingService
      */
     public function isEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\ListingRankingService')) { return false; }
         return \Nexus\Services\ListingRankingService::isEnabled();
     }
 
@@ -38,6 +40,7 @@ class ListingRankingService
      */
     public function clearCache(): void
     {
+        if (!class_exists('\Nexus\Services\ListingRankingService')) { return; }
         \Nexus\Services\ListingRankingService::clearCache();
     }
 
@@ -46,6 +49,7 @@ class ListingRankingService
      */
     public function rankListings(array $listings, ?int $viewerId = null, array $options = []): array
     {
+        if (!class_exists('\Nexus\Services\ListingRankingService')) { return []; }
         return \Nexus\Services\ListingRankingService::rankListings($listings, $viewerId, $options);
     }
 
@@ -54,6 +58,7 @@ class ListingRankingService
      */
     public function buildRankedQuery(?int $viewerId = null, array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\ListingRankingService')) { return []; }
         return \Nexus\Services\ListingRankingService::buildRankedQuery($viewerId, $filters);
     }
 }

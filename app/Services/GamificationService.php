@@ -203,6 +203,7 @@ class GamificationService
      */
     public function getBadgeDefinitions(): array
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return []; }
         return \Nexus\Services\GamificationService::getBadgeDefinitions();
     }
 
@@ -211,6 +212,7 @@ class GamificationService
      */
     public function runAllBadgeChecks(int $userId): void
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
         \Nexus\Services\GamificationService::runAllBadgeChecks($userId);
     }
 
@@ -219,6 +221,7 @@ class GamificationService
      */
     public function awardBadgeByKey(int $userId, string $badgeKey): void
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
         \Nexus\Services\GamificationService::awardBadgeByKey($userId, $badgeKey);
     }
 
@@ -229,6 +232,7 @@ class GamificationService
      */
     public function getBadgeProgress(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return []; }
         return \Nexus\Services\GamificationService::getBadgeProgress($userId);
     }
 
@@ -239,6 +243,7 @@ class GamificationService
      */
     public function getLevelProgress(int $xp, int $level): float|int
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return 0; }
         return \Nexus\Services\GamificationService::getLevelProgress($xp, $level);
     }
 
@@ -249,6 +254,7 @@ class GamificationService
      */
     public function getBadgeByKey(string $key): ?array
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return null; }
         return \Nexus\Services\GamificationService::getBadgeByKey($key);
     }
 
@@ -257,6 +263,7 @@ class GamificationService
      */
     public function awardXP(int $userId, int $amount, string $action, string $description = ''): void
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
         \Nexus\Services\GamificationService::awardXP($userId, $amount, $action, $description);
     }
 
@@ -265,6 +272,7 @@ class GamificationService
      */
     public function awardBadge(int $userId, $badge): void
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
         \Nexus\Services\GamificationService::awardBadge($userId, $badge);
     }
 
@@ -273,6 +281,7 @@ class GamificationService
      */
     public function checkStreakBadges(int $userId, int $streakLength): void
     {
+        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
         \Nexus\Services\GamificationService::checkStreakBadges($userId, $streakLength);
     }
 }

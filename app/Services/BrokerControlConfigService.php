@@ -22,6 +22,7 @@ class BrokerControlConfigService
      */
     public function getConfig(?string $section = null): array
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return []; }
         return \Nexus\Services\BrokerControlConfigService::getConfig($section);
     }
 
@@ -30,6 +31,7 @@ class BrokerControlConfigService
      */
     public function updateConfig(array $data): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return false; }
         return \Nexus\Services\BrokerControlConfigService::updateConfig($data);
     }
 
@@ -38,6 +40,7 @@ class BrokerControlConfigService
      */
     public function updateSection(string $section, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return false; }
         return \Nexus\Services\BrokerControlConfigService::updateSection($section, $data);
     }
 
@@ -46,6 +49,7 @@ class BrokerControlConfigService
      */
     public function isDirectMessagingEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return false; }
         return \Nexus\Services\BrokerControlConfigService::isDirectMessagingEnabled();
     }
 
@@ -54,6 +58,7 @@ class BrokerControlConfigService
      */
     public function isFirstContactMonitoringEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return false; }
         return \Nexus\Services\BrokerControlConfigService::isFirstContactMonitoringEnabled();
     }
 
@@ -62,6 +67,7 @@ class BrokerControlConfigService
      */
     public function isExchangeWorkflowEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return false; }
         return \Nexus\Services\BrokerControlConfigService::isExchangeWorkflowEnabled();
     }
 
@@ -70,6 +76,7 @@ class BrokerControlConfigService
      */
     public function isVettingEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return false; }
         return \Nexus\Services\BrokerControlConfigService::isVettingEnabled();
     }
 
@@ -78,6 +85,7 @@ class BrokerControlConfigService
      */
     public function isInsuranceEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerControlConfigService')) { return false; }
         return \Nexus\Services\BrokerControlConfigService::isInsuranceEnabled();
     }
 }

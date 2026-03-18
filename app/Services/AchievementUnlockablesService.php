@@ -22,6 +22,7 @@ class AchievementUnlockablesService
      */
     public function getAllUnlockables(): array
     {
+        if (!class_exists('\Nexus\Services\AchievementUnlockablesService')) { return []; }
         return \Nexus\Services\AchievementUnlockablesService::getAllUnlockables();
     }
 
@@ -30,6 +31,7 @@ class AchievementUnlockablesService
      */
     public function getUserUnlockables(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\AchievementUnlockablesService')) { return []; }
         return \Nexus\Services\AchievementUnlockablesService::getUserUnlockables($userId);
     }
 
@@ -38,6 +40,7 @@ class AchievementUnlockablesService
      */
     public function getUserActiveUnlockables(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\AchievementUnlockablesService')) { return []; }
         return \Nexus\Services\AchievementUnlockablesService::getUserActiveUnlockables($userId);
     }
 
@@ -46,6 +49,7 @@ class AchievementUnlockablesService
      */
     public function setActiveUnlockable(int $userId, string $type, string $key): bool
     {
+        if (!class_exists('\Nexus\Services\AchievementUnlockablesService')) { return false; }
         return \Nexus\Services\AchievementUnlockablesService::setActiveUnlockable($userId, $type, $key);
     }
 
@@ -54,6 +58,7 @@ class AchievementUnlockablesService
      */
     public function removeActiveUnlockable(int $userId, string $type): bool
     {
+        if (!class_exists('\Nexus\Services\AchievementUnlockablesService')) { return false; }
         return \Nexus\Services\AchievementUnlockablesService::removeActiveUnlockable($userId, $type);
     }
 }

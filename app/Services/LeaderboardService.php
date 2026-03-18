@@ -37,6 +37,7 @@ class LeaderboardService
      */
     public function getLeaderboard(int $tenantId, string $period = 'monthly', int $limit = 20): array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardService')) { return []; }
         return \Nexus\Services\LeaderboardService::getLeaderboard($tenantId, $period, $limit);
     }
 
@@ -45,6 +46,7 @@ class LeaderboardService
      */
     public function getUserRank(int $tenantId, int $userId): ?array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardService')) { return null; }
         return \Nexus\Services\LeaderboardService::getUserRank($tenantId, $userId);
     }
 
@@ -53,6 +55,7 @@ class LeaderboardService
      */
     public function getTopMembers(int $tenantId, int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\LeaderboardService')) { return []; }
         return \Nexus\Services\LeaderboardService::getTopMembers($tenantId, $limit);
     }
 
@@ -63,6 +66,7 @@ class LeaderboardService
      */
     public function formatScore($score, string $type): string
     {
+        if (!class_exists('\Nexus\Services\LeaderboardService')) { return ''; }
         return \Nexus\Services\LeaderboardService::formatScore($score, $type);
     }
 
@@ -73,6 +77,7 @@ class LeaderboardService
      */
     public function getMedalIcon(int $rank): string
     {
+        if (!class_exists('\Nexus\Services\LeaderboardService')) { return ''; }
         return \Nexus\Services\LeaderboardService::getMedalIcon($rank);
     }
 }

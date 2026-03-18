@@ -22,6 +22,7 @@ class ChallengeOutcomeService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeOutcomeService')) { return []; }
         return \Nexus\Services\ChallengeOutcomeService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class ChallengeOutcomeService
      */
     public function getForChallenge(int $challengeId): ?array
     {
+        if (!class_exists('\Nexus\Services\ChallengeOutcomeService')) { return null; }
         return \Nexus\Services\ChallengeOutcomeService::getForChallenge($challengeId);
     }
 
@@ -38,6 +40,7 @@ class ChallengeOutcomeService
      */
     public function upsert(int $challengeId, int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\ChallengeOutcomeService')) { return null; }
         return \Nexus\Services\ChallengeOutcomeService::upsert($challengeId, $userId, $data);
     }
 
@@ -46,6 +49,7 @@ class ChallengeOutcomeService
      */
     public function getDashboard(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeOutcomeService')) { return []; }
         return \Nexus\Services\ChallengeOutcomeService::getDashboard();
     }
 }

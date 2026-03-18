@@ -22,6 +22,7 @@ class CollaborativeFilteringService
      */
     public function getSimilarListings(int $listingId, int $tenantId, int $limit = 5): array
     {
+        if (!class_exists('\Nexus\Services\CollaborativeFilteringService')) { return []; }
         return \Nexus\Services\CollaborativeFilteringService::getSimilarListings($listingId, $tenantId, $limit);
     }
 
@@ -30,6 +31,7 @@ class CollaborativeFilteringService
      */
     public function getSuggestedMembers(int $userId, int $tenantId, int $limit = 5): array
     {
+        if (!class_exists('\Nexus\Services\CollaborativeFilteringService')) { return []; }
         return \Nexus\Services\CollaborativeFilteringService::getSuggestedMembers($userId, $tenantId, $limit);
     }
 
@@ -38,6 +40,7 @@ class CollaborativeFilteringService
      */
     public function getSuggestedListingsForUser(int $userId, int $tenantId, int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\CollaborativeFilteringService')) { return []; }
         return \Nexus\Services\CollaborativeFilteringService::getSuggestedListingsForUser($userId, $tenantId, $limit);
     }
 }

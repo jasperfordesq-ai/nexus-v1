@@ -22,6 +22,7 @@ class SmartMatchingEngine
      */
     public function getConfig(): array
     {
+        if (!class_exists('\Nexus\Services\SmartMatchingEngine')) { return []; }
         return \Nexus\Services\SmartMatchingEngine::getConfig();
     }
 
@@ -30,6 +31,7 @@ class SmartMatchingEngine
      */
     public function clearCache(): void
     {
+        if (!class_exists('\Nexus\Services\SmartMatchingEngine')) { return; }
         \Nexus\Services\SmartMatchingEngine::clearCache();
     }
 
@@ -38,6 +40,7 @@ class SmartMatchingEngine
      */
     public function findMatchesForUser(int $userId, array $options = []): array
     {
+        if (!class_exists('\Nexus\Services\SmartMatchingEngine')) { return []; }
         return \Nexus\Services\SmartMatchingEngine::findMatchesForUser($userId, $options);
     }
 
@@ -46,6 +49,7 @@ class SmartMatchingEngine
      */
     public function getHotMatches(int $userId, int $limit = 5): array
     {
+        if (!class_exists('\Nexus\Services\SmartMatchingEngine')) { return []; }
         return \Nexus\Services\SmartMatchingEngine::getHotMatches($userId, $limit);
     }
 
@@ -54,6 +58,7 @@ class SmartMatchingEngine
      */
     public function getMutualMatches(int $userId, int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\SmartMatchingEngine')) { return []; }
         return \Nexus\Services\SmartMatchingEngine::getMutualMatches($userId, $limit);
     }
 }

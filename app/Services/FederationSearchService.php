@@ -22,6 +22,7 @@ class FederationSearchService
      */
     public function cachedSearchMembers(array $partnerTenantIds, array $filters): array
     {
+        if (!class_exists('\Nexus\Services\FederationSearchService')) { return []; }
         return \Nexus\Services\FederationSearchService::cachedSearchMembers($partnerTenantIds, $filters);
     }
 
@@ -30,6 +31,7 @@ class FederationSearchService
      */
     public function searchMembers(array $partnerTenantIds, array $filters): array
     {
+        if (!class_exists('\Nexus\Services\FederationSearchService')) { return []; }
         return \Nexus\Services\FederationSearchService::searchMembers($partnerTenantIds, $filters);
     }
 
@@ -38,6 +40,7 @@ class FederationSearchService
      */
     public function getAvailableSkills(array $partnerTenantIds, string $query = '', int $limit = 20): array
     {
+        if (!class_exists('\Nexus\Services\FederationSearchService')) { return []; }
         return \Nexus\Services\FederationSearchService::getAvailableSkills($partnerTenantIds, $query, $limit);
     }
 
@@ -46,6 +49,7 @@ class FederationSearchService
      */
     public function getAvailableLocations(array $partnerTenantIds, string $query = '', int $limit = 20): array
     {
+        if (!class_exists('\Nexus\Services\FederationSearchService')) { return []; }
         return \Nexus\Services\FederationSearchService::getAvailableLocations($partnerTenantIds, $query, $limit);
     }
 
@@ -54,6 +58,7 @@ class FederationSearchService
      */
     public function getSearchStats(array $partnerTenantIds): array
     {
+        if (!class_exists('\Nexus\Services\FederationSearchService')) { return []; }
         return \Nexus\Services\FederationSearchService::getSearchStats($partnerTenantIds);
     }
 }

@@ -22,6 +22,7 @@ class EmbeddingService
      */
     public function generateForListing(array $listing): void
     {
+        if (!class_exists('\Nexus\Services\EmbeddingService')) { return; }
         \Nexus\Services\EmbeddingService::generateForListing($listing);
     }
 
@@ -30,6 +31,7 @@ class EmbeddingService
      */
     public function generateForUser(array $user): void
     {
+        if (!class_exists('\Nexus\Services\EmbeddingService')) { return; }
         \Nexus\Services\EmbeddingService::generateForUser($user);
     }
 
@@ -38,6 +40,7 @@ class EmbeddingService
      */
     public function findSimilar(int $contentId, string $contentType, int $tenantId, int $limit = 5): array
     {
+        if (!class_exists('\Nexus\Services\EmbeddingService')) { return []; }
         return \Nexus\Services\EmbeddingService::findSimilar($contentId, $contentType, $tenantId, $limit);
     }
 
@@ -46,6 +49,7 @@ class EmbeddingService
      */
     public function cosineSimilarity(array $a, array $b): float
     {
+        if (!class_exists('\Nexus\Services\EmbeddingService')) { return 0.0; }
         return \Nexus\Services\EmbeddingService::cosineSimilarity($a, $b);
     }
 }

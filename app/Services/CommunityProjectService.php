@@ -24,6 +24,7 @@ class CommunityProjectService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\CommunityProjectService')) { return []; }
         return \Nexus\Services\CommunityProjectService::getErrors();
     }
 
@@ -32,6 +33,7 @@ class CommunityProjectService
      */
     public function propose(int $userId, array $data): array
     {
+        if (!class_exists('\Nexus\Services\CommunityProjectService')) { return []; }
         return \Nexus\Services\CommunityProjectService::propose($userId, $data);
     }
 
@@ -40,6 +42,7 @@ class CommunityProjectService
      */
     public function getProposals(array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\CommunityProjectService')) { return []; }
         return \Nexus\Services\CommunityProjectService::getProposals($filters);
     }
 
@@ -48,6 +51,7 @@ class CommunityProjectService
      */
     public function getProposal(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\CommunityProjectService')) { return null; }
         return \Nexus\Services\CommunityProjectService::getProposal($id);
     }
 
@@ -56,6 +60,7 @@ class CommunityProjectService
      */
     public function updateProposal(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\CommunityProjectService')) { return false; }
         return \Nexus\Services\CommunityProjectService::updateProposal($id, $userId, $data);
     }
 

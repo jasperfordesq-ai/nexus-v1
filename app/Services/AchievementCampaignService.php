@@ -22,6 +22,7 @@ class AchievementCampaignService
      */
     public function getCampaigns($status = null)
     {
+        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
         return \Nexus\Services\AchievementCampaignService::getCampaigns($status);
     }
 
@@ -30,6 +31,7 @@ class AchievementCampaignService
      */
     public function getCampaign($id)
     {
+        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
         return \Nexus\Services\AchievementCampaignService::getCampaign($id);
     }
 
@@ -38,6 +40,7 @@ class AchievementCampaignService
      */
     public function createCampaign($data)
     {
+        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
         return \Nexus\Services\AchievementCampaignService::createCampaign($data);
     }
 
@@ -46,6 +49,7 @@ class AchievementCampaignService
      */
     public function updateCampaign($id, $data)
     {
+        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
         return \Nexus\Services\AchievementCampaignService::updateCampaign($id, $data);
     }
 
@@ -54,6 +58,7 @@ class AchievementCampaignService
      */
     public function activateCampaign($id)
     {
+        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
         return \Nexus\Services\AchievementCampaignService::activateCampaign($id);
     }
 
@@ -62,6 +67,7 @@ class AchievementCampaignService
      */
     public function pauseCampaign($id)
     {
+        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
         return \Nexus\Services\AchievementCampaignService::pauseCampaign($id);
     }
 
@@ -70,6 +76,7 @@ class AchievementCampaignService
      */
     public function deleteCampaign($id)
     {
+        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
         return \Nexus\Services\AchievementCampaignService::deleteCampaign($id);
     }
 }

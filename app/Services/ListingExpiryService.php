@@ -22,6 +22,7 @@ class ListingExpiryService
      */
     public function processExpiredListings(): array
     {
+        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return []; }
         return \Nexus\Services\ListingExpiryService::processExpiredListings();
     }
 
@@ -30,6 +31,7 @@ class ListingExpiryService
      */
     public function processAllTenants(): array
     {
+        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return []; }
         return \Nexus\Services\ListingExpiryService::processAllTenants();
     }
 
@@ -38,6 +40,7 @@ class ListingExpiryService
      */
     public function renewListing(int $listingId, int $userId): array
     {
+        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return []; }
         return \Nexus\Services\ListingExpiryService::renewListing($listingId, $userId);
     }
 
@@ -46,6 +49,7 @@ class ListingExpiryService
      */
     public function setExpiry(int $listingId, ?string $expiresAt): bool
     {
+        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return false; }
         return \Nexus\Services\ListingExpiryService::setExpiry($listingId, $expiresAt);
     }
 }

@@ -418,6 +418,7 @@ class EventService
      */
     public function getNearby(float $lat, float $lon, array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return []; }
         return \Nexus\Services\EventService::getNearby($lat, $lon, $filters);
     }
 
@@ -460,6 +461,7 @@ class EventService
      */
     public function cancelEvent(int $eventId, int $userId, string $reason = ''): bool
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return false; }
         return \Nexus\Services\EventService::cancelEvent($eventId, $userId, $reason);
     }
 
@@ -647,6 +649,7 @@ class EventService
      */
     public function getAttendanceRecords(int $eventId): array
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return []; }
         return \Nexus\Services\EventService::getAttendanceRecords($eventId);
     }
 
@@ -656,6 +659,7 @@ class EventService
      */
     public function markAttended(int $eventId, int $attendeeId, int $markedById, ?float $hoursOverride = null, ?string $notes = null): bool
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return false; }
         return \Nexus\Services\EventService::markAttended($eventId, $attendeeId, $markedById, $hoursOverride, $notes);
     }
 
@@ -665,6 +669,7 @@ class EventService
      */
     public function bulkMarkAttended(int $eventId, array $attendeeIds, int $markedById): array
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return []; }
         return \Nexus\Services\EventService::bulkMarkAttended($eventId, $attendeeIds, $markedById);
     }
 
@@ -674,6 +679,7 @@ class EventService
      */
     public function getAllSeries(array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return []; }
         return \Nexus\Services\EventService::getAllSeries($filters);
     }
 
@@ -683,6 +689,7 @@ class EventService
      */
     public function createSeries(int $userId, string $title, ?string $description = null): ?int
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return null; }
         return \Nexus\Services\EventService::createSeries($userId, $title, $description);
     }
 
@@ -692,6 +699,7 @@ class EventService
      */
     public function getSeriesInfo(int $seriesId): ?array
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return null; }
         return \Nexus\Services\EventService::getSeriesInfo($seriesId);
     }
 
@@ -701,6 +709,7 @@ class EventService
      */
     public function getSeriesEvents(int $seriesId): array
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return []; }
         return \Nexus\Services\EventService::getSeriesEvents($seriesId);
     }
 
@@ -710,6 +719,7 @@ class EventService
      */
     public function linkToSeries(int $eventId, int $seriesId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return false; }
         return \Nexus\Services\EventService::linkToSeries($eventId, $seriesId, $userId);
     }
 
@@ -719,6 +729,7 @@ class EventService
      */
     public function createRecurring(int $userId, array $data): ?array
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return null; }
         return \Nexus\Services\EventService::createRecurring($userId, $data);
     }
 
@@ -728,6 +739,7 @@ class EventService
      */
     public function updateRecurring(int $eventId, int $userId, array $data, string $scope = 'single'): bool
     {
+        if (!class_exists('\Nexus\Services\EventService')) { return false; }
         return \Nexus\Services\EventService::updateRecurring($eventId, $userId, $data, $scope);
     }
 }

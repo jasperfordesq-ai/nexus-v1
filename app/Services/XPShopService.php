@@ -22,6 +22,7 @@ class XPShopService
      */
     public function getItems(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return []; }
         return \Nexus\Services\XPShopService::getItems($tenantId);
     }
 
@@ -30,6 +31,7 @@ class XPShopService
      */
     public function purchase(int $tenantId, int $userId, int $itemId): bool
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return false; }
         return \Nexus\Services\XPShopService::purchase($tenantId, $userId, $itemId);
     }
 
@@ -38,6 +40,7 @@ class XPShopService
      */
     public function getUserPurchases(int $tenantId, int $userId): array
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return []; }
         return \Nexus\Services\XPShopService::getUserPurchases($tenantId, $userId);
     }
 
@@ -46,6 +49,7 @@ class XPShopService
      */
     public function getBalance(int $tenantId, int $userId): int
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return 0; }
         return \Nexus\Services\XPShopService::getBalance($tenantId, $userId);
     }
 
@@ -56,6 +60,7 @@ class XPShopService
      */
     public function getItemsWithUserStatus(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return []; }
         return \Nexus\Services\XPShopService::getItemsWithUserStatus($userId);
     }
 
@@ -66,6 +71,7 @@ class XPShopService
      */
     public function purchaseItem(int $userId, $itemId): array
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return []; }
         return \Nexus\Services\XPShopService::purchase($userId, $itemId);
     }
 
@@ -74,6 +80,7 @@ class XPShopService
      */
     public function getAvailableItems(): array
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return []; }
         return \Nexus\Services\XPShopService::getAvailableItems();
     }
 
@@ -82,6 +89,7 @@ class XPShopService
      */
     public function getUserActivePerks(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\XPShopService')) { return []; }
         return \Nexus\Services\XPShopService::getUserActivePerks($userId);
     }
 }
