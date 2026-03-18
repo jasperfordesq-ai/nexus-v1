@@ -45,7 +45,7 @@ return [
 
     'domain' => env('SESSION_DOMAIN'),
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => env('SESSION_SECURE_COOKIE', true),
 
     'http_only' => env('SESSION_HTTP_ONLY', true),
 

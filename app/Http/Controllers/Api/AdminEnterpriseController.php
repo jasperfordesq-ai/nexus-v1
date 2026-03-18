@@ -46,13 +46,13 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        try { $userCount = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { $userCount = 0; }
+        try { $userCount = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] User count query failed: ' . $e->getMessage()); $userCount = 0; }
 
         $roleCount = 0;
-        try { $roleCount = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM roles WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { $roleCount = 4; }
+        try { $roleCount = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM roles WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Role count query failed: ' . $e->getMessage()); }
 
         $pendingGdpr = 0;
-        try { $pendingGdpr = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->cnt ?? 0); } catch (\Exception $e) {}
+        try { $pendingGdpr = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] GDPR pending count query failed: ' . $e->getMessage()); }
 
         $dbConnected = true;
         try { DB::select("SELECT 1"); } catch (\Exception $e) { $dbConnected = false; }
@@ -239,13 +239,13 @@ class AdminEnterpriseController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $pending = 0; $total = 0;
-        try { $row = DB::selectOne("SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending FROM gdpr_requests WHERE tenant_id = ?", [$tenantId]); $pending = (int)($row->pending ?? 0); $total = (int)($row->total ?? 0); } catch (\Exception $e) {}
+        try { $row = DB::selectOne("SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending FROM gdpr_requests WHERE tenant_id = ?", [$tenantId]); $pending = (int)($row->pending ?? 0); $total = (int)($row->total ?? 0); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] GDPR dashboard query failed: ' . $e->getMessage()); }
 
         $consents = 0;
-        try { $consents = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) {}
+        try { $consents = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Consents count query failed: ' . $e->getMessage()); }
 
         $breaches = 0;
-        try { $breaches = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) {}
+        try { $breaches = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM data_breach_log WHERE tenant_id = ?", [$tenantId])->cnt ?? 0); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Breaches count query failed: ' . $e->getMessage()); }
 
         return $this->respondWithData(['total_requests' => $total, 'pending_requests' => $pending, 'total_consents' => $consents, 'total_breaches' => $breaches]);
     }
@@ -359,10 +359,10 @@ class AdminEnterpriseController extends BaseApiController
         $memUsage = memory_get_usage(true);
 
         $dbSize = '0 MB';
-        try { $dbName = getenv('DB_NAME') ?: 'nexus'; $row = DB::selectOne("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb FROM information_schema.tables WHERE table_schema = ?", [$dbName]); $dbSize = ($row->size_mb ?? '0') . ' MB'; } catch (\Exception $e) {}
+        try { $dbName = getenv('DB_NAME') ?: 'nexus'; $row = DB::selectOne("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb FROM information_schema.tables WHERE table_schema = ?", [$dbName]); $dbSize = ($row->size_mb ?? '0') . ' MB'; } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] DB size query failed: ' . $e->getMessage()); }
 
         $uptime = 'N/A';
-        try { $rows = DB::select("SHOW GLOBAL STATUS LIKE 'Uptime'"); $row = $rows[0] ?? null; if ($row) { $s = (int)($row->Value ?? 0); $uptime = floor($s/86400) . 'd ' . floor(($s%86400)/3600) . 'h'; } } catch (\Exception $e) {}
+        try { $rows = DB::select("SHOW GLOBAL STATUS LIKE 'Uptime'"); $row = $rows[0] ?? null; if ($row) { $s = (int)($row->Value ?? 0); $uptime = floor($s/86400) . 'd ' . floor(($s%86400)/3600) . 'h'; } } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Uptime query failed: ' . $e->getMessage()); }
 
         $redisConnected = false; $redisMemory = 'N/A';
         try { $stats = \App\Services\RedisCache::getStats(); $redisConnected = !empty($stats['enabled']); if ($redisConnected) { $redisMemory = $stats['memory_used'] ?? 'N/A'; } } catch (\Exception $e) {}
@@ -443,7 +443,7 @@ class AdminEnterpriseController extends BaseApiController
             $existing = json_decode($row->configuration ?? '{}', true) ?: [];
             $merged = array_merge($existing, $newConfig);
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($merged), $tenantId]);
-            try { \App\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {}
+            try { \App\Services\RedisCache::delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Cache invalidation failed: ' . $e->getMessage()); }
             return $this->respondWithData($merged);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', 'Failed to update configuration', null, 500);

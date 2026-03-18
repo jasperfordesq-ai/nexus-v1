@@ -448,13 +448,26 @@ class AdminContentController extends BaseApiController
         if (empty($label)) { return $this->respondWithError('VALIDATION_ERROR', 'Label is required', 'label', 422); }
 
         $parentId = isset($input['parent_id']) ? (int)$input['parent_id'] : null;
+        $pageId = isset($input['page_id']) ? (int)$input['page_id'] : null;
         $visibilityRules = isset($input['visibility_rules']) ? json_encode($input['visibility_rules']) : null;
+
+        // Validate parent_id belongs to the same menu (and therefore same tenant)
+        if ($parentId !== null) {
+            $parentExists = DB::selectOne("SELECT id FROM menu_items WHERE id = ? AND menu_id = ?", [$parentId, $menuId]);
+            if (!$parentExists) { return $this->respondWithError('VALIDATION_ERROR', 'Parent menu item not found in this menu', 'parent_id', 422); }
+        }
+
+        // Validate page_id belongs to the same tenant
+        if ($pageId !== null) {
+            $pageExists = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$pageId, $tenantId]);
+            if (!$pageExists) { return $this->respondWithError('VALIDATION_ERROR', 'Page not found', 'page_id', 422); }
+        }
 
         DB::insert(
             "INSERT INTO menu_items (menu_id, parent_id, type, label, url, route_name, page_id, icon, css_class, target, sort_order, visibility_rules, is_active, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
             [$menuId, $parentId, $input['type'] ?? 'link', $label, $input['url'] ?? null, $input['route_name'] ?? null,
-             isset($input['page_id']) ? (int)$input['page_id'] : null, $input['icon'] ?? null, $input['css_class'] ?? null,
+             $pageId, $input['icon'] ?? null, $input['css_class'] ?? null,
              $input['target'] ?? '_self', (int)($input['sort_order'] ?? 0), $visibilityRules, (int)($input['is_active'] ?? 1)]
         );
 
@@ -488,12 +501,32 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Items array is required', 'items', 422);
         }
 
-        foreach ($items as $item) {
-            $itemId = (int)($item['id'] ?? 0);
-            if ($itemId < 1) continue;
-            $parentId = isset($item['parent_id']) ? (int)$item['parent_id'] : null;
-            DB::update("UPDATE menu_items SET sort_order = ?, parent_id = ?, updated_at = NOW() WHERE id = ? AND menu_id = ?",
-                [(int)($item['sort_order'] ?? 0), $parentId, $itemId, $menuId]);
+        // Collect valid item IDs in this menu for parent_id validation
+        $validItemIds = array_map(
+            fn($r) => (int) $r->id,
+            DB::select("SELECT id FROM menu_items WHERE menu_id = ?", [$menuId])
+        );
+
+        DB::beginTransaction();
+        try {
+            foreach ($items as $item) {
+                $itemId = (int)($item['id'] ?? 0);
+                if ($itemId < 1) continue;
+                $parentId = isset($item['parent_id']) ? (int)$item['parent_id'] : null;
+
+                // Validate parent_id belongs to the same menu
+                if ($parentId !== null && !in_array($parentId, $validItemIds, true)) {
+                    DB::rollBack();
+                    return $this->respondWithError('VALIDATION_ERROR', 'Parent menu item not found in this menu', 'parent_id', 422);
+                }
+
+                DB::update("UPDATE menu_items SET sort_order = ?, parent_id = ?, updated_at = NOW() WHERE id = ? AND menu_id = ?",
+                    [(int)($item['sort_order'] ?? 0), $parentId, $itemId, $menuId]);
+            }
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
         }
 
         return $this->respondWithData($this->buildMenuItemTree($menuId));
@@ -521,8 +554,22 @@ class AdminContentController extends BaseApiController
         if (isset($input['type'])) { $updates[] = 'type = ?'; $params[] = $input['type']; }
         if (array_key_exists('url', $input)) { $updates[] = 'url = ?'; $params[] = $input['url']; }
         if (array_key_exists('route_name', $input)) { $updates[] = 'route_name = ?'; $params[] = $input['route_name']; }
-        if (array_key_exists('page_id', $input)) { $updates[] = 'page_id = ?'; $params[] = isset($input['page_id']) ? (int)$input['page_id'] : null; }
-        if (array_key_exists('parent_id', $input)) { $updates[] = 'parent_id = ?'; $params[] = isset($input['parent_id']) ? (int)$input['parent_id'] : null; }
+        if (array_key_exists('page_id', $input)) {
+            $pageId = isset($input['page_id']) ? (int)$input['page_id'] : null;
+            if ($pageId !== null) {
+                $pageExists = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$pageId, $tenantId]);
+                if (!$pageExists) { return $this->respondWithError('VALIDATION_ERROR', 'Page not found', 'page_id', 422); }
+            }
+            $updates[] = 'page_id = ?'; $params[] = $pageId;
+        }
+        if (array_key_exists('parent_id', $input)) {
+            $parentId = isset($input['parent_id']) ? (int)$input['parent_id'] : null;
+            if ($parentId !== null) {
+                $parentExists = DB::selectOne("SELECT id FROM menu_items WHERE id = ? AND menu_id = ?", [$parentId, $existing->menu_id]);
+                if (!$parentExists) { return $this->respondWithError('VALIDATION_ERROR', 'Parent menu item not found in this menu', 'parent_id', 422); }
+            }
+            $updates[] = 'parent_id = ?'; $params[] = $parentId;
+        }
         if (array_key_exists('icon', $input)) { $updates[] = 'icon = ?'; $params[] = $input['icon']; }
         if (array_key_exists('css_class', $input)) { $updates[] = 'css_class = ?'; $params[] = $input['css_class']; }
         if (isset($input['target'])) { $updates[] = 'target = ?'; $params[] = $input['target']; }

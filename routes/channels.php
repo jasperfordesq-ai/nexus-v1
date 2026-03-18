@@ -27,8 +27,13 @@ Broadcast::channel('tenant.{tenantId}.conversation.{conversationId}', function (
     if ($user->tenant_id !== $tenantId) {
         return false;
     }
-    // TODO: Check conversation membership via MessageService::isParticipant()
-    return true;
+    return \Illuminate\Support\Facades\DB::table('messages')
+        ->where('tenant_id', $tenantId)
+        ->where('id', $conversationId)
+        ->where(function ($q) use ($user) {
+            $q->where('sender_id', $user->id)->orWhere('receiver_id', $user->id);
+        })
+        ->exists();
 });
 
 // Private group channel — group members only
@@ -36,8 +41,11 @@ Broadcast::channel('tenant.{tenantId}.group.{groupId}', function (User $user, in
     if ($user->tenant_id !== $tenantId) {
         return false;
     }
-    // TODO: Check group membership via GroupService::isMember()
-    return true;
+    return \Illuminate\Support\Facades\DB::table('group_members')
+        ->where('group_id', $groupId)
+        ->where('user_id', $user->id)
+        ->where('status', 'active')
+        ->exists();
 });
 
 // Presence channel for online members in a tenant
