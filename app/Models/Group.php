@@ -73,7 +73,7 @@ class Group extends Model
 
     public function discussions(): HasMany
     {
-        return $this->hasMany(Discussion::class);
+        return $this->hasMany(GroupDiscussion::class);
     }
 
     public function scopePublic(Builder $query): Builder

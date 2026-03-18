@@ -7,10 +7,8 @@
 namespace App\Core;
 
 /**
- * App-namespace wrapper for Nexus\Core\Env.
- *
- * Uses Laravel's env() helper when available, falling back to the legacy
- * Nexus\Core\Env implementation for backwards compatibility.
+ * Environment variable access using Laravel's env() helper.
+ * Replaces legacy Nexus\Core\Env with direct implementation.
  */
 class Env
 {
@@ -18,18 +16,43 @@ class Env
      * Load environment variables from a .env file.
      *
      * In a full Laravel context this is handled by Dotenv automatically.
-     * This method delegates to the legacy loader for compatibility.
+     * This method provides backwards compatibility for legacy code paths.
      */
     public static function load(string $path): void
     {
-        \Nexus\Core\Env::load($path);
+        if (!file_exists($path)) {
+            return;
+        }
+
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        foreach ($lines as $line) {
+            if (strpos(trim($line), '#') === 0) {
+                continue;
+            }
+
+            list($name, $value) = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value);
+
+            // Remove quotes if present
+            if (strlen($value) > 1 && $value[0] === '"' && $value[strlen($value) - 1] === '"') {
+                $value = substr($value, 1, -1);
+            }
+
+            if (!array_key_exists($name, $_SERVER) && !array_key_exists($name, $_ENV)) {
+                putenv(sprintf('%s=%s', $name, $value));
+                $_ENV[$name] = $value;
+                $_SERVER[$name] = $value;
+            }
+        }
     }
 
     /**
      * Get an environment variable value.
      *
-     * Prefers Laravel's env() helper when available, then falls back to
-     * the legacy Nexus\Core\Env::get() implementation.
+     * Uses Laravel's env() helper when available, then falls back to
+     * checking $_ENV, $_SERVER, and getenv().
      *
      * @param string $key     Environment variable name
      * @param mixed  $default Default value if not found
@@ -45,6 +68,22 @@ class Env
             }
         }
 
-        return \Nexus\Core\Env::get($key, $default);
+        // Check $_ENV (most reliable across platforms)
+        if (isset($_ENV[$key])) {
+            return $_ENV[$key];
+        }
+
+        // Check $_SERVER (often populated by web servers)
+        if (isset($_SERVER[$key])) {
+            return $_SERVER[$key];
+        }
+
+        // Check getenv() (system environment variables)
+        $value = getenv($key);
+        if ($value !== false) {
+            return $value;
+        }
+
+        return $default;
     }
 }

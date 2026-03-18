@@ -20,11 +20,12 @@ class User extends Authenticatable
     protected $table = 'users';
 
     protected $fillable = [
-        'tenant_id', 'name', 'first_name', 'last_name', 'email', 'password_hash',
-        'role', 'status', 'avatar_url', 'bio', 'location', 'latitude', 'longitude',
-        'phone', 'balance', 'is_verified', 'is_admin', 'is_super_admin', 'is_god',
-        'is_tenant_super_admin', 'is_approved', 'onboarding_completed',
+        'name', 'first_name', 'last_name', 'email', 'password_hash',
+        'status', 'avatar_url', 'bio', 'location', 'latitude', 'longitude',
+        'phone', 'is_verified',
+        'onboarding_completed',
         'profile_type', 'organization_name', 'totp_enabled',
+        'notification_preferences',
         'email_verified_at', 'last_active_at',
     ];
 
@@ -46,6 +47,7 @@ class User extends Authenticatable
         'totp_enabled' => 'boolean',
         'email_verified_at' => 'datetime',
         'last_active_at' => 'datetime',
+        'notification_preferences' => 'array',
     ];
 
     public function getAuthPassword(): string

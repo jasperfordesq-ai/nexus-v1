@@ -47,6 +47,12 @@ Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapContr
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);
 
 // ============================================
+
+// ============================================
+// Authenticated routes (controllers also check auth internally)
+// ============================================
+Route::middleware('auth:api')->group(function () {
+
 // MIGRATED ROUTES — Exchanges
 // Source: httpdocs/routes/exchanges.php
 // ============================================
@@ -462,6 +468,13 @@ Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController:
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
 
 // ============================================
+}); // end authenticated routes
+
+// ============================================
+// Admin routes (auth:api required)
+// ============================================
+Route::middleware('auth:api')->group(function () {
+
 // MIGRATED ROUTES — Admin API (Dashboard, Users, Listings, Config, Cache, Jobs, Federation, CRM, Super Admin)
 // Source: httpdocs/routes/admin-api.php
 // ============================================
@@ -965,6 +978,32 @@ Route::get('/v2/admin/crm/export/tasks', [\App\Http\Controllers\Api\AdminCrmCont
 Route::get('/v2/admin/crm/export/dashboard', [\App\Http\Controllers\Api\AdminCrmController::class, 'exportDashboard']);
 
 // ============================================
+}); // end admin routes
+
+// ============================================
+// Public routes (auth, CSRF, VAPID — no auth required)
+// ============================================
+Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
+Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
+Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class, 'heartbeat']);
+Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
+Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
+Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
+Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
+Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
+Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
+Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
+Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
+Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
+
+// ============================================
+// Authenticated misc/legacy/federation routes
+// ============================================
+Route::middleware('auth:api')->group(function () {
+
 // MIGRATED ROUTES — Misc API (Social, Auth, Push, AI, Menus, Wallet Features, Events, Volunteering, Ideation, Matching)
 // Source: httpdocs/routes/misc-api.php
 // ============================================
@@ -982,31 +1021,16 @@ Route::post('/social/mention-search', [\App\Http\Controllers\Api\SocialControlle
 Route::post('/social/feed', [\App\Http\Controllers\Api\SocialController::class, 'feed']);
 Route::post('/social/create-post', [\App\Http\Controllers\Api\SocialController::class, 'createPost']);
 Route::post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
-Route::get('/push/vapid-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
-Route::get('/push/vapid-public-key', [\App\Http\Controllers\Api\PushController::class, 'vapidKey']);
 Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
 Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushController::class, 'unsubscribe']);
 Route::post('/push/send', [\App\Http\Controllers\Api\PushController::class, 'send']);
 Route::get('/push/status', [\App\Http\Controllers\Api\PushController::class, 'status']);
 Route::post('/push/register-device', [\App\Http\Controllers\Api\PushController::class, 'registerDevice']);
 Route::post('/push/unregister-device', [\App\Http\Controllers\Api\PushController::class, 'unregisterDevice']);
-Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class, 'heartbeat']);
-Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
-Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
-Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
-Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
-Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
-Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
-Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
-Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
 Route::post('/auth/revoke', [\App\Http\Controllers\Api\AuthController::class, 'revokeToken']);
 Route::post('/auth/revoke-all', [\App\Http\Controllers\Api\AuthController::class, 'revokeAllTokens']);
 Route::post('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
 Route::get('/auth/admin-session', [\App\Http\Controllers\Api\AuthController::class, 'adminSession']);
-Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
 Route::get('/v2/auth/verification-status', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getVerificationStatus']);
 Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification']);
 Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode']);
@@ -1352,3 +1376,4 @@ Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationCont
 Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
 Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken']);
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
+}); // end authenticated misc routes

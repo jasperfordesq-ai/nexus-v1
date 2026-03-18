@@ -203,11 +203,15 @@ class PollService
     }
 
     /**
-     * Get validation errors — delegates to legacy PollService.
+     * Get validation errors.
+     *
+     * The legacy PollService used a static error collector; in Laravel,
+     * validation is handled by Laravel's Validator, so this returns an
+     * empty array for backward-compatibility with any callers.
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\PollService::getErrors();
+        return [];
     }
 
     /**

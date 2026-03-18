@@ -14,7 +14,7 @@ class UserBadge extends Model
 {
     protected $table = 'user_badges';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     const CREATED_AT = 'awarded_at';
     const UPDATED_AT = null;

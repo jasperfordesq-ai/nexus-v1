@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -10,27 +10,26 @@ use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AiMessage extends Model
+class ListingSkillTag extends Model
 {
     use HasTenantScope;
 
-    protected $table = 'ai_messages';
+    protected $table = 'listing_skill_tags';
+
+    public $timestamps = false;
 
     protected $fillable = [
-        'conversation_id',
-        'role',
-        'content',
-        'tokens_used',
-        'model',
         'tenant_id',
+        'listing_id',
+        'tag',
     ];
 
     protected $casts = [
-        'tokens_used' => 'integer',
+        'listing_id' => 'integer',
     ];
 
-    public function conversation(): BelongsTo
+    public function listing(): BelongsTo
     {
-        return $this->belongsTo(AiConversation::class, 'conversation_id');
+        return $this->belongsTo(Listing::class);
     }
 }

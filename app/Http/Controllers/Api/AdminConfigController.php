@@ -370,7 +370,7 @@ class AdminConfigController extends BaseApiController
         $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
-        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        $uri = request()->getRequestUri();
         preg_match('#/api/v2/admin/system/cron-jobs/(\d+)/run#', $uri, $matches);
         $numericId = (int) ($matches[1] ?? 0);
 
@@ -492,16 +492,20 @@ class AdminConfigController extends BaseApiController
                     $controller = new \Nexus\Controllers\CronController();
                     $method = $methodMap[$jobSlug];
                     ob_start();
+                    request()->query->set('key', $cronKey); // also set $_GET for legacy CronController
                     $_GET['key'] = $cronKey;
                     $controller->$method();
+                    request()->query->remove('key');
                     unset($_GET['key']);
                     $output = ob_get_clean() ?: 'Completed (no output)';
                 } elseif (isset($adminMethodMap[$jobSlug])) {
                     $controller = new \Nexus\Controllers\AdminController();
                     $method = $adminMethodMap[$jobSlug];
                     ob_start();
+                    request()->query->set('key', $cronKey); // also set $_GET for legacy CronController
                     $_GET['key'] = $cronKey;
                     $controller->$method();
+                    request()->query->remove('key');
                     unset($_GET['key']);
                     $output = ob_get_clean() ?: 'Completed (no output)';
                 } else {

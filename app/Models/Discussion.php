@@ -6,26 +6,30 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class GroupFeedback extends Model
+class Discussion extends Model
 {
-    protected $table = 'group_feedback';
+    use HasTenantScope;
 
-    public $timestamps = true;
-
-    const UPDATED_AT = null;
+    protected $table = 'group_discussions';
 
     protected $fillable = [
-        'group_id', 'user_id', 'rating', 'comment',
+        'tenant_id',
+        'group_id',
+        'user_id',
+        'title',
+        'is_pinned',
+        'is_locked',
+        'status',
     ];
 
     protected $casts = [
-        'group_id' => 'integer',
-        'user_id' => 'integer',
-        'rating' => 'integer',
-        'created_at' => 'datetime',
+        'is_pinned' => 'boolean',
+        'is_locked' => 'boolean',
     ];
 
     public function group(): BelongsTo
@@ -36,5 +40,10 @@ class GroupFeedback extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(GroupPost::class, 'discussion_id');
     }
 }

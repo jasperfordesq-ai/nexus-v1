@@ -46,10 +46,6 @@ class Listing extends Model
         'save_count',
         'is_featured',
         'featured_until',
-        'moderation_status',
-        'reviewed_by',
-        'reviewed_at',
-        'rejection_reason',
     ];
 
     protected $casts = [

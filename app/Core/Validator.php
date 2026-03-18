@@ -6,15 +6,11 @@
 
 namespace App\Core;
 
-use Nexus\Core\Validator as LegacyValidator;
-
 /**
- * App-namespace wrapper for Nexus\Core\Validator.
+ * Input validation helpers.
+ * Direct implementation replacing Nexus\Core\Validator delegation.
  *
- * Delegates to the legacy implementation. Once the Laravel migration is
- * complete this can be replaced with Laravel's Validator facade / custom rules.
- *
- * NOTE: isIrishPhone() is intentionally NOT exposed here — it is legacy only.
+ * NOTE: isIrishPhone() is intentionally NOT exposed here -- it is legacy only.
  * Project NEXUS is a global platform; use isPhone() for international E.164 format.
  */
 class Validator
@@ -25,7 +21,8 @@ class Validator
      */
     public static function isPhone(string $phone): bool
     {
-        return LegacyValidator::isPhone($phone);
+        $clean = preg_replace('/[\s\-\(\)\.]/', '', $phone);
+        return (bool) preg_match('/^\+?\d{7,15}$/', $clean);
     }
 
     /**

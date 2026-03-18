@@ -21,6 +21,6 @@ class OrgWallet extends Model
 
     protected $casts = [
         'organization_id' => 'integer',
-        'balance' => 'float',
+        'balance' => 'decimal:2',
     ];
 }

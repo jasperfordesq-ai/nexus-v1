@@ -6,23 +6,72 @@
 
 namespace App\Core;
 
-use Nexus\Core\ClientIp as LegacyClientIp;
-
 /**
- * App-namespace wrapper for Nexus\Core\ClientIp.
+ * Centralized, secure client IP extraction.
+ * Direct implementation replacing Nexus\Core\ClientIp delegation.
  *
- * Delegates to the legacy implementation. Once the Laravel migration is
- * complete this can be replaced with Laravel's Request::ip() / TrustedProxy middleware.
+ * Handles the full proxy chain: Client -> Cloudflare -> Docker -> Apache -> PHP.
+ *
+ * Priority order:
+ *   1. CF-Connecting-IP  (Cloudflare's verified real client IP)
+ *   2. X-Forwarded-For   (left-most IP after stripping trusted proxies)
+ *   3. X-Real-IP         (single-IP header from reverse proxies)
+ *   4. REMOTE_ADDR       (fallback)
  */
 class ClientIp
 {
+    /**
+     * Trusted proxy CIDRs.
+     */
+    private const TRUSTED_PROXIES = [
+        // Docker bridge networks
+        '172.16.0.0/12',
+        '10.0.0.0/8',
+        '192.168.0.0/16',
+        // Localhost
+        '127.0.0.0/8',
+        '::1',
+        // Cloudflare IPv4 ranges
+        '173.245.48.0/20',
+        '103.21.244.0/22',
+        '103.22.200.0/22',
+        '103.31.4.0/22',
+        '141.101.64.0/18',
+        '108.162.192.0/18',
+        '190.93.240.0/20',
+        '188.114.96.0/20',
+        '197.234.240.0/22',
+        '198.41.128.0/17',
+        '162.158.0.0/15',
+        '104.16.0.0/13',
+        '104.24.0.0/14',
+        '172.64.0.0/13',
+        '131.0.72.0/22',
+        // Cloudflare IPv6 ranges
+        '2400:cb00::/32',
+        '2606:4700::/32',
+        '2803:f800::/32',
+        '2405:b500::/32',
+        '2405:8100::/32',
+        '2a06:98c0::/29',
+        '2c0f:f248::/32',
+    ];
+
+    /** Cached result for the current request */
+    private static ?string $cachedIp = null;
+
     /**
      * Get the real client IP address.
      * Safe to call from anywhere -- result is cached per-request.
      */
     public static function get(): string
     {
-        return LegacyClientIp::get();
+        if (self::$cachedIp !== null) {
+            return self::$cachedIp;
+        }
+
+        self::$cachedIp = self::resolve();
+        return self::$cachedIp;
     }
 
     /**
@@ -30,7 +79,110 @@ class ClientIp
      */
     public static function clearCache(): void
     {
-        LegacyClientIp::clearCache();
+        self::$cachedIp = null;
+    }
+
+    /**
+     * Resolve the real client IP from request headers.
+     */
+    private static function resolve(): string
+    {
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+
+        // If REMOTE_ADDR is NOT a trusted proxy, it IS the real client.
+        if (!self::isTrustedProxy($remoteAddr)) {
+            return $remoteAddr;
+        }
+
+        // 1. CF-Connecting-IP
+        $cfIp = self::getHeader('HTTP_CF_CONNECTING_IP');
+        if ($cfIp !== null && filter_var($cfIp, FILTER_VALIDATE_IP)) {
+            return $cfIp;
+        }
+
+        // 2. X-Forwarded-For
+        $xff = self::getHeader('HTTP_X_FORWARDED_FOR');
+        if ($xff !== null) {
+            $ips = array_map('trim', explode(',', $xff));
+            for ($i = count($ips) - 1; $i >= 0; $i--) {
+                $ip = $ips[$i];
+                if (filter_var($ip, FILTER_VALIDATE_IP) && !self::isTrustedProxy($ip)) {
+                    return $ip;
+                }
+            }
+            $leftMost = trim($ips[0]);
+            if (filter_var($leftMost, FILTER_VALIDATE_IP)) {
+                return $leftMost;
+            }
+        }
+
+        // 3. X-Real-IP
+        $realIp = self::getHeader('HTTP_X_REAL_IP');
+        if ($realIp !== null && filter_var($realIp, FILTER_VALIDATE_IP)) {
+            return $realIp;
+        }
+
+        // 4. Fallback to REMOTE_ADDR
+        return $remoteAddr;
+    }
+
+    /**
+     * Check if an IP is within our trusted proxy ranges.
+     */
+    private static function isTrustedProxy(string $ip): bool
+    {
+        foreach (self::TRUSTED_PROXIES as $cidr) {
+            if (self::ipInCidr($ip, $cidr)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if an IP address falls within a CIDR range.
+     * Supports both IPv4 and IPv6.
+     */
+    private static function ipInCidr(string $ip, string $cidr): bool
+    {
+        if (strpos($cidr, '/') === false) {
+            return $ip === $cidr;
+        }
+
+        [$subnet, $bits] = explode('/', $cidr, 2);
+        $bits = (int) $bits;
+
+        $ipBin = @inet_pton($ip);
+        $subnetBin = @inet_pton($subnet);
+
+        if ($ipBin === false || $subnetBin === false) {
+            return false;
+        }
+
+        if (strlen($ipBin) !== strlen($subnetBin)) {
+            return false;
+        }
+
+        $byteLen = strlen($ipBin);
+        $mask = str_repeat("\xff", (int) ($bits / 8));
+        if ($bits % 8 !== 0) {
+            $mask .= chr(0xff << (8 - ($bits % 8)) & 0xff);
+        }
+        $mask = str_pad($mask, $byteLen, "\x00");
+
+        return ($ipBin & $mask) === ($subnetBin & $mask);
+    }
+
+    /**
+     * Get a $_SERVER header value, trimmed.
+     */
+    private static function getHeader(string $key): ?string
+    {
+        $value = $_SERVER[$key] ?? null;
+        if ($value === null || $value === '') {
+            return null;
+        }
+        return trim($value);
     }
 
     /**
@@ -39,6 +191,17 @@ class ClientIp
      */
     public static function debug(): array
     {
-        return LegacyClientIp::debug();
+        return [
+            'resolved_ip' => self::get(),
+            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null,
+            'HTTP_CF_CONNECTING_IP' => $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
+            'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
+            'HTTP_X_REAL_IP' => $_SERVER['HTTP_X_REAL_IP'] ?? null,
+            'HTTP_X_FORWARDED_PROTO' => $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null,
+            'HTTP_CF_RAY' => $_SERVER['HTTP_CF_RAY'] ?? null,
+            'HTTP_CF_IPCOUNTRY' => $_SERVER['HTTP_CF_IPCOUNTRY'] ?? null,
+            'remote_addr_is_trusted' => self::isTrustedProxy($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'),
+            'mod_remoteip_active' => isset($_SERVER['REMOTE_ADDR']) && !self::isTrustedProxy($_SERVER['REMOTE_ADDR']),
+        ];
     }
 }

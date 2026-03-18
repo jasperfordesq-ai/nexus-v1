@@ -9,12 +9,15 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Core\TenantContext;
 
 /**
  * UserService — Laravel DI-based service for user/profile operations.
  *
  * Eloquent/DI counterpart to the legacy static \Nexus\Services\UserService.
- * All queries are tenant-scoped automatically via the HasTenantScope trait.
+ * Eloquent queries on User are tenant-scoped via HasTenantScope.
+ * Raw DB::table() queries are explicitly scoped with tenant_id filters.
  */
 class UserService
 {
@@ -183,9 +186,12 @@ class UserService
      */
     public function getProfileStats(int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
         // Count offers
         $offersCount = DB::table('listings')
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('type', 'offer')
             ->where(function ($q) {
                 $q->whereNull('status')->orWhere('status', 'active');
@@ -195,6 +201,7 @@ class UserService
         // Count requests
         $requestsCount = DB::table('listings')
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('type', 'request')
             ->where(function ($q) {
                 $q->whereNull('status')->orWhere('status', 'active');
@@ -204,12 +211,14 @@ class UserService
         // Hours given
         $givenTotal = (float) DB::table('transactions')
             ->where('sender_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'completed')
             ->sum('amount');
 
         // Hours received
         $receivedTotal = (float) DB::table('transactions')
             ->where('receiver_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'completed')
             ->sum('amount');
 
@@ -292,26 +301,36 @@ class UserService
      */
     private function getUserStats(int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
         $avgRating = DB::table('reviews')
-            ->where('receiver_id', $userId)->avg('rating');
+            ->where('receiver_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->avg('rating');
 
         return [
             'listings_count'     => DB::table('listings')
                 ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
                 ->where(function ($q) { $q->whereNull('status')->orWhere('status', 'active'); })
                 ->count(),
             'transactions_count' => DB::table('transactions')
+                ->where('tenant_id', $tenantId)
                 ->where(function ($q) use ($userId) {
                     $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
                 })
                 ->count(),
             'connections_count'  => DB::table('connections')
+                ->where('tenant_id', $tenantId)
                 ->where('status', 'accepted')
                 ->where(function ($q) use ($userId) {
                     $q->where('requester_id', $userId)->orWhere('receiver_id', $userId);
                 })
                 ->count(),
-            'reviews_count'      => DB::table('reviews')->where('receiver_id', $userId)->count(),
+            'reviews_count'      => DB::table('reviews')
+                ->where('receiver_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->count(),
             'average_rating'     => $avgRating ? round((float) $avgRating, 1) : null,
         ];
     }
@@ -321,23 +340,34 @@ class UserService
      */
     private function getPublicStats(int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
         $stats = $this->getUserStats($userId);
         unset($stats['transactions_count']);
 
         $stats['total_hours_given'] = round((float) DB::table('transactions')
-            ->where('sender_id', $userId)->where('status', 'completed')->sum('amount'), 1);
+            ->where('sender_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'completed')
+            ->sum('amount'), 1);
 
         $stats['total_hours_received'] = round((float) DB::table('transactions')
-            ->where('receiver_id', $userId)->where('status', 'completed')->sum('amount'), 1);
+            ->where('receiver_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'completed')
+            ->sum('amount'), 1);
 
+        // group_members has no tenant_id column — scope through groups.tenant_id
         $stats['groups_count'] = (int) DB::table('group_members')
             ->join('groups', 'group_members.group_id', '=', 'groups.id')
             ->where('group_members.user_id', $userId)
             ->where('group_members.status', 'active')
+            ->where('groups.tenant_id', $tenantId)
             ->count();
 
         $stats['events_attended'] = (int) DB::table('event_rsvps')
             ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'going')
             ->count();
 
@@ -350,18 +380,22 @@ class UserService
     private function getUserBadges(int $userId): array
     {
         try {
+            $tenantId = TenantContext::getId();
+
             return DB::table('user_badges')
                 ->join('badges', function ($join) {
                     $join->on('user_badges.badge_key', '=', 'badges.badge_key')
                          ->on('user_badges.tenant_id', '=', 'badges.tenant_id');
                 })
                 ->where('user_badges.user_id', $userId)
+                ->where('user_badges.tenant_id', $tenantId)
                 ->select('badges.name', 'badges.badge_key', 'badges.icon', 'badges.description', 'user_badges.awarded_at as earned_at')
                 ->orderByDesc('user_badges.awarded_at')
                 ->get()
                 ->map(fn ($row) => (array) $row)
                 ->all();
         } catch (\Throwable $e) {
+            Log::warning('Failed to load user badges', ['user_id' => $userId, 'error' => $e->getMessage()]);
             return [];
         }
     }
@@ -372,6 +406,8 @@ class UserService
     private function getNotificationPreferences(int $userId): array
     {
         try {
+            // user_notification_preferences has no tenant_id column;
+            // tenant isolation is enforced by the caller passing a tenant-scoped userId.
             $row = DB::table('user_notification_preferences')
                 ->where('user_id', $userId)
                 ->first();
@@ -382,6 +418,7 @@ class UserService
 
             return (array) $row;
         } catch (\Throwable $e) {
+            Log::warning('Failed to load notification preferences', ['user_id' => $userId, 'error' => $e->getMessage()]);
             return [];
         }
     }
@@ -391,7 +428,10 @@ class UserService
      */
     private function areConnected(int $userId1, int $userId2): bool
     {
+        $tenantId = TenantContext::getId();
+
         return DB::table('connections')
+            ->where('tenant_id', $tenantId)
             ->where('status', 'accepted')
             ->where(function ($q) use ($userId1, $userId2) {
                 $q->where(function ($q2) use ($userId1, $userId2) {
@@ -408,7 +448,10 @@ class UserService
      */
     private function getConnectionStatus(int $targetUserId, int $viewerId): ?string
     {
+        $tenantId = TenantContext::getId();
+
         $connection = DB::table('connections')
+            ->where('tenant_id', $tenantId)
             ->where(function ($q) use ($targetUserId, $viewerId) {
                 $q->where(function ($q2) use ($targetUserId, $viewerId) {
                     $q2->where('requester_id', $viewerId)->where('receiver_id', $targetUserId);

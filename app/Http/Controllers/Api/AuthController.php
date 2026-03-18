@@ -35,17 +35,28 @@ class AuthController extends BaseApiController
     ) {}
 
     /**
-     * Helper to return error response matching legacy format
+     * Helper to return auth error response.
+     *
+     * Uses respondWithError() from BaseApiController for standard cases.
+     * Falls back to a direct response when extra fields are needed to
+     * preserve the auth-specific response contract (retry_after, etc.).
      */
     private function authError(string $message, string $code, int $status = 400, array $extra = []): JsonResponse
     {
+        if (empty($extra)) {
+            return $this->respondWithError($code, $message, null, $status);
+        }
+
+        // When extra fields are present, build a combined error envelope
+        // that includes both the standard error structure and auth-specific fields.
         $response = array_merge([
-            'error' => $message,
-            'code' => $code,
+            'errors' => [['code' => $code, 'message' => $message]],
             'success' => false,
         ], $extra);
 
-        return response()->json($response, $status);
+        return response()->json($response, $status, [
+            'API-Version' => '2.0',
+        ]);
     }
 
     /**
