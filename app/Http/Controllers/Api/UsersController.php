@@ -827,4 +827,113 @@ class UsersController extends BaseApiController
         return ucfirst($deviceType);
     }
 
+
+    /**
+     * GET /api/v2/users — Member directory listing
+     * Migrated from legacy closure in httpdocs/routes/users.php
+     */
+    public function index(): JsonResponse
+    {
+        $request = request();
+        $tenantId = $this->getTenantId();
+        $viewerId = $this->getOptionalUserId();
+
+        $limit = min((int) $request->query('limit', 50), 100);
+        $offset = max((int) $request->query('offset', 0), 0);
+        $search = $request->query('q', '');
+        $sort = $request->query('sort', 'name');
+        $order = strtoupper($request->query('order', 'ASC'));
+        if (!in_array($order, ['ASC', 'DESC'])) {
+            $order = 'ASC';
+        }
+
+        $validSorts = [
+            'name' => 'u.name',
+            'joined' => 'u.created_at',
+            'rating' => '(SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id)',
+            'hours_given' => "(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id)",
+        ];
+        $orderByField = $validSorts[$sort] ?? 'u.name';
+        $orderBy = "$orderByField $order";
+
+        $params = [$tenantId, 'active'];
+        $whereClause = 'u.tenant_id = ? AND u.status = ?';
+
+        if ($search) {
+            $memberIds = \App\Services\SearchService::searchUsers($search, $tenantId);
+            if ($memberIds !== false && !empty($memberIds)) {
+                $placeholders = implode(',', array_fill(0, count($memberIds), '?'));
+                $whereClause .= " AND u.id IN ($placeholders)";
+                $params = array_merge($params, array_map('intval', $memberIds));
+            } elseif ($memberIds !== false) {
+                $whereClause .= ' AND 1=0';
+            } else {
+                $whereClause .= ' AND (
+                    MATCH(u.first_name, u.last_name, u.bio, u.skills) AGAINST(? IN BOOLEAN MODE)
+                    OR u.name LIKE ?
+                    OR u.location LIKE ?
+                )';
+                $params[] = $search;
+                $params[] = "%$search%";
+                $params[] = "%$search%";
+            }
+        }
+
+        if ($viewerId) {
+            $whereClause .= ' AND u.id != ?';
+            $params[] = $viewerId;
+        }
+
+        $totalCount = (int) DB::selectOne("SELECT COUNT(*) as total FROM users u WHERE $whereClause", $params)->total;
+
+        $sql = "SELECT u.id, u.name, u.first_name, u.last_name,
+                       u.avatar_url as avatar, u.bio as tagline,
+                       u.location, u.latitude, u.longitude,
+                       u.created_at, u.last_login_at, u.is_verified,
+                       (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as rating,
+                       (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE sender_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_given,
+                       (SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE receiver_id = u.id AND status = 'completed' AND tenant_id = u.tenant_id) as total_hours_received,
+                       (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'offer' AND tenant_id = u.tenant_id) as offer_count,
+                       (SELECT COUNT(*) FROM listings WHERE user_id = u.id AND status = 'active' AND type = 'request' AND tenant_id = u.tenant_id) as request_count
+                FROM users u
+                WHERE $whereClause
+                ORDER BY $orderBy
+                LIMIT ? OFFSET ?";
+        $params[] = $limit;
+        $params[] = $offset;
+
+        $users = DB::select($sql, $params);
+        $users = array_map(fn ($u) => (array) $u, $users);
+
+        foreach ($users as &$user) {
+            $user['rating'] = $user['rating'] ? (float) $user['rating'] : null;
+            $user['total_hours_given'] = (int) $user['total_hours_given'];
+            $user['hours_given'] = $user['total_hours_given'];
+            $user['total_hours_received'] = (int) $user['total_hours_received'];
+            $user['offer_count'] = (int) $user['offer_count'];
+            $user['request_count'] = (int) $user['request_count'];
+            $user['is_verified'] = (bool) $user['is_verified'];
+        }
+        unset($user);
+
+        if (!$request->has('sort') && \App\Services\MemberRankingService::isEnabled() && !empty($users)) {
+            $users = \App\Services\MemberRankingService::rankMembers($users, $viewerId, ['search' => $search]);
+        }
+
+        $users = array_map(static function (array $u): array {
+            unset($u['_community_rank'], $u['_score_breakdown'], $u['hours_given'], $u['offer_count'], $u['request_count'], $u['last_login_at']);
+            return $u;
+        }, $users);
+
+        return response()->json([
+            'data' => $users,
+            'meta' => [
+                'total_items' => $totalCount,
+                'per_page' => $limit,
+                'offset' => $offset,
+                'has_more' => ($offset + $limit) < $totalCount,
+            ],
+        ]);
+    }
+
 }

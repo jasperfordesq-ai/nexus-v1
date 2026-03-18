@@ -90,7 +90,19 @@ Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController
 // ============================================
 // MIGRATED ROUTES — Listings (controller routes only)
 // Source: httpdocs/routes/listings.php
-// Note: /api/v2/categories closure stays in legacy router
+// Categories endpoint (migrated from legacy closure)
+Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
+    $type = $request->query('type', 'listing');
+    $allowed = ['listing', 'event', 'volunteering', 'resource'];
+    if (!in_array($type, $allowed, true)) {
+        $type = 'listing';
+    }
+    $categories = \App\Models\Category::where('type', $type)
+        ->where('tenant_id', \App\Core\TenantContext::getId())
+        ->orderBy('name')
+        ->get();
+    return response()->json(['data' => $categories]);
+});
 // ============================================
 // FUTURE: When ready to use new Laravel controllers, replace:
 //   [\Nexus\Controllers\Api\ListingsApiController::class, 'index']
@@ -139,7 +151,9 @@ Route::post('/v2/messages/conversations/{id}/restore', [\App\Http\Controllers\Ap
 // ============================================
 // MIGRATED ROUTES — Groups & Connections
 // Source: httpdocs/routes/groups.php
-// Note: /api/v2/connections/status/me closure stays in legacy router
+Route::get('/v2/connections/status/me', function () {
+    return response()->json(['errors' => [['code' => 'invalid_user', 'message' => 'Cannot check connection status with yourself']]], 422);
+}); // Guard: reject literal "me" before {userId} param
 // ============================================
 Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index']);
 Route::post('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'store']);
@@ -176,7 +190,7 @@ Route::delete('/v2/connections/{id}', [\App\Http\Controllers\Api\ConnectionsCont
 // ============================================
 // MIGRATED ROUTES — Users (controller routes only)
 // Source: httpdocs/routes/users.php
-// Note: /api/v2/users (directory listing) closure stays in legacy router
+Route::get('/v2/users', [\App\Http\Controllers\Api\UsersController::class, 'index']); // Member directory
 // ============================================
 Route::get('/v2/me/stats', [\App\Http\Controllers\Api\UsersController::class, 'stats']);
 Route::get('/v2/users/me', [\App\Http\Controllers\Api\UsersController::class, 'me']);
