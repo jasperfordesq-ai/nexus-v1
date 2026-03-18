@@ -22,6 +22,7 @@ class ExchangeWorkflowService
      */
     public function initiate(int $tenantId, int $listingId, int $requesterId): ?int
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return null; }
         return \Nexus\Services\ExchangeWorkflowService::initiate($tenantId, $listingId, $requesterId);
     }
 
@@ -30,6 +31,7 @@ class ExchangeWorkflowService
      */
     public function accept(int $tenantId, int $exchangeId, int $userId): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::accept($tenantId, $exchangeId, $userId);
     }
 
@@ -38,6 +40,7 @@ class ExchangeWorkflowService
      */
     public function complete(int $tenantId, int $exchangeId, int $userId, float $hours): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::complete($tenantId, $exchangeId, $userId, $hours);
     }
 
@@ -46,6 +49,7 @@ class ExchangeWorkflowService
      */
     public function cancel(int $tenantId, int $exchangeId, int $userId, ?string $reason = null): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::cancel($tenantId, $exchangeId, $userId, $reason);
     }
 
@@ -54,6 +58,7 @@ class ExchangeWorkflowService
      */
     public function approveExchange(int $exchangeId, int $brokerId, string $notes = '', string $conditions = ''): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::approveExchange($exchangeId, $brokerId, $notes, $conditions);
     }
 
@@ -62,6 +67,7 @@ class ExchangeWorkflowService
      */
     public function rejectExchange(int $exchangeId, int $brokerId, string $reason): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::rejectExchange($exchangeId, $brokerId, $reason);
     }
 
@@ -70,6 +76,7 @@ class ExchangeWorkflowService
      */
     public function createRequest(int $requesterId, int $listingId, array $data): ?int
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return null; }
         return \Nexus\Services\ExchangeWorkflowService::createRequest($requesterId, $listingId, $data);
     }
 
@@ -78,6 +85,7 @@ class ExchangeWorkflowService
      */
     public function acceptRequest(int $exchangeId, int $providerId): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::acceptRequest($exchangeId, $providerId);
     }
 
@@ -86,6 +94,7 @@ class ExchangeWorkflowService
      */
     public function declineRequest(int $exchangeId, int $providerId, string $reason = ''): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::declineRequest($exchangeId, $providerId, $reason);
     }
 
@@ -94,6 +103,7 @@ class ExchangeWorkflowService
      */
     public function startProgress(int $exchangeId, int $userId): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::startProgress($exchangeId, $userId);
     }
 
@@ -102,6 +112,7 @@ class ExchangeWorkflowService
      */
     public function markReadyForConfirmation(int $exchangeId, int $userId): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::markReadyForConfirmation($exchangeId, $userId);
     }
 
@@ -110,6 +121,7 @@ class ExchangeWorkflowService
      */
     public function confirmCompletion(int $exchangeId, int $userId, float $hours): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::confirmCompletion($exchangeId, $userId, $hours);
     }
 
@@ -118,6 +130,7 @@ class ExchangeWorkflowService
      */
     public function cancelExchange(int $exchangeId, int $userId, string $reason = ''): bool
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return false; }
         return \Nexus\Services\ExchangeWorkflowService::cancelExchange($exchangeId, $userId, $reason);
     }
 
@@ -126,6 +139,7 @@ class ExchangeWorkflowService
      */
     public function getExchange(int $exchangeId): ?array
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return null; }
         return \Nexus\Services\ExchangeWorkflowService::getExchange($exchangeId);
     }
 
@@ -134,6 +148,7 @@ class ExchangeWorkflowService
      */
     public function getActiveExchangeForListing(int $userId, int $listingId): ?array
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return null; }
         return \Nexus\Services\ExchangeWorkflowService::getActiveExchangeForListing($userId, $listingId);
     }
 
@@ -142,6 +157,7 @@ class ExchangeWorkflowService
      */
     public function getExchangeHistory(int $exchangeId): array
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return []; }
         return \Nexus\Services\ExchangeWorkflowService::getExchangeHistory($exchangeId);
     }
 
@@ -150,6 +166,7 @@ class ExchangeWorkflowService
      */
     public function checkComplianceRequirements(int $listingId, int $providerId): array
     {
+        if (!class_exists('Nexus\\Services\\ExchangeWorkflowService')) { return []; }
         return \Nexus\Services\ExchangeWorkflowService::checkComplianceRequirements($listingId, $providerId);
     }
 }
