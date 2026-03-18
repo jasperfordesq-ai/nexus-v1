@@ -29,6 +29,7 @@ class FeedActivity extends Model
         'user_id' => 'integer',
         'group_id' => 'integer',
         'is_visible' => 'boolean',
+        'metadata' => 'array',
         'created_at' => 'datetime',
     ];
 

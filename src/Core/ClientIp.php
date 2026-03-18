@@ -21,6 +21,12 @@ namespace Nexus\Core;
  * trusted proxy (Docker gateway, localhost, or Cloudflare IP ranges).
  * This prevents spoofing from direct public connections.
  */
+/**
+ *  Use AppCoreClientIp instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreClientIp instead. Maintained for backward compatibility.
+ */
 class ClientIp
 {
     /**

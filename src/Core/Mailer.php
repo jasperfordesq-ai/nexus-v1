@@ -10,6 +10,12 @@ use Nexus\Models\EmailSettings;
 use Nexus\Services\EmailMonitorService;
 use Nexus\Services\RedisCache;
 
+/**
+ *  Use AppCoreMailer instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreMailer instead. Maintained for backward compatibility.
+ */
 class Mailer
 {
     private $host;

@@ -11,6 +11,13 @@ use PDO;
 
 use Nexus\Core\TenantContext;
 
+/**
+ * Legacy User model (raw PDO).
+ *
+ * @deprecated Still referenced by App\Core\SuperPanelAccess::isGod() and
+ *             httpdocs/index.php. Migrate callers to App\Models\User (Eloquent)
+ *             and remove this legacy model.
+ */
 class User
 {
     public static function create($firstName, $lastName, $email, $password, $location = null, $phone = null, $profileType = 'individual', $orgName = null)

@@ -6,11 +6,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AiMessage extends Model
 {
+    use HasTenantScope;
+
     protected $table = 'ai_messages';
 
     protected $fillable = [
@@ -19,6 +22,7 @@ class AiMessage extends Model
         'content',
         'tokens_used',
         'model',
+        'tenant_id',
     ];
 
     protected $casts = [

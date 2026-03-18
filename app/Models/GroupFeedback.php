@@ -13,9 +13,9 @@ class GroupFeedback extends Model
 {
     protected $table = 'group_feedback';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
-    const CREATED_AT = 'created_at';
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'group_id', 'user_id', 'rating', 'comment',

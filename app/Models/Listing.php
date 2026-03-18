@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Listing extends Model
 {
+    use HasFactory;
     use HasTenantScope;
 
     protected $table = 'listings';
@@ -46,10 +48,6 @@ class Listing extends Model
         'save_count',
         'is_featured',
         'featured_until',
-        'moderation_status',
-        'reviewed_by',
-        'reviewed_at',
-        'rejection_reason',
     ];
 
     protected $casts = [

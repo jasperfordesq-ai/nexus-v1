@@ -27,6 +27,9 @@ services:
       # Persist uploads between rebuilds
       - nexus-uploads:/var/www/html/uploads
       - nexus-httpdocs-uploads:/var/www/html/httpdocs/uploads
+      # Laravel storage (writable by www-data)
+      - nexus-storage:/var/www/html/storage
+      - nexus-bootstrap-cache:/var/www/html/bootstrap/cache
     environment:
       # Database (uses Docker service name) - HARDCODED to prevent .env override
       - DB_TYPE=mysql
@@ -240,6 +243,10 @@ volumes:
     name: nexus-uploads
   nexus-httpdocs-uploads:
     name: nexus-httpdocs-uploads
+  nexus-storage:
+    name: nexus-storage
+  nexus-bootstrap-cache:
+    name: nexus-bootstrap-cache
 
 # =============================================================================
 # Networks (Isolated - does NOT connect to external projects)

@@ -9,6 +9,12 @@ namespace Nexus\Core;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
+/**
+ *  Use AppCoreMenuGenerator instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreMenuGenerator instead. Maintained for backward compatibility.
+ */
 class MenuGenerator
 {
     /**

@@ -12,6 +12,12 @@ namespace Nexus\Core;
  * Provides secure encryption/decryption of TOTP secrets stored in the database.
  * Uses AES-256-GCM which provides both confidentiality and authenticity.
  */
+/**
+ *  Use AppCoreTotpEncryption instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreTotpEncryption instead. Maintained for backward compatibility.
+ */
 class TotpEncryption
 {
     private const CIPHER = 'aes-256-gcm';

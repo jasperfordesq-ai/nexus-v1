@@ -2,13 +2,16 @@
 # =============================================================================
 # Project NEXUS - Safe Production Deploy Script (Enhanced)
 # =============================================================================
-# Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status]
+# Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status] [--migrate]
 #
 # Modes:
 #   quick     - Git pull + rebuild frontend + restart all (DEFAULT)
 #   full      - Git pull + rebuild ALL containers (--no-cache)
 #   rollback  - Rollback to last successful deploy (full rebuild)
 #   status    - Show current deployment status (no changes)
+#
+# Flags:
+#   --migrate - Also run `php artisan migrate --force` (Laravel migrations)
 #
 # Features:
 #   - Rollback capability (saves last successful commit)
@@ -472,6 +475,56 @@ run_pending_migrations() {
     return 0
 }
 
+# --- Laravel artisan cache optimization ---
+# Clears and rebuilds config/route/event caches inside the PHP container.
+# Safe to call even if artisan does not exist yet (guards with -f check).
+run_laravel_cache() {
+    log_step "=== Laravel Cache Optimization ==="
+
+    if ! docker exec nexus-php-app test -f /var/www/html/artisan 2>/dev/null; then
+        log_info "artisan not found — skipping Laravel cache steps"
+        return 0
+    fi
+
+    # Clear stale caches first
+    log_info "Clearing Laravel caches..."
+    docker exec nexus-php-app php /var/www/html/artisan config:clear 2>&1 | tee -a "$LOG_FILE" || true
+    docker exec nexus-php-app php /var/www/html/artisan route:clear 2>&1 | tee -a "$LOG_FILE" || true
+    docker exec nexus-php-app php /var/www/html/artisan event:clear 2>&1 | tee -a "$LOG_FILE" || true
+    docker exec nexus-php-app php /var/www/html/artisan view:clear 2>&1 | tee -a "$LOG_FILE" || true
+
+    # Rebuild caches for production
+    log_info "Rebuilding Laravel caches..."
+    docker exec nexus-php-app php /var/www/html/artisan config:cache 2>&1 | tee -a "$LOG_FILE" || true
+    docker exec nexus-php-app php /var/www/html/artisan route:cache 2>&1 | tee -a "$LOG_FILE" || true
+    docker exec nexus-php-app php /var/www/html/artisan event:cache 2>&1 | tee -a "$LOG_FILE" || true
+
+    # Ensure storage:link exists
+    docker exec nexus-php-app php /var/www/html/artisan storage:link 2>&1 | tee -a "$LOG_FILE" || true
+
+    log_ok "Laravel caches rebuilt"
+}
+
+# --- Laravel artisan migrate (optional, behind --migrate flag) ---
+# Runs `php artisan migrate --force` inside the PHP container.
+# Only called when LARAVEL_MIGRATE=1 is set or --migrate flag is passed.
+run_laravel_artisan_migrate() {
+    log_step "=== Laravel Artisan Migrations ==="
+
+    if ! docker exec nexus-php-app test -f /var/www/html/artisan 2>/dev/null; then
+        log_info "artisan not found — skipping Laravel migrations"
+        return 0
+    fi
+
+    log_info "Running php artisan migrate --force..."
+    if docker exec nexus-php-app php /var/www/html/artisan migrate --force 2>&1 | tee -a "$LOG_FILE"; then
+        log_ok "Laravel artisan migrations completed"
+    else
+        log_err "Laravel artisan migrate failed"
+        return 1
+    fi
+}
+
 # --- Deployment modes ---
 deploy_quick() {
     log_step "=== Quick Deployment (Git Pull + Rebuild Frontend + Restart) ==="
@@ -526,6 +579,9 @@ deploy_quick() {
     log_info "Restarting PHP container (OPCache clear)..."
     docker restart nexus-php-app
     log_ok "All containers updated"
+
+    # Laravel cache optimization
+    run_laravel_cache
 }
 
 deploy_full() {
@@ -573,6 +629,9 @@ deploy_full() {
     docker compose up -d --force-recreate
 
     log_ok "Full rebuild complete"
+
+    # Laravel cache optimization
+    run_laravel_cache
 }
 
 rollback_deployment() {
@@ -702,8 +761,17 @@ echo "  Started: $(date '+%Y-%m-%d %H:%M:%S')"      | tee -a "$LOG_FILE"
 echo "============================================" | tee -a "$LOG_FILE"
 echo "" | tee -a "$LOG_FILE"
 
-# Parse mode
+# Parse mode and flags
 MODE="${1:-quick}"
+LARAVEL_MIGRATE="${LARAVEL_MIGRATE:-0}"
+
+# Check for --migrate flag in remaining args
+shift 2>/dev/null || true
+for arg in "$@"; do
+    case "$arg" in
+        --migrate) LARAVEL_MIGRATE=1 ;;
+    esac
+done
 
 # Handle status mode (no lock needed)
 if [ "$MODE" = "status" ]; then
@@ -735,10 +803,18 @@ case "$MODE" in
         ;;
     *)
         log_err "Invalid mode: $MODE"
-        log_info "Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status]"
+        log_info "Usage: sudo bash scripts/safe-deploy.sh [quick|full|rollback|status] [--migrate]"
         exit 1
         ;;
 esac
+
+# Run Laravel artisan migrate if requested (--migrate flag or LARAVEL_MIGRATE=1)
+if [ "$LARAVEL_MIGRATE" = "1" ]; then
+    if ! run_laravel_artisan_migrate; then
+        log_err "Laravel artisan migration failed — consider rollback"
+        exit 1
+    fi
+fi
 
 # Verify production images (catches dev-on-prod bug)
 if ! verify_production_images; then

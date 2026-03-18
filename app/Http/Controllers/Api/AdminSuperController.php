@@ -81,18 +81,14 @@ class AdminSuperController extends BaseApiController
             );
         }
 
-        // Best-effort session sync for any legacy code that reads $_SESSION
+        // Best-effort session sync for any legacy code that reads session data
         try {
-            if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
-                @session_start();
-            }
-            if (session_status() === PHP_SESSION_ACTIVE) {
-                $_SESSION['user_id'] = $userId;
-                $_SESSION['tenant_id'] = $access['tenant_id'];
-                $_SESSION['user_role'] = 'admin';
-                $_SESSION['is_super_admin'] = 1;
-                $_SESSION['is_tenant_super_admin'] = 1;
-            }
+            $session = request()->session();
+            $session->put('user_id', $userId);
+            $session->put('tenant_id', $access['tenant_id']);
+            $session->put('user_role', 'admin');
+            $session->put('is_super_admin', 1);
+            $session->put('is_tenant_super_admin', 1);
         } catch (\Throwable $e) {
             // Session sync is best-effort — API works without it
         }

@@ -8,6 +8,12 @@ namespace Nexus\Core;
 
 use Nexus\Admin\WebPConverter;
 
+/**
+ *  Use AppCoreImageUploader instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreImageUploader instead. Maintained for backward compatibility.
+ */
 class ImageUploader
 {
     private static $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];

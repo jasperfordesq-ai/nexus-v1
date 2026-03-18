@@ -357,12 +357,12 @@ class FederationController extends BaseApiController
         $isExternal = !empty($auth['platform_id']);
         $db = DB::getPdo();
 
-        $query = $_GET['q'] ?? '';
-        $timebankId = isset($_GET['timebank_id']) ? (int) $_GET['timebank_id'] : null;
-        $skills = !empty($_GET['skills']) ? explode(',', $_GET['skills']) : [];
-        $location = $_GET['location'] ?? '';
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-        $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 20)));
+        $query = request()->query('q', '');
+        $timebankId = request()->query('timebank_id') !== null ? (int) request()->query('timebank_id') : null;
+        $skills = !empty(request()->query('skills')) ? explode(',', request()->query('skills')) : [];
+        $location = request()->query('location', '');
+        $page = max(1, (int) request()->query('page', 1));
+        $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
 
         if ($isExternal) {
             $sql = "SELECT SQL_CALC_FOUND_ROWS u.id, u.username, u.first_name, u.last_name, u.avatar_url as avatar, u.location, u.bio, u.skills, u.created_at, u.tenant_id, fus.service_reach, t.name as timebank_name
@@ -466,12 +466,12 @@ class FederationController extends BaseApiController
         $isExternal = !empty($auth['platform_id']);
         $db = DB::getPdo();
 
-        $query = $_GET['q'] ?? '';
-        $type = $_GET['type'] ?? '';
-        $timebankId = isset($_GET['timebank_id']) ? (int) $_GET['timebank_id'] : null;
-        $category = $_GET['category'] ?? '';
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-        $perPage = min(100, max(1, (int) ($_GET['per_page'] ?? 20)));
+        $query = request()->query('q', '');
+        $type = request()->query('type', '');
+        $timebankId = request()->query('timebank_id') !== null ? (int) request()->query('timebank_id') : null;
+        $category = request()->query('category', '');
+        $page = max(1, (int) request()->query('page', 1));
+        $perPage = min(100, max(1, (int) request()->query('per_page', 20)));
 
         if ($isExternal) {
             $sql = "SELECT SQL_CALC_FOUND_ROWS l.id, l.title, l.description, l.type, l.category, l.price as rate, l.created_at, l.user_id, u.first_name, u.last_name, u.avatar_url as avatar, l.tenant_id, t.name as timebank_name
@@ -560,7 +560,7 @@ class FederationController extends BaseApiController
 
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = request()->json()->all();
         $db = DB::getPdo();
 
         foreach (['recipient_id', 'subject', 'body', 'sender_id'] as $field) {
@@ -619,7 +619,7 @@ class FederationController extends BaseApiController
 
         $partnerTenantId = $auth['tenant_id'];
         $isExternal = !empty($auth['platform_id']);
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = request()->json()->all();
         $db = DB::getPdo();
 
         foreach (['recipient_id', 'amount', 'description', 'sender_id'] as $field) {
@@ -682,9 +682,9 @@ class FederationController extends BaseApiController
     /** POST /api/v1/federation/test-webhook */
     public function testWebhook(): JsonResponse
     {
-        $platformId = $_SERVER['HTTP_X_FEDERATION_PLATFORM_ID'] ?? '';
-        $timestamp = $_SERVER['HTTP_X_FEDERATION_TIMESTAMP'] ?? '';
-        $signature = $_SERVER['HTTP_X_FEDERATION_SIGNATURE'] ?? '';
+        $platformId = request()->header('X-Federation-Platform-Id', '');
+        $timestamp = request()->header('X-Federation-Timestamp', '');
+        $signature = request()->header('X-Federation-Signature', '');
 
         if (empty($platformId) || empty($timestamp) || empty($signature)) {
             return $this->fedError(400, 'Missing required headers', 'MISSING_HEADERS');
@@ -707,9 +707,9 @@ class FederationController extends BaseApiController
         if (!$partner) return $this->fedError(404, 'Platform not found', 'PLATFORM_NOT_FOUND');
         if (empty($partner['signing_secret'])) return $this->fedError(400, 'HMAC signing not configured for this platform', 'SIGNING_NOT_CONFIGURED');
 
-        $method = $_SERVER['REQUEST_METHOD'];
-        $path = $_SERVER['REQUEST_URI'];
-        $body = file_get_contents('php://input') ?: '';
+        $method = request()->method();
+        $path = request()->getRequestUri();
+        $body = request()->getContent() ?: '';
         $stringToSign = implode("\n", [$method, $path, $timestamp, $body]);
         $expectedSignature = hash_hmac('sha256', $stringToSign, $partner['signing_secret']);
         $signatureValid = hash_equals($expectedSignature, $signature);

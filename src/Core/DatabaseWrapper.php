@@ -13,6 +13,12 @@ namespace Nexus\Core;
  * tenant isolation. It prevents the "Missing WHERE Clause" vulnerability by
  * ensuring every query is scoped to the current tenant ID.
  */
+/**
+ *  Use AppCoreDatabaseWrapper instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreDatabaseWrapper instead. Maintained for backward compatibility.
+ */
 class DatabaseWrapper
 {
     /**

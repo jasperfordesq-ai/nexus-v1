@@ -16,7 +16,11 @@ class ResolveTenant
     public function handle(Request $request, Closure $next): Response
     {
         if (!TenantContext::getId()) {
-            TenantContext::resolve();
+            try {
+                TenantContext::resolve();
+            } catch (\Throwable $e) {
+                return response()->json(['error' => 'Unable to resolve tenant'], 400);
+            }
         }
         return $next($request);
     }

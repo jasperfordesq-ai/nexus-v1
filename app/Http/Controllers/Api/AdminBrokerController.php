@@ -51,10 +51,11 @@ class AdminBrokerController extends BaseApiController
         if ($user) {
             return $user;
         }
-        if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
+        $userId = \Illuminate\Support\Facades\Auth::id() ?? $this->getOptionalUserId();
+        if ($userId) {
             $row = DB::selectOne(
                 "SELECT id, role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-                [(int)$_SESSION['user_id']]
+                [$userId]
             );
             if ($row) {
                 return $row;

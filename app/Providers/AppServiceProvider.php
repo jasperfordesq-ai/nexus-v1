@@ -10,8 +10,10 @@ use App\Models\Category;
 use App\Models\Connection;
 use App\Models\Event;
 use App\Models\EventRsvp;
+use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Goal;
+use App\Models\GoalTemplate;
 use App\Models\Group;
 use App\Models\Listing;
 use App\Models\Message;
@@ -318,7 +320,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(FeedService::class, function ($app) {
-            return new FeedService(new FeedPost());
+            return new FeedService(new FeedActivity(), new FeedPost());
         });
 
         // --- New services ---
@@ -864,7 +866,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(GoalTemplateService::class, function ($app) {
-            return new GoalTemplateService();
+            return new GoalTemplateService(new GoalTemplate());
         });
 
         $this->app->singleton(GroupAchievementService::class, function ($app) {

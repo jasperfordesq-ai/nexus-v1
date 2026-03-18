@@ -18,8 +18,8 @@ class Gamification extends Model
 
     // Legacy Gamification model is a utility class that updates users.points
     // There is no dedicated gamification table — XP is tracked on the users table
-    // This model exists as a placeholder for future gamification_actions table
-    protected $table = 'users';
+    // This model maps to the gamification_actions table for action logging
+    protected $table = 'gamification_actions';
 
     protected $fillable = [
         'tenant_id',

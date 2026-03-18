@@ -20,6 +20,9 @@ use Nexus\Services\TokenService;
  * and getAuthenticatedUserRole() methods to access user data instead of
  * reading from $_SESSION directly.
  */
+/**
+ * @deprecated Use AppCoreApiAuth instead. Maintained for backward compatibility.
+ */
 trait ApiAuth
 {
     private ?int $authenticatedUserId = null;

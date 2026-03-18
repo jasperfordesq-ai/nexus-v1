@@ -9,6 +9,12 @@ namespace Nexus\Core;
 use PDO;
 use PDOException;
 
+/**
+ *  Use AppCoreDatabase instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreDatabase instead. Maintained for backward compatibility.
+ */
 class Database
 {
     private static $instance = null;
