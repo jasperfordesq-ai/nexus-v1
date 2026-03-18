@@ -49,9 +49,9 @@ Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigContro
 // ============================================
 
 // ============================================
-// Authenticated routes (controllers also check auth internally)
+// Authenticated routes — auth enforced by controllers via $this->requireAuth()
+// TODO: Add Route::middleware('auth:sanctum') once Sanctum token migration is complete
 // ============================================
-Route::middleware('auth:api')->group(function () {
 
 // MIGRATED ROUTES — Exchanges
 // Source: httpdocs/routes/exchanges.php
@@ -482,12 +482,11 @@ Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController:
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
 
 // ============================================
-}); // end authenticated routes
 
 // ============================================
-// Admin routes (auth:api required)
+// Admin routes — auth enforced by controllers via $this->requireAdmin()
+// TODO: Add Route::middleware(['auth:sanctum', 'admin']) once Sanctum migration is complete
 // ============================================
-Route::middleware('auth:api')->group(function () {
 
 // MIGRATED ROUTES — Admin API (Dashboard, Users, Listings, Config, Cache, Jobs, Federation, CRM, Super Admin)
 // Source: httpdocs/routes/admin-api.php
@@ -992,7 +991,6 @@ Route::get('/v2/admin/crm/export/tasks', [\App\Http\Controllers\Api\AdminCrmCont
 Route::get('/v2/admin/crm/export/dashboard', [\App\Http\Controllers\Api\AdminCrmController::class, 'exportDashboard']);
 
 // ============================================
-}); // end admin routes
 
 // ============================================
 // Public routes (auth, CSRF, VAPID — no auth required)
@@ -1014,9 +1012,9 @@ Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'get
 Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
 
 // ============================================
-// Authenticated misc/legacy/federation routes
+// Misc/legacy/federation routes — auth enforced by controllers internally
+// TODO: Add Route::middleware('auth:sanctum') once Sanctum migration is complete
 // ============================================
-Route::middleware('auth:api')->group(function () {
 
 // MIGRATED ROUTES — Misc API (Social, Auth, Push, AI, Menus, Wallet Features, Events, Volunteering, Ideation, Matching)
 // Source: httpdocs/routes/misc-api.php
@@ -1390,4 +1388,3 @@ Route::post('/v1/federation/messages', [\App\Http\Controllers\Api\FederationCont
 Route::post('/v1/federation/transactions', [\App\Http\Controllers\Api\FederationController::class, 'createTransaction']);
 Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationController::class, 'oauthToken']);
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
-}); // end authenticated misc routes
