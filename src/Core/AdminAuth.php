@@ -18,6 +18,12 @@ namespace Nexus\Core;
  * 5. Newsletter Admin (role=newsletter_admin) - Newsletter module only
  * 6. Member (role=member) - Standard user
  */
+/**
+ *  Use AppCoreAdminAuth instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreAdminAuth instead. Maintained for backward compatibility.
+ */
 class AdminAuth
 {
     /**

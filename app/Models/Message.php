@@ -183,7 +183,7 @@ class Message extends Model
 HTML;
 
             if ($frequency === 'instant') {
-                $mailer = new \Nexus\Core\Mailer();
+                $mailer = new \App\Core\Mailer();
                 $mailer->send($receiver->email, "New Message from {$senderName}", $htmlBody);
             } else {
                 // Queue for daily digest

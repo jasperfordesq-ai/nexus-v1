@@ -6,6 +6,12 @@
 
 namespace Nexus\Core;
 
+/**
+ *  Use AppCorenv instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCorenv instead. Maintained for backward compatibility.
+ */
 class Env
 {
     private static $path;

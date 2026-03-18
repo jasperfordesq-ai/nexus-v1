@@ -17,6 +17,12 @@ use GuzzleHttp\Exception\GuzzleException;
  * Provides secure access to secrets stored in HashiCorp Vault,
  * with support for AppRole authentication, caching, and fallback mechanisms.
  */
+/**
+ *  Use AppCoreVaultClient instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreVaultClient instead. Maintained for backward compatibility.
+ */
 class VaultClient
 {
     private Client $httpClient;

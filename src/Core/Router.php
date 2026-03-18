@@ -6,6 +6,12 @@
 
 namespace Nexus\Core;
 
+/**
+ *  Use AppCoreRouter instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreRouter instead. Maintained for backward compatibility.
+ */
 class Router
 {
     protected $routes = [];

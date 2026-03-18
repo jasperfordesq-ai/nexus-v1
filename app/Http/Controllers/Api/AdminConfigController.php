@@ -448,6 +448,7 @@ class AdminConfigController extends BaseApiController
                     $GLOBALS['argv'] = [basename($script), $args];
                     $GLOBALS['argc'] = count($GLOBALS['argv']);
 
+                    // TODO: Replace script inclusion with Artisan command or service call
                     ob_start();
                     try {
                         include $script;
@@ -489,25 +490,26 @@ class AdminConfigController extends BaseApiController
                 ];
 
                 if (isset($methodMap[$jobSlug])) {
+                    // TODO: Replace legacy CronController delegation with direct service calls
+                    // once App\Services equivalents exist for all 12 cron jobs.
                     $controller = new \Nexus\Controllers\CronController();
                     $method = $methodMap[$jobSlug];
                     ob_start();
-                    request()->query->set('key', $cronKey); // also set $_GET for legacy CronController
+                    request()->query->set('key', $cronKey);
                     $_GET['key'] = $cronKey;
                     $controller->$method();
                     request()->query->remove('key');
                     unset($_GET['key']);
                     $output = ob_get_clean() ?: 'Completed (no output)';
                 } elseif (isset($adminMethodMap[$jobSlug])) {
-                    $controller = new \Nexus\Controllers\AdminController();
-                    $method = $adminMethodMap[$jobSlug];
-                    ob_start();
-                    request()->query->set('key', $cronKey); // also set $_GET for legacy CronController
-                    $_GET['key'] = $cronKey;
-                    $controller->$method();
-                    request()->query->remove('key');
-                    unset($_GET['key']);
-                    $output = ob_get_clean() ?: 'Completed (no output)';
+                    // Direct service call — no legacy controller delegation
+                    if ($jobSlug === 'update-featured-groups') {
+                        $stats = \App\Services\SmartGroupRankingService::updateAllFeaturedGroups();
+                        $output = 'Featured groups updated. Stats: ' . json_encode($stats);
+                    } else {
+                        $output = "No direct implementation for admin job: {$jobSlug}";
+                        $status = 'error';
+                    }
                 } else {
                     $output = "No method mapping for job: {$jobSlug}";
                     $status = 'error';

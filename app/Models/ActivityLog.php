@@ -44,7 +44,7 @@ class ActivityLog extends Model
         ?string $entityType = null,
         ?int $entityId = null
     ): int {
-        $ip = \Nexus\Core\ClientIp::get();
+        $ip = \App\Core\ClientIp::get();
 
         $id = DB::table('activity_log')->insertGetId([
             'user_id' => $userId,

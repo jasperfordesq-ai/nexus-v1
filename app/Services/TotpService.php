@@ -10,7 +10,7 @@ use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use OTPHP\TOTP;
-use Nexus\Core\TotpEncryption;
+use App\Core\TotpEncryption;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;

@@ -397,7 +397,7 @@ class ListingService
         DB::table('user_saved_listings')->insertOrIgnore([
             'user_id'    => $userId,
             'listing_id' => $listingId,
-            'tenant_id'  => \Nexus\Core\TenantContext::getId(),
+            'tenant_id'  => \App\Core\TenantContext::getId(),
         ]);
 
         return true;

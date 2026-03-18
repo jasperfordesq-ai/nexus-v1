@@ -5,38 +5,22 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Project NEXUS - Route Definitions
- * ---------------------------------
- * Routes are split into domain-specific files under routes/.
- * Each partial uses the $router instance from this scope.
+ * Project NEXUS - Legacy Route Definitions (DEPRECATED)
+ * -----------------------------------------------------
+ * All API routes have been migrated to Laravel (routes/api.php).
+ * The Laravel bridge in index.php handles routing first.
+ * This file exists only as a fallback for any routes not yet
+ * matched by Laravel — it should match nothing in normal operation.
  *
- * IMPORTANT: Order matters — literal routes must come before
- * wildcard {id} routes in the same path prefix.
+ * @deprecated All routes migrated to routes/api.php
  */
 
 use Nexus\Core\Router;
-use Nexus\Core\TenantContext;
 
 $router = new Router();
 
-// ============================================
-// Route partials (loaded in dependency order)
-// ============================================
+// All route partials have been removed — routes are in routes/api.php
+// Legacy route files (httpdocs/routes/*.php) deleted as of 2026-03-18
 
-require __DIR__ . '/routes/super-admin.php';
-require __DIR__ . '/routes/federation-api-v1.php';
-require __DIR__ . '/routes/legacy-api.php';
-require __DIR__ . '/routes/tenant-bootstrap.php';
-require __DIR__ . '/routes/listings.php';
-require __DIR__ . '/routes/users.php';
-require __DIR__ . '/routes/messages.php';
-require __DIR__ . '/routes/exchanges.php';
-require __DIR__ . '/routes/events.php';
-require __DIR__ . '/routes/groups.php';
-require __DIR__ . '/routes/social.php';
-require __DIR__ . '/routes/content.php';
-require __DIR__ . '/routes/admin-api.php';
-require __DIR__ . '/routes/misc-api.php';
-
-// DISPATCH
+// DISPATCH (catches any unmatched request — should be a no-op)
 $router->dispatch();
