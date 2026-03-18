@@ -129,6 +129,7 @@ class ImageUploader
     private static function convertToWebP(string $imagePath): ?array
     {
         try {
+            if (!class_exists(WebPConverter::class)) { return null; }
             $converter = new WebPConverter();
 
             if (!$converter->isCwebpAvailable()) {

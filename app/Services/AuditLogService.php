@@ -120,6 +120,9 @@ class AuditLogService
      */
     public static function log($action, $organizationId = null, $userId = null, $details = [], $targetUserId = null)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::log($action, $organizationId, $userId, $details, $targetUserId);
     }
 
@@ -128,6 +131,9 @@ class AuditLogService
      */
     public static function logAdminAction($action, $adminUserId, $targetUserId = null, $details = [])
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logAdminAction($action, $adminUserId, $targetUserId, $details);
     }
 
@@ -136,6 +142,9 @@ class AuditLogService
      */
     public static function logUserUpdated($adminUserId, $targetUserId, $changedFields = [])
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserUpdated($adminUserId, $targetUserId, $changedFields);
     }
 
@@ -144,6 +153,9 @@ class AuditLogService
      */
     public static function logAdminRoleChanged($adminUserId, $targetUserId, $oldRole, $newRole)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logAdminRoleChanged($adminUserId, $targetUserId, $oldRole, $newRole);
     }
 
@@ -152,6 +164,9 @@ class AuditLogService
      */
     public static function logUserCreated($adminUserId, $targetUserId, $targetEmail = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserCreated($adminUserId, $targetUserId, $targetEmail);
     }
 
@@ -160,6 +175,9 @@ class AuditLogService
      */
     public static function logUserApproved($adminUserId, $targetUserId, $targetEmail = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserApproved($adminUserId, $targetUserId, $targetEmail);
     }
 
@@ -168,6 +186,9 @@ class AuditLogService
      */
     public static function logUserSuspended($adminUserId, $targetUserId, $reason = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserSuspended($adminUserId, $targetUserId, $reason);
     }
 
@@ -176,6 +197,9 @@ class AuditLogService
      */
     public static function logUserBanned($adminUserId, $targetUserId, $reason = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserBanned($adminUserId, $targetUserId, $reason);
     }
 
@@ -184,6 +208,9 @@ class AuditLogService
      */
     public static function logUserReactivated($adminUserId, $targetUserId, $previousStatus = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserReactivated($adminUserId, $targetUserId, $previousStatus);
     }
 
@@ -192,6 +219,9 @@ class AuditLogService
      */
     public static function logUserDeleted($adminUserId, $targetUserId, $targetEmail = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserDeleted($adminUserId, $targetUserId, $targetEmail);
     }
 
@@ -200,6 +230,9 @@ class AuditLogService
      */
     public static function log2faReset($adminUserId, $targetUserId, $reason = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::log2faReset($adminUserId, $targetUserId, $reason);
     }
 
@@ -208,6 +241,9 @@ class AuditLogService
      */
     public static function logUserImpersonated($adminUserId, $targetUserId, $targetEmail = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logUserImpersonated($adminUserId, $targetUserId, $targetEmail);
     }
 
@@ -216,6 +252,9 @@ class AuditLogService
      */
     public static function logSuperAdminRevoked($adminUserId, $targetUserId, $targetEmail = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logSuperAdminRevoked($adminUserId, $targetUserId, $targetEmail);
     }
 
@@ -224,6 +263,9 @@ class AuditLogService
      */
     public static function logBulkImport($adminUserId, $importedCount, $skippedCount, $totalRows)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logBulkImport($adminUserId, $importedCount, $skippedCount, $totalRows);
     }
 
@@ -234,6 +276,9 @@ class AuditLogService
      */
     public static function logTransaction($organizationId, $userId, $type, $amount, $recipientId = null, $description = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logTransaction($organizationId, $userId, $type, $amount, $recipientId, $description);
     }
 
@@ -242,6 +287,9 @@ class AuditLogService
      */
     public static function logTransferRequest($organizationId, $requesterId, $recipientId, $amount, $description = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logTransferRequest($organizationId, $requesterId, $recipientId, $amount, $description);
     }
 
@@ -250,6 +298,9 @@ class AuditLogService
      */
     public static function logTransferApproval($organizationId, $approverId, $requestId, $recipientId, $amount)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logTransferApproval($organizationId, $approverId, $requestId, $recipientId, $amount);
     }
 
@@ -258,6 +309,9 @@ class AuditLogService
      */
     public static function logTransferRejection($organizationId, $approverId, $requestId, $recipientId, $reason = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logTransferRejection($organizationId, $approverId, $requestId, $recipientId, $reason);
     }
 
@@ -266,6 +320,9 @@ class AuditLogService
      */
     public static function logMemberAdded($organizationId, $addedBy, $memberId, $role)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logMemberAdded($organizationId, $addedBy, $memberId, $role);
     }
 
@@ -274,6 +331,9 @@ class AuditLogService
      */
     public static function logMemberRemoved($organizationId, $removedBy, $memberId, $reason = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logMemberRemoved($organizationId, $removedBy, $memberId, $reason);
     }
 
@@ -282,6 +342,9 @@ class AuditLogService
      */
     public static function logRoleChanged($organizationId, $changedBy, $memberId, $oldRole, $newRole)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logRoleChanged($organizationId, $changedBy, $memberId, $oldRole, $newRole);
     }
 
@@ -290,6 +353,9 @@ class AuditLogService
      */
     public static function logOwnershipTransfer($organizationId, $oldOwnerId, $newOwnerId)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logOwnershipTransfer($organizationId, $oldOwnerId, $newOwnerId);
     }
 
@@ -298,6 +364,9 @@ class AuditLogService
      */
     public static function logSettingsChanged($organizationId, $userId, $changes)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logSettingsChanged($organizationId, $userId, $changes);
     }
 
@@ -306,6 +375,9 @@ class AuditLogService
      */
     public static function logLimitsChanged($organizationId, $userId, $oldLimits, $newLimits)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logLimitsChanged($organizationId, $userId, $oldLimits, $newLimits);
     }
 
@@ -314,6 +386,9 @@ class AuditLogService
      */
     public static function logBulkApproval($organizationId, $approverId, $requestIds, $successCount, $failCount)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logBulkApproval($organizationId, $approverId, $requestIds, $successCount, $failCount);
     }
 
@@ -322,6 +397,9 @@ class AuditLogService
      */
     public static function logBulkRejection($organizationId, $approverId, $requestIds, $successCount, $failCount, $reason = '')
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return null;
+        }
         return LegacyAuditLogService::logBulkRejection($organizationId, $approverId, $requestIds, $successCount, $failCount, $reason);
     }
 
@@ -332,6 +410,9 @@ class AuditLogService
      */
     public static function getLog($organizationId, $filters = [], $limit = 50, $offset = 0)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return [];
+        }
         return LegacyAuditLogService::getLog($organizationId, $filters, $limit, $offset);
     }
 
@@ -340,6 +421,9 @@ class AuditLogService
      */
     public static function getLogCount($organizationId, $filters = [])
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return 0;
+        }
         return LegacyAuditLogService::getLogCount($organizationId, $filters);
     }
 
@@ -348,6 +432,9 @@ class AuditLogService
      */
     public static function getActionSummary($organizationId, $days = 30)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return [];
+        }
         return LegacyAuditLogService::getActionSummary($organizationId, $days);
     }
 
@@ -356,6 +443,9 @@ class AuditLogService
      */
     public static function getUserActivity($userId, $limit = 20)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return [];
+        }
         return LegacyAuditLogService::getUserActivity($userId, $limit);
     }
 
@@ -364,6 +454,9 @@ class AuditLogService
      */
     public static function getActionLabel($action)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return $action;
+        }
         return LegacyAuditLogService::getActionLabel($action);
     }
 
@@ -372,6 +465,9 @@ class AuditLogService
      */
     public static function exportToCSV($organizationId, $filters = [])
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return '';
+        }
         return LegacyAuditLogService::exportToCSV($organizationId, $filters);
     }
 
@@ -382,6 +478,9 @@ class AuditLogService
      */
     public static function cleanup($daysToKeep = 365)
     {
+        if (!class_exists(LegacyAuditLogService::class)) {
+            return 0;
+        }
         return LegacyAuditLogService::cleanup($daysToKeep);
     }
 }

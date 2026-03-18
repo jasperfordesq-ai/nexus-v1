@@ -16,67 +16,51 @@ use Nexus\Helpers\UrlHelper as LegacyUrlHelper;
  */
 class UrlHelper
 {
-    /**
-     * Validate and sanitize a redirect URL to prevent open redirect attacks.
-     */
     public static function safeRedirect(?string $url, string $fallback = '/dashboard'): string
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return $fallback; }
         return LegacyUrlHelper::safeRedirect($url, $fallback);
     }
 
-    /**
-     * Get safe redirect URL from HTTP_REFERER.
-     */
     public static function safeReferer(string $fallback = '/dashboard'): string
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return $fallback; }
         return LegacyUrlHelper::safeReferer($fallback);
     }
 
-    /**
-     * Check if a host is in the allowed list.
-     */
     public static function isAllowedHost(string $host): bool
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return false; }
         return LegacyUrlHelper::isAllowedHost($host);
     }
 
-    /**
-     * Add a host to the allowed list dynamically.
-     */
     public static function addAllowedHost(string $host): void
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return; }
         LegacyUrlHelper::addAllowedHost($host);
     }
 
-    /**
-     * Get the base URL for the current tenant/request.
-     */
     public static function getBaseUrl(): string
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return ''; }
         return LegacyUrlHelper::getBaseUrl();
     }
 
-    /**
-     * Convert a relative URL to an absolute URL.
-     */
     public static function absolute(?string $url): ?string
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return $url; }
         return LegacyUrlHelper::absolute($url);
     }
 
-    /**
-     * Convert avatar URL to absolute, with fallback to default avatar.
-     */
     public static function absoluteAvatar(?string $avatarUrl, string $default = '/assets/img/defaults/default_avatar.png'): string
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return $avatarUrl ?? $default; }
         return LegacyUrlHelper::absoluteAvatar($avatarUrl, $default);
     }
 
-    /**
-     * Convert an array of URLs to absolute URLs.
-     */
     public static function absoluteAll(array $urls): array
     {
+        if (!class_exists(LegacyUrlHelper::class)) { return $urls; }
         return LegacyUrlHelper::absoluteAll($urls);
     }
 }

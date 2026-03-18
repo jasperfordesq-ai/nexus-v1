@@ -15,17 +15,39 @@ use Nexus\Services\Identity\RegistrationPolicyService as LegacyService;
  */
 class RegistrationPolicyService
 {
-    /** Valid registration modes — mirrored from legacy */
-    public const MODES = LegacyService::MODES;
+    /** Valid registration modes (inlined — safe when legacy is removed) */
+    public const MODES = [
+        'open',
+        'open_with_approval',
+        'verified_identity',
+        'government_id',
+        'invite_only',
+        'waitlist',
+    ];
 
-    /** Valid verification levels — mirrored from legacy */
-    public const VERIFICATION_LEVELS = LegacyService::VERIFICATION_LEVELS;
+    /** Valid verification levels (inlined — safe when legacy is removed) */
+    public const VERIFICATION_LEVELS = [
+        'none',
+        'document_only',
+        'document_selfie',
+        'reusable_digital_id',
+        'manual_review',
+    ];
 
-    /** Valid post-verification actions — mirrored from legacy */
-    public const POST_VERIFICATION_ACTIONS = LegacyService::POST_VERIFICATION_ACTIONS;
+    /** Valid post-verification actions (inlined — safe when legacy is removed) */
+    public const POST_VERIFICATION_ACTIONS = [
+        'activate',
+        'admin_approval',
+        'limited_access',
+        'reject_on_fail',
+    ];
 
-    /** Valid fallback modes — mirrored from legacy */
-    public const FALLBACK_MODES = LegacyService::FALLBACK_MODES;
+    /** Valid fallback modes (inlined — safe when legacy is removed) */
+    public const FALLBACK_MODES = [
+        'none',
+        'admin_review',
+        'native_registration',
+    ];
 
     public function __construct()
     {
@@ -36,6 +58,9 @@ class RegistrationPolicyService
      */
     public function getPolicy(int $tenantId): ?array
     {
+        if (!class_exists(LegacyService::class)) {
+            return null;
+        }
         return LegacyService::getPolicy($tenantId);
     }
 
@@ -44,6 +69,9 @@ class RegistrationPolicyService
      */
     public function getEffectivePolicy(int $tenantId): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getEffectivePolicy($tenantId);
     }
 
@@ -54,6 +82,9 @@ class RegistrationPolicyService
      */
     public function upsertPolicy(int $tenantId, array $data): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::upsertPolicy($tenantId, $data);
     }
 
@@ -62,6 +93,9 @@ class RegistrationPolicyService
      */
     public function encryptConfig(array $config): string
     {
+        if (!class_exists(LegacyService::class)) {
+            return '';
+        }
         return LegacyService::encryptConfig($config);
     }
 
@@ -70,6 +104,9 @@ class RegistrationPolicyService
      */
     public function decryptConfig(string $encrypted): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::decryptConfig($encrypted);
     }
 }

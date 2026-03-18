@@ -24,6 +24,9 @@ class RegistrationOrchestrationService
      */
     public function processRegistration(int $userId, int $tenantId): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::processRegistration($userId, $tenantId);
     }
 
@@ -34,6 +37,9 @@ class RegistrationOrchestrationService
      */
     public function initiateVerification(int $userId, int $tenantId): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::initiateVerification($userId, $tenantId);
     }
 
@@ -42,6 +48,9 @@ class RegistrationOrchestrationService
      */
     public function handleVerificationResult(int $sessionId, string $status, array $result): void
     {
+        if (!class_exists(LegacyService::class)) {
+            return;
+        }
         LegacyService::handleVerificationResult($sessionId, $status, $result);
     }
 
@@ -50,6 +59,9 @@ class RegistrationOrchestrationService
      */
     public function applyPostVerificationAction(int $userId, int $tenantId, string $verificationStatus): void
     {
+        if (!class_exists(LegacyService::class)) {
+            return;
+        }
         LegacyService::applyPostVerificationAction($userId, $tenantId, $verificationStatus);
     }
 
@@ -58,6 +70,9 @@ class RegistrationOrchestrationService
      */
     public function triggerFallback(int $userId, int $tenantId, string $reason): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::triggerFallback($userId, $tenantId, $reason);
     }
 
@@ -66,6 +81,9 @@ class RegistrationOrchestrationService
      */
     public function getRegistrationStatus(int $userId, int $tenantId): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::getRegistrationStatus($userId, $tenantId);
     }
 
@@ -76,6 +94,9 @@ class RegistrationOrchestrationService
      */
     public function adminReview(int $sessionId, int $adminId, string $decision): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::adminReview($sessionId, $adminId, $decision);
     }
 
@@ -84,6 +105,9 @@ class RegistrationOrchestrationService
      */
     public function sendVerificationReminders(): int
     {
+        if (!class_exists(LegacyService::class)) {
+            return 0;
+        }
         return LegacyService::sendVerificationReminders();
     }
 
@@ -92,6 +116,9 @@ class RegistrationOrchestrationService
      */
     public function expireAbandonedSessions(): int
     {
+        if (!class_exists(LegacyService::class)) {
+            return 0;
+        }
         return LegacyService::expireAbandonedSessions();
     }
 
@@ -100,6 +127,9 @@ class RegistrationOrchestrationService
      */
     public function purgeOldSessions(int $retentionDays = 180): int
     {
+        if (!class_exists(LegacyService::class)) {
+            return 0;
+        }
         return LegacyService::purgeOldSessions($retentionDays);
     }
 }

@@ -1236,10 +1236,9 @@ Route::get('/v2/events/series', [\App\Http\Controllers\Api\EventsController::cla
 Route::post('/v2/events/series', [\App\Http\Controllers\Api\EventsController::class, 'createSeries']);
 Route::get('/v2/events/series/{seriesId}', [\App\Http\Controllers\Api\EventsController::class, 'showSeries']);
 Route::put('/v2/events/{id}/recurring', [\App\Http\Controllers\Api\EventsController::class, 'updateRecurring']);
-Route::post('/v2/events/{id}/cancel', [\App\Http\Controllers\Api\EventsController::class, 'cancel']);
+// cancel duplicate removed — registered at line 86
 Route::get('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'waitlist']);
-Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'joinWaitlist']);
-Route::delete('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'leaveWaitlist']);
+// POST/DELETE waitlist duplicates removed — registered at lines 87-88
 Route::get('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'getReminders']);
 Route::put('/v2/events/{id}/reminders', [\App\Http\Controllers\Api\EventsController::class, 'updateReminders']);
 Route::get('/v2/events/{id}/attendance', [\App\Http\Controllers\Api\EventsController::class, 'getAttendance']);
@@ -1368,11 +1367,7 @@ Route::middleware('admin')->group(function () {
     Route::delete('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'unfeature']);
     Route::post('/v2/admin/listings/{id}/reject', [\App\Http\Controllers\Api\AdminListingsController::class, 'reject']);
 });
-Route::get('/v2/search/saved', [\App\Http\Controllers\Api\SearchController::class, 'savedSearches']);
-Route::post('/v2/search/saved', [\App\Http\Controllers\Api\SearchController::class, 'saveSearch']);
-Route::delete('/v2/search/saved/{id}', [\App\Http\Controllers\Api\SearchController::class, 'deleteSavedSearch']);
-Route::post('/v2/search/saved/{id}/run', [\App\Http\Controllers\Api\SearchController::class, 'runSavedSearch']);
-Route::get('/v2/search/trending', [\App\Http\Controllers\Api\SearchController::class, 'trending']);
+// search saved/trending duplicates removed — registered at lines 345-349
 Route::middleware('admin')->group(function () {
     Route::get('/v2/admin/search/analytics', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchAnalytics']);
     Route::get('/v2/admin/search/trending', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchTrending']);

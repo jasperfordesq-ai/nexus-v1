@@ -26,6 +26,9 @@ class InviteCodeService
      */
     public function generate(int $tenantId, int $createdBy, int $count = 1, ?int $maxUses = 1, ?string $expiresAt = null, ?string $note = null): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::generate($tenantId, $createdBy, $count, $maxUses, $expiresAt, $note);
     }
 
@@ -36,6 +39,9 @@ class InviteCodeService
      */
     public function validate(int $tenantId, string $code): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::validate($tenantId, $code);
     }
 
@@ -44,6 +50,9 @@ class InviteCodeService
      */
     public function redeem(int $tenantId, string $code, int $userId): bool
     {
+        if (!class_exists(LegacyService::class)) {
+            return false;
+        }
         return LegacyService::redeem($tenantId, $code, $userId);
     }
 
@@ -52,6 +61,9 @@ class InviteCodeService
      */
     public function listForTenant(int $tenantId, int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists(LegacyService::class)) {
+            return [];
+        }
         return LegacyService::listForTenant($tenantId, $limit, $offset);
     }
 
@@ -60,6 +72,9 @@ class InviteCodeService
      */
     public function deactivate(int $tenantId, int $codeId): bool
     {
+        if (!class_exists(LegacyService::class)) {
+            return false;
+        }
         return LegacyService::deactivate($tenantId, $codeId);
     }
 }

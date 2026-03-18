@@ -24,6 +24,9 @@ class IdentityProviderRegistry
      */
     public function register(\Nexus\Services\Identity\IdentityVerificationProviderInterface $provider): void
     {
+        if (!class_exists(LegacyRegistry::class)) {
+            return;
+        }
         LegacyRegistry::register($provider);
     }
 
@@ -34,6 +37,9 @@ class IdentityProviderRegistry
      */
     public function get(string $slug): \Nexus\Services\Identity\IdentityVerificationProviderInterface
     {
+        if (!class_exists(LegacyRegistry::class)) {
+            throw new \RuntimeException('Legacy IdentityProviderRegistry is not available');
+        }
         return LegacyRegistry::get($slug);
     }
 
@@ -42,6 +48,9 @@ class IdentityProviderRegistry
      */
     public function has(string $slug): bool
     {
+        if (!class_exists(LegacyRegistry::class)) {
+            return false;
+        }
         return LegacyRegistry::has($slug);
     }
 
@@ -52,6 +61,9 @@ class IdentityProviderRegistry
      */
     public function all(): array
     {
+        if (!class_exists(LegacyRegistry::class)) {
+            return [];
+        }
         return LegacyRegistry::all();
     }
 
@@ -62,6 +74,9 @@ class IdentityProviderRegistry
      */
     public function listForAdmin(): array
     {
+        if (!class_exists(LegacyRegistry::class)) {
+            return [];
+        }
         return LegacyRegistry::listForAdmin();
     }
 
@@ -70,6 +85,9 @@ class IdentityProviderRegistry
      */
     public function reset(): void
     {
+        if (!class_exists(LegacyRegistry::class)) {
+            return;
+        }
         LegacyRegistry::reset();
     }
 }
