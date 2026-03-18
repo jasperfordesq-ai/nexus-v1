@@ -472,6 +472,30 @@ run_pending_migrations() {
     return 0
 }
 
+# --- Laravel cache optimization ---
+run_laravel_cache() {
+    log_step "=== Laravel Cache Optimization ==="
+
+    if ! docker exec nexus-php-app test -f artisan 2>/dev/null; then
+        log_info "artisan not found — skipping Laravel cache commands"
+        return 0
+    fi
+
+    log_info "Clearing config cache..."
+    docker exec nexus-php-app php artisan config:clear 2>&1 | tee -a "$LOG_FILE" || true
+
+    log_info "Caching config..."
+    docker exec nexus-php-app php artisan config:cache 2>&1 | tee -a "$LOG_FILE" || true
+
+    log_info "Caching routes..."
+    docker exec nexus-php-app php artisan route:cache 2>&1 | tee -a "$LOG_FILE" || true
+
+    log_info "Creating storage symlink..."
+    docker exec nexus-php-app php artisan storage:link 2>&1 | tee -a "$LOG_FILE" || true
+
+    log_ok "Laravel cache optimization complete"
+}
+
 # --- Deployment modes ---
 deploy_quick() {
     log_step "=== Quick Deployment (Git Pull + Rebuild Frontend + Restart) ==="
@@ -526,6 +550,9 @@ deploy_quick() {
     log_info "Restarting PHP container (OPCache clear)..."
     docker restart nexus-php-app
     log_ok "All containers updated"
+
+    # Run Laravel cache optimization
+    run_laravel_cache
 }
 
 deploy_full() {
@@ -573,6 +600,9 @@ deploy_full() {
     docker compose up -d --force-recreate
 
     log_ok "Full rebuild complete"
+
+    # Run Laravel cache optimization
+    run_laravel_cache
 }
 
 rollback_deployment() {

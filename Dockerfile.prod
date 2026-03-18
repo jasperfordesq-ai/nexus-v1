@@ -183,6 +183,10 @@ RUN mkdir -p /var/www/html/httpdocs && \
 RUN mkdir -p /var/www/html/httpdocs/uploads \
     && chown -R www-data:www-data /var/www/html
 
+# Create Laravel storage directories
+RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
+
 # =============================================================================
 # Expose Port
 # =============================================================================
@@ -199,4 +203,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # Ensure upload dirs are writable by www-data at each startup (handles volume
 # re-mounts that reset ownership) then start Apache.
 # =============================================================================
-CMD ["sh", "-c", "chown -R www-data:www-data /var/www/html/httpdocs/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads 2>/dev/null; apache2-foreground"]
+CMD ["sh", "-c", "chown -R www-data:www-data /var/www/html/httpdocs/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads 2>/dev/null; if test -f artisan; then php artisan config:cache || true; php artisan route:cache || true; fi; apache2-foreground"]
