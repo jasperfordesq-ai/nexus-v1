@@ -85,11 +85,12 @@ class ListingService
             $query->where('category_id', (int) $filters['category_id']);
         }
 
-        // Category slug filter (resolve slug → id)
+        // Category slug filter (resolve slug → id, tenant-scoped)
         if (!empty($filters['category_slug'])) {
             $catId = DB::table('categories')
                 ->where('slug', $filters['category_slug'])
                 ->where('type', 'listings')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->value('id');
             if ($catId) {
                 $query->where('category_id', $catId);
@@ -226,11 +227,12 @@ class ListingService
             $query->where('category_id', (int) $filters['category_id']);
         }
 
-        // Category slug filter (resolve slug → id)
+        // Category slug filter (resolve slug → id, tenant-scoped)
         if (!empty($filters['category_slug'])) {
             $catId = DB::table('categories')
                 ->where('slug', $filters['category_slug'])
                 ->where('type', 'listings')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->value('id');
             if ($catId) {
                 $query->where('category_id', $catId);

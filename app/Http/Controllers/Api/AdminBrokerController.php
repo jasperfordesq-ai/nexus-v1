@@ -102,7 +102,7 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $pendingExchanges = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
         $unreviewedMessages = 0;
         try {
@@ -111,7 +111,7 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $unreviewedMessages = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
         $highRiskListings = 0;
         try {
@@ -120,7 +120,7 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $highRiskListings = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
         $monitoredUsers = 0;
         try {
@@ -129,7 +129,7 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $monitoredUsers = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
         $vettingPending = 0;
         $vettingExpiring = 0;
@@ -143,7 +143,7 @@ class AdminBrokerController extends BaseApiController
             );
             $vettingPending = (int) ($row->pending ?? 0);
             $vettingExpiring = (int) ($row->expiring ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
         $safeguardingAlerts = 0;
         try {
@@ -152,7 +152,7 @@ class AdminBrokerController extends BaseApiController
                 $tenantParams
             );
             $safeguardingAlerts = (int) ($row->cnt ?? 0);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
         $recentActivity = [];
         try {
@@ -173,7 +173,7 @@ class AdminBrokerController extends BaseApiController
                 $actParams
             );
             $recentActivity = array_map(fn($r) => (array)$r, $recentActivity);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
         return $this->respondWithData([
             'pending_exchanges' => $pendingExchanges,
@@ -318,7 +318,7 @@ class AdminBrokerController extends BaseApiController
                     [$id]
                 );
                 $history = array_map(fn($r) => (array)$r, $history);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
 
             $riskTag = null;
             if (!empty($exchange['listing_id'])) {
@@ -328,7 +328,7 @@ class AdminBrokerController extends BaseApiController
                         [$exchange['listing_id'], $exchangeTenantId]
                     );
                     $riskTag = $riskTagRow ? (array) $riskTagRow : null;
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('[AdminBroker] Dashboard query failed: ' . $e->getMessage()); }
             }
 
             return $this->respondWithData([

@@ -71,16 +71,30 @@ class MessageService
             ->orderByDesc('id')
             ->get();
 
-        // Append unread count per partner
-        $items = $messages->map(function (Message $msg) use ($userId) {
+        // Batch-fetch unread counts per partner (avoids N+1)
+        $partnerIds = $messages->map(function (Message $msg) use ($userId) {
+            return $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
+        })->unique()->values()->all();
+
+        $unreadCounts = [];
+        if (!empty($partnerIds)) {
+            $rows = DB::table('messages')
+                ->selectRaw('sender_id, COUNT(*) as cnt')
+                ->where('receiver_id', $userId)
+                ->where('is_read', false)
+                ->whereIn('sender_id', $partnerIds)
+                ->groupBy('sender_id')
+                ->get();
+            foreach ($rows as $row) {
+                $unreadCounts[(int) $row->sender_id] = (int) $row->cnt;
+            }
+        }
+
+        $items = $messages->map(function (Message $msg) use ($userId, $unreadCounts) {
             $data = $msg->toArray();
             $partnerId = $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
             $data['partner_id'] = $partnerId;
-            $data['unread_count'] = $this->message->newQuery()
-                ->where('sender_id', $partnerId)
-                ->where('receiver_id', $userId)
-                ->where('is_read', false)
-                ->count();
+            $data['unread_count'] = $unreadCounts[$partnerId] ?? 0;
             return $data;
         })->all();
 
