@@ -511,10 +511,7 @@ class FederationV2Controller extends BaseApiController
         $cursorId = $cursorParam ? $this->decodeCursor($cursorParam) : null;
 
         try {
-            $sql = "
-                SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
-                    u.location, u.tenant_id, t.name as tenant_name,
-                    fus.service_reach, fus.messaging_enabled_federated
+            $fromWhere = "
                 FROM users u
                 JOIN federation_user_settings fus ON fus.user_id = u.id
                 JOIN tenants t ON t.id = u.tenant_id
@@ -526,26 +523,26 @@ class FederationV2Controller extends BaseApiController
                 AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
                 AND u.status = 'active' AND u.tenant_id != :tid3
             ";
-            $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
+            $filterParams = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
             if (!empty($q)) {
-                $sql .= " AND (u.first_name LIKE :q1 OR u.last_name LIKE :q2 OR u.skills LIKE :q3 OR u.bio LIKE :q4)";
+                $fromWhere .= " AND (u.first_name LIKE :q1 OR u.last_name LIKE :q2 OR u.skills LIKE :q3 OR u.bio LIKE :q4)";
                 $searchTerm = "%{$q}%";
-                $params[':q1'] = $searchTerm;
-                $params[':q2'] = $searchTerm;
-                $params[':q3'] = $searchTerm;
-                $params[':q4'] = $searchTerm;
+                $filterParams[':q1'] = $searchTerm;
+                $filterParams[':q2'] = $searchTerm;
+                $filterParams[':q3'] = $searchTerm;
+                $filterParams[':q4'] = $searchTerm;
             }
             if ($partnerId) {
-                $sql .= " AND u.tenant_id = :partner_id";
-                $params[':partner_id'] = $partnerId;
+                $fromWhere .= " AND u.tenant_id = :partner_id";
+                $filterParams[':partner_id'] = $partnerId;
             }
             if (!empty($serviceReach) && in_array($serviceReach, ['local_only', 'remote_ok', 'travel_ok'])) {
                 if ($serviceReach === 'remote_ok') {
-                    $sql .= " AND fus.service_reach IN ('remote_ok', 'travel_ok')";
+                    $fromWhere .= " AND fus.service_reach IN ('remote_ok', 'travel_ok')";
                 } else {
-                    $sql .= " AND fus.service_reach = :service_reach";
-                    $params[':service_reach'] = $serviceReach;
+                    $fromWhere .= " AND fus.service_reach = :service_reach";
+                    $filterParams[':service_reach'] = $serviceReach;
                 }
             }
             if (!empty($skills)) {
@@ -554,17 +551,30 @@ class FederationV2Controller extends BaseApiController
                 foreach ($skillList as $skill) {
                     if (!empty($skill)) {
                         $paramName = ":skill{$skillIdx}";
-                        $sql .= " AND u.skills LIKE {$paramName}";
-                        $params[$paramName] = "%{$skill}%";
+                        $fromWhere .= " AND u.skills LIKE {$paramName}";
+                        $filterParams[$paramName] = "%{$skill}%";
                         $skillIdx++;
                     }
                 }
             }
+
+            // Count query (without cursor) for total_items
+            $countStmt = DB::getPdo()->prepare("SELECT COUNT(*) " . $fromWhere);
+            foreach ($filterParams as $key => $value) {
+                $countStmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+            }
+            $countStmt->execute();
+            $totalItems = (int) ($countStmt->fetchColumn() ?: 0);
+
+            // Data query with cursor and limit
+            $params = $filterParams;
+            $sql = "SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
+                    u.location, u.tenant_id, t.name as tenant_name,
+                    fus.service_reach, fus.messaging_enabled_federated " . $fromWhere;
             if ($cursorId) {
                 $sql .= " AND u.id < :cursor_id";
                 $params[':cursor_id'] = (int) $cursorId;
             }
-
             $sql .= " ORDER BY u.id DESC LIMIT :limit";
             $params[':limit'] = $perPage + 1;
 
@@ -607,10 +617,10 @@ class FederationV2Controller extends BaseApiController
                 $nextCursor = $this->encodeCursor($lastRow['id']);
             }
 
-            return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore);
+            return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore, ['total_items' => $totalItems]);
         } catch (\Exception $e) {
             error_log("FederationV2Api::members error: " . $e->getMessage());
-            return $this->respondWithCollection([], null, $perPage, false);
+            return $this->respondWithCollection([], null, $perPage, false, ['total_items' => 0]);
         }
     }
 
