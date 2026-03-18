@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,7 +27,10 @@ class KnowledgeBaseService
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
-        $query = DB::table('knowledge_base_articles as a');
+        $tenantId = TenantContext::getId();
+
+        $query = DB::table('knowledge_base_articles as a')
+            ->where('a.tenant_id', $tenantId);
 
         if (($filters['published_only'] ?? true)) {
             $query->where('a.is_published', true);
@@ -57,12 +61,13 @@ class KnowledgeBaseService
      */
     public function getById(int $id): ?array
     {
-        $article = DB::table('knowledge_base_articles')->find($id);
+        $tenantId = TenantContext::getId();
+        $article = DB::table('knowledge_base_articles')->where('tenant_id', $tenantId)->where('id', $id)->first();
         if (! $article) {
             return null;
         }
 
-        DB::table('knowledge_base_articles')->where('id', $id)->increment('view_count');
+        DB::table('knowledge_base_articles')->where('tenant_id', $tenantId)->where('id', $id)->increment('view_count');
 
         return (array) $article;
     }
@@ -75,6 +80,7 @@ class KnowledgeBaseService
         $like = '%' . $term . '%';
 
         return DB::table('knowledge_base_articles')
+            ->where('tenant_id', TenantContext::getId())
             ->where('is_published', true)
             ->where(fn ($q) => $q->where('title', 'LIKE', $like)->orWhere('content', 'LIKE', $like))
             ->orderByDesc('view_count')
@@ -90,6 +96,7 @@ class KnowledgeBaseService
     public function create(int $userId, array $data): int
     {
         return DB::table('knowledge_base_articles')->insertGetId([
+            'tenant_id'    => TenantContext::getId(),
             'title'        => trim($data['title']),
             'content'      => trim($data['content'] ?? ''),
             'category_id'  => $data['category_id'] ?? null,
@@ -106,6 +113,9 @@ class KnowledgeBaseService
      */
     public function delete(int $id): bool
     {
+        if (!class_exists('\Nexus\Services\KnowledgeBaseService')) {
+            return (bool) DB::table('knowledge_base_articles')->where('tenant_id', TenantContext::getId())->where('id', $id)->delete();
+        }
         return \Nexus\Services\KnowledgeBaseService::delete($id);
     }
 }

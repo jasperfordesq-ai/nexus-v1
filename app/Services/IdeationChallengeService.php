@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,8 +27,11 @@ class IdeationChallengeService
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
+        $tenantId = TenantContext::getId();
+
         $query = DB::table('ideation_challenges as c')
             ->leftJoin('users as u', 'c.created_by', '=', 'u.id')
+            ->where('c.tenant_id', $tenantId)
             ->select('c.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
         if (! empty($filters['status'])) {
@@ -57,7 +61,7 @@ class IdeationChallengeService
      */
     public function getById(int $id): ?array
     {
-        $challenge = DB::table('ideation_challenges')->find($id);
+        $challenge = DB::table('ideation_challenges')->where('tenant_id', TenantContext::getId())->where('id', $id)->first();
         if (! $challenge) {
             return null;
         }
@@ -74,6 +78,7 @@ class IdeationChallengeService
     public function create(int $userId, array $data): int
     {
         return DB::table('ideation_challenges')->insertGetId([
+            'tenant_id'   => TenantContext::getId(),
             'title'       => trim($data['title']),
             'description' => trim($data['description'] ?? ''),
             'status'      => $data['status'] ?? 'open',
@@ -185,6 +190,9 @@ class IdeationChallengeService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return [];
+        }
         return \Nexus\Services\IdeationChallengeService::getErrors();
     }
 
@@ -193,6 +201,9 @@ class IdeationChallengeService
      */
     public function getChallengeById(int $id, ?int $userId = null): ?array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return $this->getById($id);
+        }
         return \Nexus\Services\IdeationChallengeService::getChallengeById($id, $userId);
     }
 
@@ -201,6 +212,9 @@ class IdeationChallengeService
      */
     public function updateChallenge(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::updateChallenge($id, $userId, $data);
     }
 
@@ -209,6 +223,9 @@ class IdeationChallengeService
      */
     public function deleteChallenge(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::deleteChallenge($id, $userId);
     }
 
@@ -217,6 +234,9 @@ class IdeationChallengeService
      */
     public function updateChallengeStatus(int $id, int $userId, string $status): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::updateChallengeStatus($id, $userId, $status);
     }
 
@@ -225,6 +245,9 @@ class IdeationChallengeService
      */
     public function toggleFavorite(int $challengeId, int $userId): array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return ['favorited' => false];
+        }
         return \Nexus\Services\IdeationChallengeService::toggleFavorite($challengeId, $userId);
     }
 
@@ -233,6 +256,9 @@ class IdeationChallengeService
      */
     public function duplicateChallenge(int $challengeId, int $userId): ?int
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return null;
+        }
         return \Nexus\Services\IdeationChallengeService::duplicateChallenge($challengeId, $userId);
     }
 
@@ -241,6 +267,9 @@ class IdeationChallengeService
      */
     public function getIdeaById(int $id, ?int $userId = null): ?array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return null;
+        }
         return \Nexus\Services\IdeationChallengeService::getIdeaById($id, $userId);
     }
 
@@ -249,6 +278,9 @@ class IdeationChallengeService
      */
     public function updateIdea(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::updateIdea($id, $userId, $data);
     }
 
@@ -257,6 +289,9 @@ class IdeationChallengeService
      */
     public function updateDraftIdea(int $ideaId, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::updateDraftIdea($ideaId, $userId, $data);
     }
 
@@ -265,6 +300,9 @@ class IdeationChallengeService
      */
     public function deleteIdea(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::deleteIdea($id, $userId);
     }
 
@@ -273,6 +311,9 @@ class IdeationChallengeService
      */
     public function voteIdea(int $ideaId, int $userId): ?array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return $this->vote($ideaId, $userId);
+        }
         return \Nexus\Services\IdeationChallengeService::voteIdea($ideaId, $userId);
     }
 
@@ -281,6 +322,9 @@ class IdeationChallengeService
      */
     public function updateIdeaStatus(int $ideaId, int $userId, string $status): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::updateIdeaStatus($ideaId, $userId, $status);
     }
 
@@ -289,6 +333,9 @@ class IdeationChallengeService
      */
     public function getUserDrafts(int $challengeId, int $userId): array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return [];
+        }
         return \Nexus\Services\IdeationChallengeService::getUserDrafts($challengeId, $userId);
     }
 
@@ -299,6 +346,9 @@ class IdeationChallengeService
      */
     public function getComments(int $ideaId, array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return ['items' => [], 'cursor' => null, 'has_more' => false];
+        }
         return \Nexus\Services\IdeationChallengeService::getComments($ideaId, $filters);
     }
 
@@ -307,6 +357,9 @@ class IdeationChallengeService
      */
     public function addComment(int $ideaId, int $userId, string $body): ?int
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return null;
+        }
         return \Nexus\Services\IdeationChallengeService::addComment($ideaId, $userId, $body);
     }
 
@@ -315,6 +368,9 @@ class IdeationChallengeService
      */
     public function deleteComment(int $commentId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return false;
+        }
         return \Nexus\Services\IdeationChallengeService::deleteComment($commentId, $userId);
     }
 
@@ -323,6 +379,9 @@ class IdeationChallengeService
      */
     public function getAllTags(): array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return [];
+        }
         return \Nexus\Services\IdeationChallengeService::getAllTags();
     }
 
@@ -331,6 +390,9 @@ class IdeationChallengeService
      */
     public function getAllChallenges(array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+            return $this->getAll($filters)['items'];
+        }
         return \Nexus\Services\IdeationChallengeService::getAllChallenges($filters);
     }
 }

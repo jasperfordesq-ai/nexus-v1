@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -74,6 +75,7 @@ class AiChatService
     public function getHistory(int $userId, int $limit = 50): array
     {
         return DB::table('ai_chat_messages')
+            ->where('tenant_id', TenantContext::getId())
             ->where('user_id', $userId)
             ->orderByDesc('created_at')
             ->limit(min($limit, 200))
@@ -88,6 +90,7 @@ class AiChatService
     private function saveMessage(int $userId, string $userMessage, string $aiReply): void
     {
         DB::table('ai_chat_messages')->insert([
+            'tenant_id'  => TenantContext::getId(),
             'user_id'    => $userId,
             'user_msg'   => $userMessage,
             'ai_reply'   => $aiReply,

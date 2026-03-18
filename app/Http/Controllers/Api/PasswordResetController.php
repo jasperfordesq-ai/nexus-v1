@@ -351,8 +351,8 @@ class PasswordResetController extends BaseApiController
 
             if (!empty($columns)) {
                 DB::update(
-                    "UPDATE users SET password_changed_at = NOW() WHERE id = ?",
-                    [$userId]
+                    "UPDATE users SET password_changed_at = NOW() WHERE id = ? AND tenant_id = ?",
+                    [$userId, $this->getTenantId()]
                 );
             }
         } catch (\Throwable $e) {

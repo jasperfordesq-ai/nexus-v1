@@ -86,6 +86,7 @@ class Notification extends Model
     public static function countUnread(int $userId): int
     {
         return (int) DB::table('notifications')
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->where('user_id', $userId)
             ->where('is_read', 0)
             ->whereNull('deleted_at')

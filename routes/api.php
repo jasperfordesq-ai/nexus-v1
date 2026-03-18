@@ -252,9 +252,29 @@ Route::get('/v2/users/me/activity/monthly', [\App\Http\Controllers\Api\MemberAct
 Route::get('/v2/users/{id}/activity/dashboard', [\App\Http\Controllers\Api\MemberActivityController::class, 'getPublicDashboard']);
 // Verification Badges
 Route::get('/v2/users/{id}/verification-badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getUserBadges']);
-Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'grantBadge']);
-Route::delete('/v2/admin/users/{id}/badges/{type}', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'revokeBadge']);
-Route::get('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getAdminBadgeList']);
+// NOTE: Admin badge management routes moved to admin middleware group below
+// Federation (user-facing — NOT admin-only)
+Route::get('/v2/federation/status', [\App\Http\Controllers\Api\FederationV2Controller::class, 'status']);
+Route::post('/v2/federation/opt-in', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optIn']);
+Route::post('/v2/federation/setup', [\App\Http\Controllers\Api\FederationV2Controller::class, 'setup']);
+Route::post('/v2/federation/opt-out', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optOut']);
+Route::get('/v2/federation/partners', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partners']);
+Route::get('/v2/federation/activity', [\App\Http\Controllers\Api\FederationV2Controller::class, 'activity']);
+Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Controller::class, 'events']);
+Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings']);
+Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members']);
+Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member']);
+Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
+Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage']);
+Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead']);
+Route::get('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'getSettings']);
+Route::put('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'updateSettings']);
+Route::get('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connections']);
+Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendConnectionRequest']);
+Route::post('/v2/federation/connections/{id}/accept', [\App\Http\Controllers\Api\FederationV2Controller::class, 'acceptConnection']);
+Route::post('/v2/federation/connections/{id}/reject', [\App\Http\Controllers\Api\FederationV2Controller::class, 'rejectConnection']);
+Route::delete('/v2/federation/connections/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'removeConnection']);
+Route::get('/v2/federation/connections/status/{userId}/{tenantId}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connectionStatus']);
 // Sub-Accounts
 Route::get('/v2/users/me/sub-accounts', [\App\Http\Controllers\Api\SubAccountController::class, 'getChildAccounts']);
 Route::get('/v2/users/me/parent-accounts', [\App\Http\Controllers\Api\SubAccountController::class, 'getParentAccounts']);
@@ -495,6 +515,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 // MIGRATED ROUTES — Admin API (Dashboard, Users, Listings, Config, Cache, Jobs, Federation, CRM, Super Admin)
 // Source: httpdocs/routes/admin-api.php
 // ============================================
+// Admin verification badge management
+Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'grantBadge']);
+Route::delete('/v2/admin/users/{id}/badges/{type}', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'revokeBadge']);
+Route::get('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getAdminBadgeList']);
+
 Route::get('/v2/admin/dashboard/stats', [\App\Http\Controllers\Api\AdminDashboardController::class, 'stats']);
 Route::get('/v2/admin/dashboard/trends', [\App\Http\Controllers\Api\AdminDashboardController::class, 'trends']);
 Route::get('/v2/admin/dashboard/activity', [\App\Http\Controllers\Api\AdminDashboardController::class, 'activity']);
@@ -874,27 +899,7 @@ Route::get('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFede
 Route::post('/v2/admin/federation/api-keys', [\App\Http\Controllers\Api\AdminFederationController::class, 'createApiKey']);
 Route::get('/v2/admin/federation/data', [\App\Http\Controllers\Api\AdminFederationController::class, 'dataManagement']);
 Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\AdminFederationController::class, 'exportData']);
-Route::get('/v2/federation/status', [\App\Http\Controllers\Api\FederationV2Controller::class, 'status']);
-Route::post('/v2/federation/opt-in', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optIn']);
-Route::post('/v2/federation/setup', [\App\Http\Controllers\Api\FederationV2Controller::class, 'setup']);
-Route::post('/v2/federation/opt-out', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optOut']);
-Route::get('/v2/federation/partners', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partners']);
-Route::get('/v2/federation/activity', [\App\Http\Controllers\Api\FederationV2Controller::class, 'activity']);
-Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Controller::class, 'events']);
-Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings']);
-Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members']);
-Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member']);
-Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
-Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage']);
-Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead']);
-Route::get('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'getSettings']);
-Route::put('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'updateSettings']);
-Route::get('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connections']);
-Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendConnectionRequest']);
-Route::post('/v2/federation/connections/{id}/accept', [\App\Http\Controllers\Api\FederationV2Controller::class, 'acceptConnection']);
-Route::post('/v2/federation/connections/{id}/reject', [\App\Http\Controllers\Api\FederationV2Controller::class, 'rejectConnection']);
-Route::delete('/v2/federation/connections/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'removeConnection']);
-Route::get('/v2/federation/connections/status/{userId}/{tenantId}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connectionStatus']);
+// NOTE: Federation user routes moved to auth-only group (not admin-only)
 Route::get('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'getPages']);
 Route::post('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'createPage']);
 Route::get('/v2/admin/pages/{id}', [\App\Http\Controllers\Api\AdminContentController::class, 'getPage']);
@@ -1146,7 +1151,7 @@ Route::post('/menus/clear-cache', [\App\Http\Controllers\Api\MenuController::cla
 // NOTE: GET /menus, /menus/config, /menus/mobile, /menus/{slug} are public routes (registered above auth group)
 // NOTE: POST /v2/contact is a public route (registered above auth group)
 Route::post('/help/feedback', [\App\Http\Controllers\Api\HelpController::class, 'feedback']);
-Route::get('/groups/{id}/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'apiData']);
+Route::get('/groups/{id}/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'apiData'])->middleware('admin');
 Route::get('/recommendations/groups', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
 Route::post('/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
 Route::get('/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
@@ -1170,7 +1175,7 @@ Route::get('/gamification/share', [\App\Http\Controllers\Api\GamificationControl
 Route::get('/gamification/seasons', [\App\Http\Controllers\Api\GamificationController::class, 'getSeasons']);
 Route::get('/gamification/seasons/current', [\App\Http\Controllers\Api\GamificationController::class, 'getCurrentSeason']);
 Route::post('/shop/purchase', [\App\Http\Controllers\Api\GamificationController::class, 'purchaseItem']);
-Route::get('/insights', [\App\Http\Controllers\Api\AdminDashboardController::class, 'apiInsights']);
+Route::get('/insights', [\App\Http\Controllers\Api\AdminDashboardController::class, 'apiInsights'])->middleware('admin');
 Route::get('/organizations/{id}/members', [\App\Http\Controllers\Api\OrgWalletController::class, 'apiMembers']);
 Route::get('/organizations/{id}/wallet/balance', [\App\Http\Controllers\Api\OrgWalletController::class, 'apiBalance']);
 Route::post('/feed/hide', [\App\Http\Controllers\Api\FeedController::class, 'hidePost']);
@@ -1185,7 +1190,7 @@ Route::post('/messages/delete', [\App\Http\Controllers\Api\MessagesController::c
 Route::post('/messages/delete-conversation', [\App\Http\Controllers\Api\MessagesController::class, 'deleteConversation']);
 Route::post('/messages/reaction', [\App\Http\Controllers\Api\MessagesController::class, 'toggleReaction']);
 Route::get('/messages/reactions-batch', [\App\Http\Controllers\Api\MessagesController::class, 'getReactionsBatch']);
-Route::get('/admin/users/search', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userSearchApi']);
+Route::get('/admin/users/search', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userSearchApi'])->middleware('admin');
 Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe']);
 Route::post('/gdpr/consent', [\App\Http\Controllers\Api\GdprController::class, 'updateConsent']);
 Route::post('/gdpr/request', [\App\Http\Controllers\Api\GdprController::class, 'createRequest']);

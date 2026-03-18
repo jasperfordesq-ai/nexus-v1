@@ -159,8 +159,8 @@ class GamificationV2Controller extends BaseApiController
         }
 
         $userBadgeRow = DB::selectOne(
-            "SELECT * FROM user_badges WHERE user_id = ? AND badge_key = ?",
-            [$userId, $key]
+            "SELECT * FROM user_badges WHERE user_id = ? AND badge_key = ? AND tenant_id = ?",
+            [$userId, $key, $this->getTenantId()]
         );
         $userBadge = $userBadgeRow ? (array)$userBadgeRow : null;
 
@@ -360,8 +360,8 @@ class GamificationV2Controller extends BaseApiController
             }
 
             $progressRow = DB::selectOne(
-                "SELECT * FROM challenge_progress WHERE challenge_id = ? AND user_id = ?",
-                [$id, $userId]
+                "SELECT * FROM challenge_progress WHERE challenge_id = ? AND user_id = ? AND tenant_id = ?",
+                [$id, $userId, $this->getTenantId()]
             );
             $progress = $progressRow ? (array)$progressRow : null;
 
@@ -374,8 +374,8 @@ class GamificationV2Controller extends BaseApiController
             }
 
             DB::update(
-                "UPDATE challenge_progress SET status = 'claimed', claimed_at = NOW() WHERE challenge_id = ? AND user_id = ?",
-                [$id, $userId]
+                "UPDATE challenge_progress SET status = 'claimed', claimed_at = NOW() WHERE challenge_id = ? AND user_id = ? AND tenant_id = ?",
+                [$id, $userId, $this->getTenantId()]
             );
 
             $xpReward = (int) ($challenge['xp_reward'] ?? 0);

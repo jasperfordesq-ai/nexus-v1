@@ -170,6 +170,7 @@ class FeedController extends BaseApiController
 
         try {
             DB::table('reports')->insert([
+                'tenant_id'   => \App\Core\TenantContext::getId(),
                 'reporter_id' => $userId,
                 'target_type' => $targetType,
                 'target_id'   => $postId,

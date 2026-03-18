@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,8 +27,11 @@ class JobVacancyService
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
+        $tenantId = TenantContext::getId();
+
         $query = DB::table('job_vacancies as jv')
             ->leftJoin('users as u', 'jv.created_by', '=', 'u.id')
+            ->where('jv.tenant_id', $tenantId)
             ->select('jv.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
         if (! empty($filters['status'])) {
@@ -63,7 +67,7 @@ class JobVacancyService
      */
     public function getById(int $id): ?array
     {
-        $job = DB::table('job_vacancies')->find($id);
+        $job = DB::table('job_vacancies')->where('tenant_id', TenantContext::getId())->where('id', $id)->first();
         if (! $job) {
             return null;
         }
@@ -80,6 +84,7 @@ class JobVacancyService
     public function create(int $userId, array $data): int
     {
         return DB::table('job_vacancies')->insertGetId([
+            'tenant_id'   => TenantContext::getId(),
             'title'       => trim($data['title']),
             'description' => trim($data['description'] ?? ''),
             'type'        => $data['type'] ?? 'volunteer',
@@ -123,6 +128,9 @@ class JobVacancyService
      */
     public function delete(int $id, int $adminId): bool
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) {
+            return (bool) DB::table('job_vacancies')->where('tenant_id', TenantContext::getId())->where('id', $id)->delete();
+        }
         return \Nexus\Services\JobVacancyService::delete($id, $adminId);
     }
 
@@ -131,6 +139,7 @@ class JobVacancyService
      */
     public function featureJob(int $id, int $adminId, int $days = 7): bool
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
         return \Nexus\Services\JobVacancyService::featureJob($id, $adminId, $days);
     }
 
@@ -139,6 +148,7 @@ class JobVacancyService
      */
     public function unfeatureJob(int $id, int $adminId): bool
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
         return \Nexus\Services\JobVacancyService::unfeatureJob($id, $adminId);
     }
 
@@ -147,6 +157,7 @@ class JobVacancyService
      */
     public function getApplications(int $jobId, int $adminId): ?array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
         return \Nexus\Services\JobVacancyService::getApplications($jobId, $adminId);
     }
 
@@ -155,6 +166,7 @@ class JobVacancyService
      */
     public function updateApplicationStatus(int $applicationId, int $adminId, string $status, ?string $notes = null): bool
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
         return \Nexus\Services\JobVacancyService::updateApplicationStatus($applicationId, $adminId, $status, $notes);
     }
 
@@ -163,6 +175,7 @@ class JobVacancyService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
         return \Nexus\Services\JobVacancyService::getErrors();
     }
 
@@ -175,6 +188,9 @@ class JobVacancyService
      */
     public function legacyGetById(int $id, ?int $userId = null): ?array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) {
+            return $this->getById($id);
+        }
         return \Nexus\Services\JobVacancyService::getById($id, $userId);
     }
 
@@ -183,6 +199,7 @@ class JobVacancyService
      */
     public function incrementViews(int $id, ?int $userId = null): void
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
         \Nexus\Services\JobVacancyService::incrementViews($id, $userId);
     }
 
@@ -191,6 +208,7 @@ class JobVacancyService
      */
     public function update(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
         return \Nexus\Services\JobVacancyService::update($id, $userId, $data);
     }
 
@@ -199,6 +217,9 @@ class JobVacancyService
      */
     public function legacyApply(int $jobId, int $userId, ?string $message = null): ?int
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) {
+            return $this->apply($jobId, $userId, ['cover_letter' => $message]);
+        }
         return \Nexus\Services\JobVacancyService::apply($jobId, $userId, $message);
     }
 
@@ -207,6 +228,7 @@ class JobVacancyService
      */
     public function getSavedJobs(int $userId, array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
         return \Nexus\Services\JobVacancyService::getSavedJobs($userId, $filters);
     }
 
@@ -215,6 +237,7 @@ class JobVacancyService
      */
     public function saveJob(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
         return \Nexus\Services\JobVacancyService::saveJob($id, $userId);
     }
 
@@ -223,6 +246,7 @@ class JobVacancyService
      */
     public function unsaveJob(int $id, int $userId): void
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
         \Nexus\Services\JobVacancyService::unsaveJob($id, $userId);
     }
 
@@ -231,6 +255,7 @@ class JobVacancyService
      */
     public function getMyApplications(int $userId, array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
         return \Nexus\Services\JobVacancyService::getMyApplications($userId, $filters);
     }
 
@@ -239,6 +264,7 @@ class JobVacancyService
      */
     public function getMyPostings(int $userId, int $tenantId, array $params = []): array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
         return \Nexus\Services\JobVacancyService::getMyPostings($userId, $tenantId, $params);
     }
 
@@ -247,6 +273,7 @@ class JobVacancyService
      */
     public function getAlerts(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
         return \Nexus\Services\JobVacancyService::getAlerts($userId);
     }
 
@@ -255,6 +282,7 @@ class JobVacancyService
      */
     public function subscribeAlert(int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
         return \Nexus\Services\JobVacancyService::subscribeAlert($userId, $data);
     }
 
@@ -263,6 +291,7 @@ class JobVacancyService
      */
     public function deleteAlert(int $id, int $userId): void
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
         \Nexus\Services\JobVacancyService::deleteAlert($id, $userId);
     }
 
@@ -271,6 +300,7 @@ class JobVacancyService
      */
     public function unsubscribeAlert(int $id, int $userId): void
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
         \Nexus\Services\JobVacancyService::unsubscribeAlert($id, $userId);
     }
 
@@ -279,6 +309,7 @@ class JobVacancyService
      */
     public function resubscribeAlert(int $id, int $userId): void
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
         \Nexus\Services\JobVacancyService::resubscribeAlert($id, $userId);
     }
 
@@ -287,6 +318,7 @@ class JobVacancyService
      */
     public function calculateMatchPercentage(int $userId, int $jobId): array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
         return \Nexus\Services\JobVacancyService::calculateMatchPercentage($userId, $jobId);
     }
 
@@ -295,6 +327,7 @@ class JobVacancyService
      */
     public function getQualificationAssessment(int $userId, int $jobId): ?array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
         return \Nexus\Services\JobVacancyService::getQualificationAssessment($userId, $jobId);
     }
 
@@ -303,6 +336,7 @@ class JobVacancyService
      */
     public function getApplicationHistory(int $applicationId, int $userId): ?array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
         return \Nexus\Services\JobVacancyService::getApplicationHistory($applicationId, $userId);
     }
 
@@ -311,6 +345,7 @@ class JobVacancyService
      */
     public function getAnalytics(int $jobId, int $userId): ?array
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
         return \Nexus\Services\JobVacancyService::getAnalytics($jobId, $userId);
     }
 
@@ -319,6 +354,7 @@ class JobVacancyService
      */
     public function renewJob(int $id, int $userId, int $days = 30): bool
     {
+        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
         return \Nexus\Services\JobVacancyService::renewJob($id, $userId, $days);
     }
 }

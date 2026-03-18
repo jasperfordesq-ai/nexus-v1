@@ -52,32 +52,32 @@ class MemberRankingService
         // Activity: transactions in lookback window
         $txnCounts = DB::select(
             "SELECT sender_id as user_id, COUNT(*) as cnt FROM transactions
-             WHERE sender_id IN ({$placeholders}) AND created_at >= ? GROUP BY sender_id",
-            array_merge($userIds, [$cutoff])
+             WHERE tenant_id = ? AND sender_id IN ({$placeholders}) AND created_at >= ? GROUP BY sender_id",
+            array_merge([$tenantId], $userIds, [$cutoff])
         );
         $txnMap = collect($txnCounts)->pluck('cnt', 'user_id')->all();
 
         // Activity: posts in lookback window
         $postCounts = DB::select(
             "SELECT user_id, COUNT(*) as cnt FROM feed_posts
-             WHERE user_id IN ({$placeholders}) AND created_at >= ? GROUP BY user_id",
-            array_merge($userIds, [$cutoff])
+             WHERE tenant_id = ? AND user_id IN ({$placeholders}) AND created_at >= ? GROUP BY user_id",
+            array_merge([$tenantId], $userIds, [$cutoff])
         );
         $postMap = collect($postCounts)->pluck('cnt', 'user_id')->all();
 
         // Contribution: listings created
         $listingCounts = DB::select(
             "SELECT user_id, COUNT(*) as cnt FROM listings
-             WHERE user_id IN ({$placeholders}) GROUP BY user_id",
-            $userIds
+             WHERE tenant_id = ? AND user_id IN ({$placeholders}) GROUP BY user_id",
+            array_merge([$tenantId], $userIds)
         );
         $listingMap = collect($listingCounts)->pluck('cnt', 'user_id')->all();
 
         // Reputation: average review rating
         $avgRatings = DB::select(
             "SELECT reviewed_user_id as user_id, AVG(rating) as avg_rating
-             FROM reviews WHERE reviewed_user_id IN ({$placeholders}) GROUP BY reviewed_user_id",
-            $userIds
+             FROM reviews WHERE tenant_id = ? AND reviewed_user_id IN ({$placeholders}) GROUP BY reviewed_user_id",
+            array_merge([$tenantId], $userIds)
         );
         $ratingMap = collect($avgRatings)->pluck('avg_rating', 'user_id')->all();
 
@@ -121,6 +121,7 @@ class MemberRankingService
      */
     public function isEnabled(): bool
     {
+        if (!class_exists('\Nexus\Services\MemberRankingService')) { return true; }
         return \Nexus\Services\MemberRankingService::isEnabled();
     }
 
@@ -129,6 +130,7 @@ class MemberRankingService
      */
     public function getConfig(): array
     {
+        if (!class_exists('\Nexus\Services\MemberRankingService')) { return []; }
         return \Nexus\Services\MemberRankingService::getConfig();
     }
 
@@ -137,6 +139,7 @@ class MemberRankingService
      */
     public function clearCache(): void
     {
+        if (!class_exists('\Nexus\Services\MemberRankingService')) { return; }
         \Nexus\Services\MemberRankingService::clearCache();
     }
 }
