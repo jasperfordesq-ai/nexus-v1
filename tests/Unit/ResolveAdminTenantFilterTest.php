@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Controllers\Api\BaseApiController;
+use App\Http\Controllers\Api\BaseApiController;
 
 /**
  * Regression test for resolveAdminTenantFilter()
@@ -21,7 +21,7 @@ use Nexus\Controllers\Api\BaseApiController;
  * removed ALL tenant scoping by default. This caused admin pages to show data
  * from all tenants instead of the current tenant.
  *
- * @covers \Nexus\Controllers\Api\BaseApiController::resolveAdminTenantFilter
+ * @covers \App\Http\Controllers\Api\BaseApiController::resolveAdminTenantFilter
  * @group unit
  * @group regression
  */

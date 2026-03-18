@@ -715,6 +715,34 @@ abstract class BaseApiController extends Controller
         return UrlHelper::getBaseUrl();
     }
 
+
+    // ============================================
+    // ADMIN TENANT FILTER
+    // ============================================
+
+    /**
+     * Resolve which tenant ID to filter admin listings by.
+     *
+     * - Regular admins: always scoped to their own tenant
+     * - Super admins: defaults to current tenant, supports ?tenant_id=N or ?tenant_id=all
+     */
+    protected function resolveAdminTenantFilter(bool $isSuperAdmin, int $tenantId): ?int
+    {
+        $filterTenantIdRaw = $_GET['tenant_id'] ?? null;
+
+        if ($isSuperAdmin) {
+            if ($filterTenantIdRaw === 'all') {
+                return null;
+            }
+            if ($filterTenantIdRaw !== null && is_numeric($filterTenantIdRaw)) {
+                return (int) $filterTenantIdRaw;
+            }
+            return $tenantId;
+        }
+
+        return $tenantId;
+    }
+
     // ============================================
     // PRIVATE HELPERS
     // ============================================
