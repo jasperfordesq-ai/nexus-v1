@@ -10,8 +10,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-
 /**
  * RegistrationService — Laravel DI-based service for user registration.
  *
@@ -27,9 +25,9 @@ class RegistrationService
     /**
      * Register a new user account.
      *
-     * @throws ValidationException
+     * @return array Registration result with user data and status flags
      */
-    public function register(array $data): User
+    public function register(array $data, int $tenantId): array
     {
         $validator = validator($data, [
             'first_name' => 'required|string|max:100',
@@ -39,34 +37,70 @@ class RegistrationService
         ]);
 
         if ($validator->fails()) {
-            throw new ValidationException($validator);
+            $errors = $validator->errors()->first();
+            return ['error' => $errors];
         }
 
-        $exists = $this->user->newQuery()->where('email', $data['email'])->exists();
+        $exists = $this->user->newQuery()
+            ->where('email', strtolower(trim($data['email'])))
+            ->where('tenant_id', $tenantId)
+            ->exists();
         if ($exists) {
-            throw ValidationException::withMessages(['email' => 'This email is already registered.']);
+            return ['error' => 'This email is already registered.'];
         }
 
-        return DB::transaction(function () use ($data) {
-            $user = $this->user->newInstance([
-                'first_name'         => trim($data['first_name']),
-                'last_name'          => trim($data['last_name']),
-                'email'              => strtolower(trim($data['email'])),
-                'password'           => Hash::make($data['password']),
-                'status'             => 'pending',
-                'verification_token' => Str::random(64),
-                'balance'            => 0,
-            ]);
+        $user = DB::transaction(function () use ($data, $tenantId) {
+            $user = $this->user->newInstance();
+            $user->tenant_id = $tenantId;
+            $user->first_name = trim($data['first_name']);
+            $user->last_name = trim($data['last_name']);
+            $user->email = strtolower(trim($data['email']));
+            $user->password_hash = Hash::make($data['password']);
+            $user->status = 'pending';
+            $user->verification_token = Str::random(64);
+            $user->balance = 0;
+
+            // Optional fields from frontend
+            if (!empty($data['phone'])) {
+                $user->phone = $data['phone'];
+            }
+            if (!empty($data['location'])) {
+                $user->location = $data['location'];
+            }
+            if (!empty($data['latitude'])) {
+                $user->latitude = (float) $data['latitude'];
+            }
+            if (!empty($data['longitude'])) {
+                $user->longitude = (float) $data['longitude'];
+            }
+            if (!empty($data['profile_type'])) {
+                $user->profile_type = $data['profile_type'];
+            }
+            if (!empty($data['organization_name'])) {
+                $user->organization_name = $data['organization_name'];
+            }
+
             $user->save();
 
             return $user;
         });
+
+        return [
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+            ],
+            'requires_verification' => true,
+            'message' => 'Registration successful. Please check your email to verify your account.',
+        ];
     }
 
     /**
      * Verify a user's email with the verification token.
      */
-    public function verify(string $token): bool
+    public function verifyEmail(string $token): bool
     {
         /** @var User|null $user */
         $user = $this->user->newQuery()
@@ -92,7 +126,7 @@ class RegistrationService
      *
      * @return string|null The new verification token, or null if user not found.
      */
-    public function resendVerification(string $email): ?string
+    public function resendVerification(string $email, int $tenantId = 0): ?string
     {
         /** @var User|null $user */
         $user = $this->user->newQuery()

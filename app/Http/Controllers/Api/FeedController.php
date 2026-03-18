@@ -104,7 +104,7 @@ class FeedController extends BaseApiController
         $postId = (int) ($this->input('post_id', 0));
 
         if ($postId <= 0) {
-            return response()->json(['success' => false, 'error' => 'Invalid post ID']);
+            return $this->respondWithError('INVALID_INPUT', 'Invalid post ID');
         }
 
         try {
@@ -114,9 +114,9 @@ class FeedController extends BaseApiController
                 'created_at' => now(),
             ]);
 
-            return response()->json(['success' => true]);
+            return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => 'Database error']);
+            return $this->respondWithError('DATABASE_ERROR', 'Database error', null, 500);
         }
     }
 
@@ -134,7 +134,7 @@ class FeedController extends BaseApiController
         $mutedUserId = (int) ($this->input('user_id', 0));
 
         if ($mutedUserId <= 0 || $mutedUserId === $userId) {
-            return response()->json(['success' => false, 'error' => 'Invalid user']);
+            return $this->respondWithError('INVALID_INPUT', 'Invalid user');
         }
 
         try {
@@ -144,9 +144,9 @@ class FeedController extends BaseApiController
                 'created_at'    => now(),
             ]);
 
-            return response()->json(['success' => true]);
+            return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => 'Database error']);
+            return $this->respondWithError('DATABASE_ERROR', 'Database error', null, 500);
         }
     }
 
@@ -165,12 +165,12 @@ class FeedController extends BaseApiController
         $targetType = $this->input('target_type', 'post');
 
         if ($postId <= 0) {
-            return response()->json(['success' => false, 'error' => 'Invalid post ID']);
+            return $this->respondWithError('INVALID_INPUT', 'Invalid post ID');
         }
 
         try {
             DB::table('reports')->insert([
-                'tenant_id'   => \App\Core\TenantContext::getId(),
+                'tenant_id'   => $this->getTenantId(),
                 'reporter_id' => $userId,
                 'target_type' => $targetType,
                 'target_id'   => $postId,
@@ -178,9 +178,9 @@ class FeedController extends BaseApiController
                 'created_at'  => now(),
             ]);
 
-            return response()->json(['success' => true]);
+            return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => 'Database error']);
+            return $this->respondWithError('DATABASE_ERROR', 'Database error', null, 500);
         }
     }
 }

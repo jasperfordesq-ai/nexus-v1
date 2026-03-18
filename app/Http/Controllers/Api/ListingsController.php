@@ -83,6 +83,9 @@ class ListingsController extends BaseApiController
 
         $result = $this->listingService->getAll($filters);
 
+        // Count total matching listings (without cursor/limit)
+        $totalCount = $this->listingService->countAll($filters);
+
         // Apply MatchRank if enabled; skip when featured_first is set
         if ($this->listingRankingService->isEnabled() && !empty($result['items']) && empty($filters['featured_first'])) {
             $result['items'] = $this->listingRankingService->rankListings(
@@ -100,7 +103,8 @@ class ListingsController extends BaseApiController
             $result['items'],
             $result['cursor'],
             $filters['limit'],
-            $result['has_more']
+            $result['has_more'],
+            ['total_items' => $totalCount]
         );
     }
 

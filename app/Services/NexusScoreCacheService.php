@@ -22,6 +22,7 @@ class NexusScoreCacheService
      */
     public function get(int $tenantId, int $userId): ?float
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return null; }
         return \Nexus\Services\NexusScoreCacheService::get($tenantId, $userId);
     }
 
@@ -30,6 +31,7 @@ class NexusScoreCacheService
      */
     public function set(int $tenantId, int $userId, float $score): void
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return; }
         \Nexus\Services\NexusScoreCacheService::set($tenantId, $userId, $score);
     }
 
@@ -38,6 +40,7 @@ class NexusScoreCacheService
      */
     public function invalidate(int $tenantId, int $userId): void
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return; }
         \Nexus\Services\NexusScoreCacheService::invalidate($tenantId, $userId);
     }
 
@@ -46,6 +49,7 @@ class NexusScoreCacheService
      */
     public function warmCache(int $tenantId): int
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return 0; }
         return \Nexus\Services\NexusScoreCacheService::warmCache($tenantId);
     }
 
@@ -57,6 +61,7 @@ class NexusScoreCacheService
      */
     public function getScore(int $userId, int $tenantId, bool $forceRecalculate = false): array
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return []; }
         $db = \Illuminate\Support\Facades\DB::getPdo();
         $legacyService = new \Nexus\Services\NexusScoreCacheService($db);
         return $legacyService->getScore($userId, $tenantId, $forceRecalculate);
@@ -67,6 +72,7 @@ class NexusScoreCacheService
      */
     public function invalidateCache(int $userId, int $tenantId): void
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return; }
         $db = \Illuminate\Support\Facades\DB::getPdo();
         $legacyService = new \Nexus\Services\NexusScoreCacheService($db);
         $legacyService->invalidateCache($userId, $tenantId);
@@ -77,6 +83,7 @@ class NexusScoreCacheService
      */
     public function getCachedLeaderboard(int $tenantId, int $limit = 10): array
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return []; }
         $db = \Illuminate\Support\Facades\DB::getPdo();
         $legacyService = new \Nexus\Services\NexusScoreCacheService($db);
         return $legacyService->getCachedLeaderboard($tenantId, $limit);
@@ -87,6 +94,7 @@ class NexusScoreCacheService
      */
     public function getCachedRank(int $userId, int $tenantId): array
     {
+        if (!class_exists('Nexus\\Services\\NexusScoreCacheService')) { return []; }
         $db = \Illuminate\Support\Facades\DB::getPdo();
         $legacyService = new \Nexus\Services\NexusScoreCacheService($db);
         return $legacyService->getCachedRank($userId, $tenantId);

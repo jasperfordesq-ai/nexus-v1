@@ -186,6 +186,67 @@ class ListingService
     }
 
     /**
+     * Count total listings matching filters (without cursor/limit).
+     *
+     * Accepts the same filter array as getAll(), but ignores cursor and limit.
+     */
+    public function countAll(array $filters = []): int
+    {
+        $query = $this->listing->newQuery();
+
+        // Status filter
+        if (empty($filters['include_deleted'])) {
+            $query->where(function (Builder $q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            });
+        }
+
+        // Type filter
+        if (! empty($filters['type'])) {
+            $type = $filters['type'];
+            is_array($type)
+                ? $query->whereIn('type', $type)
+                : $query->where('type', $type);
+        }
+
+        // Category filter
+        if (! empty($filters['category_id'])) {
+            $query->where('category_id', (int) $filters['category_id']);
+        }
+
+        // User filter
+        if (! empty($filters['user_id'])) {
+            $query->where('user_id', (int) $filters['user_id']);
+        }
+
+        // Search
+        if (! empty($filters['search'])) {
+            $term = '%' . $filters['search'] . '%';
+            $query->where(function (Builder $q) use ($term) {
+                $q->where('title', 'LIKE', $term)
+                  ->orWhere('description', 'LIKE', $term)
+                  ->orWhere('location', 'LIKE', $term);
+            });
+        }
+
+        // Skills filter
+        if (! empty($filters['skills'])) {
+            $skills = is_array($filters['skills'])
+                ? $filters['skills']
+                : explode(',', $filters['skills']);
+            $skills = array_map(fn ($s) => strtolower(trim($s)), array_filter($skills));
+
+            if (! empty($skills)) {
+                $query->whereHas('skillTags', function (Builder $q) use ($skills) {
+                    $q->whereIn('tag', $skills);
+                });
+            }
+        }
+
+        return $query->count();
+    }
+
+    /**
      * Get a single listing by ID.
      */
     public function getById(int $id, bool $includeDeleted = false, ?int $currentUserId = null): ?array

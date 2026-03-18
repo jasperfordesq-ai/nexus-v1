@@ -70,6 +70,84 @@ class AdminFederationNeighborhoodsController extends BaseApiController
     }
 
     /**
+     * DELETE /api/v2/admin/federation/neighborhoods/{id}
+     *
+     * Delete a federation neighborhood.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        try {
+            $deleted = DB::delete(
+                "DELETE FROM federation_neighborhoods WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+
+            if ($deleted === 0) {
+                return $this->respondWithError('NOT_FOUND', 'Neighborhood not found', null, 404);
+            }
+
+            return $this->respondWithData(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('DELETE_FAILED', 'Failed to delete neighborhood', null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/admin/federation/neighborhoods/{id}/tenants
+     *
+     * Add a tenant to a federation neighborhood.
+     */
+    public function addTenant(int $id): JsonResponse
+    {
+        $this->requireAdmin();
+        $input = $this->getAllInput();
+
+        $tenantId = (int) ($input['tenant_id'] ?? 0);
+        if ($tenantId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Tenant ID is required', 'tenant_id');
+        }
+
+        try {
+            DB::insert(
+                "INSERT INTO federation_neighborhood_tenants (neighborhood_id, tenant_id) VALUES (?, ?)",
+                [$id, $tenantId]
+            );
+
+            return $this->respondWithData(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('ADD_FAILED', 'Failed to add tenant to neighborhood: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * DELETE /api/v2/admin/federation/neighborhoods/{id}/tenants/{tenantId}
+     *
+     * Remove a tenant from a federation neighborhood.
+     */
+    public function removeTenant(int $id, int $tenantId): JsonResponse
+    {
+        $this->requireAdmin();
+
+        try {
+            $deleted = DB::delete(
+                "DELETE FROM federation_neighborhood_tenants WHERE neighborhood_id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+
+            if ($deleted === 0) {
+                return $this->respondWithError('NOT_FOUND', 'Tenant not found in neighborhood', null, 404);
+            }
+
+            return $this->respondWithData(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('DELETE_FAILED', 'Failed to remove tenant from neighborhood', null, 500);
+        }
+    }
+
+    /**
      * GET /api/v2/admin/federation/available-tenants
      *
      * List tenants that can be added to neighborhoods (active tenants excluding current).

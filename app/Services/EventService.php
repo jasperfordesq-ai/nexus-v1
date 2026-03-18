@@ -158,7 +158,7 @@ class EventService
                 'location'             => $data['location'] ?? null,
                 'latitude'             => $data['latitude'] ?? null,
                 'longitude'            => $data['longitude'] ?? null,
-                'category_id'          => $data['category_id'] ?? null,
+                'category_id'          => $this->resolveCategoryId($data),
                 'group_id'             => $data['group_id'] ?? null,
                 'max_attendees'        => $data['max_attendees'] ?? null,
                 'is_online'            => $data['is_online'] ?? false,
@@ -181,6 +181,11 @@ class EventService
         /** @var Event $event */
         $event = $this->event->newQuery()->findOrFail($id);
 
+        // Resolve category_name slug to category_id if provided
+        if (!empty($data['category_name']) && empty($data['category_id'])) {
+            $data['category_id'] = $this->resolveCategoryId($data);
+        }
+
         $allowed = [
             'title', 'description', 'start_time', 'end_time', 'location',
             'latitude', 'longitude', 'category_id', 'group_id', 'max_attendees',
@@ -191,6 +196,26 @@ class EventService
         $event->save();
 
         return $event->fresh(['user', 'category']);
+    }
+
+    /**
+     * Resolve category_id from data — supports both numeric ID and string slug.
+     */
+    private function resolveCategoryId(array $data): ?int
+    {
+        if (!empty($data['category_id'])) {
+            return (int) $data['category_id'];
+        }
+
+        if (!empty($data['category_name'])) {
+            $category = DB::table('categories')
+                ->where('name', $data['category_name'])
+                ->where('type', 'events')
+                ->value('id');
+            return $category ? (int) $category : null;
+        }
+
+        return null;
     }
 
     /**

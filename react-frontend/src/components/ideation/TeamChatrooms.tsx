@@ -119,7 +119,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
   const fetchMessages = useCallback(async (chatroomId: number) => {
     try {
       setIsLoadingMessages(true);
-      const response = await api.get<ChatMessage[]>(`/v2/chatrooms/${chatroomId}/messages`);
+      const response = await api.get<ChatMessage[]>(`/v2/group-chatrooms/${chatroomId}/messages`);
       if (response.success && response.data) {
         setMessages(Array.isArray(response.data) ? response.data : []);
       }
@@ -149,7 +149,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
     setIsSending(true);
     try {
-      await api.post(`/v2/chatrooms/${activeChatroomId}/messages`, {
+      await api.post(`/v2/group-chatrooms/${activeChatroomId}/messages`, {
         body: newMessage.trim(),
       });
       toast.success(t('toast.message_posted'));
@@ -165,7 +165,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
   const handleDeleteMessage = async (messageId: number) => {
     try {
-      await api.delete(`/v2/chatroom-messages/${messageId}`);
+      await api.delete(`/v2/group-chatroom-messages/${messageId}`);
       setMessages(prev => prev.filter(m => m.id !== messageId));
     } catch (err) {
       logError('Failed to delete message', err);
@@ -201,7 +201,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
     setIsDeletingChannel(true);
     try {
-      await api.delete(`/v2/chatrooms/${activeChatroomId}`);
+      await api.delete(`/v2/group-chatrooms/${activeChatroomId}`);
       toast.success(t('toast.chatroom_deleted'));
       onDeleteClose();
       setActiveChatroomId(null);

@@ -904,8 +904,12 @@ Route::get('/v2/admin/federation/export/{type}', [\App\Http\Controllers\Api\Admi
 Route::get('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'index']);
 Route::post('/v2/admin/federation/neighborhoods', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'store']);
 Route::get('/v2/admin/federation/available-tenants', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'availableTenants']);
+Route::delete('/v2/admin/federation/neighborhoods/{id}', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'destroy']);
+Route::post('/v2/admin/federation/neighborhoods/{id}/tenants', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'addTenant']);
+Route::delete('/v2/admin/federation/neighborhoods/{id}/tenants/{tenantId}', [\App\Http\Controllers\Api\AdminFederationNeighborhoodsController::class, 'removeTenant']);
 Route::get('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'index']);
 Route::post('/v2/admin/federation/credit-agreements', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'store']);
+Route::post('/v2/admin/federation/credit-agreements/{id}/{action}', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'action']);
 Route::get('/v2/admin/federation/partners', [\App\Http\Controllers\Api\AdminFederationCreditAgreementsController::class, 'partners']);
 // NOTE: Federation user routes moved to auth-only group (not admin-only)
 Route::get('/v2/admin/pages', [\App\Http\Controllers\Api\AdminContentController::class, 'getPages']);
@@ -951,6 +955,12 @@ Route::get('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeli
 Route::put('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'updateDeliverable']);
 Route::delete('/v2/admin/deliverability/{id}', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'deleteDeliverable']);
 Route::post('/v2/admin/deliverability/{id}/comments', [\App\Http\Controllers\Api\AdminDeliverabilityController::class, 'addComment']);
+Route::get('/v2/admin/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'dashboard']);
+Route::get('/v2/admin/safeguarding/flagged-messages', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'flaggedMessages']);
+Route::get('/v2/admin/safeguarding/assignments', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'assignments']);
+Route::post('/v2/admin/safeguarding/flagged-messages/{id}/review', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'reviewMessage']);
+Route::post('/v2/admin/safeguarding/assignments', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'createAssignment']);
+Route::delete('/v2/admin/safeguarding/assignments/{id}', [\App\Http\Controllers\Api\AdminSafeguardingController::class, 'deleteAssignment']);
 
 }); // End Route::middleware(['auth:sanctum', 'admin'])
 

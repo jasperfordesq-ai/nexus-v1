@@ -143,7 +143,7 @@ class UserService
         $user = $this->user->newQuery()->findOrFail($id);
 
         $allowed = [
-            'first_name', 'last_name', 'bio', 'location', 'latitude', 'longitude',
+            'first_name', 'last_name', 'bio', 'tagline', 'location', 'latitude', 'longitude',
             'phone', 'avatar_url', 'organization_name', 'profile_type',
         ];
 
@@ -283,8 +283,11 @@ class UserService
 
         // Private fields (only for own profile)
         if ($includePrivate) {
+            $profile['tenant_id']               = $user->tenant_id;
             $profile['email']                   = $user->email;
             $profile['phone']                   = $user->phone;
+            $profile['status']                  = $user->status ?? 'active';
+            $profile['email_verified_at']       = $user->email_verified_at?->toISOString();
             $profile['balance']                 = (float) ($user->balance ?? 0);
             $profile['role']                    = $user->role ?? 'member';
             $profile['is_admin']                = in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin'])
