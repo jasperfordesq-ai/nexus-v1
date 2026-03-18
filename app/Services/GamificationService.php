@@ -235,9 +235,9 @@ class GamificationService
     /**
      * Delegates to legacy GamificationService::getLevelProgress().
      *
-     * Returns level progress details (current XP, next level threshold, percentage).
+     * Returns level progress percentage (0–100).
      */
-    public function getLevelProgress(int $xp, int $level): array
+    public function getLevelProgress(int $xp, int $level): float|int
     {
         return \Nexus\Services\GamificationService::getLevelProgress($xp, $level);
     }

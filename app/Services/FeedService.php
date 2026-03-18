@@ -168,6 +168,7 @@ class FeedService
                 ->selectRaw('target_id, COUNT(*) as cnt')
                 ->where('target_type', $sType)
                 ->whereIn('target_id', $sIds)
+                ->where('tenant_id', $tenantId)
                 ->groupBy('target_id')
                 ->pluck('cnt', 'target_id');
             foreach ($counts as $targetId => $cnt) {
@@ -201,7 +202,7 @@ class FeedService
         // Transform rows into the format expected by the React frontend
         $items = [];
         foreach ($rows as $row) {
-            $meta = $row->metadata ? json_decode($row->metadata, true) : [];
+            $meta = is_array($row->metadata) ? $row->metadata : ($row->metadata ? json_decode($row->metadata, true) : []);
             $likeKey = $row->source_type . ':' . $row->source_id;
 
             $contentResult = $this->truncateWithFlag($row->content ?? '', 500);

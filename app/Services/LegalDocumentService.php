@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -20,6 +21,9 @@ class LegalDocumentService
     public const TYPE_PRIVACY = 'privacy';
     public const TYPE_COOKIES = 'cookies';
     public const TYPE_COMMUNITY = 'community_guidelines';
+    public const TYPE_ACCESSIBILITY = 'accessibility';
+    public const TYPE_COMMUNITY_GUIDELINES = 'community_guidelines';
+    public const TYPE_ACCEPTABLE_USE = 'acceptable_use';
 
     /**
      * Get a legal document by type for the current tenant.
@@ -28,6 +32,7 @@ class LegalDocumentService
     {
         $record = DB::table('legal_documents as ld')
             ->leftJoin('legal_document_versions as ldv', 'ld.current_version_id', '=', 'ldv.id')
+            ->where('ld.tenant_id', TenantContext::getId())
             ->where('ld.document_type', $type)
             ->where('ld.is_active', true)
             ->select('ld.*', 'ldv.version_number', 'ldv.content', 'ldv.effective_date', 'ldv.summary_of_changes')
@@ -55,6 +60,7 @@ class LegalDocumentService
     public function acceptAll(int $userId, string $method = 'registration'): int
     {
         $documents = DB::table('legal_documents')
+            ->where('tenant_id', TenantContext::getId())
             ->where('is_active', true)
             ->whereNotNull('current_version_id')
             ->get();
@@ -89,6 +95,7 @@ class LegalDocumentService
     public function hasAccepted(int $userId, string $type): bool
     {
         $doc = DB::table('legal_documents')
+            ->where('tenant_id', TenantContext::getId())
             ->where('document_type', $type)
             ->where('is_active', true)
             ->first();
@@ -113,6 +120,9 @@ class LegalDocumentService
      */
     public function getAllForTenant(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return [];
+        }
         return \Nexus\Services\LegalDocumentService::getAllForTenant($tenantId);
     }
 
@@ -121,6 +131,9 @@ class LegalDocumentService
      */
     public function createDocument(array $data): array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return [];
+        }
         return \Nexus\Services\LegalDocumentService::createDocument($data);
     }
 
@@ -129,6 +142,9 @@ class LegalDocumentService
      */
     public function updateDocument(int $id, array $data): ?array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return null;
+        }
         return \Nexus\Services\LegalDocumentService::updateDocument($id, $data);
     }
 
@@ -137,6 +153,9 @@ class LegalDocumentService
      */
     public function compareVersions(int $v1, int $v2): ?array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return null;
+        }
         return \Nexus\Services\LegalDocumentService::compareVersions($v1, $v2);
     }
 
@@ -145,6 +164,9 @@ class LegalDocumentService
      */
     public function createVersion(int $docId, array $data): int
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return 0;
+        }
         return \Nexus\Services\LegalDocumentService::createVersion($docId, $data);
     }
 
@@ -153,6 +175,9 @@ class LegalDocumentService
      */
     public function publishVersion(int $vid): bool
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return false;
+        }
         return \Nexus\Services\LegalDocumentService::publishVersion($vid);
     }
 
@@ -161,6 +186,9 @@ class LegalDocumentService
      */
     public function getComplianceSummary(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return [];
+        }
         return \Nexus\Services\LegalDocumentService::getComplianceSummary($tenantId);
     }
 
@@ -169,6 +197,9 @@ class LegalDocumentService
      */
     public function getVersionAcceptances(int $vid, int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return [];
+        }
         return \Nexus\Services\LegalDocumentService::getVersionAcceptances($vid, $limit, $offset);
     }
 
@@ -177,6 +208,9 @@ class LegalDocumentService
      */
     public function exportAcceptanceRecords(int $docId, ?string $startDate = null, ?string $endDate = null): array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return [];
+        }
         return \Nexus\Services\LegalDocumentService::exportAcceptanceRecords($docId, $startDate, $endDate);
     }
 
@@ -185,6 +219,9 @@ class LegalDocumentService
      */
     public function notifyUsersOfUpdate(int $docId, int $vid, bool $sendEmail = true): int
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return 0;
+        }
         return \Nexus\Services\LegalDocumentService::notifyUsersOfUpdate($docId, $vid, $sendEmail);
     }
 
@@ -193,6 +230,9 @@ class LegalDocumentService
      */
     public function getUsersPendingAcceptanceCount(int $docId, int $vid): int
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return 0;
+        }
         return \Nexus\Services\LegalDocumentService::getUsersPendingAcceptanceCount($docId, $vid);
     }
 
@@ -201,6 +241,9 @@ class LegalDocumentService
      */
     public function getVersion(int $vid): ?array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return null;
+        }
         return \Nexus\Services\LegalDocumentService::getVersion($vid);
     }
 
@@ -209,6 +252,9 @@ class LegalDocumentService
      */
     public function updateVersion(int $vid, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return false;
+        }
         return \Nexus\Services\LegalDocumentService::updateVersion($vid, $data);
     }
 
@@ -217,6 +263,9 @@ class LegalDocumentService
      */
     public function deleteVersion(int $vid): bool
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return false;
+        }
         return \Nexus\Services\LegalDocumentService::deleteVersion($vid);
     }
 
@@ -225,6 +274,9 @@ class LegalDocumentService
      */
     public function getByType(string $type): ?array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return null;
+        }
         return \Nexus\Services\LegalDocumentService::getByType($type);
     }
 
@@ -233,6 +285,9 @@ class LegalDocumentService
      */
     public function legacyGetById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return null;
+        }
         return \Nexus\Services\LegalDocumentService::getById($id);
     }
 
@@ -241,6 +296,9 @@ class LegalDocumentService
      */
     public function recordAcceptanceFromRequest(int $userId, int $documentId, int $versionId, string $method): void
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return;
+        }
         \Nexus\Services\LegalDocumentService::recordAcceptanceFromRequest($userId, $documentId, $versionId, $method);
     }
 
@@ -249,6 +307,9 @@ class LegalDocumentService
      */
     public function getUserAcceptanceStatus(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return [];
+        }
         return \Nexus\Services\LegalDocumentService::getUserAcceptanceStatus($userId);
     }
 
@@ -257,6 +318,9 @@ class LegalDocumentService
      */
     public function hasPendingAcceptances(int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return false;
+        }
         return \Nexus\Services\LegalDocumentService::hasPendingAcceptances($userId);
     }
 
@@ -265,6 +329,9 @@ class LegalDocumentService
      */
     public function legacyGetVersions(int $documentId): array
     {
+        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
+            return [];
+        }
         return \Nexus\Services\LegalDocumentService::getVersions($documentId);
     }
 

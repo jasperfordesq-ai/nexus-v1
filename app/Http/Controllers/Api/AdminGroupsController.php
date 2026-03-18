@@ -247,7 +247,10 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', 'Pending membership request not found', null, 404);
             }
 
-            DB::update("UPDATE group_members SET status = 'approved', updated_at = NOW() WHERE id = ?", [(int) $id]);
+            DB::update(
+                "UPDATE group_members SET status = 'approved', updated_at = NOW() WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
+                [(int) $id, $tenantId]
+            );
             ActivityLog::log($adminId, 'admin_approve_group_member', "Approved membership #{$id} for group \"{$membership->group_name}\"");
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'approved']);
@@ -274,7 +277,10 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', 'Pending membership request not found', null, 404);
             }
 
-            DB::update("UPDATE group_members SET status = 'rejected', updated_at = NOW() WHERE id = ?", [(int) $id]);
+            DB::update(
+                "UPDATE group_members SET status = 'rejected', updated_at = NOW() WHERE id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
+                [(int) $id, $tenantId]
+            );
             ActivityLog::log($adminId, 'admin_reject_group_member', "Rejected membership #{$id} for group \"{$membership->group_name}\"");
 
             return $this->respondWithData(['id' => (int) $id, 'status' => 'rejected']);
@@ -681,7 +687,10 @@ class AdminGroupsController extends BaseApiController
             }
 
             $newRole = $member->role === 'member' ? 'admin' : 'owner';
-            DB::update("UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ?", [$newRole, (int) $groupId, (int) $userId]);
+            DB::update(
+                "UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
+                [$newRole, (int) $groupId, (int) $userId, $tenantId]
+            );
             ActivityLog::log($adminId, 'admin_promote_group_member', "Promoted user #{$userId} to {$newRole} in group #{$groupId}");
 
             return $this->respondWithData(['role' => $newRole]);
@@ -709,7 +718,10 @@ class AdminGroupsController extends BaseApiController
             }
 
             $newRole = $member->role === 'owner' ? 'admin' : 'member';
-            DB::update("UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ?", [$newRole, (int) $groupId, (int) $userId]);
+            DB::update(
+                "UPDATE group_members SET role = ? WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
+                [$newRole, (int) $groupId, (int) $userId, $tenantId]
+            );
             ActivityLog::log($adminId, 'admin_demote_group_member', "Demoted user #{$userId} to {$newRole} in group #{$groupId}");
 
             return $this->respondWithData(['role' => $newRole]);
@@ -736,7 +748,10 @@ class AdminGroupsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', 'Member not found', null, 404);
             }
 
-            DB::delete("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", [(int) $groupId, (int) $userId]);
+            DB::delete(
+                "DELETE FROM group_members WHERE group_id = ? AND user_id = ? AND group_id IN (SELECT id FROM `groups` WHERE tenant_id = ?)",
+                [(int) $groupId, (int) $userId, $tenantId]
+            );
             ActivityLog::log($adminId, 'admin_kick_group_member', "Kicked user #{$userId} from group #{$groupId}");
 
             return $this->respondWithData(['kicked' => true]);
@@ -796,7 +811,7 @@ class AdminGroupsController extends BaseApiController
             foreach ($groups as $group) {
                 $coords = $this->geocodingService->geocode($group->location);
                 if ($coords) {
-                    DB::update("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ?", [$coords['latitude'], $coords['longitude'], $group->id]);
+                    DB::update("UPDATE `groups` SET latitude = ?, longitude = ? WHERE id = ? AND tenant_id = ?", [$coords['latitude'], $coords['longitude'], $group->id, $tenantId]);
                     $success++;
                 } else {
                     $failed++;

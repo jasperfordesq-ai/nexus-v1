@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -32,8 +33,11 @@ class ExchangeService
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
+        $tenantId = TenantContext::getId();
+
         $query = DB::table('exchange_requests as er')
             ->leftJoin('listings as l', 'er.listing_id', '=', 'l.id')
+            ->where('er.tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('er.requester_id', $userId)->orWhere('er.provider_id', $userId))
             ->select('er.*', 'l.title as listing_title');
 
@@ -63,7 +67,7 @@ class ExchangeService
      */
     public function getById(int $id): ?array
     {
-        $exchange = DB::table('exchange_requests')->find($id);
+        $exchange = DB::table('exchange_requests')->where('tenant_id', TenantContext::getId())->where('id', $id)->first();
         return $exchange ? (array) $exchange : null;
     }
 
@@ -72,7 +76,7 @@ class ExchangeService
      */
     public function create(int $requesterId, int $listingId, array $data = []): ?int
     {
-        $listing = DB::table('listings')->find($listingId);
+        $listing = DB::table('listings')->where('tenant_id', TenantContext::getId())->where('id', $listingId)->first();
         if (! $listing) {
             return null;
         }
@@ -81,6 +85,7 @@ class ExchangeService
         }
 
         return DB::table('exchange_requests')->insertGetId([
+            'tenant_id'       => TenantContext::getId(),
             'listing_id'      => $listingId,
             'requester_id'    => $requesterId,
             'provider_id'     => $listing->user_id,
@@ -98,6 +103,7 @@ class ExchangeService
     public function accept(int $exchangeId, int $providerId): bool
     {
         return DB::table('exchange_requests')
+            ->where('tenant_id', TenantContext::getId())
             ->where('id', $exchangeId)
             ->where('provider_id', $providerId)
             ->where('status', self::STATUS_PENDING)
@@ -110,6 +116,7 @@ class ExchangeService
     public function decline(int $exchangeId, int $providerId, ?string $reason = null): bool
     {
         return DB::table('exchange_requests')
+            ->where('tenant_id', TenantContext::getId())
             ->where('id', $exchangeId)
             ->where('provider_id', $providerId)
             ->where('status', self::STATUS_PENDING)
@@ -125,7 +132,7 @@ class ExchangeService
      */
     public function complete(int $exchangeId, int $userId): bool
     {
-        $exchange = DB::table('exchange_requests')->find($exchangeId);
+        $exchange = DB::table('exchange_requests')->where('tenant_id', TenantContext::getId())->where('id', $exchangeId)->first();
         if (! $exchange || $exchange->status !== self::STATUS_ACCEPTED) {
             return false;
         }
@@ -135,6 +142,7 @@ class ExchangeService
         }
 
         return DB::table('exchange_requests')
+            ->where('tenant_id', TenantContext::getId())
             ->where('id', $exchangeId)
             ->update([
                 'status'       => self::STATUS_COMPLETED,

@@ -280,7 +280,7 @@ class AdminNewsletterController extends BaseApiController
                 );
                 $subscribers = array_map(fn($r) => (array)$r, $subscribers);
                 $total = count($subscribers);
-                $this->jsonResponse([
+                return $this->respondWithData([
                     'data' => $subscribers,
                     'meta' => [
                         'page' => 1,
@@ -299,7 +299,6 @@ class AdminNewsletterController extends BaseApiController
             } catch (\Exception $e) {
                 return $this->respondWithPaginatedCollection([], 0, 1, 20);
             }
-            return $this->respondWithData(null);
         }
 
         try {
@@ -355,7 +354,7 @@ class AdminNewsletterController extends BaseApiController
 
             $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 0;
 
-            $this->jsonResponse([
+            return $this->respondWithData([
                 'data' => $subscribers,
                 'meta' => [
                     'page' => $page,

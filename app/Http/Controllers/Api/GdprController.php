@@ -154,6 +154,7 @@ class GdprController extends BaseApiController
         // Verify password
         $user = DB::table('users')
             ->where('id', $userId)
+            ->where('tenant_id', $this->getTenantId())
             ->select('password_hash')
             ->first();
 

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,7 +24,7 @@ class PollExportService
      */
     public function exportToCsv(int $pollId, int $userId): ?string
     {
-        $poll = DB::table('polls')->find($pollId);
+        $poll = DB::table('polls')->where('tenant_id', TenantContext::getId())->where('id', $pollId)->first();
 
         if (! $poll) {
             return null;

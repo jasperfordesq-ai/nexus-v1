@@ -52,8 +52,10 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         $this->routes(function () {
-            // API routes — NO prefix (NEXUS uses /v2/... at root level)
+            // API routes — prefixed with /api (Apache rewrites /api/* → index.php,
+            // so REQUEST_URI keeps the /api prefix that Laravel must match)
             Route::middleware('api')
+                ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
             // Channel authorization routes for broadcasting

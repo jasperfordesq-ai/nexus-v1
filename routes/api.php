@@ -33,7 +33,7 @@ Route::get('/laravel/health', function () {
         'status' => 'ok',
         'framework' => 'laravel',
         'version' => app()->version(),
-        'tenant_id' => \Nexus\Core\TenantContext::getId(),
+        'tenant_id' => \App\Core\TenantContext::getId(),
     ]);
 });
 
@@ -271,12 +271,12 @@ Route::get('/v2/users/me/sub-accounts/{childId}/activity', [\App\Http\Controller
 Route::get('/v2/realtime/config', [\App\Http\Controllers\Api\RealtimeController::class, 'config']);
 // ============================================
 // Wallet
-Route::get('/v2/wallet/balance', [\App\Http\Controllers\Api\WalletController::class, 'balanceV2']);
-Route::get('/v2/wallet/transactions', [\App\Http\Controllers\Api\WalletController::class, 'transactionsV2']);
+Route::get('/v2/wallet/balance', [\App\Http\Controllers\Api\WalletController::class, 'balance']);
+Route::get('/v2/wallet/transactions', [\App\Http\Controllers\Api\WalletController::class, 'transactions']);
 Route::get('/v2/wallet/transactions/{id}', [\App\Http\Controllers\Api\WalletController::class, 'showTransaction']);
-Route::post('/v2/wallet/transfer', [\App\Http\Controllers\Api\WalletController::class, 'transferV2']);
+Route::post('/v2/wallet/transfer', [\App\Http\Controllers\Api\WalletController::class, 'transfer']);
 Route::delete('/v2/wallet/transactions/{id}', [\App\Http\Controllers\Api\WalletController::class, 'destroyTransaction']);
-Route::get('/v2/wallet/user-search', [\App\Http\Controllers\Api\WalletController::class, 'userSearchV2']);
+Route::get('/v2/wallet/user-search', [\App\Http\Controllers\Api\WalletController::class, 'userSearch']);
 Route::get('/v2/wallet/pending-count', [\App\Http\Controllers\Api\WalletController::class, 'pendingCount']);
 // Feed
 Route::get('/v2/feed', [\App\Http\Controllers\Api\SocialController::class, 'feedV2']);
@@ -1033,6 +1033,38 @@ Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, '
 Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
 Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
 
+// TOTP 2FA verification — must be public (user is mid-login, no token yet)
+Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);
+
+// ============================================
+// Public routes — No auth required
+// These were incorrectly inside auth:sanctum but must be accessible
+// to unauthenticated visitors (menus, WebAuthn login, password reset, etc.)
+// ============================================
+Route::get('/menus', [\App\Http\Controllers\Api\MenuController::class, 'index']);
+Route::get('/menus/config', [\App\Http\Controllers\Api\MenuController::class, 'config']);
+Route::get('/menus/mobile', [\App\Http\Controllers\Api\MenuController::class, 'mobile']);
+Route::get('/menus/{slug}', [\App\Http\Controllers\Api\MenuController::class, 'show']);
+
+// WebAuthn authentication (login) — must be public (user is not yet authenticated)
+Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
+Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
+Route::post('/webauthn/login/options', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
+Route::post('/webauthn/login/verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
+
+// Auth flows that must work without a token
+Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
+Route::post('/auth/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
+Route::post('/auth/verify-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyEmail']);
+Route::post('/auth/resend-verification', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerification']);
+Route::post('/auth/resend-verification-by-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerificationByEmail']);
+Route::post('/v2/contact', [\App\Http\Controllers\Api\CoreController::class, 'apiSubmit']);
+
+// API documentation
+Route::get('/docs', [\App\Http\Controllers\Api\OpenApiDocController::class, 'ui']);
+Route::get('/docs/openapi.json', [\App\Http\Controllers\Api\OpenApiDocController::class, 'json']);
+Route::get('/docs/openapi.yaml', [\App\Http\Controllers\Api\OpenApiDocController::class, 'yaml']);
+
 // ============================================
 // Misc/legacy/federation routes — Sanctum auth required
 // Controllers also enforce auth internally as a fallback
@@ -1071,15 +1103,9 @@ Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\Registrati
 Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode']);
 Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo']);
 Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook']);
-Route::get('/docs', [\App\Http\Controllers\Api\OpenApiDocController::class, 'ui']);
-Route::get('/docs/openapi.json', [\App\Http\Controllers\Api\OpenApiDocController::class, 'json']);
-Route::get('/docs/openapi.yaml', [\App\Http\Controllers\Api\OpenApiDocController::class, 'yaml']);
-Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
-Route::post('/auth/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
-Route::post('/auth/verify-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyEmail']);
-Route::post('/auth/resend-verification', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerification']);
-Route::post('/auth/resend-verification-by-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerificationByEmail']);
-Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);
+// NOTE: /docs, /auth/forgot-password, /auth/reset-password, /auth/verify-email,
+// /auth/resend-verification, /auth/resend-verification-by-email are public routes (registered above auth group)
+// NOTE: /totp/verify moved to public routes section (user has no token during 2FA login)
 Route::get('/totp/status', [\App\Http\Controllers\Api\TotpController::class, 'status']);
 Route::get('/v2/auth/2fa/status', [\App\Http\Controllers\Api\TwoFactorController::class, 'status']);
 Route::post('/v2/auth/2fa/setup', [\App\Http\Controllers\Api\TwoFactorController::class, 'setup']);
@@ -1093,17 +1119,13 @@ Route::get('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, '
 Route::get('/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);
 Route::post('/webauthn/register-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerChallenge']);
 Route::post('/webauthn/register-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerVerify']);
-Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
-Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
+// NOTE: POST /webauthn/auth-challenge, /webauthn/auth-verify, /webauthn/login/options, /webauthn/login/verify
+// are public routes (registered above auth group) — they're pre-login flows
 Route::post('/webauthn/remove', [\App\Http\Controllers\Api\WebAuthnController::class, 'remove']);
 Route::post('/webauthn/rename', [\App\Http\Controllers\Api\WebAuthnController::class, 'rename']);
 Route::post('/webauthn/remove-all', [\App\Http\Controllers\Api\WebAuthnController::class, 'removeAll']);
 Route::get('/webauthn/credentials', [\App\Http\Controllers\Api\WebAuthnController::class, 'credentials']);
 Route::get('/webauthn/status', [\App\Http\Controllers\Api\WebAuthnController::class, 'status']);
-Route::post('/webauthn/register/options', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerChallenge']);
-Route::post('/webauthn/register/verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'registerVerify']);
-Route::post('/webauthn/login/options', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
-Route::post('/webauthn/login/verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
 Route::post('/ai/chat', [\App\Http\Controllers\Api\AiChatController::class, 'chat']);
 Route::post('/ai/chat/stream', [\App\Http\Controllers\Api\AiChatController::class, 'streamChat']);
 Route::get('/ai/conversations', [\App\Http\Controllers\Api\AiChatController::class, 'listConversations']);
@@ -1120,12 +1142,9 @@ Route::post('/ai/generate/bio', [\App\Http\Controllers\Api\AiChatController::cla
 Route::post('/ai/generate/newsletter', [\App\Http\Controllers\Api\AiChatController::class, 'generateNewsletter']);
 Route::post('/ai/generate/blog', [\App\Http\Controllers\Api\AiChatController::class, 'generateBlog']);
 Route::post('/ai/generate/page', [\App\Http\Controllers\Api\AiChatController::class, 'generatePage']);
-Route::get('/menus', [\App\Http\Controllers\Api\MenuController::class, 'index']);
-Route::get('/menus/config', [\App\Http\Controllers\Api\MenuController::class, 'config']);
-Route::get('/menus/mobile', [\App\Http\Controllers\Api\MenuController::class, 'mobile']);
-Route::get('/menus/{slug}', [\App\Http\Controllers\Api\MenuController::class, 'show']);
 Route::post('/menus/clear-cache', [\App\Http\Controllers\Api\MenuController::class, 'clearCache']);
-Route::post('/v2/contact', [\App\Http\Controllers\Api\CoreController::class, 'apiSubmit']);
+// NOTE: GET /menus, /menus/config, /menus/mobile, /menus/{slug} are public routes (registered above auth group)
+// NOTE: POST /v2/contact is a public route (registered above auth group)
 Route::post('/help/feedback', [\App\Http\Controllers\Api\HelpController::class, 'feedback']);
 Route::get('/groups/{id}/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'apiData']);
 Route::get('/recommendations/groups', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);

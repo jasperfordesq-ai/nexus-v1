@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -21,14 +22,17 @@ class MemberActivityService
      */
     public function getDashboard(int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
         return [
             'timeline'    => $this->getTimeline($userId, 20),
             'hours'       => $this->getHours($userId),
             'connections' => (int) DB::table('connections')
+                ->where('tenant_id', $tenantId)
                 ->where(fn ($q) => $q->where('user_id', $userId)->orWhere('connected_user_id', $userId))
                 ->where('status', 'accepted')
                 ->count(),
-            'posts_count' => (int) DB::table('feed_posts')->where('user_id', $userId)->count(),
+            'posts_count' => (int) DB::table('feed_posts')->where('tenant_id', $tenantId)->where('user_id', $userId)->count(),
         ];
     }
 
@@ -39,8 +43,11 @@ class MemberActivityService
     {
         $items = collect();
 
+        $tenantId = TenantContext::getId();
+
         // Posts
         $posts = DB::table('feed_posts')
+            ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
             ->select('id', DB::raw("'post' as activity_type"), 'content as description', 'created_at')
             ->orderByDesc('created_at')
@@ -50,6 +57,7 @@ class MemberActivityService
 
         // Transactions
         $txns = DB::table('transactions as t')
+            ->where('t.tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('t.sender_id', $userId)->orWhere('t.receiver_id', $userId))
             ->where('t.status', 'completed')
             ->select(
@@ -78,12 +86,16 @@ class MemberActivityService
      */
     public function getHours(int $userId): array
     {
+        $tenantId = TenantContext::getId();
+
         $given = (float) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
             ->where('sender_id', $userId)
             ->where('status', 'completed')
             ->sum('amount');
 
         $received = (float) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
             ->where('receiver_id', $userId)
             ->where('status', 'completed')
             ->sum('amount');
@@ -100,6 +112,9 @@ class MemberActivityService
      */
     public function getDashboardData(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\MemberActivityService')) {
+            return $this->getDashboard($userId);
+        }
         return \Nexus\Services\MemberActivityService::getDashboardData($userId);
     }
 
@@ -108,6 +123,9 @@ class MemberActivityService
      */
     public function getRecentTimeline(int $userId, ?int $tenantId = null, int $limit = 30): array
     {
+        if (!class_exists('\Nexus\Services\MemberActivityService')) {
+            return $this->getTimeline($userId, $limit);
+        }
         return \Nexus\Services\MemberActivityService::getRecentTimeline($userId, $tenantId, $limit);
     }
 
@@ -116,6 +134,9 @@ class MemberActivityService
      */
     public function getHoursSummary(int $userId, ?int $tenantId = null): array
     {
+        if (!class_exists('\Nexus\Services\MemberActivityService')) {
+            return $this->getHours($userId);
+        }
         return \Nexus\Services\MemberActivityService::getHoursSummary($userId, $tenantId);
     }
 
@@ -124,6 +145,9 @@ class MemberActivityService
      */
     public function getMonthlyHours(int $userId, ?int $tenantId = null): array
     {
+        if (!class_exists('\Nexus\Services\MemberActivityService')) {
+            return [];
+        }
         return \Nexus\Services\MemberActivityService::getMonthlyHours($userId, $tenantId);
     }
 }

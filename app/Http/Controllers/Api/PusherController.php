@@ -172,6 +172,7 @@ class PusherController extends BaseApiController
         $user = DB::table('users')
             ->select('id', 'first_name', 'last_name', 'avatar_url')
             ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
             ->first();
 
         if (!$user) {

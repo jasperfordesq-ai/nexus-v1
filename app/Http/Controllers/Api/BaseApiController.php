@@ -728,7 +728,7 @@ abstract class BaseApiController extends Controller
      */
     protected function resolveAdminTenantFilter(bool $isSuperAdmin, int $tenantId): ?int
     {
-        $filterTenantIdRaw = $_GET['tenant_id'] ?? null;
+        $filterTenantIdRaw = request()->query('tenant_id');
 
         if ($isSuperAdmin) {
             if ($filterTenantIdRaw === 'all') {
@@ -811,8 +811,8 @@ abstract class BaseApiController extends Controller
         if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
             $userId = (int) $_SESSION['user_id'];
             $row = \Illuminate\Support\Facades\DB::selectOne(
-                "SELECT id, role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-                [$userId]
+                "SELECT id, role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?",
+                [$userId, TenantContext::getId()]
             );
 
             if ($row) {

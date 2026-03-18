@@ -46,9 +46,11 @@
     "skills": "Skills",
     "nexus_score": "NexusScore",
     "knowledge_base": "Knowledge Base",
-    "unread_notifications": "{{count}} unread notifications"
+    "unread_notifications": "{{count}} unread notifications",
+    "timebanking": "Timebanking"
   },
   "nav_desc": {
+    "feed": "Community feed",
     "members": "Browse community members",
     "connections": "Your connections & requests",
     "events": "Upcoming community events",
@@ -86,7 +88,9 @@
     "social_prescribing": "Health & wellbeing referrals",
     "our_impact": "Community impact summary",
     "impact_report": "Detailed impact data",
-    "strategic_plan": "Our strategic direction"
+    "strategic_plan": "Our strategic direction",
+    "timebanking_listings": "Offers & requests",
+    "messages": "Your messages"
   },
   "user_menu": {
     "my_profile": "My Profile",
@@ -164,7 +168,11 @@
     "legal": "Legal",
     "admin": "Admin",
     "account": "Account",
-    "language": "Language"
+    "language": "Language",
+    "engage": "Engage",
+    "progress": "Progress",
+    "tools": "Tools",
+    "impact": "Impact"
   },
   "accessibility": {
     "open_menu": "Open menu",

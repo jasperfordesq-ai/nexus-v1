@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -29,7 +30,7 @@ class FeedSocialService
             'created_at' => now(),
         ]);
 
-        DB::table('feed_posts')->where('id', $postId)->increment('share_count');
+        DB::table('feed_posts')->where('id', $postId)->where('tenant_id', TenantContext::getId())->increment('share_count');
 
         return $shareId;
     }
@@ -43,6 +44,7 @@ class FeedSocialService
 
         return DB::table('feed_hashtags as fh')
             ->join('feed_posts as fp', 'fh.post_id', '=', 'fp.id')
+            ->where('fp.tenant_id', TenantContext::getId())
             ->where('fp.created_at', '>=', $since)
             ->select('fh.hashtag', DB::raw('COUNT(*) as usage_count'))
             ->groupBy('fh.hashtag')
@@ -66,6 +68,7 @@ class FeedSocialService
         $query = DB::table('feed_posts as fp')
             ->join('feed_hashtags as fh', 'fp.id', '=', 'fh.post_id')
             ->leftJoin('users as u', 'fp.user_id', '=', 'u.id')
+            ->where('fp.tenant_id', TenantContext::getId())
             ->where('fh.hashtag', strtolower(ltrim($hashtag, '#')))
             ->select('fp.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
