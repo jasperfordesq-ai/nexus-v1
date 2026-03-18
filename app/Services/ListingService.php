@@ -553,6 +553,7 @@ class ListingService
      */
     public function canModify(array $listing, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\ListingService')) { return false; }
         return \Nexus\Services\ListingService::canModify($listing, $userId);
     }
 
@@ -563,6 +564,7 @@ class ListingService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ListingService')) { return []; }
         return \Nexus\Services\ListingService::getErrors();
     }
 

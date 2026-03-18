@@ -110,6 +110,7 @@ class ChallengeService
      */
     public function getChallengesWithProgress(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeService')) { return []; }
         return \Nexus\Services\ChallengeService::getChallengesWithProgress($userId);
     }
 
@@ -118,6 +119,7 @@ class ChallengeService
      */
     public function getActiveChallenges(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeService')) { return []; }
         return \Nexus\Services\ChallengeService::getActiveChallenges();
     }
 
@@ -126,6 +128,7 @@ class ChallengeService
      */
     public function updateProgress(int $userId, string $actionType, int $increment = 1): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeService')) { return []; }
         return \Nexus\Services\ChallengeService::updateProgress($userId, $actionType, $increment);
     }
 
@@ -134,6 +137,7 @@ class ChallengeService
      */
     public function getLegacyById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\ChallengeService')) { return null; }
         $result = \Nexus\Services\ChallengeService::getById($id);
         return $result ?: null;
     }

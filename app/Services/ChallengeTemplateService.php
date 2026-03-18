@@ -22,6 +22,7 @@ class ChallengeTemplateService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeTemplateService')) { return []; }
         return \Nexus\Services\ChallengeTemplateService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class ChallengeTemplateService
      */
     public function getAll(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeTemplateService')) { return []; }
         return \Nexus\Services\ChallengeTemplateService::getAll();
     }
 
@@ -38,6 +40,7 @@ class ChallengeTemplateService
      */
     public function getById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\ChallengeTemplateService')) { return null; }
         return \Nexus\Services\ChallengeTemplateService::getById($id);
     }
 
@@ -46,6 +49,7 @@ class ChallengeTemplateService
      */
     public function create(int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\ChallengeTemplateService')) { return null; }
         return \Nexus\Services\ChallengeTemplateService::create($userId, $data);
     }
 
@@ -54,6 +58,7 @@ class ChallengeTemplateService
      */
     public function update(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\ChallengeTemplateService')) { return false; }
         return \Nexus\Services\ChallengeTemplateService::update($id, $userId, $data);
     }
 
@@ -62,6 +67,7 @@ class ChallengeTemplateService
      */
     public function delete(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\ChallengeTemplateService')) { return false; }
         return \Nexus\Services\ChallengeTemplateService::delete($id, $userId);
     }
 
@@ -70,6 +76,7 @@ class ChallengeTemplateService
      */
     public function getTemplateData(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\ChallengeTemplateService')) { return null; }
         return \Nexus\Services\ChallengeTemplateService::getTemplateData($id);
     }
 }

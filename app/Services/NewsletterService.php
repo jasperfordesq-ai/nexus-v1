@@ -122,6 +122,8 @@ class NewsletterService
             return false;
         }
 
+        if (!class_exists('\Nexus\Services\NewsletterService')) { return false; }
+
         try {
             \Nexus\Services\NewsletterService::sendNow(
                 $newsletterId,
@@ -153,6 +155,8 @@ class NewsletterService
             ->where('id', $tenantId)
             ->value('name') ?? 'Community';
 
+        if (!class_exists('\Nexus\Services\NewsletterService')) { return ''; }
+
         return \Nexus\Services\NewsletterService::renderEmail(
             $newsletter->toArray(),
             $tenantName
@@ -164,6 +168,7 @@ class NewsletterService
      */
     public function getSegmentRecipientCount(int $segmentId, int $tenantId): int
     {
+        if (!class_exists('\Nexus\Services\NewsletterService')) { return 0; }
         return (int) \Nexus\Services\NewsletterService::getSegmentRecipientCount($segmentId);
     }
 
@@ -177,6 +182,8 @@ class NewsletterService
         if (!$newsletter) {
             return 0;
         }
+
+        if (!class_exists('\Nexus\Services\NewsletterService')) { return 0; }
 
         return (int) \Nexus\Services\NewsletterService::getRecipientCount(
             $newsletter->target_audience ?? 'all_members'

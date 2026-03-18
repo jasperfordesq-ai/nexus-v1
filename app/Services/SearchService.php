@@ -351,6 +351,7 @@ class SearchService
      */
     public function isAvailable(): bool
     {
+        if (!class_exists('\Nexus\Services\SearchService')) { return false; }
         return \Nexus\Services\SearchService::isAvailable();
     }
 }

@@ -22,6 +22,7 @@ class ListingModerationService
      */
     public function flag(int $tenantId, int $listingId, int $userId, string $reason): bool
     {
+        if (!class_exists('\Nexus\Services\ListingModerationService')) { return false; }
         return \Nexus\Services\ListingModerationService::flag($tenantId, $listingId, $userId, $reason);
     }
 
@@ -30,6 +31,7 @@ class ListingModerationService
      */
     public function approve(int $tenantId, int $listingId, int $adminId): bool
     {
+        if (!class_exists('\Nexus\Services\ListingModerationService')) { return false; }
         return \Nexus\Services\ListingModerationService::approve($tenantId, $listingId, $adminId);
     }
 
@@ -38,6 +40,7 @@ class ListingModerationService
      */
     public function reject(int $tenantId, int $listingId, int $adminId, string $reason): bool
     {
+        if (!class_exists('\Nexus\Services\ListingModerationService')) { return false; }
         return \Nexus\Services\ListingModerationService::reject($tenantId, $listingId, $adminId, $reason);
     }
 
@@ -46,6 +49,7 @@ class ListingModerationService
      */
     public function getPending(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\ListingModerationService')) { return []; }
         return \Nexus\Services\ListingModerationService::getPending($tenantId);
     }
 
@@ -54,6 +58,7 @@ class ListingModerationService
      */
     public function rejectListing(int $id, int $adminId, string $reason = ''): array
     {
+        if (!class_exists('\Nexus\Services\ListingModerationService')) { return []; }
         return \Nexus\Services\ListingModerationService::reject($id, $adminId, $reason);
     }
 
@@ -62,6 +67,7 @@ class ListingModerationService
      */
     public function getReviewQueue(int $page = 1, int $limit = 20, ?string $type = null): array
     {
+        if (!class_exists('\Nexus\Services\ListingModerationService')) { return []; }
         return \Nexus\Services\ListingModerationService::getReviewQueue($page, $limit, $type);
     }
 
@@ -70,6 +76,7 @@ class ListingModerationService
      */
     public function getStats(): array
     {
+        if (!class_exists('\Nexus\Services\ListingModerationService')) { return []; }
         return \Nexus\Services\ListingModerationService::getStats();
     }
 }

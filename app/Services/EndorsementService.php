@@ -23,6 +23,7 @@ class EndorsementService
      */
     public function endorse(int $endorserId, int $endorsedId, string $skillName, ?int $skillId = null, ?string $comment = null): ?int
     {
+        if (!class_exists('\Nexus\Services\EndorsementService')) { return null; }
         return \Nexus\Services\EndorsementService::endorse($endorserId, $endorsedId, $skillName, $skillId, $comment);
     }
 
@@ -86,6 +87,7 @@ class EndorsementService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
         return \Nexus\Services\EndorsementService::getErrors();
     }
 
@@ -94,6 +96,7 @@ class EndorsementService
      */
     public function getSkillEndorsements(int $userId, string $skillName): array
     {
+        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
         return \Nexus\Services\EndorsementService::getSkillEndorsements($userId, $skillName);
     }
 
@@ -102,6 +105,7 @@ class EndorsementService
      */
     public function getEndorsementsForUser(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
         return \Nexus\Services\EndorsementService::getEndorsementsForUser($userId);
     }
 
@@ -110,6 +114,7 @@ class EndorsementService
      */
     public function getStats(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
         return \Nexus\Services\EndorsementService::getStats($userId);
     }
 
@@ -118,6 +123,7 @@ class EndorsementService
      */
     public function getTopEndorsedMembers(int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
         return \Nexus\Services\EndorsementService::getTopEndorsedMembers($limit);
     }
 }

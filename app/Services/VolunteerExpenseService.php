@@ -25,6 +25,7 @@ class VolunteerExpenseService
      */
     public function submitExpense(int $userId, array $data): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerExpenseService')) { return []; }
         return \Nexus\Services\VolunteerExpenseService::submitExpense($userId, $data);
     }
 
@@ -33,6 +34,7 @@ class VolunteerExpenseService
      */
     public function getExpenses(array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerExpenseService')) { return []; }
         return \Nexus\Services\VolunteerExpenseService::getExpenses($filters);
     }
 
@@ -41,6 +43,7 @@ class VolunteerExpenseService
      */
     public function getExpense(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\VolunteerExpenseService')) { return null; }
         return \Nexus\Services\VolunteerExpenseService::getExpense($id);
     }
 
@@ -49,6 +52,7 @@ class VolunteerExpenseService
      */
     public function reviewExpense(int $id, int $reviewerId, string $status, ?string $notes = null): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerExpenseService')) { return false; }
         return \Nexus\Services\VolunteerExpenseService::reviewExpense($id, $reviewerId, $status, $notes);
     }
 
@@ -57,6 +61,7 @@ class VolunteerExpenseService
      */
     public function markPaid(int $id, int $adminId, ?string $paymentReference = null): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerExpenseService')) { return false; }
         return \Nexus\Services\VolunteerExpenseService::markPaid($id, $adminId, $paymentReference);
     }
 

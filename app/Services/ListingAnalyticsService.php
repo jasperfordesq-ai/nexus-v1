@@ -240,7 +240,8 @@ class ListingAnalyticsService
     {
         try {
             return DB::delete(
-                "DELETE FROM listing_views WHERE viewed_at < DATE_SUB(NOW(), INTERVAL 90 DAY)"
+                "DELETE FROM listing_views WHERE tenant_id = ? AND viewed_at < DATE_SUB(NOW(), INTERVAL 90 DAY)",
+                [TenantContext::getId()]
             );
         } catch (\Exception $e) {
             \Log::error("[ListingAnalyticsService] Cleanup error: " . $e->getMessage());

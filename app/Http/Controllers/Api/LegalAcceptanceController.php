@@ -103,15 +103,14 @@ class LegalAcceptanceController extends BaseApiController
 
             try {
                 DB::table('user_legal_acceptances')->insert([
-                    'user_id'        => $userId,
-                    'document_id'    => (int) $doc->document_id,
-                    'version_id'     => (int) $doc->current_version_id,
-                    'version_number' => $doc->current_version,
-                    'method'         => 'login_prompt',
-                    'ip_address'     => request()->ip(),
-                    'user_agent'     => request()->userAgent(),
-                    'accepted_at'    => now(),
-                    'created_at'     => now(),
+                    'user_id'           => $userId,
+                    'document_id'       => (int) $doc->document_id,
+                    'version_id'        => (int) $doc->current_version_id,
+                    'version_number'    => $doc->current_version,
+                    'acceptance_method' => 'login_prompt',
+                    'ip_address'        => request()->ip(),
+                    'user_agent'        => request()->userAgent(),
+                    'accepted_at'       => now(),
                 ]);
                 $accepted[] = $doc->document_type;
             } catch (\Throwable $e) {

@@ -22,6 +22,7 @@ class VolunteerCheckInService
      */
     public function checkIn(int $tenantId, int $opportunityId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return false; }
         return \Nexus\Services\VolunteerCheckInService::checkIn($tenantId, $opportunityId, $userId);
     }
 
@@ -30,6 +31,7 @@ class VolunteerCheckInService
      */
     public function checkOut(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return false; }
         return \Nexus\Services\VolunteerCheckInService::checkOut($tenantId, $opportunityId, $userId, $hours);
     }
 
@@ -38,6 +40,7 @@ class VolunteerCheckInService
      */
     public function getCheckIns(int $tenantId, int $opportunityId): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return []; }
         return \Nexus\Services\VolunteerCheckInService::getCheckIns($tenantId, $opportunityId);
     }
 
@@ -46,6 +49,7 @@ class VolunteerCheckInService
      */
     public function isCheckedIn(int $tenantId, int $opportunityId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return false; }
         return \Nexus\Services\VolunteerCheckInService::isCheckedIn($tenantId, $opportunityId, $userId);
     }
 
@@ -54,6 +58,7 @@ class VolunteerCheckInService
      */
     public function getUserCheckIn(int $userId, int $shiftId, int $tenantId): ?array
     {
+        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return null; }
         return \Nexus\Services\VolunteerCheckInService::getUserCheckIn($shiftId, $userId);
     }
 

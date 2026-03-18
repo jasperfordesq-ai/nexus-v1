@@ -515,10 +515,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 // MIGRATED ROUTES — Admin API (Dashboard, Users, Listings, Config, Cache, Jobs, Federation, CRM, Super Admin)
 // Source: httpdocs/routes/admin-api.php
 // ============================================
-// Admin verification badge management
-Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'grantBadge']);
-Route::delete('/v2/admin/users/{id}/badges/{type}', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'revokeBadge']);
-Route::get('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getAdminBadgeList']);
+// Admin verification badge management (distinct path to avoid collision with gamification badges at line 539)
+Route::post('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'grantBadge']);
+Route::delete('/v2/admin/users/{id}/verification-badges/{type}', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'revokeBadge']);
+Route::get('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getAdminBadgeList']);
 
 Route::get('/v2/admin/dashboard/stats', [\App\Http\Controllers\Api\AdminDashboardController::class, 'stats']);
 Route::get('/v2/admin/dashboard/trends', [\App\Http\Controllers\Api\AdminDashboardController::class, 'trends']);

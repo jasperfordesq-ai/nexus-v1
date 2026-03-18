@@ -22,6 +22,7 @@ class ChallengeCategoryService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeCategoryService')) { return []; }
         return \Nexus\Services\ChallengeCategoryService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class ChallengeCategoryService
      */
     public function getAll(): array
     {
+        if (!class_exists('\Nexus\Services\ChallengeCategoryService')) { return []; }
         return \Nexus\Services\ChallengeCategoryService::getAll();
     }
 
@@ -38,6 +40,7 @@ class ChallengeCategoryService
      */
     public function getById(int $id): ?array
     {
+        if (!class_exists('\Nexus\Services\ChallengeCategoryService')) { return null; }
         return \Nexus\Services\ChallengeCategoryService::getById($id);
     }
 
@@ -46,6 +49,7 @@ class ChallengeCategoryService
      */
     public function create(int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\ChallengeCategoryService')) { return null; }
         return \Nexus\Services\ChallengeCategoryService::create($userId, $data);
     }
 
@@ -54,6 +58,7 @@ class ChallengeCategoryService
      */
     public function update(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\ChallengeCategoryService')) { return false; }
         return \Nexus\Services\ChallengeCategoryService::update($id, $userId, $data);
     }
 
@@ -62,6 +67,7 @@ class ChallengeCategoryService
      */
     public function delete(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\ChallengeCategoryService')) { return false; }
         return \Nexus\Services\ChallengeCategoryService::delete($id, $userId);
     }
 }

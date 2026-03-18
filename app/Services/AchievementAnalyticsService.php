@@ -22,6 +22,7 @@ class AchievementAnalyticsService
      */
     public function getOverallStats()
     {
+        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
         return \Nexus\Services\AchievementAnalyticsService::getOverallStats();
     }
 
@@ -30,6 +31,7 @@ class AchievementAnalyticsService
      */
     public function getBadgeTrends($days = 30)
     {
+        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
         return \Nexus\Services\AchievementAnalyticsService::getBadgeTrends($days);
     }
 
@@ -38,6 +40,7 @@ class AchievementAnalyticsService
      */
     public function getPopularBadges($limit = 10)
     {
+        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
         return \Nexus\Services\AchievementAnalyticsService::getPopularBadges($limit);
     }
 
@@ -46,6 +49,7 @@ class AchievementAnalyticsService
      */
     public function getRarestBadges($limit = 10)
     {
+        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
         return \Nexus\Services\AchievementAnalyticsService::getRarestBadges($limit);
     }
 
@@ -54,6 +58,7 @@ class AchievementAnalyticsService
      */
     public function getTopEarners($limit = 10)
     {
+        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
         return \Nexus\Services\AchievementAnalyticsService::getTopEarners($limit);
     }
 }

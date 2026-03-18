@@ -25,6 +25,7 @@ class VolunteerDonationService
      */
     public function getDonations(array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerDonationService')) { return []; }
         return \Nexus\Services\VolunteerDonationService::getDonations($filters);
     }
 
@@ -33,6 +34,7 @@ class VolunteerDonationService
      */
     public function createDonation(int $userId, array $data): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerDonationService')) { return []; }
         return \Nexus\Services\VolunteerDonationService::createDonation($userId, $data);
     }
 
@@ -41,6 +43,7 @@ class VolunteerDonationService
      */
     public function getGivingDays(): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerDonationService')) { return []; }
         return \Nexus\Services\VolunteerDonationService::getGivingDays();
     }
 
@@ -49,6 +52,7 @@ class VolunteerDonationService
      */
     public function getGivingDayStats(int $givingDayId): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerDonationService')) { return []; }
         return \Nexus\Services\VolunteerDonationService::getGivingDayStats($givingDayId);
     }
 
@@ -57,6 +61,7 @@ class VolunteerDonationService
      */
     public function adminGetGivingDays(): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerDonationService')) { return []; }
         return \Nexus\Services\VolunteerDonationService::adminGetGivingDays();
     }
 

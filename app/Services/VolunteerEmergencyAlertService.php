@@ -22,6 +22,7 @@ class VolunteerEmergencyAlertService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerEmergencyAlertService')) { return []; }
         return \Nexus\Services\VolunteerEmergencyAlertService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class VolunteerEmergencyAlertService
      */
     public function createAlert(int $createdBy, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\VolunteerEmergencyAlertService')) { return null; }
         return \Nexus\Services\VolunteerEmergencyAlertService::createAlert($createdBy, $data);
     }
 
@@ -38,6 +40,7 @@ class VolunteerEmergencyAlertService
      */
     public function respond(int $alertId, int $userId, string $response): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerEmergencyAlertService')) { return false; }
         return \Nexus\Services\VolunteerEmergencyAlertService::respond($alertId, $userId, $response);
     }
 
@@ -46,6 +49,7 @@ class VolunteerEmergencyAlertService
      */
     public function getUserAlerts(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerEmergencyAlertService')) { return []; }
         return \Nexus\Services\VolunteerEmergencyAlertService::getUserAlerts($userId);
     }
 
@@ -54,6 +58,7 @@ class VolunteerEmergencyAlertService
      */
     public function getCoordinatorAlerts(int $coordinatorId): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerEmergencyAlertService')) { return []; }
         return \Nexus\Services\VolunteerEmergencyAlertService::getCoordinatorAlerts($coordinatorId);
     }
 

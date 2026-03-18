@@ -24,6 +24,7 @@ class ShiftWaitlistService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return []; }
         return \Nexus\Services\ShiftWaitlistService::getErrors();
     }
 
@@ -32,6 +33,7 @@ class ShiftWaitlistService
      */
     public function join(int $shiftId, int $userId): ?int
     {
+        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return null; }
         return \Nexus\Services\ShiftWaitlistService::join($shiftId, $userId);
     }
 
@@ -40,6 +42,7 @@ class ShiftWaitlistService
      */
     public function leave(int $shiftId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return false; }
         return \Nexus\Services\ShiftWaitlistService::leave($shiftId, $userId);
     }
 
@@ -48,6 +51,7 @@ class ShiftWaitlistService
      */
     public function getWaitlist(int $shiftId): array
     {
+        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return []; }
         return \Nexus\Services\ShiftWaitlistService::getWaitlist($shiftId);
     }
 
@@ -56,6 +60,7 @@ class ShiftWaitlistService
      */
     public function getUserPosition(int $shiftId, int $userId): ?array
     {
+        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return null; }
         return \Nexus\Services\ShiftWaitlistService::getUserPosition($shiftId, $userId);
     }
 
@@ -150,6 +155,7 @@ class ShiftWaitlistService
                 ]);
 
             // Sign up for shift via legacy service
+            if (!class_exists('\Nexus\Services\VolunteerService')) { return false; }
             $result = \Nexus\Services\VolunteerService::signUpForShift($entry->shift_id, $entry->user_id);
 
             if (!$result) {

@@ -26,6 +26,7 @@ class SafeguardingService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\SafeguardingService')) { return []; }
         return \Nexus\Services\SafeguardingService::getErrors();
     }
 
@@ -34,6 +35,7 @@ class SafeguardingService
      */
     public function createAssignment(int $guardianUserId, int $wardUserId, int $assignedBy, ?string $notes = null): array
     {
+        if (!class_exists('\Nexus\Services\SafeguardingService')) { return []; }
         return \Nexus\Services\SafeguardingService::createAssignment($guardianUserId, $wardUserId, $assignedBy, $notes);
     }
 
@@ -42,6 +44,7 @@ class SafeguardingService
      */
     public function recordConsent(int $wardUserId): bool
     {
+        if (!class_exists('\Nexus\Services\SafeguardingService')) { return false; }
         return \Nexus\Services\SafeguardingService::recordConsent($wardUserId);
     }
 
@@ -50,6 +53,7 @@ class SafeguardingService
      */
     public function revokeAssignment(int $assignmentId, int $revokedBy): bool
     {
+        if (!class_exists('\Nexus\Services\SafeguardingService')) { return false; }
         return \Nexus\Services\SafeguardingService::revokeAssignment($assignmentId, $revokedBy);
     }
 
@@ -58,6 +62,7 @@ class SafeguardingService
      */
     public function listAssignments(): array
     {
+        if (!class_exists('\Nexus\Services\SafeguardingService')) { return []; }
         return \Nexus\Services\SafeguardingService::listAssignments();
     }
 

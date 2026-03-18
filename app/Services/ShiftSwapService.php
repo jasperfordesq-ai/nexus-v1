@@ -22,6 +22,7 @@ class ShiftSwapService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ShiftSwapService')) { return []; }
         return \Nexus\Services\ShiftSwapService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class ShiftSwapService
      */
     public function requestSwap(int $fromUserId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\ShiftSwapService')) { return null; }
         return \Nexus\Services\ShiftSwapService::requestSwap($fromUserId, $data);
     }
 
@@ -38,6 +40,7 @@ class ShiftSwapService
      */
     public function respond(int $swapId, int $userId, string $action): bool
     {
+        if (!class_exists('\Nexus\Services\ShiftSwapService')) { return false; }
         return \Nexus\Services\ShiftSwapService::respond($swapId, $userId, $action);
     }
 
@@ -46,6 +49,7 @@ class ShiftSwapService
      */
     public function adminDecision(int $swapId, int $adminId, string $action): bool
     {
+        if (!class_exists('\Nexus\Services\ShiftSwapService')) { return false; }
         return \Nexus\Services\ShiftSwapService::adminDecision($swapId, $adminId, $action);
     }
 
@@ -54,6 +58,7 @@ class ShiftSwapService
      */
     public function getSwapRequests(int $userId, string $direction = 'all'): array
     {
+        if (!class_exists('\Nexus\Services\ShiftSwapService')) { return []; }
         return \Nexus\Services\ShiftSwapService::getSwapRequests($userId, $direction);
     }
 

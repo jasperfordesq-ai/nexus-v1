@@ -22,6 +22,7 @@ class BrokerMessageVisibilityService
      */
     public function shouldCopyMessage(int $senderId, int $receiverId, ?int $listingId = null): ?string
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return null; }
         return \Nexus\Services\BrokerMessageVisibilityService::shouldCopyMessage($senderId, $receiverId, $listingId);
     }
 
@@ -30,6 +31,7 @@ class BrokerMessageVisibilityService
      */
     public function copyMessageForBroker(int $messageId, string $reason): ?int
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return null; }
         return \Nexus\Services\BrokerMessageVisibilityService::copyMessageForBroker($messageId, $reason);
     }
 
@@ -38,6 +40,7 @@ class BrokerMessageVisibilityService
      */
     public function getUnreviewedMessages(int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return []; }
         return \Nexus\Services\BrokerMessageVisibilityService::getUnreviewedMessages($limit, $offset);
     }
 
@@ -46,6 +49,7 @@ class BrokerMessageVisibilityService
      */
     public function getMessages(string $filter = 'unreviewed', int $page = 1, int $perPage = 50): array
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return []; }
         return \Nexus\Services\BrokerMessageVisibilityService::getMessages($filter, $page, $perPage);
     }
 
@@ -54,6 +58,7 @@ class BrokerMessageVisibilityService
      */
     public function markAsReviewed(int $copyId, int $brokerId): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return false; }
         return \Nexus\Services\BrokerMessageVisibilityService::markAsReviewed($copyId, $brokerId);
     }
 
@@ -62,6 +67,7 @@ class BrokerMessageVisibilityService
      */
     public function isMessagingDisabledForUser(int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return false; }
         return \Nexus\Services\BrokerMessageVisibilityService::isMessagingDisabledForUser($userId);
     }
 
@@ -72,6 +78,7 @@ class BrokerMessageVisibilityService
      */
     public function getUserRestrictionStatus(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return []; }
         return \Nexus\Services\BrokerMessageVisibilityService::getUserRestrictionStatus($userId);
     }
 
@@ -82,6 +89,7 @@ class BrokerMessageVisibilityService
      */
     public function countUnreviewed(): int
     {
+        if (!class_exists('\Nexus\Services\BrokerMessageVisibilityService')) { return 0; }
         return \Nexus\Services\BrokerMessageVisibilityService::countUnreviewed();
     }
 }

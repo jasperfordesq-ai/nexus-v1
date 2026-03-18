@@ -22,6 +22,7 @@ class OnboardingService
      */
     public function getProgress(int $tenantId, int $userId): array
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return []; }
         return \Nexus\Services\OnboardingService::getProgress($tenantId, $userId);
     }
 
@@ -30,6 +31,7 @@ class OnboardingService
      */
     public function completeStep(int $tenantId, int $userId, string $step): bool
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return false; }
         return \Nexus\Services\OnboardingService::completeStep($tenantId, $userId, $step);
     }
 
@@ -38,6 +40,7 @@ class OnboardingService
      */
     public function getChecklist(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return []; }
         return \Nexus\Services\OnboardingService::getChecklist($tenantId);
     }
 
@@ -46,6 +49,7 @@ class OnboardingService
      */
     public function resetProgress(int $tenantId, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return false; }
         return \Nexus\Services\OnboardingService::resetProgress($tenantId, $userId);
     }
 
@@ -54,6 +58,7 @@ class OnboardingService
      */
     public function isOnboardingComplete(int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return false; }
         return \Nexus\Services\OnboardingService::isOnboardingComplete($userId);
     }
 
@@ -62,6 +67,7 @@ class OnboardingService
      */
     public function getUserInterests(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return []; }
         return \Nexus\Services\OnboardingService::getUserInterests($userId);
     }
 
@@ -70,6 +76,7 @@ class OnboardingService
      */
     public function saveInterests(int $userId, array $categoryIds): void
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return; }
         \Nexus\Services\OnboardingService::saveInterests($userId, $categoryIds);
     }
 
@@ -78,6 +85,7 @@ class OnboardingService
      */
     public function saveSkills(int $userId, array $offers, array $needs): void
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return; }
         \Nexus\Services\OnboardingService::saveSkills($userId, $offers, $needs);
     }
 
@@ -88,6 +96,7 @@ class OnboardingService
      */
     public function autoCreateListings(int $userId, array $offers, array $needs): array
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return []; }
         return \Nexus\Services\OnboardingService::autoCreateListings($userId, $offers, $needs);
     }
 
@@ -96,6 +105,7 @@ class OnboardingService
      */
     public function completeOnboarding(int $userId): void
     {
+        if (!class_exists('\Nexus\Services\OnboardingService')) { return; }
         \Nexus\Services\OnboardingService::completeOnboarding($userId);
     }
 

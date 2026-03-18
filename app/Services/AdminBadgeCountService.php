@@ -22,6 +22,7 @@ class AdminBadgeCountService
      */
     public function getCounts(): array
     {
+        if (!class_exists('\Nexus\Services\AdminBadgeCountService')) { return []; }
         return \Nexus\Services\AdminBadgeCountService::getCounts();
     }
 
@@ -30,6 +31,7 @@ class AdminBadgeCountService
      */
     public function getCount(string $key): int
     {
+        if (!class_exists('\Nexus\Services\AdminBadgeCountService')) { return 0; }
         return \Nexus\Services\AdminBadgeCountService::getCount($key);
     }
 
@@ -38,6 +40,7 @@ class AdminBadgeCountService
      */
     public function clearCache(): void
     {
+        if (!class_exists('\Nexus\Services\AdminBadgeCountService')) { return; }
         \Nexus\Services\AdminBadgeCountService::clearCache();
     }
 }

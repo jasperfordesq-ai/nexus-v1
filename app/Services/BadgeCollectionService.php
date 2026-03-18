@@ -22,6 +22,7 @@ class BadgeCollectionService
      */
     public function getCollectionsWithProgress($userId)
     {
+        if (!class_exists('\Nexus\Services\BadgeCollectionService')) { return null; }
         return \Nexus\Services\BadgeCollectionService::getCollectionsWithProgress($userId);
     }
 
@@ -30,6 +31,7 @@ class BadgeCollectionService
      */
     public function checkCollectionCompletion($userId)
     {
+        if (!class_exists('\Nexus\Services\BadgeCollectionService')) { return null; }
         return \Nexus\Services\BadgeCollectionService::checkCollectionCompletion($userId);
     }
 
@@ -38,6 +40,7 @@ class BadgeCollectionService
      */
     public function create($data)
     {
+        if (!class_exists('\Nexus\Services\BadgeCollectionService')) { return null; }
         return \Nexus\Services\BadgeCollectionService::create($data);
     }
 
@@ -46,6 +49,7 @@ class BadgeCollectionService
      */
     public function addBadgeToCollection($collectionId, $badgeKey, $order = 0)
     {
+        if (!class_exists('\Nexus\Services\BadgeCollectionService')) { return null; }
         return \Nexus\Services\BadgeCollectionService::addBadgeToCollection($collectionId, $badgeKey, $order);
     }
 
@@ -54,6 +58,7 @@ class BadgeCollectionService
      */
     public function removeBadgeFromCollection($collectionId, $badgeKey)
     {
+        if (!class_exists('\Nexus\Services\BadgeCollectionService')) { return null; }
         return \Nexus\Services\BadgeCollectionService::removeBadgeFromCollection($collectionId, $badgeKey);
     }
 }

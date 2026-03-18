@@ -22,6 +22,7 @@ class CommunityFundService
      */
     public function getOrCreateFund(): array
     {
+        if (!class_exists('\Nexus\Services\CommunityFundService')) { return []; }
         return \Nexus\Services\CommunityFundService::getOrCreateFund();
     }
 
@@ -30,6 +31,7 @@ class CommunityFundService
      */
     public function getBalance(): array
     {
+        if (!class_exists('\Nexus\Services\CommunityFundService')) { return []; }
         return \Nexus\Services\CommunityFundService::getBalance();
     }
 
@@ -38,6 +40,7 @@ class CommunityFundService
      */
     public function adminDeposit(int $adminId, float $amount, string $description = ''): array
     {
+        if (!class_exists('\Nexus\Services\CommunityFundService')) { return []; }
         return \Nexus\Services\CommunityFundService::adminDeposit($adminId, $amount, $description);
     }
 
@@ -46,6 +49,7 @@ class CommunityFundService
      */
     public function adminWithdraw(int $adminId, int $recipientId, float $amount, string $description = ''): array
     {
+        if (!class_exists('\Nexus\Services\CommunityFundService')) { return []; }
         return \Nexus\Services\CommunityFundService::adminWithdraw($adminId, $recipientId, $amount, $description);
     }
 
@@ -54,6 +58,7 @@ class CommunityFundService
      */
     public function receiveDonation(int $donorId, float $amount, string $message = ''): array
     {
+        if (!class_exists('\Nexus\Services\CommunityFundService')) { return []; }
         return \Nexus\Services\CommunityFundService::receiveDonation($donorId, $amount, $message);
     }
 }

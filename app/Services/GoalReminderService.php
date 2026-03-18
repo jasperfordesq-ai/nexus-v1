@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -58,7 +59,7 @@ class GoalReminderService
             ]));
         }
 
-        return (array) DB::table('goal_reminders')->find($id);
+        return (array) DB::table('goal_reminders')->where('id', $id)->where('tenant_id', TenantContext::getId())->first();
     }
 
     /**

@@ -204,6 +204,7 @@ class GroupService
      */
     public function update(int $id, int $userId, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
         return \Nexus\Services\GroupService::update($id, $userId, $data);
     }
 
@@ -214,6 +215,7 @@ class GroupService
      */
     public function delete(int $id, int $userId): bool
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
         return \Nexus\Services\GroupService::delete($id, $userId);
     }
 
@@ -224,6 +226,7 @@ class GroupService
      */
     public function getMembers(int $groupId, array $filters = []): array
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return []; }
         return \Nexus\Services\GroupService::getMembers($groupId, $filters);
     }
 
@@ -234,6 +237,7 @@ class GroupService
      */
     public function updateMemberRole(int $groupId, int $targetUserId, int $actingUserId, string $role): bool
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
         return \Nexus\Services\GroupService::updateMemberRole($groupId, $targetUserId, $actingUserId, $role);
     }
 
@@ -244,6 +248,7 @@ class GroupService
      */
     public function removeMember(int $groupId, int $targetUserId, int $actingUserId): bool
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
         return \Nexus\Services\GroupService::removeMember($groupId, $targetUserId, $actingUserId);
     }
 
@@ -254,6 +259,7 @@ class GroupService
      */
     public function getPendingRequests(int $groupId, int $adminUserId): ?array
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
         return \Nexus\Services\GroupService::getPendingRequests($groupId, $adminUserId);
     }
 
@@ -264,6 +270,7 @@ class GroupService
      */
     public function handleJoinRequest(int $groupId, int $requesterId, int $adminUserId, string $action): bool
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
         return \Nexus\Services\GroupService::handleJoinRequest($groupId, $requesterId, $adminUserId, $action);
     }
 
@@ -274,6 +281,7 @@ class GroupService
      */
     public function getDiscussions(int $groupId, int $userId, array $filters = []): ?array
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
         return \Nexus\Services\GroupService::getDiscussions($groupId, $userId, $filters);
     }
 
@@ -284,6 +292,7 @@ class GroupService
      */
     public function createDiscussion(int $groupId, int $userId, array $data): ?array
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
         return \Nexus\Services\GroupService::createDiscussion($groupId, $userId, $data);
     }
 
@@ -294,6 +303,7 @@ class GroupService
      */
     public function getDiscussionMessages(int $groupId, int $discussionId, int $userId, array $filters = []): ?array
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
         return \Nexus\Services\GroupService::getDiscussionMessages($groupId, $discussionId, $userId, $filters);
     }
 
@@ -304,6 +314,7 @@ class GroupService
      */
     public function postToDiscussion(int $groupId, int $discussionId, int $userId, array $data): ?array
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
         return \Nexus\Services\GroupService::postToDiscussion($groupId, $discussionId, $userId, $data);
     }
 
@@ -314,6 +325,7 @@ class GroupService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return []; }
         return \Nexus\Services\GroupService::getErrors();
     }
 
@@ -324,6 +336,7 @@ class GroupService
      */
     public function updateImage(int $groupId, int $userId, string $imageUrl, string $type = 'avatar'): bool
     {
+        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
         return \Nexus\Services\GroupService::updateImage($groupId, $userId, $imageUrl, $type);
     }
 }

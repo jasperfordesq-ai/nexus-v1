@@ -25,6 +25,7 @@ class VolunteerFormService
      */
     public function getCustomFields(?int $organizationId = null, string $appliesTo = 'application'): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerFormService')) { return []; }
         return \Nexus\Services\VolunteerFormService::getCustomFields($organizationId, $appliesTo);
     }
 
@@ -33,6 +34,7 @@ class VolunteerFormService
      */
     public function createField(array $data): array
     {
+        if (!class_exists('\Nexus\Services\VolunteerFormService')) { return []; }
         return \Nexus\Services\VolunteerFormService::createField($data);
     }
 
@@ -41,6 +43,7 @@ class VolunteerFormService
      */
     public function updateField(int $id, array $data): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerFormService')) { return false; }
         return \Nexus\Services\VolunteerFormService::updateField($id, $data);
     }
 
@@ -49,6 +52,7 @@ class VolunteerFormService
      */
     public function deleteField(int $id): bool
     {
+        if (!class_exists('\Nexus\Services\VolunteerFormService')) { return false; }
         return \Nexus\Services\VolunteerFormService::deleteField($id);
     }
 
@@ -57,6 +61,7 @@ class VolunteerFormService
      */
     public function saveFieldValues(string $entityType, int $entityId, array $values): void
     {
+        if (!class_exists('\Nexus\Services\VolunteerFormService')) { return; }
         \Nexus\Services\VolunteerFormService::saveFieldValues($entityType, $entityId, $values);
     }
 

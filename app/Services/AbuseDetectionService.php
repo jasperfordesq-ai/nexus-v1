@@ -22,6 +22,7 @@ class AbuseDetectionService
      */
     public function runAllChecks()
     {
+        if (!class_exists('\Nexus\Services\AbuseDetectionService')) { return null; }
         return \Nexus\Services\AbuseDetectionService::runAllChecks();
     }
 
@@ -30,6 +31,7 @@ class AbuseDetectionService
      */
     public function checkLargeTransfers($threshold = null)
     {
+        if (!class_exists('\Nexus\Services\AbuseDetectionService')) { return null; }
         return \Nexus\Services\AbuseDetectionService::checkLargeTransfers($threshold);
     }
 
@@ -38,6 +40,7 @@ class AbuseDetectionService
      */
     public function checkHighVelocity($threshold = null)
     {
+        if (!class_exists('\Nexus\Services\AbuseDetectionService')) { return null; }
         return \Nexus\Services\AbuseDetectionService::checkHighVelocity($threshold);
     }
 
@@ -46,6 +49,7 @@ class AbuseDetectionService
      */
     public function checkCircularTransfers($windowHours = null)
     {
+        if (!class_exists('\Nexus\Services\AbuseDetectionService')) { return null; }
         return \Nexus\Services\AbuseDetectionService::checkCircularTransfers($windowHours);
     }
 
@@ -54,6 +58,7 @@ class AbuseDetectionService
      */
     public function checkInactiveHighBalances()
     {
+        if (!class_exists('\Nexus\Services\AbuseDetectionService')) { return null; }
         return \Nexus\Services\AbuseDetectionService::checkInactiveHighBalances();
     }
 
@@ -62,6 +67,7 @@ class AbuseDetectionService
      */
     public function updateAlertStatus(int $id, string $status, ?int $resolvedBy = null, ?string $notes = null): bool
     {
+        if (!class_exists('\Nexus\Services\AbuseDetectionService')) { return false; }
         return \Nexus\Services\AbuseDetectionService::updateAlertStatus($id, $status, $resolvedBy, $notes);
     }
 }

@@ -97,6 +97,7 @@ class AdminAnalyticsService
      */
     public function getOverallStats(): array
     {
+        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
         return \Nexus\Services\AdminAnalyticsService::getOverallStats();
     }
 
@@ -105,6 +106,7 @@ class AdminAnalyticsService
      */
     public function getMonthlyTrends(int $months = 12): array
     {
+        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
         return \Nexus\Services\AdminAnalyticsService::getMonthlyTrends($months);
     }
 
@@ -113,6 +115,7 @@ class AdminAnalyticsService
      */
     public function getWeeklyTrends(int $weeks = 12): array
     {
+        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
         return \Nexus\Services\AdminAnalyticsService::getWeeklyTrends($weeks);
     }
 
@@ -121,6 +124,7 @@ class AdminAnalyticsService
      */
     public function getTopEarners(int $days = 30, int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
         return \Nexus\Services\AdminAnalyticsService::getTopEarners($days, $limit);
     }
 
@@ -129,6 +133,7 @@ class AdminAnalyticsService
      */
     public function getTopSpenders(int $days = 30, int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
         return \Nexus\Services\AdminAnalyticsService::getTopSpenders($days, $limit);
     }
 }

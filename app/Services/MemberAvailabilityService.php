@@ -114,6 +114,7 @@ class MemberAvailabilityService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
         return \Nexus\Services\MemberAvailabilityService::getErrors();
     }
 
@@ -122,6 +123,7 @@ class MemberAvailabilityService
      */
     public function getUserAvailability(int $userId): array
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
         return \Nexus\Services\MemberAvailabilityService::getUserAvailability($userId);
     }
 
@@ -130,6 +132,7 @@ class MemberAvailabilityService
      */
     public function setBulkAvailability(int $userId, array $schedule): bool
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return false; }
         return \Nexus\Services\MemberAvailabilityService::setBulkAvailability($userId, $schedule);
     }
 
@@ -138,6 +141,7 @@ class MemberAvailabilityService
      */
     public function setDayAvailability(int $userId, int $dayOfWeek, array $slots): bool
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return false; }
         return \Nexus\Services\MemberAvailabilityService::setDayAvailability($userId, $dayOfWeek, $slots);
     }
 
@@ -146,6 +150,7 @@ class MemberAvailabilityService
      */
     public function addSpecificDate(int $userId, array $data): ?int
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return null; }
         return \Nexus\Services\MemberAvailabilityService::addSpecificDate($userId, $data);
     }
 
@@ -154,6 +159,7 @@ class MemberAvailabilityService
      */
     public function deleteSlot(int $userId, int $slotId): bool
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return false; }
         return \Nexus\Services\MemberAvailabilityService::deleteSlot($userId, $slotId);
     }
 
@@ -162,6 +168,7 @@ class MemberAvailabilityService
      */
     public function findCompatibleTimes(int $userId1, int $userId2): array
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
         return \Nexus\Services\MemberAvailabilityService::findCompatibleTimes($userId1, $userId2);
     }
 
@@ -170,6 +177,7 @@ class MemberAvailabilityService
      */
     public function getAvailableMembers(int $dayOfWeek, ?string $time = null, int $limit = 50): array
     {
+        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
         return \Nexus\Services\MemberAvailabilityService::getAvailableMembers($dayOfWeek, $time, $limit);
     }
 }

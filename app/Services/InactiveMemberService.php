@@ -22,6 +22,7 @@ class InactiveMemberService
      */
     public function detectInactive(int $tenantId, int $thresholdDays = 90): array
     {
+        if (!class_exists('\Nexus\Services\InactiveMemberService')) { return []; }
         return \Nexus\Services\InactiveMemberService::detectInactive($tenantId, $thresholdDays);
     }
 
@@ -30,6 +31,7 @@ class InactiveMemberService
      */
     public function getInactiveMembers(int $tenantId, int $days = 90, ?string $flagType = null, int $limit = 50, int $offset = 0): array
     {
+        if (!class_exists('\Nexus\Services\InactiveMemberService')) { return []; }
         return \Nexus\Services\InactiveMemberService::getInactiveMembers($tenantId, $days, $flagType, $limit, $offset);
     }
 
@@ -38,6 +40,7 @@ class InactiveMemberService
      */
     public function getInactivityStats(int $tenantId): array
     {
+        if (!class_exists('\Nexus\Services\InactiveMemberService')) { return []; }
         return \Nexus\Services\InactiveMemberService::getInactivityStats($tenantId);
     }
 
@@ -46,6 +49,7 @@ class InactiveMemberService
      */
     public function markNotified(int $tenantId, array $userIds): int
     {
+        if (!class_exists('\Nexus\Services\InactiveMemberService')) { return 0; }
         return \Nexus\Services\InactiveMemberService::markNotified($tenantId, $userIds);
     }
 }

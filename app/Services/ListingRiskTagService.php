@@ -25,6 +25,7 @@ class ListingRiskTagService
      */
     public function tagListing(int $listingId, array $data, int $brokerId): ?int
     {
+        if (!class_exists('\Nexus\Services\ListingRiskTagService')) { return null; }
         return \Nexus\Services\ListingRiskTagService::tagListing($listingId, $data, $brokerId);
     }
 
@@ -33,6 +34,7 @@ class ListingRiskTagService
      */
     public function getTagForListing(int $listingId): ?array
     {
+        if (!class_exists('\Nexus\Services\ListingRiskTagService')) { return null; }
         return \Nexus\Services\ListingRiskTagService::getTagForListing($listingId);
     }
 
@@ -41,6 +43,7 @@ class ListingRiskTagService
      */
     public function removeTag(int $listingId, ?int $removedBy = null): bool
     {
+        if (!class_exists('\Nexus\Services\ListingRiskTagService')) { return false; }
         return \Nexus\Services\ListingRiskTagService::removeTag($listingId, $removedBy);
     }
 
@@ -49,6 +52,7 @@ class ListingRiskTagService
      */
     public function getTaggedListings(?string $riskLevel = null, int $page = 1, int $perPage = 20): array
     {
+        if (!class_exists('\Nexus\Services\ListingRiskTagService')) { return []; }
         return \Nexus\Services\ListingRiskTagService::getTaggedListings($riskLevel, $page, $perPage);
     }
 
@@ -57,6 +61,7 @@ class ListingRiskTagService
      */
     public function getHighRiskListings(): array
     {
+        if (!class_exists('\Nexus\Services\ListingRiskTagService')) { return []; }
         return \Nexus\Services\ListingRiskTagService::getHighRiskListings();
     }
 }

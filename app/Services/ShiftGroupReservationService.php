@@ -22,6 +22,7 @@ class ShiftGroupReservationService
      */
     public function getErrors(): array
     {
+        if (!class_exists('\Nexus\Services\ShiftGroupReservationService')) { return []; }
         return \Nexus\Services\ShiftGroupReservationService::getErrors();
     }
 
@@ -30,6 +31,7 @@ class ShiftGroupReservationService
      */
     public function reserve(int $shiftId, int $groupId, int $reservedBy, int $slots, ?string $notes = null): ?int
     {
+        if (!class_exists('\Nexus\Services\ShiftGroupReservationService')) { return null; }
         return \Nexus\Services\ShiftGroupReservationService::reserve($shiftId, $groupId, $reservedBy, $slots, $notes);
     }
 
@@ -38,6 +40,7 @@ class ShiftGroupReservationService
      */
     public function addMember(int $reservationId, int $userId, int $leaderUserId): bool
     {
+        if (!class_exists('\Nexus\Services\ShiftGroupReservationService')) { return false; }
         return \Nexus\Services\ShiftGroupReservationService::addMember($reservationId, $userId, $leaderUserId);
     }
 
@@ -46,6 +49,7 @@ class ShiftGroupReservationService
      */
     public function removeMember(int $reservationId, int $userId, int $leaderUserId): bool
     {
+        if (!class_exists('\Nexus\Services\ShiftGroupReservationService')) { return false; }
         return \Nexus\Services\ShiftGroupReservationService::removeMember($reservationId, $userId, $leaderUserId);
     }
 
@@ -54,6 +58,7 @@ class ShiftGroupReservationService
      */
     public function cancelReservation(int $reservationId, int $leaderUserId): bool
     {
+        if (!class_exists('\Nexus\Services\ShiftGroupReservationService')) { return false; }
         return \Nexus\Services\ShiftGroupReservationService::cancelReservation($reservationId, $leaderUserId);
     }
 

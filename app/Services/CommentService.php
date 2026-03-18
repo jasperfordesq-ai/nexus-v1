@@ -160,6 +160,7 @@ class CommentService
      */
     public function fetchComments(string $targetType, int $targetId, int $currentUserId = 0): array
     {
+        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
         return \Nexus\Services\CommentService::fetchComments($targetType, $targetId, $currentUserId);
     }
 
@@ -168,6 +169,7 @@ class CommentService
      */
     public function addComment(int $userId, int $tenantId, string $targetType, int $targetId, string $content, ?int $parentId = null): array
     {
+        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
         return \Nexus\Services\CommentService::addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
     }
 
@@ -176,6 +178,7 @@ class CommentService
      */
     public function deleteComment(int $commentId, int $userId, bool $isSuperAdmin = false): array
     {
+        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
         return \Nexus\Services\CommentService::deleteComment($commentId, $userId, $isSuperAdmin);
     }
 
@@ -184,6 +187,7 @@ class CommentService
      */
     public function editComment(int $commentId, int $userId, string $newContent): array
     {
+        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
         return \Nexus\Services\CommentService::editComment($commentId, $userId, $newContent);
     }
 
@@ -204,6 +208,7 @@ class CommentService
      */
     public function getAvailableReactions(): array
     {
+        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
         return \Nexus\Services\CommentService::getAvailableReactions();
     }
 
@@ -212,6 +217,7 @@ class CommentService
      */
     public function searchUsersForMention(string $query, int $tenantId, int $limit = 10): array
     {
+        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
         return \Nexus\Services\CommentService::searchUsersForMention($query, $tenantId, $limit);
     }
 

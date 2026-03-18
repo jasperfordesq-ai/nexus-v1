@@ -22,6 +22,7 @@ class BalanceAlertService
      */
     public function checkAllBalances()
     {
+        if (!class_exists('\Nexus\Services\BalanceAlertService')) { return null; }
         return \Nexus\Services\BalanceAlertService::checkAllBalances();
     }
 
@@ -30,6 +31,7 @@ class BalanceAlertService
      */
     public function checkBalance($organizationId, $balance = null, $orgName = null)
     {
+        if (!class_exists('\Nexus\Services\BalanceAlertService')) { return null; }
         return \Nexus\Services\BalanceAlertService::checkBalance($organizationId, $balance, $orgName);
     }
 
@@ -38,6 +40,7 @@ class BalanceAlertService
      */
     public function getThresholds($organizationId)
     {
+        if (!class_exists('\Nexus\Services\BalanceAlertService')) { return null; }
         return \Nexus\Services\BalanceAlertService::getThresholds($organizationId);
     }
 
@@ -46,6 +49,7 @@ class BalanceAlertService
      */
     public function areAlertsEnabled($organizationId)
     {
+        if (!class_exists('\Nexus\Services\BalanceAlertService')) { return null; }
         return \Nexus\Services\BalanceAlertService::areAlertsEnabled($organizationId);
     }
 
@@ -54,6 +58,7 @@ class BalanceAlertService
      */
     public function setThresholds($organizationId, $lowThreshold, $criticalThreshold)
     {
+        if (!class_exists('\Nexus\Services\BalanceAlertService')) { return null; }
         return \Nexus\Services\BalanceAlertService::setThresholds($organizationId, $lowThreshold, $criticalThreshold);
     }
 }

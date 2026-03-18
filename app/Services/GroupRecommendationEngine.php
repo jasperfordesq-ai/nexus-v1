@@ -22,6 +22,7 @@ class GroupRecommendationEngine
      */
     public function getRecommendations($userId, $limit = 10, $options = [])
     {
+        if (!class_exists('\Nexus\Services\GroupRecommendationEngine')) { return null; }
         return \Nexus\Services\GroupRecommendationEngine::getRecommendations($userId, $limit, $options);
     }
 
@@ -30,6 +31,7 @@ class GroupRecommendationEngine
      */
     public function trackInteraction($userId, $groupId, $action)
     {
+        if (!class_exists('\Nexus\Services\GroupRecommendationEngine')) { return null; }
         return \Nexus\Services\GroupRecommendationEngine::trackInteraction($userId, $groupId, $action);
     }
 
@@ -38,6 +40,7 @@ class GroupRecommendationEngine
      */
     public function getPerformanceMetrics($days = 30)
     {
+        if (!class_exists('\Nexus\Services\GroupRecommendationEngine')) { return null; }
         return \Nexus\Services\GroupRecommendationEngine::getPerformanceMetrics($days);
     }
 }

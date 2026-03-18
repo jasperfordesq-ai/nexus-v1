@@ -22,6 +22,7 @@ class ListingExpiryReminderService
      */
     public function sendDueReminders(): array
     {
+        if (!class_exists('\Nexus\Services\ListingExpiryReminderService')) { return []; }
         return \Nexus\Services\ListingExpiryReminderService::sendDueReminders();
     }
 
@@ -30,6 +31,7 @@ class ListingExpiryReminderService
      */
     public function cleanupOldRecords(): int
     {
+        if (!class_exists('\Nexus\Services\ListingExpiryReminderService')) { return 0; }
         return \Nexus\Services\ListingExpiryReminderService::cleanupOldRecords();
     }
 }
