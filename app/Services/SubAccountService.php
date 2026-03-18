@@ -23,9 +23,12 @@ class SubAccountService
      */
     public function getChildren(int $parentUserId): array
     {
+        $tenantId = \App\Core\TenantContext::getId();
+
         return DB::table('account_relationships as ar')
             ->join('users as u', 'ar.child_user_id', '=', 'u.id')
             ->where('ar.parent_user_id', $parentUserId)
+            ->where('ar.tenant_id', $tenantId)
             ->where('ar.status', 'active')
             ->select('ar.*', 'u.first_name', 'u.last_name', 'u.email', 'u.avatar_url')
             ->orderByDesc('ar.created_at')
@@ -48,9 +51,12 @@ class SubAccountService
             return null;
         }
 
+        $tenantId = \App\Core\TenantContext::getId();
+
         $existing = DB::table('account_relationships')
             ->where('parent_user_id', $parentUserId)
             ->where('child_user_id', $childUserId)
+            ->where('tenant_id', $tenantId)
             ->first();
 
         if ($existing) {
@@ -67,6 +73,7 @@ class SubAccountService
         return DB::table('account_relationships')->insertGetId([
             'parent_user_id'    => $parentUserId,
             'child_user_id'     => $childUserId,
+            'tenant_id'         => $tenantId,
             'relationship_type' => $type,
             'permissions'       => json_encode(array_merge($defaultPerms, $permissions)),
             'status'            => 'pending',
@@ -83,6 +90,7 @@ class SubAccountService
         return DB::table('account_relationships')
             ->where('id', $relationshipId)
             ->where('child_user_id', $childUserId)
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->where('status', 'pending')
             ->update([
                 'status'     => 'active',
@@ -97,6 +105,7 @@ class SubAccountService
     {
         return DB::table('account_relationships')
             ->where('id', $relationshipId)
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->where(fn ($q) => $q->where('parent_user_id', $userId)->orWhere('child_user_id', $userId))
             ->update([
                 'status'     => 'revoked',

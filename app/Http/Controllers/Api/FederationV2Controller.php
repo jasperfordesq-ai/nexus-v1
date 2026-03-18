@@ -983,8 +983,8 @@ class FederationV2Controller extends BaseApiController
 
             if ($message['status'] !== 'read') {
                 DB::update(
-                    "UPDATE federation_messages SET status = 'read', read_at = NOW() WHERE id = ?",
-                    [$id]
+                    "UPDATE federation_messages SET status = 'read', read_at = NOW() WHERE id = ? AND receiver_tenant_id = ? AND receiver_user_id = ?",
+                    [$id, $tenantId, $userId]
                 );
             }
 
