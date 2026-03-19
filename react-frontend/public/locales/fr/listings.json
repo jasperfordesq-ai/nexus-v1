@@ -119,5 +119,7 @@
   "load_error": "Impossible de charger les annonces.",
   "load_more_error": "Impossible de charger plus",
   "page_meta_description": "Parcourez les services.",
-  "page_meta_keywords": "annonces, services, offres"
+  "page_meta_keywords": "annonces, services, offres",
+  "save_listing": "Enregistrer l'annonce",
+  "unsave_listing": "Retirer l'annonce"
 }

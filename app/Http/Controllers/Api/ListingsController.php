@@ -126,7 +126,7 @@ class ListingsController extends BaseApiController
             try {
                 $ip = \App\Core\ClientIp::get();
                 $this->listingAnalyticsService->recordView($id, $userId, $ip);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Non-critical
             }
         }
@@ -134,7 +134,7 @@ class ListingsController extends BaseApiController
         // Attach skill tags
         try {
             $listing['skill_tags'] = $this->listingSkillTagService->getTags($id);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $listing['skill_tags'] = [];
         }
 

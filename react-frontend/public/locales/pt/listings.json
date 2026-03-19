@@ -119,5 +119,7 @@
   "load_error": "Falha ao carregar anuncios.",
   "load_more_error": "Falha ao carregar mais",
   "page_meta_description": "Navegue por servicos.",
-  "page_meta_keywords": "anuncios, servicos, ofertas"
+  "page_meta_keywords": "anuncios, servicos, ofertas",
+  "save_listing": "Guardar anúncio",
+  "unsave_listing": "Remover anúncio"
 }
