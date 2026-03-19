@@ -214,13 +214,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   }), [t, tenantPath, hasFeature, hasModule]);
 
   const communityItems = useMemo(() => [
-    { label: t('nav.members'), desc: t('nav_desc.members'), href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
-    { label: t('nav.connections'), desc: t('nav_desc.connections'), href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
-    { label: t('nav.events'), desc: t('nav_desc.events'), href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
-    { label: t('nav.groups'), desc: t('nav_desc.groups'), href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
-    { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
-    { label: t('nav.resources'), desc: t('nav_desc.resources'), href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
-    { label: t('nav.jobs'), desc: t('nav_desc.jobs'), href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
+    { label: t('nav.members'), desc: t('nav_desc.members'), path: '/members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
+    { label: t('nav.connections'), desc: t('nav_desc.connections'), path: '/connections', href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
+    { label: t('nav.events'), desc: t('nav_desc.events'), path: '/events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
+    { label: t('nav.groups'), desc: t('nav_desc.groups'), path: '/groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
+    { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), path: '/volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
+    { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
+    { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
   ].filter(item => hasFeature(item.feature)), [t, tenantPath, hasFeature]);
 
   // Helper to filter items by feature/module gates

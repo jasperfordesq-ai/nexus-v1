@@ -383,6 +383,9 @@ export function CreateEventPage() {
         const categoryInt = parseInt(formData.category);
         if (!isNaN(categoryInt)) {
           payload.category_id = categoryInt;
+        } else {
+          // Category is a slug string (e.g. 'workshop') — send as category_name
+          payload.category_name = formData.category;
         }
       }
 

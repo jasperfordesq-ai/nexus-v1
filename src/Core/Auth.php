@@ -12,6 +12,12 @@ namespace Nexus\Core;
  * Provides authentication utilities for the application.
  * Works alongside AdminAuth for admin-level access control.
  */
+/**
+ *  Use AppCoreAuth instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreAuth instead. Maintained for backward compatibility.
+ */
 class Auth
 {
     /**

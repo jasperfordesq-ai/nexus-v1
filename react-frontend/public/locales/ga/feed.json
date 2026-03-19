@@ -24,7 +24,9 @@
     "goals": "Spriocanna",
     "jobs": "Jobs",
     "challenges": "Challenges",
-    "volunteering": "Volunteering"
+    "volunteering": "Volunteering",
+    "blogs": "Blag",
+    "discussions": "Plé"
   },
   "report": {
     "title": "Tuairiscigh Postáil",
@@ -296,7 +298,9 @@
       "create_poll": "Create Poll",
       "set_goal": "Set Goal",
       "groups": "Groups"
-    }
+    },
+    "by_owner": "le {{name}}",
+    "offer": "Tairiscint"
   },
   "mode": {
     "for_you": "For You",

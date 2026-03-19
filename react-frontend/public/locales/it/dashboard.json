@@ -85,6 +85,7 @@
   "reviews": {
     "sent": "Inviato {{amount}}h",
     "received": "Ricevuto {{amount}}h",
-    "review": "Recensione"
+    "review": "Recensione",
+    "none_pending": "Nessuna recensione in sospeso"
   }
 }

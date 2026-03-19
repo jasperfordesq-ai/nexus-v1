@@ -46,7 +46,8 @@
     "nexus_score": "NexusScore",
     "knowledge_base": "Bunachar eolais",
     "federation_settings": "Socruithe Cónaidhme",
-    "unread_notifications": "{{count}} fógra gan léamh"
+    "unread_notifications": "{{count}} fógra gan léamh",
+    "timebanking": "Baincéireacht ama"
   },
   "nav_desc": {
     "members": "Brabhsáil baill an phobail",
@@ -86,7 +87,10 @@
     "our_impact": "Achoimre ar thionchar an phobail",
     "impact_report": "Sonraí mionsonraithe tionchair",
     "strategic_plan": "Ár dtreo straitéiseach",
-    "federation_settings": "Bainistigh do roghanna cónaidhme"
+    "federation_settings": "Bainistigh do roghanna cónaidhme",
+    "feed": "Fotha an phobail",
+    "timebanking_listings": "Tairiscintí agus iarratais",
+    "messages": "Do theachtaireachtaí"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",
@@ -164,7 +168,11 @@
     "legal": "Dlíthiúil",
     "admin": "Riarachán",
     "account": "Cuntas",
-    "language": "Teanga"
+    "language": "Teanga",
+    "engage": "Glac páirt",
+    "progress": "Dul chun cinn",
+    "tools": "Uirlisí",
+    "impact": "Tionchar"
   },
   "accessibility": {
     "open_menu": "Oscail roghchlár",

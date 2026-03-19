@@ -42,6 +42,13 @@
 .bg-theme-hover { background-color: var(--surface-hover); }
 .bg-theme-active { background-color: var(--surface-active); }
 .bg-theme-card { background-color: var(--card-bg); }
+.bg-theme-solid { background-color: var(--surface-solid); }
+
+/* Modal backgrounds — HeroUI modals need opaque backgrounds, not glassmorphism */
+[role="dialog"] > section,
+[data-slot="base"][class*="modal"] {
+  background-color: var(--surface-solid) !important;
+}
 
 /* Border colors */
 .border-theme-default { border-color: var(--border-default); }

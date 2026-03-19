@@ -9,6 +9,12 @@ namespace Nexus\Core;
 use PDO;
 use PDOException;
 
+/**
+ *  Use AppCoreDatabase instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreDatabase instead. Maintained for backward compatibility.
+ */
 class Database
 {
     private static $instance = null;
@@ -20,6 +26,13 @@ class Database
     private static $queryLog = [];
     private static $slowQueryThreshold = 0.1; // 100ms in seconds
     private static $enableProfiling = null;
+
+    /**
+     * Laravel DB bridge — when set, getInstance() returns Laravel's PDO
+     * instead of creating a separate connection. This ensures both frameworks
+     * share the same connection pool and transaction state.
+     */
+    private static ?PDO $laravelPdo = null;
 
     private function __construct()
     {
@@ -50,8 +63,22 @@ class Database
         }
     }
 
+    /**
+     * Set Laravel's PDO connection for the DB bridge.
+     * When set, all Database::query() calls use Laravel's connection pool.
+     */
+    public static function setLaravelConnection(PDO $pdo): void
+    {
+        self::$laravelPdo = $pdo;
+    }
+
     public static function getInstance()
     {
+        // Laravel bridge: use Laravel's PDO if available
+        if (self::$laravelPdo !== null) {
+            return self::$laravelPdo;
+        }
+
         if (self::$instance === null) {
             self::$instance = new self();
         }

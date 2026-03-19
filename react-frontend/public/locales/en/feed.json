@@ -24,7 +24,9 @@
     "goals": "Goals",
     "jobs": "Jobs",
     "challenges": "Challenges",
-    "volunteering": "Volunteering"
+    "volunteering": "Volunteering",
+    "blogs": "Blog",
+    "discussions": "Discussions"
   },
   "report": {
     "title": "Report Post",
@@ -296,7 +298,9 @@
       "create_poll": "Create Poll",
       "set_goal": "Set Goal",
       "groups": "Groups"
-    }
+    },
+    "by_owner": "by {{name}}",
+    "offer": "Offer"
   },
   "mode": {
     "for_you": "For You",

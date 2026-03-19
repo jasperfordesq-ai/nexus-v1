@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+define('LARAVEL_START', microtime(true));
+
+require __DIR__ . '/vendor/autoload.php';
+
+
+$status = (require_once __DIR__ . '/bootstrap/app.php')
+    ->handleCommand(new Symfony\Component\Console\Input\ArgvInput);
+
+exit($status);

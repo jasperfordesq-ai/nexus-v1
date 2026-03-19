@@ -1,0 +1,98 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+
+$app = Application::configure(basePath: dirname(__DIR__))
+    ->withProviders([
+        \App\Providers\RouteServiceProvider::class,
+        \App\Providers\EventServiceProvider::class,
+        \App\Providers\BroadcastServiceProvider::class,
+    ])
+    ->withCommands([
+        __DIR__ . '/../app/Console/Commands',
+    ])
+    ->withRouting(
+        // Routes loaded by RouteServiceProvider (no /api prefix).
+        // Only register the health-check here to avoid double-loading.
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->api(prepend: [
+            \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\ResolveTenant::class,
+        ]);
+
+        $middleware->alias([
+            'auth' => \App\Http\Middleware\Authenticate::class,
+            'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
+            'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        // JSON error responses for API — see App\Exceptions\Handler
+        $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'errors' => [
+                    ['code' => 'validation_failed', 'message' => 'Validation failed', 'details' => $e->errors()],
+                ],
+                'success' => false,
+            ], 422, ['API-Version' => '2.0']);
+        });
+
+        $exceptions->renderable(function (\Illuminate\Auth\AuthenticationException $e) {
+            return response()->json([
+                'errors' => [
+                    ['code' => 'auth_required', 'message' => 'You must be logged in to access this resource.'],
+                ],
+                'success' => false,
+            ], 401, ['API-Version' => '2.0']);
+        });
+
+        $exceptions->renderable(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $model = class_basename($e->getModel());
+            return response()->json([
+                'errors' => [
+                    ['code' => 'not_found', 'message' => "{$model} not found."],
+                ],
+                'success' => false,
+            ], 404, ['API-Version' => '2.0']);
+        });
+
+        $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException $e) {
+            return response()->json([
+                'errors' => [
+                    ['code' => 'rate_limited', 'message' => 'Rate limit exceeded. Please try again later.'],
+                ],
+                'success' => false,
+                'retry_after' => $e->getHeaders()['Retry-After'] ?? null,
+            ], 429, ['API-Version' => '2.0']);
+        });
+
+        // Sentry integration — report to Sentry in production
+        $exceptions->reportable(function (\Throwable $e) {
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+        });
+    })
+    ->create();
+
+// DB Bridge: Share Laravel's PDO connection with the legacy Database class.
+// This ensures both frameworks use the same connection pool and transaction state.
+$app->booted(function () use ($app) {
+    try {
+        $pdo = $app->make('db')->connection()->getPdo();
+        \Nexus\Core\Database::setLaravelConnection($pdo);
+    } catch (\Throwable $e) {
+        // If Laravel DB isn't configured yet, legacy Database creates its own connection
+        error_log('[Laravel Bridge] DB bridge skipped: ' . $e->getMessage());
+    }
+});
+
+return $app;

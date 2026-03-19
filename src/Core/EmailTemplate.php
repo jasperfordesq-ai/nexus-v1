@@ -6,6 +6,12 @@
 
 namespace Nexus\Core;
 
+/**
+ *  Use AppCoremailTemplate instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoremailTemplate instead. Maintained for backward compatibility.
+ */
 class EmailTemplate
 {
     /**

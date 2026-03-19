@@ -1,0 +1,184 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Services\Enterprise\GdprService;
+
+/**
+ * GdprController — Eloquent-powered GDPR consent and data request endpoints.
+ *
+ * Fully migrated from legacy delegation. Uses legacy GdprService (instantiated)
+ * for consent updates and data requests. Password verification uses DB facade.
+ */
+class GdprController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly GdprService $gdprService,
+    ) {}
+
+    /**
+     * POST /api/v2/gdpr/consent
+     *
+     * Update user consent preference.
+     *
+     * Request body (JSON):
+     * - consent_id: int (required, unless consent_type provided)
+     * - consent_type: string (alternative to consent_id)
+     * - granted: bool (required)
+     */
+    public function updateConsent(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('gdpr_consent', 30, 60);
+
+        $consentId = $this->input('consent_id');
+        $granted = $this->inputBool('granted', false);
+
+        if (!$consentId && !$this->input('consent_type')) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Missing consent_id', 'consent_id', 400);
+        }
+
+        // Resolve consent_id (int) to consent type slug, or use consent_type directly
+        if ($consentId) {
+            $consentRow = DB::table('consent_types')
+                ->where('id', (int) $consentId)
+                ->select('slug')
+                ->first();
+            $consentType = $consentRow->slug ?? null;
+        } else {
+            $consentType = $this->input('consent_type');
+        }
+
+        if (!$consentType) {
+            return $this->respondWithError('VALIDATION_ERROR', 'consent_id or consent_type is required', 'consent_id', 422);
+        }
+
+        try {
+            $this->gdprService->updateUserConsent($userId, $consentType, $granted);
+
+            return $this->respondWithData([
+                'updated' => true,
+                'consent_id' => $consentId ? (int) $consentId : null,
+                'consent_type' => $consentType,
+                'granted' => $granted,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('CONSENT_UPDATE_FAILED', $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/gdpr/request
+     *
+     * Create a GDPR data request (export, portability, rectification, access).
+     *
+     * Request body (JSON):
+     * - type: 'data_export' | 'data_portability' | 'data_rectification' | 'data_access' (required)
+     * - notes: string (optional)
+     */
+    public function createRequest(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('gdpr_request', 5, 3600);
+
+        $type = $this->input('type');
+        $notes = $this->input('notes');
+
+        // Map user-friendly types to internal types
+        $typeMap = [
+            'data_export' => 'portability',
+            'data_portability' => 'portability',
+            'data_rectification' => 'rectification',
+            'data_access' => 'access',
+        ];
+
+        if (!$type || !isset($typeMap[$type])) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Invalid request type. Valid types: data_export, data_portability, data_rectification, data_access',
+                'type',
+                400
+            );
+        }
+
+        try {
+            $internalType = $typeMap[$type];
+
+            $result = $this->gdprService->createRequest($userId, $internalType, [
+                'notes' => $notes,
+            ]);
+
+            return $this->respondWithData([
+                'request_id' => $result['id'],
+                'type' => $type,
+                'status' => 'pending',
+                'message' => 'Your request has been submitted and will be processed within 30 days.',
+            ], null, 201);
+        } catch (\Exception $e) {
+            return $this->respondWithError('REQUEST_FAILED', $e->getMessage(), null, 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/gdpr/delete-account
+     *
+     * Request account deletion (GDPR right to erasure).
+     * Requires password verification for security.
+     *
+     * Request body (JSON):
+     * - password: string (required)
+     * - reason: string (optional)
+     * - feedback: string (optional)
+     */
+    public function deleteAccount(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('gdpr_delete', 3, 3600);
+
+        $password = $this->input('password', '');
+        $reason = $this->input('reason');
+        $feedback = $this->input('feedback');
+
+        if (empty($password)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Password is required', 'password', 400);
+        }
+
+        // Verify password
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $this->getTenantId())
+            ->select('password_hash')
+            ->first();
+
+        if (!$user || !password_verify($password, $user->password_hash)) {
+            return $this->respondWithError('INVALID_PASSWORD', 'Invalid password', 'password', 403);
+        }
+
+        try {
+            $result = $this->gdprService->createRequest($userId, 'erasure', [
+                'notes' => $reason,
+                'metadata' => [
+                    'feedback' => $feedback,
+                    'self_service' => true,
+                    'requested_via' => 'api',
+                ],
+            ]);
+
+            return $this->respondWithData([
+                'request_id' => $result['id'],
+                'message' => 'Your account deletion request has been submitted. You will receive confirmation via email.',
+                'logout_required' => true,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondWithError('DELETE_FAILED', $e->getMessage(), null, 500);
+        }
+    }
+}

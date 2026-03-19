@@ -22,6 +22,12 @@ use Nexus\Models\PayPlan;
  * - Advanced visibility rules
  * - Menu caching
  */
+/**
+ *  Use AppCoreMenuManager instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreMenuManager instead. Maintained for backward compatibility.
+ */
 class MenuManager
 {
     /**

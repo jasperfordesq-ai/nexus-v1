@@ -9,6 +9,12 @@ namespace Nexus\Core;
 use Nexus\Models\SeoMetadata;
 use Nexus\Services\SchemaService;
 
+/**
+ *  Use AppCoreSEO instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreSEO instead. Maintained for backward compatibility.
+ */
 class SEO
 {
     protected static $title = 'Project NEXUS';

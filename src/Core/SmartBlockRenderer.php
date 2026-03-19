@@ -17,6 +17,12 @@ use Nexus\Models\Event;
  * Renders dynamic content blocks for CMS pages.
  * Replaces placeholders with data-smart-type attributes with actual content.
  */
+/**
+ *  Use AppCoreSmartBlockRenderer instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreSmartBlockRenderer instead. Maintained for backward compatibility.
+ */
 class SmartBlockRenderer
 {
     private string $basePath;

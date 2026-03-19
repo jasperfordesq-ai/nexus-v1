@@ -7,7 +7,7 @@
  * Volunteering Page - Browse opportunities, track hours, manage applications
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -25,6 +25,7 @@ import {
   Progress,
   Select,
   SelectItem,
+  Spinner,
 } from '@heroui/react';
 import {
   Heart,
@@ -54,6 +55,11 @@ import {
   Users,
   MessageSquare,
   ClipboardCheck,
+  Receipt,
+  Shield,
+  Lightbulb,
+  HandHeart,
+  Accessibility,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -71,6 +77,11 @@ import { WaitlistTab } from './WaitlistTab';
 import { ShiftSwapsTab } from './ShiftSwapsTab';
 import { GroupSignUpTab } from './GroupSignUpTab';
 import { HoursReviewTab } from './HoursReviewTab';
+const ExpensesTab = React.lazy(() => import('./ExpensesTab'));
+const SafeguardingTab = React.lazy(() => import('./SafeguardingTab'));
+const CommunityProjectsTab = React.lazy(() => import('./CommunityProjectsTab'));
+const DonationsTab = React.lazy(() => import('./DonationsTab'));
+const AccessibilityTab = React.lazy(() => import('./AccessibilityTab'));
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -127,7 +138,7 @@ interface HoursSummary {
   by_month: { month: string; total: number }[];
 }
 
-type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'hours-review';
+type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'hours-review' | 'expenses' | 'safeguarding' | 'community-projects' | 'donations' | 'accessibility';
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
@@ -306,6 +317,46 @@ export function VolunteeringPage() {
             >
               {t('volunteering.tab_hours_review', 'Hours Review')}
             </Button>
+            <Button
+              variant={tab === 'expenses' ? 'solid' : 'flat'}
+              className={tab === 'expenses' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('expenses')}
+              startContent={<Receipt className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('volunteering.tab_expenses', 'Expenses')}
+            </Button>
+            <Button
+              variant={tab === 'safeguarding' ? 'solid' : 'flat'}
+              className={tab === 'safeguarding' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('safeguarding')}
+              startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('volunteering.tab_safeguarding', 'Safeguarding')}
+            </Button>
+            <Button
+              variant={tab === 'community-projects' ? 'solid' : 'flat'}
+              className={tab === 'community-projects' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('community-projects')}
+              startContent={<Lightbulb className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('volunteering.tab_community_projects', 'Projects')}
+            </Button>
+            <Button
+              variant={tab === 'donations' ? 'solid' : 'flat'}
+              className={tab === 'donations' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('donations')}
+              startContent={<HandHeart className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('volunteering.tab_donations', 'Donations')}
+            </Button>
+            <Button
+              variant={tab === 'accessibility' ? 'solid' : 'flat'}
+              className={tab === 'accessibility' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
+              onPress={() => setTab('accessibility')}
+              startContent={<Accessibility className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('volunteering.tab_accessibility', 'Accessibility')}
+            </Button>
           </>
         )}
       </div>
@@ -323,6 +374,13 @@ export function VolunteeringPage() {
       {tab === 'swaps' && <ShiftSwapsTab />}
       {tab === 'group-signups' && <GroupSignUpTab />}
       {tab === 'hours-review' && <HoursReviewTab />}
+      <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
+        {tab === 'expenses' && <ExpensesTab />}
+        {tab === 'safeguarding' && <SafeguardingTab />}
+        {tab === 'community-projects' && <CommunityProjectsTab />}
+        {tab === 'donations' && <DonationsTab />}
+        {tab === 'accessibility' && <AccessibilityTab />}
+      </Suspense>
     </div>
   );
 }
@@ -629,7 +687,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
             )}
             {opportunity.category && (
               <Chip size="sm" variant="flat" className="text-theme-subtle">
-                {opportunity.category}
+                {typeof opportunity.category === 'object' ? (opportunity.category as { name?: string }).name : opportunity.category}
               </Chip>
             )}
             {opportunity.skills_needed && (
@@ -1166,8 +1224,8 @@ function HoursTab() {
             <Select
               label={t('volunteering.organisation_label')}
               placeholder={t('volunteering.select_organisation')}
-              selectedKeys={logForm.organization_id ? [logForm.organization_id] : []}
-              onChange={(e) => setLogForm((prev) => ({ ...prev, organization_id: e.target.value }))}
+              selectedKeys={logForm.organization_id ? new Set([logForm.organization_id]) : new Set()}
+              onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setLogForm((prev) => ({ ...prev, organization_id: val })); }}
               isRequired
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',

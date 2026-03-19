@@ -6,6 +6,12 @@
 
 namespace Nexus\Core;
 
+/**
+ *  Use AppCoreTenantContext instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreTenantContext instead. Maintained for backward compatibility.
+ */
 class TenantContext
 {
     private static $tenant = null;
