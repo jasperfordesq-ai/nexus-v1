@@ -36,7 +36,8 @@ export function CategorySelect({
       try {
         const response = await api.get<TransactionCategory[]>('/v2/wallet/categories');
         if (response.success && response.data) {
-          setCategories(response.data);
+          const data = response.data;
+          setCategories(Array.isArray(data) ? data : (data as { items?: TransactionCategory[] }).items ?? []);
         }
       } catch (err) {
         logError('Failed to load categories', err);
@@ -67,7 +68,7 @@ export function CategorySelect({
         label: 'text-theme-muted',
       }}
     >
-      {categories.map((cat) => (
+      {(Array.isArray(categories) ? categories : []).map((cat) => (
         <SelectItem key={String(cat.id)} textValue={cat.name}>
           <div className="flex items-center gap-2">
             {cat.color && (

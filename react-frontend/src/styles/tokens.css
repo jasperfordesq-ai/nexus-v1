@@ -102,6 +102,9 @@
   --card-border: rgba(255, 255, 255, 0.08);
   --card-hover-bg: rgba(255, 255, 255, 0.05);
 
+  /* Solid surface — for modals, dropdowns, popovers that must be opaque */
+  --surface-solid: hsl(240, 10%, 8%);
+
   /* Input/form colors */
   --input-bg: rgba(255, 255, 255, 0.05);
   --input-border: rgba(255, 255, 255, 0.10);
@@ -203,6 +206,9 @@
   --card-bg: rgba(255, 255, 255, 0.8);
   --card-border: rgba(0, 0, 0, 0.06);
   --card-hover-bg: rgba(255, 255, 255, 0.95);
+
+  /* Solid surface — for modals, dropdowns, popovers that must be opaque */
+  --surface-solid: #ffffff;
 
   /* Input/form colors */
   --input-bg: rgba(255, 255, 255, 0.8);

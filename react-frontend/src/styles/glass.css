@@ -5,6 +5,15 @@
    ============================================= */
 
 /* ─────────────────────────────────────────────
+   OPAQUE SURFACES — Modals, popovers, dropdowns
+   These need solid backgrounds, not glassmorphism.
+   ───────────────────────────────────────────── */
+[role="dialog"] section,
+[role="dialog"] > section {
+  background-color: var(--surface-solid, hsl(240, 10%, 8%)) !important;
+}
+
+/* ─────────────────────────────────────────────
    GLASS CARD
    ───────────────────────────────────────────── */
 .glass-card {
