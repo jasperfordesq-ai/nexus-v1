@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -701,6 +702,8 @@ class AdminCrmController extends BaseApiController
         $unions = [];
         $params = [];
         $countParams = [];
+        $safeDays = (int) $days;
+        $dayFilter = $safeDays > 0 ? " DATE_SUB(NOW(), INTERVAL {$safeDays} DAY)" : null;
 
         // 1. Logins
         if (!$type || $type === 'login') {
@@ -709,7 +712,7 @@ class AdminCrmController extends BaseApiController
                      FROM users u WHERE u.tenant_id = ? AND u.last_login_at IS NOT NULL";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
-            if ($days > 0) { $sql .= " AND u.last_login_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+            if ($dayFilter) { $sql .= " AND u.last_login_at >= {$dayFilter}"; }
             $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
         }
 
@@ -720,7 +723,7 @@ class AdminCrmController extends BaseApiController
                      FROM users u WHERE u.tenant_id = ?";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
-            if ($days > 0) { $sql .= " AND u.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+            if ($dayFilter) { $sql .= " AND u.created_at >= {$dayFilter}"; }
             $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
         }
 
@@ -733,7 +736,7 @@ class AdminCrmController extends BaseApiController
                          FROM listings l LEFT JOIN users u ON u.id = l.user_id WHERE l.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND l.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($days > 0) { $sql .= " AND l.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                if ($dayFilter) { $sql .= " AND l.created_at >= {$dayFilter}"; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -748,7 +751,7 @@ class AdminCrmController extends BaseApiController
                          WHERE t.tenant_id = ? AND t.status = 'completed'";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND t.sender_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($days > 0) { $sql .= " AND t.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                if ($dayFilter) { $sql .= " AND t.created_at >= {$dayFilter}"; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -763,7 +766,7 @@ class AdminCrmController extends BaseApiController
                          WHERE mn.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND mn.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($days > 0) { $sql .= " AND mn.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                if ($dayFilter) { $sql .= " AND mn.created_at >= {$dayFilter}"; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -777,7 +780,7 @@ class AdminCrmController extends BaseApiController
                          FROM coordinator_tasks ct LEFT JOIN users u ON u.id = ct.created_by WHERE ct.tenant_id = ?";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND ct.created_by = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($days > 0) { $sql .= " AND ct.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                if ($dayFilter) { $sql .= " AND ct.created_at >= {$dayFilter}"; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -792,7 +795,7 @@ class AdminCrmController extends BaseApiController
                          INNER JOIN `groups` g ON g.id = gm.group_id AND g.tenant_id = ? WHERE 1=1";
                 $p = [$tenantId]; $cp = [$tenantId];
                 if ($userId) { $sql .= " AND gm.user_id = ?"; $p[] = $userId; $cp[] = $userId; }
-                if ($days > 0) { $sql .= " AND gm.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+                if ($dayFilter) { $sql .= " AND gm.created_at >= {$dayFilter}"; }
                 $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
             } catch (\Throwable $e) {}
         }
@@ -804,7 +807,7 @@ class AdminCrmController extends BaseApiController
                      FROM users u WHERE u.tenant_id = ? AND u.updated_at > u.created_at";
             $p = [$tenantId]; $cp = [$tenantId];
             if ($userId) { $sql .= " AND u.id = ?"; $p[] = $userId; $cp[] = $userId; }
-            if ($days > 0) { $sql .= " AND u.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)"; $p[] = $days; $cp[] = $days; }
+            if ($dayFilter) { $sql .= " AND u.updated_at >= {$dayFilter}"; }
             $unions[] = $sql; $params = array_merge($params, $p); $countParams = array_merge($countParams, $cp);
         }
 
@@ -812,19 +815,23 @@ class AdminCrmController extends BaseApiController
             return $this->respondWithPaginatedCollection([], 0, $page, $limit);
         }
 
-        $unionSql = implode(" UNION ALL ", $unions);
+        try {
+            $unionSql = implode(" UNION ALL ", $unions);
 
-        $total = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM ({$unionSql}) AS timeline", $countParams)->cnt;
+            $total = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM ({$unionSql}) AS timeline", $countParams)->cnt;
 
-        $dataParams = array_merge($params, [$limit, $offset]);
-        $entries = DB::select("SELECT * FROM ({$unionSql}) AS timeline ORDER BY created_at DESC LIMIT ? OFFSET ?", $dataParams);
-        $entries = array_map(fn($r) => (array)$r, $entries);
+            $entries = DB::select("SELECT * FROM ({$unionSql}) AS timeline ORDER BY created_at DESC LIMIT " . (int) $limit . " OFFSET " . (int) $offset, $params);
+            $entries = array_map(fn($r) => (array)$r, $entries);
 
-        foreach ($entries as $i => &$entry) {
-            $entry['id'] = ($page - 1) * $limit + $i + 1;
+            foreach ($entries as $i => &$entry) {
+                $entry['id'] = ($page - 1) * $limit + $i + 1;
+            }
+
+            return $this->respondWithPaginatedCollection($entries, $total, $page, $limit);
+        } catch (\Throwable $e) {
+            Log::warning('CRM timeline query failed', ['error' => $e->getMessage()]);
+            return $this->respondWithPaginatedCollection([], 0, $page, $limit);
         }
-
-        return $this->respondWithPaginatedCollection($entries, $total, $page, $limit);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

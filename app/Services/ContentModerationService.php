@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 class ContentModerationService
 {
     /**
-     * Get all content reports for a tenant with pagination.
+     * Get all content moderation items for a tenant with pagination.
      *
      * @return array{items: array, total: int}
      */
@@ -27,17 +27,18 @@ class ContentModerationService
         $offset = max(0, (int) ($filters['offset'] ?? 0));
         $status = $filters['status'] ?? null;
 
-        $query = DB::table('content_reports as cr')
-            ->leftJoin('users as reporter', 'cr.reporter_id', '=', 'reporter.id')
-            ->where('cr.tenant_id', $tenantId)
-            ->select('cr.*', 'reporter.name as reporter_name');
+        $query = DB::table('content_moderation_queue as cmq')
+            ->leftJoin('users as author', 'cmq.author_id', '=', 'author.id')
+            ->leftJoin('users as reviewer', 'cmq.reviewer_id', '=', 'reviewer.id')
+            ->where('cmq.tenant_id', $tenantId)
+            ->select('cmq.*', 'author.name as author_name', 'reviewer.name as reviewer_name');
 
         if ($status !== null) {
-            $query->where('cr.status', $status);
+            $query->where('cmq.status', $status);
         }
 
         $total = $query->count();
-        $items = $query->orderByDesc('cr.created_at')
+        $items = $query->orderByDesc('cmq.created_at')
             ->offset($offset)
             ->limit($limit)
             ->get()
@@ -48,37 +49,37 @@ class ContentModerationService
     }
 
     /**
-     * Approve reported content (dismiss the report).
+     * Approve moderation queue item (dismiss the report).
      */
     public function approve(int $reportId, int $tenantId, int $moderatorId): bool
     {
-        return DB::table('content_reports')
+        return DB::table('content_moderation_queue')
             ->where('id', $reportId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
             ->update([
                 'status'       => 'approved',
-                'resolved_by'  => $moderatorId,
-                'resolved_at'  => now(),
+                'reviewer_id'  => $moderatorId,
+                'reviewed_at'  => now(),
                 'updated_at'   => now(),
             ]) > 0;
     }
 
     /**
-     * Reject reported content (take action — hide or remove).
+     * Reject moderation queue item (take action — hide or remove).
      */
     public function reject(int $reportId, int $tenantId, int $moderatorId, ?string $reason = null): bool
     {
-        return DB::table('content_reports')
+        return DB::table('content_moderation_queue')
             ->where('id', $reportId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
             ->update([
-                'status'       => 'rejected',
-                'resolved_by'  => $moderatorId,
-                'resolved_at'  => now(),
-                'action_notes' => $reason,
-                'updated_at'   => now(),
+                'status'           => 'rejected',
+                'reviewer_id'      => $moderatorId,
+                'reviewed_at'      => now(),
+                'rejection_reason' => $reason,
+                'updated_at'       => now(),
             ]) > 0;
     }
 
@@ -87,17 +88,22 @@ class ContentModerationService
      */
     public function getStats(int $tenantId): array
     {
-        $rows = DB::table('content_reports')
-            ->where('tenant_id', $tenantId)
-            ->selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->all();
+        try {
+            $rows = DB::table('content_moderation_queue')
+                ->where('tenant_id', $tenantId)
+                ->selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->all();
+        } catch (\Throwable $e) {
+            return ['pending' => 0, 'approved' => 0, 'rejected' => 0, 'flagged' => 0, 'total' => 0];
+        }
 
         return [
             'pending'  => (int) ($rows['pending'] ?? 0),
             'approved' => (int) ($rows['approved'] ?? 0),
             'rejected' => (int) ($rows['rejected'] ?? 0),
+            'flagged'  => (int) ($rows['flagged'] ?? 0),
             'total'    => array_sum(array_map('intval', $rows)),
         ];
     }
