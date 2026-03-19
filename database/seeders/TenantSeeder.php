@@ -27,7 +27,7 @@ class TenantSeeder extends Seeder
                 'name'       => 'Hour Timebank',
                 'slug'       => 'hour-timebank',
                 'domain'     => 'hour-timebank.project-nexus.ie',
-                'status'     => 'active',
+                'is_active'  => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -51,7 +51,7 @@ class TenantSeeder extends Seeder
                 [
                     'slug'       => str($name)->slug()->toString(),
                     'sort_order' => $sort,
-                    'status'     => 'active',
+                    'is_active'  => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
@@ -69,25 +69,33 @@ class TenantSeeder extends Seeder
         ];
 
         foreach ($settings as $key => $value) {
-            DB::table('settings')->updateOrInsert(
-                ['tenant_id' => $tenantId, 'setting_key' => $key],
+            DB::table('tenant_settings')->updateOrInsert(
+                ['tenant_id' => $tenantId, 'key' => $key],
                 [
-                    'setting_value' => $value,
-                    'created_at'    => now(),
-                    'updated_at'    => now(),
+                    'value'      => $value,
+                    'type'       => 'string',
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ],
             );
         }
 
-        // Create admin user for the test tenant
-        User::factory()
-            ->admin()
-            ->forTenant($tenantId)
-            ->create([
-                'first_name'    => 'Admin',
-                'last_name'     => 'User',
-                'name'          => 'Admin User',
-                'email'         => 'admin@hour-timebank.test',
-            ]);
+        // Create admin user for the test tenant (skip if already exists)
+        $adminExists = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('email', 'admin@hour-timebank.test')
+            ->exists();
+
+        if (!$adminExists) {
+            User::factory()
+                ->admin()
+                ->forTenant($tenantId)
+                ->create([
+                    'first_name'    => 'Admin',
+                    'last_name'     => 'User',
+                    'name'          => 'Admin User',
+                    'email'         => 'admin@hour-timebank.test',
+                ]);
+        }
     }
 }
