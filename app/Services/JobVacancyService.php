@@ -30,7 +30,7 @@ class JobVacancyService
         $tenantId = TenantContext::getId();
 
         $query = DB::table('job_vacancies as jv')
-            ->leftJoin('users as u', 'jv.created_by', '=', 'u.id')
+            ->leftJoin('users as u', 'jv.user_id', '=', 'u.id')
             ->where('jv.tenant_id', $tenantId)
             ->select('jv.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
@@ -91,7 +91,7 @@ class JobVacancyService
             'commitment'  => $data['commitment'] ?? 'flexible',
             'location'    => $data['location'] ?? null,
             'status'      => 'open',
-            'created_by'  => $userId,
+            'user_id'     => $userId,
             'created_at'  => now(),
             'updated_at'  => now(),
         ]);
