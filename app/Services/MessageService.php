@@ -37,11 +37,13 @@ class MessageService
         $cursor = $filters['cursor'] ?? null;
 
         // Get the latest message ID per conversation partner
+        $tenantId = app('tenant.id');
         $latestIds = DB::table('messages')
             ->selectRaw('
                 MAX(id) as latest_id,
                 CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as partner_id
             ', [$userId])
+            ->where('tenant_id', $tenantId)
             ->where(function ($q) use ($userId) {
                 $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
             })
@@ -80,6 +82,7 @@ class MessageService
         if (!empty($partnerIds)) {
             $rows = DB::table('messages')
                 ->selectRaw('sender_id, COUNT(*) as cnt')
+                ->where('tenant_id', $tenantId)
                 ->where('receiver_id', $userId)
                 ->where('is_read', false)
                 ->whereIn('sender_id', $partnerIds)

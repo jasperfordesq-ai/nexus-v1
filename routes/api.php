@@ -1047,7 +1047,23 @@ Route::post('/auth/heartbeat', [\App\Http\Controllers\Api\AuthController::class,
 Route::get('/auth/check-session', [\App\Http\Controllers\Api\AuthController::class, 'checkSession']);
 Route::post('/auth/refresh-session', [\App\Http\Controllers\Api\AuthController::class, 'refreshSession']);
 Route::post('/auth/restore-session', [\App\Http\Controllers\Api\AuthController::class, 'restoreSession']);
-Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+// Rate-limited auth endpoints (10 requests/minute per IP — brute force protection)
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/auth/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+    Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
+    Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);
+    Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
+    Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
+    Route::post('/webauthn/login/options', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
+    Route::post('/webauthn/login/verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
+    Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
+    Route::post('/auth/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
+    Route::post('/auth/verify-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyEmail']);
+    Route::post('/auth/resend-verification', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerification']);
+    Route::post('/auth/resend-verification-by-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerificationByEmail']);
+});
+
+// Non-rate-limited auth utilities
 Route::post('/auth/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
 Route::post('/auth/refresh-token', [\App\Http\Controllers\Api\AuthController::class, 'refreshToken']);
 Route::post('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::class, 'validateToken']);
@@ -1055,10 +1071,6 @@ Route::get('/auth/validate-token', [\App\Http\Controllers\Api\AuthController::cl
 Route::get('/auth/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
 Route::get('/v2/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
 Route::get('/csrf-token', [\App\Http\Controllers\Api\AuthController::class, 'getCsrfToken']);
-Route::post('/v2/auth/register', [\App\Http\Controllers\Api\RegistrationController::class, 'register']);
-
-// TOTP 2FA verification — must be public (user is mid-login, no token yet)
-Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify']);
 
 // ============================================
 // Public routes — No auth required
@@ -1069,19 +1081,6 @@ Route::get('/menus', [\App\Http\Controllers\Api\MenuController::class, 'index'])
 Route::get('/menus/config', [\App\Http\Controllers\Api\MenuController::class, 'config']);
 Route::get('/menus/mobile', [\App\Http\Controllers\Api\MenuController::class, 'mobile']);
 Route::get('/menus/{slug}', [\App\Http\Controllers\Api\MenuController::class, 'show']);
-
-// WebAuthn authentication (login) — must be public (user is not yet authenticated)
-Route::post('/webauthn/auth-challenge', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
-Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
-Route::post('/webauthn/login/options', [\App\Http\Controllers\Api\WebAuthnController::class, 'authChallenge']);
-Route::post('/webauthn/login/verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
-
-// Auth flows that must work without a token
-Route::post('/auth/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
-Route::post('/auth/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
-Route::post('/auth/verify-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyEmail']);
-Route::post('/auth/resend-verification', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerification']);
-Route::post('/auth/resend-verification-by-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendVerificationByEmail']);
 Route::post('/v2/contact', [\App\Http\Controllers\Api\CoreController::class, 'apiSubmit']);
 
 // API documentation

@@ -1,4 +1,18 @@
 #!/usr/bin/env sh
-powershell.exe -Command "docker exec nexus-php-app vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github" || true
-powershell.exe -Command "docker exec nexus-php-app vendor/bin/phpunit --testsuite Unit,Services --no-progress"
+
+# PHPStan (warning-only — 123 pre-existing errors)
+if command -v powershell.exe >/dev/null 2>&1; then
+  powershell.exe -Command "docker exec nexus-php-app vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github" || true
+elif command -v docker >/dev/null 2>&1; then
+  docker exec nexus-php-app vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github || true
+fi
+
+# PHPUnit (blocking)
+if command -v powershell.exe >/dev/null 2>&1; then
+  powershell.exe -Command "docker exec nexus-php-app vendor/bin/phpunit --testsuite Unit,Services --no-progress"
+elif command -v docker >/dev/null 2>&1; then
+  docker exec nexus-php-app vendor/bin/phpunit --testsuite Unit,Services --no-progress
+fi
+
+# i18n drift check + React TypeScript check + build
 node scripts/check-i18n-drift.mjs --summary && cd react-frontend && npx tsc --noEmit && npm run build

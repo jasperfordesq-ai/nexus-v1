@@ -22,6 +22,7 @@ class MemberAvailabilityService
     public function getAvailability(int $userId): array
     {
         return DB::table('member_availability')
+            ->where('tenant_id', app('tenant.id'))
             ->where('user_id', $userId)
             ->orderBy('day_of_week')
             ->orderBy('start_time')
@@ -43,7 +44,10 @@ class MemberAvailabilityService
         }
 
         return DB::transaction(function () use ($userId, $dayOfWeek, $slots) {
+            $tenantId = app('tenant.id');
+
             DB::table('member_availability')
+                ->where('tenant_id', $tenantId)
                 ->where('user_id', $userId)
                 ->where('day_of_week', $dayOfWeek)
                 ->where('is_recurring', true)
@@ -58,6 +62,7 @@ class MemberAvailabilityService
                 }
 
                 DB::table('member_availability')->insert([
+                    'tenant_id'    => $tenantId,
                     'user_id'      => $userId,
                     'day_of_week'  => $dayOfWeek,
                     'start_time'   => $slot['start_time'],
