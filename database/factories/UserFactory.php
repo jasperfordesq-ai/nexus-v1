@@ -23,27 +23,27 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $firstName = fake()->firstName();
-        $lastName  = fake()->lastName();
+        $firstName = $this->faker->firstName();
+        $lastName  = $this->faker->lastName();
 
         return [
             'tenant_id'     => 2,
             'first_name'    => $firstName,
             'last_name'     => $lastName,
             'name'          => $firstName . ' ' . $lastName,
-            'email'         => fake()->unique()->safeEmail(),
+            'email'         => $this->faker->unique()->safeEmail(),
             'password_hash' => bcrypt('password'),
             'role'          => 'member',
             'status'        => 'active',
-            'bio'           => fake()->optional()->sentence(),
-            'location'      => fake()->optional()->city(),
-            'phone'         => fake()->optional()->e164PhoneNumber(),
-            'is_verified'   => fake()->boolean(80),
+            'bio'           => $this->faker->optional()->sentence(),
+            'location'      => $this->faker->optional()->city(),
+            'phone'         => $this->faker->optional()->e164PhoneNumber(),
+            'is_verified'   => $this->faker->boolean(80),
             'is_approved'   => true,
-            'balance'       => fake()->randomFloat(2, 0, 50),
+            'balance'       => $this->faker->randomFloat(2, 0, 50),
             'profile_type'  => 'individual',
             'onboarding_completed' => true,
-            'created_at'    => fake()->dateTimeBetween('-1 year'),
+            'created_at'    => $this->faker->dateTimeBetween('-1 year'),
         ];
     }
 

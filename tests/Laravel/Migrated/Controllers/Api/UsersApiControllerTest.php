@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Migrated\Controllers\Api;
 
 use Tests\Laravel\LegacyBridgeTestCase;
-use App\Http\Controllers\Api\UsersApiController;
+use App\Http\Controllers\Api\UsersController as UsersApiController;
 
 /**
  * Tests for UsersApiController (Laravel migration)

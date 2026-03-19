@@ -8,8 +8,9 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Tests\Laravel\TestCase;
 use App\Http\Controllers\Api\BaseApiController;
+use Illuminate\Http\Request;
 
 /**
  * Regression test for resolveAdminTenantFilter()
@@ -33,19 +34,17 @@ class ResolveAdminTenantFilterTest extends TestCase
     {
         parent::setUp();
         $this->controller = new TestableBaseApiController();
-        // Clear any leftover $_GET state
-        unset($_GET['tenant_id']);
     }
 
-    protected function tearDown(): void
+    /**
+     * Helper: set ?tenant_id query parameter on the current request.
+     */
+    private function setQueryTenantId(string $value): void
     {
-        unset($_GET['tenant_id']);
-        parent::tearDown();
+        $this->app->instance('request', Request::create('/', 'GET', ['tenant_id' => $value]));
     }
 
-    // ─────────────────────────────────────────────
     // Regular Admin Tests
-    // ─────────────────────────────────────────────
 
     public function testRegularAdminAlwaysScopedToOwnTenant(): void
     {
@@ -55,21 +54,19 @@ class ResolveAdminTenantFilterTest extends TestCase
 
     public function testRegularAdminCannotOverrideWithQueryParam(): void
     {
-        $_GET['tenant_id'] = '5';
+        $this->setQueryTenantId('5');
         $result = $this->controller->publicResolveAdminTenantFilter(false, 2);
         $this->assertSame(2, $result, 'Regular admin must be scoped to own tenant even with ?tenant_id');
     }
 
     public function testRegularAdminCannotUseAllTenants(): void
     {
-        $_GET['tenant_id'] = 'all';
+        $this->setQueryTenantId('all');
         $result = $this->controller->publicResolveAdminTenantFilter(false, 2);
         $this->assertSame(2, $result, 'Regular admin must never see all tenants');
     }
 
-    // ─────────────────────────────────────────────
-    // Super Admin Tests — Default Behavior (CRITICAL)
-    // ─────────────────────────────────────────────
+    // Super Admin Tests - Default Behavior (CRITICAL)
 
     public function testSuperAdminDefaultsToCurrentTenant(): void
     {
@@ -90,56 +87,50 @@ class ResolveAdminTenantFilterTest extends TestCase
         $this->assertSame(4, $result, 'Super admin on tenant 4 should default to tenant 4');
     }
 
-    // ─────────────────────────────────────────────
-    // Super Admin Tests — Explicit Tenant Filter
-    // ─────────────────────────────────────────────
+    // Super Admin Tests - Explicit Tenant Filter
 
     public function testSuperAdminCanFilterToSpecificTenant(): void
     {
-        $_GET['tenant_id'] = '3';
+        $this->setQueryTenantId('3');
         $result = $this->controller->publicResolveAdminTenantFilter(true, 2);
         $this->assertSame(3, $result, 'Super admin with ?tenant_id=3 should see tenant 3');
     }
 
     public function testSuperAdminCanFilterToOwnTenantExplicitly(): void
     {
-        $_GET['tenant_id'] = '2';
+        $this->setQueryTenantId('2');
         $result = $this->controller->publicResolveAdminTenantFilter(true, 2);
         $this->assertSame(2, $result, 'Super admin with ?tenant_id=2 while on tenant 2 should see tenant 2');
     }
 
-    // ─────────────────────────────────────────────
-    // Super Admin Tests — Cross-Tenant "All" View
-    // ─────────────────────────────────────────────
+    // Super Admin Tests - Cross-Tenant All View
 
     public function testSuperAdminCanExplicitlyRequestAllTenants(): void
     {
-        $_GET['tenant_id'] = 'all';
+        $this->setQueryTenantId('all');
         $result = $this->controller->publicResolveAdminTenantFilter(true, 2);
         $this->assertNull($result, 'Super admin with ?tenant_id=all should get null (no tenant filter)');
     }
 
-    // ─────────────────────────────────────────────
     // Edge Cases
-    // ─────────────────────────────────────────────
 
     public function testNonNumericTenantIdTreatedAsNoFilter(): void
     {
-        $_GET['tenant_id'] = 'invalid';
+        $this->setQueryTenantId('invalid');
         $result = $this->controller->publicResolveAdminTenantFilter(true, 2);
-        $this->assertSame(2, $result, 'Non-numeric, non-"all" tenant_id should fall back to current tenant');
+        $this->assertSame(2, $result, 'Non-numeric, non-all tenant_id should fall back to current tenant');
     }
 
     public function testEmptyStringTenantIdDefaultsToCurrentTenant(): void
     {
-        $_GET['tenant_id'] = '';
+        $this->setQueryTenantId('');
         $result = $this->controller->publicResolveAdminTenantFilter(true, 2);
         $this->assertSame(2, $result, 'Empty string tenant_id should fall back to current tenant');
     }
 
     public function testZeroTenantIdTreatedAsNoFilter(): void
     {
-        $_GET['tenant_id'] = '0';
+        $this->setQueryTenantId('0');
         $result = $this->controller->publicResolveAdminTenantFilter(true, 2);
         // 0 is_numeric() === true, so (int)'0' = 0
         $this->assertSame(0, $result, 'Zero tenant_id should return 0 (which the controller treats as a specific ID)');

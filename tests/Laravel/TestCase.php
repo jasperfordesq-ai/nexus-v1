@@ -8,6 +8,7 @@ namespace Tests\Laravel;
 
 use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Base test case for all Laravel tests in the migration.
@@ -50,6 +51,19 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTenantContext(): void
     {
+        // Seed the test tenant if it doesn't exist (RefreshDatabase creates empty tables)
+        DB::table('tenants')->insertOrIgnore([
+            'id' => $this->testTenantId,
+            'name' => 'Hour Timebank',
+            'slug' => $this->testTenantSlug,
+            'domain' => null,
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         TenantContext::setById($this->testTenantId);
     }
 

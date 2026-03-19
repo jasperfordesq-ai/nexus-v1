@@ -243,7 +243,7 @@ class UserModelTest extends TestCase
         $prefs = ['email_messages' => 1, 'push_enabled' => 0];
 
         $user = User::factory()->forTenant($this->testTenantId)->create([
-            'notification_preferences' => json_encode($prefs),
+            'notification_preferences' => $prefs,
         ]);
 
         // Refresh to ensure cast happens on retrieval

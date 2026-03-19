@@ -310,35 +310,52 @@ class ListingService
         $data['category_name'] = $listing->category?->name;
         $data['category_color'] = $listing->category?->color;
 
-        // Engagement counts
-        $data['likes_count'] = (int) DB::table('likes')
-            ->where('tenant_id', \App\Core\TenantContext::getId())
-            ->where('target_type', 'listing')
-            ->where('target_id', $id)
-            ->count();
+        // Engagement counts (wrapped in try/catch — tables may not exist during migration)
+        $tenantId = \App\Core\TenantContext::getId();
+        try {
+            $data['likes_count'] = (int) DB::table('likes')
+                ->where('tenant_id', $tenantId)
+                ->where('target_type', 'listing')
+                ->where('target_id', $id)
+                ->count();
+        } catch (\Throwable $e) {
+            $data['likes_count'] = 0;
+        }
 
-        $data['comments_count'] = (int) DB::table('comments')
-            ->where('tenant_id', \App\Core\TenantContext::getId())
-            ->where('target_type', 'listing')
-            ->where('target_id', $id)
-            ->count();
+        try {
+            $data['comments_count'] = (int) DB::table('comments')
+                ->where('tenant_id', $tenantId)
+                ->where('target_type', 'listing')
+                ->where('target_id', $id)
+                ->count();
+        } catch (\Throwable $e) {
+            $data['comments_count'] = 0;
+        }
 
         // Favorited / liked flags for the current user
         $data['is_favorited'] = false;
         $data['is_liked'] = false;
 
         if ($currentUserId) {
-            $data['is_favorited'] = DB::table('user_saved_listings')
-                ->where('listing_id', $id)
-                ->where('user_id', $currentUserId)
-                ->exists();
+            try {
+                $data['is_favorited'] = DB::table('user_saved_listings')
+                    ->where('listing_id', $id)
+                    ->where('user_id', $currentUserId)
+                    ->exists();
+            } catch (\Throwable $e) {
+                // Table may not exist
+            }
 
-            $data['is_liked'] = DB::table('likes')
-                ->where('tenant_id', \App\Core\TenantContext::getId())
-                ->where('target_type', 'listing')
-                ->where('target_id', $id)
-                ->where('user_id', $currentUserId)
-                ->exists();
+            try {
+                $data['is_liked'] = DB::table('likes')
+                    ->where('tenant_id', $tenantId)
+                    ->where('target_type', 'listing')
+                    ->where('target_id', $id)
+                    ->where('user_id', $currentUserId)
+                    ->exists();
+            } catch (\Throwable $e) {
+                // Table may not exist
+            }
         }
 
         return $data;

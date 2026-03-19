@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Migrated\Controllers\Api;
 
 use Tests\Laravel\LegacyBridgeTestCase;
-use App\Http\Controllers\Api\NotificationsApiController;
+use App\Http\Controllers\Api\NotificationsController as NotificationsApiController;
 
 /**
  * Tests for NotificationsApiController (Laravel migration)

@@ -10,5 +10,5 @@ return [
         'localhost,localhost:5173,127.0.0.1,app.project-nexus.ie'
     )),
     'guard' => ['web'],
-    'expiration' => null,
+    'expiration' => 60 * 24 * 7, // 7 days in minutes
 ];

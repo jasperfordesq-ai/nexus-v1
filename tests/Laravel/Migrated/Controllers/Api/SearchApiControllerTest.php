@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Migrated\Controllers\Api;
 
 use Tests\Laravel\LegacyBridgeTestCase;
-use App\Http\Controllers\Api\SearchApiController;
+use App\Http\Controllers\Api\SearchController as SearchApiController;
 
 /**
  * Tests for SearchApiController (Laravel migration)

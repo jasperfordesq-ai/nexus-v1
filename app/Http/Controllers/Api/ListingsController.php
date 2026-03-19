@@ -154,16 +154,21 @@ class ListingsController extends BaseApiController
 
         $data = $this->getAllInput();
 
-        $listingId = $this->listingService->create($userId, $data);
-
-        if ($listingId === null) {
-            $errors = $this->listingService->getErrors();
+        try {
+            $listing = $this->listingService->create($userId, $data);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = [];
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => $message, 'field' => $field];
+                }
+            }
             return $this->respondWithErrors($errors, 422);
         }
 
-        $listing = $this->listingService->getById($listingId);
+        $result = $this->listingService->getById($listing->id);
 
-        return $this->respondWithData($listing, null, 201);
+        return $this->respondWithData($result, null, 201);
     }
 
     // -----------------------------------------------------------------
@@ -175,24 +180,29 @@ class ListingsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('listing_update', 20, 60);
 
+        // Verify ownership
+        $existing = $this->listingService->getById($id);
+        if (!$existing) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+        if ((int) ($existing['user_id'] ?? 0) !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'You can only edit your own listings', null, 403);
+        }
+
         $data = $this->getAllInput();
 
-        $success = $this->listingService->update($id, $userId, $data);
-
-        if (!$success) {
-            $errors = $this->listingService->getErrors();
-            $status = 422;
-            foreach ($errors as $error) {
-                if ($error['code'] === 'NOT_FOUND') {
-                    $status = 404;
-                    break;
-                }
-                if ($error['code'] === 'FORBIDDEN') {
-                    $status = 403;
-                    break;
+        try {
+            $this->listingService->update($id, $data);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = [];
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => $message, 'field' => $field];
                 }
             }
-            return $this->respondWithErrors($errors, $status);
+            return $this->respondWithErrors($errors, 422);
         }
 
         $listing = $this->listingService->getById($id);
@@ -209,22 +219,19 @@ class ListingsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('listing_delete', 10, 60);
 
-        $success = $this->listingService->delete($id, $userId);
+        // Verify ownership
+        $existing = $this->listingService->getById($id);
+        if (!$existing) {
+            return $this->respondWithError('NOT_FOUND', 'Listing not found', null, 404);
+        }
+        if ((int) ($existing['user_id'] ?? 0) !== $userId) {
+            return $this->respondWithError('FORBIDDEN', 'You can only delete your own listings', null, 403);
+        }
+
+        $success = $this->listingService->delete($id);
 
         if (!$success) {
-            $errors = $this->listingService->getErrors();
-            $status = 400;
-            foreach ($errors as $error) {
-                if ($error['code'] === 'NOT_FOUND') {
-                    $status = 404;
-                    break;
-                }
-                if ($error['code'] === 'FORBIDDEN') {
-                    $status = 403;
-                    break;
-                }
-            }
-            return $this->respondWithErrors($errors, $status);
+            return $this->respondWithError('DELETE_FAILED', 'Failed to delete listing', null, 400);
         }
 
         return $this->noContent();
