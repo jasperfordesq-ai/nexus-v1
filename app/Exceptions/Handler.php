@@ -76,70 +76,102 @@ class Handler extends ExceptionHandler
 
     /**
      * Build a structured JSON error response.
+     *
+     * Uses the v2 API envelope format: { "errors": [{ "code", "message", "field"? }] }
+     * This ensures consistency between controller-thrown errors and exception-thrown errors.
+     *
+     * For ValidationException, field errors are mapped into the errors array so the
+     * frontend can display per-field validation messages.
      */
     protected function renderJsonResponse(Request $request, Throwable $e): JsonResponse
     {
         if ($e instanceof ValidationException) {
-            return response()->json([
-                'error' => 'Validation failed',
-                'messages' => $e->errors(),
-            ], 422);
+            $errors = [];
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $errors[] = [
+                        'code' => 'VALIDATION_ERROR',
+                        'message' => $message,
+                        'field' => $field,
+                    ];
+                }
+            }
+            return response()->json(['errors' => $errors], 422);
         }
 
         if ($e instanceof AuthenticationException) {
-            return response()->json([
-                'error' => 'Unauthenticated',
-                'message' => 'You must be logged in to access this resource.',
-            ], 401);
+            return $this->v2Error('AUTH_REQUIRED', 'You must be logged in to access this resource.', 401);
         }
 
         if ($e instanceof ModelNotFoundException) {
             $model = class_basename($e->getModel());
-            return response()->json([
-                'error' => 'Not found',
-                'message' => "{$model} not found.",
-            ], 404);
+            return $this->v2Error('NOT_FOUND', "{$model} not found.", 404);
         }
 
         if ($e instanceof NotFoundHttpException) {
-            return response()->json([
-                'error' => 'Not found',
-                'message' => 'The requested resource was not found.',
-            ], 404);
+            return $this->v2Error('NOT_FOUND', 'The requested resource was not found.', 404);
         }
 
         if ($e instanceof TooManyRequestsHttpException) {
-            return response()->json([
-                'error' => 'Too many requests',
-                'message' => 'Rate limit exceeded. Please try again later.',
-                'retry_after' => $e->getHeaders()['Retry-After'] ?? null,
+            $retryAfter = $e->getHeaders()['Retry-After'] ?? null;
+            $response = response()->json([
+                'errors' => [[
+                    'code' => 'RATE_LIMIT_EXCEEDED',
+                    'message' => 'Rate limit exceeded. Please try again later.',
+                ]],
             ], 429);
+
+            if ($retryAfter !== null) {
+                $response->header('Retry-After', (string) $retryAfter);
+            }
+
+            return $response;
         }
 
         if ($e instanceof HttpException) {
-            return response()->json([
-                'error' => 'HTTP error',
-                'message' => $e->getMessage() ?: 'An error occurred.',
-            ], $e->getStatusCode());
+            $statusCode = $e->getStatusCode();
+            $code = match (true) {
+                $statusCode === 403 => 'FORBIDDEN',
+                $statusCode === 405 => 'METHOD_NOT_ALLOWED',
+                $statusCode >= 500 => 'SERVER_ERROR',
+                default => "HTTP_{$statusCode}",
+            };
+            return $this->v2Error($code, $e->getMessage() ?: 'An error occurred.', $statusCode);
         }
 
         // Generic server error
-        $status = 500;
         $response = [
-            'error' => 'Server error',
-            'message' => 'An unexpected error occurred.',
+            'errors' => [[
+                'code' => 'SERVER_ERROR',
+                'message' => 'An unexpected error occurred.',
+            ]],
         ];
 
-        // In development, include debug details
+        // In development, include debug details alongside the v2 envelope
         if (config('app.debug')) {
-            $response['exception'] = get_class($e);
-            $response['message'] = $e->getMessage();
-            $response['file'] = $e->getFile();
-            $response['line'] = $e->getLine();
-            $response['trace'] = collect($e->getTrace())->take(10)->toArray();
+            $response['debug'] = [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => collect($e->getTrace())->take(10)->toArray(),
+            ];
         }
 
-        return response()->json($response, $status);
+        return response()->json($response, 500);
+    }
+
+    /**
+     * Build a v2 API error response: { "errors": [{ "code", "message" }] }
+     */
+    private function v2Error(string $code, string $message, int $status): JsonResponse
+    {
+        return response()->json([
+            'errors' => [[
+                'code' => $code,
+                'message' => $message,
+            ]],
+        ], $status);
     }
 
     /**
@@ -147,9 +179,6 @@ class Handler extends ExceptionHandler
      */
     protected function unauthenticated($request, AuthenticationException $exception): JsonResponse
     {
-        return response()->json([
-            'error' => 'Unauthenticated',
-            'message' => 'You must be logged in to access this resource.',
-        ], 401);
+        return $this->v2Error('AUTH_REQUIRED', 'You must be logged in to access this resource.', 401);
     }
 }

@@ -57,23 +57,23 @@ class TotpController extends BaseApiController
             $challengeData = $this->twoFactorChallengeManager->get($twoFactorToken);
 
             if (!$challengeData) {
-                return response()->json([
-                    'error' => '2FA session expired. Please log in again.',
-                    'code' => ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED,
-                    'success' => false,
-                    'redirect' => '/login',
-                ], 401);
+                return $this->respondWithError(
+                    ApiErrorCodes::AUTH_2FA_TOKEN_EXPIRED,
+                    '2FA session expired. Please log in again.',
+                    null,
+                    401
+                );
             }
 
             // Record attempt and check if we've exceeded max attempts
             $attemptResult = $this->twoFactorChallengeManager->recordAttempt($twoFactorToken);
             if (!$attemptResult['allowed']) {
-                return response()->json([
-                    'error' => 'Too many failed attempts. Please log in again.',
-                    'code' => ApiErrorCodes::AUTH_2FA_MAX_ATTEMPTS,
-                    'success' => false,
-                    'redirect' => '/login',
-                ], 401);
+                return $this->respondWithError(
+                    ApiErrorCodes::AUTH_2FA_MAX_ATTEMPTS,
+                    'Too many failed attempts. Please log in again.',
+                    null,
+                    401
+                );
             }
 
             $userId = $challengeData['user_id'];
@@ -88,31 +88,18 @@ class TotpController extends BaseApiController
 
             // Validate CSRF for session-based requests
             if (!Csrf::verify($csrfToken)) {
-                return response()->json([
-                    'error' => 'Invalid CSRF token',
-                    'code' => ApiErrorCodes::AUTH_CSRF_INVALID,
-                    'success' => false,
-                ], 403);
+                return $this->respondWithError(ApiErrorCodes::AUTH_CSRF_INVALID, 'Invalid CSRF token', null, 403);
             }
 
             // Check for pending 2FA session
             if (empty($_SESSION['pending_2fa_user_id'])) {
-                return response()->json([
-                    'error' => 'No pending 2FA session',
-                    'code' => ApiErrorCodes::AUTH_2FA_EXPIRED,
-                    'success' => false,
-                ], 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, 'No pending 2FA session', null, 401);
             }
 
             // Check session expiry
             if (($_SESSION['pending_2fa_expires'] ?? 0) < time()) {
                 unset($_SESSION['pending_2fa_user_id'], $_SESSION['pending_2fa_expires']);
-                return response()->json([
-                    'error' => 'Session expired',
-                    'code' => ApiErrorCodes::AUTH_2FA_EXPIRED,
-                    'success' => false,
-                    'redirect' => '/login',
-                ], 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_2FA_EXPIRED, 'Session expired', null, 401);
             }
 
             $userId = (int)$_SESSION['pending_2fa_user_id'];
@@ -120,12 +107,7 @@ class TotpController extends BaseApiController
 
         // Validate code is provided
         if (empty($code)) {
-            return response()->json([
-                'error' => 'Code is required',
-                'code' => ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'success' => false,
-                'field' => 'code',
-            ], 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Code is required', 'code', 400);
         }
 
         // Verify the code
@@ -136,11 +118,7 @@ class TotpController extends BaseApiController
         }
 
         if (!$result['success']) {
-            return response()->json([
-                'error' => $result['error'] ?? 'Invalid code',
-                'code' => ApiErrorCodes::AUTH_2FA_INVALID,
-                'success' => false,
-            ], 401);
+            return $this->respondWithError(ApiErrorCodes::AUTH_2FA_INVALID, $result['error'] ?? 'Invalid code', null, 401);
         }
 
         // =========================================================
@@ -169,21 +147,13 @@ class TotpController extends BaseApiController
         $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
-            return response()->json([
-                'error' => 'User not found',
-                'code' => ApiErrorCodes::RESOURCE_NOT_FOUND,
-                'success' => false,
-            ], 401);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 401);
         }
 
         // SECURITY: Enforce registration policy gates after 2FA completion
         $gateBlock = $this->tenantSettingsService->checkLoginGates($user);
         if ($gateBlock) {
-            return response()->json([
-                'error' => $gateBlock['message'],
-                'code' => $gateBlock['code'],
-                'success' => false,
-            ], 403);
+            return $this->respondWithError($gateBlock['code'], $gateBlock['message'], null, 403);
         }
 
         // Generate tokens
