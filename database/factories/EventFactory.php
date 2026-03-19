@@ -35,11 +35,11 @@ class EventFactory extends Factory
             'location'       => fake()->optional()->address(),
             'latitude'       => fake()->optional()->latitude(),
             'longitude'      => fake()->optional()->longitude(),
-            'start_time'     => $startTime,
-            'end_time'       => $endTime,
+            'start_date'     => $startTime,
+            'end_date'       => $endTime,
             'max_attendees'  => fake()->optional()->numberBetween(5, 100),
-            'is_online'      => fake()->boolean(30),
-            'online_link'    => fake()->optional(0.3)->url(),
+            'is_virtual'     => fake()->boolean(30),
+            'virtual_link'   => fake()->optional(0.3)->url(),
             'created_at'     => fake()->dateTimeBetween('-3 months'),
         ];
     }
