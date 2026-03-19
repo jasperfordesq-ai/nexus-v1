@@ -11,7 +11,9 @@ return [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_NAME', env('DB_DATABASE', 'nexus')),
+            // DB_DATABASE is checked first so PHPUnit's force="true" override works.
+            // DB_NAME is the legacy env var from Docker Compose.
+            'database' => env('DB_DATABASE', env('DB_NAME', 'nexus')),
             'username' => env('DB_USER', env('DB_USERNAME', 'nexus')),
             'password' => env('DB_PASS', env('DB_PASSWORD', '')),
             'unix_socket' => env('DB_SOCKET', ''),

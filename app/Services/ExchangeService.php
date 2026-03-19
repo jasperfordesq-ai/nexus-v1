@@ -37,12 +37,35 @@ class ExchangeService
 
         $query = DB::table('exchange_requests as er')
             ->leftJoin('listings as l', 'er.listing_id', '=', 'l.id')
+            ->leftJoin('users as req', 'er.requester_id', '=', 'req.id')
+            ->leftJoin('users as prov', 'er.provider_id', '=', 'prov.id')
             ->where('er.tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('er.requester_id', $userId)->orWhere('er.provider_id', $userId))
-            ->select('er.*', 'l.title as listing_title');
+            ->select(
+                'er.*',
+                'l.title as listing_title',
+                'l.type as listing_type',
+                'req.name as requester_name',
+                'req.email as requester_email',
+                'req.avatar_url as requester_avatar',
+                'prov.name as provider_name',
+                'prov.email as provider_email',
+                'prov.avatar_url as provider_avatar'
+            );
 
         if (! empty($filters['status'])) {
-            $query->where('er.status', $filters['status']);
+            if ($filters['status'] === 'active') {
+                $query->whereIn('er.status', [
+                    self::STATUS_PENDING,
+                    self::STATUS_ACCEPTED,
+                    'pending_broker',
+                    'in_progress',
+                ]);
+            } elseif ($filters['status'] === 'needs_confirmation') {
+                $query->whereIn('er.status', ['completed', 'pending_confirmation']);
+            } else {
+                $query->where('er.status', $filters['status']);
+            }
         }
         if ($cursor !== null) {
             $query->where('er.id', '<', (int) base64_decode($cursor));

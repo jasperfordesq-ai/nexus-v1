@@ -93,8 +93,25 @@ class MessageService
         $items = $messages->map(function (Message $msg) use ($userId, $unreadCounts) {
             $data = $msg->toArray();
             $partnerId = $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
+            $partner = $msg->sender_id === $userId ? $msg->receiver : $msg->sender;
             $data['partner_id'] = $partnerId;
             $data['unread_count'] = $unreadCounts[$partnerId] ?? 0;
+            $data['other_user'] = $partner ? [
+                'id'         => $partner->id,
+                'name'       => $partner->name,
+                'first_name' => $partner->first_name,
+                'last_name'  => $partner->last_name,
+                'avatar_url' => $partner->avatar_url,
+                'is_online'  => ($partner->last_active_at && $partner->last_active_at->gt(now()->subMinutes(5))),
+            ] : null;
+            $data['last_message'] = [
+                'id'         => $msg->id,
+                'content'    => $msg->content,
+                'sender_id'  => $msg->sender_id,
+                'created_at' => $msg->created_at?->toISOString(),
+                'is_read'    => $msg->is_read,
+            ];
+            $data['id'] = $partnerId;
             return $data;
         })->all();
 
@@ -115,8 +132,8 @@ class MessageService
      */
     public function getMessages(int $partnerId, int $userId, array $filters = []): ?array
     {
-        // Verify the partner user exists
-        $partner = User::find($partnerId);
+        // Verify the partner user exists (skip tenant scope — users may be cross-tenant visible)
+        $partner = User::withoutGlobalScopes()->find($partnerId);
         if ($partner === null) {
             return null;
         }
@@ -157,7 +174,7 @@ class MessageService
 
         // Mark messages as read when viewing (older direction or no cursor)
         if ($direction !== 'newer' || $cursor === null) {
-            $this->markRead($userId, $partnerId);
+            $this->markAsRead($partnerId, $userId);
         }
 
         $items = $messages->map(fn (Message $msg) => $msg->toArray())->all();
@@ -197,20 +214,16 @@ class MessageService
             return ['error' => 'recipient_id is required'];
         }
 
-        $body = trim($data['body'] ?? '');
-        $voiceUrl = $data['voice_url'] ?? ($data['audio_url'] ?? null);
+        $content = trim($data['body'] ?? ($data['content'] ?? ''));
 
-        if (empty($body) && empty($voiceUrl)) {
-            return ['error' => 'Message body or voice message is required'];
+        if (empty($content)) {
+            return ['error' => 'Message body is required'];
         }
 
         $message = $this->message->newInstance([
             'sender_id'      => $senderId,
             'receiver_id'    => $receiverId,
-            'subject'        => $data['subject'] ?? null,
-            'body'           => $body,
-            'audio_url'      => $voiceUrl,
-            'audio_duration' => $data['voice_duration'] ?? ($data['audio_duration'] ?? null),
+            'content'        => $content,
             'is_read'        => false,
             'created_at'     => now(),
         ]);
@@ -223,7 +236,7 @@ class MessageService
     /**
      * Mark all messages from a partner as read.
      */
-    public function markRead(int $userId, int $partnerId): int
+    public function markAsRead(int $partnerId, int $userId): int
     {
         return $this->message->newQuery()
             ->where('sender_id', $partnerId)
