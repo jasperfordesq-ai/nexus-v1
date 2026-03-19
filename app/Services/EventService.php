@@ -94,9 +94,28 @@ class EventService
             ->groupBy('event_id')
             ->pluck('count', 'event_id');
 
-        $result = $items->map(function (Event $event) use ($rsvpCounts) {
+        // Also get interested counts for the same events
+        $interestedCounts = $this->rsvp->newQuery()
+            ->selectRaw('event_id, COUNT(*) as count')
+            ->whereIn('event_id', $eventIds)
+            ->where('status', 'interested')
+            ->groupBy('event_id')
+            ->pluck('count', 'event_id');
+
+        $result = $items->map(function (Event $event) use ($rsvpCounts, $interestedCounts) {
             $data = $event->toArray();
-            $data['attendee_count'] = (int) ($rsvpCounts[$event->id] ?? 0);
+            $goingCount = (int) ($rsvpCounts[$event->id] ?? 0);
+            $interestedCount = (int) ($interestedCounts[$event->id] ?? 0);
+            $maxAttendees = $event->max_attendees;
+
+            // Frontend field names (with legacy aliases)
+            $data['attendee_count'] = $goingCount;
+            $data['attendees_count'] = $goingCount;
+            $data['interested_count'] = $interestedCount;
+            $data['rsvp_counts'] = ['going' => $goingCount, 'interested' => $interestedCount];
+            $data['spots_left'] = $maxAttendees ? max(0, $maxAttendees - $goingCount) : null;
+            $data['is_full'] = $maxAttendees ? ($goingCount >= $maxAttendees) : false;
+
             return $data;
         })->all();
 
@@ -122,7 +141,17 @@ class EventService
         }
 
         $data = $event->toArray();
-        $data['attendee_count'] = $event->rsvps->where('status', 'going')->count();
+        $goingCount = $event->rsvps->where('status', 'going')->count();
+        $interestedCount = $event->rsvps->where('status', 'interested')->count();
+        $maxAttendees = $event->max_attendees;
+
+        // Frontend field names (with legacy aliases)
+        $data['attendee_count'] = $goingCount;
+        $data['attendees_count'] = $goingCount;
+        $data['interested_count'] = $interestedCount;
+        $data['rsvp_counts'] = ['going' => $goingCount, 'interested' => $interestedCount];
+        $data['spots_left'] = $maxAttendees ? max(0, $maxAttendees - $goingCount) : null;
+        $data['is_full'] = $maxAttendees ? ($goingCount >= $maxAttendees) : false;
 
         if ($currentUserId) {
             $data['my_rsvp'] = $event->rsvps
