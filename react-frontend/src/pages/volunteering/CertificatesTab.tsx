@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Chip } from '@heroui/react';
 import {
@@ -25,7 +26,7 @@ import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { useToast } from '@/contexts/ToastContext';
+import { useToast } from '@/contexts';
 
 interface Certificate {
   id: number;
@@ -42,6 +43,7 @@ interface Certificate {
 }
 
 export function CertificatesTab() {
+  const { t } = useTranslation('volunteering');
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,11 +64,11 @@ export function CertificatesTab() {
         const payload = response.data as { certificates?: Certificate[] } | Certificate[];
         setCertificates(Array.isArray(payload) ? payload : (payload.certificates ?? []));
       } else {
-        setError('Failed to load certificates');
+        setError(t('certificates.error_load', 'Failed to load certificates'));
       }
     } catch (err) {
       logError('Failed to load certificates', err);
-      setError('Unable to load certificates.');
+      setError(t('certificates.error_load_generic', 'Unable to load certificates.'));
     } finally {
       setIsLoading(false);
     }
@@ -83,17 +85,17 @@ export function CertificatesTab() {
       const response = await api.post('/v2/volunteering/certificates', {});
 
       if (response.success) {
-        toastSuccess('Certificate generated!');
+        toastSuccess(t('certificates.generated_success', 'Certificate generated!'));
         load();
       } else {
         toastError(
           response.error ||
-          'No verified volunteer hours found. Hours must be approved before generating a certificate.'
+          t('certificates.no_verified_hours', 'No verified volunteer hours found. Hours must be approved before generating a certificate.')
         );
       }
     } catch (err) {
       logError('Failed to generate certificate', err);
-      toastError('Failed to generate certificate. Please try again.');
+      toastError(t('certificates.generated_error', 'Failed to generate certificate. Please try again.'));
     } finally {
       setIsGenerating(false);
     }
@@ -118,7 +120,7 @@ export function CertificatesTab() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">Impact Certificates</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('certificates.title', 'Impact Certificates')}</h2>
         </div>
         <Button
           size="sm"
@@ -127,20 +129,20 @@ export function CertificatesTab() {
           onPress={handleGenerate}
           isLoading={isGenerating}
         >
-          Generate Certificate
+          {t('certificates.generate', 'Generate Certificate')}
         </Button>
       </div>
 
 
       <p className="text-sm text-theme-muted">
-        Certificates include all of your approved volunteer hours across every organization.
+        {t('certificates.description', 'Certificates include all of your approved volunteer hours across every organization.')}
       </p>
       {error && !isLoading && (
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            Try Again
+            {t('common.try_again', 'Try Again')}
           </Button>
         </GlassCard>
       )}
@@ -160,14 +162,14 @@ export function CertificatesTab() {
       {!error && !isLoading && certificates.length === 0 && (
         <EmptyState
           icon={<Award className="w-12 h-12" aria-hidden="true" />}
-          title="No certificates yet"
-          description="Generate a certificate to showcase your volunteer hours."
+          title={t('certificates.empty_title', 'No certificates yet')}
+          description={t('certificates.empty_description', 'Generate a certificate to showcase your volunteer hours.')}
           action={
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleGenerate}
             >
-              Generate Certificate
+              {t('certificates.generate', 'Generate Certificate')}
             </Button>
           }
         />
@@ -188,7 +190,7 @@ export function CertificatesTab() {
                     <div className="flex items-center gap-2 mb-2">
                       <Award className="w-5 h-5 text-amber-400" aria-hidden="true" />
                       <h3 className="font-semibold text-theme-primary text-lg">
-                        {cert.total_hours} Verified Hours
+                        {t('certificates.verified_hours', '{{count}} Verified Hours', { count: cert.total_hours })}
                       </h3>
                     </div>
 
@@ -199,7 +201,7 @@ export function CertificatesTab() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        Generated {new Date(cert.generated_at).toLocaleDateString()}
+                        {t('certificates.generated_on', 'Generated')} {new Date(cert.generated_at).toLocaleDateString()}
                       </span>
                       <span className="flex items-center gap-1">
                         <QrCode className="w-3 h-3" aria-hidden="true" />
@@ -225,7 +227,7 @@ export function CertificatesTab() {
                       startContent={<Download className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => handleDownload(cert.verification_code)}
                     >
-                      Download
+                      {t('certificates.download', 'Download')}
                     </Button>
                     <Button
                       size="sm"
@@ -234,7 +236,7 @@ export function CertificatesTab() {
                       startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => window.open(cert.verification_url, '_blank')}
                     >
-                      Verify
+                      {t('certificates.verify', 'Verify')}
                     </Button>
                   </div>
                 </div>

@@ -147,10 +147,17 @@ session.cookie_httponly = 1\n\
 ; Timezone\n\
 date.timezone = UTC\n\
 \n\
-; OPcache (less aggressive for dev)\n\
+; OPcache - tuned for Laravel\n\
 opcache.enable = 1\n\
 opcache.validate_timestamps = 1\n\
 opcache.revalidate_freq = 0\n\
+opcache.memory_consumption = 256\n\
+opcache.max_accelerated_files = 30000\n\
+opcache.interned_strings_buffer = 32\n\
+opcache.jit = tracing\n\
+opcache.jit_buffer_size = 100M\n\
+opcache.preload = /var/www/html/scripts/opcache-preload.php\n\
+opcache.preload_user = www-data\n\
 " >> "$PHP_INI_DIR/php.ini"
 
 # =============================================================================
@@ -172,6 +179,17 @@ RUN mkdir -p /var/www/html/httpdocs && \
     > /var/www/html/httpdocs/health.php
 
 # =============================================================================
+# Laravel Directory Structure
+# =============================================================================
+# Create storage directories required by Laravel framework
+RUN mkdir -p /var/www/html/storage/app/public \
+             /var/www/html/storage/framework/cache/data \
+             /var/www/html/storage/framework/sessions \
+             /var/www/html/storage/framework/views \
+             /var/www/html/storage/logs \
+             /var/www/html/bootstrap/cache
+
+# =============================================================================
 # Permissions
 # =============================================================================
 RUN chown -R www-data:www-data /var/www/html
@@ -182,9 +200,8 @@ RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/uploads \
     && chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads \
     && chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads
 
-# Create Laravel storage directories
-RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
-RUN chmod -R 775 storage bootstrap/cache
+# Ensure Laravel storage and bootstrap/cache are writable by www-data
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # =============================================================================
 # Expose Port
@@ -196,4 +213,4 @@ EXPOSE 80
 # Ensure upload dirs are writable by www-data at each startup (handles volume
 # re-mounts that reset ownership) then start Apache.
 # =============================================================================
-CMD ["sh", "-c", "chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; apache2-foreground"]
+CMD ["sh", "-c", "chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads 2>/dev/null; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; apache2-foreground"]

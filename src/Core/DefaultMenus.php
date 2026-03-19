@@ -10,6 +10,12 @@ namespace Nexus\Core;
  * Default Platform Menu System
  * Provides fallback menus when custom menus are not available or disabled
  */
+/**
+ *  Use AppCoreDefaultMenus instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreDefaultMenus instead. Maintained for backward compatibility.
+ */
 class DefaultMenus
 {
     /**

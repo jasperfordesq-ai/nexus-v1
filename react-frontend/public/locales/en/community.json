@@ -101,7 +101,12 @@
     "hours_log_failed": "Failed to log hours. Please try again.",
     "organisers_note": "Organiser's note:",
     "date_range_sr": "Opportunity date range",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "tab_expenses": "Expenses",
+    "tab_safeguarding": "Safeguarding",
+    "tab_community_projects": "Projects",
+    "tab_donations": "Donations",
+    "tab_accessibility": "Accessibility"
   },
   "credentials": {
     "heading": "Credential Verification",

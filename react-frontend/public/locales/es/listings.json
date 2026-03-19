@@ -119,5 +119,7 @@
   "load_error": "Error al cargar los anuncios.",
   "load_more_error": "Error al cargar mas anuncios",
   "page_meta_description": "Explora servicios y solicitudes.",
-  "page_meta_keywords": "anuncios, servicios, ofertas"
+  "page_meta_keywords": "anuncios, servicios, ofertas",
+  "save_listing": "Guardar anuncio",
+  "unsave_listing": "Quitar anuncio"
 }

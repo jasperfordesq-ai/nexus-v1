@@ -289,6 +289,7 @@ class GdprService
             'events' => $this->getEventsData($userId),
             'groups' => $this->getGroupsData($userId),
             'volunteering' => $this->getVolunteeringData($userId),
+            'volunteer_detailed' => $this->exportVolunteerData($userId),
             'gamification' => $this->getGamificationData($userId),
             'activity_log' => $this->getActivityLogData($userId),
             'consents' => $this->getConsentsData($userId),
@@ -385,6 +386,289 @@ class GdprService
              WHERE va.user_id = ? AND vo.tenant_id = ?",
             [$userId, $this->tenantId]
         )->fetchAll();
+    }
+
+    /**
+     * Export ALL volunteer-related data for a user (GDPR Article 15 - comprehensive)
+     *
+     * Queries all volunteer module tables and returns structured data grouped by category.
+     * This complements getVolunteeringData() which only covers applications/logs.
+     *
+     * @param int $userId The user whose volunteer data to export
+     * @return array Structured volunteer data grouped by category
+     */
+    private function exportVolunteerData(int $userId): array
+    {
+        $t = $this->tenantId;
+
+        // vol_applications
+        $applications = $this->query(
+            "SELECT va.id, va.opportunity_id, va.shift_id, va.status, va.message,
+                    va.reviewed_by, va.reviewed_at, va.created_at, va.updated_at,
+                    opp.title as opportunity_title
+             FROM vol_applications va
+             LEFT JOIN vol_opportunities opp ON va.opportunity_id = opp.id
+             WHERE va.user_id = ? AND va.tenant_id = ?
+             ORDER BY va.created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_logs (hour logs)
+        $logs = $this->query(
+            "SELECT vl.id, vl.organization_id, vl.opportunity_id, vl.hours, vl.description,
+                    vl.date_logged, vl.status, vl.verified_by, vl.verified_at, vl.created_at,
+                    opp.title as opportunity_title
+             FROM vol_logs vl
+             LEFT JOIN vol_opportunities opp ON vl.opportunity_id = opp.id
+             WHERE vl.user_id = ? AND vl.tenant_id = ?
+             ORDER BY vl.date_logged DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_shift_signups
+        $shiftSignups = $this->query(
+            "SELECT vss.id, vss.shift_id, vss.status, vss.created_at,
+                    vs.start_time, vs.end_time
+             FROM vol_shift_signups vss
+             LEFT JOIN vol_shifts vs ON vss.shift_id = vs.id
+             WHERE vss.user_id = ? AND vss.tenant_id = ?
+             ORDER BY vss.created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_shift_checkins
+        $shiftCheckins = $this->query(
+            "SELECT id, shift_id, qr_token, checked_in_at, checked_out_at,
+                    status, created_at
+             FROM vol_shift_checkins
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY checked_in_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_reviews (reviews written by or about the user)
+        $reviews = $this->query(
+            "SELECT id, reviewer_id, target_type, target_id, rating,
+                    comment, created_at,
+                    CASE WHEN reviewer_id = ? THEN 'given' ELSE 'received' END as direction
+             FROM vol_reviews
+             WHERE (reviewer_id = ? OR (target_type = 'user' AND target_id = ?)) AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $userId, $userId, $t]
+        )->fetchAll();
+
+        // vol_certificates
+        $certificates = $this->query(
+            "SELECT id, verification_code, total_hours, date_range_start,
+                    date_range_end, organizations, generated_at, downloaded_at
+             FROM vol_certificates
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY generated_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_mood_checkins
+        $moodCheckins = $this->query(
+            "SELECT id, mood, note, created_at
+             FROM vol_mood_checkins
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_credentials
+        $credentials = $this->query(
+            "SELECT id, credential_type, file_url, file_name, status,
+                    verified_by, verified_at, expires_at, notes, created_at, updated_at
+             FROM vol_credentials
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_expenses
+        $expenses = $this->query(
+            "SELECT id, organization_id, opportunity_id, expense_type, amount, currency,
+                    description, receipt_path, receipt_filename, status,
+                    reviewed_by, review_notes, reviewed_at, paid_at, payment_reference, submitted_at, created_at
+             FROM vol_expenses
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY submitted_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_safeguarding_training
+        $safeguardingTraining = $this->query(
+            "SELECT id, training_type, training_name, provider, completed_at,
+                    expires_at, certificate_url, document_path, status, created_at
+             FROM vol_safeguarding_training
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY completed_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_guardian_consents (as minor)
+        $guardianConsents = $this->query(
+            "SELECT id, opportunity_id, guardian_name, guardian_email, relationship,
+                    status, consent_given_at, consent_withdrawn_at, expires_at, created_at
+             FROM vol_guardian_consents
+             WHERE minor_user_id = ? AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_accessibility_needs
+        $accessibilityNeeds = $this->query(
+            "SELECT id, need_type, description, accommodations_required,
+                    emergency_contact_name, emergency_contact_phone, created_at, updated_at
+             FROM vol_accessibility_needs
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_safeguarding_incidents (reported by user)
+        $safeguardingIncidents = $this->query(
+            "SELECT id, opportunity_id, incident_type, severity, description,
+                    action_taken, status, resolution_notes, created_at
+             FROM vol_safeguarding_incidents
+             WHERE reported_by = ? AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_custom_field_values (custom form data submitted by user)
+        $customFieldValues = $this->query(
+            "SELECT cfv.id, cfv.entity_type, cfv.entity_id, cfv.field_value,
+                    cf.field_key, cf.field_label, cf.field_type, cfv.created_at
+             FROM vol_custom_field_values cfv
+             JOIN vol_custom_fields cf ON cfv.custom_field_id = cf.id
+             WHERE cfv.entity_type = 'application'
+               AND cfv.entity_id IN (SELECT va.id FROM vol_applications va WHERE va.user_id = ? AND va.tenant_id = ?)
+               AND cfv.tenant_id = ?
+             ORDER BY cfv.created_at DESC",
+            [$userId, $t, $t]
+        )->fetchAll();
+
+        // vol_donations
+        $donations = $this->query(
+            "SELECT id, opportunity_id, community_project_id, giving_day_id, amount, currency,
+                    payment_method, payment_reference, donor_name, donor_email,
+                    message, is_anonymous, status, created_at
+             FROM vol_donations
+             WHERE user_id = ? AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_community_projects (proposed by user)
+        $communityProjects = $this->query(
+            "SELECT id, title, description, category, location, status,
+                    proposed_date, created_at
+             FROM vol_community_projects
+             WHERE proposed_by = ? AND tenant_id = ?
+             ORDER BY created_at DESC",
+            [$userId, $t]
+        )->fetchAll();
+
+        // vol_shift_waitlist (user's waitlist entries)
+        try {
+            $shiftWaitlist = $this->query(
+                "SELECT sw.id, sw.shift_id, sw.position, sw.status,
+                        sw.notified_at, sw.promoted_at, sw.created_at,
+                        vs.start_time, vs.end_time
+                 FROM vol_shift_waitlist sw
+                 LEFT JOIN vol_shifts vs ON sw.shift_id = vs.id
+                 WHERE sw.user_id = ? AND sw.tenant_id = ?
+                 ORDER BY sw.created_at DESC",
+                [$userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $shiftWaitlist = [];
+        }
+
+        // vol_shift_swap_requests (user's swap requests as requester or target)
+        try {
+            $shiftSwapRequests = $this->query(
+                "SELECT id, from_user_id, to_user_id, from_shift_id, to_shift_id,
+                        status, requires_admin_approval, message, created_at, updated_at,
+                        CASE WHEN from_user_id = ? THEN 'outgoing' ELSE 'incoming' END as direction
+                 FROM vol_shift_swap_requests
+                 WHERE (from_user_id = ? OR to_user_id = ?) AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $userId, $userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $shiftSwapRequests = [];
+        }
+
+        // vol_shift_group_members (user's group reservation memberships)
+        try {
+            $shiftGroupMemberships = $this->query(
+                "SELECT gm.id, gm.reservation_id, gm.status, gm.created_at,
+                        gr.shift_id, gr.group_id, gr.reserved_slots
+                 FROM vol_shift_group_members gm
+                 LEFT JOIN vol_shift_group_reservations gr ON gm.reservation_id = gr.id
+                 WHERE gm.user_id = ? AND gm.tenant_id = ?
+                 ORDER BY gm.created_at DESC",
+                [$userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $shiftGroupMemberships = [];
+        }
+
+        // vol_emergency_alert_recipients (emergency alerts sent to user)
+        try {
+            $emergencyAlertRecipients = $this->query(
+                "SELECT ear.id, ear.alert_id, ear.notified_at, ear.response, ear.responded_at,
+                        ea.priority, ea.message, ea.shift_id, ea.status as alert_status
+                 FROM vol_emergency_alert_recipients ear
+                 LEFT JOIN vol_emergency_alerts ea ON ear.alert_id = ea.id
+                 WHERE ear.user_id = ? AND ear.tenant_id = ?
+                 ORDER BY ear.notified_at DESC",
+                [$userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $emergencyAlertRecipients = [];
+        }
+
+        // vol_wellbeing_alerts (burnout alerts about user)
+        try {
+            $wellbeingAlerts = $this->query(
+                "SELECT id, risk_level, risk_score, indicators, coordinator_notified,
+                        coordinator_notes, status, resolved_at, created_at, updated_at
+                 FROM vol_wellbeing_alerts
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $wellbeingAlerts = [];
+        }
+
+        return [
+            'applications' => $applications,
+            'hour_logs' => $logs,
+            'shift_signups' => $shiftSignups,
+            'shift_checkins' => $shiftCheckins,
+            'shift_waitlist' => $shiftWaitlist,
+            'shift_swap_requests' => $shiftSwapRequests,
+            'shift_group_memberships' => $shiftGroupMemberships,
+            'reviews' => $reviews,
+            'certificates' => $certificates,
+            'mood_checkins' => $moodCheckins,
+            'credentials' => $credentials,
+            'expenses' => $expenses,
+            'safeguarding_training' => $safeguardingTraining,
+            'guardian_consents' => $guardianConsents,
+            'accessibility_needs' => $accessibilityNeeds,
+            'safeguarding_incidents' => $safeguardingIncidents,
+            'custom_field_values' => $customFieldValues,
+            'donations' => $donations,
+            'community_projects' => $communityProjects,
+            'emergency_alert_recipients' => $emergencyAlertRecipients,
+            'wellbeing_alerts' => $wellbeingAlerts,
+        ];
     }
 
     private function getGamificationData(int $userId): array

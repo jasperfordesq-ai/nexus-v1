@@ -6,6 +6,12 @@
 
 namespace Nexus\Core;
 
+/**
+ *  Use AppCoreValidator instead. This class is maintained for backward compatibility only.
+ */
+/**
+ * @deprecated Use AppCoreValidator instead. Maintained for backward compatibility.
+ */
 class Validator
 {
     /**

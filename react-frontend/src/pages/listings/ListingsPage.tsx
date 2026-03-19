@@ -243,6 +243,7 @@ export function ListingsPage() {
 
           <div className="flex flex-col sm:flex-row flex-wrap gap-3">
             <Select
+              aria-label={t('filter_type_label')}
               placeholder={t('filter_type_label')}
               selectedKeys={selectedType ? [selectedType] : []}
               onChange={(e) => setSelectedType(e.target.value as ListingType)}
@@ -259,6 +260,7 @@ export function ListingsPage() {
             </Select>
 
             <Select
+              aria-label={t('filter_category_label')}
               placeholder={t('filter_category_label')}
               selectedKeys={selectedCategory ? [selectedCategory] : []}
               onChange={(e) => setSelectedCategory(e.target.value)}

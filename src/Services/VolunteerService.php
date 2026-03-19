@@ -19,6 +19,7 @@ use Nexus\Models\ActivityLog;
 use Nexus\Models\Transaction;
 use Nexus\Services\EmailTemplateService;
 use Nexus\Services\NotificationDispatcher;
+use Nexus\Services\WebhookDispatchService;
 
 /**
  * VolunteerService - Business logic for volunteering operations
@@ -555,6 +556,17 @@ class VolunteerService
                 // Silent fail
             }
 
+            // Webhook: volunteer.applied
+            try {
+                WebhookDispatchService::dispatch('volunteer.applied', [
+                    'user_id' => $userId,
+                    'opportunity_id' => $opportunityId,
+                    'application_id' => (int)$appId,
+                ]);
+            } catch (\Throwable $e) {
+                error_log("Webhook dispatch failed for volunteer.applied: " . $e->getMessage());
+            }
+
             return (int)$appId;
         } catch (\Exception $e) {
             error_log("VolunteerService::apply error: " . $e->getMessage());
@@ -910,6 +922,18 @@ class VolunteerService
                 // Silent fail
             }
 
+            // Webhook: volunteer.approved or volunteer.declined
+            try {
+                $webhookEvent = $status === 'approved' ? 'volunteer.approved' : 'volunteer.declined';
+                WebhookDispatchService::dispatch($webhookEvent, [
+                    'user_id' => (int)$app['user_id'],
+                    'opportunity_id' => (int)$app['opportunity_id'],
+                    'application_id' => $applicationId,
+                ]);
+            } catch (\Throwable $e) {
+                error_log("Webhook dispatch failed for volunteer.{$status}: " . $e->getMessage());
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::handleApplication error: " . $e->getMessage());
@@ -1155,6 +1179,17 @@ class VolunteerService
                 // Silent fail
             }
 
+            // Webhook: shift.signup
+            try {
+                WebhookDispatchService::dispatch('shift.signup', [
+                    'user_id' => $userId,
+                    'shift_id' => $shiftId,
+                    'opportunity_id' => (int)$opportunityId,
+                ]);
+            } catch (\Throwable $e) {
+                error_log("Webhook dispatch failed for shift.signup: " . $e->getMessage());
+            }
+
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::signUpForShift error: " . $e->getMessage());
@@ -1320,7 +1355,21 @@ class VolunteerService
             );
 
             $db = Database::getConnection();
-            return (int)$db->lastInsertId();
+            $logId = (int)$db->lastInsertId();
+
+            // Webhook: hours.logged
+            try {
+                WebhookDispatchService::dispatch('hours.logged', [
+                    'user_id' => $userId,
+                    'opportunity_id' => $data['opportunity_id'] ?? null,
+                    'hours' => (float)$data['hours'],
+                    'log_id' => $logId,
+                ]);
+            } catch (\Throwable $e) {
+                error_log("Webhook dispatch failed for hours.logged: " . $e->getMessage());
+            }
+
+            return $logId;
         } catch (\Exception $e) {
             error_log("VolunteerService::logHours error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to log hours'];
@@ -1492,6 +1541,19 @@ class VolunteerService
                 );
             } catch (\Throwable $e) {
                 // Silent fail
+            }
+
+            // Webhook: hours.verified (only for approvals)
+            if ($status === 'approved') {
+                try {
+                    WebhookDispatchService::dispatch('hours.verified', [
+                        'user_id' => (int)$log['user_id'],
+                        'log_id' => $logId,
+                        'verified_by' => $adminUserId,
+                    ]);
+                } catch (\Throwable $e) {
+                    error_log("Webhook dispatch failed for hours.verified: " . $e->getMessage());
+                }
             }
 
             return true;

@@ -24,7 +24,9 @@
     "goals": "Obiettivi",
     "jobs": "Jobs",
     "challenges": "Challenges",
-    "volunteering": "Volunteering"
+    "volunteering": "Volunteering",
+    "blogs": "Blog",
+    "discussions": "Discussioni"
   },
   "report": {
     "title": "Segnala post",
@@ -296,7 +298,9 @@
       "create_poll": "Create Poll",
       "set_goal": "Set Goal",
       "groups": "Groups"
-    }
+    },
+    "by_owner": "di {{name}}",
+    "offer": "Offerta"
   },
   "mode": {
     "for_you": "For You",

@@ -176,11 +176,11 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
         setCursor(newCursor);
         setHasMore(has_more);
       } else {
-        toast.error(response.error || 'Failed to load applications.');
+        toast.error(response.error || t('applications.load_failed', 'Failed to load applications.'));
       }
     } catch (err) {
       logError('Failed to load applications', err);
-      toast.error(t('applications_load_failed'));
+      toast.error(t('applications.load_failed', 'Failed to load applications.'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -198,7 +198,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
     try {
       const response = await api.put(`/v2/volunteering/applications/${applicationId}`, { action });
       if (response.success) {
-        toast.success(action === 'approve' ? 'Application approved.' : 'Application declined.');
+        toast.success(action === 'approve' ? t('applications.approved', 'Application approved.') : t('applications.declined', 'Application declined.'));
         setApplications((prev) =>
           prev.map((a) =>
             a.id === applicationId
@@ -207,21 +207,21 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           )
         );
       } else {
-        toast.error(response.error || `Failed to ${action} application.`);
+        toast.error(response.error || t('applications.action_failed', `Failed to ${action} application.`));
       }
     } catch (err) {
       logError(`Failed to ${action} application`, err);
-      toast.error(t('something_wrong'));
+      toast.error(t('something_wrong', 'Something went wrong.'));
     } finally {
       setActionLoading((prev) => ({ ...prev, [applicationId]: false }));
     }
   }
 
   const filters: { key: AppStatusFilter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'pending', label: 'Pending' },
-    { key: 'approved', label: 'Approved' },
-    { key: 'declined', label: 'Declined' },
+    { key: 'all', label: t('applications.filter_all', 'All') },
+    { key: 'pending', label: t('applications.filter_pending', 'Pending') },
+    { key: 'approved', label: t('applications.filter_approved', 'Approved') },
+    { key: 'declined', label: t('applications.filter_declined', 'Declined') },
   ];
 
   const pendingCount = applications.filter((a) => a.status === 'pending').length;
@@ -253,9 +253,9 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
         <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <ClipboardList className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-            Applications
+            {t('applications.heading', 'Applications')}
             {pendingCount > 0 && statusFilter === 'all' && (
-              <Chip size="sm" color="warning" variant="flat">{pendingCount} pending</Chip>
+              <Chip size="sm" color="warning" variant="flat">{t('applications.pending_count', '{{count}} pending', { count: pendingCount })}</Chip>
             )}
           </h2>
           {pendingFiltered.length > 0 && (
@@ -272,7 +272,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               }}
               aria-label="Select all visible pending applications"
             >
-              <span className="text-xs text-theme-muted">Select all</span>
+              <span className="text-xs text-theme-muted">{t('applications.select_all', 'Select all')}</span>
             </Checkbox>
           )}
         </div>
@@ -296,7 +296,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 
         <Input
           size="sm"
-          placeholder="Search by name..."
+          placeholder={t('opportunity.search_placeholder', 'Search by name...')}
           value={nameSearch}
           onValueChange={setNameSearch}
           startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" />}
@@ -306,7 +306,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 
         {selected.size > 0 && (
           <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30">
-            <span className="text-sm text-indigo-400 font-medium">{selected.size} selected</span>
+            <span className="text-sm text-indigo-400 font-medium">{t('applications.selected_count', '{{count}} selected', { count: selected.size })}</span>
             <Button
               size="sm"
               color="success"
@@ -314,7 +314,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               startContent={<CheckCircle className="w-3.5 h-3.5" />}
               onPress={() => handleBulkAction('approve')}
             >
-              Approve All
+              {t('applications.approve_all', 'Approve All')}
             </Button>
             <Button
               size="sm"
@@ -323,10 +323,10 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               startContent={<XCircle className="w-3.5 h-3.5" />}
               onPress={() => handleBulkAction('decline')}
             >
-              Decline All
+              {t('applications.decline_all', 'Decline All')}
             </Button>
             <Button size="sm" variant="light" onPress={() => setSelected(new Set())}>
-              Clear
+              {t('applications.clear', 'Clear')}
             </Button>
           </div>
         )}
@@ -339,7 +339,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           <div className="text-center py-8">
             <Users className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
             <p className="text-sm text-theme-muted">
-              {statusFilter === 'all' ? 'No applications yet.' : `No ${statusFilter} applications.`}
+              {statusFilter === 'all' ? t('applications.none_yet', 'No applications yet.') : t('applications.none_filtered', 'No {{status}} applications.', { status: statusFilter })}
             </p>
           </div>
         ) : (
@@ -390,7 +390,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                       {formatShortDate(app.shift.start_time)} · {formatTime(app.shift.start_time)}–{formatTime(app.shift.end_time)}
                     </p>
                   )}
-                  <p className="text-xs text-theme-subtle">Applied {formatDate(app.created_at)}</p>
+                  <p className="text-xs text-theme-subtle">{t('applications.applied_date', 'Applied {{date}}', { date: formatDate(app.created_at) })}</p>
                 </div>
 
                 {app.status === 'pending' && (
@@ -403,7 +403,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                       isLoading={actionLoading[app.id]}
                       onPress={() => handleAction(app.id, 'approve')}
                     >
-                      Approve
+                      {t('applications.approve', 'Approve')}
                     </Button>
                     <Button
                       size="sm"
@@ -413,7 +413,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                       isLoading={actionLoading[app.id]}
                       onPress={() => handleAction(app.id, 'decline')}
                     >
-                      Decline
+                      {t('applications.decline', 'Decline')}
                     </Button>
                   </div>
                 )}
@@ -432,7 +432,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               isDisabled={isLoadingMore}
               onPress={() => loadApplications(statusFilter, cursor)}
             >
-              Load more
+              {t('applications.load_more', 'Load more')}
             </Button>
           </div>
         )}
@@ -450,7 +450,7 @@ export function OpportunityDetailPage() {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
 
-  usePageTitle('Opportunity Details');
+  usePageTitle(t('opportunity.page_title', 'Opportunity Details'));
 
   const [opportunity, setOpportunity] = useState<OpportunityDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -471,11 +471,11 @@ export function OpportunityDetailPage() {
       if (response.success && response.data) {
         setOpportunity(response.data);
       } else {
-        setError('Opportunity not found.');
+        setError(t('opportunity.not_found', 'Opportunity not found.'));
       }
     } catch (err) {
       logError('Failed to load opportunity', err);
-      setError('Unable to load this opportunity. Please try again.');
+      setError(t('opportunity.load_error', 'Unable to load this opportunity. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -494,17 +494,17 @@ export function OpportunityDetailPage() {
 
       const response = await api.post(`/v2/volunteering/opportunities/${id}/apply`, body);
       if (response.success) {
-        toast.success(t('application_submitted'));
+        toast.success(t('opportunity.application_submitted', 'Application submitted.'));
         applyModal.onClose();
         setApplyMessage('');
         setSelectedShiftId(null);
         load(); // Refresh to show applied state
       } else {
-        toast.error(response.error || 'Failed to apply.');
+        toast.error(response.error || t('opportunity.apply_failed', 'Failed to apply.'));
       }
     } catch (err) {
       logError('Failed to apply', err);
-      toast.error(t('something_wrong'));
+      toast.error(t('something_wrong', 'Something went wrong.'));
     } finally {
       setIsApplying(false);
     }
@@ -518,13 +518,13 @@ export function OpportunityDetailPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
-          <p className="text-theme-muted mb-4">{error || 'Opportunity not found.'}</p>
+          <p className="text-theme-muted mb-4">{error || t('opportunity.not_found', 'Opportunity not found.')}</p>
           <Button
             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={load}
           >
-            Try Again
+            {t('opportunity.try_again', 'Try Again')}
           </Button>
         </GlassCard>
       </div>
@@ -538,7 +538,7 @@ export function OpportunityDetailPage() {
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
       <Breadcrumbs
         items={[
-          { label: 'Volunteering', href: '/volunteering' },
+          { label: t('breadcrumb_volunteering', 'Volunteering'), href: '/volunteering' },
           { label: opp.title },
         ]}
       />
@@ -573,11 +573,11 @@ export function OpportunityDetailPage() {
               variant="flat"
               color={opp.is_active ? 'success' : 'danger'}
             >
-              {opp.is_active ? 'Active' : 'Closed'}
+              {opp.is_active ? t('opportunity.status_active', 'Active') : t('opportunity.status_closed', 'Closed')}
             </Chip>
             {opp.is_remote && (
               <Chip size="sm" variant="flat" color="secondary" startContent={<Wifi className="w-3 h-3" />}>
-                Remote
+                {t('opportunity.remote', 'Remote')}
               </Chip>
             )}
             {opp.category && (
@@ -587,12 +587,12 @@ export function OpportunityDetailPage() {
             )}
             {opp.has_applied && (
               <Chip size="sm" variant="flat" color="success" startContent={<CheckCircle className="w-3 h-3" />}>
-                Applied
+                {t('opportunity.applied', 'Applied')}
               </Chip>
             )}
             {opp.is_owner && (
               <Chip size="sm" variant="flat" color="secondary" startContent={<ClipboardList className="w-3 h-3" />}>
-                Your opportunity
+                {t('opportunity.your_opportunity', 'Your opportunity')}
               </Chip>
             )}
           </div>
@@ -634,7 +634,7 @@ export function OpportunityDetailPage() {
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               onPress={applyModal.onOpen}
             >
-              Apply Now
+              {t('opportunity.apply_now', 'Apply Now')}
             </Button>
           )}
 
@@ -643,10 +643,10 @@ export function OpportunityDetailPage() {
               <CheckCircle className="w-5 h-5 text-emerald-400" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-emerald-400">
-                  You have applied
+                  {t('opportunity.you_have_applied', 'You have applied')}
                 </p>
                 <p className="text-xs text-theme-subtle">
-                  Status: {opp.application.status} &middot; Applied {formatDate(opp.application.created_at)}
+                  {t('opportunity.application_status', 'Status: {{status}}', { status: opp.application.status })} &middot; {t('opportunity.applied_on', 'Applied {{date}}', { date: formatDate(opp.application.created_at) })}
                 </p>
               </div>
             </div>
@@ -660,7 +660,7 @@ export function OpportunityDetailPage() {
           <GlassCard className="p-6 space-y-4">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
               <Clock className="w-5 h-5 text-indigo-400" aria-hidden="true" />
-              Upcoming Shifts
+              {t('opportunity.upcoming_shifts', 'Upcoming Shifts')}
             </h2>
             <div className="space-y-2">
               {upcomingShifts.map((shift) => (
@@ -685,9 +685,9 @@ export function OpportunityDetailPage() {
                       {shift.signup_count}{shift.capacity ? `/${shift.capacity}` : ''}
                     </span>
                     {(shift.spots_available === null || shift.spots_available > 0) ? (
-                      <Chip size="sm" variant="flat" color="success">Open</Chip>
+                      <Chip size="sm" variant="flat" color="success">{t('opportunity.shift_open', 'Open')}</Chip>
                     ) : (
-                      <Chip size="sm" variant="flat" color="danger">Full</Chip>
+                      <Chip size="sm" variant="flat" color="danger">{t('opportunity.shift_full', 'Full')}</Chip>
                     )}
                   </div>
                 </div>
@@ -705,18 +705,18 @@ export function OpportunityDetailPage() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Apply to {opp.title}</ModalHeader>
+              <ModalHeader>{t('opportunity.apply_to', 'Apply to {{title}}', { title: opp.title })}</ModalHeader>
               <ModalBody>
                 <Textarea
-                  label="Message (optional)"
-                  placeholder="Tell the organiser why you'd like to volunteer..."
+                  label={t('opportunity.apply_message_label', 'Message (optional)')}
+                  placeholder={t('opportunity.apply_message_placeholder', "Tell the organiser why you'd like to volunteer...")}
                   value={applyMessage}
                   onValueChange={setApplyMessage}
                   minRows={3}
                 />
                 {upcomingShifts.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-theme-muted">Select a shift (optional)</p>
+                    <p className="text-sm font-medium text-theme-muted">{t('opportunity.select_shift', 'Select a shift (optional)')}</p>
                     {upcomingShifts.filter((s) => s.spots_available === null || s.spots_available > 0).map((shift) => (
                       <Button
                         key={shift.id}
@@ -737,13 +737,13 @@ export function OpportunityDetailPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>Cancel</Button>
+                <Button variant="flat" onPress={onClose}>{t('opportunity.cancel', 'Cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={handleApply}
                   isLoading={isApplying}
                 >
-                  Submit Application
+                  {t('opportunity.submit_application', 'Submit Application')}
                 </Button>
               </ModalFooter>
             </>

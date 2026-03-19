@@ -109,7 +109,7 @@ class VolunteerCertificateService
         $verificationCode = self::generateVerificationCode();
 
         // Get tenant info for branding
-        $stmt = $db->prepare("SELECT name, logo_url FROM tenants WHERE id = ?");
+        $stmt = $db->prepare("SELECT name, og_image_url as logo_url FROM tenants WHERE id = ?");
         $stmt->execute([$tenantId]);
         $tenant = $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -172,7 +172,7 @@ class VolunteerCertificateService
 
         $stmt = $db->prepare("
             SELECT c.*, u.name as user_name, u.avatar_url as user_avatar,
-                   t.name as tenant_name, t.logo_url as tenant_logo
+                   t.name as tenant_name, t.og_image_url as tenant_logo
             FROM vol_certificates c
             JOIN users u ON c.user_id = u.id
             JOIN tenants t ON c.tenant_id = t.id

@@ -1,0 +1,175 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use App\Services\CommentService;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * CommentsController — Eloquent-powered threaded comments with reactions.
+ *
+ * Fully migrated from legacy delegation to Eloquent via CommentService.
+ */
+class CommentsController extends BaseApiController
+{
+    protected bool $isV2Api = true;
+
+    public function __construct(
+        private readonly CommentService $commentService,
+    ) {}
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/comments?target_type=...&target_id=...
+    // -----------------------------------------------------------------
+
+    public function index(): JsonResponse
+    {
+        $targetType = $this->query('target_type');
+        $targetId = $this->queryInt('target_id');
+
+        if (! $targetType || ! $targetId) {
+            return $this->respondWithError(
+                'VALIDATION_REQUIRED_FIELD',
+                'target_type and target_id are required',
+                null,
+                400
+            );
+        }
+
+        $currentUserId = $this->getOptionalUserId() ?? 0;
+        $comments = $this->commentService->getForEntity($targetType, $targetId, $currentUserId);
+        $count = $this->commentService->countAll($comments);
+
+        return $this->respondWithData([
+            'comments' => $comments,
+            'count'    => $count,
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/comments
+    // -----------------------------------------------------------------
+
+    public function store(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        $data = $this->getAllInput();
+        $targetType = $data['target_type'] ?? null;
+        $targetId = isset($data['target_id']) ? (int) $data['target_id'] : null;
+        $content = trim($data['content'] ?? '');
+
+        if (! $targetType || ! $targetId) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'target_type and target_id are required', null, 400);
+        }
+
+        if (empty($content)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Comment content is required', 'content', 400);
+        }
+
+        $comment = $this->commentService->create($targetType, $targetId, $userId, $tenantId, $data);
+
+        $comment->load('user:id,first_name,last_name,avatar_url');
+        $user = $comment->user;
+
+        return $this->respondWithData([
+            'id'             => $comment->id,
+            'content'        => $comment->content,
+            'created_at'     => (string) $comment->created_at,
+            'edited'         => false,
+            'is_own'         => true,
+            'author'         => [
+                'id'     => $userId,
+                'name'   => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                'avatar' => $user->avatar_url ?? null,
+            ],
+            'reactions'      => (object) [],
+            'user_reactions' => [],
+            'replies'        => [],
+        ], null, 201);
+    }
+
+    // -----------------------------------------------------------------
+    //  PUT /api/v2/comments/{id}
+    // -----------------------------------------------------------------
+
+    public function update(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+
+        $content = trim($this->input('content', ''));
+
+        if (empty($content)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Comment content is required', 'content', 400);
+        }
+
+        $updated = $this->commentService->update($id, $userId, $content);
+
+        if (! $updated) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Cannot edit this comment', null, 403);
+        }
+
+        return $this->respondWithData([
+            'id'      => $id,
+            'content' => $content,
+            'edited'  => true,
+        ]);
+    }
+
+    // -----------------------------------------------------------------
+    //  DELETE /api/v2/comments/{id}
+    // -----------------------------------------------------------------
+
+    public function destroy(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+
+        $deleted = $this->commentService->delete($id, $userId);
+
+        if (! $deleted) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Cannot delete this comment', null, 403);
+        }
+
+        return $this->respondWithData(['deleted' => true, 'id' => $id]);
+    }
+
+    // -----------------------------------------------------------------
+    //  POST /api/v2/comments/{id}/reactions
+    // -----------------------------------------------------------------
+
+    public function reactions(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        $emoji = $this->input('emoji');
+
+        if (! $emoji) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Emoji is required', 'emoji', 400);
+        }
+
+        // Map frontend emoji names to actual emojis
+        $emojiMap = [
+            'heart'       => "\u{2764}\u{FE0F}",
+            'thumbs_up'   => "\u{1F44D}",
+            'thumbs_down' => "\u{1F44E}",
+            'laugh'       => "\u{1F602}",
+            'angry'       => "\u{1F62E}",
+        ];
+
+        $actualEmoji = $emojiMap[$emoji] ?? $emoji;
+
+        $result = $this->commentService->toggleReaction($userId, $tenantId, $id, $actualEmoji);
+
+        return $this->respondWithData([
+            'action'    => $result['action'],
+            'emoji'     => $emoji,
+            'reactions' => $result['reactions'],
+        ]);
+    }
+}

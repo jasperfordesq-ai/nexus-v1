@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -57,6 +58,7 @@ interface EmergencyAlert {
 }
 
 export function EmergencyAlertsTab() {
+  const { t } = useTranslation('volunteering');
   const toast = useToast();
   const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -76,11 +78,11 @@ export function EmergencyAlertsTab() {
         const payload = response.data as { alerts?: EmergencyAlert[] } | EmergencyAlert[];
         setAlerts(Array.isArray(payload) ? payload : (payload.alerts ?? []));
       } else {
-        setError('Failed to load alerts');
+        setError(t('emergency.error_load', 'Failed to load alerts'));
       }
     } catch (err) {
       logError('Failed to load emergency alerts', err);
-      setError('Unable to load alerts.');
+      setError(t('emergency.error_load_generic', 'Unable to load alerts.'));
     } finally {
       setIsLoading(false);
     }
@@ -95,23 +97,23 @@ export function EmergencyAlertsTab() {
       setRespondingTo(alertId);
       const result = await api.put(`/v2/volunteering/emergency-alerts/${alertId}`, { response });
       if (result.success) {
-        toast.success(response === 'accepted' ? 'Alert accepted.' : 'Alert declined.');
+        toast.success(response === 'accepted' ? t('emergency.alert_accepted', 'Alert accepted.') : t('emergency.alert_declined', 'Alert declined.'));
         load();
       } else {
-        toast.error(result.error || 'Failed to respond to alert.');
+        toast.error(result.error || t('emergency.respond_error', 'Failed to respond to alert.'));
       }
     } catch (err) {
       logError('Failed to respond to alert', err);
-      toast.error('Failed to respond to alert. Please try again.');
+      toast.error(t('emergency.respond_error_generic', 'Failed to respond to alert. Please try again.'));
     } finally {
       setRespondingTo(null);
     }
   };
 
   const priorityConfig = {
-    critical: { color: 'danger' as const, label: 'CRITICAL', bgClass: 'border-red-500/30 bg-red-500/5' },
-    urgent: { color: 'warning' as const, label: 'URGENT', bgClass: 'border-amber-500/30 bg-amber-500/5' },
-    normal: { color: 'primary' as const, label: 'NORMAL', bgClass: '' },
+    critical: { color: 'danger' as const, label: t('emergency.priority_critical', 'CRITICAL'), bgClass: 'border-red-500/30 bg-red-500/5' },
+    urgent: { color: 'warning' as const, label: t('emergency.priority_urgent', 'URGENT'), bgClass: 'border-amber-500/30 bg-amber-500/5' },
+    normal: { color: 'primary' as const, label: t('emergency.priority_normal', 'NORMAL'), bgClass: '' },
   };
 
   const containerVariants = {
@@ -129,10 +131,10 @@ export function EmergencyAlertsTab() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Siren className="w-5 h-5 text-red-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">Emergency Alerts</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('emergency.title', 'Emergency Alerts')}</h2>
           {alerts.filter(a => a.my_response === 'pending').length > 0 && (
             <Chip size="sm" color="danger" variant="flat">
-              {alerts.filter(a => a.my_response === 'pending').length} pending
+              {t('emergency.pending_count', '{{count}} pending', { count: alerts.filter(a => a.my_response === 'pending').length })}
             </Chip>
           )}
         </div>
@@ -144,7 +146,7 @@ export function EmergencyAlertsTab() {
           onPress={load}
           isLoading={isLoading}
         >
-          Refresh
+          {t('common.refresh', 'Refresh')}
         </Button>
       </div>
 
@@ -153,7 +155,7 @@ export function EmergencyAlertsTab() {
           <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{error}</p>
           <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={load}>
-            Try Again
+            {t('common.try_again', 'Try Again')}
           </Button>
         </GlassCard>
       )}
@@ -173,8 +175,8 @@ export function EmergencyAlertsTab() {
       {!error && !isLoading && alerts.length === 0 && (
         <EmptyState
           icon={<Bell className="w-12 h-12" aria-hidden="true" />}
-          title="No emergency alerts"
-          description="You don't have any emergency shift requests at the moment."
+          title={t('emergency.empty_title', 'No emergency alerts')}
+          description={t('emergency.empty_description', "You don't have any emergency shift requests at the moment.")}
         />
       )}
 
@@ -233,7 +235,7 @@ export function EmergencyAlertsTab() {
                       )}
 
                       <p className="text-xs text-theme-subtle mt-2">
-                        From {alert.coordinator.name} -- Expires {new Date(alert.expires_at).toLocaleString()}
+                        {t('emergency.from', 'From')} {alert.coordinator.name} -- {t('emergency.expires', 'Expires')} {new Date(alert.expires_at).toLocaleString()}
                       </p>
                     </div>
 
@@ -246,7 +248,7 @@ export function EmergencyAlertsTab() {
                           onPress={() => handleRespond(alert.id, 'accepted')}
                           isLoading={respondingTo === alert.id}
                         >
-                          Accept
+                          {t('emergency.accept', 'Accept')}
                         </Button>
                         <Button
                           size="sm"
@@ -256,7 +258,7 @@ export function EmergencyAlertsTab() {
                           onPress={() => handleRespond(alert.id, 'declined')}
                           isLoading={respondingTo === alert.id}
                         >
-                          Decline
+                          {t('emergency.decline', 'Decline')}
                         </Button>
                       </div>
                     )}
@@ -267,7 +269,7 @@ export function EmergencyAlertsTab() {
                         color={alert.my_response === 'accepted' ? 'success' : 'danger'}
                         variant="flat"
                       >
-                        {alert.my_response === 'accepted' ? 'Accepted' : 'Declined'}
+                        {alert.my_response === 'accepted' ? t('emergency.accepted', 'Accepted') : t('emergency.declined', 'Declined')}
                       </Chip>
                     )}
                   </div>

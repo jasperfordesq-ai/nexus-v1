@@ -85,6 +85,7 @@
   "reviews": {
     "sent": "Sent {{amount}}h",
     "received": "Received {{amount}}h",
-    "review": "Review"
+    "review": "Review",
+    "none_pending": "No pending reviews"
   }
 }

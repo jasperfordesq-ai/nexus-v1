@@ -457,10 +457,10 @@ export function CredentialVerificationTab() {
 
             {/* Credential Type */}
             <Select
-              label="Credential Type"
-              placeholder="Select credential type"
-              selectedKeys={uploadForm.type ? [uploadForm.type] : []}
-              onChange={(e) => setUploadForm((prev) => ({ ...prev, type: e.target.value }))}
+              label={t('credentials.type_label', 'Credential Type')}
+              placeholder={t('credentials.type_placeholder', 'Select credential type')}
+              selectedKeys={uploadForm.type ? new Set([uploadForm.type]) : new Set()}
+              onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setUploadForm((prev) => ({ ...prev, type: val })); }}
               isRequired
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
@@ -476,7 +476,7 @@ export function CredentialVerificationTab() {
             {/* File Upload */}
             <div>
               <label className="block text-sm font-medium text-theme-primary mb-2">
-                Document <span className="text-rose-400">*</span>
+                {t('credentials.document_label', 'Document')} <span className="text-rose-400">*</span>
               </label>
               <div
                 className={`relative overflow-hidden border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
@@ -529,8 +529,8 @@ export function CredentialVerificationTab() {
             {/* Expiry Date */}
             <Input
               type="date"
-              label="Expiry Date (optional)"
-              placeholder="Leave blank if no expiry"
+              label={t('credentials.expiry_label', 'Expiry Date (optional)')}
+              placeholder={t('credentials.expiry_placeholder', 'Leave blank if no expiry')}
               value={uploadForm.expiry_date}
               onChange={(e) => setUploadForm((prev) => ({ ...prev, expiry_date: e.target.value }))}
               classNames={{

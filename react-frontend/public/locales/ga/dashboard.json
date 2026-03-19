@@ -85,6 +85,7 @@
   "reviews": {
     "sent": "Seolta {{amount}}u",
     "received": "Faighte {{amount}}u",
-    "review": "Léirmheas"
+    "review": "Léirmheas",
+    "none_pending": "Gan léirmheasanna ar feitheamh"
   }
 }

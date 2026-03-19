@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -53,6 +54,7 @@ interface RecommendedShift {
 }
 
 export function RecommendedShiftsTab() {
+  const { t } = useTranslation('volunteering');
   const [shifts, setShifts] = useState<RecommendedShift[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,11 +72,11 @@ export function RecommendedShiftsTab() {
         const payload = response.data as { shifts?: RecommendedShift[] } | RecommendedShift[];
         setShifts(Array.isArray(payload) ? payload : (payload.shifts ?? []));
       } else {
-        setError('Failed to load recommendations');
+        setError(t('recommendations.error_load', 'Failed to load recommendations'));
       }
     } catch (err) {
       logError('Failed to load recommended shifts', err);
-      setError('Unable to load recommendations. Please try again.');
+      setError(t('recommendations.error_load_generic', 'Unable to load recommendations. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +108,7 @@ export function RecommendedShiftsTab() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-amber-400" aria-hidden="true" />
-          <h2 className="text-lg font-semibold text-theme-primary">Recommended for You</h2>
+          <h2 className="text-lg font-semibold text-theme-primary">{t('recommendations.title', 'Recommended for You')}</h2>
         </div>
         <Button
           size="sm"
@@ -116,7 +118,7 @@ export function RecommendedShiftsTab() {
           onPress={load}
           isLoading={isLoading}
         >
-          Refresh
+          {t('common.refresh', 'Refresh')}
         </Button>
       </div>
 
@@ -128,7 +130,7 @@ export function RecommendedShiftsTab() {
             className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
             onPress={load}
           >
-            Try Again
+            {t('common.try_again', 'Try Again')}
           </Button>
         </GlassCard>
       )}
@@ -148,8 +150,8 @@ export function RecommendedShiftsTab() {
       {!error && !isLoading && shifts.length === 0 && (
         <EmptyState
           icon={<Target className="w-12 h-12" aria-hidden="true" />}
-          title="No recommendations yet"
-          description="Add skills to your profile to get personalized shift recommendations."
+          title={t('recommendations.empty_title', 'No recommendations yet')}
+          description={t('recommendations.empty_description', 'Add skills to your profile to get personalized shift recommendations.')}
         />
       )}
 
@@ -173,7 +175,7 @@ export function RecommendedShiftsTab() {
                         variant="flat"
                         startContent={<Zap className="w-3 h-3" />}
                       >
-                        {item.match_score}% match
+                        {t('recommendations.match_score', '{{score}}% match', { score: item.match_score })}
                       </Chip>
                     </div>
 

@@ -699,7 +699,7 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
               </div>
 
               <p className="text-theme-muted text-sm mt-1">
-                {vacancy.organization ? vacancy.organization.name : vacancy.creator.name}
+                {vacancy.organization?.name || vacancy.creator?.name || t('unknown')}
               </p>
 
               <p className="text-theme-muted text-sm line-clamp-2 mt-1">

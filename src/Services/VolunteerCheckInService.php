@@ -303,6 +303,28 @@ class VolunteerCheckInService
     }
 
     /**
+     * Resolve volunteer user ID from a check-in token in current tenant scope.
+     *
+     * @param string $token QR token
+     * @return int|null User ID or null if token is invalid
+     */
+    public static function getUserIdByToken(string $token): ?int
+    {
+        $tenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        try {
+            $stmt = $db->prepare("SELECT user_id FROM vol_shift_checkins WHERE qr_token = ? AND tenant_id = ? LIMIT 1");
+            $stmt->execute([$token, $tenantId]);
+            $userId = $stmt->fetchColumn();
+
+            return $userId !== false ? (int)$userId : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
      * Get check-in status for a shift
      *
      * @param int $shiftId Shift ID
