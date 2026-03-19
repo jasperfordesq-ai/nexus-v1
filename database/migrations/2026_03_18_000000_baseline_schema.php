@@ -35,6 +35,7 @@ return new class extends Migration
                 $table->string('domain', 255)->nullable();
                 $table->string('subdomain', 100)->nullable()->unique();
                 $table->text('description')->nullable();
+                $table->string('tagline', 500)->nullable();
                 $table->string('logo', 500)->nullable();
                 $table->string('favicon', 500)->nullable();
                 $table->string('timezone', 50)->default('UTC');
@@ -44,6 +45,9 @@ return new class extends Migration
                 $table->json('settings')->nullable()->comment('JSON tenant settings');
                 $table->boolean('is_active')->default(true);
                 $table->boolean('is_federation_enabled')->default(false);
+                $table->boolean('allows_subtenants')->default(false);
+                $table->unsignedInteger('depth')->default(0);
+                $table->json('configuration')->nullable();
                 $table->string('plan', 50)->default('free');
                 $table->unsignedInteger('max_users')->nullable();
                 $table->timestamp('created_at')->useCurrent();
@@ -67,14 +71,16 @@ return new class extends Migration
                 $table->string('username', 100)->nullable();
                 $table->string('email', 255);
                 $table->timestamp('email_verified_at')->nullable();
-                $table->string('password_hash', 255);
+                $table->string('password_hash', 255)->default('');
                 $table->string('remember_token', 100)->nullable();
                 $table->string('phone', 50)->nullable();
+                $table->date('date_of_birth')->nullable();
                 $table->text('bio')->nullable();
                 $table->string('location', 255)->nullable();
                 $table->decimal('latitude', 10, 8)->nullable();
                 $table->decimal('longitude', 11, 8)->nullable();
                 $table->string('avatar', 500)->nullable();
+                $table->string('avatar_url', 500)->nullable();
                 $table->string('cover_photo', 500)->nullable();
                 $table->string('profile_type', 50)->default('individual');
                 $table->string('organization_name', 255)->nullable();
@@ -82,14 +88,29 @@ return new class extends Migration
                 $table->string('role', 50)->default('member');
                 $table->boolean('is_admin')->default(false);
                 $table->boolean('is_super_admin')->default(false);
+                $table->boolean('is_god')->default(false);
                 $table->boolean('is_tenant_super_admin')->default(false);
                 $table->boolean('is_verified')->default(false);
+                $table->boolean('is_approved')->default(true);
                 $table->boolean('is_active')->default(true);
                 $table->string('status', 50)->default('active');
                 $table->string('preferred_language', 10)->default('en');
-                $table->decimal('credit_balance', 10, 2)->default(0);
+                $table->decimal('balance', 10, 2)->default(0);
                 $table->unsignedInteger('xp_points')->default(0);
+                $table->unsignedInteger('xp')->default(0);
                 $table->unsignedInteger('level')->default(1);
+                $table->text('skills')->nullable();
+                $table->boolean('onboarding_completed')->default(false);
+                $table->string('privacy_profile', 50)->default('public');
+                $table->string('privacy_search', 50)->default('public');
+                $table->string('privacy_contact', 50)->default('public');
+                $table->boolean('totp_enabled')->default(false);
+                $table->text('totp_secret')->nullable();
+                $table->text('totp_backup_codes')->nullable();
+                $table->json('notification_preferences')->nullable();
+                $table->json('email_preferences')->nullable();
+                $table->timestamp('last_login_at')->nullable();
+                $table->timestamp('last_active_at')->nullable();
                 $table->string('reset_token', 255)->nullable();
                 $table->timestamp('reset_token_expiry')->nullable();
                 $table->timestamp('last_login')->nullable();
@@ -145,14 +166,29 @@ return new class extends Migration
                 $table->string('slug', 255)->nullable();
                 $table->text('description')->nullable();
                 $table->enum('type', ['offer', 'request'])->default('offer');
-                $table->enum('status', ['active', 'completed', 'expired', 'draft', 'closed'])->default('active');
+                $table->string('status', 50)->default('active');
                 $table->decimal('time_credits', 10, 2)->nullable();
+                $table->decimal('price', 10, 2)->nullable();
+                $table->decimal('hours_estimate', 10, 2)->nullable();
+                $table->string('service_type', 50)->default('in-person');
                 $table->string('location', 255)->nullable();
                 $table->decimal('latitude', 10, 8)->nullable();
                 $table->decimal('longitude', 11, 8)->nullable();
                 $table->boolean('is_virtual')->default(false);
                 $table->boolean('is_featured')->default(false);
+                $table->timestamp('featured_until')->nullable();
+                $table->string('image_url', 500)->nullable();
+                $table->unsignedInteger('subcategory_id')->nullable();
+                $table->text('sdg_goals')->nullable();
+                $table->string('federated_visibility', 50)->default('none');
+                $table->boolean('direct_messaging_disabled')->default(false);
+                $table->boolean('exchange_workflow_required')->default(false);
+                $table->unsignedInteger('view_count')->default(0);
+                $table->unsignedInteger('contact_count')->default(0);
+                $table->unsignedInteger('save_count')->default(0);
                 $table->unsignedInteger('views')->default(0);
+                $table->timestamp('renewed_at')->nullable();
+                $table->unsignedInteger('renewal_count')->default(0);
                 $table->timestamp('expires_at')->nullable();
                 $table->timestamp('created_at')->useCurrent();
                 $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
@@ -802,13 +838,15 @@ return new class extends Migration
             Schema::create('tenant_settings', function (Blueprint $table) {
                 $table->increments('id');
                 $table->unsignedInteger('tenant_id');
-                $table->string('key', 255);
-                $table->text('value')->nullable();
-                $table->string('type', 50)->default('string');
+                $table->string('setting_key', 255);
+                $table->text('setting_value')->nullable();
+                $table->string('setting_type', 50)->default('string');
+                $table->unsignedInteger('created_by')->nullable();
+                $table->unsignedInteger('updated_by')->nullable();
                 $table->timestamp('created_at')->useCurrent();
                 $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
 
-                $table->unique(['tenant_id', 'key']);
+                $table->unique(['tenant_id', 'setting_key']);
                 $table->index('tenant_id');
             });
         }
@@ -919,6 +957,107 @@ return new class extends Migration
 
                 $table->index(['tenant_id', 'user_id']);
                 $table->index(['tenant_id', 'status']);
+            });
+        }
+
+        // ------------------------------------------------------------------
+        // FEDERATION TENANT FEATURES
+        // ------------------------------------------------------------------
+        if (! Schema::hasTable('federation_tenant_features')) {
+            Schema::create('federation_tenant_features', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedInteger('tenant_id');
+                $table->string('feature_key', 100);
+                $table->boolean('is_enabled')->default(false);
+                $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
+                $table->unsignedInteger('updated_by')->nullable();
+
+                $table->unique(['tenant_id', 'feature_key'], 'unique_tenant_feature');
+                $table->index('tenant_id');
+            });
+        }
+
+        // ------------------------------------------------------------------
+        // LIKES — generic likes (listings, feed posts, etc.)
+        // ------------------------------------------------------------------
+        if (! Schema::hasTable('likes')) {
+            Schema::create('likes', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedInteger('tenant_id');
+                $table->unsignedInteger('user_id');
+                $table->string('target_type', 50);
+                $table->unsignedInteger('target_id');
+                $table->timestamp('created_at')->useCurrent();
+
+                $table->unique(['user_id', 'target_type', 'target_id']);
+                $table->index(['tenant_id', 'target_type', 'target_id']);
+            });
+        }
+
+        // ------------------------------------------------------------------
+        // LISTING_SKILL_TAGS — skill tags on listings
+        // ------------------------------------------------------------------
+        if (! Schema::hasTable('listing_skill_tags')) {
+            Schema::create('listing_skill_tags', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedInteger('tenant_id');
+                $table->unsignedInteger('listing_id');
+                $table->unsignedInteger('skill_id')->nullable();
+                $table->string('tag_name', 255);
+                $table->timestamp('created_at')->useCurrent();
+
+                $table->index(['listing_id', 'tenant_id']);
+                $table->index('tenant_id');
+            });
+        }
+
+        // ------------------------------------------------------------------
+        // SANCTUM — Personal Access Tokens
+        // ------------------------------------------------------------------
+        if (! Schema::hasTable('personal_access_tokens')) {
+            Schema::create('personal_access_tokens', function (Blueprint $table) {
+                $table->id();
+                $table->morphs('tokenable');
+                $table->string('name');
+                $table->string('token', 64)->unique();
+                $table->text('abilities')->nullable();
+                $table->timestamp('last_used_at')->nullable();
+                $table->timestamp('expires_at')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        // ------------------------------------------------------------------
+        // USER_SAVED_LISTINGS — Favourited listings
+        // ------------------------------------------------------------------
+        if (! Schema::hasTable('user_saved_listings')) {
+            Schema::create('user_saved_listings', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedInteger('tenant_id');
+                $table->unsignedInteger('user_id');
+                $table->unsignedInteger('listing_id');
+                $table->timestamp('created_at')->useCurrent();
+
+                $table->unique(['user_id', 'listing_id']);
+                $table->index('tenant_id');
+                $table->index('listing_id');
+            });
+        }
+
+        // ------------------------------------------------------------------
+        // LOGIN_ATTEMPTS — Rate limiting for brute force protection
+        // ------------------------------------------------------------------
+        if (! Schema::hasTable('login_attempts')) {
+            Schema::create('login_attempts', function (Blueprint $table) {
+                $table->id();
+                $table->string('identifier', 255);
+                $table->enum('type', ['email', 'ip'])->default('email');
+                $table->string('ip_address', 45);
+                $table->boolean('success')->default(false);
+                $table->timestamp('attempted_at');
+
+                $table->index(['identifier', 'type']);
+                $table->index('attempted_at');
             });
         }
     }

@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Migrated\Controllers\Api;
 
 use Tests\Laravel\LegacyBridgeTestCase;
-use App\Http\Controllers\Api\EventsApiController;
+use App\Http\Controllers\Api\EventsController as EventsApiController;
 
 /**
  * Tests for EventsApiController (Laravel migration)

@@ -22,24 +22,30 @@ class Message extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'tenant_id', 'sender_id', 'receiver_id', 'subject', 'body',
-        'is_read', 'audio_url', 'audio_duration', 'created_at',
+        'tenant_id', 'sender_id', 'receiver_id', 'listing_id',
+        'content', 'is_read', 'is_edited', 'edited_at',
+        'is_deleted_sender', 'is_deleted_receiver',
+        'read_at', 'created_at',
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
-        'audio_duration' => 'integer',
+        'is_edited' => 'boolean',
+        'is_deleted_sender' => 'boolean',
+        'is_deleted_receiver' => 'boolean',
         'created_at' => 'datetime',
+        'edited_at' => 'datetime',
+        'read_at' => 'datetime',
     ];
 
     public function sender(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id')->withoutGlobalScopes();
     }
 
     public function receiver(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'receiver_id');
+        return $this->belongsTo(User::class, 'receiver_id')->withoutGlobalScopes();
     }
 
     public function listing(): BelongsTo

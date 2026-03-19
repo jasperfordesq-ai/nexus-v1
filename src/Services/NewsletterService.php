@@ -13,7 +13,7 @@ use Nexus\Models\User;
 use Nexus\Core\Mailer;
 use Nexus\Core\TenantContext;
 use Nexus\Core\Env;
-use Nexus\Controllers\NewsletterTrackingController;
+use App\Services\NewsletterTrackingService as NewsletterTrackingController;
 
 /**
  * ============================================================================

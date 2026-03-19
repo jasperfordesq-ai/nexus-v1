@@ -37,8 +37,9 @@ class Authenticate
         // 2. Fall back to legacy JWT token validation
         $token = $this->extractBearerToken($request);
         if ($token) {
-            $user = $this->validateLegacyToken($token);
-            if ($user) {
+            $validated = $this->validateLegacyToken($token);
+            if ($validated) {
+                // shouldUse AFTER setUser (setUser happens inside validateLegacyToken)
                 auth()->shouldUse('sanctum');
                 return $next($request);
             }
@@ -99,6 +100,21 @@ class Authenticate
             if (!$eloquentUser) {
                 \Illuminate\Support\Facades\Log::debug('[Auth] User not found in DB', ['user_id' => $userId]);
                 return false;
+            }
+
+            // Validate user is active and belongs to the resolved tenant
+            if ($eloquentUser->status !== 'active') {
+                \Illuminate\Support\Facades\Log::debug('[Auth] User is not active', ['user_id' => $userId, 'status' => $eloquentUser->status]);
+                return false;
+            }
+
+            $tenantId = \App\Core\TenantContext::getId();
+            if ($tenantId && (int) $eloquentUser->tenant_id !== $tenantId) {
+                // Allow super admins to access any tenant
+                if (!$eloquentUser->is_super_admin && !$eloquentUser->is_tenant_super_admin) {
+                    \Illuminate\Support\Facades\Log::debug('[Auth] User tenant mismatch', ['user_id' => $userId, 'user_tenant' => $eloquentUser->tenant_id, 'request_tenant' => $tenantId]);
+                    return false;
+                }
             }
 
             auth()->guard('sanctum')->setUser($eloquentUser);

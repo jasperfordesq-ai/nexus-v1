@@ -28,6 +28,8 @@ class Group extends Model
         'cached_member_count', 'federated_visibility',
     ];
 
+    protected $appends = ['members_count', 'member_count'];
+
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',
@@ -35,6 +37,22 @@ class Group extends Model
         'has_children' => 'boolean',
         'cached_member_count' => 'integer',
     ];
+
+    /**
+     * Accessor: React frontend expects 'members_count'.
+     */
+    public function getMembersCountAttribute(): int
+    {
+        return $this->cached_member_count ?? 0;
+    }
+
+    /**
+     * Accessor: Some endpoints use 'member_count'.
+     */
+    public function getMemberCountAttribute(): int
+    {
+        return $this->cached_member_count ?? 0;
+    }
 
     public function creator(): BelongsTo
     {

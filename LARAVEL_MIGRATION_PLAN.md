@@ -2,13 +2,51 @@
 
 ## Context
 
-Project NEXUS has a custom PHP 8.2 framework (564 files, ~147K lines) that works well but limits access to Laravel's ecosystem (Eloquent, queues, Scout, broadcasting, Sanctum, etc.) and makes onboarding harder. The user is seriously evaluating a migration. The React frontend is unaffected — only the PHP backend changes.
+Project NEXUS migrated from a custom PHP 8.2 framework to Laravel 12.54. The React frontend is unaffected — only the PHP backend changed.
 
 ## Strategy: In-Place Incremental Migration
 
-**Not a strangler fig or parallel repo.** Work in-place on a long-lived `laravel-migration` branch. Convert file-by-file, merge incrementally, test against the same database. This avoids doubled infrastructure and schema drift risks.
+**Not a strangler fig or parallel repo.** Work in-place on a long-lived `laravel-migration` branch. Convert file-by-file, merge incrementally, test against the same database.
 
-The key enabler: a **bridge layer** that lets Laravel and the legacy framework coexist. Legacy routes fall through to the old router; converted routes use Laravel. Both share the same DB connection.
+The key enabler: a **bridge layer** that let Laravel and the legacy framework coexist. Legacy routes fell through to the old router; converted routes used Laravel. Both shared the same DB connection.
+
+---
+
+## Current Status (2026-03-19)
+
+**Phases 0-5 are complete.** Laravel is the sole HTTP handler. The legacy framework no longer boots for any request. Performance improved from 8.4s/req (bridge mode) to ~100ms/req (pure Laravel + JIT + OPCache).
+
+**What is genuinely Laravel (62% of services):**
+- Entry point, routing, middleware pipeline (100%)
+- 68 Eloquent models with automatic `HasTenantScope` (100%)
+- ~154 services with real Eloquent/DI implementations (wallet, listings, users, search, auth, notifications, reviews, events, admin dashboards, categories)
+- Events, broadcasting, queue dispatch
+- Auth (Sanctum tokens)
+
+**What is still legacy PHP wrapped by Laravel (28% of services):**
+- ~70 pure wrapper services that delegate to `src/Services/` static methods (matching, collaborative filtering, embeddings, federation messaging, achievement analytics, group recommendations)
+- These are algorithmic/integration-heavy — stable and rarely changed
+
+**What is partially migrated (10% of services):**
+- ~25 mixed services with some methods converted to Eloquent, some still delegating
+
+### Legacy Code Remaining
+
+| Category | Files | Lines | Status |
+|----------|-------|-------|--------|
+| `src/Services/` | 215 | ~100K | 62% genuinely migrated, 28% wrappers, 10% mixed |
+| `src/Core/` | ~25 | ~15K | `TenantContext` + `Database` still critical; `Router`, `View` unused but referenced |
+| `src/Helpers/` | 8 | ~3K | Still in use |
+| `src/Models/` | 2 | <1K | `User.php` used by `SuperPanelAccess`, `EmailSettings.php` used by `Mailer` |
+| `views/admin/` + `views/modern/admin/` | ~200 | -- | Legacy admin panels, intentionally NOT migrated |
+| `views/emails/` | ~25 | -- | Email templates, still in use |
+
+### Deleted (2026-03-19)
+
+| Category | Files | Lines | Why safe |
+|----------|-------|-------|----------|
+| `src/Controllers/` | 80 | ~45K | All 1,223 routes served by Laravel controllers. Two blocking controllers (`CronController`, `NewsletterTrackingController`) relocated to `app/Services/CronJobRunner.php` and `app/Services/NewsletterTrackingService.php` before deletion. |
+| `tests/Controllers/` | 142 | -- | Scaffold tests for deleted controllers (class_exists checks only) |
 
 ---
 
@@ -25,7 +63,7 @@ Install Laravel alongside the existing app without breaking anything.
 5. [x] **TenantScope**: `App\Scopes\TenantScope` + `App\Models\Concerns\HasTenantScope` trait for Eloquent models
 6. [x] **Health check verified**: `/api/laravel/health` returns Laravel response, legacy routes unaffected
 7. [x] DB bridge: `Database::setLaravelConnection()` shares Laravel's PDO with legacy code
-8. [ ] Add `tests/Laravel/` directory; configure `phpunit.xml` for both suites (deferred)
+8. [ ] ~~Add `tests/Laravel/` directory~~ (created but `TestCase` class has autoload issue — pre-existing)
 
 **Files created:**
 - `bootstrap/app.php` — Laravel application bootstrap
@@ -45,49 +83,23 @@ Install Laravel alongside the existing app without breaking anything.
 
 Existing controllers still use `echo json_encode()` + `exit()` — Laravel routes call them directly. Controller conversion to return proper Laravel Response objects is a later phase.
 
-### Phase 2 — Models (COMPLETE — 60/60)
+### Phase 2 — Models (COMPLETE — 68 models)
 
-**All 60 Eloquent models created and verified.** Every model tested against the live database with tenant scoping.
+All Eloquent models created with `HasTenantScope`. Tested against live database.
 
-**Models:** ActivityLog, AiConversation, AiMessage, AiSetting, AiUsage, AiUserLimit, Attribute, Category, Connection, Deliverable, DeliverableComment, DeliverableMilestone, EmailSetting, Error404Log, Event, EventRsvp, FeedPost, Gamification, Goal, Group, GroupDiscussion, GroupDiscussionSubscriber, GroupFeedback, GroupPost, GroupType, HelpArticle, Listing, Menu, MenuItem, Message, Newsletter, NewsletterAnalytics, NewsletterBounce, NewsletterSegment, NewsletterSubscriber, NewsletterTemplate, Notification, OrgMember, OrgTransaction, OrgTransferRequest, OrgWallet, Page, PayPlan, Poll, Post, Report, ResourceItem, Review, SeoMetadata, SeoRedirect, Tenant, Transaction, User, UserBadge, VolApplication, VolLog, VolOpportunity, VolOrganization, VolReview, VolShift
+### Phase 3 — Services (IN PROGRESS — 62% genuine)
 
-**TenantScope global scope** replaces 1,377+ manual `TenantContext::getId()` calls:
-```php
-class TenantScope implements Scope {
-    public function apply(Builder $builder, Model $model) {
-        $builder->where($model->getTable().'.tenant_id', TenantContext::getId());
-    }
-}
-```
+DI pattern established. **249 Laravel services** created (vs 215 legacy).
 
-**Conversion order** (start simple, build confidence):
-1. `Listing` (pilot — moderate complexity, well-isolated)
-2. Newsletter cluster (`Newsletter`, `NewsletterSubscriber`, `NewsletterAnalytics`)
-3. `Group`, `GroupType`
-4. `Event`, `EventRsvp`
-5. `Transaction`, `Review`
-6. `OrgMember`, `OrgWallet`
-7. `User` (most complex — save for last after pattern is proven)
-8. Remaining ~45 models
+| Status | Count | Description |
+|--------|-------|-------------|
+| **Genuine** | ~154 | Real Eloquent/DI implementations (wallet, listings, users, search, auth, etc.) |
+| **Wrappers** | ~70 | Delegate to legacy static services (matching, filtering, embeddings, federation) |
+| **Mixed** | ~25 | Partially converted — good candidates to finish next |
 
-Per model: create Eloquent model → add TenantScope → define relationships → update service methods one-by-one → run tests after each.
+### Phase 4 — Controllers (COMPLETE — 130 Laravel controllers)
 
-### Phase 3 — Services (COMPLETE — 241/219)
-
-DI pattern established with `ListingService` as the reference implementation. Legacy static services continue working unchanged — conversion is incremental.
-
-**Pattern:** New `app/Services/` classes use constructor injection + Eloquent models. Registered as singletons in `AppServiceProvider`. Old `src/Services/` static classes untouched.
-
-**Completed:** ListingService (Eloquent-based, cursor pagination, search, CRUD)
-**Remaining:** 218 services — convert as needed when touching each module
-
-### Phase 4 — Controllers (COMPLETE — 126/120)
-
-Convert 120 API controllers to Laravel controllers.
-
-Per controller: change parent class → add `Request $request` parameter → replace manual auth with middleware → replace rate limiting with `throttle` middleware.
-
-Order follows route files from smallest to largest, ending with `misc-api.php` (30+ controllers) and `admin-api.php` (30+ controllers).
+All API controllers converted. Legacy controllers deleted (2026-03-19).
 
 ### Phase 5 — Activation (COMPLETE — 2026-03-18)
 
@@ -107,109 +119,109 @@ Laravel is now the sole HTTP handler. The legacy bridge pattern (boot both frame
 
 ---
 
-## Timeline
+## Phase 6 — Legacy Cleanup (NOT STARTED)
 
-| Phase | Duration | Cumulative |
-|---|---|---|
-| 0: Foundation | 2-3 weeks | 2-3 weeks |
-| 1: Core Infrastructure | 3-4 weeks | 5-7 weeks |
-| 2: Models | 4-6 weeks | 9-13 weeks |
-| 3: Services | 6-8 weeks | 15-21 weeks |
-| 4: Controllers | 4-5 weeks | 19-26 weeks |
-| 5: Cleanup | 4-6 weeks | 23-32 weeks |
+Remaining work to make this a fully Laravel application. Ordered by risk and value.
 
-**Total: ~6-8 months** solo without AI. **With Claude Code: ~6-10 weeks.**
+### 6a. Finish mixed services (~25 services) — LOW RISK
+Services that are partially converted. Some methods use Eloquent, some delegate. Finish the conversion.
+- **Effort:** Small per service
+- **Risk:** Low — partial logic already works in Laravel
+- **Approach:** As you touch each service for bugs/features, finish the conversion
+
+### 6b. Convert wrapper services (~70 services) — MEDIUM RISK
+Pure wrappers that just call legacy static methods. Convert to Eloquent/DI.
+- **Effort:** Medium — rewrite each with Eloquent
+- **Risk:** Medium — algorithmic code (matching, filtering, embeddings) with low test coverage
+- **Approach:** Incrementally, as you touch them. Do NOT bulk-rewrite without tests.
+- **Key services:** SmartMatchingEngine, CollaborativeFilteringService, EmbeddingService, FederatedMessageService, AchievementAnalyticsService, GroupRecommendationEngine
+
+### 6c. Remove dead framework classes — LOW RISK
+Classes in `src/Core/` that are no longer called but could not be deleted yet due to entanglement.
+
+| Class | Lines | Blocker |
+|-------|-------|---------|
+| `Router.php` | 9.4K | Used by `generate_openapi.php` |
+| `View.php` | 4.6K | Was referenced by deleted controllers — **may now be deletable** (needs verification) |
+| `MenuGenerator.php` | -- | Called directly by `MenuManager.php` lines 400-417 (no `class_exists` guard) |
+| `DefaultMenus.php` | 13K | Called by `MenuManager.php` with `class_exists` guard, but also calls `MenuGenerator` internally |
+
+**To unblock MenuGenerator/DefaultMenus deletion:** Rewrite `MenuManager.php` lines 400-417 to not delegate to `MenuGenerator`. Then both can go.
+
+### 6d. Migrate core framework classes — HIGH VALUE, HIGH RISK
+The two most critical legacy classes.
+
+| Class | Lines | Why it matters |
+|-------|-------|---------------|
+| `TenantContext` | 802 | 7 resolution strategies, called everywhere. Both `src/Core/` and `app/Core/` versions exist. |
+| `Database.php` | 9.4K | Raw PDO wrapper used by legacy services. Once wrapper services (6b) are gone, this has no callers. |
+
+**Approach:** Do `Database.php` last — once all services use Eloquent/`DB::` facade, it becomes dead code. `TenantContext` can be rewritten as a proper Laravel singleton after that.
+
+### 6e. Migrate legacy models — LOW EFFORT, BLOCKED
+
+| Model | Blocker |
+|-------|---------|
+| `src/Models/User.php` | `SuperPanelAccess::canManageTenant()` calls `User::isGod()` |
+| `src/Models/EmailSettings.php` | `App\Core\Mailer` imports it directly |
+
+**Fix:** Move `isGod()` to `App\Models\User`, update `SuperPanelAccess`. Move `EmailSettings` logic to Eloquent model, update `Mailer`.
+
+### 6f. Admin panel modernisation (OPTIONAL) — LOW PRIORITY
+- `views/admin/` + `views/modern/admin/` (~200 files) serve `/admin-legacy/` and `/super-admin/`
+- Could convert to Laravel Blade or React admin panel
+- **Not recommended now** — works fine, low traffic, admin-only
+
+---
+
+## Test Coverage
+
+| Suite | Tests | Status |
+|-------|-------|--------|
+| Unit | 249 | 12 pre-existing errors (`ResolveAdminTenantFilterTest`) |
+| Services | 1,283 | 95 pre-existing errors (DB access to `nexus_test`), 56% coverage gap |
+| Models | -- | Pre-existing DB access errors |
+| Laravel | 17 | `TestCase` autoload issue (pre-existing) |
+| Controllers | -- | **Deleted** (were scaffold tests for removed legacy controllers) |
+
+**Priority:** Fix `nexus_test` database access to unblock service tests before converting more services.
+
+---
 
 ## Critical Risks
 
 | Risk | Mitigation |
 |---|---|
-| API contract breakage (React breaks) | Response shape logging middleware + snapshot tests at each phase |
-| Multi-tenant scope leak | `TenantScope` global scope is actually *safer* than manual scoping |
-| Auth breakage during transition | Run both auth systems in parallel |
-| 56% services untested | Add tests *before* converting untested services |
-| Performance regression | Benchmark response times before/after each phase |
+| API contract breakage (React breaks) | Response shape logging + snapshot tests |
+| Multi-tenant scope leak | `TenantScope` global scope is safer than manual scoping |
+| Wrapper service rewrite breaks logic | Add tests BEFORE converting untested services |
+| 56% services untested | Fix `nexus_test` DB access, add tests incrementally |
+| `TenantContext` rewrite breaks everything | Do last, after all dependencies migrated |
 
 ## What NOT to Migrate
 
-- Legacy PHP admin views (`views/admin/`, `views/modern/admin/`) — leave as-is
+- Legacy PHP admin views (`views/admin/`, `views/modern/admin/`) — leave as-is (optional future work)
 - React frontend — untouched
 - PHP i18n files (`lang/`) — only used by legacy admin
 - PageBuilder — low priority
-
 
 ---
 
 ## Production Impact & Parallel Development
 
-**Production stays untouched until you are ready.** All migration work happens on a `laravel-migration` branch. You keep deploying other changes to `main` normally -- bug fixes, new features, whatever you need.
-
-Periodically merge `main` into `laravel-migration` to pick up those changes. If you add a new controller on `main`, convert it on the migration branch too. Claude Code handles this easily.
-
-When ready to go live: merge the migration branch to `main` and deploy. `safe-deploy.sh rollback` reverts instantly if anything breaks. You can even deploy the hybrid version first (Laravel handles converted routes, legacy handles the rest) to reduce risk.
-
-## Development Workflow
-
-Same Docker stack, same database, same URLs -- just switch branches:
+All migration work happens on a `laravel-migration` branch. `main` remains the stable production branch. Periodically merge `main` into `laravel-migration` to stay current.
 
 ```bash
-# Switch to the migration branch
-git checkout laravel-migration
-
-# Start Docker as normal -- same compose.yml, same containers
-docker compose up -d
-
-# Work with Claude Code on conversions
-# Test at localhost:8090 (PHP API) and localhost:5173 (React)
-
-# Switch back to main for other work
-git checkout main
-docker compose up -d   # containers pick up the main code
-```
-
-### Keeping main changes in sync
-
-```bash
-# Periodically pull main changes into the migration branch
 git checkout laravel-migration
 git merge main
-# Resolve any conflicts (Claude Code can help)
 ```
 
-### Testing the migration
-
-- **API tests:** `vendor/bin/phpunit` -- all 439 existing tests must still pass after each conversion
-- **React frontend:** Just use the app at `localhost:5173` -- it hits the same API endpoints, does not care whether Laravel or the old framework is serving them
-- **Spot-check endpoints:** `curl localhost:8090/api/v2/listings` -- response shape should be identical before and after conversion
-- **Artisan CLI:** Available after Phase 0 for Laravel-specific commands (cache clear, route list, etc.)
-
-## Effort Estimate With Claude Code
-
-~75% of this migration is mechanical pattern transformation -- exactly what Claude Code excels at:
-
-| Task | Human solo | With Claude Code |
-|---|---|---|
-| Convert 3,818 SQL queries | 2-3 weeks | **2-3 days** |
-| Convert 920 routes | 1 week | **hours** |
-| Convert 120 controllers | 2-3 weeks | **2-3 days** |
-| Convert 60 models to Eloquent | 2 weeks | **2-3 days** |
-| Refactor 234 static services to DI | 3-4 weeks | **1-2 weeks** |
-| Migrate 439 test files | 2 weeks | **3-4 days** |
-
-**Realistic total with Claude Code: 6-10 weeks** (vs 6-8 months solo).
-
-The remaining ~25% that still takes real time:
-- Bridge layer setup (~1 week)
-- Tenant scoping verification (~1-2 weeks)
-- Auth transition (session + JWT + WebAuthn) (~1 week)
-- Docker/deployment config (~few days)
-- Manual QA on production (~1 week)
+**NEVER merge `laravel-migration` into `main` without explicit user approval.**
 
 ## Verification
 
 After each phase:
-1. Run full PHPUnit suite (439 test files must pass)
-2. Hit every converted endpoint via React frontend
-3. Diff API response shapes (before/after logging middleware)
-4. Verify tenant scoping with cross-tenant test queries
-5. Check Docker builds still work
+1. Run PHPUnit suites (Unit, Services, Models)
+2. Hit converted endpoints via React frontend
+3. Verify tenant scoping with cross-tenant test queries
+4. Check Docker builds still work

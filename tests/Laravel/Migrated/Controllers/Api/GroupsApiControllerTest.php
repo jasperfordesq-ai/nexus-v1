@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Migrated\Controllers\Api;
 
 use Tests\Laravel\LegacyBridgeTestCase;
-use App\Http\Controllers\Api\GroupsApiController;
+use App\Http\Controllers\Api\GroupsController as GroupsApiController;
 
 /**
  * Tests for GroupsApiController (Laravel migration)

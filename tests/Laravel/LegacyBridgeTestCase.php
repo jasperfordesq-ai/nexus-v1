@@ -41,7 +41,7 @@ abstract class LegacyBridgeTestCase extends TestCase
     // Static properties kept for source-level compatibility with
     // legacy tests that reference self::$testUserId, etc.
     // ---------------------------------------------------------------
-    protected static ?int $testTenantId = null;
+    protected static ?int $legacyTestTenantId = null;
     protected static ?int $testUserId = null;
     protected static ?string $testUserEmail = null;
     protected static ?string $testAuthToken = null;
@@ -60,10 +60,10 @@ abstract class LegacyBridgeTestCase extends TestCase
         parent::setUp();
 
         // Default tenant — mirrors legacy ApiTestCase
-        if (static::$testTenantId === null) {
-            static::$testTenantId = $this->testTenantId; // from parent TestCase (2)
+        if (static::$legacyTestTenantId === null) {
+            static::$legacyTestTenantId = $this->testTenantId; // from parent TestCase (2)
         }
-        TenantContext::setById(static::$testTenantId);
+        TenantContext::setById(static::$legacyTestTenantId);
 
         // Create an authenticated test user via Sanctum
         $this->setUpTestUser();
@@ -77,15 +77,15 @@ abstract class LegacyBridgeTestCase extends TestCase
         $timestamp = time() . rand(1000, 9999);
 
         $this->testUser = User::create([
-            'tenant_id'   => static::$testTenantId,
+            'tenant_id'   => static::$legacyTestTenantId,
             'email'       => "bridge_test_{$timestamp}@test.com",
             'username'    => "bridge_test_{$timestamp}",
             'first_name'  => 'Bridge',
             'last_name'   => 'TestUser',
             'name'        => 'Bridge TestUser',
-            'password'    => bcrypt('TestPassword123!'),
-            'balance'     => 100,
-            'is_approved' => 1,
+            'password_hash' => bcrypt('TestPassword123!'),
+            'balance'       => 100,
+            'is_approved'   => 1,
         ]);
 
         static::$testUserId    = $this->testUser->id;
@@ -387,15 +387,15 @@ abstract class LegacyBridgeTestCase extends TestCase
     {
         $timestamp = time() . rand(1000, 9999);
         $defaults = [
-            'tenant_id'   => static::$testTenantId,
+            'tenant_id'   => static::$legacyTestTenantId,
             'email'       => "test_user_{$timestamp}@test.com",
             'username'    => "test_user_{$timestamp}",
             'first_name'  => 'Test',
             'last_name'   => 'User',
             'name'        => 'Test User',
-            'password'    => bcrypt('TestPassword123!'),
-            'balance'     => 50,
-            'is_approved' => 1,
+            'password_hash' => bcrypt('TestPassword123!'),
+            'balance'       => 50,
+            'is_approved'   => 1,
         ];
 
         $data = array_merge($defaults, $attributes);
@@ -463,7 +463,7 @@ abstract class LegacyBridgeTestCase extends TestCase
     /**
      * Act as an unauthenticated guest.
      */
-    protected function actingAsGuest(): static
+    public function actingAsGuest($guard = null): static
     {
         // Reset Sanctum auth by refreshing the app
         $this->app['auth']->forgetGuards();

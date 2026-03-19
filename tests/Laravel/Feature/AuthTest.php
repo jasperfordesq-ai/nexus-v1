@@ -32,6 +32,7 @@ class AuthTest extends TestCase
             'password_hash' => Hash::make('secret123'),
             'status' => 'active',
             'is_approved' => true,
+            'email_verified_at' => now(),
         ]);
 
         $response = $this->apiPost('/auth/login', [
@@ -40,8 +41,9 @@ class AuthTest extends TestCase
         ]);
 
         $response->assertStatus(200);
+        // Login returns token at top level (not nested under 'data')
         $response->assertJsonStructure([
-            'data' => ['token'],
+            'token',
         ]);
     }
 
@@ -116,10 +118,11 @@ class AuthTest extends TestCase
     public function test_login_is_tenant_scoped(): void
     {
         // Create a user on a DIFFERENT tenant
-        $user = User::factory()->forTenant(999)->create([
+        User::factory()->forTenant(999)->create([
             'email' => 'other-tenant@example.com',
             'password_hash' => Hash::make('secret123'),
             'status' => 'active',
+            'email_verified_at' => now(),
         ]);
 
         // Attempt login against the default test tenant (2)

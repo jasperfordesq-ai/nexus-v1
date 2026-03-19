@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Migrated\Controllers\Api;
 
 use Tests\Laravel\LegacyBridgeTestCase;
-use App\Http\Controllers\Api\ListingsApiController;
+use App\Http\Controllers\Api\ListingsController as ListingsApiController;
 
 /**
  * Tests for ListingsApiController (Laravel migration)

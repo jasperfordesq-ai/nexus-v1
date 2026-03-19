@@ -51,7 +51,9 @@ class TenantBootstrapTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'data' => [
-                'tenant',
+                'id',
+                'name',
+                'slug',
             ],
         ]);
     }
@@ -66,7 +68,7 @@ class TenantBootstrapTest extends TestCase
         $response = $this->apiGet('/v2/tenant/bootstrap?slug=' . $this->testTenantSlug);
 
         $response->assertStatus(200);
-        $response->assertJsonPath('data.tenant.slug', $this->testTenantSlug);
+        $response->assertJsonPath('data.slug', $this->testTenantSlug);
     }
 
     /**
@@ -80,8 +82,7 @@ class TenantBootstrapTest extends TestCase
         DB::table('federation_tenant_features')->insertOrIgnore([
             'tenant_id' => $this->testTenantId,
             'feature_key' => 'listings',
-            'enabled' => true,
-            'created_at' => now(),
+            'is_enabled' => true,
             'updated_at' => now(),
         ]);
 
@@ -92,7 +93,7 @@ class TenantBootstrapTest extends TestCase
         // The bootstrap response should include features somewhere in the data
         $data = $response->json('data');
         $this->assertIsArray($data);
-        $this->assertArrayHasKey('tenant', $data);
+        $this->assertArrayHasKey('id', $data);
     }
 
     /**

@@ -46,6 +46,7 @@ class ListingTest extends TestCase
      */
     public function test_listing_index_returns_data(): void
     {
+        $this->authenticatedUser();
         Listing::factory()->forTenant($this->testTenantId)->count(3)->create();
 
         $response = $this->apiGet('/v2/listings');
@@ -61,6 +62,7 @@ class ListingTest extends TestCase
      */
     public function test_listing_index_is_tenant_scoped(): void
     {
+        $this->authenticatedUser();
         // Create listings on two different tenants
         Listing::factory()->forTenant($this->testTenantId)->count(2)->create();
         Listing::factory()->forTenant(999)->count(3)->create();

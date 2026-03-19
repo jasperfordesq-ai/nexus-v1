@@ -32,7 +32,7 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
     {
         parent::setUp();
 
-        TenantContext::setById(static::$testTenantId);
+        TenantContext::setById(static::$legacyTestTenantId);
 
         // Create test sender
         $sender = $this->createUser([
@@ -71,10 +71,10 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
      */
     public function testGetUserBalance(): void
     {
-        $user = User::findOrFail($this->testSenderId);
+        $user = User::withoutGlobalScopes()->findOrFail($this->testSenderId);
 
         $this->assertNotNull($user->balance, 'User should have balance field');
-        $this->assertEquals($this->initialBalance, $user->balance, 'Balance should match initial value');
+        $this->assertEquals((float) $this->initialBalance, (float) $user->balance, 'Balance should match initial value');
     }
 
     /**
@@ -85,7 +85,7 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
         $amount = 25;
 
         Transaction::create([
-            'tenant_id'   => static::$testTenantId,
+            'tenant_id'   => static::$legacyTestTenantId,
             'sender_id'   => $this->testSenderId,
             'receiver_id' => $this->testReceiverId,
             'amount'      => $amount,
@@ -96,8 +96,8 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
         DB::table('users')->where('id', $this->testSenderId)->decrement('balance', $amount);
         DB::table('users')->where('id', $this->testReceiverId)->increment('balance', $amount);
 
-        $receiver = User::findOrFail($this->testReceiverId);
-        $this->assertEquals($amount, $receiver->balance, 'Receiver balance should equal transferred amount');
+        $receiver = User::withoutGlobalScopes()->findOrFail($this->testReceiverId);
+        $this->assertEquals($amount, (float) $receiver->balance, 'Receiver balance should equal transferred amount');
     }
 
     // ===== Transfer Validation Tests =====
@@ -119,8 +119,8 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
      */
     public function testTransferFailsWithInsufficientFunds(): void
     {
-        $sender = User::findOrFail($this->testSenderId);
-        $excessiveAmount = $sender->balance + 100;
+        $sender = User::withoutGlobalScopes()->findOrFail($this->testSenderId);
+        $excessiveAmount = (float) $sender->balance + 100;
 
         $this->assertGreaterThan(
             $sender->balance,
@@ -147,7 +147,7 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
      */
     public function testFindUserById(): void
     {
-        $user = User::find($this->testReceiverId);
+        $user = User::withoutGlobalScopes()->find($this->testReceiverId);
 
         $this->assertNotNull($user, 'User should be found by ID');
         $this->assertEquals($this->testReceiverId, $user->id, 'Found user ID should match');
@@ -168,7 +168,7 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
         // Create 3 transactions
         for ($i = 0; $i < 3; $i++) {
             DB::table('transactions')->insert([
-                'tenant_id'   => static::$testTenantId,
+                'tenant_id'   => static::$legacyTestTenantId,
                 'sender_id'   => $this->testSenderId,
                 'receiver_id' => $this->testReceiverId,
                 'amount'      => 1,
