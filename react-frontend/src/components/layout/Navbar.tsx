@@ -165,10 +165,18 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   const dropdownNavigate = useCallback((path: string) => {
     closeAllDropdowns();
+    // Re-apply tenantPath at click time to handle race condition where
+    // useMemo'd hrefs were computed before the tenant slug was available.
+    // Strip any existing slug prefix first to avoid double-prefixing.
+    const slug = tenant?.slug;
+    let resolved = path;
+    if (slug && !path.startsWith(`/${slug}`)) {
+      resolved = tenantPath(path);
+    }
     requestAnimationFrame(() => {
-      navigate(path);
+      navigate(resolved);
     });
-  }, [closeAllDropdowns, navigate]);
+  }, [closeAllDropdowns, navigate, tenant?.slug, tenantPath]);
 
   const handleLogout = async () => {
     closeAllDropdowns();
