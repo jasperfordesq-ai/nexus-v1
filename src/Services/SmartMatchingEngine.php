@@ -6,6 +6,7 @@
 
 namespace Nexus\Services;
 
+use Nexus\Core\Auth;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 
@@ -447,7 +448,7 @@ class SmartMatchingEngine
         ];
 
         // Attach per-component debug scores when debug mode is requested
-        if (($_GET['debug'] ?? null) === 'true') {
+        if (($_GET['debug'] ?? null) === 'true' && Auth::user() && Auth::isAdmin()) {
             $result['_debug_scores'] = [
                 'category' => round(($scores['category'] ?? 0) * 100),
                 'skill' => round(($scores['skill'] ?? 0) * 100),

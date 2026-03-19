@@ -1394,7 +1394,6 @@ Route::middleware('admin')->group(function () {
 });
 Route::get('/v2/matches/all', [\App\Http\Controllers\Api\MatchingController::class, 'allMatches']);
 Route::post('/v2/matches/{id}/dismiss', [\App\Http\Controllers\Api\MatchingController::class, 'dismiss']);
-Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events']);
 
 // ============================================
 // MIGRATED ROUTES — Legacy API (Polls, Goals, Events, Wallet, Cookie Consent, Legal, Nexus Score, Notifications, Listings)
@@ -1459,3 +1458,10 @@ Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationC
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
 
 }); // End Route::middleware('auth:sanctum') — Misc/legacy routes
+
+// ============================================
+// PUBLIC WEBHOOK ROUTES — No auth required
+// SendGrid sends event notifications directly to this endpoint;
+// it cannot authenticate via Sanctum tokens.
+// ============================================
+Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events']);

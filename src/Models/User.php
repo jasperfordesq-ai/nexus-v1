@@ -489,8 +489,9 @@ class User
     public static function updateLastActive(int $userId): bool
     {
         try {
-            $sql = "UPDATE users SET last_active_at = NOW() WHERE id = ?";
-            Database::query($sql, [$userId]);
+            $tenantId = TenantContext::getId();
+            $sql = "UPDATE users SET last_active_at = NOW() WHERE id = ? AND tenant_id = ?";
+            Database::query($sql, [$userId, $tenantId]);
             return true;
         } catch (\Exception $e) {
             // Column may not exist yet - silently fail
@@ -520,8 +521,9 @@ class User
 
         // Otherwise query the database
         try {
-            $sql = "SELECT last_active_at FROM users WHERE id = ?";
-            $result = Database::query($sql, [$userId])->fetch(\PDO::FETCH_ASSOC);
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT last_active_at FROM users WHERE id = ? AND tenant_id = ?";
+            $result = Database::query($sql, [$userId, $tenantId])->fetch(\PDO::FETCH_ASSOC);
             if ($result && !empty($result['last_active_at'])) {
                 $lastActive = strtotime($result['last_active_at']);
                 return $lastActive && (time() - $lastActive) <= 300; // 5 minutes
@@ -708,8 +710,9 @@ class User
     {
         // Internal check: fetch hash
         // We need a specific query because `findById` might not return the hash for security
-        $sql = "SELECT password_hash FROM users WHERE id = ?";
-        $user = Database::query($sql, [$id])->fetch();
+        $tenantId = TenantContext::getId();
+        $sql = "SELECT password_hash FROM users WHERE id = ? AND tenant_id = ?";
+        $user = Database::query($sql, [$id, $tenantId])->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
             return true;
@@ -719,9 +722,10 @@ class User
 
     public static function updatePassword($id, $newPassword)
     {
+        $tenantId = TenantContext::getId();
         $hash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $sql = "UPDATE users SET password_hash = ? WHERE id = ?";
-        Database::query($sql, [$hash, $id]);
+        $sql = "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?";
+        Database::query($sql, [$hash, $id, $tenantId]);
     }
     public static function getAllGlobal()
     {
@@ -821,8 +825,9 @@ class User
     public static function getCoordinates($id)
     {
         try {
-            $sql = "SELECT latitude, longitude FROM users WHERE id = ?";
-            return Database::query($sql, [$id])->fetch();
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT latitude, longitude FROM users WHERE id = ? AND tenant_id = ?";
+            return Database::query($sql, [$id, $tenantId])->fetch();
         } catch (\Exception $e) {
             // Columns may not exist yet
             error_log("getCoordinates error: " . $e->getMessage());
@@ -1451,9 +1456,10 @@ class User
     public static function grantTenantSuperAdmin(int $userId): bool
     {
         try {
+            $tenantId = TenantContext::getId();
             Database::query(
-                "UPDATE users SET is_tenant_super_admin = 1 WHERE id = ?",
-                [$userId]
+                "UPDATE users SET is_tenant_super_admin = 1 WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
             return true;
         } catch (\Exception $e) {
@@ -1467,9 +1473,10 @@ class User
     public static function revokeTenantSuperAdmin(int $userId): bool
     {
         try {
+            $tenantId = TenantContext::getId();
             Database::query(
-                "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ?",
-                [$userId]
+                "UPDATE users SET is_tenant_super_admin = 0 WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
             return true;
         } catch (\Exception $e) {

@@ -487,8 +487,8 @@ class KnowledgeBaseService
                 $oldHelpful = (bool)$existing['is_helpful'];
 
                 Database::query(
-                    "UPDATE knowledge_base_feedback SET is_helpful = ?, comment = ? WHERE id = ?",
-                    [$isHelpful ? 1 : 0, $comment, $existing['id']]
+                    "UPDATE knowledge_base_feedback SET is_helpful = ?, comment = ? WHERE id = ? AND tenant_id = ?",
+                    [$isHelpful ? 1 : 0, $comment, $existing['id'], $tenantId]
                 );
 
                 // Adjust counters

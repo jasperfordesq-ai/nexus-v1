@@ -331,8 +331,8 @@ class InsuranceCertificateService
 
             if (!$best) {
                 Database::query(
-                    "UPDATE users SET insurance_status = 'none', insurance_expires_at = NULL WHERE id = ?",
-                    [$userId]
+                    "UPDATE users SET insurance_status = 'none', insurance_expires_at = NULL WHERE id = ? AND tenant_id = ?",
+                    [$userId, $tenantId]
                 );
                 return;
             }
@@ -351,8 +351,8 @@ class InsuranceCertificateService
             }
 
             Database::query(
-                "UPDATE users SET insurance_status = ?, insurance_expires_at = ? WHERE id = ?",
-                [$status, $expiresAt, $userId]
+                "UPDATE users SET insurance_status = ?, insurance_expires_at = ? WHERE id = ? AND tenant_id = ?",
+                [$status, $expiresAt, $userId, $tenantId]
             );
         } catch (\Exception $e) {
             // Columns may not exist yet

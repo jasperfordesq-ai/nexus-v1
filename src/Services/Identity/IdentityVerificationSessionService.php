@@ -7,6 +7,7 @@
 namespace Nexus\Services\Identity;
 
 use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
 
 /**
  * IdentityVerificationSessionService — CRUD and status management for verification sessions.
@@ -56,8 +57,8 @@ class IdentityVerificationSessionService
     public static function getById(int $sessionId): ?array
     {
         $row = Database::query(
-            "SELECT * FROM identity_verification_sessions WHERE id = ?",
-            [$sessionId]
+            "SELECT * FROM identity_verification_sessions WHERE id = ? AND tenant_id = ?",
+            [$sessionId, TenantContext::getId()]
         )->fetch();
 
         return $row ?: null;

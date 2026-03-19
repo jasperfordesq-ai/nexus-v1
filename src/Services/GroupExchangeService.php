@@ -388,8 +388,8 @@ class GroupExchangeService
 
             // Mark exchange completed
             Database::query(
-                "UPDATE group_exchanges SET status = 'completed', completed_at = NOW(), updated_at = NOW() WHERE id = ?",
-                [$exchangeId]
+                "UPDATE group_exchanges SET status = 'completed', completed_at = NOW(), updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$exchangeId, $tenantId]
             );
 
             Database::commit();

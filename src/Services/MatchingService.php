@@ -304,8 +304,8 @@ class MatchingService
 
                 // Update transaction with match attribution
                 Database::query(
-                    "UPDATE transactions SET source_match_id = ? WHERE id = ?",
-                    [$match['id'], $transactionId]
+                    "UPDATE transactions SET source_match_id = ? WHERE id = ? AND tenant_id = ?",
+                    [$match['id'], $transactionId, $tenantId]
                 );
 
                 return true;

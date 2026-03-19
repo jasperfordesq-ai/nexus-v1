@@ -284,6 +284,8 @@ class WebAuthnController extends BaseApiController
     /** POST /api/webauthn/auth-verify */
     public function authVerify(): JsonResponse
     {
+        $this->rateLimit('webauthn_auth_verify', 10, 60);
+
         $input = $this->getAllInput();
 
         // Retrieve stored challenge

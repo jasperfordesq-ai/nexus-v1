@@ -80,8 +80,8 @@ class ReferralService
         $code = self::createUniqueCode($userId);
 
         Database::query(
-            "UPDATE users SET referral_code = ? WHERE id = ?",
-            [$code, $userId]
+            "UPDATE users SET referral_code = ? WHERE id = ? AND tenant_id = ?",
+            [$code, $userId, TenantContext::getId()]
         );
 
         return $code;
@@ -170,8 +170,8 @@ class ReferralService
 
             // Update referred user's record
             Database::query(
-                "UPDATE users SET referred_by = ? WHERE id = ?",
-                [$referrerId, $newUserId]
+                "UPDATE users SET referred_by = ? WHERE id = ? AND tenant_id = ?",
+                [$referrerId, $newUserId, $tenantId]
             );
 
             Database::commit();

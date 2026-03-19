@@ -73,8 +73,8 @@ class LegalDocumentService
             "SELECT ld.*, ld.document_type as type, ldv.version_number, ldv.content, ldv.effective_date, ldv.summary_of_changes
              FROM legal_documents ld
              LEFT JOIN legal_document_versions ldv ON ld.current_version_id = ldv.id
-             WHERE ld.id = ?",
-            [$id]
+             WHERE ld.id = ? AND ld.tenant_id = ?",
+            [$id, TenantContext::getId()]
         );
 
         return $stmt->fetch() ?: null;
@@ -200,9 +200,10 @@ class LegalDocumentService
         }
 
         $params[] = $id;
+        $params[] = TenantContext::getId();
 
         Database::query(
-            "UPDATE legal_documents SET " . implode(', ', $sets) . " WHERE id = ?",
+            "UPDATE legal_documents SET " . implode(', ', $sets) . " WHERE id = ? AND tenant_id = ?",
             $params
         );
 
@@ -267,9 +268,10 @@ class LegalDocumentService
         }
 
         $params[] = $versionId;
+        $params[] = TenantContext::getId();
 
         Database::query(
-            "UPDATE legal_document_versions SET " . implode(', ', $sets) . " WHERE id = ?",
+            "UPDATE legal_document_versions SET " . implode(', ', $sets) . " WHERE id = ? AND document_id IN (SELECT id FROM legal_documents WHERE tenant_id = ?)",
             $params
         );
 

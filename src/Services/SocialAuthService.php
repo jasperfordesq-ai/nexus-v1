@@ -62,7 +62,7 @@ class SocialAuthService
 
             // LOGIC: Sync Avatar if missing locally AND present in source
             if (empty($user['avatar_url']) && $avatar) {
-                Database::query("UPDATE users SET avatar_url = ? WHERE id = ?", [$avatar, $user['id']]);
+                Database::query("UPDATE users SET avatar_url = ? WHERE id = ? AND tenant_id = ?", [$avatar, $user['id'], $tenantId]);
             }
             return $user;
         }

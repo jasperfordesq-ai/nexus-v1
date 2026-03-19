@@ -122,8 +122,8 @@ class CommentService
 
         // If replying, verify parent exists
         if ($parentId) {
-            $stmt = $pdo->prepare("SELECT id, user_id FROM comments WHERE id = ?");
-            $stmt->execute([$parentId]);
+            $stmt = $pdo->prepare("SELECT id, user_id FROM comments WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$parentId, $tenantId]);
             $parent = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$parent) {
                 return ['success' => false, 'error' => 'Parent comment not found'];
@@ -265,8 +265,8 @@ class CommentService
             $action = 'added';
 
             // Notify comment owner
-            $stmt = $pdo->prepare("SELECT user_id FROM comments WHERE id = ?");
-            $stmt->execute([$commentId]);
+            $stmt = $pdo->prepare("SELECT user_id FROM comments WHERE id = ? AND tenant_id = ?");
+            $stmt->execute([$commentId, $tenantId]);
             $comment = $stmt->fetch();
             if ($comment && (int)$comment['user_id'] !== $userId) {
                 if (class_exists('\Nexus\Services\SocialNotificationService')) {
@@ -278,8 +278,8 @@ class CommentService
         }
 
         // Get updated reaction counts
-        $stmt = $pdo->prepare("SELECT emoji, COUNT(*) as count FROM reactions WHERE target_type = 'comment' AND target_id = ? GROUP BY emoji");
-        $stmt->execute([$commentId]);
+        $stmt = $pdo->prepare("SELECT emoji, COUNT(*) as count FROM reactions WHERE target_type = 'comment' AND target_id = ? AND tenant_id = ? GROUP BY emoji");
+        $stmt->execute([$commentId, $tenantId]);
         $reactions = [];
         foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             $reactions[$row['emoji']] = (int)$row['count'];
@@ -357,8 +357,9 @@ class CommentService
     public static function getUnreadMentionsCount(int $userId): int
     {
         $pdo = Database::getInstance();
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM mentions WHERE mentioned_user_id = ? AND seen_at IS NULL");
-        $stmt->execute([$userId]);
+        $tenantId = TenantContext::getId();
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM mentions WHERE mentioned_user_id = ? AND tenant_id = ? AND seen_at IS NULL");
+        $stmt->execute([$userId, $tenantId]);
         return (int)$stmt->fetchColumn();
     }
 

@@ -63,9 +63,12 @@ class SendGridWebhookController extends BaseApiController
                 continue;
             }
 
-            // Set tenant context for scoped queries
+            // Validate and set tenant context for scoped queries
             if ($tenantId > 0) {
-                TenantContext::setById($tenantId);
+                if (!TenantContext::setById($tenantId)) {
+                    // Invalid tenant ID from payload — skip this event
+                    continue;
+                }
             }
 
             switch ($type) {

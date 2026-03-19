@@ -41,6 +41,8 @@ class TotpController extends BaseApiController
      */
     public function verify(): JsonResponse
     {
+        $this->rateLimit('totp_verify', 5, 300);
+
         $input = $this->getAllInput();
         $twoFactorToken = $input['two_factor_token'] ?? null;
         $code = trim($input['code'] ?? '');

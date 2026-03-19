@@ -1083,8 +1083,8 @@ class IdeationChallengeService
             Database::beginTransaction();
 
             Database::query(
-                "UPDATE challenge_ideas SET title = ?, description = ?, status = ?, updated_at = NOW() WHERE id = ?",
-                [$title, $description, $newStatus, $ideaId]
+                "UPDATE challenge_ideas SET title = ?, description = ?, status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                [$title, $description, $newStatus, $ideaId, $tenantId]
             );
 
             // If publishing, increment challenge ideas_count and award points
@@ -1242,8 +1242,8 @@ class IdeationChallengeService
                     [$ideaId, $userId]
                 );
                 Database::query(
-                    "UPDATE challenge_ideas SET votes_count = GREATEST(0, votes_count - 1) WHERE id = ?",
-                    [$ideaId]
+                    "UPDATE challenge_ideas SET votes_count = GREATEST(0, votes_count - 1) WHERE id = ? AND tenant_id = ?",
+                    [$ideaId, $tenantId]
                 );
                 $voted = false;
             } else {
@@ -1253,8 +1253,8 @@ class IdeationChallengeService
                     [$ideaId, $userId]
                 );
                 Database::query(
-                    "UPDATE challenge_ideas SET votes_count = votes_count + 1 WHERE id = ?",
-                    [$ideaId]
+                    "UPDATE challenge_ideas SET votes_count = votes_count + 1 WHERE id = ? AND tenant_id = ?",
+                    [$ideaId, $tenantId]
                 );
                 $voted = true;
             }
@@ -1449,6 +1449,8 @@ class IdeationChallengeService
             return null;
         }
 
+        $tenantId = TenantContext::getId();
+
         try {
             Database::beginTransaction();
 
@@ -1461,8 +1463,8 @@ class IdeationChallengeService
 
             // Increment comments_count
             Database::query(
-                "UPDATE challenge_ideas SET comments_count = comments_count + 1 WHERE id = ?",
-                [$ideaId]
+                "UPDATE challenge_ideas SET comments_count = comments_count + 1 WHERE id = ? AND tenant_id = ?",
+                [$ideaId, $tenantId]
             );
 
             Database::commit();
@@ -1717,8 +1719,8 @@ class IdeationChallengeService
 
             // Decrement comments_count
             Database::query(
-                "UPDATE challenge_ideas SET comments_count = GREATEST(0, comments_count - 1) WHERE id = ?",
-                [$ideaId]
+                "UPDATE challenge_ideas SET comments_count = GREATEST(0, comments_count - 1) WHERE id = ? AND tenant_id = ?",
+                [$ideaId, $tenantId]
             );
 
             Database::commit();

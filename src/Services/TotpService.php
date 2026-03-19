@@ -263,8 +263,8 @@ class TotpService
             );
 
             Database::query(
-                "UPDATE users SET totp_enabled = 1, totp_setup_required = 0 WHERE id = ?",
-                [$userId]
+                "UPDATE users SET totp_enabled = 1, totp_setup_required = 0 WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
 
             // Generate backup codes
@@ -528,8 +528,8 @@ class TotpService
 
             // Update user flags - they'll need to set up again
             Database::query(
-                "UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ?",
-                [$userId]
+                "UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
 
             Database::commit();
@@ -585,8 +585,8 @@ class TotpService
 
             // Update user flags
             Database::query(
-                "UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ?",
-                [$userId]
+                "UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
             );
 
             Database::commit();

@@ -57,9 +57,7 @@ class Database
             $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         } catch (PDOException $e) {
             error_log('Database Connection Failed: ' . $e->getMessage());
-            // Show a generic error to the user (Security Best Practice)
-            header('HTTP/1.1 503 Service Unavailable');
-            die("<h1>Service Unavailable</h1><p>The application is currently experiencing high load. Please try again later.</p>");
+            throw new \RuntimeException('Database connection failed: ' . $e->getMessage());
         }
     }
 

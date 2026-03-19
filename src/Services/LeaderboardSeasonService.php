@@ -222,8 +222,8 @@ class LeaderboardSeasonService
     public static function endSeason($seasonId)
     {
         $season = Database::query(
-            "SELECT * FROM leaderboard_seasons WHERE id = ?",
-            [$seasonId]
+            "SELECT * FROM leaderboard_seasons WHERE id = ? AND tenant_id = ?",
+            [$seasonId, TenantContext::getId()]
         )->fetch();
 
         if (!$season || $season['status'] !== 'active') {
@@ -279,8 +279,8 @@ class LeaderboardSeasonService
 
             // Mark season as completed
             Database::query(
-                "UPDATE leaderboard_seasons SET status = 'completed' WHERE id = ?",
-                [$seasonId]
+                "UPDATE leaderboard_seasons SET status = 'completed' WHERE id = ? AND tenant_id = ?",
+                [$seasonId, TenantContext::getId()]
             );
 
             $pdo->commit();
