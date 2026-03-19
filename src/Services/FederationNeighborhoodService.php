@@ -119,10 +119,26 @@ class FederationNeighborhoodService
      */
     public static function delete(int $id): bool
     {
+        $tenantId = TenantContext::getId();
+
         try {
-            // Remove members first
-            Database::query("DELETE FROM federation_neighborhood_members WHERE neighborhood_id = ?", [$id]);
-            Database::query("DELETE FROM federation_neighborhoods WHERE id = ?", [$id]);
+            // Verify the neighborhood belongs to this tenant before deleting
+            $neighborhood = Database::query(
+                "SELECT id FROM federation_neighborhoods WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$neighborhood) {
+                self::$errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Neighborhood not found'];
+                return false;
+            }
+
+            // Remove members first, scoped via subquery
+            Database::query(
+                "DELETE FROM federation_neighborhood_members WHERE neighborhood_id IN (SELECT id FROM federation_neighborhoods WHERE id = ? AND tenant_id = ?)",
+                [$id, $tenantId]
+            );
+            Database::query("DELETE FROM federation_neighborhoods WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             return true;
         } catch (\Exception $e) {
             error_log("FederationNeighborhoodService::delete error: " . $e->getMessage());

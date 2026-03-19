@@ -458,7 +458,7 @@ class AdminEnterpriseController extends BaseApiController
         $secrets = [];
         foreach ($secretKeys as $key) {
             $value = getenv($key);
-            $secrets[] = ['key' => $key, 'is_set' => $value !== false && $value !== '', 'masked_value' => ($value !== false && $value !== '') ? substr($value, 0, 3) . '***' : 'Not set'];
+            $secrets[] = ['key' => $key, 'is_set' => $value !== false && $value !== ''];
         }
         return $this->respondWithData($secrets);
     }

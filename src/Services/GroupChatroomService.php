@@ -336,7 +336,7 @@ class GroupChatroomService
         }
 
         try {
-            Database::query("DELETE FROM group_chatroom_messages WHERE id = ?", [$messageId]);
+            Database::query("DELETE FROM group_chatroom_messages WHERE id = ? AND tenant_id = ?", [$messageId, $tenantId]);
             return true;
         } catch (\Throwable $e) {
             error_log("Chatroom message deletion failed: " . $e->getMessage());

@@ -205,7 +205,10 @@ class FederatedConnectionService
             return ['success' => false, 'error' => 'Connection not found'];
         }
 
-        Database::query("DELETE FROM federation_connections WHERE id = ?", [$connectionId]);
+        Database::query(
+            "DELETE FROM federation_connections WHERE id = ? AND ((requester_tenant_id = ? OR receiver_tenant_id = ?))",
+            [$connectionId, $userTenantId, $userTenantId]
+        );
 
         return ['success' => true];
     }

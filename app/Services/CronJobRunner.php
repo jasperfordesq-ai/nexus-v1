@@ -51,12 +51,10 @@ class CronJobRunner
         }
 
         // 2. HTTP Access requires a Key
-        // Try to get key from GET param or Header
-        $key = $_GET['key'] ?? null;
+        // Try to get key from request query param or Header
+        $key = request()->query('key');
         if (!$key) {
-            // Check Header 'X-Cron-Key'
-            $headers = getallheaders();
-            $key = $headers['X-Cron-Key'] ?? null;
+            $key = request()->header('X-Cron-Key');
         }
 
         // SECURITY: Require CRON_KEY to be explicitly set - no insecure defaults

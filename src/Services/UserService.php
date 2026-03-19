@@ -735,19 +735,19 @@ class UserService
                 [$anonymizedEmail, $anonymizedName, $userId, $tenantId]
             );
 
-            // Delete sensitive data
-            Database::query("DELETE FROM user_sessions WHERE user_id = ?", [$userId]);
-            Database::query("DELETE FROM user_tokens WHERE user_id = ?", [$userId]);
-            Database::query("DELETE FROM password_resets WHERE email = ?", [$user['email']]);
+            // Delete sensitive data — scoped by tenant via user_id join
+            Database::query("DELETE FROM user_sessions WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
+            Database::query("DELETE FROM user_tokens WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
+            Database::query("DELETE FROM password_resets WHERE email = ? AND tenant_id = ?", [$user['email'], $tenantId]);
 
             // Anonymize messages (keep for other party's history)
             Database::query(
                 "UPDATE messages SET sender_id = NULL WHERE sender_id = ? AND tenant_id = ?",
-                [$userId, TenantContext::getId()]
+                [$userId, $tenantId]
             );
 
             // Remove from groups and connections
-            Database::query("DELETE FROM group_members WHERE user_id = ?", [$userId]);
+            Database::query("DELETE FROM group_members WHERE user_id = ? AND tenant_id = ?", [$userId, $tenantId]);
             Database::query("DELETE FROM connections WHERE (user_id = ? OR connected_user_id = ?) AND tenant_id = ?", [$userId, $userId, TenantContext::getId()]);
 
             Database::commit();

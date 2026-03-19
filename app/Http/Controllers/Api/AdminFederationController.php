@@ -347,7 +347,8 @@ class AdminFederationController extends BaseApiController
             $keyValue = bin2hex(random_bytes(32));
             $prefix = substr($keyValue, 0, 8);
             DB::insert("INSERT INTO federation_api_keys (tenant_id, name, key_hash, key_prefix, permissions, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?, NOW())", [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $this->getUserId()]);
-            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'message' => 'Store this key securely. It will not be shown again.'], null, 201);
+            \Illuminate\Support\Facades\Log::info('[Federation] API key created', ['tenant_id' => $tenantId, 'key_prefix' => $prefix, 'created_by' => $this->getUserId()]);
+            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'warning' => 'This key is shown ONCE. Store it securely — it cannot be retrieved again.'], null, 201);
         } catch (\Exception $e) { return $this->respondWithError('CREATE_FAILED', 'Failed to create API key'); }
     }
 

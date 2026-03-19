@@ -500,10 +500,8 @@ class AdminConfigController extends BaseApiController
                         $method = $methodMap[$jobSlug];
                         ob_start();
                         request()->query->set('key', $cronKey);
-                        $_GET['key'] = $cronKey;
                         $controller->$method();
                         request()->query->remove('key');
-                        unset($_GET['key']);
                         $output = ob_get_clean() ?: 'Completed (no output)';
                     }
                 } elseif (isset($adminMethodMap[$jobSlug])) {

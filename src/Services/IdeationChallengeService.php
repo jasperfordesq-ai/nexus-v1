@@ -1713,7 +1713,7 @@ class IdeationChallengeService
 
             $ideaId = (int)$comment['idea_id'];
 
-            Database::query("DELETE FROM challenge_idea_comments WHERE id = ?", [$commentId]);
+            Database::query("DELETE FROM challenge_idea_comments WHERE id = ? AND tenant_id = ?", [$commentId, $tenantId]);
 
             // Decrement comments_count
             Database::query(

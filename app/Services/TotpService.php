@@ -136,7 +136,7 @@ class TotpService
      */
     public function isTrustedDevice(int $userId, ?string $deviceHash = null): bool
     {
-        $token = $_COOKIE[self::TRUSTED_DEVICE_COOKIE] ?? null;
+        $token = request()->cookie(self::TRUSTED_DEVICE_COOKIE);
         if (!$token) {
             return false;
         }

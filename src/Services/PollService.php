@@ -477,14 +477,21 @@ class PollService
         try {
             Database::beginTransaction();
 
-            // Delete votes first (if no FK cascade)
-            Database::query("DELETE FROM poll_votes WHERE poll_id = ?", [$id]);
+            $tenantId = TenantContext::getId();
 
-            // Delete options
-            Database::query("DELETE FROM poll_options WHERE poll_id = ?", [$id]);
+            // Delete votes first — scoped via tenant-owned poll subquery
+            Database::query(
+                "DELETE FROM poll_votes WHERE poll_id IN (SELECT id FROM polls WHERE id = ? AND tenant_id = ?)",
+                [$id, $tenantId]
+            );
+
+            // Delete options — scoped via tenant-owned poll subquery
+            Database::query(
+                "DELETE FROM poll_options WHERE poll_id IN (SELECT id FROM polls WHERE id = ? AND tenant_id = ?)",
+                [$id, $tenantId]
+            );
 
             // Delete poll — scoped by tenant
-            $tenantId = TenantContext::getId();
             Database::query("DELETE FROM polls WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
             Database::commit();
