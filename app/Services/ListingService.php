@@ -296,10 +296,15 @@ class ListingService
 
         // Author info
         $user = $listing->user;
-        $data['author_name'] = ($user->profile_type === 'organisation' && $user->organization_name)
-            ? $user->organization_name
-            : trim($user->first_name . ' ' . $user->last_name);
-        $data['author_avatar'] = $user->avatar_url ?? null;
+        if ($user) {
+            $data['author_name'] = ($user->profile_type === 'organisation' && $user->organization_name)
+                ? $user->organization_name
+                : trim($user->first_name . ' ' . $user->last_name);
+            $data['author_avatar'] = $user->avatar_url ?? null;
+        } else {
+            $data['author_name'] = 'Unknown User';
+            $data['author_avatar'] = null;
+        }
 
         // Category
         $data['category_name'] = $listing->category?->name;

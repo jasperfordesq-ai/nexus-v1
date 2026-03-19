@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -28,7 +29,7 @@ class ListingAnalyticsService
      */
     public function recordView(int $listingId, ?int $userId = null, ?string $ipAddress = null): bool
     {
-        $tenantId = tenant_id();
+        $tenantId = TenantContext::getId();
         $ipHash = $ipAddress ? hash('sha256', $ipAddress . $listingId) : null;
 
         // Deduplicate: check if same user/IP viewed in last hour
@@ -78,7 +79,7 @@ class ListingAnalyticsService
      */
     public function recordContact(int $listingId, int $userId, string $contactType = 'message'): bool
     {
-        $tenantId = tenant_id();
+        $tenantId = TenantContext::getId();
 
         $validTypes = ['message', 'phone', 'email', 'exchange_request'];
         if (!in_array($contactType, $validTypes, true)) {
@@ -110,7 +111,7 @@ class ListingAnalyticsService
      */
     public function getAnalytics(int $listingId, int $days = 30): array
     {
-        $tenantId = tenant_id();
+        $tenantId = TenantContext::getId();
 
         $listing = DB::selectOne(
             "SELECT id, title, view_count, contact_count, save_count, created_at, expires_at
@@ -219,7 +220,7 @@ class ListingAnalyticsService
      */
     public function updateSaveCount(int $listingId, bool $increment): void
     {
-        $tenantId = tenant_id();
+        $tenantId = TenantContext::getId();
         $op = $increment ? '+ 1' : '- 1';
 
         try {

@@ -119,5 +119,7 @@
   "load_error": "Inserate konnten nicht geladen werden.",
   "load_more_error": "Weitere Inserate konnten nicht geladen werden",
   "page_meta_description": "Durchsuchen Sie Dienste und Anfragen.",
-  "page_meta_keywords": "Inserate, Dienste, Angebote"
+  "page_meta_keywords": "Inserate, Dienste, Angebote",
+  "save_listing": "Eintrag speichern",
+  "unsave_listing": "Eintrag nicht mehr speichern"
 }

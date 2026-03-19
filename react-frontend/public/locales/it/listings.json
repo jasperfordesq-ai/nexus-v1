@@ -119,5 +119,7 @@
   "load_error": "Impossibile caricare gli annunci.",
   "load_more_error": "Impossibile caricare altri annunci",
   "page_meta_description": "Sfoglia servizi e richieste.",
-  "page_meta_keywords": "annunci, servizi, offerte"
+  "page_meta_keywords": "annunci, servizi, offerte",
+  "save_listing": "Salva annuncio",
+  "unsave_listing": "Rimuovi annuncio"
 }

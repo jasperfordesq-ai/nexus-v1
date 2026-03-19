@@ -119,5 +119,7 @@
   "load_error": "Failed to load listings. Please try again.",
   "load_more_error": "Failed to load more listings",
   "page_meta_description": "Browse services and requests from the community. Find offers and requests for time-banked services.",
-  "page_meta_keywords": "listings, services, offers, requests, time banking"
+  "page_meta_keywords": "listings, services, offers, requests, time banking",
+  "save_listing": "Save listing",
+  "unsave_listing": "Unsave listing"
 }
