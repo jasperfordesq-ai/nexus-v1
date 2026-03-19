@@ -34,6 +34,52 @@ class Notification extends Model
         'deleted_at' => 'datetime',
     ];
 
+    /**
+     * Appended attributes for frontend compatibility.
+     *
+     * Frontend expects `read_at` (nullable timestamp) and `body`/`title` fields.
+     * Backend stores `is_read` (boolean) and `message` (string).
+     */
+    protected $appends = ['read_at', 'body', 'title'];
+
+    /**
+     * read_at accessor — converts boolean `is_read` to nullable timestamp.
+     *
+     * Frontend checks `!notification.read_at` to determine unread status.
+     * When read, returns `created_at` as the approximate "read" timestamp
+     * (no separate read timestamp column exists).
+     */
+    public function getReadAtAttribute(): ?string
+    {
+        if (! $this->is_read) {
+            return null;
+        }
+
+        return $this->created_at?->toIso8601String() ?? now()->toIso8601String();
+    }
+
+    /**
+     * body accessor — alias for `message` field.
+     *
+     * Frontend Notification type defines `body: string`.
+     */
+    public function getBodyAttribute(): ?string
+    {
+        return $this->attributes['message'] ?? null;
+    }
+
+    /**
+     * title accessor — extracts a title from the notification.
+     *
+     * Frontend Notification type defines `title: string`.
+     * Notifications don't have a separate title column, so derive from type.
+     */
+    public function getTitleAttribute(): string
+    {
+        $type = $this->attributes['type'] ?? 'notification';
+        return ucfirst(str_replace('_', ' ', $type));
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

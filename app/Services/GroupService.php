@@ -74,8 +74,13 @@ class GroupService
             $items->pop();
         }
 
+        $enriched = $items->map(function (Group $group) {
+            $data = $group->toArray();
+            return $this->enrichGroupData($data, $group);
+        })->all();
+
         return [
-            'items'    => $items->toArray(),
+            'items'    => $enriched,
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];
@@ -97,6 +102,7 @@ class GroupService
         }
 
         $data = $group->toArray();
+        $data = $this->enrichGroupData($data, $group);
 
         if ($currentUserId) {
             $membership = DB::table('group_members')
@@ -104,9 +110,48 @@ class GroupService
                 ->where('user_id', $currentUserId)
                 ->first();
 
+            // Flat fields (legacy)
             $data['my_role'] = $membership?->role;
             $data['my_status'] = $membership?->status;
+
+            // Nested viewer_membership (frontend expects this structure)
+            $data['viewer_membership'] = $membership ? [
+                'status'   => $membership->status ?? 'none',
+                'role'     => $membership->role,
+                'is_admin' => in_array($membership->role ?? '', ['admin', 'owner']),
+            ] : null;
+
+            // Recent members (last 5 active members)
+            $recentMembers = DB::table('group_members')
+                ->join('users', 'group_members.user_id', '=', 'users.id')
+                ->where('group_members.group_id', $id)
+                ->where('group_members.status', 'active')
+                ->orderByDesc('group_members.created_at')
+                ->limit(5)
+                ->select(['users.id', 'users.first_name', 'users.last_name', 'users.avatar_url'])
+                ->get();
+
+            $data['recent_members'] = $recentMembers->map(fn($m) => [
+                'id'         => (int) $m->id,
+                'first_name' => $m->first_name,
+                'last_name'  => $m->last_name,
+                'name'       => trim(($m->first_name ?? '') . ' ' . ($m->last_name ?? '')),
+                'avatar_url' => $m->avatar_url,
+                'avatar'     => $m->avatar_url,
+            ])->all();
         }
+
+        return $data;
+    }
+
+    /**
+     * Enrich group data with frontend-compatible field aliases.
+     */
+    private function enrichGroupData(array $data, Group $group): array
+    {
+        $memberCount = $data['active_members_count'] ?? $group->cached_member_count ?? 0;
+        $data['member_count'] = $memberCount;
+        $data['members_count'] = $memberCount;
 
         return $data;
     }

@@ -36,6 +36,23 @@ class Event extends Model
         'is_online' => 'boolean',
     ];
 
+    /**
+     * Appended attributes for frontend compatibility.
+     *
+     * Frontend expects `start_date`/`end_date` (aliases for start_time/end_time).
+     */
+    protected $appends = ['start_date', 'end_date'];
+
+    public function getStartDateAttribute(): ?string
+    {
+        return $this->start_time?->toIso8601String();
+    }
+
+    public function getEndDateAttribute(): ?string
+    {
+        return $this->end_time?->toIso8601String();
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
