@@ -41,11 +41,7 @@ class WebAuthnController extends BaseApiController
         $user = $this->getWebAuthnUser($userId);
 
         if (!$user) {
-            return response()->json([
-                'error' => 'User not found',
-                'code' => ApiErrorCodes::RESOURCE_NOT_FOUND,
-                'success' => false,
-            ], 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'User not found', null, 404);
         }
 
         // Generate random challenge
@@ -114,7 +110,7 @@ class WebAuthnController extends BaseApiController
             'excludeCredentials' => $excludeCredentials,
         ];
 
-        return response()->json($options);
+        return $this->respondWithData($options);
     }
 
     /** POST /api/webauthn/register-verify */
@@ -130,11 +126,7 @@ class WebAuthnController extends BaseApiController
         }
 
         if (empty($input['id']) || empty($input['response']['clientDataJSON']) || empty($input['response']['attestationObject'])) {
-            return response()->json([
-                'error' => 'Invalid credential data',
-                'code' => ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'success' => false,
-            ], 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Invalid credential data', null, 400);
         }
 
         // Decode the raw binary data from base64url
@@ -163,11 +155,7 @@ class WebAuthnController extends BaseApiController
             );
         } catch (WebAuthnException $e) {
             error_log('[WebAuthn] Registration verification failed: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Passkey registration failed: ' . $e->getMessage(),
-                'code' => ApiErrorCodes::AUTH_WEBAUTHN_FAILED,
-                'success' => false,
-            ], 400);
+            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, 'Passkey registration failed: ' . $e->getMessage(), null, 400);
         }
 
         // Store the credential
@@ -212,7 +200,7 @@ class WebAuthnController extends BaseApiController
         // Consume the challenge (single-use)
         $this->consumeChallenge($input);
 
-        return response()->json(['success' => true, 'data' => ['message' => 'Passkey registered successfully']]);
+        return $this->respondWithData(['message' => 'Passkey registered successfully']);
     }
 
     /** POST /api/webauthn/auth-challenge */
@@ -290,7 +278,7 @@ class WebAuthnController extends BaseApiController
             $options['allowCredentials'] = $allowCredentials;
         }
 
-        return response()->json($options);
+        return $this->respondWithData($options);
     }
 
     /** POST /api/webauthn/auth-verify */
@@ -306,11 +294,7 @@ class WebAuthnController extends BaseApiController
 
         if (empty($input['id']) || empty($input['response']['clientDataJSON']) ||
             empty($input['response']['authenticatorData']) || empty($input['response']['signature'])) {
-            return response()->json([
-                'error' => 'Invalid assertion data',
-                'code' => ApiErrorCodes::VALIDATION_REQUIRED_FIELD,
-                'success' => false,
-            ], 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_REQUIRED_FIELD, 'Invalid assertion data', null, 400);
         }
 
         // Find credential by ID
@@ -324,11 +308,7 @@ class WebAuthnController extends BaseApiController
         );
 
         if (!$credentialRow) {
-            return response()->json([
-                'error' => 'Credential not found',
-                'code' => ApiErrorCodes::AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND,
-                'success' => false,
-            ], 401);
+            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CREDENTIAL_NOT_FOUND, 'Credential not found', null, 401);
         }
 
         $credential = (array)$credentialRow;
@@ -359,11 +339,7 @@ class WebAuthnController extends BaseApiController
             );
         } catch (WebAuthnException $e) {
             error_log('[WebAuthn] Authentication verification failed: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Passkey authentication failed: ' . $e->getMessage(),
-                'code' => ApiErrorCodes::AUTH_WEBAUTHN_FAILED,
-                'success' => false,
-            ], 401);
+            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_FAILED, 'Passkey authentication failed: ' . $e->getMessage(), null, 401);
         }
 
         // Update sign count
@@ -390,11 +366,7 @@ class WebAuthnController extends BaseApiController
         if ($webauthnUser) {
             $gateBlock = $this->tenantSettingsService->checkLoginGates((array)$webauthnUser);
             if ($gateBlock) {
-                return response()->json([
-                    'error' => $gateBlock['message'],
-                    'code' => $gateBlock['code'],
-                    'success' => false,
-                ], 403);
+                return $this->respondWithError($gateBlock['code'], $gateBlock['message'], null, 403);
             }
         }
 
@@ -432,6 +404,8 @@ class WebAuthnController extends BaseApiController
             }
         }
 
+        // Auth success response — follows the same contract as AuthController/TotpController
+        // (success, user, tokens). Frontend explicitly handles this shape.
         return response()->json([
             'success' => true,
             'message' => 'Authentication successful',
@@ -469,7 +443,7 @@ class WebAuthnController extends BaseApiController
             );
         }
 
-        return response()->json(['success' => true, 'data' => ['message' => 'Credential(s) removed']]);
+        return $this->respondWithData(['message' => 'Credential(s) removed']);
     }
 
     /** POST /api/webauthn/rename */
@@ -481,20 +455,12 @@ class WebAuthnController extends BaseApiController
         $newName = $input['device_name'] ?? null;
 
         if (!$credentialId || !$newName) {
-            return response()->json([
-                'error' => 'credential_id and device_name are required',
-                'code' => ApiErrorCodes::VALIDATION_ERROR,
-                'success' => false,
-            ], 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'credential_id and device_name are required', null, 400);
         }
 
         $newName = mb_substr(trim($newName), 0, 100);
         if (empty($newName)) {
-            return response()->json([
-                'error' => 'device_name cannot be empty',
-                'code' => ApiErrorCodes::VALIDATION_ERROR,
-                'success' => false,
-            ], 400);
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, 'device_name cannot be empty', 'device_name', 400);
         }
 
         $tenantId = TenantContext::getId();
@@ -504,14 +470,10 @@ class WebAuthnController extends BaseApiController
         );
 
         if ($affected === 0) {
-            return response()->json([
-                'error' => 'Credential not found',
-                'code' => ApiErrorCodes::RESOURCE_NOT_FOUND,
-                'success' => false,
-            ], 404);
+            return $this->respondWithError(ApiErrorCodes::RESOURCE_NOT_FOUND, 'Credential not found', null, 404);
         }
 
-        return response()->json(['success' => true, 'device_name' => $newName]);
+        return $this->respondWithData(['device_name' => $newName]);
     }
 
     /** POST /api/webauthn/remove-all */
@@ -531,12 +493,9 @@ class WebAuthnController extends BaseApiController
             [$userId, $tenantId]
         );
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'message' => "Removed {$count} passkey(s). You can now re-register on any device.",
-                'removed_count' => $count,
-            ]
+        return $this->respondWithData([
+            'message' => "Removed {$count} passkey(s). You can now re-register on any device.",
+            'removed_count' => $count,
         ]);
     }
 
@@ -555,7 +514,7 @@ class WebAuthnController extends BaseApiController
         );
         $credentials = array_map(fn($r) => (array)$r, $results);
 
-        return response()->json([
+        return $this->respondWithData([
             'credentials' => $credentials,
             'count' => count($credentials),
         ]);
@@ -567,7 +526,7 @@ class WebAuthnController extends BaseApiController
         $userId = $this->getOptionalUserId();
 
         if (!$userId) {
-            return response()->json(['registered' => false, 'count' => 0]);
+            return $this->respondWithData(['registered' => false, 'count' => 0]);
         }
 
         $tenantId = TenantContext::getId();
@@ -576,7 +535,7 @@ class WebAuthnController extends BaseApiController
             [$userId, $tenantId]
         );
 
-        return response()->json([
+        return $this->respondWithData([
             'registered' => $result->count > 0,
             'count' => (int)$result->count,
         ]);
@@ -665,25 +624,13 @@ class WebAuthnController extends BaseApiController
         if ($challengeId) {
             $challengeData = $this->webAuthnChallengeStore->get($challengeId);
             if (!$challengeData) {
-                return response()->json([
-                    'error' => 'Challenge expired or invalid',
-                    'code' => ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED,
-                    'success' => false,
-                ], 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, 'Challenge expired or invalid', null, 401);
             }
             if ($challengeData['user_id'] !== $userId) {
-                return response()->json([
-                    'error' => 'Challenge user mismatch',
-                    'code' => ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
-                    'success' => false,
-                ], 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, 'Challenge user mismatch', null, 401);
             }
             if ($challengeData['type'] !== $expectedType) {
-                return response()->json([
-                    'error' => 'Invalid challenge type',
-                    'code' => ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
-                    'success' => false,
-                ], 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, 'Invalid challenge type', null, 401);
             }
             return $challengeData['challenge'];
         }
@@ -695,11 +642,7 @@ class WebAuthnController extends BaseApiController
         if (empty($_SESSION['webauthn_challenge']) ||
             empty($_SESSION['webauthn_challenge_expires']) ||
             time() > $_SESSION['webauthn_challenge_expires']) {
-            return response()->json([
-                'error' => 'Challenge expired',
-                'code' => ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED,
-                'success' => false,
-            ], 401);
+            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, 'Challenge expired', null, 401);
         }
         return $_SESSION['webauthn_challenge'];
     }
@@ -717,18 +660,10 @@ class WebAuthnController extends BaseApiController
         if ($challengeId) {
             $challengeData = $this->webAuthnChallengeStore->get($challengeId);
             if (!$challengeData) {
-                return response()->json([
-                    'error' => 'Challenge expired or invalid',
-                    'code' => ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED,
-                    'success' => false,
-                ], 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, 'Challenge expired or invalid', null, 401);
             }
             if ($challengeData['type'] !== 'authenticate') {
-                return response()->json([
-                    'error' => 'Invalid challenge type',
-                    'code' => ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID,
-                    'success' => false,
-                ], 401);
+                return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_INVALID, 'Invalid challenge type', null, 401);
             }
             return $challengeData['challenge'];
         }
@@ -740,11 +675,7 @@ class WebAuthnController extends BaseApiController
         if (empty($_SESSION['webauthn_auth_challenge']) ||
             empty($_SESSION['webauthn_auth_challenge_expires']) ||
             time() > $_SESSION['webauthn_auth_challenge_expires']) {
-            return response()->json([
-                'error' => 'Challenge expired',
-                'code' => ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED,
-                'success' => false,
-            ], 401);
+            return $this->respondWithError(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED, 'Challenge expired', null, 401);
         }
         return $_SESSION['webauthn_auth_challenge'];
     }

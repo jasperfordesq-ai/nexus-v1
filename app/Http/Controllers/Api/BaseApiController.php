@@ -169,7 +169,7 @@ abstract class BaseApiController extends Controller
      * {
      *   "data": [ ... ],
      *   "meta": {
-     *     "page": 1,
+     *     "current_page": 1,
      *     "per_page": 20,
      *     "total": 100,
      *     "total_pages": 5,
@@ -191,7 +191,7 @@ abstract class BaseApiController extends Controller
             'data' => $items,
             'meta' => [
                 'base_url' => UrlHelper::getBaseUrl(),
-                'page' => $page,
+                'current_page' => $page,
                 'per_page' => $perPage,
                 'total' => $total,
                 'total_pages' => $totalPages,

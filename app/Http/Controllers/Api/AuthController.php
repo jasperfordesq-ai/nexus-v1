@@ -932,18 +932,18 @@ class AuthController extends BaseApiController
         }
 
         if (empty($token)) {
-            return response()->json(['error' => 'Missing token'], 400);
+            return $this->authError('Missing token', ApiErrorCodes::AUTH_TOKEN_MISSING, 400);
         }
 
         // Validate the JWT
         $payload = $this->tokenService->validateToken($token);
         if (!$payload) {
-            return response()->json(['error' => 'Invalid or expired token'], 401);
+            return $this->authError('Invalid or expired token', ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
         }
 
         $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
         if (!$userId) {
-            return response()->json(['error' => 'Invalid token payload'], 401);
+            return $this->authError('Invalid token payload', ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
         }
 
         // Load user from DB
@@ -954,14 +954,14 @@ class AuthController extends BaseApiController
         $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return $this->authError('User not found', ApiErrorCodes::RESOURCE_NOT_FOUND, 404);
         }
 
         // Check admin privileges
         $adminRoles = ['admin', 'super_admin', 'tenant_admin'];
         $isAdmin = in_array($user['role'], $adminRoles) || !empty($user['is_super_admin']) || !empty($user['is_tenant_super_admin']) || !empty($user['is_god']);
         if (!$isAdmin) {
-            return response()->json(['error' => 'Admin access required'], 403);
+            return $this->authError('Admin access required', ApiErrorCodes::AUTH_INSUFFICIENT_PERMISSIONS, 403);
         }
 
         // Create PHP session
