@@ -253,12 +253,13 @@ export function TransferModal({
       size="md"
       scrollBehavior="inside"
       classNames={{
-        base: 'bg-theme-card border border-theme-default',
+        base: 'bg-theme-solid border border-theme-default',
         header: 'border-b border-theme-default',
+        body: 'py-4',
         footer: 'border-t border-theme-default',
       }}
     >
-      <ModalContent>
+      <ModalContent className="bg-theme-solid">
         {(onModalClose) => (
           <>
             <ModalHeader className="text-xl font-semibold text-theme-primary flex items-center gap-2">
