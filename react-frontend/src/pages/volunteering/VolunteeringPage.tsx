@@ -687,7 +687,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
             )}
             {opportunity.category && (
               <Chip size="sm" variant="flat" className="text-theme-subtle">
-                {opportunity.category}
+                {typeof opportunity.category === 'object' ? (opportunity.category as { name?: string }).name : opportunity.category}
               </Chip>
             )}
             {opportunity.skills_needed && (
