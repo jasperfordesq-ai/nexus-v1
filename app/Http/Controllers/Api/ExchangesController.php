@@ -86,8 +86,10 @@ class ExchangesController extends BaseApiController
 
         $result = $this->exchangeService->getAll($userId, $filters);
 
+        $formatted = array_map(fn ($item) => $this->formatExchange($item), $result['items']);
+
         return $this->respondWithCollection(
-            $result['items'],
+            $formatted,
             $result['cursor'],
             $filters['limit'],
             $result['has_more']

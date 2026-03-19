@@ -1256,6 +1256,18 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        // SAFETY: Prevent migrate:fresh/refresh from wiping the main database.
+        // Only nexus_test may be wiped. This guards against accidental data loss
+        // from RefreshDatabase in tests or manual artisan commands.
+        if ($this->app->runningInConsole()) {
+            $db = config('database.connections.' . config('database.default') . '.database');
+            $dangerous = ['migrate:fresh', 'migrate:refresh', 'db:wipe'];
+            $command = $_SERVER['argv'][1] ?? '';
+            if (in_array($command, $dangerous) && $db === 'nexus') {
+                fwrite(STDERR, "\n  ❌ BLOCKED: '$command' on the main 'nexus' database.\n");
+                fwrite(STDERR, "  Use DB_DATABASE=nexus_test or run against the test database.\n\n");
+                exit(1);
+            }
+        }
     }
 }

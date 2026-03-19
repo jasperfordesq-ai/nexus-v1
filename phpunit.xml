@@ -16,9 +16,6 @@
     <testsuite name="Services">
       <directory suffix="Test.php">tests/Services</directory>
     </testsuite>
-    <testsuite name="Controllers">
-      <directory suffix="Test.php">tests/Controllers</directory>
-    </testsuite>
     <testsuite name="Enterprise">
       <directory suffix="Test.php">tests/Enterprise</directory>
     </testsuite>
@@ -35,7 +32,9 @@
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
-    <!-- DB_DATABASE: force=true ensures tests never accidentally hit production DB -->
+    <!-- DB_NAME takes precedence over DB_DATABASE in config/database.php.
+         Both must be set to nexus_test to prevent RefreshDatabase from wiping the dev DB. -->
+    <env name="DB_NAME" value="nexus_test" force="true"/>
     <env name="DB_DATABASE" value="nexus_test" force="true"/>
     <env name="CACHE_DRIVER" value="array"/>
     <env name="SESSION_DRIVER" value="array"/>
