@@ -44,7 +44,7 @@ class FeedService
      * @param array $filters [
      *   'type' => 'all' (default), 'posts', 'listings', 'events', 'polls', 'goals',
      *            'jobs', 'challenges', 'volunteering',
-     *   'subtype' => string|null ('offer' or 'request' — filters listings by listing_type in metadata),
+     *   'subtype' => string|null ('offer' or 'request' ï¿½ filters listings by listing_type in metadata),
      *   'user_id' => int (for user profile feed),
      *   'group_id' => int (for group feed),
      *   'cursor' => string,
@@ -271,9 +271,10 @@ class FeedService
         $db = Database::getConnection();
         $placeholders = implode(',', array_fill(0, count($receiverIds), '?'));
         $stmt = $db->prepare(
-            "SELECT id, COALESCE(name, CONCAT(first_name, ' ', last_name)) as name FROM users WHERE id IN ($placeholders)"
+            "SELECT id, COALESCE(name, CONCAT(first_name, ' ', last_name)) as name FROM users WHERE id IN ($placeholders) AND tenant_id = ?"
         );
-        $stmt->execute($receiverIds);
+        $params = array_merge($receiverIds, [TenantContext::getId()]);
+        $stmt->execute($params);
         $nameMap = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $nameMap[(int)$row['id']] = $row['name'];

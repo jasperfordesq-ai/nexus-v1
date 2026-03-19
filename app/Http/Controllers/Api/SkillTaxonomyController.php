@@ -63,7 +63,7 @@ class SkillTaxonomyController extends BaseApiController
     /** POST /api/v2/skills/categories (admin) */
     public function createCategory(): JsonResponse
     {
-        $this->requireAuth();
+        $this->requireAdmin();
         $this->rateLimit('skills_category_create', 10, 60);
 
         $data = $this->getAllInput();
@@ -81,7 +81,7 @@ class SkillTaxonomyController extends BaseApiController
     /** PUT /api/v2/skills/categories/{id} (admin) */
     public function updateCategory($id): JsonResponse
     {
-        $this->requireAuth();
+        $this->requireAdmin();
         $this->rateLimit('skills_category_update', 10, 60);
 
         $data = $this->getAllInput();
@@ -99,7 +99,7 @@ class SkillTaxonomyController extends BaseApiController
     /** DELETE /api/v2/skills/categories/{id} (admin) */
     public function deleteCategory($id): JsonResponse
     {
-        $this->requireAuth();
+        $this->requireAdmin();
 
         $hard = $this->queryBool('hard', false);
         $success = $this->skillTaxonomyService->deleteCategory((int) $id, $hard);

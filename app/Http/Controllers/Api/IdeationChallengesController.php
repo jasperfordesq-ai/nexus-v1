@@ -511,6 +511,7 @@ class IdeationChallengesController extends BaseApiController
     /** POST /api/v2/ideation-categories */
     public function createCategory(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_category', 20, 60);
@@ -530,6 +531,7 @@ class IdeationChallengesController extends BaseApiController
     /** PUT /api/v2/ideation-categories/{id} */
     public function updateCategory($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_category', 20, 60);
@@ -549,6 +551,7 @@ class IdeationChallengesController extends BaseApiController
     /** DELETE /api/v2/ideation-categories/{id} */
     public function deleteCategory($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_category', 10, 60);
@@ -587,6 +590,7 @@ class IdeationChallengesController extends BaseApiController
     /** POST /api/v2/ideation-tags */
     public function createTag(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_tag', 30, 60);
@@ -606,6 +610,7 @@ class IdeationChallengesController extends BaseApiController
     /** DELETE /api/v2/ideation-tags/{id} */
     public function deleteTag($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_tag', 10, 60);
@@ -706,6 +711,7 @@ class IdeationChallengesController extends BaseApiController
     /** POST /api/v2/ideation-campaigns */
     public function createCampaign(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_campaign', 10, 60);
@@ -725,6 +731,7 @@ class IdeationChallengesController extends BaseApiController
     /** PUT /api/v2/ideation-campaigns/{id} */
     public function updateCampaign($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_campaign', 20, 60);
@@ -744,6 +751,7 @@ class IdeationChallengesController extends BaseApiController
     /** DELETE /api/v2/ideation-campaigns/{id} */
     public function deleteCampaign($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_campaign', 10, 60);
@@ -827,6 +835,7 @@ class IdeationChallengesController extends BaseApiController
     /** POST /api/v2/ideation-templates */
     public function createTemplate(): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_template', 10, 60);
@@ -846,6 +855,7 @@ class IdeationChallengesController extends BaseApiController
     /** PUT /api/v2/ideation-templates/{id} */
     public function updateTemplate($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_template', 20, 60);
@@ -865,6 +875,7 @@ class IdeationChallengesController extends BaseApiController
     /** DELETE /api/v2/ideation-templates/{id} */
     public function deleteTemplate($id): JsonResponse
     {
+        $this->requireAdmin();
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('ideation_template', 10, 60);

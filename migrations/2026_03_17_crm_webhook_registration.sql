@@ -6,7 +6,7 @@ INSERT INTO outbound_webhooks (tenant_id, name, url, secret, events, is_active, 
 SELECT 2,
        'CRM Volunteering Integration',
        'http://nexus-backend-api:8080/api/webhooks/volunteering',
-       'nexus-crm-webhook-shared-secret-2026',
+       'CHANGE_ME_USE_ENV_VAR',  -- IMPORTANT: rotate this secret and set via environment variable, not hardcoded
        '["volunteer.applied","volunteer.approved","volunteer.declined","shift.signup","shift.completed","shift.noshow","hours.logged","hours.verified","expense.submitted","expense.approved","safeguarding.incident","credential.expiring","training.expired"]',
        1,
        0,

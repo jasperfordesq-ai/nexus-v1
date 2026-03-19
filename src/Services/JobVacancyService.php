@@ -703,8 +703,8 @@ class JobVacancyService
 
             // Increment applications count (atomic within transaction)
             Database::query(
-                "UPDATE job_vacancies SET applications_count = applications_count + 1 WHERE id = ?",
-                [$vacancyId]
+                "UPDATE job_vacancies SET applications_count = applications_count + 1 WHERE id = ? AND tenant_id = ?",
+                [$vacancyId, TenantContext::getId()]
             );
 
             Database::commit();

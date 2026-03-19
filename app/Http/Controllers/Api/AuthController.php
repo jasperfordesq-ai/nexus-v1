@@ -750,8 +750,12 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Fetch user data to populate session
-        $userRow = DB::selectOne("SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin, is_tenant_super_admin, email_verified_at, is_approved FROM users WHERE id = ?", [$userId]);
+        // Fetch user data to populate session — scoped by tenant to prevent cross-tenant session restore
+        $tenantId = TenantContext::getId();
+        $userRow = DB::selectOne(
+            "SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin, is_tenant_super_admin, email_verified_at, is_approved FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
         $user = $userRow ? (array)$userRow : null;
 
         if (!$user) {
@@ -946,12 +950,28 @@ class AuthController extends BaseApiController
             return $this->authError('Invalid token payload', ApiErrorCodes::AUTH_TOKEN_INVALID, 401);
         }
 
-        // Load user from DB
+        // Load user from DB — tenant-scoped, with super-admin bypass
+        $tenantId = TenantContext::getId();
+
+        // First try tenant-scoped lookup
         $userRow = DB::selectOne(
-            "SELECT id, first_name, last_name, email, role, tenant_id, avatar_url, is_super_admin, is_tenant_super_admin, is_god, is_admin FROM users WHERE id = ?",
-            [(int)$userId]
+            "SELECT id, first_name, last_name, email, role, tenant_id, avatar_url, is_super_admin, is_tenant_super_admin, is_god, is_admin FROM users WHERE id = ? AND tenant_id = ?",
+            [(int)$userId, $tenantId]
         );
         $user = $userRow ? (array)$userRow : null;
+
+        // Super-admin cross-tenant fallback: if not found in current tenant,
+        // check if user is a super-admin who can access any tenant's admin panel
+        if (!$user && $tenantId) {
+            $candidateRow = DB::selectOne(
+                "SELECT id, first_name, last_name, email, role, tenant_id, avatar_url, is_super_admin, is_tenant_super_admin, is_god, is_admin FROM users WHERE id = ?",
+                [(int)$userId]
+            );
+            $candidate = $candidateRow ? (array)$candidateRow : null;
+            if ($candidate && (!empty($candidate['is_super_admin']) || !empty($candidate['is_god']))) {
+                $user = $candidate;
+            }
+        }
 
         if (!$user) {
             return $this->authError('User not found', ApiErrorCodes::RESOURCE_NOT_FOUND, 404);

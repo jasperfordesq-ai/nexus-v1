@@ -456,8 +456,8 @@ class NotificationService
     {
         $db = Database::getConnection();
 
-        $sql = "UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0";
-        $params = [$userId];
+        $sql = "UPDATE notifications SET is_read = 1 WHERE user_id = ? AND tenant_id = ? AND is_read = 0";
+        $params = [$userId, TenantContext::getId()];
 
         if ($category && isset(self::TYPE_CATEGORIES[$category])) {
             $types = self::TYPE_CATEGORIES[$category];

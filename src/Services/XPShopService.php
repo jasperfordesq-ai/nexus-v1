@@ -166,8 +166,8 @@ class XPShopService
         try {
             // Deduct XP
             Database::query(
-                "UPDATE users SET xp = xp - ? WHERE id = ? AND xp >= ?",
-                [$item['xp_cost'], $userId, $item['xp_cost']]
+                "UPDATE users SET xp = xp - ? WHERE id = ? AND tenant_id = ? AND xp >= ?",
+                [$item['xp_cost'], $userId, TenantContext::getId(), $item['xp_cost']]
             );
 
             // Check if XP was actually deducted

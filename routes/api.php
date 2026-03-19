@@ -1126,7 +1126,7 @@ Route::get('/v2/auth/verification-status', [\App\Http\Controllers\Api\Registrati
 Route::post('/v2/auth/start-verification', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'startVerification']);
 Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode']);
 Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo']);
-Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook']);
+// NOTE: identity webhook route moved to public webhook section (below auth group)
 // NOTE: /docs, /auth/forgot-password, /auth/reset-password, /auth/verify-email,
 // /auth/resend-verification, /auth/resend-verification-by-email are public routes (registered above auth group)
 // NOTE: /totp/verify moved to public routes section (user has no token during 2FA login)
@@ -1465,3 +1465,7 @@ Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\Federatio
 // it cannot authenticate via Sanctum tokens.
 // ============================================
 Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events']);
+
+// Identity verification provider webhooks (e.g., Onfido, Jumio)
+// Must be public — providers send callbacks without Sanctum tokens.
+Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook']);

@@ -357,11 +357,11 @@ class SocialNotificationService
 
             switch ($contentType) {
                 case 'post':
-                    $result = $dbClass::query("SELECT user_id FROM feed_posts WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM feed_posts WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'listing':
-                    $result = $dbClass::query("SELECT user_id FROM listings WHERE id = ? AND tenant_id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM listings WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'event':
@@ -373,15 +373,15 @@ class SocialNotificationService
                     return $result ? $result['user_id'] : null;
 
                 case 'poll':
-                    $result = $dbClass::query("SELECT user_id FROM polls WHERE id = ?", [$contentId, TenantContext::getId()])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM polls WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'resource':
-                    $result = $dbClass::query("SELECT user_id FROM resources WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT user_id FROM resources WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'volunteering':
-                    $result = $dbClass::query("SELECT created_by as user_id FROM vol_opportunities WHERE id = ?", [$contentId])->fetch();
+                    $result = $dbClass::query("SELECT created_by as user_id FROM vol_opportunities WHERE id = ? AND tenant_id = ?", [$contentId, TenantContext::getId()])->fetch();
                     return $result ? $result['user_id'] : null;
 
                 case 'review':

@@ -179,8 +179,8 @@ class IdentityVerificationSessionService
     public static function markReminderSent(int $sessionId): void
     {
         Database::query(
-            "UPDATE identity_verification_sessions SET reminder_sent_at = NOW() WHERE id = ?",
-            [$sessionId]
+            "UPDATE identity_verification_sessions SET reminder_sent_at = NOW() WHERE id = ? AND tenant_id = ?",
+            [$sessionId, TenantContext::getId()]
         );
     }
 
@@ -196,8 +196,9 @@ class IdentityVerificationSessionService
             "UPDATE identity_verification_sessions
              SET status = 'expired', completed_at = NOW(), updated_at = NOW()
              WHERE status IN ('created', 'started')
-               AND created_at < DATE_SUB(NOW(), INTERVAL ? HOUR)",
-            [$hoursOld]
+               AND created_at < DATE_SUB(NOW(), INTERVAL ? HOUR)
+               AND tenant_id = ?",
+            [$hoursOld, TenantContext::getId()]
         );
 
         return $stmt->rowCount();

@@ -10,6 +10,7 @@ use App\Services\EmailMonitorService;
 use Illuminate\Http\JsonResponse;
 use App\Core\TenantContext;
 use App\Models\NewsletterBounce;
+use Illuminate\Support\Facades\DB;
 
 /**
  * SendGridWebhookController — Eloquent-powered SendGrid event webhook handler.
@@ -33,9 +34,24 @@ class SendGridWebhookController extends BaseApiController
      *
      * Process SendGrid event webhook payload.
      * Expects a JSON array of event objects from SendGrid.
+     *
+     * TODO: Implement proper SendGrid Event Webhook signature verification
+     * using the SENDGRID_WEBHOOK_VERIFICATION_KEY env var once configured.
+     * See: https://docs.sendgrid.com/for-developers/tracking-events/getting-started-event-webhook-security-features
      */
     public function events(): JsonResponse
     {
+        // Shared secret check — if SENDGRID_WEBHOOK_SECRET is configured,
+        // require it as a query parameter or header for basic authentication.
+        $expectedSecret = env('SENDGRID_WEBHOOK_SECRET');
+        if (!empty($expectedSecret)) {
+            $providedSecret = request()->header('X-Webhook-Secret')
+                ?? request()->query('secret');
+            if (!hash_equals($expectedSecret, (string) $providedSecret)) {
+                return $this->respondWithError('UNAUTHORIZED', 'Invalid webhook secret', null, 401);
+            }
+        }
+
         $payload = request()->getContent();
 
         if (empty($payload)) {
@@ -63,10 +79,17 @@ class SendGridWebhookController extends BaseApiController
                 continue;
             }
 
-            // Validate and set tenant context for scoped queries
+            // Validate tenant exists AND is active before accepting the tenant_id from payload
             if ($tenantId > 0) {
+                $tenant = DB::selectOne(
+                    "SELECT id, is_active FROM tenants WHERE id = ?",
+                    [$tenantId]
+                );
+                if (!$tenant || empty($tenant->is_active)) {
+                    // Invalid or inactive tenant ID from payload — skip this event
+                    continue;
+                }
                 if (!TenantContext::setById($tenantId)) {
-                    // Invalid tenant ID from payload — skip this event
                     continue;
                 }
             }

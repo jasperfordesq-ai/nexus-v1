@@ -53,10 +53,13 @@ export function DataManagement() {
   const handleExport = useCallback(async (type: string) => {
     setExportingType(type);
     try {
+      const token = localStorage.getItem('nexus_access_token');
+      const tenantId = localStorage.getItem('nexus_tenant_id');
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (tenantId) headers['X-Tenant-ID'] = tenantId;
       const response = await fetch(`${API_BASE}/v2/admin/federation/export/${type}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('nexus_access_token') || ''}`,
-        },
+        headers,
       });
       if (!response.ok) throw new Error('Export failed');
       const blob = await response.blob();
