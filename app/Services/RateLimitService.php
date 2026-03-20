@@ -6,8 +6,10 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\RateLimiter;
+
 /**
- * RateLimitService — Rate limiting using Redis or in-memory store.
+ * RateLimitService — Rate limiting using Laravel's RateLimiter (Redis-backed).
  *
  * Provides tenant-aware rate limiting for API endpoints and auth flows.
  */
@@ -27,21 +29,29 @@ class RateLimitService
      */
     public static function check(string $key, int $maxAttempts, int $windowSeconds = 60): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return true;
+        return RateLimiter::remaining($key, $maxAttempts) > 0;
     }
 
     /**
      * Increment the attempt counter for a given key.
      *
+     * Returns true if the attempt is allowed (under the limit), false if rate-limited.
+     *
      * @param string $key Unique identifier
+     * @param int $maxAttempts Maximum number of attempts allowed
      * @param int $windowSeconds Time window in seconds
-     * @return int Current attempt count
+     * @return bool True if allowed, false if rate-limited
      */
-    public static function increment(string $key, int $windowSeconds = 60): int
+    public static function increment(string $key, int $maxAttempts = 10, int $windowSeconds = 60): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0;
+        return RateLimiter::attempt(
+            $key,
+            $maxAttempts,
+            function () {
+                // no-op — we just want to record the attempt
+            },
+            $windowSeconds
+        );
     }
 
     /**
@@ -54,8 +64,7 @@ class RateLimitService
      */
     public static function remaining(string $key, int $maxAttempts, int $windowSeconds = 60): int
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return $maxAttempts;
+        return RateLimiter::remaining($key, $maxAttempts);
     }
 
     /**
@@ -67,8 +76,7 @@ class RateLimitService
      */
     public static function hit(string $key, int $decaySeconds = 60): int
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0;
+        return RateLimiter::hit($key, $decaySeconds);
     }
 
     /**
@@ -76,7 +84,7 @@ class RateLimitService
      */
     public static function clear(string $key): void
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        RateLimiter::clear($key);
     }
 
     /**
@@ -84,6 +92,6 @@ class RateLimitService
      */
     public static function reset(string $key): void
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        RateLimiter::clear($key);
     }
 }

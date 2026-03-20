@@ -389,10 +389,16 @@ class WebAuthnController extends BaseApiController
         // Set up session for browser clients
         $wantsStateless = $this->tokenService->isMobileRequest() || isset($_SERVER['HTTP_X_STATELESS_AUTH']);
         if (!$wantsStateless) {
+            // Ensure a PHP session is active before accessing $_SESSION
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             $currentSessionUser = $_SESSION['user_id'] ?? null;
             if ($currentSessionUser === null) {
                 $preservedLayout = $_SESSION['nexus_active_layout'] ?? $_SESSION['nexus_layout'] ?? null;
-                session_regenerate_id(true);
+                if (session_status() === PHP_SESSION_ACTIVE) {
+                    session_regenerate_id(true);
+                }
                 if ($preservedLayout) {
                     $_SESSION['nexus_active_layout'] = $preservedLayout;
                     $_SESSION['nexus_layout'] = $preservedLayout;

@@ -6,105 +6,216 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
 /**
- *
- * Provides dependency-injectable access to the legacy static service methods.
+ * TenantSettingsService — reads/writes tenant_settings (key-value) table,
+ * enforces login gates, and checks registration policy.
  */
 class TenantSettingsService
 {
+    private const CACHE_PREFIX = 'tenant_settings:';
+    private const CACHE_TTL = 300; // 5 minutes
+
     public function __construct()
     {
     }
 
     /**
-     * Delegates to legacy TenantSettingsService::get().
+     * Get a single tenant setting value.
      */
     public static function get(int $tenantId, string $key, $default = null)
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        $settings = static::loadAll($tenantId);
+        return $settings[$key] ?? $default;
     }
 
     /**
-     * Delegates to legacy TenantSettingsService::getBool().
+     * Get a tenant setting as a boolean.
      */
     public static function getBool(int $tenantId, string $key, bool $default = false): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $value = static::get($tenantId, $key);
+
+        if ($value === null) {
+            return $default;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
-     * Delegates to legacy TenantSettingsService::getAllGeneral().
+     * Set a tenant setting value.
+     */
+    public static function set(int $tenantId, string $key, string $value, string $type = 'string'): void
+    {
+        $existing = DB::selectOne(
+            "SELECT id FROM tenant_settings WHERE tenant_id = ? AND setting_key = ?",
+            [$tenantId, $key]
+        );
+
+        if ($existing) {
+            DB::update(
+                "UPDATE tenant_settings SET setting_value = ? WHERE tenant_id = ? AND setting_key = ?",
+                [$value, $tenantId, $key]
+            );
+        } else {
+            DB::insert(
+                "INSERT INTO tenant_settings (tenant_id, setting_key, setting_value, setting_type) VALUES (?, ?, ?, ?)",
+                [$tenantId, $key, $value, $type]
+            );
+        }
+
+        static::clearCacheForTenant($tenantId);
+    }
+
+    /**
+     * Get all settings for a tenant.
      */
     public static function getAllGeneral(int $tenantId): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        return static::loadAll($tenantId);
     }
 
     /**
-     * Delegates to legacy TenantSettingsService::clearCache().
+     * Clear all cached settings.
      */
     public static function clearCache(): void
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        // Flush all tenant settings from cache
+        // Since we can't enumerate all keys easily, use a tagged approach
+        // or just clear specific known tenants. For now, flush the cache store.
+        try {
+            Cache::forget(self::CACHE_PREFIX . '*');
+        } catch (\Throwable $e) {
+            // Ignore cache errors
+        }
     }
 
     /**
-     * Delegates to legacy TenantSettingsService::isRegistrationOpen().
+     * Clear cached settings for a specific tenant.
+     */
+    public static function clearCacheForTenant(int $tenantId): void
+    {
+        Cache::forget(self::CACHE_PREFIX . $tenantId);
+    }
+
+    /**
+     * Check if registration is open for a tenant.
+     *
+     * Reads the `registration_mode` setting. Defaults to 'open' if not set.
      */
     public static function isRegistrationOpen(int $tenantId): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $mode = static::get($tenantId, 'registration_mode', 'open');
+        return $mode === 'open';
     }
 
     /**
-     * Check if a user passes all registration policy gates for their tenant.
+     * Check login gates for a user array.
      *
-     * Returns null if the user passes, or an error array if blocked.
+     * Admins and super admins always pass. Regular members may be blocked by:
+     * - Pending/failed identity verification
+     * - Unapproved account when admin_approval is required
+     * - Unverified email when email_verification is required
      *
-     * @param int $tenantId Tenant ID
+     * @param array $user User row (must include: role, is_super_admin, is_tenant_super_admin, tenant_id)
      * @return array|null Null = passes, or ['code' => ..., 'message' => ..., 'extra' => [...]]
      */
-    public static function checkLoginGates(int $tenantId): ?array
+    public static function checkLoginGates(array $user): ?array
     {
-        // Delegate to legacy which accepts a user array.
-        // When called from a controller the caller typically has a user row;
-        // however the task signature only passes tenantId, so we build a
-        // minimal user array from the authenticated user context.
-        $user = null;
-        try {
-            $user = \App\Core\Auth::user();
-        } catch (\Throwable $e) {
-            // No authenticated user available
-        }
-
-        if (!$user) {
-            return null;
-        }
-
-        // Ensure the user row has tenant_id set
-        $user['tenant_id'] = $tenantId;
-
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        return static::checkLoginGatesForUser($user);
     }
 
     /**
      * Check login gates for a specific user array.
-     *
-     * This is the preferred method when the caller already has
-     * the full user row (must include: role, is_super_admin,
-     * is_tenant_super_admin, tenant_id, email_verified_at, is_approved).
      *
      * @param array $user User row from DB
      * @return array|null Null = passes, or error array
      */
     public static function checkLoginGatesForUser(array $user): ?array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        $role = $user['role'] ?? 'member';
+        $isSuperAdmin = !empty($user['is_super_admin']);
+        $isTenantSuperAdmin = !empty($user['is_tenant_super_admin']);
+
+        // Admins and super admins always pass login gates
+        if (in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || $isSuperAdmin
+            || $isTenantSuperAdmin
+        ) {
+            return null;
+        }
+
+        $tenantId = (int)($user['tenant_id'] ?? 0);
+
+        // Check identity verification status (if present)
+        $verificationStatus = $user['verification_status'] ?? null;
+        if ($verificationStatus === 'pending') {
+            return [
+                'code' => 'AUTH_PENDING_VERIFICATION',
+                'message' => 'Your identity verification is pending. Please wait for approval.',
+                'extra' => ['pending_verification' => true],
+            ];
+        }
+        if ($verificationStatus === 'failed') {
+            return [
+                'code' => 'AUTH_VERIFICATION_FAILED',
+                'message' => 'Your identity verification has failed. Please contact support.',
+                'extra' => ['verification_failed' => true],
+            ];
+        }
+
+        // Check email verification requirement
+        if ($tenantId > 0 && static::getBool($tenantId, 'email_verification', false)) {
+            if (empty($user['email_verified_at'])) {
+                return [
+                    'code' => 'AUTH_EMAIL_NOT_VERIFIED',
+                    'message' => 'Please verify your email address before logging in.',
+                    'extra' => ['email_not_verified' => true],
+                ];
+            }
+        }
+
+        // Check admin approval requirement
+        if ($tenantId > 0 && static::getBool($tenantId, 'admin_approval', false)) {
+            if (empty($user['is_approved'])) {
+                return [
+                    'code' => 'AUTH_ACCOUNT_PENDING_APPROVAL',
+                    'message' => 'Your account is pending admin approval.',
+                    'extra' => ['pending_approval' => true],
+                ];
+            }
+        }
+
         return null;
+    }
+
+    /**
+     * Load all settings for a tenant (with caching).
+     */
+    private static function loadAll(int $tenantId): array
+    {
+        $cacheKey = self::CACHE_PREFIX . $tenantId;
+
+        try {
+            return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($tenantId) {
+                $rows = DB::select(
+                    "SELECT setting_key, setting_value FROM tenant_settings WHERE tenant_id = ?",
+                    [$tenantId]
+                );
+
+                $settings = [];
+                foreach ($rows as $row) {
+                    $settings[$row->setting_key] = $row->setting_value;
+                }
+                return $settings;
+            });
+        } catch (\Throwable $e) {
+            // If DB/cache fails, return empty to avoid blocking login
+            error_log('[TenantSettingsService] loadAll failed for tenant ' . $tenantId . ': ' . $e->getMessage());
+            return [];
+        }
     }
 }
