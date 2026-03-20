@@ -22,6 +22,13 @@ class ResolveTenant
                 return response()->json(['error' => 'Unable to resolve tenant'], 400);
             }
         }
+
+        // Bind tenant.id into Laravel's container for services that use app('tenant.id')
+        $tenantId = TenantContext::getId();
+        if ($tenantId) {
+            app()->instance('tenant.id', $tenantId);
+        }
+
         return $next($request);
     }
 }

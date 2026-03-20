@@ -38,6 +38,8 @@ services:
       - ./bootstrap:/var/www/html/bootstrap:ro
       - ./routes:/var/www/html/routes:ro
       - ./app:/var/www/html/app:ro
+      - ./composer.json:/var/www/html/composer.json:ro
+      - ./database:/var/www/html/database:ro
       # Writable uploads directory
       - nexus-php-uploads:/var/www/html/httpdocs/uploads
       # Writable logs
