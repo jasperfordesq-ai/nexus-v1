@@ -12,6 +12,11 @@ use App\Models\NewsletterSegment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+// Define rate limit constant globally for cron/test access
+if (!defined('NEWSLETTER_EMAIL_DELAY_MICROSECONDS')) {
+    define('NEWSLETTER_EMAIL_DELAY_MICROSECONDS', 250000);
+}
+
 /**
  * NewsletterService — Laravel DI-based service for newsletter operations.
  *
@@ -23,7 +28,7 @@ use Illuminate\Support\Facades\Log;
 class NewsletterService
 {
     /** Rate limiting: microseconds between each email (250ms = max 4 emails/sec) */
-    private const EMAIL_DELAY_MICROSECONDS = 250000;
+    private const EMAIL_DELAY_MICROSECONDS = NEWSLETTER_EMAIL_DELAY_MICROSECONDS;
 
     public function __construct(
         private readonly Newsletter $newsletter,
@@ -127,9 +132,9 @@ class NewsletterService
      * @return int Number of recipients queued
      * @throws \Exception
      */
-    public function sendNow(int $newsletterId, string $targetAudience = 'all_members', ?int $segmentId = null): int
+    public static function sendNow(int $newsletterId, string $targetAudience = 'all_members', ?int $segmentId = null): int
     {
-        $newsletter = $this->newsletter->newQuery()->find($newsletterId);
+        $newsletter = Newsletter::find($newsletterId);
 
         if (!$newsletter) {
             throw new \Exception('Newsletter not found');
@@ -169,7 +174,7 @@ class NewsletterService
         ]);
 
         // Process queue
-        $this->processQueue($newsletterId);
+        self::processQueue($newsletterId);
 
         return $queued;
     }
@@ -179,9 +184,9 @@ class NewsletterService
      *
      * Sends emails in batches using App\Core\Mailer with rate limiting.
      */
-    private function processQueue(int $newsletterId, int $batchSize = 50): array
+    public static function processQueue(int $newsletterId, int $batchSize = 50): array
     {
-        $newsletter = $this->newsletter->newQuery()->find($newsletterId);
+        $newsletter = Newsletter::find($newsletterId);
         if (!$newsletter) {
             return ['sent' => 0, 'failed' => 0];
         }
@@ -601,7 +606,7 @@ HTML;
      *
      * @return array Array of recipient arrays
      */
-    private static function getSegmentRecipients(int $segmentId): array
+    public static function getSegmentRecipients(int $segmentId): array
     {
         $segment = NewsletterSegment::find($segmentId);
 
@@ -958,5 +963,404 @@ HTML;
         }
 
         return null;
+    }
+
+    // =========================================================================
+    // CRON ENTRY POINTS
+    // =========================================================================
+
+    /**
+     * Process scheduled newsletters that are ready to send.
+     *
+     * @return int Number of newsletters processed
+     */
+    public static function processScheduled(): int
+    {
+        $tenantId = TenantContext::getId();
+        $processed = 0;
+
+        try {
+            $newsletters = DB::table('newsletters')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'scheduled')
+                ->where('scheduled_at', '<=', now())
+                ->get();
+
+            foreach ($newsletters as $newsletter) {
+                try {
+                    $service = app(self::class);
+                    $service->sendNow(
+                        (int) $newsletter->id,
+                        $newsletter->target_audience ?? 'all_members',
+                        $newsletter->segment_id ? (int) $newsletter->segment_id : null
+                    );
+                    $processed++;
+                } catch (\Exception $e) {
+                    Log::error("Failed to process scheduled newsletter {$newsletter->id}: " . $e->getMessage());
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('processScheduled error: ' . $e->getMessage());
+        }
+
+        return $processed;
+    }
+
+    /**
+     * Process recurring newsletters.
+     *
+     * @return int Number of newsletters processed
+     */
+    public static function processRecurring(): int
+    {
+        $tenantId = TenantContext::getId();
+        $processed = 0;
+
+        try {
+            $newsletters = DB::table('newsletters')
+                ->where('tenant_id', $tenantId)
+                ->where('is_recurring', true)
+                ->where('status', 'active')
+                ->get();
+
+            foreach ($newsletters as $newsletter) {
+                // Check if enough time has passed since last send
+                $lastSent = $newsletter->last_sent_at ?? null;
+                $interval = $newsletter->recurring_interval ?? 'weekly';
+
+                $shouldSend = !$lastSent;
+                if ($lastSent) {
+                    $daysSince = (int) ((time() - strtotime($lastSent)) / 86400);
+                    $shouldSend = match ($interval) {
+                        'daily' => $daysSince >= 1,
+                        'weekly' => $daysSince >= 7,
+                        'monthly' => $daysSince >= 30,
+                        default => false,
+                    };
+                }
+
+                if ($shouldSend) {
+                    try {
+                        $service = app(self::class);
+                        $service->sendNow((int) $newsletter->id);
+                        $processed++;
+                    } catch (\Exception $e) {
+                        Log::error("Failed to process recurring newsletter {$newsletter->id}: " . $e->getMessage());
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('processRecurring error: ' . $e->getMessage());
+        }
+
+        return $processed;
+    }
+
+    /**
+     * Schedule a newsletter for future sending.
+     *
+     * @param int $newsletterId Newsletter ID
+     * @param string $scheduledAt DateTime string for scheduled send
+     * @return bool
+     */
+    public static function schedule(int $newsletterId, string $scheduledAt): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $affected = DB::table('newsletters')
+                ->where('id', $newsletterId)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'status' => 'scheduled',
+                    'scheduled_at' => $scheduledAt,
+                    'updated_at' => now(),
+                ]);
+
+            return $affected > 0;
+        } catch (\Exception $e) {
+            Log::error('schedule error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get recipients based on target audience.
+     *
+     * @param string $targetAudience 'all_members', 'subscribers_only', 'both'
+     * @return array
+     */
+    public static function getRecipients(string $targetAudience = 'all_members'): array
+    {
+        return self::getRecipientsList($targetAudience);
+    }
+
+    /**
+     * Get statistics for a newsletter.
+     *
+     * @param int $newsletterId Newsletter ID
+     * @return array
+     */
+    public static function getStats(int $newsletterId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $newsletter = DB::table('newsletters')
+                ->where('id', $newsletterId)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if (!$newsletter) {
+                return [];
+            }
+
+            $stats = DB::table('newsletter_queue')
+                ->where('newsletter_id', $newsletterId)
+                ->selectRaw("
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent,
+                    SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
+                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as opened,
+                    SUM(CASE WHEN clicked_at IS NOT NULL THEN 1 ELSE 0 END) as clicked
+                ")
+                ->first();
+
+            return [
+                'total' => (int) ($stats->total ?? 0),
+                'sent' => (int) ($stats->sent ?? 0),
+                'failed' => (int) ($stats->failed ?? 0),
+                'pending' => (int) ($stats->pending ?? 0),
+                'opened' => (int) ($stats->opened ?? 0),
+                'clicked' => (int) ($stats->clicked ?? 0),
+                'open_rate' => ($stats->sent ?? 0) > 0 ? round(($stats->opened ?? 0) / $stats->sent * 100, 1) : 0,
+                'click_rate' => ($stats->sent ?? 0) > 0 ? round(($stats->clicked ?? 0) / $stats->sent * 100, 1) : 0,
+            ];
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get filtered recipients based on criteria.
+     *
+     * @param array $filters Filter criteria (location, group, etc.)
+     * @return array
+     */
+    public static function getFilteredRecipients(array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $query = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('is_approved', 1)
+                ->whereNotNull('email')
+                ->where('email', '!=', '');
+
+            if (!empty($filters['location'])) {
+                $query->where('location', 'LIKE', '%' . $filters['location'] . '%');
+            }
+
+            if (!empty($filters['group_id'])) {
+                $query->whereIn('id', function ($q) use ($filters) {
+                    $q->select('user_id')
+                        ->from('group_members')
+                        ->where('group_id', $filters['group_id'])
+                        ->where('status', 'active');
+                });
+            }
+
+            return $query->get(['id', 'email', 'name', 'first_name', 'last_name'])
+                ->map(fn ($u) => (array) $u)
+                ->toArray();
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    // =========================================================================
+    // A/B TESTING
+    // =========================================================================
+
+    /**
+     * Initialize A/B test statistics for a newsletter.
+     *
+     * @param int $newsletterId Newsletter ID
+     * @return bool
+     */
+    public static function initializeABStats(int $newsletterId): bool
+    {
+        try {
+            DB::table('newsletter_ab_stats')->updateOrInsert(
+                ['newsletter_id' => $newsletterId],
+                [
+                    'variant_a_sent' => 0,
+                    'variant_b_sent' => 0,
+                    'variant_a_opened' => 0,
+                    'variant_b_opened' => 0,
+                    'variant_a_clicked' => 0,
+                    'variant_b_clicked' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+            return true;
+        } catch (\Exception $e) {
+            Log::error('initializeABStats error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get A/B test results for a newsletter.
+     *
+     * @param int $newsletterId Newsletter ID
+     * @return array|null
+     */
+    public static function getABTestResults(int $newsletterId): ?array
+    {
+        try {
+            $stats = DB::table('newsletter_ab_stats')
+                ->where('newsletter_id', $newsletterId)
+                ->first();
+
+            if (!$stats) {
+                return null;
+            }
+
+            return (array) $stats;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Select the winning variant from an A/B test.
+     *
+     * @param int $newsletterId Newsletter ID
+     * @param string $winner 'a' or 'b'
+     * @return bool
+     */
+    public static function selectABWinner(int $newsletterId, string $winner = 'a'): bool
+    {
+        try {
+            DB::table('newsletters')
+                ->where('id', $newsletterId)
+                ->update([
+                    'ab_winner' => $winner,
+                    'updated_at' => now(),
+                ]);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    // =========================================================================
+    // RESEND TO NON-OPENERS
+    // =========================================================================
+
+    /**
+     * Resend a newsletter to recipients who haven't opened it.
+     *
+     * @param int $newsletterId Newsletter ID
+     * @param string|null $newSubject Optional new subject line
+     * @param int $waitDays Minimum days to wait before resending
+     * @return int Number of recipients resent to
+     */
+    public static function resendToNonOpeners(int $newsletterId, ?string $newSubject = null, int $waitDays = 3): int
+    {
+        try {
+            $newsletter = DB::table('newsletters')->find($newsletterId);
+            if (!$newsletter || $newsletter->status !== 'sent') {
+                return 0;
+            }
+
+            // Check if enough time has passed
+            if ($newsletter->sent_at) {
+                $daysSince = (int) ((time() - strtotime($newsletter->sent_at)) / 86400);
+                if ($daysSince < $waitDays) {
+                    return 0;
+                }
+            }
+
+            $nonOpeners = DB::table('newsletter_queue')
+                ->where('newsletter_id', $newsletterId)
+                ->where('status', 'sent')
+                ->whereNull('opened_at')
+                ->get();
+
+            // Queue them for re-send
+            foreach ($nonOpeners as $item) {
+                DB::table('newsletter_queue')
+                    ->where('id', $item->id)
+                    ->update(['status' => 'pending']);
+            }
+
+            return count($nonOpeners);
+        } catch (\Exception $e) {
+            Log::error('resendToNonOpeners error: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Get resend eligibility info for a newsletter.
+     *
+     * @param int $newsletterId Newsletter ID
+     * @return array
+     */
+    public static function getResendInfo(int $newsletterId): array
+    {
+        try {
+            $newsletter = DB::table('newsletters')->find($newsletterId);
+            if (!$newsletter) {
+                return ['eligible' => false, 'reason' => 'Newsletter not found'];
+            }
+
+            $nonOpenerCount = DB::table('newsletter_queue')
+                ->where('newsletter_id', $newsletterId)
+                ->where('status', 'sent')
+                ->whereNull('opened_at')
+                ->count();
+
+            return [
+                'eligible' => $newsletter->status === 'sent' && $nonOpenerCount > 0,
+                'non_opener_count' => $nonOpenerCount,
+                'sent_at' => $newsletter->sent_at,
+            ];
+        } catch (\Exception $e) {
+            return ['eligible' => false, 'reason' => 'Error checking eligibility'];
+        }
+    }
+
+    /**
+     * Get the current email sending method.
+     *
+     * @return string 'Gmail API' or 'SMTP'
+     */
+    public static function getSendingMethod(): string
+    {
+        if (config('mail.default') === 'gmail' || !empty(config('services.gmail.client_id'))) {
+            return 'Gmail API';
+        }
+        return 'SMTP';
+    }
+
+    /**
+     * Process template variables in newsletter content.
+     *
+     * @param string $content Raw content with placeholders
+     * @param array $variables Variable name => value mapping
+     * @return string Processed content
+     */
+    public static function processTemplateVariables(string $content, array $variables = []): string
+    {
+        foreach ($variables as $key => $value) {
+            $content = str_replace('{{' . $key . '}}', (string) $value, $content);
+        }
+        return $content;
     }
 }

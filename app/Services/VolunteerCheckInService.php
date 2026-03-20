@@ -25,8 +25,37 @@ use Illuminate\Support\Facades\Log;
  */
 class VolunteerCheckInService
 {
+    /** @var array<int, array{code: string, message: string}> */
+    private array $errors = [];
+
     public function __construct()
     {
+    }
+
+    /**
+     * Get errors from the last operation.
+     *
+     * @return array<int, array{code: string, message: string}>
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Clear errors.
+     */
+    private function clearErrors(): void
+    {
+        $this->errors = [];
+    }
+
+    /**
+     * Add an error.
+     */
+    private function addError(string $code, string $message): void
+    {
+        $this->errors[] = ['code' => $code, 'message' => $message];
     }
 
     /**
@@ -65,9 +94,45 @@ class VolunteerCheckInService
     }
 
     /**
-     * Check out a volunteer from an opportunity (legacy-compatible signature).
+     * Check out a volunteer using QR token.
+     *
+     * @param string $token QR token
+     * @return bool
      */
-    public static function checkOut(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
+    public function checkOut(string $token): bool
+    {
+        $this->clearErrors();
+
+        try {
+            $checkin = VolShiftCheckin::where('qr_token', $token)->first();
+
+            if (!$checkin) {
+                $this->addError('NOT_FOUND', 'Check-in record not found for this token.');
+                return false;
+            }
+
+            if ($checkin->status !== 'checked_in') {
+                $this->addError('VALIDATION_ERROR', 'Volunteer is not currently checked in.');
+                return false;
+            }
+
+            $checkin->update([
+                'status' => 'checked_out',
+                'checked_out_at' => now(),
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('VolunteerCheckInService::checkOut error: ' . $e->getMessage());
+            $this->addError('INTERNAL_ERROR', 'An unexpected error occurred.');
+            return false;
+        }
+    }
+
+    /**
+     * Check out a volunteer for an opportunity (legacy-compatible signature).
+     */
+    public static function checkOutLegacy(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
     {
         try {
             $shift = VolShift::where('opportunity_id', $opportunityId)->first();
@@ -97,7 +162,7 @@ class VolunteerCheckInService
     }
 
     /**
-     * Get all check-ins for an opportunity.
+     * Get all check-ins for an opportunity (legacy-compatible signature).
      */
     public static function getCheckIns(int $tenantId, int $opportunityId): array
     {
@@ -145,9 +210,15 @@ class VolunteerCheckInService
 
     /**
      * Get a user's check-in record for a specific shift.
+     *
+     * @param int $shiftId Shift ID
+     * @param int $userId User ID
+     * @return array|null
      */
-    public static function getUserCheckIn(int $userId, int $shiftId, int $tenantId): ?array
+    public function getUserCheckIn(int $shiftId, int $userId): ?array
     {
+        $tenantId = TenantContext::getId();
+
         $hasApproved = VolApplication::where('shift_id', $shiftId)
             ->where('user_id', $userId)
             ->where('status', 'approved')
@@ -178,11 +249,33 @@ class VolunteerCheckInService
     }
 
     /**
-     * Generate a QR check-in token for a shift.
+     * Generate a QR check-in token for a shift+volunteer.
+     *
+     * Returns null if the volunteer is not approved for the shift.
+     *
+     * @param int $shiftId Shift ID
+     * @param int $volunteerId Volunteer user ID
+     * @return string|null Token string or null if unapproved
      */
-    public static function generateToken(int $shiftId, int $tenantId): string
+    public function generateToken(int $shiftId, int $volunteerId): ?string
     {
+        $this->clearErrors();
+        $tenantId = TenantContext::getId();
+
+        // Check volunteer is approved for this shift
+        $hasApproved = VolApplication::where('shift_id', $shiftId)
+            ->where('user_id', $volunteerId)
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$hasApproved) {
+            $this->addError('FORBIDDEN', 'Volunteer is not approved for this shift.');
+            return null;
+        }
+
+        // Check for existing token
         $existing = VolShiftCheckin::where('shift_id', $shiftId)
+            ->where('user_id', $volunteerId)
             ->whereNotNull('qr_token')
             ->value('qr_token');
 
@@ -195,6 +288,7 @@ class VolunteerCheckInService
         VolShiftCheckin::create([
             'tenant_id' => $tenantId,
             'shift_id' => $shiftId,
+            'user_id' => $volunteerId,
             'qr_token' => $token,
             'status' => 'pending',
         ]);
@@ -215,17 +309,31 @@ class VolunteerCheckInService
 
     /**
      * Verify a check-in via QR token scan.
+     *
+     * @param string $token QR token
+     * @return array|null Check-in result or null on failure
      */
-    public static function verifyCheckIn(array $data, int $tenantId): array|false
+    public function verifyCheckIn(string $token): ?array
     {
-        $token = $data['token'] ?? '';
+        $this->clearErrors();
 
         $checkin = VolShiftCheckin::with(['shift', 'user'])
             ->where('qr_token', $token)
             ->first();
 
         if (!$checkin) {
-            return false;
+            $this->addError('NOT_FOUND', 'Invalid check-in token.');
+            return null;
+        }
+
+        // Check if the shift has started (allow 30 min early)
+        if ($checkin->shift && $checkin->shift->start_time) {
+            $shiftStart = $checkin->shift->start_time;
+            $earliestCheckin = $shiftStart->copy()->subMinutes(30);
+            if (now()->lt($earliestCheckin)) {
+                $this->addError('VALIDATION_ERROR', 'Check-in is not yet available. Shift starts at ' . $shiftStart->toDateTimeString());
+                return null;
+            }
         }
 
         if ($checkin->status === 'checked_in') {
@@ -246,7 +354,8 @@ class VolunteerCheckInService
         }
 
         if ($checkin->status === 'checked_out') {
-            return false;
+            $this->addError('VALIDATION_ERROR', 'Volunteer has already checked out.');
+            return null;
         }
 
         $checkin->update([
@@ -282,9 +391,12 @@ class VolunteerCheckInService
     }
 
     /**
-     * Get all check-ins for a shift.
+     * Get all check-ins for a shift (without exposing qr_token).
+     *
+     * @param int $shiftId Shift ID
+     * @return array
      */
-    public static function getShiftCheckIns(int $shiftId, int $tenantId): array
+    public function getShiftCheckIns(int $shiftId): array
     {
         return VolShiftCheckin::with('user')
             ->where('shift_id', $shiftId)

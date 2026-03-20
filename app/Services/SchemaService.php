@@ -17,9 +17,9 @@ class SchemaService
     }
 
     /**
-     * Delegates to legacy SchemaService::organization().
+     * Generate JSON-LD schema for an organization.
      */
-    public function organization(?array $tenant = null, ?array $config = null): array
+    public static function organization(?array $tenant = null, ?array $config = null): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

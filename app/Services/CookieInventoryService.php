@@ -155,4 +155,126 @@ class CookieInventoryService
 
         return true;
     }
+
+    /**
+     * Delete a cookie from inventory.
+     *
+     * @param int $id Cookie ID
+     * @return bool
+     */
+    public static function deleteCookie(int $id): bool
+    {
+        $cookie = CookieInventoryItem::find($id);
+        if (!$cookie) {
+            return false;
+        }
+
+        $cookie->delete();
+        return true;
+    }
+
+    /**
+     * Get a single cookie by ID.
+     *
+     * @param int $id Cookie ID
+     * @return array|null
+     */
+    public static function getCookie(int $id): ?array
+    {
+        $cookie = CookieInventoryItem::find($id);
+        return $cookie ? $cookie->toArray() : null;
+    }
+
+    /**
+     * Get a cookie by its name.
+     *
+     * @param string $name Cookie name
+     * @param int|null $tenantId Optional tenant ID
+     * @return array|null
+     */
+    public static function getCookieByName(string $name, ?int $tenantId = null): ?array
+    {
+        $query = CookieInventoryItem::where('cookie_name', $name);
+
+        if ($tenantId !== null) {
+            $query->where(function ($q) use ($tenantId) {
+                $q->whereNull('tenant_id')->orWhere('tenant_id', $tenantId);
+            });
+        }
+
+        $cookie = $query->first();
+        return $cookie ? $cookie->toArray() : null;
+    }
+
+    /**
+     * Get count of cookies per category.
+     *
+     * @param int|null $tenantId Optional tenant ID
+     * @return array Category => count
+     */
+    public static function getCookieCounts(?int $tenantId = null): array
+    {
+        $query = CookieInventoryItem::where('is_active', true);
+
+        if ($tenantId !== null) {
+            $query->where(function ($q) use ($tenantId) {
+                $q->whereNull('tenant_id')->orWhere('tenant_id', $tenantId);
+            });
+        }
+
+        $counts = $query->selectRaw('category, COUNT(*) as count')
+            ->groupBy('category')
+            ->pluck('count', 'category')
+            ->toArray();
+
+        return array_merge([
+            'essential' => 0,
+            'functional' => 0,
+            'analytics' => 0,
+            'marketing' => 0,
+        ], $counts);
+    }
+
+    /**
+     * Search cookies by name or purpose.
+     *
+     * @param string $query Search term
+     * @param int|null $tenantId Optional tenant ID
+     * @return array
+     */
+    public static function searchCookies(string $query, ?int $tenantId = null): array
+    {
+        $dbQuery = CookieInventoryItem::where(function ($q) use ($query) {
+            $q->where('cookie_name', 'LIKE', "%{$query}%")
+              ->orWhere('purpose', 'LIKE', "%{$query}%");
+        });
+
+        if ($tenantId !== null) {
+            $dbQuery->where(function ($q) use ($tenantId) {
+                $q->whereNull('tenant_id')->orWhere('tenant_id', $tenantId);
+            });
+        }
+
+        return $dbQuery->orderBy('cookie_name')->get()->toArray();
+    }
+
+    /**
+     * Get all cookies for admin management (includes inactive).
+     *
+     * @param int|null $tenantId Optional tenant ID
+     * @return array
+     */
+    public static function getAllCookiesAdmin(?int $tenantId = null): array
+    {
+        $query = CookieInventoryItem::orderBy('category')
+            ->orderBy('cookie_name');
+
+        if ($tenantId !== null) {
+            $query->where(function ($q) use ($tenantId) {
+                $q->whereNull('tenant_id')->orWhere('tenant_id', $tenantId);
+            });
+        }
+
+        return $query->get()->toArray();
+    }
 }

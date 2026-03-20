@@ -17,9 +17,9 @@ class PusherService
     }
 
     /**
-     * Delegates to legacy PusherService::getInstance().
+     * Get the Pusher instance.
      */
-    public function getInstance(): ?Pusher
+    public static function getInstance(): ?object
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

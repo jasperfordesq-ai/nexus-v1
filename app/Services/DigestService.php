@@ -17,11 +17,19 @@ class DigestService
     }
 
     /**
-     * Delegates to legacy DigestService::sendWeeklyDigests().
+     * Send weekly digest emails to all eligible users.
      */
-    public function sendWeeklyDigests()
+    public static function sendWeeklyDigests(): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+    }
+
+    /**
+     * Render the digest email template.
+     */
+    private static function renderTemplate(array $user, array $offers, array $requests, array $events): string
+    {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 }

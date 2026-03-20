@@ -36,21 +36,80 @@ use Illuminate\Support\Facades\Log;
  */
 class FeedRankingService
 {
-    // Signal constants
-    private const VIEW_TRACKING_ENABLED = true;
-    private const CLICK_TRACKING_ENABLED = true;
-    private const VELOCITY_ENABLED = true;
-    private const VELOCITY_WINDOW_HOURS = 2;
-    private const VELOCITY_THRESHOLD = 3;
-    private const VELOCITY_MAX_BOOST = 1.8;
-    private const VELOCITY_DECAY_HOURS = 6;
-    private const CONVERSATION_DEPTH_ENABLED = true;
-    private const CONVERSATION_DEPTH_MAX_BOOST = 1.5;
-    private const CONVERSATION_DEPTH_THRESHOLD = 3;
-    private const REACTION_WEIGHTS = [
+    // Public signal constants (used by tests)
+    public const LIKE_WEIGHT = 1;
+    public const COMMENT_WEIGHT = 5;
+    public const SHARE_WEIGHT = 8;
+
+    public const FRESHNESS_FULL_HOURS = 24;
+    public const FRESHNESS_HALF_LIFE_HOURS = 72;
+    public const FRESHNESS_MINIMUM = 0.3;
+
+    public const GEO_FULL_SCORE_RADIUS = 50;
+    public const GEO_DECAY_INTERVAL = 100;
+    public const GEO_DECAY_PER_INTERVAL = 0.03;
+    public const GEO_MINIMUM_SCORE = 0.15;
+
+    public const VITALITY_FULL_THRESHOLD = 7;
+    public const VITALITY_DECAY_THRESHOLD = 30;
+    public const VITALITY_MINIMUM = 0.5;
+
+    public const SOCIAL_GRAPH_ENABLED = true;
+    public const SOCIAL_GRAPH_MAX_BOOST = 2.0;
+    public const SOCIAL_GRAPH_INTERACTION_DAYS = 90;
+    public const SOCIAL_GRAPH_FOLLOWER_BOOST = 1.5;
+
+    public const NEGATIVE_SIGNALS_ENABLED = true;
+    public const HIDE_PENALTY = 0.0;
+    public const MUTE_PENALTY = 0.1;
+    public const BLOCK_PENALTY = 0.0;
+    public const REPORT_PENALTY_PER = 0.15;
+
+    public const VELOCITY_ENABLED = true;
+    public const VELOCITY_WINDOW_HOURS = 2;
+    public const VELOCITY_THRESHOLD = 3;
+    public const VELOCITY_MAX_BOOST = 1.8;
+    public const VELOCITY_DECAY_HOURS = 6;
+
+    public const CONVERSATION_DEPTH_ENABLED = true;
+    public const CONVERSATION_DEPTH_MAX_BOOST = 1.5;
+    public const CONVERSATION_DEPTH_THRESHOLD = 3;
+
+    public const DIVERSITY_ENABLED = true;
+    public const DIVERSITY_MAX_CONSECUTIVE = 2;
+    public const DIVERSITY_PENALTY = 0.5;
+    public const DIVERSITY_TYPE_ENABLED = true;
+    public const DIVERSITY_TYPE_MAX_CONSECUTIVE = 3;
+
+    public const QUALITY_ENABLED = true;
+    public const QUALITY_IMAGE_BOOST = 1.3;
+    public const QUALITY_LINK_BOOST = 1.1;
+    public const QUALITY_LENGTH_MIN = 50;
+    public const QUALITY_LENGTH_BONUS = 1.2;
+    public const QUALITY_VIDEO_BOOST = 1.4;
+    public const QUALITY_HASHTAG_BOOST = 1.1;
+    public const QUALITY_MENTION_BOOST = 1.15;
+
+    public const CTR_ENABLED = true;
+    public const CTR_MAX_BOOST = 1.5;
+    public const CTR_MIN_IMPRESSIONS = 5;
+
+    public const USER_TYPE_PREFS_ENABLED = true;
+    public const USER_TYPE_PREFS_MAX_BOOST = 1.4;
+    public const USER_TYPE_PREFS_LOOKBACK_DAYS = 30;
+
+    public const SAVE_SIGNAL_ENABLED = true;
+    public const SAVE_SIGNAL_MAX_BOOST = 1.35;
+    public const SAVE_SIGNAL_MIN_SAVES = 2;
+
+    public const REACTION_WEIGHTS = [
         'love' => 2.0, 'celebrate' => 1.8, 'insightful' => 1.5,
         'like' => 1.0, 'curious' => 0.8, 'sad' => 0.6, 'angry' => 0.5,
     ];
+
+    // View/click tracking
+    private const VIEW_TRACKING_ENABLED = true;
+    private const CLICK_TRACKING_ENABLED = true;
 
     private ?array $config = null;
     /** @var array<int, int> */
@@ -64,41 +123,37 @@ class FeedRankingService
     // CONFIG
     // =========================================================================
 
-    public function getConfig(): array
+    public static function getConfig(): array
     {
-        if ($this->config !== null) {
-            return $this->config;
-        }
-
         $defaults = [
             'enabled' => true,
-            'like_weight' => 1, 'comment_weight' => 5, 'share_weight' => 8,
-            'vitality_full_days' => 7, 'vitality_decay_days' => 30, 'vitality_minimum' => 0.5,
-            'geo_full_radius' => 50, 'geo_decay_interval' => 100,
-            'geo_decay_rate' => 0.03, 'geo_minimum' => 0.15,
-            'freshness_enabled' => true, 'freshness_full_hours' => 24,
-            'freshness_half_life' => 72, 'freshness_minimum' => 0.3, 'freshness_gravity' => 1.0,
-            'social_graph_enabled' => true, 'social_graph_max_boost' => 2.0,
-            'social_graph_lookback_days' => 90, 'social_graph_follower_boost' => 1.5,
-            'negative_signals_enabled' => true,
-            'hide_penalty' => 0.0, 'mute_penalty' => 0.1, 'block_penalty' => 0.0,
-            'report_penalty_per' => 0.15,
-            'quality_enabled' => true,
-            'quality_image_boost' => 1.3, 'quality_link_boost' => 1.1,
-            'quality_length_min' => 50, 'quality_length_bonus' => 1.2,
-            'quality_video_boost' => 1.4, 'quality_hashtag_boost' => 1.1,
-            'quality_mention_boost' => 1.15,
-            'diversity_enabled' => true, 'diversity_max_consecutive' => 2,
-            'diversity_penalty' => 0.5,
-            'diversity_type_enabled' => true, 'diversity_type_max_consecutive' => 3,
-            'velocity_enabled' => true, 'velocity_window_hours' => 2,
-            'velocity_threshold' => 3, 'velocity_max_boost' => 1.8, 'velocity_decay_hours' => 6,
-            'conversation_depth_enabled' => true,
-            'conversation_depth_max_boost' => 1.5, 'conversation_depth_threshold' => 3,
-            'ctr_enabled' => true, 'ctr_max_boost' => 1.5, 'ctr_min_impressions' => 5,
-            'user_type_prefs_enabled' => true, 'user_type_prefs_max_boost' => 1.4,
-            'user_type_prefs_lookback_days' => 30,
-            'save_signal_enabled' => true, 'save_signal_max_boost' => 1.35, 'save_signal_min_saves' => 2,
+            'like_weight' => self::LIKE_WEIGHT, 'comment_weight' => self::COMMENT_WEIGHT, 'share_weight' => self::SHARE_WEIGHT,
+            'vitality_full_days' => self::VITALITY_FULL_THRESHOLD, 'vitality_decay_days' => self::VITALITY_DECAY_THRESHOLD, 'vitality_minimum' => self::VITALITY_MINIMUM,
+            'geo_full_radius' => self::GEO_FULL_SCORE_RADIUS, 'geo_decay_interval' => self::GEO_DECAY_INTERVAL,
+            'geo_decay_rate' => self::GEO_DECAY_PER_INTERVAL, 'geo_minimum' => self::GEO_MINIMUM_SCORE,
+            'freshness_enabled' => true, 'freshness_full_hours' => self::FRESHNESS_FULL_HOURS,
+            'freshness_half_life' => self::FRESHNESS_HALF_LIFE_HOURS, 'freshness_minimum' => self::FRESHNESS_MINIMUM, 'freshness_gravity' => 1.0,
+            'social_graph_enabled' => self::SOCIAL_GRAPH_ENABLED, 'social_graph_max_boost' => self::SOCIAL_GRAPH_MAX_BOOST,
+            'social_graph_lookback_days' => self::SOCIAL_GRAPH_INTERACTION_DAYS, 'social_graph_follower_boost' => self::SOCIAL_GRAPH_FOLLOWER_BOOST,
+            'negative_signals_enabled' => self::NEGATIVE_SIGNALS_ENABLED,
+            'hide_penalty' => self::HIDE_PENALTY, 'mute_penalty' => self::MUTE_PENALTY, 'block_penalty' => self::BLOCK_PENALTY,
+            'report_penalty_per' => self::REPORT_PENALTY_PER,
+            'quality_enabled' => self::QUALITY_ENABLED,
+            'quality_image_boost' => self::QUALITY_IMAGE_BOOST, 'quality_link_boost' => self::QUALITY_LINK_BOOST,
+            'quality_length_min' => self::QUALITY_LENGTH_MIN, 'quality_length_bonus' => self::QUALITY_LENGTH_BONUS,
+            'quality_video_boost' => self::QUALITY_VIDEO_BOOST, 'quality_hashtag_boost' => self::QUALITY_HASHTAG_BOOST,
+            'quality_mention_boost' => self::QUALITY_MENTION_BOOST,
+            'diversity_enabled' => self::DIVERSITY_ENABLED, 'diversity_max_consecutive' => self::DIVERSITY_MAX_CONSECUTIVE,
+            'diversity_penalty' => self::DIVERSITY_PENALTY,
+            'diversity_type_enabled' => self::DIVERSITY_TYPE_ENABLED, 'diversity_type_max_consecutive' => self::DIVERSITY_TYPE_MAX_CONSECUTIVE,
+            'velocity_enabled' => self::VELOCITY_ENABLED, 'velocity_window_hours' => self::VELOCITY_WINDOW_HOURS,
+            'velocity_threshold' => self::VELOCITY_THRESHOLD, 'velocity_max_boost' => self::VELOCITY_MAX_BOOST, 'velocity_decay_hours' => self::VELOCITY_DECAY_HOURS,
+            'conversation_depth_enabled' => self::CONVERSATION_DEPTH_ENABLED,
+            'conversation_depth_max_boost' => self::CONVERSATION_DEPTH_MAX_BOOST, 'conversation_depth_threshold' => self::CONVERSATION_DEPTH_THRESHOLD,
+            'ctr_enabled' => self::CTR_ENABLED, 'ctr_max_boost' => self::CTR_MAX_BOOST, 'ctr_min_impressions' => self::CTR_MIN_IMPRESSIONS,
+            'user_type_prefs_enabled' => self::USER_TYPE_PREFS_ENABLED, 'user_type_prefs_max_boost' => self::USER_TYPE_PREFS_MAX_BOOST,
+            'user_type_prefs_lookback_days' => self::USER_TYPE_PREFS_LOOKBACK_DAYS,
+            'save_signal_enabled' => self::SAVE_SIGNAL_ENABLED, 'save_signal_max_boost' => self::SAVE_SIGNAL_MAX_BOOST, 'save_signal_min_saves' => self::SAVE_SIGNAL_MIN_SAVES,
         ];
 
         try {
@@ -107,23 +162,21 @@ class FeedRankingService
             if ($configJson) {
                 $configArr = json_decode($configJson, true);
                 if (is_array($configArr) && isset($configArr['feed_algorithm'])) {
-                    $this->config = array_merge($defaults, $configArr['feed_algorithm']);
-                    $this->validateConfig();
-                    return $this->config;
+                    $config = array_merge($defaults, $configArr['feed_algorithm']);
+                    self::validateConfigArray($config);
+                    return $config;
                 }
             }
         } catch (\Exception $e) {
             // Fall through to defaults
         }
 
-        $this->config = $defaults;
-        $this->validateConfig();
-        return $this->config;
+        self::validateConfigArray($defaults);
+        return $defaults;
     }
 
-    private function validateConfig(): void
+    private static function validateConfigArray(array &$c): void
     {
-        $c = &$this->config;
         $c['like_weight'] = max(0, (float) $c['like_weight']);
         $c['comment_weight'] = max(0, (float) $c['comment_weight']);
         $c['share_weight'] = max(0, (float) $c['share_weight']);
@@ -146,13 +199,382 @@ class FeedRankingService
 
     public function isEnabled(): bool
     {
-        return !empty($this->getConfig()['enabled']);
+        return !empty(self::getConfig()['enabled']);
     }
 
     public function clearCache(): void
     {
         $this->config = null;
         $this->mutedUserSet = [];
+    }
+
+    // =========================================================================
+    // PUBLIC STATIC SCORING METHODS (used by tests)
+    // =========================================================================
+
+    /**
+     * Calculate Haversine distance between two coordinate pairs.
+     */
+    public static function calculateHaversineDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earthRadiusKm = 6371;
+        $latDiff = deg2rad($lat2 - $lat1);
+        $lonDiff = deg2rad($lon2 - $lon1);
+        $a = sin($latDiff / 2) * sin($latDiff / 2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($lonDiff / 2) * sin($lonDiff / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadiusKm * $c;
+    }
+
+    /**
+     * Compute geo decay score from a pre-calculated distance in km.
+     */
+    public static function computeGeoDecayFromDistance(float $distanceKm): float
+    {
+        if ($distanceKm <= self::GEO_FULL_SCORE_RADIUS) {
+            return 1.0;
+        }
+
+        $distanceBeyond = $distanceKm - self::GEO_FULL_SCORE_RADIUS;
+        $decayIntervals = floor($distanceBeyond / self::GEO_DECAY_INTERVAL);
+        $totalDecay = $decayIntervals * self::GEO_DECAY_PER_INTERVAL;
+
+        return max(self::GEO_MINIMUM_SCORE, 1.0 - $totalDecay);
+    }
+
+    /**
+     * Calculate geo decay score from viewer/poster coordinates.
+     */
+    public static function calculateGeoDecayScore(?float $viewerLat, ?float $viewerLon, ?float $posterLat, ?float $posterLon): float
+    {
+        if ($viewerLat === null || $viewerLon === null || $posterLat === null || $posterLon === null) {
+            return 1.0;
+        }
+
+        $distanceKm = self::calculateHaversineDistance($viewerLat, $viewerLon, $posterLat, $posterLon);
+        return self::computeGeoDecayFromDistance($distanceKm);
+    }
+
+    /**
+     * Compute vitality score from days since last activity.
+     */
+    public static function computeVitalityFromDays(int $days): float
+    {
+        if ($days <= self::VITALITY_FULL_THRESHOLD) {
+            return 1.0;
+        }
+        if ($days >= self::VITALITY_DECAY_THRESHOLD) {
+            return self::VITALITY_MINIMUM;
+        }
+
+        $decayRange = self::VITALITY_DECAY_THRESHOLD - self::VITALITY_FULL_THRESHOLD;
+        $daysIntoDecay = $days - self::VITALITY_FULL_THRESHOLD;
+        $scoreRange = 1.0 - self::VITALITY_MINIMUM;
+        return 1.0 - ($daysIntoDecay / $decayRange * $scoreRange);
+    }
+
+    /**
+     * Calculate content quality score for a post.
+     */
+    public static function calculateContentQualityScore(array $post): float
+    {
+        $score = 1.0;
+        $content = (string) ($post['content'] ?? '');
+
+        if (!empty($post['image_url'])) {
+            $score *= self::QUALITY_IMAGE_BOOST;
+        }
+        if (preg_match('/https?:\/\//', $content)) {
+            $score *= self::QUALITY_LINK_BOOST;
+        }
+        if (preg_match('/(?:youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com)/i', $content)) {
+            $score *= self::QUALITY_VIDEO_BOOST;
+        }
+        if (strpos($content, '#') !== false) {
+            $score *= self::QUALITY_HASHTAG_BOOST;
+        }
+        if (strpos($content, '@') !== false) {
+            $score *= self::QUALITY_MENTION_BOOST;
+        }
+        if (strlen($content) >= self::QUALITY_LENGTH_MIN) {
+            $score *= self::QUALITY_LENGTH_BONUS;
+        }
+
+        return $score;
+    }
+
+    /**
+     * Calculate engagement score from likes and comments.
+     */
+    public static function calculateEngagementScore(int $likes, int $comments): float
+    {
+        $points = ($likes * self::LIKE_WEIGHT) + ($comments * self::COMMENT_WEIGHT);
+        if ($points <= 0) {
+            return 1.0;
+        }
+        return 1.0 + min(log(1.0 + $points) * 0.3, 2.0);
+    }
+
+    /**
+     * Calculate vitality score for a user.
+     */
+    public static function calculateVitalityScore(int $userId): float
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $rows = DB::select(
+                "SELECT MAX(created_at) AS last_active FROM (
+                    SELECT MAX(created_at) AS created_at FROM activity_log WHERE user_id = ? AND tenant_id = ? AND action IN ('login','post_created','comment_added','like_added')
+                    UNION ALL
+                    SELECT MAX(created_at) AS created_at FROM feed_posts WHERE user_id = ? AND tenant_id = ?
+                ) AS combined",
+                [$userId, $tenantId, $userId, $tenantId]
+            );
+            if (!empty($rows) && $rows[0]->last_active) {
+                $days = self::getDaysSinceDateStatic($rows[0]->last_active);
+                return self::computeVitalityFromDays($days);
+            }
+        } catch (\Exception $e) {
+        }
+        return self::VITALITY_MINIMUM;
+    }
+
+    /**
+     * Calculate freshness score from a datetime string.
+     */
+    public static function calculateFreshnessScore(string $createdAt): float
+    {
+        $hoursAgo = max(0, (time() - strtotime($createdAt)) / 3600);
+        if ($hoursAgo <= self::FRESHNESS_FULL_HOURS) {
+            return 1.0;
+        }
+        return self::hackerNewsDecay((int) round($hoursAgo));
+    }
+
+    /**
+     * Calculate social graph score for viewer-author pair.
+     */
+    public static function calculateSocialGraphScore(int $viewerId, int $authorId): float
+    {
+        if ($viewerId === 0 || $authorId === 0) {
+            return 1.0;
+        }
+        try {
+            $tenantId = TenantContext::getId();
+            $sql = "SELECT SUM(CASE
+                    WHEN va.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 3
+                    WHEN va.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 2
+                    ELSE 1
+                END) AS weighted_interactions FROM (
+                SELECT created_at FROM likes WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+                UNION ALL
+                SELECT created_at FROM comments WHERE user_id=? AND target_type='post' AND tenant_id=? AND created_at>=DATE_SUB(NOW(),INTERVAL ? DAY)
+            ) AS va";
+            $params = [$viewerId, $tenantId, self::SOCIAL_GRAPH_INTERACTION_DAYS, $viewerId, $tenantId, self::SOCIAL_GRAPH_INTERACTION_DAYS];
+            $rows = DB::select($sql, $params);
+            if (!empty($rows) && $rows[0]->weighted_interactions > 0) {
+                $bf = (self::SOCIAL_GRAPH_MAX_BOOST - 1) / 4;
+                return min(self::SOCIAL_GRAPH_MAX_BOOST, 1.0 + (log((float) $rows[0]->weighted_interactions + 1, 2) * $bf));
+            }
+        } catch (\Exception $e) {
+        }
+        return 1.0;
+    }
+
+    /**
+     * Calculate negative signals score for a post.
+     */
+    public static function calculateNegativeSignalsScore(int $viewerId, int $postId): float
+    {
+        if ($viewerId === 0) {
+            return 1.0;
+        }
+        try {
+            $tenantId = TenantContext::getId();
+            $hidden = DB::table('feed_hidden')
+                ->where('user_id', $viewerId)
+                ->where('tenant_id', $tenantId)
+                ->where('post_id', $postId)
+                ->exists();
+            if ($hidden) {
+                return self::HIDE_PENALTY;
+            }
+
+            $reportCount = DB::table('reports')
+                ->where('target_type', 'post')
+                ->where('target_id', $postId)
+                ->where('tenant_id', $tenantId)
+                ->count();
+            if ($reportCount > 0) {
+                return max(0.1, 1.0 - $reportCount * self::REPORT_PENALTY_PER);
+            }
+        } catch (\Exception $e) {
+        }
+        return 1.0;
+    }
+
+    /**
+     * Hacker News-style time decay.
+     */
+    public static function hackerNewsDecay(int $hoursAgo): float
+    {
+        $halfLife = max(1.0, (float) self::FRESHNESS_HALF_LIFE_HOURS);
+        $gravity = 1.0;
+        $decay = 1.0 / pow(1.0 + $hoursAgo / $halfLife, $gravity);
+        return max(self::FRESHNESS_MINIMUM, $decay);
+    }
+
+    /**
+     * Contextual boost based on content type and time of day.
+     */
+    public static function contextualBoost(string $sourceType, ?string $viewerTimezone = null): float
+    {
+        try {
+            $tz = $viewerTimezone ? new \DateTimeZone($viewerTimezone) : new \DateTimeZone('UTC');
+            $now = new \DateTime('now', $tz);
+            $hour = (int) $now->format('G');
+            $dow = (int) $now->format('N');
+        } catch (\Exception $e) {
+            $hour = (int) date('G');
+            $dow = (int) date('N');
+        }
+
+        $isWeekend = $dow >= 6;
+        $isWeekday = !$isWeekend;
+        $isMorning = $hour >= 7 && $hour < 12;
+        $isEvening = $hour >= 19 && $hour < 22;
+
+        return match ($sourceType) {
+            'event' => ($dow === 1 && $isMorning) ? 1.20 : (($dow === 5 && $hour >= 14) ? 1.15 : 1.0),
+            'volunteer' => $isWeekend ? 1.18 : 1.0,
+            'job' => ($isWeekday && $isMorning && $dow <= 3) ? 1.15 : 1.0,
+            'post', 'poll' => $isEvening ? 1.12 : (($hour >= 2 && $hour < 6) ? 0.90 : 1.0),
+            'listing' => ($isWeekend && $isMorning) ? 1.10 : 1.0,
+            default => 1.0,
+        };
+    }
+
+    // =========================================================================
+    // DIVERSITY (Public Static)
+    // =========================================================================
+
+    /**
+     * Apply user-author diversity to feed items.
+     */
+    public static function applyContentDiversity(array $items): array
+    {
+        $maxUser = self::DIVERSITY_MAX_CONSECUTIVE;
+        $result = [];
+        $deferred = [];
+
+        foreach ($items as $item) {
+            $userId = (int) ($item['user_id'] ?? 0);
+            $shouldDefer = false;
+
+            if ($userId > 0) {
+                $c = 0;
+                for ($i = count($result) - 1; $i >= 0 && $i >= count($result) - $maxUser; $i--) {
+                    if ((int) ($result[$i]['user_id'] ?? 0) === $userId) {
+                        $c++;
+                    } else {
+                        break;
+                    }
+                }
+                if ($c >= $maxUser) {
+                    $shouldDefer = true;
+                }
+            }
+
+            if ($shouldDefer) {
+                $deferred[] = $item;
+            } else {
+                $result[] = $item;
+            }
+        }
+
+        foreach ($deferred as $di) {
+            $dUid = (int) ($di['user_id'] ?? 0);
+            $ins = false;
+            for ($i = 0; $i < count($result); $i++) {
+                $ok = true;
+                if ($dUid > 0) {
+                    for ($j = max(0, $i - $maxUser + 1); $j < min(count($result), $i + $maxUser); $j++) {
+                        if ((int) ($result[$j]['user_id'] ?? 0) === $dUid) {
+                            $ok = false;
+                            break;
+                        }
+                    }
+                }
+                if ($ok) {
+                    array_splice($result, $i, 0, [$di]);
+                    $ins = true;
+                    break;
+                }
+            }
+            if (!$ins) {
+                $result[] = $di;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Apply content-type diversity to feed items.
+     */
+    public static function applyContentTypeDiversity(array $items): array
+    {
+        $maxType = self::DIVERSITY_TYPE_MAX_CONSECUTIVE;
+        $result = [];
+        $deferred = [];
+
+        foreach ($items as $item) {
+            $cType = $item['type'] ?? $item['content_type'] ?? 'post';
+            $shouldDefer = false;
+
+            $c = 0;
+            for ($i = count($result) - 1; $i >= 0 && $i >= count($result) - $maxType; $i--) {
+                if (($result[$i]['type'] ?? $result[$i]['content_type'] ?? 'post') === $cType) {
+                    $c++;
+                } else {
+                    break;
+                }
+            }
+            if ($c >= $maxType) {
+                $shouldDefer = true;
+            }
+
+            if ($shouldDefer) {
+                $deferred[] = $item;
+            } else {
+                $result[] = $item;
+            }
+        }
+
+        foreach ($deferred as $di) {
+            $dType = $di['type'] ?? $di['content_type'] ?? 'post';
+            $ins = false;
+            for ($i = 0; $i < count($result); $i++) {
+                $ok = true;
+                for ($j = max(0, $i - $maxType + 1); $j < min(count($result), $i + $maxType); $j++) {
+                    if (($result[$j]['type'] ?? $result[$j]['content_type'] ?? 'post') === $dType) {
+                        $ok = false;
+                        break;
+                    }
+                }
+                if ($ok) {
+                    array_splice($result, $i, 0, [$di]);
+                    $ins = true;
+                    break;
+                }
+            }
+            if (!$ins) {
+                $result[] = $di;
+            }
+        }
+
+        return $result;
     }
 
     // =========================================================================
@@ -221,7 +643,7 @@ class FeedRankingService
             $post = (array) $rows[0];
             $viewerCoords = $this->getUserCoordinates($userId);
 
-            return $this->calculatePostScore($post, $userId, $viewerCoords[0], $viewerCoords[1]);
+            return self::calculatePostScore($post, $userId, $viewerCoords[0], $viewerCoords[1]);
         } catch (\Exception $e) {
             return 0.0;
         }
@@ -233,7 +655,6 @@ class FeedRankingService
     public function boostPost(int $tenantId, int $postId, float $factor = 1.5): bool
     {
         try {
-            // Store boost in a post_boosts table or feed_posts metadata
             DB::statement(
                 "INSERT INTO post_boosts (post_id, tenant_id, boost_factor, created_at)
                  VALUES (?, ?, ?, NOW())
@@ -242,7 +663,6 @@ class FeedRankingService
             );
             return true;
         } catch (\Exception $e) {
-            // post_boosts table may not exist — try updating feed_posts directly
             try {
                 DB::table('feed_posts')
                     ->where('id', $postId)
@@ -268,7 +688,7 @@ class FeedRankingService
             return $items;
         }
 
-        $config = $this->getConfig();
+        $config = self::getConfig();
         $typeWeights = [
             'event' => 1.4, 'challenge' => 1.3, 'poll' => 1.25,
             'volunteer' => 1.2, 'goal' => 1.1, 'post' => 1.0,
@@ -301,7 +721,7 @@ class FeedRankingService
         $reactionScores = !empty($postIds) ? $this->getBatchReactionScores($postIds) : [];
         $negativeScores = ($viewerId && !empty($postIds)) ? $this->getBatchNegativeSignals($viewerId, $postIds, $authorIds) : [];
         $ctrScores = (!empty($config['ctr_enabled']) && !empty($postIds)) ? $this->getBatchClickThroughRates($postIds) : [];
-        $userTypePrefs = (!empty($config['user_type_prefs_enabled']) && $viewerId) ? $this->getUserTypePreferences($viewerId) : [];
+        $userTypePrefs = (!empty($config['user_type_prefs_enabled']) && $viewerId) ? $this->getInstanceUserTypePreferences($viewerId) : [];
         $saveScores = (!empty($config['save_signal_enabled']) && !empty($postIds)) ? $this->getBatchSaveScores($postIds) : [];
 
         foreach ($items as &$item) {
@@ -318,7 +738,7 @@ class FeedRankingService
             $createdAt = $item['created_at'] ?? null;
             if ($createdAt) {
                 $hoursAgo = max(0, (int) round((time() - strtotime($createdAt)) / 3600));
-                $score *= $this->hackerNewsDecay($hoursAgo);
+                $score *= self::hackerNewsDecay($hoursAgo);
             }
 
             // 2. Engagement
@@ -360,21 +780,16 @@ class FeedRankingService
             // 7. Geo Decay
             if ($viewerLat !== null && $authorId && isset($authorCoords[$authorId])) {
                 [$aLat, $aLon] = $authorCoords[$authorId];
-                $score *= $this->calculateGeoDecayScore($viewerLat, $viewerLon, $aLat, $aLon);
+                $score *= self::calculateGeoDecayScore($viewerLat, $viewerLon, $aLat, $aLon);
             }
 
             // 8. Quality
             if ($config['quality_enabled']) {
-                $ic = (string) ($item['content'] ?? '');
-                if (!empty($item['image_url'])) $score *= (float) $config['quality_image_boost'];
-                if (preg_match('/(?:youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com)/i', $ic)) $score *= (float) $config['quality_video_boost'];
-                if (strpos($ic, '#') !== false) $score *= (float) $config['quality_hashtag_boost'];
-                if (strpos($ic, '@') !== false) $score *= (float) $config['quality_mention_boost'];
-                if (strlen($ic) >= $config['quality_length_min']) $score *= (float) $config['quality_length_bonus'];
+                $score *= self::calculateContentQualityScore($item);
             }
 
             // 9. Context Timing
-            $score *= $this->contextualBoost($sourceType, $viewerTimezone);
+            $score *= self::contextualBoost($sourceType, $viewerTimezone);
 
             // 10. Conversation Depth
             if (self::CONVERSATION_DEPTH_ENABLED && isset($conversationDepths[$postId])) {
@@ -516,11 +931,11 @@ class FeedRankingService
             $params = array_merge($userIds, [$tenantId], $userIds, [$tenantId]);
             $rows = DB::select($sql, $params);
             $r = [];
-            $config = $this->getConfig();
             foreach ($rows as $row) {
-                $daysSince = $this->getDaysSinceDate($row->last_active);
-                $r[(int) $row->user_id] = $this->computeVitalityFromDays($daysSince);
+                $daysSince = self::getDaysSinceDateStatic($row->last_active);
+                $r[(int) $row->user_id] = self::computeVitalityFromDays($daysSince);
             }
+            $config = self::getConfig();
             foreach ($userIds as $uid) {
                 if (!isset($r[$uid])) { $r[$uid] = (float) $config['vitality_minimum']; }
             }
@@ -587,7 +1002,7 @@ class FeedRankingService
 
     private function getBatchNegativeSignals(int $viewerId, array $postIds, array $authorIds): array
     {
-        $config = $this->getConfig();
+        $config = self::getConfig();
         if (empty($config['negative_signals_enabled']) || $viewerId === 0) return [];
         $result = [];
         $tenantId = TenantContext::getId();
@@ -639,10 +1054,21 @@ class FeedRankingService
         } catch (\Exception $e) { return []; }
     }
 
-    private function getUserTypePreferences(int $viewerId): array
+    /**
+     * Instance-level user type preferences (used internally by rankFeedItems).
+     */
+    private function getInstanceUserTypePreferences(int $viewerId): array
+    {
+        return self::getUserTypePreferences($viewerId);
+    }
+
+    /**
+     * Get user content type preferences.
+     */
+    public static function getUserTypePreferences(int $viewerId): array
     {
         if ($viewerId === 0) return [];
-        $config = $this->getConfig();
+        $config = self::getConfig();
         $maxBoost = (float) ($config['user_type_prefs_max_boost'] ?? 1.4);
         $lookbackDays = (int) ($config['user_type_prefs_lookback_days'] ?? 30);
         try {
@@ -699,101 +1125,22 @@ class FeedRankingService
     }
 
     // =========================================================================
-    // SCORING HELPERS
+    // SCORING HELPERS (static)
     // =========================================================================
 
-    private function hackerNewsDecay(int $hoursAgo): float
+    /**
+     * Calculate the full post score (used by getEdgeRankScore).
+     */
+    public static function calculatePostScore(array $post, int $viewerId, ?float $viewerLat = null, ?float $viewerLon = null): float
     {
-        $config = $this->getConfig();
-        $halfLife = max(1.0, (float) $config['freshness_half_life']);
-        $gravity = (float) ($config['freshness_gravity'] ?? 1.0);
-        $decay = 1.0 / pow(1.0 + $hoursAgo / $halfLife, $gravity);
-        return max((float) $config['freshness_minimum'], $decay);
-    }
-
-    private function calculateGeoDecayScore(?float $viewerLat, ?float $viewerLon, ?float $posterLat, ?float $posterLon): float
-    {
-        if ($viewerLat === null || $viewerLon === null || $posterLat === null || $posterLon === null) return 1.0;
-
-        $distanceKm = $this->calculateHaversineDistance($viewerLat, $viewerLon, $posterLat, $posterLon);
-        $config = $this->getConfig();
-        $fullRadius = $config['geo_full_radius'];
-
-        if ($distanceKm <= $fullRadius) return 1.0;
-
-        $distanceBeyond = $distanceKm - $fullRadius;
-        $decayIntervals = floor($distanceBeyond / $config['geo_decay_interval']);
-        $totalDecay = $decayIntervals * $config['geo_decay_rate'];
-
-        return max($config['geo_minimum'], 1.0 - $totalDecay);
-    }
-
-    private function calculateHaversineDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
-    {
-        $earthRadiusKm = 6371;
-        $latDiff = deg2rad($lat2 - $lat1);
-        $lonDiff = deg2rad($lon2 - $lon1);
-        $a = sin($latDiff / 2) * sin($latDiff / 2) +
-             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-             sin($lonDiff / 2) * sin($lonDiff / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        return $earthRadiusKm * $c;
-    }
-
-    private function computeVitalityFromDays(int $days): float
-    {
-        $config = $this->getConfig();
-        $fullThreshold = $config['vitality_full_days'];
-        $decayThreshold = $config['vitality_decay_days'];
-        $minimum = $config['vitality_minimum'];
-
-        if ($days <= $fullThreshold) return 1.0;
-        if ($days >= $decayThreshold) return $minimum;
-
-        $decayRange = $decayThreshold - $fullThreshold;
-        $daysIntoDecay = $days - $fullThreshold;
-        $scoreRange = 1.0 - $minimum;
-        return 1.0 - ($daysIntoDecay / $decayRange * $scoreRange);
-    }
-
-    private function contextualBoost(string $sourceType, ?string $viewerTimezone = null): float
-    {
-        try {
-            $tz = $viewerTimezone ? new \DateTimeZone($viewerTimezone) : new \DateTimeZone('UTC');
-            $now = new \DateTime('now', $tz);
-            $hour = (int) $now->format('G');
-            $dow = (int) $now->format('N');
-        } catch (\Exception $e) {
-            $hour = (int) date('G');
-            $dow = (int) date('N');
-        }
-
-        $isWeekend = $dow >= 6;
-        $isWeekday = !$isWeekend;
-        $isMorning = $hour >= 7 && $hour < 12;
-        $isEvening = $hour >= 19 && $hour < 22;
-
-        return match ($sourceType) {
-            'event' => ($dow === 1 && $isMorning) ? 1.20 : (($dow === 5 && $hour >= 14) ? 1.15 : 1.0),
-            'volunteer' => $isWeekend ? 1.18 : 1.0,
-            'job' => ($isWeekday && $isMorning && $dow <= 3) ? 1.15 : 1.0,
-            'post', 'poll' => $isEvening ? 1.12 : (($hour >= 2 && $hour < 6) ? 0.90 : 1.0),
-            'listing' => ($isWeekend && $isMorning) ? 1.10 : 1.0,
-            default => 1.0,
-        };
-    }
-
-    private function calculatePostScore(array $post, int $viewerId, ?float $viewerLat = null, ?float $viewerLon = null): float
-    {
-        $config = $this->getConfig();
-        $postId = (int) ($post['id'] ?? $post['post_id'] ?? 0);
+        $config = self::getConfig();
         $score = 1.0;
 
         // Time Decay
         $createdAt = $post['created_at'] ?? null;
         if ($createdAt) {
             $hoursAgo = max(0, (int) round((time() - strtotime($createdAt)) / 3600));
-            $score *= $this->hackerNewsDecay($hoursAgo);
+            $score *= self::hackerNewsDecay($hoursAgo);
         }
 
         // Engagement
@@ -814,7 +1161,7 @@ class FeedRankingService
         // Geo Decay
         $posterLat = isset($post['author_lat']) ? (float) $post['author_lat'] : null;
         $posterLon = isset($post['author_lon']) ? (float) $post['author_lon'] : null;
-        $score *= $this->calculateGeoDecayScore($viewerLat, $viewerLon, $posterLat, $posterLon);
+        $score *= self::calculateGeoDecayScore($viewerLat, $viewerLon, $posterLat, $posterLon);
 
         return $score;
     }
@@ -876,73 +1223,32 @@ class FeedRankingService
     }
 
     // =========================================================================
-    // DIVERSITY (Post-Sort Processing)
+    // DIVERSITY (Instance-level, used by rankFeedItems)
     // =========================================================================
 
     private function applyDiversityInPlace(array $items): array
     {
-        $config = $this->getConfig();
+        $config = self::getConfig();
         $userDiv = !empty($config['diversity_enabled']);
         $typeDiv = !empty($config['diversity_type_enabled']);
         if (!$userDiv && !$typeDiv) return $items;
 
-        $maxUser = $config['diversity_max_consecutive'] ?? 2;
-        $maxType = $config['diversity_type_max_consecutive'] ?? 3;
-        $result = [];
-        $deferred = [];
-
-        foreach ($items as $item) {
-            $userId = (int) ($item['user_id'] ?? 0);
-            $cType = $item['type'] ?? $item['content_type'] ?? 'post';
-            $shouldDefer = false;
-
-            if ($userDiv && $userId > 0) {
-                $c = 0;
-                for ($i = count($result) - 1; $i >= 0 && $i >= count($result) - $maxUser; $i--) {
-                    if ((int) ($result[$i]['user_id'] ?? 0) === $userId) $c++; else break;
-                }
-                if ($c >= $maxUser) $shouldDefer = true;
-            }
-            if (!$shouldDefer && $typeDiv) {
-                $c = 0;
-                for ($i = count($result) - 1; $i >= 0 && $i >= count($result) - $maxType; $i--) {
-                    if (($result[$i]['type'] ?? $result[$i]['content_type'] ?? 'post') === $cType) $c++; else break;
-                }
-                if ($c >= $maxType) $shouldDefer = true;
-            }
-
-            if ($shouldDefer) $deferred[] = $item; else $result[] = $item;
+        // Use the static methods for the actual diversity logic
+        if ($userDiv) {
+            $items = self::applyContentDiversity($items);
+        }
+        if ($typeDiv) {
+            $items = self::applyContentTypeDiversity($items);
         }
 
-        foreach ($deferred as $di) {
-            $dUid = (int) ($di['user_id'] ?? 0);
-            $dType = $di['type'] ?? $di['content_type'] ?? 'post';
-            $ins = false;
-            for ($i = 0; $i < count($result); $i++) {
-                $ok = true;
-                if ($userDiv && $dUid > 0) {
-                    for ($j = max(0, $i - $maxUser + 1); $j < min(count($result), $i + $maxUser); $j++) {
-                        if ((int) ($result[$j]['user_id'] ?? 0) === $dUid) { $ok = false; break; }
-                    }
-                }
-                if ($ok && $typeDiv) {
-                    for ($j = max(0, $i - $maxType + 1); $j < min(count($result), $i + $maxType); $j++) {
-                        if (($result[$j]['type'] ?? $result[$j]['content_type'] ?? 'post') === $dType) { $ok = false; break; }
-                    }
-                }
-                if ($ok) { array_splice($result, $i, 0, [$di]); $ins = true; break; }
-            }
-            if (!$ins) $result[] = $di;
-        }
-
-        return $result;
+        return $items;
     }
 
     // =========================================================================
     // UTILITY
     // =========================================================================
 
-    private function getDaysSinceDate(string $dateString): int
+    private static function getDaysSinceDateStatic(string $dateString): int
     {
         try {
             $date = new \DateTime($dateString);

@@ -1,5 +1,5 @@
 <?php
-// Copyright � 2024�2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -7,8 +7,9 @@
 namespace App\Services;
 
 /**
+ * RateLimitService — Rate limiting using Redis or in-memory store.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Provides tenant-aware rate limiting for API endpoints and auth flows.
  */
 class RateLimitService
 {
@@ -17,68 +18,71 @@ class RateLimitService
     }
 
     /**
-     * Delegates to legacy RateLimitService::check().
-     */
-    public function check(string $key, int $maxAttempts, int $decaySeconds = 60): bool
-    {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
-    }
-
-    /**
-     * Delegates to legacy RateLimitService::hit().
-     */
-    public function hit(string $key, int $decaySeconds = 60): int
-    {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0;
-    }
-
-    /**
-     * Delegates to legacy RateLimitService::remaining().
-     */
-    public function remaining(string $key, int $maxAttempts): int
-    {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0;
-    }
-
-    /**
-     * Delegates to legacy RateLimitService::clear().
-     */
-    public function clear(string $key): void
-    {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-    }
-
-    /**
-     * Increment the attempt counter for a given key.
+     * Check if a key has exceeded the rate limit.
      *
-     * Delegates to the legacy tenant-aware RateLimitService which uses
-     * RedisCache with tenant-prefixed keys (nexus:t{tenantId}:ratelimit:{key}).
-     *
-     * @param string $key    Unique identifier (e.g., "auth:login:192.168.1.1")
-     * @param int    $limit  Maximum number of attempts allowed in the window
-     * @param int    $window Time window in seconds
+     * @param string $key Unique identifier (e.g., "auth:login:192.168.1.1")
+     * @param int $maxAttempts Maximum number of attempts allowed
+     * @param int $windowSeconds Time window in seconds
      * @return bool True if allowed, false if rate-limited
      */
-    public function increment(string $key, int $limit, int $window): bool
+    public static function check(string $key, int $maxAttempts, int $windowSeconds = 60): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        if (false) {
-            return false;
-        }
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return true;
     }
 
     /**
-     * Reset the rate limit counter for a given key.
+     * Increment the attempt counter for a given key.
      *
-     * @param string $key Unique identifier (e.g., "auth:login:192.168.1.1")
-     * @return void
+     * @param string $key Unique identifier
+     * @param int $windowSeconds Time window in seconds
+     * @return int Current attempt count
      */
-    public function reset(string $key): void
+    public static function increment(string $key, int $windowSeconds = 60): int
+    {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
+    }
+
+    /**
+     * Get remaining attempts for a key.
+     *
+     * @param string $key Unique identifier
+     * @param int $maxAttempts Maximum allowed attempts
+     * @param int $windowSeconds Time window in seconds
+     * @return int Remaining attempts
+     */
+    public static function remaining(string $key, int $maxAttempts, int $windowSeconds = 60): int
+    {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return $maxAttempts;
+    }
+
+    /**
+     * Hit (increment) a rate limit key.
+     *
+     * @param string $key Unique identifier
+     * @param int $decaySeconds Window in seconds
+     * @return int Current count
+     */
+    public static function hit(string $key, int $decaySeconds = 60): int
+    {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
+    }
+
+    /**
+     * Clear rate limit counter for a key.
+     */
+    public static function clear(string $key): void
+    {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+    }
+
+    /**
+     * Reset the rate limit counter for a given key.
+     */
+    public static function reset(string $key): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }

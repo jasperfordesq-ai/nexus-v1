@@ -35,10 +35,10 @@ class LeaderboardService
     /**
      * Get leaderboard data.
      */
-    public function getLeaderboard(int $tenantId, string $period = 'monthly', int $limit = 20): array
+    public static function getLeaderboard(int $tenantId, string $period = 'monthly', int $limit = 20): array
     {
         // Default to credits_earned for backward compatibility
-        return $this->getLeaderboardByType($tenantId, 'credits_earned', $period, $limit);
+        return (new self())->getLeaderboardByType($tenantId, 'credits_earned', $period, $limit);
     }
 
     /**

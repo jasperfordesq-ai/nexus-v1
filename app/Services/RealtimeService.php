@@ -74,4 +74,32 @@ class RealtimeService
     {
         return "private-tenant.{$tenantId}.{$suffix}";
     }
+
+    /**
+     * Broadcast a notification to a user's private channel.
+     */
+    public static function broadcastNotification(int $userId, array $data): bool
+    {
+        try {
+            $service = new self();
+            return $service->broadcast("private-user.{$userId}", 'notification', $data);
+        } catch (\Throwable $e) {
+            Log::error('RealtimeService::broadcastNotification failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Broadcast a message event to a channel.
+     */
+    public static function broadcastMessage(string $channel, array $data): bool
+    {
+        try {
+            $service = new self();
+            return $service->broadcast($channel, 'message', $data);
+        } catch (\Throwable $e) {
+            Log::error('RealtimeService::broadcastMessage failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
 }

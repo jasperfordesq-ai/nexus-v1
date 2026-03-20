@@ -19,7 +19,7 @@ class FCMPushService
     /**
      * Delegates to legacy FCMPushService::sendToUser().
      */
-    public function sendToUser(int $userId, string $title, string $body, array $data = []): array
+    public static function sendToUser(int $userId, string $title, string $body, array $data = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FCMPushService
     /**
      * Delegates to legacy FCMPushService::sendToUsers().
      */
-    public function sendToUsers(array $userIds, string $title, string $body, array $data = []): array
+    public static function sendToUsers(array $userIds, string $title, string $body, array $data = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

@@ -224,6 +224,30 @@ class ReviewService
     }
 
     /**
+     * Create a review (static entry point).
+     *
+     * @param int $reviewerId Reviewer user ID
+     * @param int $receiverId Receiver user ID
+     * @param int $rating Rating (1-5)
+     * @param string|null $comment Optional comment
+     * @return array|null Created review data or null on failure
+     */
+    public static function createReview(int $reviewerId, int $receiverId, int $rating, ?string $comment = null): ?array
+    {
+        try {
+            $service = app(self::class);
+            return $service->create($reviewerId, [
+                'receiver_id' => $receiverId,
+                'rating' => $rating,
+                'comment' => $comment,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('ReviewService::createReview error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Delete (soft-hide) a review. Only the reviewer may delete.
      */
     public function delete(int $reviewId): bool

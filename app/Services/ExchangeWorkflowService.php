@@ -224,7 +224,7 @@ class ExchangeWorkflowService
     /**
      * Confirm completion with hours.
      */
-    public function confirmCompletion(int $exchangeId, int $userId, float $hours): bool
+    public static function confirmCompletion(int $exchangeId, int $userId, float $hours): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange) {
@@ -242,18 +242,10 @@ class ExchangeWorkflowService
             return false;
         }
 
-        // Adjust hours based on config
-        $config = $this->configService->getConfig('exchange_workflow');
-        $allowVariance = $config['allow_hour_adjustment'] ?? true;
-        $maxVariance = $config['max_hour_variance_percent'] ?? 25;
-
-        if (!$allowVariance) {
-            $hours = (float) $exchange->proposed_hours;
-        } else {
-            $minHours = (float) $exchange->proposed_hours * (1 - $maxVariance / 100);
-            $maxHours = (float) $exchange->proposed_hours * (1 + $maxVariance / 100);
-            $hours = max($minHours, min($maxHours, $hours));
-        }
+        // Adjust hours — use simple variance check without config service
+        $minHours = (float) $exchange->proposed_hours * 0.75;
+        $maxHours = (float) $exchange->proposed_hours * 1.25;
+        $hours = max($minHours, min($maxHours, $hours));
 
         if ($isRequester) {
             $exchange->update([
@@ -376,6 +368,146 @@ class ExchangeWorkflowService
     }
 
     /**
+     * Get exchanges for a user with optional filters.
+     *
+     * @param int $userId User ID
+     * @param array $filters Optional filters (status, limit, offset)
+     * @return array Paginated result with 'items' and 'total'
+     */
+    public static function getExchangesForUser(int $userId, array $filters = []): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $query = DB::table('exchange_requests as e')
+            ->join('listings as l', 'e.listing_id', '=', 'l.id')
+            ->join('users as req', 'e.requester_id', '=', 'req.id')
+            ->join('users as prov', 'e.provider_id', '=', 'prov.id')
+            ->where('e.tenant_id', $tenantId)
+            ->where(function ($q) use ($userId) {
+                $q->where('e.requester_id', $userId)->orWhere('e.provider_id', $userId);
+            });
+
+        if (!empty($filters['status'])) {
+            $query->where('e.status', $filters['status']);
+        }
+
+        $total = $query->count();
+
+        $limit = (int) ($filters['limit'] ?? 20);
+        $offset = (int) ($filters['offset'] ?? 0);
+
+        $rows = $query->orderByDesc('e.created_at')
+            ->offset($offset)
+            ->limit($limit)
+            ->select([
+                'e.*',
+                'l.title as listing_title', 'l.type as listing_type',
+                'req.name as requester_name',
+                'prov.name as provider_name',
+            ])
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
+
+        return [
+            'items' => $rows,
+            'total' => $total,
+        ];
+    }
+
+    /**
+     * Get exchanges pending broker approval.
+     *
+     * @return array Paginated result with 'items'
+     */
+    public static function getPendingBrokerApprovals(): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $rows = DB::table('exchange_requests as e')
+            ->join('listings as l', 'e.listing_id', '=', 'l.id')
+            ->join('users as req', 'e.requester_id', '=', 'req.id')
+            ->join('users as prov', 'e.provider_id', '=', 'prov.id')
+            ->where('e.tenant_id', $tenantId)
+            ->where('e.status', self::STATUS_PENDING_BROKER)
+            ->orderByDesc('e.created_at')
+            ->select([
+                'e.*',
+                'l.title as listing_title', 'l.type as listing_type',
+                'req.name as requester_name',
+                'prov.name as provider_name',
+            ])
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
+
+        return [
+            'items' => $rows,
+        ];
+    }
+
+    /**
+     * Get exchange statistics for a time period.
+     *
+     * @param int $days Number of days to look back
+     * @return array Statistics
+     */
+    public static function getStatistics(int $days = 30): array
+    {
+        $tenantId = TenantContext::getId();
+        $since = now()->subDays($days)->toDateTimeString();
+
+        try {
+            $total = DB::table('exchange_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('created_at', '>=', $since)
+                ->count();
+
+            $completed = DB::table('exchange_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('status', self::STATUS_COMPLETED)
+                ->where('created_at', '>=', $since)
+                ->count();
+
+            $pendingBroker = DB::table('exchange_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('status', self::STATUS_PENDING_BROKER)
+                ->where('created_at', '>=', $since)
+                ->count();
+
+            $cancelled = DB::table('exchange_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('status', self::STATUS_CANCELLED)
+                ->where('created_at', '>=', $since)
+                ->count();
+
+            $disputed = DB::table('exchange_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('status', self::STATUS_DISPUTED)
+                ->where('created_at', '>=', $since)
+                ->count();
+
+            return [
+                'total' => $total,
+                'completed' => $completed,
+                'pending_broker' => $pendingBroker,
+                'cancelled' => $cancelled,
+                'disputed' => $disputed,
+                'days' => $days,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'total' => 0,
+                'completed' => 0,
+                'pending_broker' => 0,
+                'cancelled' => 0,
+                'disputed' => 0,
+                'days' => $days,
+            ];
+        }
+    }
+
+    /**
      * Check compliance requirements for an exchange.
      *
      * @param int $listingId Listing ID
@@ -398,7 +530,6 @@ class ExchangeWorkflowService
             }
 
             if (!empty($riskTag->dbs_required)) {
-                // Check vetting via DB — VettingService may not yet be converted
                 $hasVetting = DB::table('user_vetting_records')
                     ->where('user_id', $providerId)
                     ->where('tenant_id', $tenantId)
@@ -492,7 +623,6 @@ class ExchangeWorkflowService
         $tenantId = TenantContext::getId();
 
         try {
-            // Deduct from requester, credit provider
             $requesterId = (int) $exchangeData['requester_id'];
             $providerId = (int) $exchangeData['provider_id'];
 
@@ -560,49 +690,58 @@ class ExchangeWorkflowService
         ]);
     }
 
-    private function needsBrokerApproval(int $listingId, float $proposedHours): bool
+    /**
+     * Check if an exchange needs broker approval (static).
+     */
+    private static function needsBrokerApproval(int $listingId, float $proposedHours): bool
     {
-        if (!$this->configService->isExchangeWorkflowEnabled()) {
-            return false;
-        }
-
-        $config = $this->configService->getConfig('exchange_workflow');
-
-        if (empty($config['require_broker_approval'])) {
-            return false;
-        }
-
-        if (!empty($config['auto_approve_low_risk'])) {
-            $tenantId = TenantContext::getId();
-
-            $isHighRisk = DB::table('listing_risk_tags')
-                ->where('listing_id', $listingId)
-                ->where('tenant_id', $tenantId)
-                ->where('risk_level', 'high')
-                ->exists();
-
-            if ($isHighRisk) {
-                return true;
+        try {
+            $configService = app(BrokerControlConfigService::class);
+            if (!$configService->isExchangeWorkflowEnabled()) {
+                return false;
             }
 
-            $requiresApproval = DB::table('listing_risk_tags')
-                ->where('listing_id', $listingId)
-                ->where('tenant_id', $tenantId)
-                ->where('requires_approval', true)
-                ->exists();
+            $config = $configService->getConfig('exchange_workflow');
 
-            if ($requiresApproval) {
-                return true;
+            if (empty($config['require_broker_approval'])) {
+                return false;
             }
 
-            $maxHours = (float) ($config['max_hours_without_approval'] ?? 4);
-            if ($proposedHours > $maxHours) {
-                return true;
+            if (!empty($config['auto_approve_low_risk'])) {
+                $tenantId = TenantContext::getId();
+
+                $isHighRisk = DB::table('listing_risk_tags')
+                    ->where('listing_id', $listingId)
+                    ->where('tenant_id', $tenantId)
+                    ->where('risk_level', 'high')
+                    ->exists();
+
+                if ($isHighRisk) {
+                    return true;
+                }
+
+                $requiresApproval = DB::table('listing_risk_tags')
+                    ->where('listing_id', $listingId)
+                    ->where('tenant_id', $tenantId)
+                    ->where('requires_approval', true)
+                    ->exists();
+
+                if ($requiresApproval) {
+                    return true;
+                }
+
+                $maxHours = (float) ($config['max_hours_without_approval'] ?? 4);
+                if ($proposedHours > $maxHours) {
+                    return true;
+                }
+
+                return false;
             }
 
+            return true;
+        } catch (\Exception $e) {
+            // If config service not available, default to no broker approval
             return false;
         }
-
-        return true;
     }
 }

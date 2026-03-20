@@ -1,5 +1,5 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright ï¿½ 2024ï¿½2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -12,8 +12,22 @@ namespace App\Services;
  */
 class RankingService
 {
+    public const DEFAULT_SCORE = 1.0;
+    public const EARTH_RADIUS_KM = 6371;
+
     public function __construct()
     {
+    }
+
+    /**
+     * Get shared ranking configuration.
+     */
+    public static function getSharedConfig(): array
+    {
+        return [
+            'default_score' => self::DEFAULT_SCORE,
+            'earth_radius_km' => self::EARTH_RADIUS_KM,
+        ];
     }
 
     /**
