@@ -1169,7 +1169,7 @@ Route::post('/menus/clear-cache', [\App\Http\Controllers\Api\MenuController::cla
 // NOTE: GET /menus, /menus/config, /menus/mobile, /menus/{slug} are public routes (registered above auth group)
 // NOTE: POST /v2/contact is a public route (registered above auth group)
 Route::post('/help/feedback', [\App\Http\Controllers\Api\HelpController::class, 'feedback']);
-Route::get('/groups/{id}/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'apiData'])->middleware('admin');
+Route::get('/groups/{id}/analytics', [\App\Http\Controllers\Api\AdminGroupsController::class, 'apiData'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/recommendations/groups', [\App\Http\Controllers\Api\GroupRecommendController::class, 'index']);
 Route::post('/recommendations/track', [\App\Http\Controllers\Api\GroupRecommendController::class, 'track']);
 Route::get('/recommendations/metrics', [\App\Http\Controllers\Api\GroupRecommendController::class, 'metrics']);
@@ -1193,7 +1193,7 @@ Route::get('/gamification/share', [\App\Http\Controllers\Api\GamificationControl
 Route::get('/gamification/seasons', [\App\Http\Controllers\Api\GamificationController::class, 'getSeasons']);
 Route::get('/gamification/seasons/current', [\App\Http\Controllers\Api\GamificationController::class, 'getCurrentSeason']);
 Route::post('/shop/purchase', [\App\Http\Controllers\Api\GamificationController::class, 'purchaseItem']);
-Route::get('/insights', [\App\Http\Controllers\Api\AdminDashboardController::class, 'apiInsights'])->middleware('admin');
+Route::get('/insights', [\App\Http\Controllers\Api\AdminDashboardController::class, 'apiInsights'])->middleware(['auth:sanctum', 'admin']);
 Route::get('/organizations/{id}/members', [\App\Http\Controllers\Api\OrgWalletController::class, 'apiMembers']);
 Route::get('/organizations/{id}/wallet/balance', [\App\Http\Controllers\Api\OrgWalletController::class, 'apiBalance']);
 Route::post('/feed/hide', [\App\Http\Controllers\Api\FeedController::class, 'hidePost']);
@@ -1208,12 +1208,12 @@ Route::post('/messages/delete', [\App\Http\Controllers\Api\MessagesController::c
 Route::post('/messages/delete-conversation', [\App\Http\Controllers\Api\MessagesController::class, 'deleteConversation']);
 Route::post('/messages/reaction', [\App\Http\Controllers\Api\MessagesController::class, 'toggleReaction']);
 Route::get('/messages/reactions-batch', [\App\Http\Controllers\Api\MessagesController::class, 'getReactionsBatch']);
-Route::get('/admin/users/search', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userSearchApi'])->middleware('admin');
+Route::get('/admin/users/search', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userSearchApi'])->middleware(['auth:sanctum', 'admin']);
 Route::post('/v2/newsletter/unsubscribe', [\App\Http\Controllers\Api\NewsletterController::class, 'unsubscribe']);
 Route::post('/gdpr/consent', [\App\Http\Controllers\Api\GdprController::class, 'updateConsent']);
 Route::post('/gdpr/request', [\App\Http\Controllers\Api\GdprController::class, 'createRequest']);
 Route::post('/gdpr/delete-account', [\App\Http\Controllers\Api\GdprController::class, 'deleteAccount']);
-Route::middleware('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/community-analytics', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'index']);
     Route::get('/v2/admin/community-analytics/export', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'export']);
     Route::get('/v2/admin/community-analytics/geography', [\App\Http\Controllers\Api\AdminCommunityAnalyticsController::class, 'geography']);
@@ -1367,7 +1367,7 @@ Route::get('/v2/groups/{id}/task-stats', [\App\Http\Controllers\Api\IdeationChal
 Route::get('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'listDocuments']);
 Route::post('/v2/groups/{id}/documents', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'uploadDocument']);
 Route::delete('/v2/team-documents/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteDocument']);
-Route::middleware('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/members/inactive', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'inactiveMembers']);
     Route::post('/v2/admin/members/inactive/detect', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'detectInactive']);
     Route::post('/v2/admin/members/inactive/notify', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'markInactiveNotified']);
@@ -1380,13 +1380,13 @@ Route::middleware('admin')->group(function () {
 Route::post('/v2/listings/{id}/renew', [\App\Http\Controllers\Api\ListingsController::class, 'renew']);
 Route::get('/v2/listings/{id}/analytics', [\App\Http\Controllers\Api\ListingsController::class, 'analytics']);
 Route::put('/v2/listings/{id}/tags', [\App\Http\Controllers\Api\ListingsController::class, 'setSkillTags']);
-Route::middleware('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'feature']);
     Route::delete('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'unfeature']);
     Route::post('/v2/admin/listings/{id}/reject', [\App\Http\Controllers\Api\AdminListingsController::class, 'reject']);
 });
 // search saved/trending duplicates removed — registered at lines 345-349
-Route::middleware('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/search/analytics', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchAnalytics']);
     Route::get('/v2/admin/search/trending', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchTrending']);
     Route::get('/v2/admin/search/zero-results', [\App\Http\Controllers\Api\AdminListingsController::class, 'searchZeroResults']);

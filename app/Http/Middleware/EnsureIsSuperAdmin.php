@@ -32,7 +32,7 @@ class EnsureIsSuperAdmin
             ]);
         }
 
-        $isSuperAdmin = $user->is_super_admin || $user->is_god;
+        $isSuperAdmin = $user->is_super_admin || $user->is_tenant_super_admin || $user->is_god;
 
         if (!$isSuperAdmin) {
             return response()->json([
