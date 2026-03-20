@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Helpers\HtmlSanitizer;
+use App\Helpers\HtmlSanitizer;
 
 /**
  * Tests for HtmlSanitizer — security-critical XSS prevention.

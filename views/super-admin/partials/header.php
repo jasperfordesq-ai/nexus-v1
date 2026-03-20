@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 use App\Core\TenantContext;
-use Nexus\Middleware\SuperPanelAccess;
+use App\Middleware\SuperPanelAccess;
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';

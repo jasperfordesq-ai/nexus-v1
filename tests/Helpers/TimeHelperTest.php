@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Helpers;
 
 use Nexus\Tests\TestCase;
-use Nexus\Helpers\TimeHelper;
+use App\Helpers\TimeHelper;
 
 /**
  * TimeHelper Tests

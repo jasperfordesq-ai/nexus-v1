@@ -6,45 +6,190 @@
 
 namespace App\Core;
 
+use Illuminate\Support\Facades\DB;
+
 /**
- * App-namespace wrapper for Nexus\Core\Auth.
- * Delegates all calls to the legacy implementation.
+ * Auth - Core authentication helper.
+ *
+ * Provides authentication utilities for the application.
+ * Works alongside AdminAuth for admin-level access control.
+ *
+ * This is the authoritative implementation; Nexus\Core\Auth delegates here.
  */
 class Auth
 {
-    public static function user(): ?object
+    /**
+     * Get the currently logged-in user.
+     *
+     * @return array|null User data array or null if not logged in
+     */
+    public static function user(): ?array
     {
-        if (!class_exists('\Nexus\Core\Auth')) { return null; }
-        return \Nexus\Core\Auth::user();
+        if (!self::check()) {
+            return null;
+        }
+
+        $userId = (int) $_SESSION['user_id'];
+
+        try {
+            $user = (array) DB::selectOne(
+                "SELECT id, tenant_id, first_name, last_name, name, email, role, status,
+                        avatar_url, profile_type, organization_name, location, latitude, longitude,
+                        phone, is_approved, is_verified, is_admin, is_super_admin, is_god,
+                        is_tenant_super_admin, onboarding_completed, email_verified_at,
+                        totp_enabled, created_at, updated_at, last_active_at
+                 FROM users WHERE id = ? LIMIT 1",
+                [$userId]
+            );
+
+            return !empty($user) ? $user : null;
+        } catch (\Throwable $e) {
+            error_log("Auth::user() error: " . $e->getMessage());
+            return null;
+        }
     }
 
+    /**
+     * Check if user is logged in.
+     */
     public static function check(): bool
     {
-        if (!class_exists('\Nexus\Core\Auth')) { return false; }
-        return \Nexus\Core\Auth::check();
+        return !empty($_SESSION['user_id']);
     }
 
+    /**
+     * Get the current user ID.
+     */
     public static function id(): ?int
     {
-        if (!class_exists('\Nexus\Core\Auth')) { return null; }
-        return \Nexus\Core\Auth::id();
+        return self::check() ? (int) $_SESSION['user_id'] : null;
     }
 
-    public static function isAdmin(): bool
+    /**
+     * Require user to be logged in, redirect to login if not.
+     *
+     * @param bool $jsonResponse Return JSON error instead of redirect
+     * @return array User data
+     */
+    public static function require(bool $jsonResponse = false): array
     {
-        if (!class_exists('\Nexus\Core\Auth')) { return false; }
-        return \Nexus\Core\Auth::isAdmin();
+        if (!self::check()) {
+            if ($jsonResponse) {
+                header('Content-Type: application/json');
+                http_response_code(401);
+                echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+                exit;
+            }
+            header('Location: ' . TenantContext::getBasePath() . '/login');
+            exit;
+        }
+
+        $user = self::user();
+        if (!$user) {
+            // Session exists but user not found in DB
+            self::logout();
+            if ($jsonResponse) {
+                header('Content-Type: application/json');
+                http_response_code(401);
+                echo json_encode(['success' => false, 'error' => 'Session expired']);
+                exit;
+            }
+            header('Location: ' . TenantContext::getBasePath() . '/login');
+            exit;
+        }
+
+        return $user;
     }
 
-    public static function isSuperAdmin(): bool
+    /**
+     * Require admin access.
+     *
+     * @param bool $jsonResponse Return JSON error instead of redirect
+     * @return array User data
+     */
+    public static function requireAdmin(bool $jsonResponse = false): array
     {
-        if (!class_exists('\Nexus\Core\Auth')) { return false; }
-        return \Nexus\Core\Auth::isSuperAdmin();
+        $user = self::require($jsonResponse);
+
+        if (!self::isAdmin($user)) {
+            if ($jsonResponse) {
+                header('Content-Type: application/json');
+                http_response_code(403);
+                echo json_encode(['success' => false, 'error' => 'Access denied']);
+                exit;
+            }
+            http_response_code(403);
+            echo "<h1>403 Forbidden</h1><p>Admin access required.</p>";
+            exit;
+        }
+
+        return $user;
     }
 
-    public static function authenticate(): void
+    /**
+     * Check if user has admin privileges.
+     *
+     * @param array|null $user User data (uses current user if null)
+     */
+    public static function isAdmin(?array $user = null): bool
     {
-        if (!class_exists('\Nexus\Core\Auth')) { return; }
-        \Nexus\Core\Auth::authenticate();
+        if ($user === null) {
+            $user = self::user();
+        }
+
+        if (!$user) {
+            return false;
+        }
+
+        // Check god mode
+        if (!empty($_SESSION['is_god']) || !empty($user['is_god'])) {
+            return true;
+        }
+
+        // Check super admin (global or tenant-scoped)
+        if (!empty($_SESSION['is_super_admin']) || !empty($user['is_super_admin'])
+            || !empty($_SESSION['is_tenant_super_admin']) || !empty($user['is_tenant_super_admin'])) {
+            return true;
+        }
+
+        // Check role
+        $role = $user['role'] ?? $_SESSION['user_role'] ?? '';
+        return in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_admin']);
+    }
+
+    /**
+     * Validate CSRF token.
+     *
+     * @param string|null $token Token to validate
+     */
+    public static function validateCsrf(?string $token = null): bool
+    {
+        return Csrf::verify($token);
+    }
+
+    /**
+     * Log the user out.
+     */
+    public static function logout(): void
+    {
+        unset(
+            $_SESSION['user_id'],
+            $_SESSION['user_role'],
+            $_SESSION['is_admin'],
+            $_SESSION['is_super_admin'],
+            $_SESSION['is_god']
+        );
+    }
+
+    /**
+     * Get the user's role.
+     */
+    public static function role(): ?string
+    {
+        if (!self::check()) {
+            return null;
+        }
+
+        return $_SESSION['user_role'] ?? null;
     }
 }

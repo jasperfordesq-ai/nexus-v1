@@ -616,7 +616,7 @@ class AdminSuperServiceTest extends DatabaseTestCase
     private function setUpSuperAdminSession(): void
     {
         // Reset cached access from prior tests
-        \Nexus\Middleware\SuperPanelAccess::reset();
+        \App\Middleware\SuperPanelAccess::reset();
 
         // Ensure the test user has is_super_admin flag
         Database::query(
@@ -671,7 +671,7 @@ class AdminSuperServiceTest extends DatabaseTestCase
 
         // Clean up session and cached access
         unset($_SESSION['user_id'], $_SESSION['is_super_admin']);
-        \Nexus\Middleware\SuperPanelAccess::reset();
+        \App\Middleware\SuperPanelAccess::reset();
 
         parent::tearDown();
     }

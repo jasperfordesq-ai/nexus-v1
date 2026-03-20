@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Middleware;
 
 use Nexus\Tests\TestCase;
-use Nexus\Middleware\FederationApiMiddleware;
+use App\Middleware\FederationApiMiddleware;
 use ReflectionClass;
 use ReflectionMethod;
 

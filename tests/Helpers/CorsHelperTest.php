@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Helpers;
 
 use Nexus\Tests\TestCase;
-use Nexus\Helpers\CorsHelper;
+use App\Helpers\CorsHelper;
 
 /**
  * CorsHelper Tests

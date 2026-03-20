@@ -7,199 +7,59 @@
 namespace Nexus\Core;
 
 /**
- * Auth - Core authentication helper
+ * Thin delegate — forwards all calls to \App\Core\Auth which
+ * holds the real implementation.
  *
- * Provides authentication utilities for the application.
- * Works alongside AdminAuth for admin-level access control.
- */
-/**
- *  Use AppCoreAuth instead. This class is maintained for backward compatibility only.
- */
-/**
- * @deprecated Use AppCoreAuth instead. Maintained for backward compatibility.
+ * This class is kept for backward compatibility: legacy Nexus\ namespace
+ * code references it. The public API is identical.
+ *
+ * @see \App\Core\Auth  The authoritative implementation.
+ * @deprecated Use \App\Core\Auth instead.
  */
 class Auth
 {
-    /**
-     * Get the currently logged-in user
-     *
-     * @return array|null User data array or null if not logged in
-     */
     public static function user(): ?array
     {
-        if (!self::check()) {
-            return null;
-        }
-
-        $userId = (int) $_SESSION['user_id'];
-
-        try {
-            $user = Database::query(
-                "SELECT id, tenant_id, first_name, last_name, name, email, role, status,
-                        avatar_url, profile_type, organization_name, location, latitude, longitude,
-                        phone, is_approved, is_verified, is_admin, is_super_admin, is_god,
-                        is_tenant_super_admin, onboarding_completed, email_verified_at,
-                        totp_enabled, created_at, updated_at, last_active_at
-                 FROM users WHERE id = ? LIMIT 1",
-                [$userId]
-            )->fetch();
-
-            return $user ?: null;
-        } catch (\Throwable $e) {
-            error_log("Auth::user() error: " . $e->getMessage());
-            return null;
-        }
+        return \App\Core\Auth::user();
     }
 
-    /**
-     * Check if user is logged in
-     *
-     * @return bool
-     */
     public static function check(): bool
     {
-        return !empty($_SESSION['user_id']);
+        return \App\Core\Auth::check();
     }
 
-    /**
-     * Get the current user ID
-     *
-     * @return int|null
-     */
     public static function id(): ?int
     {
-        return self::check() ? (int) $_SESSION['user_id'] : null;
+        return \App\Core\Auth::id();
     }
 
-    /**
-     * Require user to be logged in, redirect to login if not
-     *
-     * @param bool $jsonResponse Return JSON error instead of redirect
-     * @return array User data
-     */
     public static function require(bool $jsonResponse = false): array
     {
-        if (!self::check()) {
-            if ($jsonResponse) {
-                header('Content-Type: application/json');
-                http_response_code(401);
-                echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-                exit;
-            }
-            header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
-        }
-
-        $user = self::user();
-        if (!$user) {
-            // Session exists but user not found in DB
-            self::logout();
-            if ($jsonResponse) {
-                header('Content-Type: application/json');
-                http_response_code(401);
-                echo json_encode(['success' => false, 'error' => 'Session expired']);
-                exit;
-            }
-            header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
-        }
-
-        return $user;
+        return \App\Core\Auth::require($jsonResponse);
     }
 
-    /**
-     * Require admin access
-     *
-     * @param bool $jsonResponse Return JSON error instead of redirect
-     * @return array User data
-     */
     public static function requireAdmin(bool $jsonResponse = false): array
     {
-        $user = self::require($jsonResponse);
-
-        if (!self::isAdmin($user)) {
-            if ($jsonResponse) {
-                header('Content-Type: application/json');
-                http_response_code(403);
-                echo json_encode(['success' => false, 'error' => 'Access denied']);
-                exit;
-            }
-            http_response_code(403);
-            echo "<h1>403 Forbidden</h1><p>Admin access required.</p>";
-            exit;
-        }
-
-        return $user;
+        return \App\Core\Auth::requireAdmin($jsonResponse);
     }
 
-    /**
-     * Check if user has admin privileges
-     *
-     * @param array|null $user User data (uses current user if null)
-     * @return bool
-     */
     public static function isAdmin(?array $user = null): bool
     {
-        if ($user === null) {
-            $user = self::user();
-        }
-
-        if (!$user) {
-            return false;
-        }
-
-        // Check god mode
-        if (!empty($_SESSION['is_god']) || !empty($user['is_god'])) {
-            return true;
-        }
-
-        // Check super admin (global or tenant-scoped)
-        if (!empty($_SESSION['is_super_admin']) || !empty($user['is_super_admin'])
-            || !empty($_SESSION['is_tenant_super_admin']) || !empty($user['is_tenant_super_admin'])) {
-            return true;
-        }
-
-        // Check role
-        $role = $user['role'] ?? $_SESSION['user_role'] ?? '';
-        return in_array($role, ['admin', 'tenant_admin']) || !empty($_SESSION['is_admin']);
+        return \App\Core\Auth::isAdmin($user);
     }
 
-    /**
-     * Validate CSRF token
-     *
-     * @param string|null $token Token to validate
-     * @return bool
-     */
     public static function validateCsrf(?string $token = null): bool
     {
-        return Csrf::verify($token);
+        return \App\Core\Auth::validateCsrf($token);
     }
 
-    /**
-     * Log the user out
-     */
     public static function logout(): void
     {
-        unset(
-            $_SESSION['user_id'],
-            $_SESSION['user_role'],
-            $_SESSION['is_admin'],
-            $_SESSION['is_super_admin'],
-            $_SESSION['is_god']
-        );
+        \App\Core\Auth::logout();
     }
 
-    /**
-     * Get the user's role
-     *
-     * @return string|null
-     */
     public static function role(): ?string
     {
-        if (!self::check()) {
-            return null;
-        }
-
-        return $_SESSION['user_role'] ?? null;
+        return \App\Core\Auth::role();
     }
 }

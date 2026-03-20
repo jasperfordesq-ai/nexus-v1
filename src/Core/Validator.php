@@ -7,21 +7,29 @@
 namespace Nexus\Core;
 
 /**
- *  Use AppCoreValidator instead. This class is maintained for backward compatibility only.
- */
-/**
- * @deprecated Use AppCoreValidator instead. Maintained for backward compatibility.
+ * Thin delegate — forwards all calls to \App\Core\Validator which
+ * holds the real implementation.
+ *
+ * This class is kept for backward compatibility: legacy Nexus\ namespace
+ * code references it. The public API is identical.
+ *
+ * @see \App\Core\Validator  The authoritative implementation.
+ * @deprecated Use \App\Core\Validator instead.
  */
 class Validator
 {
-    /**
-     * Validate a phone number in any international format.
-     * Accepts E.164 and common local formats (7–15 digits after stripping formatting).
-     */
     public static function isPhone(string $phone): bool
     {
-        $clean = preg_replace('/[\s\-\(\)\.]/', '', $phone);
-        return (bool) preg_match('/^\+?\d{7,15}$/', $clean);
+        return \App\Core\Validator::isPhone($phone);
     }
 
+    public static function isEmail(string $email): bool
+    {
+        return \App\Core\Validator::isEmail($email);
+    }
+
+    public static function isUrl(string $url): bool
+    {
+        return \App\Core\Validator::isUrl($url);
+    }
 }

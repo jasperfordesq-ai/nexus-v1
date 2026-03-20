@@ -7,65 +7,24 @@
 namespace Nexus\Core;
 
 /**
- *  Use AppCorenv instead. This class is maintained for backward compatibility only.
- */
-/**
- * @deprecated Use AppCorenv instead. Maintained for backward compatibility.
+ * Thin delegate — forwards all calls to \App\Core\Env which
+ * holds the real implementation.
+ *
+ * This class is kept for backward compatibility: legacy Nexus\ namespace
+ * code references it. The public API is identical.
+ *
+ * @see \App\Core\Env  The authoritative implementation.
+ * @deprecated Use \App\Core\Env instead.
  */
 class Env
 {
-    private static $path;
-
-    public static function load($path)
+    public static function load($path): void
     {
-        if (!file_exists($path)) {
-            return;
-        }
-
-        self::$path = $path;
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-        foreach ($lines as $line) {
-            if (strpos(trim($line), '#') === 0) {
-                continue;
-            }
-
-            list($name, $value) = explode('=', $line, 2);
-            $name = trim($name);
-            $value = trim($value);
-
-            // Remove quotes if present
-            if (strlen($value) > 1 && $value[0] === '"' && $value[strlen($value) - 1] === '"') {
-                $value = substr($value, 1, -1);
-            }
-
-            if (!array_key_exists($name, $_SERVER) && !array_key_exists($name, $_ENV)) {
-                putenv(sprintf('%s=%s', $name, $value));
-                $_ENV[$name] = $value;
-                $_SERVER[$name] = $value;
-            }
-        }
+        \App\Core\Env::load($path);
     }
 
     public static function get($key, $default = null)
     {
-        // Check multiple sources in order of priority
-        // 1. Check $_ENV (most reliable across platforms)
-        if (isset($_ENV[$key])) {
-            return $_ENV[$key];
-        }
-
-        // 2. Check $_SERVER (often populated by web servers)
-        if (isset($_SERVER[$key])) {
-            return $_SERVER[$key];
-        }
-
-        // 3. Check getenv() (system environment variables)
-        $value = getenv($key);
-        if ($value !== false) {
-            return $value;
-        }
-
-        return $default;
+        return \App\Core\Env::get($key, $default);
     }
 }

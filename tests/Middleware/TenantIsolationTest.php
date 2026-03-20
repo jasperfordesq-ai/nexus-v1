@@ -10,7 +10,7 @@ namespace Nexus\Tests\Middleware;
 
 use Nexus\Tests\TestCase;
 use App\Core\ApiErrorCodes;
-use Nexus\Middleware\SuperPanelAccess;
+use App\Middleware\SuperPanelAccess;
 use ReflectionClass;
 use ReflectionMethod;
 
