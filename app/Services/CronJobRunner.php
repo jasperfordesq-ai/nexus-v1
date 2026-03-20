@@ -7,32 +7,32 @@
 namespace App\Services;
 
 use Nexus\Core\Database;
-use Nexus\Core\Mailer;
-use Nexus\Core\Env;
-use Nexus\Core\TenantContext;
-use Nexus\Models\User;
-use Nexus\Services\NewsletterService;
-use Nexus\Services\MatchingService;
-use Nexus\Services\NotificationDispatcher;
-use Nexus\Services\GeocodingService;
-use Nexus\Services\FederationEmailService;
-use Nexus\Services\GamificationService;
-use Nexus\Services\GamificationEmailService;
-use Nexus\Services\AchievementCampaignService;
-use Nexus\Services\DailyRewardService;
-use Nexus\Services\ChallengeService;
-use Nexus\Services\AbuseDetectionService;
-use Nexus\Services\GroupReportingService;
-use Nexus\Services\BalanceAlertService;
-use Nexus\Services\SmartMatchingEngine;
-use Nexus\Services\BrokerMessageVisibilityService;
-use Nexus\Services\GoalReminderService;
-use Nexus\Services\InactiveMemberService;
-use Nexus\Services\EventReminderService;
-use Nexus\Services\ListingExpiryService;
-use Nexus\Services\ListingExpiryReminderService;
-use Nexus\Services\JobVacancyService;
-use Nexus\Services\RecurringShiftService;
+use App\Core\Mailer;
+use App\Core\Env;
+use App\Core\TenantContext;
+use App\Models\User;
+use App\Services\NewsletterService;
+use App\Services\MatchingService;
+use App\Services\NotificationDispatcher;
+use App\Services\GeocodingService;
+use App\Services\FederationEmailService;
+use App\Services\GamificationService;
+use App\Services\GamificationEmailService;
+use App\Services\AchievementCampaignService;
+use App\Services\DailyRewardService;
+use App\Services\ChallengeService;
+use App\Services\AbuseDetectionService;
+use App\Services\GroupReportingService;
+use App\Services\BalanceAlertService;
+use App\Services\SmartMatchingEngine;
+use App\Services\BrokerMessageVisibilityService;
+use App\Services\GoalReminderService;
+use App\Services\InactiveMemberService;
+use App\Services\EventReminderService;
+use App\Services\ListingExpiryService;
+use App\Services\ListingExpiryReminderService;
+use App\Services\JobVacancyService;
+use App\Services\RecurringShiftService;
 
 /**
  * CronJobRunner — relocated from Nexus\Controllers\CronController.
@@ -533,9 +533,9 @@ class CronJobRunner
             $pending = Database::query($sql)->fetchAll();
 
             foreach ($pending as $row) {
-                $newsletter = \Nexus\Models\Newsletter::findById($row['newsletter_id']);
+                $newsletter = \App\Models\Newsletter::findById($row['newsletter_id']);
                 if ($newsletter && $newsletter['status'] === 'sending') {
-                    \Nexus\Core\TenantContext::setById($newsletter['tenant_id']);
+                    \App\Core\TenantContext::setById($newsletter['tenant_id']);
 
                     // Process ALL pending items for this newsletter (loop until done)
                     // Use smaller batches and pauses to avoid overwhelming the server
@@ -553,7 +553,7 @@ class CronJobRunner
                         $batchCount++;
 
                         // Check if there are more pending
-                        $stats = \Nexus\Models\Newsletter::getQueueStats($row['newsletter_id']);
+                        $stats = \App\Models\Newsletter::getQueueStats($row['newsletter_id']);
                         $morePending = ($stats['pending'] ?? 0) > 0;
 
                         if ($batchSent > 0) {
@@ -1010,9 +1010,9 @@ class CronJobRunner
         }
 
         foreach ($pending as $row) {
-            $newsletter = \Nexus\Models\Newsletter::findById($row['newsletter_id']);
+            $newsletter = \App\Models\Newsletter::findById($row['newsletter_id']);
             if ($newsletter && $newsletter['status'] === 'sending') {
-                \Nexus\Core\TenantContext::setById($newsletter['tenant_id']);
+                \App\Core\TenantContext::setById($newsletter['tenant_id']);
 
                 // Process ALL pending items for this newsletter
                 // Smaller batches with pauses for stability
@@ -1027,7 +1027,7 @@ class CronJobRunner
                     $newsletterSent += $batchSent;
                     $newsletterFailed += $batchFailed;
 
-                    $stats = \Nexus\Models\Newsletter::getQueueStats($row['newsletter_id']);
+                    $stats = \App\Models\Newsletter::getQueueStats($row['newsletter_id']);
                     $morePending = ($stats['pending'] ?? 0) > 0;
 
                     // Pause between batches to prevent server overload
@@ -1318,7 +1318,7 @@ class CronJobRunner
 
                     // Calculate match score using the engine
                     $userData = User::findById($user['user_id']);
-                    $matchResult = \Nexus\Services\SmartMatchingEngine::calculateMatchScore(
+                    $matchResult = \App\Services\SmartMatchingEngine::calculateMatchScore(
                         $userData,
                         $userListings,
                         $userListings[0], // Use first listing as reference
@@ -2195,7 +2195,7 @@ class CronJobRunner
     {
         $this->checkAccess();
         try {
-            $sent = \Nexus\Services\Identity\RegistrationOrchestrationService::sendVerificationReminders();
+            $sent = \App\Services\Identity\RegistrationOrchestrationService::sendVerificationReminders();
             echo json_encode(['success' => true, 'reminders_sent' => $sent]);
         } catch (\Throwable $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
@@ -2210,7 +2210,7 @@ class CronJobRunner
     {
         $this->checkAccess();
         try {
-            $expired = \Nexus\Services\Identity\RegistrationOrchestrationService::expireAbandonedSessions();
+            $expired = \App\Services\Identity\RegistrationOrchestrationService::expireAbandonedSessions();
             echo json_encode(['success' => true, 'sessions_expired' => $expired]);
         } catch (\Throwable $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
@@ -2225,7 +2225,7 @@ class CronJobRunner
     {
         $this->checkAccess();
         try {
-            $purged = \Nexus\Services\Identity\RegistrationOrchestrationService::purgeOldSessions(180);
+            $purged = \App\Services\Identity\RegistrationOrchestrationService::purgeOldSessions(180);
             echo json_encode(['success' => true, 'sessions_purged' => $purged]);
         } catch (\Throwable $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
@@ -2242,7 +2242,7 @@ class CronJobRunner
         $this->checkAccess();
         $this->startJob('volunteer_pre_shift_reminders');
         try {
-            $sent = \Nexus\Services\VolunteerReminderService::sendPreShiftReminders();
+            $sent = \App\Services\VolunteerReminderService::sendPreShiftReminders();
             $this->logJob('success', "Sent {$sent} pre-shift reminders");
             echo json_encode(['success' => true, 'reminders_sent' => $sent]);
         } catch (\Throwable $e) {
@@ -2259,7 +2259,7 @@ class CronJobRunner
         $this->checkAccess();
         $this->startJob('volunteer_post_shift_feedback');
         try {
-            $sent = \Nexus\Services\VolunteerReminderService::sendPostShiftFeedback();
+            $sent = \App\Services\VolunteerReminderService::sendPostShiftFeedback();
             $this->logJob('success', "Sent {$sent} feedback requests");
             echo json_encode(['success' => true, 'feedback_sent' => $sent]);
         } catch (\Throwable $e) {
@@ -2276,7 +2276,7 @@ class CronJobRunner
         $this->checkAccess();
         $this->startJob('volunteer_lapsed_nudge');
         try {
-            $sent = \Nexus\Services\VolunteerReminderService::nudgeLapsedVolunteers();
+            $sent = \App\Services\VolunteerReminderService::nudgeLapsedVolunteers();
             $this->logJob('success', "Nudged {$sent} lapsed volunteers");
             echo json_encode(['success' => true, 'nudges_sent' => $sent]);
         } catch (\Throwable $e) {
@@ -2293,8 +2293,8 @@ class CronJobRunner
         $this->checkAccess();
         $this->startJob('volunteer_expiry_warnings');
         try {
-            $credentials = \Nexus\Services\VolunteerReminderService::sendCredentialExpiryWarnings();
-            $training = \Nexus\Services\VolunteerReminderService::sendTrainingExpiryWarnings();
+            $credentials = \App\Services\VolunteerReminderService::sendCredentialExpiryWarnings();
+            $training = \App\Services\VolunteerReminderService::sendTrainingExpiryWarnings();
             $total = $credentials + $training;
             $this->logJob('success', "Sent {$total} expiry warnings (creds: {$credentials}, training: {$training})");
             echo json_encode(['success' => true, 'credential_warnings' => $credentials, 'training_warnings' => $training]);
@@ -2312,7 +2312,7 @@ class CronJobRunner
         $this->checkAccess();
         $this->startJob('volunteer_expire_consents');
         try {
-            $expired = \Nexus\Services\GuardianConsentService::expireOldConsents();
+            $expired = \App\Services\GuardianConsentService::expireOldConsents();
             $this->logJob('success', "Expired {$expired} consents");
             echo json_encode(['success' => true, 'consents_expired' => $expired]);
         } catch (\Throwable $e) {
@@ -2331,7 +2331,7 @@ class CronJobRunner
         $this->checkAccess();
         $this->startJob('retry_failed_webhooks');
         try {
-            $retried = \Nexus\Services\WebhookDispatchService::retryFailed();
+            $retried = \App\Services\WebhookDispatchService::retryFailed();
             $this->logJob('success', "Retried {$retried} failed webhooks");
             echo json_encode(['success' => true, 'webhooks_retried' => $retried]);
         } catch (\Throwable $e) {
@@ -2346,7 +2346,7 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $sent = \Nexus\Services\VolunteerReminderService::sendPreShiftReminders();
+                $sent = \App\Services\VolunteerReminderService::sendPreShiftReminders();
                 if ($sent > 0) {
                     echo "   [{$slug}] Pre-shift reminders: {$sent} sent.\n";
                 }
@@ -2360,7 +2360,7 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $sent = \Nexus\Services\VolunteerReminderService::sendPostShiftFeedback();
+                $sent = \App\Services\VolunteerReminderService::sendPostShiftFeedback();
                 if ($sent > 0) {
                     echo "   [{$slug}] Post-shift feedback: {$sent} sent.\n";
                 }
@@ -2374,7 +2374,7 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $sent = \Nexus\Services\VolunteerReminderService::nudgeLapsedVolunteers();
+                $sent = \App\Services\VolunteerReminderService::nudgeLapsedVolunteers();
                 if ($sent > 0) {
                     echo "   [{$slug}] Lapsed nudges: {$sent} sent.\n";
                 }
@@ -2388,8 +2388,8 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $creds = \Nexus\Services\VolunteerReminderService::sendCredentialExpiryWarnings();
-                $train = \Nexus\Services\VolunteerReminderService::sendTrainingExpiryWarnings();
+                $creds = \App\Services\VolunteerReminderService::sendCredentialExpiryWarnings();
+                $train = \App\Services\VolunteerReminderService::sendTrainingExpiryWarnings();
                 $total = $creds + $train;
                 if ($total > 0) {
                     echo "   [{$slug}] Expiry warnings: {$total} sent (creds: {$creds}, training: {$train}).\n";
@@ -2404,7 +2404,7 @@ class CronJobRunner
     {
         // Guardian consent expiry is not tenant-scoped (runs across all tenants in one query)
         try {
-            $expired = \Nexus\Services\GuardianConsentService::expireOldConsents();
+            $expired = \App\Services\GuardianConsentService::expireOldConsents();
             if ($expired > 0) {
                 echo "   Expired {$expired} guardian consents.\n";
             }
@@ -2417,7 +2417,7 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $retried = \Nexus\Services\WebhookDispatchService::retryFailed();
+                $retried = \App\Services\WebhookDispatchService::retryFailed();
                 if ($retried > 0) {
                     echo "   [{$slug}] Webhook retries: {$retried}.\n";
                 }
