@@ -27,8 +27,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
             $runner->runAll();
         })
             ->everyMinute()
-            ->withoutOverlapping(10)
             ->name('nexus:run-all')
+            ->withoutOverlapping(10)
             ->runInBackground();
     })
     ->withRouting(
