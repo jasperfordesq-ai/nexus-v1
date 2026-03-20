@@ -366,7 +366,7 @@ class WebAuthnController extends BaseApiController
         );
 
         if ($webauthnUser) {
-            $gateBlock = $this->tenantSettingsService->checkLoginGates((array)$webauthnUser);
+            $gateBlock = TenantSettingsService::checkLoginGatesForUser((array)$webauthnUser);
             if ($gateBlock) {
                 return $this->respondWithError($gateBlock['code'], $gateBlock['message'], null, 403);
             }
