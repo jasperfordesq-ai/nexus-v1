@@ -50,11 +50,14 @@ class FeedController extends BaseApiController
         if ($this->query('cursor')) {
             $filters['cursor'] = $this->query('cursor');
         }
-        if ($userId !== null) {
-            $filters['current_user_id'] = $userId;
+        if ($this->query('user_id')) {
+            $filters['user_id'] = $this->query('user_id');
+        }
+        if ($this->query('group_id')) {
+            $filters['group_id'] = $this->query('group_id');
         }
 
-        $result = $this->feedService->getFeed($filters);
+        $result = $this->feedService->getFeed($userId, $filters);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -85,7 +88,14 @@ class FeedController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('feed_like', 60, 60);
 
-        $result = $this->feedService->toggleLike($userId, $this->getAllInput());
+        $input = $this->getAllInput();
+        $postId = (int) ($input['post_id'] ?? $input['target_id'] ?? 0);
+
+        if ($postId <= 0) {
+            return $this->respondWithError('INVALID_INPUT', 'Invalid post ID');
+        }
+
+        $result = $this->feedService->like($postId, $userId);
 
         return $this->respondWithData($result);
     }

@@ -343,38 +343,38 @@ class FeedServiceTest extends DatabaseTestCase
     // likePost Tests
     // ==========================================
 
-    public function testToggleLikeReturnsArrayForValidPost(): void
+    public function testLikeReturnsArrayForValidPost(): void
     {
         if (!self::$testPostId) {
             $this->markTestSkipped('Test post not available');
         }
 
-        // toggleLike(userId, targetType, targetId) returns array with action/likes_count
-        $result = self::svc()->toggleLike(self::$testUser2Id, 'post', self::$testPostId);
+        // like(postId, userId) returns array with liked/likes_count
+        $result = self::svc()->like(self::$testPostId, self::$testUser2Id);
 
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('action', $result);
+        $this->assertArrayHasKey('liked', $result);
         $this->assertArrayHasKey('likes_count', $result);
-        $this->assertEquals('liked', $result['action']);
+        $this->assertTrue($result['liked']);
 
         // Cleanup
         Database::query("DELETE FROM likes WHERE target_type = 'post' AND target_id = ? AND user_id = ?", [self::$testPostId, self::$testUser2Id]);
     }
 
-    public function testToggleLikeUnlikesWhenAlreadyLiked(): void
+    public function testLikeUnlikesWhenAlreadyLiked(): void
     {
         if (!self::$testPostId) {
             $this->markTestSkipped('Test post not available');
         }
 
         // Like once
-        self::svc()->toggleLike(self::$testUser2Id, 'post', self::$testPostId);
+        self::svc()->like(self::$testPostId, self::$testUser2Id);
 
         // Toggle again (unlike)
-        $result = self::svc()->toggleLike(self::$testUser2Id, 'post', self::$testPostId);
+        $result = self::svc()->like(self::$testPostId, self::$testUser2Id);
 
         $this->assertIsArray($result);
-        $this->assertEquals('unliked', $result['action']);
+        $this->assertFalse($result['liked']);
 
         // Cleanup
         Database::query("DELETE FROM likes WHERE target_type = 'post' AND target_id = ? AND user_id = ?", [self::$testPostId, self::$testUser2Id]);

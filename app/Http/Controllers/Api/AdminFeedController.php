@@ -93,9 +93,9 @@ class AdminFeedController extends BaseApiController
 
         if ($isHidden !== null) {
             if (filter_var($isHidden, FILTER_VALIDATE_BOOLEAN)) {
-                $conditions[] = 'fh.id IS NOT NULL';
+                $conditions[] = 'fp.is_hidden = 1';
             } else {
-                $conditions[] = 'fh.id IS NULL';
+                $conditions[] = 'fp.is_hidden = 0';
             }
         }
 
@@ -112,7 +112,6 @@ class AdminFeedController extends BaseApiController
             "SELECT COUNT(*) as total
              FROM feed_posts fp
              LEFT JOIN users u ON fp.user_id = u.id
-             LEFT JOIN feed_hidden fh ON fh.target_type = 'post' AND fh.target_id = fp.id AND fh.tenant_id = fp.tenant_id
              WHERE {$where}",
             $params
         )->total;
@@ -121,12 +120,10 @@ class AdminFeedController extends BaseApiController
             "SELECT fp.*,
                     u.name as user_name, u.avatar_url as user_avatar,
                     t.name as tenant_name,
-                    (fh.id IS NOT NULL) as is_hidden,
                     (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = fp.id) as comments_count
              FROM feed_posts fp
              LEFT JOIN users u ON fp.user_id = u.id
              LEFT JOIN tenants t ON fp.tenant_id = t.id
-             LEFT JOIN feed_hidden fh ON fh.target_type = 'post' AND fh.target_id = fp.id AND fh.tenant_id = fp.tenant_id
              WHERE {$where}
              ORDER BY fp.created_at DESC
              LIMIT ? OFFSET ?",
@@ -141,13 +138,12 @@ class AdminFeedController extends BaseApiController
                 'tenant_name' => $post->tenant_name ?? 'Unknown',
                 'user_name' => $post->user_name ?? 'Unknown',
                 'user_avatar' => $post->user_avatar,
-                'type' => $post->type,
+                'type' => $post->type ?? 'post',
                 'content' => $post->content,
-                'image_url' => $post->image_url,
-                'video_url' => $post->video_url,
-                'likes_count' => (int) $post->likes_count,
+                'image_url' => $post->image ?? null,
+                'likes_count' => (int) ($post->likes_count ?? 0),
                 'comments_count' => (int) ($post->comments_count ?? 0),
-                'visibility' => $post->visibility,
+                'visibility' => $post->visibility ?? 'public',
                 'is_hidden' => (bool) ($post->is_hidden ?? false),
                 'created_at' => $post->created_at,
             ];
@@ -172,12 +168,10 @@ class AdminFeedController extends BaseApiController
         $post = DB::selectOne(
             "SELECT fp.*,
                     u.name as user_name, u.email as user_email, u.avatar_url as user_avatar,
-                    t.name as tenant_name,
-                    (fh.id IS NOT NULL) as is_hidden
+                    t.name as tenant_name
              FROM feed_posts fp
              LEFT JOIN users u ON fp.user_id = u.id
              LEFT JOIN tenants t ON fp.tenant_id = t.id
-             LEFT JOIN feed_hidden fh ON fh.target_type = 'post' AND fh.target_id = fp.id AND fh.tenant_id = fp.tenant_id
              WHERE fp.id = ? AND {$tenantWhere}",
             array_merge([$id], $tenantParams)
         );
@@ -205,12 +199,11 @@ class AdminFeedController extends BaseApiController
             'user_name' => $post->user_name ?? 'Unknown',
             'user_email' => $post->user_email,
             'user_avatar' => $post->user_avatar,
-            'type' => $post->type,
+            'type' => $post->type ?? 'post',
             'content' => $post->content,
-            'image_url' => $post->image_url,
-            'video_url' => $post->video_url,
-            'likes_count' => (int) $post->likes_count,
-            'visibility' => $post->visibility,
+            'image_url' => $post->image ?? null,
+            'likes_count' => (int) ($post->likes_count ?? 0),
+            'visibility' => $post->visibility ?? 'public',
             'is_hidden' => (bool) ($post->is_hidden ?? false),
             'created_at' => $post->created_at,
             'recent_comments' => $recentComments,
@@ -241,10 +234,16 @@ class AdminFeedController extends BaseApiController
 
         $postTenantId = (int) $post->tenant_id;
 
-        DB::statement(
-            "INSERT IGNORE INTO feed_hidden (user_id, tenant_id, target_type, target_id, created_at)
-             VALUES (?, ?, 'post', ?, NOW())",
-            [$adminId, $postTenantId, $id]
+        // Global admin hide — set is_hidden on the post itself (hides from all users)
+        DB::update(
+            "UPDATE feed_posts SET is_hidden = 1 WHERE id = ? AND tenant_id = ?",
+            [$id, $postTenantId]
+        );
+
+        // Also hide from feed_activity so it doesn't appear in the main feed
+        DB::update(
+            "UPDATE feed_activity SET is_hidden = 1, is_visible = 0 WHERE source_type = 'post' AND source_id = ? AND tenant_id = ?",
+            [$id, $postTenantId]
         );
 
         ActivityLog::log(
@@ -282,6 +281,9 @@ class AdminFeedController extends BaseApiController
 
         DB::delete("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$id, $postTenantId]);
         DB::delete("DELETE FROM feed_hidden WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$id, $postTenantId]);
+        DB::delete("DELETE FROM feed_activity WHERE source_type = 'post' AND source_id = ? AND tenant_id = ?", [$id, $postTenantId]);
+        DB::delete("DELETE FROM likes WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$id, $postTenantId]);
+        DB::delete("DELETE FROM comments WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$id, $postTenantId]);
 
         ActivityLog::log(
             $adminId,
@@ -306,20 +308,18 @@ class AdminFeedController extends BaseApiController
         if ($effectiveTenantId !== null) {
             $stats = DB::selectOne(
                 "SELECT
-                    COUNT(DISTINCT fp.id) as total,
-                    (SELECT COUNT(DISTINCT fh.target_id) FROM feed_hidden fh
-                     WHERE fh.target_type = 'post' AND fh.tenant_id = ?) as hidden,
+                    COUNT(*) as total,
+                    SUM(fp.is_hidden) as hidden,
                     (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND tenant_id = ?) as total_comments
                  FROM feed_posts fp
                  WHERE fp.tenant_id = ?",
-                [$effectiveTenantId, $effectiveTenantId, $effectiveTenantId]
+                [$effectiveTenantId, $effectiveTenantId]
             );
         } else {
             $stats = DB::selectOne(
                 "SELECT
-                    COUNT(DISTINCT fp.id) as total,
-                    (SELECT COUNT(DISTINCT fh.target_id) FROM feed_hidden fh
-                     WHERE fh.target_type = 'post') as hidden,
+                    COUNT(*) as total,
+                    SUM(fp.is_hidden) as hidden,
                     (SELECT COUNT(*) FROM comments WHERE target_type = 'post') as total_comments
                  FROM feed_posts fp"
             );

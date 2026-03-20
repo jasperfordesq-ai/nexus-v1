@@ -33,7 +33,7 @@ import type { AdminFeedPost } from '@/admin/api/types';
 
 const POST_TYPES = [
   { label: 'All Types', value: '' },
-  { label: 'Text Post', value: 'text' },
+  { label: 'Text Post', value: 'post' },
   { label: 'Poll', value: 'poll' },
   { label: 'Event', value: 'event' },
   { label: 'Listing', value: 'listing' },

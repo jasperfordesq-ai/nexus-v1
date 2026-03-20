@@ -1584,13 +1584,13 @@ export interface AdminFeedPost {
   user_name: string;
   user_avatar?: string | null;
   content: string;
-  type: 'text' | 'poll' | 'event' | 'listing';
-  status: 'active' | 'hidden' | 'flagged';
+  type: string;
+  image_url?: string | null;
   is_hidden: boolean;
-  is_flagged: boolean;
+  is_flagged?: boolean;
+  likes_count?: number;
   comments_count: number;
-  reactions_count: number;
-  reports_count: number;
+  visibility?: string;
   created_at: string;
 }
 

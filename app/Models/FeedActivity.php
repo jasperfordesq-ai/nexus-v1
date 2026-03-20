@@ -21,7 +21,7 @@ class FeedActivity extends Model
     protected $fillable = [
         'tenant_id', 'source_type', 'source_id', 'user_id',
         'title', 'content', 'image_url', 'metadata',
-        'group_id', 'is_visible', 'created_at',
+        'group_id', 'is_visible', 'is_hidden', 'created_at',
     ];
 
     protected $casts = [
@@ -29,6 +29,7 @@ class FeedActivity extends Model
         'user_id' => 'integer',
         'group_id' => 'integer',
         'is_visible' => 'boolean',
+        'is_hidden' => 'boolean',
         'metadata' => 'array',
         'created_at' => 'datetime',
     ];

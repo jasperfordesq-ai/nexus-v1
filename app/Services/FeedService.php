@@ -379,17 +379,45 @@ class FeedService
      */
     public function createPost(int $userId, array $data): FeedPost
     {
+        $tenantId = TenantContext::getId();
+        $content = trim($data['content'] ?? '');
+        $image = $data['image_url'] ?? $data['image'] ?? null;
+        $visibility = $data['visibility'] ?? 'public';
+        $groupId = !empty($data['group_id']) ? (int) $data['group_id'] : null;
+
         $post = $this->feedPost->newInstance([
             'user_id'     => $userId,
-            'content'     => trim($data['content']),
+            'tenant_id'   => $tenantId,
+            'content'     => $content,
             'emoji'       => $data['emoji'] ?? null,
-            'image_url'   => $data['image_url'] ?? null,
+            'image'       => $image,
+            'type'        => 'post',
             'parent_type' => $data['parent_type'] ?? null,
             'parent_id'   => $data['parent_id'] ?? null,
-            'visibility'  => $data['visibility'] ?? 'public',
+            'visibility'  => $visibility,
+            'group_id'    => $groupId,
         ]);
 
         $post->save();
+
+        // Also record in feed_activity so the post appears in the main feed
+        try {
+            DB::table('feed_activity')->insertOrIgnore([
+                'tenant_id'   => $tenantId,
+                'user_id'     => $userId,
+                'source_type' => 'post',
+                'source_id'   => $post->id,
+                'group_id'    => $groupId,
+                'title'       => null,
+                'content'     => $content,
+                'image_url'   => $image,
+                'metadata'    => null,
+                'is_visible'  => true,
+                'created_at'  => $post->created_at,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("FeedService::createPost feed_activity sync failed: " . $e->getMessage());
+        }
 
         return $post->fresh(['user']);
     }
@@ -439,12 +467,12 @@ class FeedService
 
             if ($groupId > 0) {
                 DB::insert(
-                    "INSERT INTO feed_posts (user_id, tenant_id, content, image_url, likes_count, visibility, group_id, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, NOW())",
+                    "INSERT INTO feed_posts (user_id, tenant_id, content, image, likes_count, visibility, group_id, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, NOW())",
                     [$userId, $tenantId, $content, $imageUrl, $visibility, $groupId]
                 );
             } else {
                 DB::insert(
-                    "INSERT INTO feed_posts (user_id, tenant_id, content, image_url, likes_count, visibility, created_at) VALUES (?, ?, ?, ?, 0, ?, NOW())",
+                    "INSERT INTO feed_posts (user_id, tenant_id, content, image, likes_count, visibility, created_at) VALUES (?, ?, ?, ?, 0, ?, NOW())",
                     [$userId, $tenantId, $content, $imageUrl, $visibility]
                 );
             }
@@ -484,7 +512,7 @@ class FeedService
         switch ($type) {
             case 'post':
                 $rows = DB::select(
-                    "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count, p.user_id,
+                    "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count, p.user_id,
                            'post' as type,
                            COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                            u.avatar_url as author_avatar,
@@ -584,7 +612,7 @@ class FeedService
         $tenantId = TenantContext::getId();
 
         $existing = DB::table('likes')
-            ->where('target_type', 'feed_post')
+            ->where('target_type', 'post')
             ->where('target_id', $postId)
             ->where('user_id', $userId)
             ->where('tenant_id', $tenantId)
@@ -592,7 +620,7 @@ class FeedService
 
         if ($existing) {
             DB::table('likes')
-                ->where('target_type', 'feed_post')
+                ->where('target_type', 'post')
                 ->where('target_id', $postId)
                 ->where('user_id', $userId)
                 ->where('tenant_id', $tenantId)
@@ -600,7 +628,7 @@ class FeedService
             $liked = false;
         } else {
             DB::table('likes')->insert([
-                'target_type' => 'feed_post',
+                'target_type' => 'post',
                 'target_id'   => $postId,
                 'user_id'     => $userId,
                 'tenant_id'   => $tenantId,
@@ -610,7 +638,7 @@ class FeedService
         }
 
         $count = (int) DB::table('likes')
-            ->where('target_type', 'feed_post')
+            ->where('target_type', 'post')
             ->where('target_id', $postId)
             ->where('tenant_id', $tenantId)
             ->count();

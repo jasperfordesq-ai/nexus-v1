@@ -17,13 +17,18 @@ class FeedPost extends Model
     protected $table = 'feed_posts';
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'content', 'emoji', 'image_url',
-        'parent_id', 'parent_type', 'visibility',
+        'tenant_id', 'user_id', 'content', 'emoji', 'image', 'type',
+        'parent_id', 'parent_type', 'visibility', 'group_id',
     ];
 
     protected $casts = [
         'user_id' => 'integer',
         'parent_id' => 'integer',
+        'group_id' => 'integer',
+        'likes_count' => 'integer',
+        'comments_count' => 'integer',
+        'is_pinned' => 'boolean',
+        'is_hidden' => 'boolean',
     ];
 
     public function user(): BelongsTo

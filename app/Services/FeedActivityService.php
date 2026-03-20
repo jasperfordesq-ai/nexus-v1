@@ -157,4 +157,30 @@ class FeedActivityService
             [$tenantId, $sourceType, $sourceId]
         );
     }
+
+    /**
+     * Hide an activity by setting is_visible = 0.
+     */
+    public function hideActivity(string $sourceType, int $sourceId): void
+    {
+        $tenantId = TenantContext::getId();
+
+        DB::update(
+            "UPDATE feed_activity SET is_visible = 0 WHERE tenant_id = ? AND source_type = ? AND source_id = ?",
+            [$tenantId, $sourceType, $sourceId]
+        );
+    }
+
+    /**
+     * Show a previously hidden activity by restoring is_visible = 1.
+     */
+    public function showActivity(string $sourceType, int $sourceId): void
+    {
+        $tenantId = TenantContext::getId();
+
+        DB::update(
+            "UPDATE feed_activity SET is_visible = 1 WHERE tenant_id = ? AND source_type = ? AND source_id = ?",
+            [$tenantId, $sourceType, $sourceId]
+        );
+    }
 }
