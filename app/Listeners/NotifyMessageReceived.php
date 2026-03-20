@@ -7,10 +7,13 @@
 namespace App\Listeners;
 
 use App\Events\MessageSent;
+use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
- * Sends a notification to the message recipient when a new message arrives.
+ * Sends a notification to the message recipient(s) when a new message arrives.
  */
 class NotifyMessageReceived implements ShouldQueue
 {
@@ -21,18 +24,40 @@ class NotifyMessageReceived implements ShouldQueue
 
     /**
      * Handle the event.
-     *
-     * TODO: Migrate logic from legacy MessageService::notifyRecipient()
-     *       and NotificationService::create(). The legacy code lives at:
-     *       - src/Services/MessageService.php (notifyRecipient method)
-     *       - src/Services/NotificationService.php
-     *       - src/Services/PushNotificationService.php (FCM push)
-     *       - src/Services/RealtimeService.php (Pusher broadcast — now handled by ShouldBroadcast)
      */
     public function handle(MessageSent $event): void
     {
-        // TODO: Create in-app notification via NotificationService::create()
-        // TODO: Send push notification via PushNotificationService
-        // TODO: Send email notification if user preferences allow and user is offline
+        try {
+            $senderId = $event->sender->id;
+            $senderName = $event->sender->first_name ?? $event->sender->name ?? 'Someone';
+
+            // Find all other participants in the conversation (not the sender)
+            $recipientIds = DB::table('conversation_participants')
+                ->where('conversation_id', $event->conversationId)
+                ->where('user_id', '!=', $senderId)
+                ->pluck('user_id');
+
+            $link = '/messages/' . $event->conversationId;
+            $content = "{$senderName} sent you a message";
+
+            foreach ($recipientIds as $recipientId) {
+                NotificationDispatcher::dispatch(
+                    (int) $recipientId,
+                    'global',
+                    null,
+                    'new_message',
+                    $content,
+                    $link,
+                    null
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::error('NotifyMessageReceived listener failed', [
+                'conversation_id' => $event->conversationId ?? null,
+                'sender_id' => $event->sender->id ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 }

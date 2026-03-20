@@ -7,7 +7,9 @@
 namespace App\Listeners;
 
 use App\Events\ConnectionRequested;
+use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Sends a notification to the target user when they receive a connection request.
@@ -21,17 +23,29 @@ class NotifyConnectionRequest implements ShouldQueue
 
     /**
      * Handle the event.
-     *
-     * TODO: Migrate logic from legacy ConnectionService::sendConnectionNotification()
-     *       and NotificationService::create(). The legacy code lives at:
-     *       - src/Services/ConnectionService.php
-     *       - src/Services/NotificationService.php
-     *       - src/Services/PushNotificationService.php (FCM push)
      */
     public function handle(ConnectionRequested $event): void
     {
-        // TODO: Create in-app notification via NotificationService::create()
-        // TODO: Send push notification via PushNotificationService
-        // TODO: Send email notification if user preferences allow
+        try {
+            $requesterName = $event->requester->first_name ?? $event->requester->name ?? 'Someone';
+            $targetUserId = $event->target->id;
+
+            NotificationDispatcher::dispatch(
+                $targetUserId,
+                'global',
+                null,
+                'connection_request',
+                "{$requesterName} sent you a connection request",
+                '/connections',
+                null
+            );
+        } catch (\Throwable $e) {
+            Log::error('NotifyConnectionRequest listener failed', [
+                'requester_id' => $event->requester->id ?? null,
+                'target_id' => $event->target->id ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 }

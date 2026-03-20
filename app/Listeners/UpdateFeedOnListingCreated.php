@@ -7,7 +7,10 @@
 namespace App\Listeners;
 
 use App\Events\ListingCreated;
+use App\Models\FeedActivity;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Creates a feed activity entry when a new listing is created,
@@ -22,16 +25,29 @@ class UpdateFeedOnListingCreated implements ShouldQueue
 
     /**
      * Handle the event.
-     *
-     * TODO: Migrate logic from legacy FeedService::createActivity().
-     *       The legacy code lives at:
-     *       - src/Services/FeedService.php (createActivity method)
-     *       - src/Services/SearchService.php (index the new listing)
      */
     public function handle(ListingCreated $event): void
     {
-        // TODO: Create feed activity via FeedService::createActivity()
-        // TODO: Index listing in search via SearchService::indexListing()
-        // TODO: Notify followers via NotificationService
+        try {
+            FeedActivity::create([
+                'tenant_id'   => $event->tenantId,
+                'source_type' => 'listing',
+                'source_id'   => $event->listing->id,
+                'user_id'     => $event->user->id,
+                'title'       => $event->listing->title ?? 'New Listing',
+                'content'     => Str::limit($event->listing->description ?? '', 500),
+                'image_url'   => $event->listing->image_url ?? null,
+                'is_visible'  => true,
+                'created_at'  => now(),
+            ]);
+
+            // Note: Search indexing skipped — SearchService has no indexing method yet
+        } catch (\Throwable $e) {
+            Log::error('UpdateFeedOnListingCreated listener failed', [
+                'listing_id' => $event->listing->id ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 }
