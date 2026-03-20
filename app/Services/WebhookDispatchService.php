@@ -147,7 +147,7 @@ class WebhookDispatchService
 
         $id = DB::table('outbound_webhooks')->insertGetId([
             'tenant_id' => $tenantId,
-            'user_id' => $userId,
+            'created_by' => $userId,
             'name' => $data['name'],
             'url' => $data['url'],
             'secret' => $data['secret'],

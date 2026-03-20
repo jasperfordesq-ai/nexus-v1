@@ -257,9 +257,9 @@ class VolunteerCheckInService
      * @param int $volunteerId Volunteer user ID
      * @return string|null Token string or null if unapproved
      */
-    public function generateToken(int $shiftId, int $volunteerId): ?string
+    public static function generateToken(int $shiftId, int $volunteerId): ?string
     {
-        $this->clearErrors();
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         // Check volunteer is approved for this shift
@@ -269,7 +269,7 @@ class VolunteerCheckInService
             ->exists();
 
         if (!$hasApproved) {
-            $this->addError('FORBIDDEN', 'Volunteer is not approved for this shift.');
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Volunteer is not approved for this shift.'];
             return null;
         }
 
