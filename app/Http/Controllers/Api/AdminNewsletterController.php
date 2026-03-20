@@ -2120,8 +2120,79 @@ class AdminNewsletterController extends BaseApiController
                 );
                 $recipients = array_column($stmt, 'email');
             } elseif ($target === 'segment' && $segmentId) {
-                // TODO: Implement segment-based resend
-                $recipients = [];
+                // Look up segment and its rules
+                $segment = DB::selectOne(
+                    "SELECT * FROM newsletter_segments WHERE id = ? AND tenant_id = ?",
+                    [$segmentId, $tenantId]
+                );
+
+                if ($segment) {
+                    $rules = json_decode($segment->rules ?? '[]', true) ?: [];
+                    $matchType = $segment->match_type ?? 'all';
+
+                    // Build query from segment rules
+                    $query = DB::table('users')
+                        ->where('tenant_id', $tenantId)
+                        ->where('is_approved', 1)
+                        ->whereNotNull('email')
+                        ->where('email', '!=', '');
+
+                    if (!empty($rules)) {
+                        $method = ($matchType === 'any') ? 'orWhere' : 'where';
+                        $query->where(function ($q) use ($rules, $method) {
+                            foreach ($rules as $rule) {
+                                $field = $rule['field'] ?? '';
+                                $operator = $rule['operator'] ?? 'equals';
+                                $value = $rule['value'] ?? '';
+
+                                if (empty($field)) {
+                                    continue;
+                                }
+
+                                switch ($operator) {
+                                    case 'equals':
+                                        $q->$method($field, '=', $value);
+                                        break;
+                                    case 'not_equals':
+                                        $q->$method($field, '!=', $value);
+                                        break;
+                                    case 'contains':
+                                        $q->$method($field, 'LIKE', '%' . $value . '%');
+                                        break;
+                                    case 'not_contains':
+                                        $q->$method($field, 'NOT LIKE', '%' . $value . '%');
+                                        break;
+                                    case 'greater_than':
+                                        $q->$method($field, '>', $value);
+                                        break;
+                                    case 'less_than':
+                                        $q->$method($field, '<', $value);
+                                        break;
+                                    case 'is_null':
+                                        $q->{$method . 'Null'}($field);
+                                        break;
+                                    case 'is_not_null':
+                                        $q->{$method . 'NotNull'}($field);
+                                        break;
+                                    default:
+                                        $q->$method($field, '=', $value);
+                                }
+                            }
+                        });
+                    }
+
+                    // Also filter to only include users who received the original newsletter
+                    $recipients = $query->whereIn('email', function ($sub) use ($newsletterId, $tenantId) {
+                        $sub->select('email')
+                            ->from('newsletter_queue')
+                            ->join('newsletters', function ($join) use ($tenantId) {
+                                $join->on('newsletters.id', '=', 'newsletter_queue.newsletter_id')
+                                     ->where('newsletters.tenant_id', '=', $tenantId);
+                            })
+                            ->where('newsletter_queue.newsletter_id', $newsletterId)
+                            ->where('newsletter_queue.status', 'sent');
+                    })->pluck('email')->all();
+                }
             }
 
             if (empty($recipients)) {

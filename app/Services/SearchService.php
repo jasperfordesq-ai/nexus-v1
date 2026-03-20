@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  * events, and groups using basic LIKE matching. Can be extended with
  * Meilisearch/Scout integration later.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\SearchService.
+ * Uses Eloquent LIKE-based matching; can be extended with Meilisearch/Scout later.
  */
 class SearchService
 {
@@ -382,12 +382,45 @@ class SearchService
     }
 
     /**
-     * Static proxy for searchUsers — delegates to legacy Meilisearch-based search.
+     * Search users by name using LIKE matching.
      *
-     * @return array|false Array of user IDs on success, false if search unavailable
+     * @return array Array of user IDs matching the query
      */
     public static function searchUsersStatic(string $query, int $tenantId, int $limit = 200, array $extraFilters = []): array|false
     {
-        return \Nexus\Services\SearchService::searchUsers($query, $tenantId, $limit, $extraFilters);
+        $like = '%' . $query . '%';
+        return User::where('tenant_id', $tenantId)
+            ->where(function ($q) use ($like) {
+                $q->where('first_name', 'LIKE', $like)
+                  ->orWhere('last_name', 'LIKE', $like)
+                  ->orWhere('organization_name', 'LIKE', $like)
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
+            })
+            ->where('status', '!=', 'banned')
+            ->limit($limit)
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
+     * Index a listing for search.
+     *
+     * Placeholder: When Meilisearch/Scout is configured, index here.
+     * For now, the LIKE-based search doesn't need indexing.
+     */
+    public function indexListing(Listing $listing): void
+    {
+        // Placeholder: When Meilisearch/Scout is configured, index here.
+        // For now, the LIKE-based search doesn't need indexing.
+    }
+
+    /**
+     * Remove a listing from the search index.
+     *
+     * Placeholder: When Meilisearch/Scout is configured, remove here.
+     */
+    public function removeListing(int $listingId): void
+    {
+        // Placeholder: When Meilisearch/Scout is configured, remove here.
     }
 }

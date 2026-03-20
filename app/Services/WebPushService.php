@@ -6,10 +6,16 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Minishlink\WebPush\Subscription;
+use Minishlink\WebPush\WebPush;
+
 /**
- * WebPushService — Laravel DI wrapper for legacy \Nexus\Services\WebPushService.
+ * WebPushService — sends web push notifications via the minishlink/web-push library.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Reads subscriptions from the `push_subscriptions` table and uses VAPID
+ * credentials from environment variables.
  */
 class WebPushService
 {
@@ -18,26 +24,114 @@ class WebPushService
     }
 
     /**
-     * Delegates to legacy WebPushService::sendToUser().
+     * Send a push notification to all subscriptions for a given user.
      */
-    public function sendToUser($userId, $title, $body, $link = null, $type = 'general', $options = [])
+    public function sendToUser($userId, $title, $body, $link = null, $type = 'general', $options = []): bool
     {
-        return \Nexus\Services\WebPushService::sendToUser($userId, $title, $body, $link, $type, $options);
+        try {
+            $subscriptions = DB::table('push_subscriptions')
+                ->where('user_id', $userId)
+                ->get();
+
+            if ($subscriptions->isEmpty()) {
+                return false;
+            }
+
+            $webPush = self::createWebPushInstance();
+            if ($webPush === null) {
+                return false;
+            }
+
+            $payload = json_encode(array_merge([
+                'title' => $title,
+                'body'  => $body,
+                'url'   => $link,
+                'type'  => $type,
+                'icon'  => '/icon-192.png',
+            ], $options));
+
+            foreach ($subscriptions as $sub) {
+                $webPush->queueNotification(
+                    Subscription::create([
+                        'endpoint'        => $sub->endpoint,
+                        'publicKey'       => $sub->p256dh_key,
+                        'authToken'       => $sub->auth_token,
+                        'contentEncoding' => 'aesgcm',
+                    ]),
+                    $payload
+                );
+            }
+
+            // Flush and handle expired subscriptions
+            foreach ($webPush->flush() as $report) {
+                if ($report->isSubscriptionExpired()) {
+                    DB::table('push_subscriptions')
+                        ->where('endpoint', $report->getEndpoint())
+                        ->delete();
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('WebPushService::sendToUser failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+            return false;
+        }
     }
 
     /**
      * Static proxy for sendToUser — used by code that cannot inject an instance.
      */
-    public static function sendToUserStatic($userId, $title, $body, $link = null, $type = 'general', $options = [])
+    public static function sendToUserStatic($userId, $title, $body, $link = null, $type = 'general', $options = []): bool
     {
-        return \Nexus\Services\WebPushService::sendToUser($userId, $title, $body, $link, $type, $options);
+        try {
+            $instance = app(self::class);
+            return $instance->sendToUser($userId, $title, $body, $link, $type, $options);
+        } catch (\Exception $e) {
+            Log::error('WebPushService::sendToUserStatic failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy WebPushService::sendToUsers().
+     * Send a push notification to multiple users.
      */
-    public function sendToUsers($userIds, $title, $body, $link = null, $type = 'general', $options = [])
+    public function sendToUsers($userIds, $title, $body, $link = null, $type = 'general', $options = []): int
     {
-        return \Nexus\Services\WebPushService::sendToUsers($userIds, $title, $body, $link, $type, $options);
+        $sent = 0;
+        foreach ((array) $userIds as $userId) {
+            if ($this->sendToUser($userId, $title, $body, $link, $type, $options)) {
+                $sent++;
+            }
+        }
+        return $sent;
+    }
+
+    /**
+     * Create a WebPush instance with VAPID authentication.
+     */
+    private static function createWebPushInstance(): ?WebPush
+    {
+        $publicKey  = env('VAPID_PUBLIC_KEY');
+        $privateKey = env('VAPID_PRIVATE_KEY');
+        $subject    = env('VAPID_SUBJECT', 'mailto:hello@project-nexus.ie');
+
+        if (empty($publicKey) || empty($privateKey)) {
+            Log::warning('WebPushService: VAPID keys not configured');
+            return null;
+        }
+
+        return new WebPush([
+            'VAPID' => [
+                'subject'    => $subject,
+                'publicKey'  => $publicKey,
+                'privateKey' => $privateKey,
+            ],
+        ]);
     }
 }

@@ -11,8 +11,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * PushNotificationService — Laravel DI-based service for web push notifications.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\WebPushService
- * and \Nexus\Services\FCMPushService. Manages push subscriptions and VAPID keys.
+ * Manages push subscriptions, VAPID keys, and delegates sending to WebPushService.
  */
 class PushNotificationService
 {
@@ -85,5 +84,25 @@ class PushNotificationService
         return DB::table('push_subscriptions')
             ->where('user_id', $userId)
             ->count();
+    }
+
+    /**
+     * Send a push notification to a user via WebPushService.
+     *
+     * This is a convenience method that delegates to WebPushService.
+     * Push is best-effort — failures are logged but do not propagate.
+     */
+    public function send(int $userId, string $title, string $body, ?string $link = null): bool
+    {
+        try {
+            $webPush = app(WebPushService::class);
+            return $webPush->sendToUser($userId, $title, $body, $link);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('PushNotificationService::send failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+            return false;
+        }
     }
 }

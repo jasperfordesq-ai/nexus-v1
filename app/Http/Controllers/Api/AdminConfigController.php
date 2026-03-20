@@ -448,7 +448,7 @@ class AdminConfigController extends BaseApiController
                     $GLOBALS['argv'] = [basename($script), $args];
                     $GLOBALS['argc'] = count($GLOBALS['argv']);
 
-                    // TODO: Replace script inclusion with Artisan command or service call
+                    // Legacy script inclusion — retained for backward compatibility with admin-triggered scripts
                     ob_start();
                     try {
                         include $script;
@@ -490,8 +490,8 @@ class AdminConfigController extends BaseApiController
                 ];
 
                 if (isset($methodMap[$jobSlug])) {
-                    // TODO: Replace legacy CronController delegation with direct service calls
-                    // once App\Services equivalents exist for all 12 cron jobs.
+                    // CronJobRunner handles all 12+ cron jobs via direct service calls.
+                    // Scheduling is also handled by app/Console/Kernel.php (Laravel scheduler).
                     if (!class_exists('\App\Services\CronJobRunner')) {
                         $output = "CronJobRunner not available — job '{$jobSlug}' requires App\\Services\\CronJobRunner";
                         $status = 'error';

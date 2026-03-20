@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use App\Core\TenantContext;
 use App\Models\NewsletterBounce;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * SendGridWebhookController — Eloquent-powered SendGrid event webhook handler.
@@ -35,20 +36,51 @@ class SendGridWebhookController extends BaseApiController
      * Process SendGrid event webhook payload.
      * Expects a JSON array of event objects from SendGrid.
      *
-     * TODO: Implement proper SendGrid Event Webhook signature verification
-     * using the SENDGRID_WEBHOOK_VERIFICATION_KEY env var once configured.
+     * Authentication: ECDSA signature verification (preferred) with shared-secret fallback.
      * See: https://docs.sendgrid.com/for-developers/tracking-events/getting-started-event-webhook-security-features
      */
     public function events(): JsonResponse
     {
-        // Shared secret check — if SENDGRID_WEBHOOK_SECRET is configured,
-        // require it as a query parameter or header for basic authentication.
-        $expectedSecret = env('SENDGRID_WEBHOOK_SECRET');
-        if (!empty($expectedSecret)) {
-            $providedSecret = request()->header('X-Webhook-Secret')
-                ?? request()->query('secret');
-            if (!hash_equals($expectedSecret, (string) $providedSecret)) {
-                return $this->respondWithError('UNAUTHORIZED', 'Invalid webhook secret', null, 401);
+        // ECDSA signature verification (SendGrid official method)
+        $verificationKey = env('SENDGRID_WEBHOOK_VERIFICATION_KEY');
+        $ecdsaVerified = false;
+
+        if (!empty($verificationKey)) {
+            $signature = request()->header('X-Twilio-Email-Event-Webhook-Signature');
+            $timestamp = request()->header('X-Twilio-Email-Event-Webhook-Timestamp');
+
+            if (empty($signature) || empty($timestamp)) {
+                return $this->respondWithError('UNAUTHORIZED', 'Missing signature headers', null, 401);
+            }
+
+            $payload = request()->getContent();
+            $timestampedPayload = $timestamp . $payload;
+            $decodedSignature = base64_decode($signature);
+
+            $publicKey = openssl_pkey_get_public($verificationKey);
+            if (!$publicKey) {
+                Log::error('SendGrid webhook: Invalid verification key');
+                // Fall through to shared secret check
+            } else {
+                $valid = openssl_verify($timestampedPayload, $decodedSignature, $publicKey, OPENSSL_ALGO_SHA256);
+                if ($valid !== 1) {
+                    return $this->respondWithError('UNAUTHORIZED', 'Invalid webhook signature', null, 401);
+                }
+                // Signature verified — skip shared secret check
+                $ecdsaVerified = true;
+            }
+        }
+
+        // Shared secret check (fallback) — if SENDGRID_WEBHOOK_SECRET is configured
+        // and ECDSA verification was not performed, require it as a query parameter or header.
+        if (!$ecdsaVerified) {
+            $expectedSecret = env('SENDGRID_WEBHOOK_SECRET');
+            if (!empty($expectedSecret)) {
+                $providedSecret = request()->header('X-Webhook-Secret')
+                    ?? request()->query('secret');
+                if (!hash_equals($expectedSecret, (string) $providedSecret)) {
+                    return $this->respondWithError('UNAUTHORIZED', 'Invalid webhook secret', null, 401);
+                }
             }
         }
 
