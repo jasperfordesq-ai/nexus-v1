@@ -53,7 +53,7 @@ class ContentModerationService
         $offset = max(0, (int) ($filters['offset'] ?? 0));
         $status = $filters['status'] ?? null;
 
-        $query = ContentModerationQueue::newQuery()
+        $query = ContentModerationQueue::query()
             ->with(['author:id,first_name,last_name,name,avatar_url', 'reviewer:id,first_name,last_name,name']);
 
         if ($status !== null) {
@@ -85,7 +85,7 @@ class ContentModerationService
      */
     public static function approve(int $reportId, int $tenantId, int $moderatorId): bool
     {
-        return ContentModerationQueue::newQuery()
+        return ContentModerationQueue::query()
             ->where('id', $reportId)
             ->where('status', self::STATUS_PENDING)
             ->update([
@@ -100,7 +100,7 @@ class ContentModerationService
      */
     public static function reject(int $reportId, int $tenantId, int $moderatorId, ?string $reason = null): bool
     {
-        return ContentModerationQueue::newQuery()
+        return ContentModerationQueue::query()
             ->where('id', $reportId)
             ->where('status', self::STATUS_PENDING)
             ->update([
@@ -117,7 +117,7 @@ class ContentModerationService
     public static function getStats(int $tenantId): array
     {
         try {
-            $rows = ContentModerationQueue::newQuery()
+            $rows = ContentModerationQueue::query()
                 ->selectRaw('status, COUNT(*) as count')
                 ->groupBy('status')
                 ->pluck('count', 'status')
@@ -145,7 +145,7 @@ class ContentModerationService
         $limit = min(200, max(1, $limit));
         $offset = max(0, $offset);
 
-        $query = ContentModerationQueue::newQuery()
+        $query = ContentModerationQueue::query()
             ->with(['author:id,first_name,last_name,email,avatar_url', 'reviewer:id,first_name,last_name']);
 
         if (!empty($filters['status']) && in_array($filters['status'], [self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED, self::STATUS_FLAGGED], true)) {
@@ -216,7 +216,7 @@ class ContentModerationService
             return ['success' => false, 'message' => 'Invalid decision. Must be approved or rejected.'];
         }
 
-        $item = ContentModerationQueue::newQuery()->find($id);
+        $item = ContentModerationQueue::query()->find($id);
 
         if (!$item) {
             return ['success' => false, 'message' => 'Moderation queue item not found.'];

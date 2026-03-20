@@ -36,7 +36,7 @@ class VolunteerService
         $limit = min((int) ($filters['limit'] ?? 20), 50);
         $cursor = $filters['cursor'] ?? null;
 
-        $query = VolOpportunity::newQuery()
+        $query = VolOpportunity::query()
             ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name', 'category:id,name,color'])
             ->where('is_active', true);
 
@@ -79,7 +79,7 @@ class VolunteerService
      */
     public static function getById(int $id): ?VolOpportunity
     {
-        return VolOpportunity::newQuery()
+        return VolOpportunity::query()
             ->with(['creator', 'organization', 'category', 'shifts', 'applications'])
             ->find($id);
     }
@@ -89,7 +89,7 @@ class VolunteerService
      */
     public static function createOpportunity(int $userId, array $data): VolOpportunity
     {
-        $opportunity = VolOpportunity::newInstance([
+        $opportunity = VolOpportunity::create([
             'created_by'      => $userId,
             'organization_id' => $data['organization_id'] ?? null,
             'title'           => trim($data['title'] ?? ''),
@@ -112,7 +112,7 @@ class VolunteerService
      */
     public static function apply(int $opportunityId, int $userId, array $data = []): VolApplication
     {
-        $application = VolApplication::newInstance([
+        $application = VolApplication::create([
             'opportunity_id' => $opportunityId,
             'user_id'        => $userId,
             'message'        => trim($data['message'] ?? ''),
@@ -129,7 +129,7 @@ class VolunteerService
      */
     public static function getMyApplications(int $userId): array
     {
-        return VolApplication::newQuery()
+        return VolApplication::query()
             ->with(['opportunity:id,title,status', 'opportunity.organization:id,name'])
             ->where('user_id', $userId)
             ->orderByDesc('created_at')

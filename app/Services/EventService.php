@@ -84,7 +84,7 @@ class EventService
         }
 
         $eventIds = $items->pluck('id');
-        $rsvpCounts = EventRsvp::newQuery()
+        $rsvpCounts = EventRsvp::query()
             ->selectRaw('event_id, COUNT(*) as count')
             ->whereIn('event_id', $eventIds)
             ->where('status', 'going')
@@ -92,7 +92,7 @@ class EventService
             ->pluck('count', 'event_id');
 
         // Also get interested counts for the same events
-        $interestedCounts = EventRsvp::newQuery()
+        $interestedCounts = EventRsvp::query()
             ->selectRaw('event_id, COUNT(*) as count')
             ->whereIn('event_id', $eventIds)
             ->where('status', 'interested')

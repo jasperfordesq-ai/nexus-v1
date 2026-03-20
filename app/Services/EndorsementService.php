@@ -56,7 +56,7 @@ class EndorsementService
         }
 
         // Check for existing endorsement
-        $existing = SkillEndorsement::newQuery()
+        $existing = SkillEndorsement::query()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
@@ -75,7 +75,7 @@ class EndorsementService
             }
         }
 
-        $endorsementRecord = SkillEndorsement::newQuery()->create([
+        $endorsementRecord = SkillEndorsement::query()->create([
             'endorser_id' => $endorserId,
             'endorsed_id' => $endorsedId,
             'skill_id' => $skillId,
@@ -91,7 +91,7 @@ class EndorsementService
      */
     public static function removeEndorsement(int $endorserId, int $endorsedId, string $skillName): bool
     {
-        return SkillEndorsement::newQuery()
+        return SkillEndorsement::query()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
@@ -103,7 +103,7 @@ class EndorsementService
      */
     public static function getEndorsements(int $userId): array
     {
-        $rows = SkillEndorsement::newQuery()
+        $rows = SkillEndorsement::query()
             ->with(['endorser:id,first_name,last_name,avatar_url'])
             ->where('endorsed_id', $userId)
             ->orderBy('skill_name')
@@ -133,7 +133,7 @@ class EndorsementService
      */
     public static function hasEndorsed(int $endorserId, int $endorsedId, string $skillName): bool
     {
-        return SkillEndorsement::newQuery()
+        return SkillEndorsement::query()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
@@ -153,7 +153,7 @@ class EndorsementService
      */
     public static function getSkillEndorsements(int $userId, string $skillName): array
     {
-        return SkillEndorsement::newQuery()
+        return SkillEndorsement::query()
             ->with(['endorser:id,first_name,last_name,avatar_url'])
             ->where('endorsed_id', $userId)
             ->where('skill_name', $skillName)
@@ -201,15 +201,15 @@ class EndorsementService
      */
     public static function getStats(int $userId): array
     {
-        $received = (int) SkillEndorsement::newQuery()
+        $received = (int) SkillEndorsement::query()
             ->where('endorsed_id', $userId)
             ->count();
 
-        $given = (int) SkillEndorsement::newQuery()
+        $given = (int) SkillEndorsement::query()
             ->where('endorser_id', $userId)
             ->count();
 
-        $uniqueSkills = (int) SkillEndorsement::newQuery()
+        $uniqueSkills = (int) SkillEndorsement::query()
             ->where('endorsed_id', $userId)
             ->distinct('skill_name')
             ->count('skill_name');

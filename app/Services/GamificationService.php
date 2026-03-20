@@ -101,7 +101,7 @@ class GamificationService
             : 100;
 
         $badgeCount = UserBadge::where('user_id', $userId)->count();
-        $showcased = UserBadge::newQuery()
+        $showcased = UserBadge::query()
             ->where('user_id', $userId)
             ->where('is_showcased', true)
             ->orderBy('showcase_order')
@@ -142,7 +142,7 @@ class GamificationService
      */
     public static function getBadges(int $userId, ?int $tenantId = null): array
     {
-        $badges = UserBadge::newQuery()
+        $badges = UserBadge::query()
             ->where('user_id', $userId)
             ->orderByDesc('awarded_at')
             ->get()
@@ -379,7 +379,7 @@ class GamificationService
             }
         }
 
-        $exists = UserBadge::newQuery()
+        $exists = UserBadge::query()
             ->where('user_id', $userId)
             ->where('badge_key', $badge['key'])
             ->exists();
@@ -388,7 +388,7 @@ class GamificationService
             return;
         }
 
-        UserBadge::newInstance([
+        UserBadge::create([
             'user_id'   => $userId,
             'badge_key' => $badge['key'],
             'name'      => $badge['name'],
@@ -581,7 +581,7 @@ class GamificationService
     public static function getBadgeProgress(int $userId): array
     {
         $progress = [];
-        $earnedKeys = UserBadge::newQuery()
+        $earnedKeys = UserBadge::query()
             ->where('user_id', $userId)
             ->pluck('badge_key')
             ->all();
