@@ -11,6 +11,7 @@ namespace Nexus\Tests\Services;
 use Nexus\Tests\DatabaseTestCase;
 use App\Core\Database;
 use App\Core\TenantContext;
+use App\Models\Goal;
 use App\Services\GoalService;
 
 /**
@@ -21,6 +22,11 @@ use App\Services\GoalService;
 class GoalServiceTest extends DatabaseTestCase
 {
     protected static ?int $testTenantId = null;
+
+    private static function svc(): GoalService
+    {
+        return new GoalService(new Goal());
+    }
     protected static ?int $testUserId = null;
     protected static ?int $testUser2Id = null;
     protected static ?int $testGoalId = null;
@@ -98,7 +104,7 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Test Goal Creation',
             'description' => 'A test goal for unit tests',
             'target_value' => 100,
@@ -119,13 +125,13 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => '',
             'target_value' => 10,
         ]);
 
         $this->assertNull($goalId);
-        $errors = GoalService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertEquals('title', $errors[0]['field'] ?? null);
     }
@@ -136,13 +142,13 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => str_repeat('A', 256),
             'target_value' => 10,
         ]);
 
         $this->assertNull($goalId);
-        $errors = GoalService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
     }
 
@@ -152,13 +158,13 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Negative Target Goal',
             'target_value' => -5,
         ]);
 
         $this->assertNull($goalId);
-        $errors = GoalService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
     }
 
@@ -168,7 +174,7 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Zero Target Goal',
             'target_value' => 0,
         ]);
@@ -187,7 +193,7 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Get By ID Test',
             'description' => 'Testing retrieval',
             'target_value' => 50,
@@ -196,7 +202,7 @@ class GoalServiceTest extends DatabaseTestCase
 
         $this->assertNotNull($goalId);
 
-        $goal = GoalService::getById($goalId);
+        $goal = self::svc()->getById($goalId);
 
         $this->assertNotNull($goal);
         $this->assertEquals('Get By ID Test', $goal['title']);
@@ -214,7 +220,7 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goal = GoalService::getById(999999);
+        $goal = self::svc()->getById(999999);
         $this->assertNull($goal);
     }
 
@@ -225,13 +231,13 @@ class GoalServiceTest extends DatabaseTestCase
         }
 
         // Create a test goal
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Pagination Test Goal',
             'target_value' => 10,
             'is_public' => true,
         ]);
 
-        $result = GoalService::getAll(['user_id' => self::$testUserId, 'limit' => 5]);
+        $result = self::svc()->getAll(['user_id' => self::$testUserId, 'limit' => 5]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('items', $result);
@@ -248,12 +254,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Active Filter Test',
             'target_value' => 100,
         ]);
 
-        $result = GoalService::getAll([
+        $result = self::svc()->getAll([
             'user_id' => self::$testUserId,
             'status' => 'active',
         ]);
@@ -269,13 +275,13 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Public Visibility Test',
             'target_value' => 10,
             'is_public' => true,
         ]);
 
-        $result = GoalService::getAll([
+        $result = self::svc()->getAll([
             'user_id' => self::$testUserId,
             'visibility' => 'public',
         ]);
@@ -295,19 +301,19 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Before Update',
             'target_value' => 10,
         ]);
 
-        $result = GoalService::update($goalId, self::$testUserId, [
+        $result = self::svc()->update($goalId, self::$testUserId, [
             'title' => 'After Update',
             'description' => 'Updated description',
         ]);
 
         $this->assertTrue($result);
 
-        $goal = GoalService::getById($goalId);
+        $goal = self::svc()->getById($goalId);
         $this->assertEquals('After Update', $goal['title']);
 
         Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);
@@ -319,12 +325,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Ownership Test',
             'target_value' => 10,
         ]);
 
-        $result = GoalService::update($goalId, self::$testUser2Id, [
+        $result = self::svc()->update($goalId, self::$testUser2Id, [
             'title' => 'Hacked Title',
         ]);
 
@@ -339,7 +345,7 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $result = GoalService::update(999999, self::$testUserId, [
+        $result = self::svc()->update(999999, self::$testUserId, [
             'title' => 'Ghost Goal',
         ]);
 
@@ -352,12 +358,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Original Title',
             'target_value' => 10,
         ]);
 
-        $result = GoalService::update($goalId, self::$testUserId, [
+        $result = self::svc()->update($goalId, self::$testUserId, [
             'title' => '',
         ]);
 
@@ -372,12 +378,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'No Change Goal',
             'target_value' => 10,
         ]);
 
-        $result = GoalService::update($goalId, self::$testUserId, []);
+        $result = self::svc()->update($goalId, self::$testUserId, []);
         $this->assertTrue($result);
 
         Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);
@@ -393,12 +399,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Progress Test',
             'target_value' => 100,
         ]);
 
-        $updated = GoalService::updateProgress($goalId, self::$testUserId, 25);
+        $updated = self::svc()->updateProgress($goalId, self::$testUserId, 25);
 
         $this->assertNotNull($updated);
         $this->assertEquals(25, (float)$updated['current_value']);
@@ -412,12 +418,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Completion Test',
             'target_value' => 10,
         ]);
 
-        $updated = GoalService::updateProgress($goalId, self::$testUserId, 10);
+        $updated = self::svc()->updateProgress($goalId, self::$testUserId, 10);
 
         $this->assertNotNull($updated);
         $this->assertEquals('completed', $updated['status']);
@@ -431,12 +437,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Non-Owner Progress',
             'target_value' => 100,
         ]);
 
-        $result = GoalService::updateProgress($goalId, self::$testUser2Id, 5);
+        $result = self::svc()->updateProgress($goalId, self::$testUser2Id, 5);
         $this->assertNull($result);
 
         Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);
@@ -448,16 +454,16 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Already Complete',
             'target_value' => 10,
         ]);
 
         // Complete it
-        GoalService::updateProgress($goalId, self::$testUserId, 10);
+        self::svc()->updateProgress($goalId, self::$testUserId, 10);
 
         // Try to update again
-        $result = GoalService::updateProgress($goalId, self::$testUserId, 5);
+        $result = self::svc()->updateProgress($goalId, self::$testUserId, 5);
         $this->assertNull($result);
 
         Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);
@@ -469,12 +475,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Floor Test',
             'target_value' => 100,
         ]);
 
-        $updated = GoalService::updateProgress($goalId, self::$testUserId, -50);
+        $updated = self::svc()->updateProgress($goalId, self::$testUserId, -50);
 
         $this->assertNotNull($updated);
         $this->assertGreaterThanOrEqual(0, (float)$updated['current_value']);
@@ -492,16 +498,16 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Buddy Test Goal',
             'target_value' => 50,
             'is_public' => true,
         ]);
 
-        $result = GoalService::offerBuddy($goalId, self::$testUser2Id);
+        $result = self::svc()->offerBuddy($goalId, self::$testUser2Id);
         $this->assertTrue($result);
 
-        $goal = GoalService::getById($goalId);
+        $goal = self::svc()->getById($goalId);
         $this->assertNotNull($goal['mentor']);
         $this->assertEquals(self::$testUser2Id, $goal['mentor']['id']);
 
@@ -514,13 +520,13 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Self Buddy Fail',
             'target_value' => 50,
             'is_public' => true,
         ]);
 
-        $result = GoalService::offerBuddy($goalId, self::$testUserId);
+        $result = self::svc()->offerBuddy($goalId, self::$testUserId);
         $this->assertFalse($result);
 
         Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);
@@ -532,13 +538,13 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Private Goal',
             'target_value' => 50,
             'is_public' => false,
         ]);
 
-        $result = GoalService::offerBuddy($goalId, self::$testUser2Id);
+        $result = self::svc()->offerBuddy($goalId, self::$testUser2Id);
         $this->assertFalse($result);
 
         Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);
@@ -554,15 +560,15 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Delete Me',
             'target_value' => 10,
         ]);
 
-        $result = GoalService::delete($goalId, self::$testUserId);
+        $result = self::svc()->delete($goalId, self::$testUserId);
         $this->assertTrue($result);
 
-        $goal = GoalService::getById($goalId);
+        $goal = self::svc()->getById($goalId);
         $this->assertNull($goal);
     }
 
@@ -572,12 +578,12 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Cannot Delete',
             'target_value' => 10,
         ]);
 
-        $result = GoalService::delete($goalId, self::$testUser2Id);
+        $result = self::svc()->delete($goalId, self::$testUser2Id);
         $this->assertFalse($result);
 
         Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);
@@ -589,7 +595,7 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $result = GoalService::delete(999999, self::$testUserId);
+        $result = self::svc()->delete(999999, self::$testUserId);
         $this->assertFalse($result);
     }
 
@@ -603,13 +609,13 @@ class GoalServiceTest extends DatabaseTestCase
             $this->markTestSkipped('goals table does not exist');
         }
 
-        $goalId = GoalService::create(self::$testUserId, [
+        $goalId = self::svc()->create(self::$testUserId, [
             'title' => 'Public Buddy Listing',
             'target_value' => 50,
             'is_public' => true,
         ]);
 
-        $result = GoalService::getPublicForBuddy(self::$testUserId);
+        $result = self::svc()->getPublicForBuddy(self::$testUserId);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('items', $result);
@@ -629,12 +635,12 @@ class GoalServiceTest extends DatabaseTestCase
         }
 
         // Trigger an error
-        GoalService::create(self::$testUserId, ['title' => '', 'target_value' => 10]);
-        $this->assertNotEmpty(GoalService::getErrors());
+        self::svc()->create(self::$testUserId, ['title' => '', 'target_value' => 10]);
+        $this->assertNotEmpty(self::svc()->getErrors());
 
         // New successful call should clear errors
-        $goalId = GoalService::create(self::$testUserId, ['title' => 'Valid Goal', 'target_value' => 10]);
-        $this->assertEmpty(GoalService::getErrors());
+        $goalId = self::svc()->create(self::$testUserId, ['title' => 'Valid Goal', 'target_value' => 10]);
+        $this->assertEmpty(self::svc()->getErrors());
 
         if ($goalId) {
             Database::query("DELETE FROM goals WHERE id = ?", [$goalId]);

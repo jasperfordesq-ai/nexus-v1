@@ -58,33 +58,33 @@ class ExchangeWorkflowService
     /**
      * Initiate an exchange (legacy compat).
      */
-    public function initiate(int $tenantId, int $listingId, int $requesterId): ?int
+    public static function initiate(int $tenantId, int $listingId, int $requesterId): ?int
     {
-        return $this->createRequest($requesterId, $listingId, []);
+        return self::createRequest($requesterId, $listingId, []);
     }
 
     /**
      * Accept an exchange (legacy compat).
      */
-    public function accept(int $tenantId, int $exchangeId, int $userId): bool
+    public static function accept(int $tenantId, int $exchangeId, int $userId): bool
     {
-        return $this->acceptRequest($exchangeId, $userId);
+        return self::acceptRequest($exchangeId, $userId);
     }
 
     /**
      * Complete an exchange (legacy compat).
      */
-    public function complete(int $tenantId, int $exchangeId, int $userId, float $hours): bool
+    public static function complete(int $tenantId, int $exchangeId, int $userId, float $hours): bool
     {
-        return $this->confirmCompletion($exchangeId, $userId, $hours);
+        return self::confirmCompletion($exchangeId, $userId, $hours);
     }
 
     /**
      * Cancel an exchange (legacy compat).
      */
-    public function cancel(int $tenantId, int $exchangeId, int $userId, ?string $reason = null): bool
+    public static function cancel(int $tenantId, int $exchangeId, int $userId, ?string $reason = null): bool
     {
-        return $this->cancelExchange($exchangeId, $userId, $reason ?? '');
+        return self::cancelExchange($exchangeId, $userId, $reason ?? '');
     }
 
     /**
@@ -95,7 +95,7 @@ class ExchangeWorkflowService
      * @param array $data Request data (proposed_hours, message)
      * @return int|null Exchange ID or null
      */
-    public function createRequest(int $requesterId, int $listingId, array $data): ?int
+    public static function createRequest(int $requesterId, int $listingId, array $data): ?int
     {
         $tenantId = TenantContext::getId();
 
@@ -123,7 +123,7 @@ class ExchangeWorkflowService
             'status' => $initialStatus,
         ]);
 
-        $this->logHistory($exchange->id, 'request_created', $requesterId, 'requester', null, $initialStatus);
+        self::logHistory($exchange->id, 'request_created', $requesterId, 'requester', null, $initialStatus);
 
         return $exchange->id;
     }
@@ -131,7 +131,7 @@ class ExchangeWorkflowService
     /**
      * Provider accepts the exchange request.
      */
-    public function acceptRequest(int $exchangeId, int $providerId): bool
+    public static function acceptRequest(int $exchangeId, int $providerId): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange || (int) $exchange->provider_id !== $providerId) {
@@ -141,16 +141,16 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $needsBroker = $this->needsBrokerApproval($exchange->listing_id, (float) $exchange->proposed_hours);
+        $needsBroker = self::needsBrokerApproval($exchange->listing_id, (float) $exchange->proposed_hours);
         $newStatus = $needsBroker ? self::STATUS_PENDING_BROKER : self::STATUS_ACCEPTED;
 
-        return $this->updateStatus($exchangeId, $newStatus, $providerId, 'provider', 'Provider accepted request');
+        return self::updateStatus($exchangeId, $newStatus, $providerId, 'provider', 'Provider accepted request');
     }
 
     /**
      * Provider declines the exchange request.
      */
-    public function declineRequest(int $exchangeId, int $providerId, string $reason = ''): bool
+    public static function declineRequest(int $exchangeId, int $providerId, string $reason = ''): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange || (int) $exchange->provider_id !== $providerId) {
@@ -160,13 +160,13 @@ class ExchangeWorkflowService
             return false;
         }
 
-        return $this->updateStatus($exchangeId, self::STATUS_CANCELLED, $providerId, 'provider', $reason ?: 'Provider declined');
+        return self::updateStatus($exchangeId, self::STATUS_CANCELLED, $providerId, 'provider', $reason ?: 'Provider declined');
     }
 
     /**
      * Broker approves the exchange.
      */
-    public function approveExchange(int $exchangeId, int $brokerId, string $notes = '', string $conditions = ''): bool
+    public static function approveExchange(int $exchangeId, int $brokerId, string $notes = '', string $conditions = ''): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange || $exchange->status !== self::STATUS_PENDING_BROKER) {
@@ -175,13 +175,13 @@ class ExchangeWorkflowService
 
         $exchange->update(['broker_id' => $brokerId, 'broker_notes' => $notes]);
 
-        return $this->updateStatus($exchangeId, self::STATUS_ACCEPTED, $brokerId, 'broker', $notes ?: 'Broker approved');
+        return self::updateStatus($exchangeId, self::STATUS_ACCEPTED, $brokerId, 'broker', $notes ?: 'Broker approved');
     }
 
     /**
      * Broker rejects the exchange.
      */
-    public function rejectExchange(int $exchangeId, int $brokerId, string $reason): bool
+    public static function rejectExchange(int $exchangeId, int $brokerId, string $reason): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange || $exchange->status !== self::STATUS_PENDING_BROKER) {
@@ -190,13 +190,13 @@ class ExchangeWorkflowService
 
         $exchange->update(['broker_id' => $brokerId, 'broker_notes' => $reason]);
 
-        return $this->updateStatus($exchangeId, self::STATUS_CANCELLED, $brokerId, 'broker', $reason);
+        return self::updateStatus($exchangeId, self::STATUS_CANCELLED, $brokerId, 'broker', $reason);
     }
 
     /**
      * Mark exchange as in progress.
      */
-    public function startProgress(int $exchangeId, int $userId): bool
+    public static function startProgress(int $exchangeId, int $userId): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange || $exchange->status !== self::STATUS_ACCEPTED) {
@@ -204,13 +204,13 @@ class ExchangeWorkflowService
         }
 
         $role = ((int) $exchange->requester_id === $userId) ? 'requester' : 'provider';
-        return $this->updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
+        return self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
     }
 
     /**
      * Mark exchange as ready for confirmation.
      */
-    public function markReadyForConfirmation(int $exchangeId, int $userId): bool
+    public static function markReadyForConfirmation(int $exchangeId, int $userId): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange || $exchange->status !== self::STATUS_IN_PROGRESS) {
@@ -218,7 +218,7 @@ class ExchangeWorkflowService
         }
 
         $role = ((int) $exchange->requester_id === $userId) ? 'requester' : 'provider';
-        return $this->updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
+        return self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
     }
 
     /**
@@ -260,23 +260,23 @@ class ExchangeWorkflowService
                 'requester_confirmed_at' => now(),
                 'requester_confirmed_hours' => $hours,
             ]);
-            $this->logHistory($exchangeId, 'requester_confirmed', $userId, 'requester', null, null, "Confirmed $hours hours");
+            self::logHistory($exchangeId, 'requester_confirmed', $userId, 'requester', null, null, "Confirmed $hours hours");
         } else {
             $exchange->update([
                 'provider_confirmed_at' => now(),
                 'provider_confirmed_hours' => $hours,
             ]);
-            $this->logHistory($exchangeId, 'provider_confirmed', $userId, 'provider', null, null, "Confirmed $hours hours");
+            self::logHistory($exchangeId, 'provider_confirmed', $userId, 'provider', null, null, "Confirmed $hours hours");
         }
 
         if ($exchange->status === self::STATUS_IN_PROGRESS) {
-            $this->updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $isRequester ? 'requester' : 'provider');
+            self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $isRequester ? 'requester' : 'provider');
         }
 
         // Refresh and check if both confirmed
         $exchange->refresh();
         if ($exchange->requester_confirmed_at && $exchange->provider_confirmed_at) {
-            return $this->processConfirmations($exchangeId, $exchange);
+            return self::processConfirmations($exchangeId, $exchange);
         }
 
         return true;
@@ -285,7 +285,7 @@ class ExchangeWorkflowService
     /**
      * Cancel an exchange.
      */
-    public function cancelExchange(int $exchangeId, int $userId, string $reason = ''): bool
+    public static function cancelExchange(int $exchangeId, int $userId, string $reason = ''): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange) {
@@ -301,7 +301,7 @@ class ExchangeWorkflowService
         $isProvider = (int) $exchange->provider_id === $userId;
         $role = $isRequester ? 'requester' : ($isProvider ? 'provider' : 'broker');
 
-        return $this->updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $reason ?: 'Cancelled');
+        return self::updateStatus($exchangeId, self::STATUS_CANCELLED, $userId, $role, $reason ?: 'Cancelled');
     }
 
     /**
@@ -310,7 +310,7 @@ class ExchangeWorkflowService
      * @param int $exchangeId Exchange ID
      * @return array|null Exchange data
      */
-    public function getExchange(int $exchangeId): ?array
+    public static function getExchange(int $exchangeId): ?array
     {
         $tenantId = TenantContext::getId();
 
@@ -345,7 +345,7 @@ class ExchangeWorkflowService
     /**
      * Get active exchange for a user on a specific listing.
      */
-    public function getActiveExchangeForListing(int $userId, int $listingId): ?array
+    public static function getActiveExchangeForListing(int $userId, int $listingId): ?array
     {
         $terminalStatuses = [self::STATUS_COMPLETED, self::STATUS_CANCELLED, self::STATUS_EXPIRED];
 
@@ -366,7 +366,7 @@ class ExchangeWorkflowService
      * @param int $exchangeId Exchange ID
      * @return array History entries
      */
-    public function getExchangeHistory(int $exchangeId): array
+    public static function getExchangeHistory(int $exchangeId): array
     {
         return ExchangeHistory::with('actor:id,name')
             ->where('exchange_id', $exchangeId)
@@ -382,7 +382,7 @@ class ExchangeWorkflowService
      * @param int $providerId Provider user ID
      * @return array Array of violation strings (empty = compliant)
      */
-    public function checkComplianceRequirements(int $listingId, int $providerId): array
+    public static function checkComplianceRequirements(int $listingId, int $providerId): array
     {
         $violations = [];
         $tenantId = TenantContext::getId();
@@ -438,29 +438,29 @@ class ExchangeWorkflowService
     // PRIVATE HELPERS
     // =========================================================================
 
-    private function processConfirmations(int $exchangeId, ExchangeRequest $exchange): bool
+    private static function processConfirmations(int $exchangeId, ExchangeRequest $exchange): bool
     {
         $requesterHours = (float) $exchange->requester_confirmed_hours;
         $providerHours = (float) $exchange->provider_confirmed_hours;
 
         if (abs($requesterHours - $providerHours) < 0.01) {
-            return $this->completeExchange($exchangeId, $requesterHours);
+            return self::completeExchange($exchangeId, $requesterHours);
         }
 
         $varianceTolerance = 0.25;
         if (abs($requesterHours - $providerHours) <= $varianceTolerance) {
             $finalHours = ($requesterHours + $providerHours) / 2;
-            return $this->completeExchange($exchangeId, $finalHours);
+            return self::completeExchange($exchangeId, $finalHours);
         }
 
         // Dispute
-        $this->updateStatus($exchangeId, self::STATUS_DISPUTED, null, 'system',
+        self::updateStatus($exchangeId, self::STATUS_DISPUTED, null, 'system',
             "Hours mismatch: requester=$requesterHours, provider=$providerHours");
 
         return true;
     }
 
-    private function completeExchange(int $exchangeId, float $finalHours): bool
+    private static function completeExchange(int $exchangeId, float $finalHours): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange) {
@@ -471,20 +471,20 @@ class ExchangeWorkflowService
             $exchange->update(['final_hours' => $finalHours]);
 
             // Create transaction via DB
-            $transactionId = $this->createTransaction($exchangeId, $finalHours);
+            $transactionId = self::createTransaction($exchangeId, $finalHours);
             if ($transactionId) {
                 $exchange->update(['transaction_id' => $transactionId]);
             }
 
-            $this->updateStatus($exchangeId, self::STATUS_COMPLETED, null, 'system', "Completed with $finalHours hours");
+            self::updateStatus($exchangeId, self::STATUS_COMPLETED, null, 'system', "Completed with $finalHours hours");
 
             return true;
         });
     }
 
-    private function createTransaction(int $exchangeId, float $hours): ?int
+    private static function createTransaction(int $exchangeId, float $hours): ?int
     {
-        $exchangeData = $this->getExchange($exchangeId);
+        $exchangeData = self::getExchange($exchangeId);
         if (!$exchangeData) {
             return null;
         }
@@ -518,7 +518,7 @@ class ExchangeWorkflowService
         }
     }
 
-    private function updateStatus(int $exchangeId, string $newStatus, ?int $actorId, string $actorRole, ?string $notes = null): bool
+    private static function updateStatus(int $exchangeId, string $newStatus, ?int $actorId, string $actorRole, ?string $notes = null): bool
     {
         $exchange = ExchangeRequest::find($exchangeId);
         if (!$exchange) {
@@ -534,12 +534,12 @@ class ExchangeWorkflowService
 
         $exchange->update(['status' => $newStatus]);
 
-        $this->logHistory($exchangeId, 'status_changed', $actorId, $actorRole, $oldStatus, $newStatus, $notes);
+        self::logHistory($exchangeId, 'status_changed', $actorId, $actorRole, $oldStatus, $newStatus, $notes);
 
         return true;
     }
 
-    private function logHistory(
+    private static function logHistory(
         int $exchangeId,
         string $action,
         ?int $actorId,

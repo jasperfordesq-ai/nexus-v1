@@ -11,6 +11,11 @@ use App\Services\TokenService;
 
 class TokenServiceTest extends TestCase
 {
+    private static function svc(): TokenService
+    {
+        return new TokenService();
+    }
+
     protected function setUp(): void
     {
         // Set APP_KEY for token signing
@@ -29,7 +34,7 @@ class TokenServiceTest extends TestCase
 
     public function testGenerateTokenReturnsJWTFormat(): void
     {
-        $token = TokenService::generateToken(1, 1, [], false);
+        $token = self::svc()->generateToken(1, 1, [], false);
 
         $parts = explode('.', $token);
         $this->assertCount(3, $parts, 'Token should have 3 parts: header.payload.signature');
@@ -37,8 +42,8 @@ class TokenServiceTest extends TestCase
 
     public function testValidateTokenReturnsPayload(): void
     {
-        $token = TokenService::generateToken(42, 5, [], false);
-        $payload = TokenService::validateToken($token);
+        $token = self::svc()->generateToken(42, 5, [], false);
+        $payload = self::svc()->validateToken($token);
 
         $this->assertNotNull($payload);
         $this->assertEquals(42, $payload['user_id']);
@@ -48,33 +53,33 @@ class TokenServiceTest extends TestCase
 
     public function testValidateTokenReturnsNullForInvalidToken(): void
     {
-        $result = TokenService::validateToken('invalid.token.here');
+        $result = self::svc()->validateToken('invalid.token.here');
         $this->assertNull($result);
     }
 
     public function testValidateTokenReturnsNullForTamperedToken(): void
     {
-        $token = TokenService::generateToken(1, 1, [], false);
+        $token = self::svc()->generateToken(1, 1, [], false);
         // Tamper with the payload
         $parts = explode('.', $token);
         $parts[1] = base64_encode('{"user_id":999,"tenant_id":1,"type":"access","iat":' . time() . ',"exp":' . (time() + 3600) . '}');
         $tampered = implode('.', $parts);
 
-        $result = TokenService::validateToken($tampered);
+        $result = self::svc()->validateToken($tampered);
         $this->assertNull($result, 'Tampered token should fail validation');
     }
 
     public function testValidateTokenReturnsNullForMalformedToken(): void
     {
-        $this->assertNull(TokenService::validateToken('not-a-jwt'));
-        $this->assertNull(TokenService::validateToken('only.two'));
-        $this->assertNull(TokenService::validateToken(''));
+        $this->assertNull(self::svc()->validateToken('not-a-jwt'));
+        $this->assertNull(self::svc()->validateToken('only.two'));
+        $this->assertNull(self::svc()->validateToken(''));
     }
 
     public function testGenerateRefreshTokenHasCorrectType(): void
     {
-        $token = TokenService::generateRefreshToken(1, 1, false);
-        $payload = TokenService::validateToken($token);
+        $token = self::svc()->generateRefreshToken(1, 1, false);
+        $payload = self::svc()->validateToken($token);
 
         $this->assertNotNull($payload);
         $this->assertEquals('refresh', $payload['type']);
@@ -84,27 +89,27 @@ class TokenServiceTest extends TestCase
 
     public function testValidateRefreshTokenRejectsAccessToken(): void
     {
-        $accessToken = TokenService::generateToken(1, 1, [], false);
-        $result = TokenService::validateRefreshToken($accessToken);
+        $accessToken = self::svc()->generateToken(1, 1, [], false);
+        $result = self::svc()->validateRefreshToken($accessToken);
 
         $this->assertNull($result, 'validateRefreshToken should reject access tokens');
     }
 
     public function testIsExpiredReturnsFalseForFreshToken(): void
     {
-        $token = TokenService::generateToken(1, 1, [], false);
-        $this->assertFalse(TokenService::isExpired($token));
+        $token = self::svc()->generateToken(1, 1, [], false);
+        $this->assertFalse(self::svc()->isExpired($token));
     }
 
     public function testIsExpiredReturnsTrueForMalformedToken(): void
     {
-        $this->assertTrue(TokenService::isExpired('not-a-jwt'));
+        $this->assertTrue(self::svc()->isExpired('not-a-jwt'));
     }
 
     public function testGetExpirationReturnsTimestamp(): void
     {
-        $token = TokenService::generateToken(1, 1, [], false);
-        $exp = TokenService::getExpiration($token);
+        $token = self::svc()->generateToken(1, 1, [], false);
+        $exp = self::svc()->getExpiration($token);
 
         $this->assertIsInt($exp);
         $this->assertGreaterThan(time(), $exp);
@@ -112,76 +117,76 @@ class TokenServiceTest extends TestCase
 
     public function testGetExpirationReturnsNullForInvalidToken(): void
     {
-        $this->assertNull(TokenService::getExpiration('invalid'));
+        $this->assertNull(self::svc()->getExpiration('invalid'));
     }
 
     public function testGetTimeRemainingReturnsPositiveForFreshToken(): void
     {
-        $token = TokenService::generateToken(1, 1, [], false);
-        $remaining = TokenService::getTimeRemaining($token);
+        $token = self::svc()->generateToken(1, 1, [], false);
+        $remaining = self::svc()->getTimeRemaining($token);
 
         $this->assertGreaterThan(0, $remaining);
     }
 
     public function testGetTimeRemainingReturnsNegativeForInvalidToken(): void
     {
-        $this->assertEquals(-1, TokenService::getTimeRemaining('invalid'));
+        $this->assertEquals(-1, self::svc()->getTimeRemaining('invalid'));
     }
 
     public function testNeedsRefreshReturnsFalseForFreshToken(): void
     {
-        $token = TokenService::generateToken(1, 1, [], false);
-        $this->assertFalse(TokenService::needsRefresh($token));
+        $token = self::svc()->generateToken(1, 1, [], false);
+        $this->assertFalse(self::svc()->needsRefresh($token));
     }
 
     public function testGetUserIdFromTokenReturnsCorrectId(): void
     {
-        $token = TokenService::generateToken(42, 1, [], false);
-        $this->assertEquals(42, TokenService::getUserIdFromToken($token));
+        $token = self::svc()->generateToken(42, 1, [], false);
+        $this->assertEquals(42, self::svc()->getUserIdFromToken($token));
     }
 
     public function testGetUserIdFromTokenReturnsNullForInvalid(): void
     {
-        $this->assertNull(TokenService::getUserIdFromToken('invalid'));
+        $this->assertNull(self::svc()->getUserIdFromToken('invalid'));
     }
 
     public function testIsMobileRequestDetectsCapacitor(): void
     {
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 Capacitor App';
-        $this->assertTrue(TokenService::isMobileRequest());
+        $this->assertTrue(self::svc()->isMobileRequest());
     }
 
     public function testIsMobileRequestDetectsAndroid(): void
     {
         // Generic Android UA is no longer trusted (spoofable) — only Capacitor UAs are
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36';
-        $this->assertFalse(TokenService::isMobileRequest());
+        $this->assertFalse(self::svc()->isMobileRequest());
     }
 
     public function testIsMobileRequestDetectsIPhone(): void
     {
         // Generic iPhone UA is no longer trusted (spoofable) — only Capacitor UAs are
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0)';
-        $this->assertFalse(TokenService::isMobileRequest());
+        $this->assertFalse(self::svc()->isMobileRequest());
     }
 
     public function testIsMobileRequestReturnsFalseForDesktop(): void
     {
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)';
-        $this->assertFalse(TokenService::isMobileRequest());
+        $this->assertFalse(self::svc()->isMobileRequest());
     }
 
     public function testIsMobileRequestDetectsCapacitorHeader(): void
     {
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Windows NT 10.0)';
         $_SERVER['HTTP_X_CAPACITOR_APP'] = '1';
-        $this->assertTrue(TokenService::isMobileRequest());
+        $this->assertTrue(self::svc()->isMobileRequest());
     }
 
     public function testGetAccessTokenExpiryWebVsMobile(): void
     {
-        $webExpiry = TokenService::getAccessTokenExpiry(false);
-        $mobileExpiry = TokenService::getAccessTokenExpiry(true);
+        $webExpiry = self::svc()->getAccessTokenExpiry(false);
+        $mobileExpiry = self::svc()->getAccessTokenExpiry(true);
 
         $this->assertEquals(7200, $webExpiry, 'Web token should expire in 2 hours');
         $this->assertEquals(2592000, $mobileExpiry, 'Mobile token should expire in 30 days');
@@ -190,27 +195,27 @@ class TokenServiceTest extends TestCase
 
     public function testGetRefreshTokenExpiryWebVsMobile(): void
     {
-        $webExpiry = TokenService::getRefreshTokenExpiry(false);
-        $mobileExpiry = TokenService::getRefreshTokenExpiry(true);
+        $webExpiry = self::svc()->getRefreshTokenExpiry(false);
+        $mobileExpiry = self::svc()->getRefreshTokenExpiry(true);
 
         $this->assertGreaterThan($webExpiry, $mobileExpiry);
     }
 
     public function testGenerateTokenIncludesPlatformClaim(): void
     {
-        $webToken = TokenService::generateToken(1, 1, [], false);
-        $webPayload = TokenService::validateToken($webToken);
+        $webToken = self::svc()->generateToken(1, 1, [], false);
+        $webPayload = self::svc()->validateToken($webToken);
         $this->assertEquals('web', $webPayload['platform']);
 
-        $mobileToken = TokenService::generateToken(1, 1, [], true);
-        $mobilePayload = TokenService::validateToken($mobileToken);
+        $mobileToken = self::svc()->generateToken(1, 1, [], true);
+        $mobilePayload = self::svc()->validateToken($mobileToken);
         $this->assertEquals('mobile', $mobilePayload['platform']);
     }
 
     public function testGenerateTokenIncludesAdditionalClaims(): void
     {
-        $token = TokenService::generateToken(1, 1, ['role' => 'admin', 'custom' => 'value'], false);
-        $payload = TokenService::validateToken($token);
+        $token = self::svc()->generateToken(1, 1, ['role' => 'admin', 'custom' => 'value'], false);
+        $payload = self::svc()->validateToken($token);
 
         $this->assertEquals('admin', $payload['role']);
         $this->assertEquals('value', $payload['custom']);
@@ -218,8 +223,8 @@ class TokenServiceTest extends TestCase
 
     public function testTokenContainsStandardJWTClaims(): void
     {
-        $token = TokenService::generateToken(1, 1, [], false);
-        $payload = TokenService::validateToken($token);
+        $token = self::svc()->generateToken(1, 1, [], false);
+        $payload = self::svc()->validateToken($token);
 
         $this->assertArrayHasKey('iat', $payload);
         $this->assertArrayHasKey('exp', $payload);

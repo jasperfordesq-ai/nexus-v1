@@ -26,7 +26,7 @@ class CommentService
      *
      * @return array Top-level comments with nested replies
      */
-    public function getForEntity(string $targetType, int $targetId, int $currentUserId = 0): array
+    public static function getForEntity(string $targetType, int $targetId, int $currentUserId = 0): array
     {
         $rows = Comment::with(['user:id,first_name,last_name,avatar_url'])
             ->where('target_type', $targetType)
@@ -102,12 +102,12 @@ class CommentService
     /**
      * Count all comments including replies.
      */
-    public function countAll(array $comments): int
+    public static function countAll(array $comments): int
     {
         $count = count($comments);
         foreach ($comments as $c) {
             if (!empty($c['replies'])) {
-                $count += $this->countAll($c['replies']);
+                $count += self::countAll($c['replies']);
             }
         }
         return $count;
@@ -116,7 +116,7 @@ class CommentService
     /**
      * Create a comment on an entity.
      */
-    public function create(string $targetType, int $targetId, int $userId, int $tenantId, array $data): Comment
+    public static function create(string $targetType, int $targetId, int $userId, int $tenantId, array $data): Comment
     {
         return Comment::create([
             'target_type' => $targetType,
@@ -131,7 +131,7 @@ class CommentService
     /**
      * Update a comment's content (owner only).
      */
-    public function update(int $commentId, int $userId, string $content): bool
+    public static function update(int $commentId, int $userId, string $content): bool
     {
         $comment = Comment::where('id', $commentId)
             ->where('user_id', $userId)
@@ -150,7 +150,7 @@ class CommentService
     /**
      * Delete a comment (owner only).
      */
-    public function delete(int $commentId, int $userId): bool
+    public static function delete(int $commentId, int $userId): bool
     {
         return (bool) Comment::where('id', $commentId)
             ->where('user_id', $userId)
@@ -162,7 +162,7 @@ class CommentService
      *
      * @return array Threaded comments array
      */
-    public function fetchComments(string $targetType, int $targetId, int $currentUserId = 0): array
+    public static function fetchComments(string $targetType, int $targetId, int $currentUserId = 0): array
     {
         $tenantId = TenantContext::getId();
 
@@ -240,7 +240,7 @@ class CommentService
     /**
      * Add a comment or reply.
      */
-    public function addComment(int $userId, int $tenantId, string $targetType, int $targetId, string $content, ?int $parentId = null): array
+    public static function addComment(int $userId, int $tenantId, string $targetType, int $targetId, string $content, ?int $parentId = null): array
     {
         $content = trim($content);
         if (empty($content)) {
@@ -272,9 +272,9 @@ class CommentService
         ]);
 
         // Process @mentions
-        $mentions = $this->extractMentions($content);
+        $mentions = self::extractMentions($content);
         if (!empty($mentions)) {
-            $this->saveMentions($commentId, $mentions, $userId, $tenantId);
+            self::saveMentions($commentId, $mentions, $userId, $tenantId);
         }
 
         // Get the created comment with author info
@@ -299,7 +299,7 @@ class CommentService
     /**
      * Delete a comment (owner or super admin).
      */
-    public function deleteComment(int $commentId, int $userId, bool $isSuperAdmin = false): array
+    public static function deleteComment(int $commentId, int $userId, bool $isSuperAdmin = false): array
     {
         $tenantId = TenantContext::getId();
 
@@ -328,7 +328,7 @@ class CommentService
     /**
      * Edit a comment (owner only).
      */
-    public function editComment(int $commentId, int $userId, string $newContent): array
+    public static function editComment(int $commentId, int $userId, string $newContent): array
     {
         $tenantId = TenantContext::getId();
         $newContent = trim($newContent);
@@ -362,9 +362,9 @@ class CommentService
             ->where('tenant_id', $tenantId)
             ->delete();
 
-        $mentions = $this->extractMentions($newContent);
+        $mentions = self::extractMentions($newContent);
         if (!empty($mentions)) {
-            $this->saveMentions($commentId, $mentions, $userId, $tenantId);
+            self::saveMentions($commentId, $mentions, $userId, $tenantId);
         }
 
         return [
@@ -378,7 +378,7 @@ class CommentService
     /**
      * Get validation errors (interface compatibility).
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
         return [];
     }
@@ -386,7 +386,7 @@ class CommentService
     /**
      * Get the list of available reaction emojis.
      */
-    public function getAvailableReactions(): array
+    public static function getAvailableReactions(): array
     {
         return self::$availableReactions;
     }
@@ -394,7 +394,7 @@ class CommentService
     /**
      * Search users for @mention autocomplete.
      */
-    public function searchUsersForMention(string $query, int $tenantId, int $limit = 10): array
+    public static function searchUsersForMention(string $query, int $tenantId, int $limit = 10): array
     {
         $searchTerm = '%' . $query . '%';
 
@@ -415,7 +415,7 @@ class CommentService
     /**
      * Toggle an emoji reaction on a comment.
      */
-    public function toggleReaction(int $userId, int $tenantId, int $commentId, string $emoji): array
+    public static function toggleReaction(int $userId, int $tenantId, int $commentId, string $emoji): array
     {
         $existing = DB::table('comment_reactions')
             ->where('comment_id', $commentId)
@@ -458,7 +458,7 @@ class CommentService
     /**
      * Extract @mentions from content.
      */
-    private function extractMentions(string $content): array
+    private static function extractMentions(string $content): array
     {
         preg_match_all('/@(\w+)/', $content, $matches);
         return array_unique($matches[1] ?? []);
@@ -467,7 +467,7 @@ class CommentService
     /**
      * Save mentions to database and notify users.
      */
-    private function saveMentions(int $commentId, array $usernames, int $mentioningUserId, int $tenantId): void
+    private static function saveMentions(int $commentId, array $usernames, int $mentioningUserId, int $tenantId): void
     {
         foreach ($usernames as $username) {
             $user = DB::table('users')

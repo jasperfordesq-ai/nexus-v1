@@ -19,7 +19,7 @@ class GroupApprovalWorkflowService
     /**
      * Delegates to legacy GroupApprovalWorkflowService::submitForApproval().
      */
-    public function submitForApproval($groupId, $submittedBy, $notes = '')
+    public static function submitForApproval($groupId, $submittedBy, $notes = '')
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class GroupApprovalWorkflowService
     /**
      * Delegates to legacy GroupApprovalWorkflowService::approveGroup().
      */
-    public function approveGroup($requestId, $approvedBy, $notes = '')
+    public static function approveGroup($requestId, $approvedBy, $notes = '')
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class GroupApprovalWorkflowService
     /**
      * Delegates to legacy GroupApprovalWorkflowService::rejectGroup().
      */
-    public function rejectGroup($requestId, $rejectedBy, $reason = '')
+    public static function rejectGroup($requestId, $rejectedBy, $reason = '')
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class GroupApprovalWorkflowService
     /**
      * Delegates to legacy GroupApprovalWorkflowService::requestChanges().
      */
-    public function requestChanges($requestId, $reviewedBy, $changes = '')
+    public static function requestChanges($requestId, $reviewedBy, $changes = '')
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -55,7 +55,7 @@ class GroupApprovalWorkflowService
     /**
      * Delegates to legacy GroupApprovalWorkflowService::resubmit().
      */
-    public function resubmit($groupId, $userId, $notes = '')
+    public static function resubmit($groupId, $userId, $notes = '')
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

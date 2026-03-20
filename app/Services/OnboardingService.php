@@ -27,7 +27,7 @@ class OnboardingService
     /**
      * Get onboarding progress for a user.
      */
-    public function getProgress(int $tenantId, int $userId): array
+    public static function getProgress(int $tenantId, int $userId): array
     {
         $user = User::find($userId);
         if (!$user) {
@@ -62,7 +62,7 @@ class OnboardingService
     /**
      * Complete a specific onboarding step.
      */
-    public function completeStep(int $tenantId, int $userId, string $step): bool
+    public static function completeStep(int $tenantId, int $userId, string $step): bool
     {
         // Steps are tracked implicitly via data presence (profile, interests, skills)
         // For explicit step tracking, we use the onboarding_completed flag
@@ -77,7 +77,7 @@ class OnboardingService
     /**
      * Get onboarding checklist (available steps).
      */
-    public function getChecklist(int $tenantId): array
+    public static function getChecklist(int $tenantId): array
     {
         return [
             ['key' => 'profile', 'label' => 'Complete your profile', 'description' => 'Add a photo and bio'],
@@ -90,7 +90,7 @@ class OnboardingService
     /**
      * Reset onboarding progress for a user.
      */
-    public function resetProgress(int $tenantId, int $userId): bool
+    public static function resetProgress(int $tenantId, int $userId): bool
     {
         User::where('id', $userId)
             ->update(['onboarding_completed' => false]);
@@ -103,7 +103,7 @@ class OnboardingService
     /**
      * Check if onboarding is complete.
      */
-    public function isOnboardingComplete(int $userId): bool
+    public static function isOnboardingComplete(int $userId): bool
     {
         $user = User::find($userId, ['id', 'onboarding_completed']);
         return $user && (bool) $user->onboarding_completed;
@@ -112,7 +112,7 @@ class OnboardingService
     /**
      * Get user's selected interests.
      */
-    public function getUserInterests(int $userId): array
+    public static function getUserInterests(int $userId): array
     {
         return UserInterest::where('user_id', $userId)
             ->join('categories', 'categories.id', '=', 'user_interests.category_id')
@@ -128,7 +128,7 @@ class OnboardingService
      * Save user's category interests (from onboarding Step 2).
      * Replaces all existing 'interest' type entries.
      */
-    public function saveInterests(int $userId, array $categoryIds): void
+    public static function saveInterests(int $userId, array $categoryIds): void
     {
         $tenantId = TenantContext::getId();
 
@@ -150,7 +150,7 @@ class OnboardingService
      * Save user's skill offers and needs (from onboarding Step 3).
      * Replaces all existing skill_offer and skill_need entries.
      */
-    public function saveSkills(int $userId, array $offers, array $needs): void
+    public static function saveSkills(int $userId, array $offers, array $needs): void
     {
         $tenantId = TenantContext::getId();
 
@@ -182,7 +182,7 @@ class OnboardingService
      *
      * @return array List of created listing IDs
      */
-    public function autoCreateListings(int $userId, array $offers, array $needs): array
+    public static function autoCreateListings(int $userId, array $offers, array $needs): array
     {
         $tenantId = TenantContext::getId();
         $createdIds = [];
@@ -246,7 +246,7 @@ class OnboardingService
     /**
      * Mark onboarding as complete.
      */
-    public function completeOnboarding(int $userId): void
+    public static function completeOnboarding(int $userId): void
     {
         User::where('id', $userId)
             ->update(['onboarding_completed' => true]);
@@ -255,15 +255,15 @@ class OnboardingService
     /**
      * Skip an onboarding step — convenience method that marks a step complete.
      */
-    public function skipStep(int $tenantId, int $userId, string $step): bool
+    public static function skipStep(int $tenantId, int $userId, string $step): bool
     {
-        return $this->completeStep($tenantId, $userId, $step);
+        return self::completeStep($tenantId, $userId, $step);
     }
 
     /**
      * Get onboarding recommendations (categories, skills) for the user.
      */
-    public function getRecommendations(int $tenantId): array
+    public static function getRecommendations(int $tenantId): array
     {
         $categories = Category::orderBy('name')
             ->select(['id', 'name', 'slug', 'color'])
@@ -288,8 +288,8 @@ class OnboardingService
     /**
      * Alias for completeOnboarding.
      */
-    public function markComplete(int $userId): void
+    public static function markComplete(int $userId): void
     {
-        $this->completeOnboarding($userId);
+        self::completeOnboarding($userId);
     }
 }

@@ -19,7 +19,7 @@ class VolunteerReminderService
     /**
      * Delegates to legacy VolunteerReminderService::sendReminders().
      */
-    public function sendReminders(int $tenantId, int $opportunityId): int
+    public static function sendReminders(int $tenantId, int $opportunityId): int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return 0;
@@ -28,7 +28,7 @@ class VolunteerReminderService
     /**
      * Delegates to legacy VolunteerReminderService::scheduleReminder().
      */
-    public function scheduleReminder(int $tenantId, int $opportunityId, string $datetime): bool
+    public static function scheduleReminder(int $tenantId, int $opportunityId, string $datetime): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class VolunteerReminderService
     /**
      * Delegates to legacy VolunteerReminderService::cancelReminder().
      */
-    public function cancelReminder(int $tenantId, int $reminderId): bool
+    public static function cancelReminder(int $tenantId, int $reminderId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -46,7 +46,7 @@ class VolunteerReminderService
     /**
      * Delegates to legacy VolunteerReminderService::getSettings().
      */
-    public function getSettings(): array
+    public static function getSettings(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class VolunteerReminderService
     /**
      * Delegates to legacy VolunteerReminderService::updateSetting().
      */
-    public function updateSetting(string $type, array $data): bool
+    public static function updateSetting(string $type, array $data): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;

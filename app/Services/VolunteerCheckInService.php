@@ -32,7 +32,7 @@ class VolunteerCheckInService
     /**
      * Check in a volunteer for an opportunity (legacy-compatible signature).
      */
-    public function checkIn(int $tenantId, int $opportunityId, int $userId): bool
+    public static function checkIn(int $tenantId, int $opportunityId, int $userId): bool
     {
         try {
             $shift = VolShift::where('opportunity_id', $opportunityId)->first();
@@ -67,7 +67,7 @@ class VolunteerCheckInService
     /**
      * Check out a volunteer from an opportunity (legacy-compatible signature).
      */
-    public function checkOut(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
+    public static function checkOut(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
     {
         try {
             $shift = VolShift::where('opportunity_id', $opportunityId)->first();
@@ -99,7 +99,7 @@ class VolunteerCheckInService
     /**
      * Get all check-ins for an opportunity.
      */
-    public function getCheckIns(int $tenantId, int $opportunityId): array
+    public static function getCheckIns(int $tenantId, int $opportunityId): array
     {
         try {
             $shiftIds = VolShift::where('opportunity_id', $opportunityId)->pluck('id');
@@ -129,7 +129,7 @@ class VolunteerCheckInService
     /**
      * Check if a volunteer is currently checked in for an opportunity.
      */
-    public function isCheckedIn(int $tenantId, int $opportunityId, int $userId): bool
+    public static function isCheckedIn(int $tenantId, int $opportunityId, int $userId): bool
     {
         try {
             $shiftIds = VolShift::where('opportunity_id', $opportunityId)->pluck('id');
@@ -146,7 +146,7 @@ class VolunteerCheckInService
     /**
      * Get a user's check-in record for a specific shift.
      */
-    public function getUserCheckIn(int $userId, int $shiftId, int $tenantId): ?array
+    public static function getUserCheckIn(int $userId, int $shiftId, int $tenantId): ?array
     {
         $hasApproved = VolApplication::where('shift_id', $shiftId)
             ->where('user_id', $userId)
@@ -180,7 +180,7 @@ class VolunteerCheckInService
     /**
      * Generate a QR check-in token for a shift.
      */
-    public function generateToken(int $shiftId, int $tenantId): string
+    public static function generateToken(int $shiftId, int $tenantId): string
     {
         $existing = VolShiftCheckin::where('shift_id', $shiftId)
             ->whereNotNull('qr_token')
@@ -205,7 +205,7 @@ class VolunteerCheckInService
     /**
      * Resolve shift ID from a check-in token.
      */
-    public function getShiftIdByToken(string $token, int $tenantId): ?int
+    public static function getShiftIdByToken(string $token, int $tenantId): ?int
     {
         $shiftId = VolShiftCheckin::where('qr_token', $token)
             ->value('shift_id');
@@ -216,7 +216,7 @@ class VolunteerCheckInService
     /**
      * Verify a check-in via QR token scan.
      */
-    public function verifyCheckIn(array $data, int $tenantId): array|false
+    public static function verifyCheckIn(array $data, int $tenantId): array|false
     {
         $token = $data['token'] ?? '';
 
@@ -273,7 +273,7 @@ class VolunteerCheckInService
     /**
      * Resolve volunteer user ID from a check-in token.
      */
-    public function getUserIdByToken(string $token): ?int
+    public static function getUserIdByToken(string $token): ?int
     {
         $userId = VolShiftCheckin::where('qr_token', $token)
             ->value('user_id');
@@ -284,7 +284,7 @@ class VolunteerCheckInService
     /**
      * Get all check-ins for a shift.
      */
-    public function getShiftCheckIns(int $shiftId, int $tenantId): array
+    public static function getShiftCheckIns(int $shiftId, int $tenantId): array
     {
         return VolShiftCheckin::with('user')
             ->where('shift_id', $shiftId)

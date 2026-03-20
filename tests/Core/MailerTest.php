@@ -13,7 +13,7 @@ use App\Core\Mailer;
 
 /**
  * Mailer Tests
- * @covers \Nexus\Core\Mailer
+ * @covers \App\Core\Mailer
  */
 class MailerTest extends TestCase
 {

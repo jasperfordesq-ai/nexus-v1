@@ -25,12 +25,12 @@ class PollService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getAll(array $filters = []): array
+    public static function getAll(array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
-        $query = $this->poll->newQuery()
+        $query = Poll::query()
             ->with(['user:id,first_name,last_name,avatar_url']);
 
         if (($filters['status'] ?? null) === 'open') {
@@ -70,9 +70,9 @@ class PollService
     /**
      * Get a single poll by ID with vote counts and user-voted flag.
      */
-    public function getById(int $id, ?int $currentUserId = null): ?array
+    public static function getById(int $id, ?int $currentUserId = null): ?array
     {
-        $poll = $this->poll->newQuery()->with(['user'])->find($id);
+        $poll = Poll::query()->with(['user'])->find($id);
         if (! $poll) {
             return null;
         }
@@ -111,10 +111,10 @@ class PollService
     /**
      * Create a new poll with options.
      */
-    public function create(int $userId, array $data): Poll
+    public static function create(int $userId, array $data): Poll
     {
         return DB::transaction(function () use ($userId, $data) {
-            $poll = $this->poll->newInstance([
+            $poll = new Poll([
                 'user_id'     => $userId,
                 'question'    => trim($data['question']),
                 'description' => trim($data['description'] ?? ''),
@@ -142,9 +142,9 @@ class PollService
     /**
      * Update a poll (owner only, no votes yet).
      */
-    public function update(int $id, int $userId, array $data): ?Poll
+    public static function update(int $id, int $userId, array $data): ?Poll
     {
-        $poll = $this->poll->newQuery()->find($id);
+        $poll = Poll::query()->find($id);
 
         if (! $poll || (int) $poll->user_id !== $userId) {
             return null;
@@ -165,9 +165,9 @@ class PollService
     /**
      * Delete a poll (owner only).
      */
-    public function delete(int $id, int $userId): bool
+    public static function delete(int $id, int $userId): bool
     {
-        $poll = $this->poll->newQuery()->find($id);
+        $poll = Poll::query()->find($id);
 
         if (! $poll || (int) $poll->user_id !== $userId) {
             return false;
@@ -181,7 +181,7 @@ class PollService
      *
      * @return bool true if vote was cast, false if already voted
      */
-    public function vote(int $pollId, int $optionId, int $userId): bool
+    public static function vote(int $pollId, int $optionId, int $userId): bool
     {
         $alreadyVoted = DB::table('poll_votes')
             ->where('poll_id', $pollId)
@@ -209,7 +209,7 @@ class PollService
      * validation is handled by Laravel's Validator, so this returns an
      * empty array for backward-compatibility with any callers.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
         return [];
     }
@@ -217,9 +217,9 @@ class PollService
     /**
      * Get distinct poll categories for the current tenant.
      */
-    public function getCategories(): array
+    public static function getCategories(): array
     {
-        return $this->poll->newQuery()
+        return Poll::query()
             ->whereNotNull('category')
             ->where('category', '!=', '')
             ->distinct()

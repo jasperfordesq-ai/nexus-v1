@@ -45,7 +45,7 @@ class VolunteerDonationService
      * @param array $filters Keys: opportunity_id, giving_day_id, cursor, limit
      * @return array{items: array, next_cursor: int|null}
      */
-    public function getDonations(array $filters = []): array
+    public static function getDonations(array $filters = []): array
     {
         $limit = max(1, min((int) ($filters['limit'] ?? self::DEFAULT_LIMIT), self::MAX_LIMIT));
         $cursor = isset($filters['cursor']) ? (int) $filters['cursor'] : null;
@@ -97,7 +97,7 @@ class VolunteerDonationService
      * @return array The created donation record
      * @throws \InvalidArgumentException On validation failure
      */
-    public function createDonation(int $userId, array $data): array
+    public static function createDonation(int $userId, array $data): array
     {
         $tenantId = TenantContext::getId();
 
@@ -174,7 +174,7 @@ class VolunteerDonationService
     /**
      * List active giving days for the current tenant.
      */
-    public function getGivingDays(): array
+    public static function getGivingDays(): array
     {
         return VolGivingDay::where('is_active', true)
             ->orderByDesc('start_date')
@@ -192,7 +192,7 @@ class VolunteerDonationService
      * @return array Keys: total_raised, donor_count, goal_amount, progress_percent
      * @throws \RuntimeException If the giving day is not found
      */
-    public function getGivingDayStats(int $givingDayId): array
+    public static function getGivingDayStats(int $givingDayId): array
     {
         $givingDay = VolGivingDay::find($givingDayId);
 
@@ -222,7 +222,7 @@ class VolunteerDonationService
     /**
      * List all giving days (active and inactive) for admin view.
      */
-    public function adminGetGivingDays(): array
+    public static function adminGetGivingDays(): array
     {
         return VolGivingDay::orderByDesc('created_at')
             ->get([
@@ -239,7 +239,7 @@ class VolunteerDonationService
      * @param int $tenantId
      * @return array|false The created giving day record, or false on failure
      */
-    public function createGivingDay(array $data, int $tenantId): array|false
+    public static function createGivingDay(array $data, int $tenantId): array|false
     {
         $title = trim($data['title'] ?? '');
         $description = trim($data['description'] ?? '');
@@ -295,7 +295,7 @@ class VolunteerDonationService
      * @param array|null $filters Optional: opportunity_id, giving_day_id, status
      * @return array Array of associative arrays (one per donation row)
      */
-    public function exportDonations(int $tenantId, ?array $filters): array
+    public static function exportDonations(int $tenantId, ?array $filters): array
     {
         $query = VolDonation::query()
             ->select([
@@ -328,7 +328,7 @@ class VolunteerDonationService
      * @param int $tenantId
      * @return bool True if a row was updated
      */
-    public function updateGivingDay(int $givingDayId, array $data, int $tenantId): bool
+    public static function updateGivingDay(int $givingDayId, array $data, int $tenantId): bool
     {
         $givingDay = VolGivingDay::find($givingDayId);
 

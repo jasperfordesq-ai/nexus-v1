@@ -19,7 +19,7 @@ class FederatedGroupService
     /**
      * Delegates to legacy FederatedGroupService::getPartnerGroups().
      */
-    public function getPartnerGroups(int $tenantId, int $page = 1, int $perPage = 12, ?string $search = null, ?int $partnerTenantId = null): array
+    public static function getPartnerGroups(int $tenantId, int $page = 1, int $perPage = 12, ?string $search = null, ?int $partnerTenantId = null): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FederatedGroupService
     /**
      * Delegates to legacy FederatedGroupService::getPartnerGroup().
      */
-    public function getPartnerGroup(int $groupId, int $groupTenantId, int $userTenantId): ?array
+    public static function getPartnerGroup(int $groupId, int $groupTenantId, int $userTenantId): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class FederatedGroupService
     /**
      * Delegates to legacy FederatedGroupService::joinGroup().
      */
-    public function joinGroup(int $userId, int $userTenantId, int $groupId, int $groupTenantId): array
+    public static function joinGroup(int $userId, int $userTenantId, int $groupId, int $groupTenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class FederatedGroupService
     /**
      * Delegates to legacy FederatedGroupService::leaveGroup().
      */
-    public function leaveGroup(int $userId, int $userTenantId, int $groupId): array
+    public static function leaveGroup(int $userId, int $userTenantId, int $groupId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class FederatedGroupService
     /**
      * Delegates to legacy FederatedGroupService::isFederatedMember().
      */
-    public function isFederatedMember(int $userId, int $userTenantId, int $groupId): ?array
+    public static function isFederatedMember(int $userId, int $userTenantId, int $groupId): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

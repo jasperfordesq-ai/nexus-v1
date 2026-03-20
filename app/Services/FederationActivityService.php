@@ -19,7 +19,7 @@ class FederationActivityService
     /**
      * Delegates to legacy FederationActivityService::getActivityFeed().
      */
-    public function getActivityFeed(int $userId, int $limit = 50, int $offset = 0): array
+    public static function getActivityFeed(int $userId, int $limit = 50, int $offset = 0): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FederationActivityService
     /**
      * Delegates to legacy FederationActivityService::getUnreadCount().
      */
-    public function getUnreadCount(int $userId): int
+    public static function getUnreadCount(int $userId): int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return 0;
@@ -37,7 +37,7 @@ class FederationActivityService
     /**
      * Delegates to legacy FederationActivityService::getActivityStats().
      */
-    public function getActivityStats(int $userId): array
+    public static function getActivityStats(int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

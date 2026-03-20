@@ -13,7 +13,7 @@ use App\Core\RateLimiter;
 
 /**
  * RateLimiter Tests
- * @covers \Nexus\Core\RateLimiter
+ * @covers \App\Core\RateLimiter
  */
 class RateLimiterTest extends DatabaseTestCase
 {

@@ -31,12 +31,12 @@ class VolunteerService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getOpportunities(array $filters = []): array
+    public static function getOpportunities(array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 50);
         $cursor = $filters['cursor'] ?? null;
 
-        $query = $this->opportunity->newQuery()
+        $query = VolOpportunity::newQuery()
             ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name', 'category:id,name,color'])
             ->where('is_active', true);
 
@@ -77,9 +77,9 @@ class VolunteerService
     /**
      * Get a single opportunity by ID.
      */
-    public function getById(int $id): ?VolOpportunity
+    public static function getById(int $id): ?VolOpportunity
     {
-        return $this->opportunity->newQuery()
+        return VolOpportunity::newQuery()
             ->with(['creator', 'organization', 'category', 'shifts', 'applications'])
             ->find($id);
     }
@@ -87,9 +87,9 @@ class VolunteerService
     /**
      * Create a new volunteer opportunity.
      */
-    public function createOpportunity(int $userId, array $data): VolOpportunity
+    public static function createOpportunity(int $userId, array $data): VolOpportunity
     {
-        $opportunity = $this->opportunity->newInstance([
+        $opportunity = VolOpportunity::newInstance([
             'created_by'      => $userId,
             'organization_id' => $data['organization_id'] ?? null,
             'title'           => trim($data['title'] ?? ''),
@@ -110,9 +110,9 @@ class VolunteerService
     /**
      * Apply to a volunteer opportunity.
      */
-    public function apply(int $opportunityId, int $userId, array $data = []): VolApplication
+    public static function apply(int $opportunityId, int $userId, array $data = []): VolApplication
     {
-        $application = $this->application->newInstance([
+        $application = VolApplication::newInstance([
             'opportunity_id' => $opportunityId,
             'user_id'        => $userId,
             'message'        => trim($data['message'] ?? ''),
@@ -127,9 +127,9 @@ class VolunteerService
     /**
      * Get applications submitted by a user.
      */
-    public function getMyApplications(int $userId): array
+    public static function getMyApplications(int $userId): array
     {
-        return $this->application->newQuery()
+        return VolApplication::newQuery()
             ->with(['opportunity:id,title,status', 'opportunity.organization:id,name'])
             ->where('user_id', $userId)
             ->orderByDesc('created_at')
@@ -140,7 +140,7 @@ class VolunteerService
     /**
      * Get shifts the user is signed up for.
      */
-    public function getMyShifts(int $userId): array
+    public static function getMyShifts(int $userId): array
     {
         return DB::table('vol_shift_signups as ss')
             ->join('vol_shifts as s', 'ss.shift_id', '=', 's.id')
@@ -156,7 +156,7 @@ class VolunteerService
     /**
      * Get logged hours for a user.
      */
-    public function getMyHours(int $userId): array
+    public static function getMyHours(int $userId): array
     {
         return VolLog::query()
             ->with(['organization:id,name', 'opportunity:id,title'])
@@ -169,7 +169,7 @@ class VolunteerService
     /**
      * Get hours summary/stats for a user.
      */
-    public function getHoursSummary(int $userId): array
+    public static function getHoursSummary(int $userId): array
     {
         $total = VolLog::where('user_id', $userId)
             ->where('status', 'approved')
@@ -199,7 +199,7 @@ class VolunteerService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getOrganisations(array $filters = []): array
+    public static function getOrganisations(array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 50);
         $cursor = $filters['cursor'] ?? null;
@@ -237,7 +237,7 @@ class VolunteerService
     /**
      * Get a single organisation by ID with stats.
      */
-    public function getOrganisationById(int $id): ?array
+    public static function getOrganisationById(int $id): ?array
     {
         $org = VolOrganization::with('owner:id,first_name,last_name,avatar_url')
             ->find($id);
@@ -264,17 +264,17 @@ class VolunteerService
     // ========================================
 
     /** @var array Validation/business errors from the last operation */
-    private array $errors = [];
+    private static array $errors = [];
 
     /** Cached decline status value for vol_logs (declined vs rejected schema variants) */
-    private ?string $declineStatusValue = null;
+    private static ?string $declineStatusValue = null;
 
     /**
      * Get errors from the last operation.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     // ========================================
@@ -284,9 +284,9 @@ class VolunteerService
     /**
      * Get single opportunity by ID (legacy-compatible format with shifts and viewer context).
      */
-    public function getOpportunityById(int $id, ?int $viewerId = null): ?array
+    public static function getOpportunityById(int $id, ?int $viewerId = null): ?array
     {
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
 
         $opp = DB::selectOne("
             SELECT opp.*, org.name as org_name, org.logo_url as org_logo,
@@ -302,8 +302,8 @@ class VolunteerService
             return null;
         }
 
-        $formatted = $this->formatOpportunity((array) $opp);
-        $formatted['shifts'] = $this->getShiftsForOpportunity($id);
+        $formatted = self::formatOpportunity((array) $opp);
+        $formatted['shifts'] = self::getShiftsForOpportunity($id);
 
         if ($viewerId) {
             $formatted['has_applied'] = (bool) DB::selectOne(
@@ -321,7 +321,7 @@ class VolunteerService
                 'shift_id'   => $userApp->shift_id ? (int) $userApp->shift_id : null,
                 'created_at' => $userApp->created_at,
             ] : null;
-            $formatted['is_owner'] = $this->canManageOpportunity((array) $opp, $viewerId);
+            $formatted['is_owner'] = self::canManageOpportunity((array) $opp, $viewerId);
         }
 
         return $formatted;
@@ -330,10 +330,10 @@ class VolunteerService
     /**
      * Update an opportunity.
      */
-    public function updateOpportunity(int $id, int $userId, array $data): bool
+    public static function updateOpportunity(int $id, int $userId, array $data): bool
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         $opp = DB::selectOne("
             SELECT opp.*, org.user_id as org_owner_id
@@ -343,12 +343,12 @@ class VolunteerService
         ", [$id, $tenantId]);
 
         if (!$opp) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
             return false;
         }
 
-        if (!$this->canManageOpportunity((array) $opp, $userId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+        if (!self::canManageOpportunity((array) $opp, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return false;
         }
 
@@ -373,7 +373,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::updateOpportunity error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update opportunity'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update opportunity'];
             return false;
         }
     }
@@ -381,10 +381,10 @@ class VolunteerService
     /**
      * Delete (deactivate) an opportunity.
      */
-    public function deleteOpportunity(int $id, int $userId): bool
+    public static function deleteOpportunity(int $id, int $userId): bool
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         $opp = DB::selectOne("
             SELECT opp.*, org.user_id as org_owner_id
@@ -394,12 +394,12 @@ class VolunteerService
         ", [$id, $tenantId]);
 
         if (!$opp) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
             return false;
         }
 
-        if (!$this->canManageOpportunity((array) $opp, $userId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+        if (!self::canManageOpportunity((array) $opp, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return false;
         }
 
@@ -408,7 +408,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::deleteOpportunity error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete opportunity'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete opportunity'];
             return false;
         }
     }
@@ -420,10 +420,10 @@ class VolunteerService
     /**
      * Get applications for an opportunity (org admin only).
      */
-    public function getApplicationsForOpportunity(int $opportunityId, int $adminUserId, array $filters = []): ?array
+    public static function getApplicationsForOpportunity(int $opportunityId, int $adminUserId, array $filters = []): ?array
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         $opp = DB::selectOne("
             SELECT opp.*, org.user_id as org_owner_id
@@ -433,17 +433,17 @@ class VolunteerService
         ", [$opportunityId, $tenantId]);
 
         if (!$opp) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
             return null;
         }
 
-        if (!$this->canManageOpportunity((array) $opp, $adminUserId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+        if (!self::canManageOpportunity((array) $opp, $adminUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return null;
         }
 
         $limit = min($filters['limit'] ?? 20, 50);
-        $cursorId = $this->decodeCursor($filters['cursor'] ?? null);
+        $cursorId = self::decodeCursor($filters['cursor'] ?? null);
 
         $sql = "
             SELECT a.*, a.org_note, u.name as user_name, u.email as user_email, u.avatar_url as user_avatar,
@@ -507,16 +507,16 @@ class VolunteerService
     /**
      * Handle application (approve/decline).
      */
-    public function handleApplication(int $applicationId, int $adminUserId, string $action, string $orgNote = ''): bool
+    public static function handleApplication(int $applicationId, int $adminUserId, string $action, string $orgNote = ''): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         if (!in_array($action, ['approve', 'decline'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or decline'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or decline'];
             return false;
         }
 
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
 
         $app = DB::selectOne("
             SELECT a.*, opp.title, opp.organization_id, org.user_id as org_owner_id
@@ -527,12 +527,12 @@ class VolunteerService
         ", [$applicationId, $tenantId]);
 
         if (!$app) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Application not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Application not found'];
             return false;
         }
 
-        if (!$this->canManageOpportunity((array) $app, $adminUserId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+        if (!self::canManageOpportunity((array) $app, $adminUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
             return false;
         }
 
@@ -547,7 +547,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::handleApplication error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update application'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update application'];
             return false;
         }
     }
@@ -555,10 +555,10 @@ class VolunteerService
     /**
      * Withdraw an application.
      */
-    public function withdrawApplication(int $applicationId, int $userId): bool
+    public static function withdrawApplication(int $applicationId, int $userId): bool
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         $app = DB::selectOne("
             SELECT a.*, opp.title, opp.id as opportunity_id, org.user_id as org_owner_id
@@ -569,17 +569,17 @@ class VolunteerService
         ", [$applicationId, $tenantId]);
 
         if (!$app) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Application not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Application not found'];
             return false;
         }
 
         if ((int) $app->user_id !== $userId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'This is not your application'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'This is not your application'];
             return false;
         }
 
         if ($app->status === 'approved') {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'You cannot withdraw an approved application. Please contact the organisation directly.'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'You cannot withdraw an approved application. Please contact the organisation directly.'];
             return false;
         }
 
@@ -588,7 +588,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::withdrawApplication error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to withdraw application'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to withdraw application'];
             return false;
         }
     }
@@ -600,9 +600,9 @@ class VolunteerService
     /**
      * Get shifts for an opportunity.
      */
-    public function getShiftsForOpportunity(int $opportunityId): array
+    public static function getShiftsForOpportunity(int $opportunityId): array
     {
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
 
         $shifts = DB::select(
             "SELECT * FROM vol_shifts WHERE opportunity_id = ? AND tenant_id = ? ORDER BY start_time ASC",
@@ -629,14 +629,14 @@ class VolunteerService
     /**
      * Sign up for a shift (requires approved application).
      */
-    public function signUpForShift(int $shiftId, int $userId): bool
+    public static function signUpForShift(int $shiftId, int $userId): bool
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         $shift = DB::selectOne("SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ?", [$shiftId, $tenantId]);
         if (!$shift) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
             return false;
         }
 
@@ -649,7 +649,7 @@ class VolunteerService
         );
 
         if (!$app) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have an approved application to sign up for shifts'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have an approved application to sign up for shifts'];
             return false;
         }
 
@@ -660,13 +660,13 @@ class VolunteerService
         )->cnt;
 
         if ($shift->capacity && $signupCount >= (int) $shift->capacity) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift is at capacity'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift is at capacity'];
             return false;
         }
 
         // Check shift hasn't passed
         if (strtotime($shift->start_time) < time()) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
             return false;
         }
 
@@ -678,7 +678,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::signUpForShift error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to sign up for shift'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to sign up for shift'];
             return false;
         }
     }
@@ -686,19 +686,19 @@ class VolunteerService
     /**
      * Cancel shift signup.
      */
-    public function cancelShiftSignup(int $shiftId, int $userId): bool
+    public static function cancelShiftSignup(int $shiftId, int $userId): bool
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         $shift = DB::selectOne("SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ?", [$shiftId, $tenantId]);
         if (!$shift) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
             return false;
         }
 
         if (strtotime($shift->start_time) < time()) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot cancel a shift that has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot cancel a shift that has already started'];
             return false;
         }
 
@@ -709,14 +709,14 @@ class VolunteerService
             );
 
             if ($affected === 0) {
-                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not signed up for this shift'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not signed up for this shift'];
                 return false;
             }
 
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::cancelShiftSignup error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel shift signup'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel shift signup'];
             return false;
         }
     }
@@ -728,40 +728,40 @@ class VolunteerService
     /**
      * Log volunteering hours.
      */
-    public function logHours(int $userId, array $data): ?int
+    public static function logHours(int $userId, array $data): ?int
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         if (empty($data['organization_id'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organization is required', 'field' => 'organization_id'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organization is required', 'field' => 'organization_id'];
             return null;
         }
 
         if (empty($data['date'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Date is required', 'field' => 'date'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Date is required', 'field' => 'date'];
             return null;
         }
 
         if (empty($data['hours']) || $data['hours'] <= 0) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Hours must be greater than 0', 'field' => 'hours'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Hours must be greater than 0', 'field' => 'hours'];
             return null;
         }
 
         if ($data['hours'] > 24) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot log more than 24 hours in a single entry', 'field' => 'hours'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot log more than 24 hours in a single entry', 'field' => 'hours'];
             return null;
         }
 
         if (strtotime($data['date']) > time()) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot log hours for a future date', 'field' => 'date'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot log hours for a future date', 'field' => 'date'];
             return null;
         }
 
         // Verify organization exists
         $org = DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [(int) $data['organization_id'], $tenantId]);
         if (!$org) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
             return null;
         }
 
@@ -772,7 +772,7 @@ class VolunteerService
                 [$data['opportunity_id'], $userId, $tenantId]
             );
             if (!$hasApp) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have an approved application for this opportunity', 'field' => 'opportunity_id'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have an approved application for this opportunity', 'field' => 'opportunity_id'];
                 return null;
             }
         }
@@ -795,7 +795,7 @@ class VolunteerService
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
             error_log("VolunteerService::logHours error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to log hours'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to log hours'];
             return null;
         }
     }
@@ -803,11 +803,11 @@ class VolunteerService
     /**
      * Get pending hours waiting for approval by an org owner.
      */
-    public function getPendingHoursForOrgOwner(int $userId, array $filters = []): array
+    public static function getPendingHoursForOrgOwner(int $userId, array $filters = []): array
     {
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
         $limit = min($filters['limit'] ?? 20, 50);
-        $cursorId = $this->decodeCursor($filters['cursor'] ?? null);
+        $cursorId = self::decodeCursor($filters['cursor'] ?? null);
 
         $sql = "
             SELECT l.id, l.hours, l.date_logged, l.description, l.status, l.created_at,
@@ -873,27 +873,27 @@ class VolunteerService
     /**
      * Verify hours (org admin).
      */
-    public function verifyHours(int $logId, int $adminUserId, string $action): bool
+    public static function verifyHours(int $logId, int $adminUserId, string $action): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         if (!in_array($action, ['approve', 'decline'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or decline'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or decline'];
             return false;
         }
 
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
 
         $log = DB::selectOne("SELECT * FROM vol_logs WHERE id = ? AND tenant_id = ?", [$logId, $tenantId]);
         if (!$log) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Log entry not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Log entry not found'];
             return false;
         }
 
         // Verify admin owns or is admin of the org
         $org = DB::selectOne("SELECT * FROM vol_organizations WHERE id = ? AND tenant_id = ?", [(int) $log->organization_id, $tenantId]);
         if (!$org) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
             return false;
         }
 
@@ -903,18 +903,18 @@ class VolunteerService
         );
 
         if ((int) $org->user_id !== $adminUserId && !in_array($orgAdminRole->role ?? '', ['owner', 'admin'], true)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this organization'];
             return false;
         }
 
-        $status = $action === 'approve' ? 'approved' : $this->getDeclineStatusValue();
+        $status = $action === 'approve' ? 'approved' : self::getDeclineStatusValue();
 
         try {
             DB::update("UPDATE vol_logs SET status = ? WHERE id = ? AND tenant_id = ?", [$status, $logId, $tenantId]);
             return true;
         } catch (\Exception $e) {
             error_log("VolunteerService::verifyHours error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to verify hours'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to verify hours'];
             return false;
         }
     }
@@ -926,9 +926,9 @@ class VolunteerService
     /**
      * Get organisations the current user owns or is admin of.
      */
-    public function getMyOrganizations(int $userId): array
+    public static function getMyOrganizations(int $userId): array
     {
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
 
         $rows = DB::select("
             SELECT vo.*, om.role as member_role
@@ -956,10 +956,10 @@ class VolunteerService
     /**
      * Register a new volunteer organisation (status='pending').
      */
-    public function createOrganization(int $userId, array $data): ?int
+    public static function createOrganization(int $userId, array $data): ?int
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         $name = trim($data['name'] ?? '');
         $description = trim($data['description'] ?? '');
@@ -967,42 +967,42 @@ class VolunteerService
         $website = trim($data['website'] ?? '');
 
         if (empty($name)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name is required', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name is required', 'field' => 'name'];
             return null;
         }
 
         if (mb_strlen($name) < 3) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be at least 3 characters', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be at least 3 characters', 'field' => 'name'];
             return null;
         }
 
         if (mb_strlen($name) > 200) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be under 200 characters', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be under 200 characters', 'field' => 'name'];
             return null;
         }
 
         if (empty($description)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
             return null;
         }
 
         if (mb_strlen($description) < 20) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description must be at least 20 characters', 'field' => 'description'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description must be at least 20 characters', 'field' => 'description'];
             return null;
         }
 
         if (empty($contactEmail)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Contact email is required', 'field' => 'contact_email'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Contact email is required', 'field' => 'contact_email'];
             return null;
         }
 
         if (!filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid email address', 'field' => 'contact_email'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid email address', 'field' => 'contact_email'];
             return null;
         }
 
         if (!empty($website) && !filter_var($website, FILTER_VALIDATE_URL)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid URL', 'field' => 'website'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid URL', 'field' => 'website'];
             return null;
         }
 
@@ -1013,11 +1013,11 @@ class VolunteerService
         );
 
         if ($existing) {
-            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'An organisation with this name already exists', 'field' => 'name'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'An organisation with this name already exists', 'field' => 'name'];
             return null;
         }
 
-        $slug = $this->generateOrgSlug($name, $tenantId);
+        $slug = self::generateOrgSlug($name, $tenantId);
 
         try {
             DB::insert(
@@ -1037,7 +1037,7 @@ class VolunteerService
             return $orgId;
         } catch (\Exception $e) {
             error_log("VolunteerService::createOrganization error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
             return null;
         }
     }
@@ -1045,9 +1045,9 @@ class VolunteerService
     /**
      * Get single organization by ID (legacy-compatible format).
      */
-    public function getOrganizationById(int $id, bool $includeNonApproved = false): ?array
+    public static function getOrganizationById(int $id, bool $includeNonApproved = false): ?array
     {
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
 
         $org = DB::selectOne("SELECT * FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$org) {
@@ -1110,18 +1110,18 @@ class VolunteerService
     /**
      * Create a volunteering review.
      */
-    public function createReview(int $reviewerId, string $targetType, int $targetId, int $rating, string $comment = ''): ?int
+    public static function createReview(int $reviewerId, string $targetType, int $targetId, int $rating, string $comment = ''): ?int
     {
-        $this->errors = [];
-        $tenantId = $this->getTenantId();
+        self::$errors = [];
+        $tenantId = self::getTenantId();
 
         if (!in_array($targetType, ['organization', 'user'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Target type must be organization or user'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Target type must be organization or user'];
             return null;
         }
 
         if ($rating < 1 || $rating > 5) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Rating must be between 1 and 5', 'field' => 'rating'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Rating must be between 1 and 5', 'field' => 'rating'];
             return null;
         }
 
@@ -1129,7 +1129,7 @@ class VolunteerService
         if ($targetType === 'organization') {
             $org = DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
             if (!$org) {
-                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
                 return null;
             }
             $history = DB::selectOne("
@@ -1142,13 +1142,13 @@ class VolunteerService
             ", [$reviewerId, $targetId, $tenantId, $reviewerId, $targetId, $tenantId]);
 
             if (!$history) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered with this organisation to leave a review'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered with this organisation to leave a review'];
                 return null;
             }
         } else {
             $user = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
             if (!$user) {
-                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
                 return null;
             }
             $history = DB::selectOne("
@@ -1159,7 +1159,7 @@ class VolunteerService
             ", [$reviewerId, $targetId, $tenantId]);
 
             if (!$history) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered together to leave a review'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered together to leave a review'];
                 return null;
             }
         }
@@ -1174,7 +1174,7 @@ class VolunteerService
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
             error_log("VolunteerService::createReview error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create review'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create review'];
             return null;
         }
     }
@@ -1182,9 +1182,9 @@ class VolunteerService
     /**
      * Get reviews for a target.
      */
-    public function getReviews(string $targetType, int $targetId): array
+    public static function getReviews(string $targetType, int $targetId): array
     {
-        $tenantId = $this->getTenantId();
+        $tenantId = self::getTenantId();
 
         $rows = DB::select("
             SELECT r.*, u.first_name, u.last_name, u.avatar_url
@@ -1220,7 +1220,7 @@ class VolunteerService
     /**
      * Get the current tenant ID.
      */
-    private function getTenantId(): int
+    private static function getTenantId(): int
     {
         return \App\Core\TenantContext::getId();
     }
@@ -1228,7 +1228,7 @@ class VolunteerService
     /**
      * Decode a base64-encoded numeric cursor.
      */
-    private function decodeCursor(?string $cursor): ?int
+    private static function decodeCursor(?string $cursor): ?int
     {
         if (!$cursor) {
             return null;
@@ -1243,7 +1243,7 @@ class VolunteerService
     /**
      * Check if a user can manage an opportunity.
      */
-    private function canManageOpportunity(array $opp, int $userId): bool
+    private static function canManageOpportunity(array $opp, int $userId): bool
     {
         if ((int) ($opp['org_owner_id'] ?? 0) === $userId) {
             return true;
@@ -1261,7 +1261,7 @@ class VolunteerService
 
         $orgRole = DB::selectOne(
             "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
-            [$this->getTenantId(), $orgId, $userId]
+            [self::getTenantId(), $orgId, $userId]
         );
 
         return $orgRole && in_array($orgRole->role, ['owner', 'admin'], true);
@@ -1270,7 +1270,7 @@ class VolunteerService
     /**
      * Format opportunity for API response.
      */
-    private function formatOpportunity(array $opp): array
+    private static function formatOpportunity(array $opp): array
     {
         return [
             'id'            => (int) $opp['id'],
@@ -1295,7 +1295,7 @@ class VolunteerService
     /**
      * Generate a unique slug for an organisation within a tenant.
      */
-    private function generateOrgSlug(string $name, int $tenantId): string
+    private static function generateOrgSlug(string $name, int $tenantId): string
     {
         $slug = mb_strtolower($name, 'UTF-8');
         $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
@@ -1327,10 +1327,10 @@ class VolunteerService
     /**
      * Resolve the "declined" state value for vol_logs across schema variants.
      */
-    private function getDeclineStatusValue(): string
+    private static function getDeclineStatusValue(): string
     {
-        if ($this->declineStatusValue !== null) {
-            return $this->declineStatusValue;
+        if (self::$declineStatusValue !== null) {
+            return self::$declineStatusValue;
         }
 
         try {
@@ -1345,18 +1345,18 @@ class VolunteerService
             $columnType = strtolower((string) ($row->COLUMN_TYPE ?? ''));
 
             if (str_contains($columnType, "'declined'")) {
-                $this->declineStatusValue = 'declined';
+                self::$declineStatusValue = 'declined';
             } elseif (str_contains($columnType, "'rejected'")) {
-                $this->declineStatusValue = 'rejected';
+                self::$declineStatusValue = 'rejected';
             }
         } catch (\Throwable $e) {
             // Fallback below
         }
 
-        if ($this->declineStatusValue === null) {
-            $this->declineStatusValue = 'declined';
+        if (self::$declineStatusValue === null) {
+            self::$declineStatusValue = 'declined';
         }
 
-        return $this->declineStatusValue;
+        return self::$declineStatusValue;
     }
 }

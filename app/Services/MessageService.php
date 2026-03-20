@@ -31,7 +31,7 @@ class MessageService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getConversations(int $userId, array $filters = []): array
+    public static function getConversations(int $userId, array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
@@ -64,7 +64,7 @@ class MessageService
             $conversationIds->pop();
         }
 
-        $messages = $this->message->newQuery()
+        $messages = Message::query()
             ->with([
                 'sender:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
                 'receiver:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
@@ -133,7 +133,7 @@ class MessageService
      * @param array $filters Pagination filters (limit, cursor, direction)
      * @return array{items: array, cursor: string|null, has_more: bool}|null Null if partner user not found
      */
-    public function getMessages(int $partnerId, int $userId, array $filters = []): ?array
+    public static function getMessages(int $partnerId, int $userId, array $filters = []): ?array
     {
         // Verify the partner user exists (skip tenant scope — users may be cross-tenant visible)
         $partner = User::withoutGlobalScopes()->find($partnerId);
@@ -145,7 +145,7 @@ class MessageService
         $cursor = $filters['cursor'] ?? null;
         $direction = $filters['direction'] ?? 'older';
 
-        $query = $this->message->newQuery()
+        $query = Message::query()
             ->with([
                 'sender:id,first_name,last_name,avatar_url',
                 'receiver:id,first_name,last_name,avatar_url',
@@ -177,7 +177,7 @@ class MessageService
 
         // Mark messages as read when viewing (older direction or no cursor)
         if ($direction !== 'newer' || $cursor === null) {
-            $this->markAsRead($partnerId, $userId);
+            self::markAsRead($partnerId, $userId);
         }
 
         $items = $messages->map(fn (Message $msg) => $msg->toArray())->all();
@@ -201,7 +201,7 @@ class MessageService
      * @param array|null $data
      * @return array The created message as an array
      */
-    public function send(int $senderId, int|array $receiverIdOrData, ?array $data = null): array
+    public static function send(int $senderId, int|array $receiverIdOrData, ?array $data = null): array
     {
         if (is_array($receiverIdOrData)) {
             // Controller-style call: send($userId, $allInput)
@@ -223,7 +223,7 @@ class MessageService
             return ['error' => 'Message body is required'];
         }
 
-        $message = $this->message->newInstance([
+        $message = new Message([
             'sender_id'      => $senderId,
             'receiver_id'    => $receiverId,
             'body'           => $content,
@@ -239,9 +239,9 @@ class MessageService
     /**
      * Mark all messages from a partner as read.
      */
-    public function markAsRead(int $partnerId, int $userId): int
+    public static function markAsRead(int $partnerId, int $userId): int
     {
-        return $this->message->newQuery()
+        return Message::query()
             ->where('sender_id', $partnerId)
             ->where('receiver_id', $userId)
             ->where('is_read', false)
@@ -251,9 +251,9 @@ class MessageService
     /**
      * Get total unread message count for a user.
      */
-    public function getUnreadCount(int $userId): int
+    public static function getUnreadCount(int $userId): int
     {
-        return $this->message->newQuery()
+        return Message::query()
             ->where('receiver_id', $userId)
             ->where('is_read', false)
             ->count();
@@ -264,14 +264,14 @@ class MessageService
     // -----------------------------------------------------------------
 
     /** @var array */
-    private array $errors = [];
+    private static array $errors = [];
 
     /**
      * Get validation errors from the last operation.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     // -----------------------------------------------------------------
@@ -281,25 +281,25 @@ class MessageService
     /**
      * Get a single conversation summary with another user.
      */
-    public function getConversation(int $otherUserId, int $userId): ?array
+    public static function getConversation(int $otherUserId, int $userId): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
         $otherUser = User::withoutGlobalScopes()->find($otherUserId);
         if (! $otherUser) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
             return null;
         }
 
         $tenantId = app('tenant.id');
 
-        $unreadCount = $this->message->newQuery()
+        $unreadCount = Message::query()
             ->where('sender_id', $otherUserId)
             ->where('receiver_id', $userId)
             ->where('is_read', false)
             ->count();
 
-        $messageCount = $this->message->newQuery()
+        $messageCount = Message::query()
             ->betweenUsers($userId, $otherUserId)
             ->count();
 
@@ -327,7 +327,7 @@ class MessageService
      *
      * Uses per-user archival columns so each user can independently archive.
      */
-    public function archiveConversation(int $otherUserId, int $userId): int
+    public static function archiveConversation(int $otherUserId, int $userId): int
     {
         $tenantId = app('tenant.id');
         $now = now();
@@ -372,7 +372,7 @@ class MessageService
     /**
      * Unarchive a conversation with another user.
      */
-    public function unarchiveConversation(int $otherUserId, int $userId): int
+    public static function unarchiveConversation(int $otherUserId, int $userId): int
     {
         $tenantId = app('tenant.id');
 
@@ -409,20 +409,20 @@ class MessageService
     /**
      * Edit a message body.
      */
-    public function editMessage(int $messageId, int $userId, string $newBody): ?array
+    public static function editMessage(int $messageId, int $userId, string $newBody): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
         /** @var Message|null $message */
-        $message = $this->message->newQuery()->find($messageId);
+        $message = Message::query()->find($messageId);
 
         if (! $message) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
             return null;
         }
 
         if ((int) $message->sender_id !== $userId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only edit your own messages'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only edit your own messages'];
             return null;
         }
 
@@ -447,20 +447,20 @@ class MessageService
     /**
      * Delete a message (soft delete).
      */
-    public function deleteMessage(int $messageId, int $userId): bool
+    public static function deleteMessage(int $messageId, int $userId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         /** @var Message|null $message */
-        $message = $this->message->newQuery()->find($messageId);
+        $message = Message::query()->find($messageId);
 
         if (! $message) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
             return false;
         }
 
         if ((int) $message->sender_id !== $userId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own messages'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own messages'];
             return false;
         }
 
@@ -492,27 +492,27 @@ class MessageService
      *
      * @return bool|null True if added, false if removed, null on error
      */
-    public function toggleReaction(int $messageId, int $userId, string $emoji): ?bool
+    public static function toggleReaction(int $messageId, int $userId, string $emoji): ?bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         /** @var Message|null $message */
-        $message = $this->message->newQuery()->find($messageId);
+        $message = Message::query()->find($messageId);
 
         if (! $message) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
             return null;
         }
 
         // User must be sender or receiver
         if ((int) $message->sender_id !== $userId && (int) $message->receiver_id !== $userId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You cannot react to this message'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You cannot react to this message'];
             return null;
         }
 
         $hasReactions = DB::getSchemaBuilder()->hasColumn('messages', 'reactions');
         if (! $hasReactions) {
-            $this->errors[] = ['code' => 'FEATURE_UNAVAILABLE', 'message' => 'Reactions feature not yet enabled'];
+            self::$errors[] = ['code' => 'FEATURE_UNAVAILABLE', 'message' => 'Reactions feature not yet enabled'];
             return null;
         }
 
@@ -562,7 +562,7 @@ class MessageService
      * This is a no-op in Eloquent mode — real-time typing indicators
      * are handled by the frontend via Pusher directly.
      */
-    public function setTypingIndicator(int $recipientId, int $userId, bool $isTyping): bool
+    public static function setTypingIndicator(int $recipientId, int $userId, bool $isTyping): bool
     {
         // Typing indicators are broadcast-only (Pusher) — no DB persistence needed.
         // The legacy implementation called RealtimeService::broadcastTyping() which

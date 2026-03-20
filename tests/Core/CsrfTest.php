@@ -20,7 +20,7 @@ use App\Core\Csrf;
  * - Bearer token bypass
  * - HTML field generation
  *
- * @covers \Nexus\Core\Csrf
+ * @covers \App\Core\Csrf
  */
 class CsrfTest extends TestCase
 {

@@ -19,7 +19,7 @@ use App\Helpers\TimeHelper;
  * - Date formatting
  * - Date and time formatting
  *
- * @covers \Nexus\Helpers\TimeHelper
+ * @covers \App\Helpers\TimeHelper
  */
 class TimeHelperTest extends TestCase
 {

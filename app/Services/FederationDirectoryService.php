@@ -19,7 +19,7 @@ class FederationDirectoryService
     /**
      * Delegates to legacy FederationDirectoryService::getDiscoverableTimebanks().
      */
-    public function getDiscoverableTimebanks(int $currentTenantId, array $filters = []): array
+    public static function getDiscoverableTimebanks(int $currentTenantId, array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FederationDirectoryService
     /**
      * Delegates to legacy FederationDirectoryService::getAvailableRegions().
      */
-    public function getAvailableRegions(): array
+    public static function getAvailableRegions(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class FederationDirectoryService
     /**
      * Delegates to legacy FederationDirectoryService::getAvailableCategories().
      */
-    public function getAvailableCategories(): array
+    public static function getAvailableCategories(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class FederationDirectoryService
     /**
      * Delegates to legacy FederationDirectoryService::getTimebankProfile().
      */
-    public function getTimebankProfile(int $tenantId): ?array
+    public static function getTimebankProfile(int $tenantId): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -55,7 +55,7 @@ class FederationDirectoryService
     /**
      * Delegates to legacy FederationDirectoryService::updateDirectoryProfile().
      */
-    public function updateDirectoryProfile(int $tenantId, array $data): bool
+    public static function updateDirectoryProfile(int $tenantId, array $data): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;

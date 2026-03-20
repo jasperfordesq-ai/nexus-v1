@@ -23,6 +23,11 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
 {
     private const TENANT_ID = 2;
 
+    private static function svc(): ShiftWaitlistService
+    {
+        return new ShiftWaitlistService();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -41,7 +46,7 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        $entryId = ShiftWaitlistService::join($shiftId, $userId);
+        $entryId = self::svc()->join($shiftId, $userId);
 
         $this->assertNotNull($entryId);
         $this->assertIsInt($entryId);
@@ -56,13 +61,13 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        $entryId1 = ShiftWaitlistService::join($shiftId, $userId);
+        $entryId1 = self::svc()->join($shiftId, $userId);
         $this->assertNotNull($entryId1);
 
         // Second join must fail
-        $entryId2 = ShiftWaitlistService::join($shiftId, $userId);
+        $entryId2 = self::svc()->join($shiftId, $userId);
         $this->assertNull($entryId2);
-        $errors = ShiftWaitlistService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame('ALREADY_EXISTS', $errors[0]['code']);
     }
@@ -81,10 +86,10 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
             [self::TENANT_ID, $opportunityId, $userId, $shiftId]
         );
 
-        $entryId = ShiftWaitlistService::join($shiftId, $userId);
+        $entryId = self::svc()->join($shiftId, $userId);
 
         $this->assertNull($entryId);
-        $errors = ShiftWaitlistService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame('ALREADY_EXISTS', $errors[0]['code']);
     }
@@ -104,10 +109,10 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         );
         $pastShiftId = (int)Database::getInstance()->lastInsertId();
 
-        $entryId = ShiftWaitlistService::join($pastShiftId, $userId);
+        $entryId = self::svc()->join($pastShiftId, $userId);
 
         $this->assertNull($entryId);
-        $errors = ShiftWaitlistService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame('VALIDATION_ERROR', $errors[0]['code']);
     }
@@ -124,9 +129,9 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        ShiftWaitlistService::join($shiftId, $userId);
+        self::svc()->join($shiftId, $userId);
 
-        $result = ShiftWaitlistService::leave($shiftId, $userId);
+        $result = self::svc()->leave($shiftId, $userId);
 
         $this->assertTrue($result);
 
@@ -146,10 +151,10 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        $result = ShiftWaitlistService::leave($shiftId, $userId);
+        $result = self::svc()->leave($shiftId, $userId);
 
         $this->assertFalse($result);
-        $errors = ShiftWaitlistService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame('NOT_FOUND', $errors[0]['code']);
     }
@@ -166,9 +171,9 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        ShiftWaitlistService::join($shiftId, $userId);
+        self::svc()->join($shiftId, $userId);
 
-        $waitlist = ShiftWaitlistService::getWaitlist($shiftId);
+        $waitlist = self::svc()->getWaitlist($shiftId);
 
         $this->assertIsArray($waitlist);
         $this->assertNotEmpty($waitlist);
@@ -189,9 +194,9 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        ShiftWaitlistService::join($shiftId, $userId);
+        self::svc()->join($shiftId, $userId);
 
-        $position = ShiftWaitlistService::getUserPosition($shiftId, $userId);
+        $position = self::svc()->getUserPosition($shiftId, $userId);
 
         $this->assertNotNull($position);
         $this->assertIsArray($position);
@@ -210,7 +215,7 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        $position = ShiftWaitlistService::getUserPosition($shiftId, $userId);
+        $position = self::svc()->getUserPosition($shiftId, $userId);
 
         $this->assertNull($position);
     }
@@ -226,7 +231,7 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $ownerId = $this->createUser('wl-owner');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        $result = ShiftWaitlistService::processSpotOpening($shiftId);
+        $result = self::svc()->processSpotOpening($shiftId);
 
         $this->assertFalse($result);
     }
@@ -239,10 +244,10 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        $entryId = ShiftWaitlistService::join($shiftId, $userId);
+        $entryId = self::svc()->join($shiftId, $userId);
         $this->assertNotNull($entryId);
 
-        $result = ShiftWaitlistService::processSpotOpening($shiftId);
+        $result = self::svc()->processSpotOpening($shiftId);
 
         $this->assertTrue($result);
 
@@ -266,9 +271,9 @@ class ShiftWaitlistServiceTest extends DatabaseTestCase
         $userId  = $this->createUser('wl-user');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
 
-        ShiftWaitlistService::join($shiftId, $userId);
+        self::svc()->join($shiftId, $userId);
 
-        $waitlists = ShiftWaitlistService::getUserWaitlists($userId);
+        $waitlists = self::svc()->getUserWaitlists($userId);
 
         $this->assertIsArray($waitlists);
         $this->assertNotEmpty($waitlists);

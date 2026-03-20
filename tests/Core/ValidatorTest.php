@@ -18,7 +18,7 @@ use App\Core\Validator;
  * - Irish phone number validation (mobile and landline)
  * - Location validation via GeocodingService
  *
- * @covers \Nexus\Core\Validator
+ * @covers \App\Core\Validator
  */
 class ValidatorTest extends TestCase
 {

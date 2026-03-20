@@ -19,7 +19,7 @@ class FederationUserService
     /**
      * Delegates to legacy FederationUserService::getUserSettings().
      */
-    public function getUserSettings(int $userId): array
+    public static function getUserSettings(int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FederationUserService
     /**
      * Delegates to legacy FederationUserService::updateSettings().
      */
-    public function updateSettings(int $userId, array $settings): bool
+    public static function updateSettings(int $userId, array $settings): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class FederationUserService
     /**
      * Delegates to legacy FederationUserService::hasOptedIn().
      */
-    public function hasOptedIn(int $userId, ?int $tenantId = null): bool
+    public static function hasOptedIn(int $userId, ?int $tenantId = null): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -46,7 +46,7 @@ class FederationUserService
     /**
      * Delegates to legacy FederationUserService::optOut().
      */
-    public function optOut(int $userId): bool
+    public static function optOut(int $userId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -55,7 +55,7 @@ class FederationUserService
     /**
      * Delegates to legacy FederationUserService::getFederatedUsers().
      */
-    public function getFederatedUsers(int $tenantId, array $filters = []): array
+    public static function getFederatedUsers(int $tenantId, array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

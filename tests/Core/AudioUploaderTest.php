@@ -13,7 +13,7 @@ use App\Core\AudioUploader;
 
 /**
  * AudioUploader Tests
- * @covers \Nexus\Core\AudioUploader
+ * @covers \App\Core\AudioUploader
  */
 class AudioUploaderTest extends TestCase
 {

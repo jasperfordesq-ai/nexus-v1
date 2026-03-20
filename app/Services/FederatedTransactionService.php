@@ -19,7 +19,7 @@ class FederatedTransactionService
     /**
      * Delegates to legacy FederatedTransactionService::createTransaction().
      */
-    public function createTransaction(int $senderId, int $receiverId, int $receiverTenantId, float $amount, string $description): array
+    public static function createTransaction(int $senderId, int $receiverId, int $receiverTenantId, float $amount, string $description): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FederatedTransactionService
     /**
      * Delegates to legacy FederatedTransactionService::getHistory().
      */
-    public function getHistory(int $userId, int $limit = 50, int $offset = 0): array
+    public static function getHistory(int $userId, int $limit = 50, int $offset = 0): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class FederatedTransactionService
     /**
      * Delegates to legacy FederatedTransactionService::getStats().
      */
-    public function getStats(int $userId): array
+    public static function getStats(int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class FederatedTransactionService
     /**
      * Delegates to legacy FederatedTransactionService::canReceiveTransactions().
      */
-    public function canReceiveTransactions(int $userId, int $tenantId): bool
+    public static function canReceiveTransactions(int $userId, int $tenantId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;

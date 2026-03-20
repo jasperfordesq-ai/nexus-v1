@@ -19,7 +19,7 @@ class FederationEmailService
     /**
      * Delegates to legacy FederationEmailService::sendNewMessageNotification().
      */
-    public function sendNewMessageNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, string $messagePreview): bool
+    public static function sendNewMessageNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, string $messagePreview): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -28,7 +28,7 @@ class FederationEmailService
     /**
      * Delegates to legacy FederationEmailService::sendTransactionNotification().
      */
-    public function sendTransactionNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, float $amount, string $description): bool
+    public static function sendTransactionNotification(int $recipientUserId, int $senderUserId, int $senderTenantId, float $amount, string $description): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class FederationEmailService
     /**
      * Delegates to legacy FederationEmailService::sendTransactionConfirmation().
      */
-    public function sendTransactionConfirmation(int $senderUserId, int $recipientUserId, int $recipientTenantId, float $amount, string $description, float $newBalance): bool
+    public static function sendTransactionConfirmation(int $senderUserId, int $recipientUserId, int $recipientTenantId, float $amount, string $description, float $newBalance): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -46,7 +46,7 @@ class FederationEmailService
     /**
      * Delegates to legacy FederationEmailService::sendWeeklyDigest().
      */
-    public function sendWeeklyDigest(int $userId, int $tenantId): bool
+    public static function sendWeeklyDigest(int $userId, int $tenantId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -55,7 +55,7 @@ class FederationEmailService
     /**
      * Delegates to legacy FederationEmailService::sendPartnershipRequestNotification().
      */
-    public function sendPartnershipRequestNotification(int $targetTenantId, int $requestingTenantId, string $requestingTenantName, int $requestedLevel, ?string $notes = null): bool
+    public static function sendPartnershipRequestNotification(int $targetTenantId, int $requestingTenantId, string $requestingTenantName, int $requestedLevel, ?string $notes = null): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;

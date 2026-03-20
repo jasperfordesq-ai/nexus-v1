@@ -19,7 +19,7 @@ class FederationExternalPartnerService
     /**
      * Delegates to legacy FederationExternalPartnerService::getAll().
      */
-    public function getAll(int $tenantId): array
+    public static function getAll(int $tenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FederationExternalPartnerService
     /**
      * Delegates to legacy FederationExternalPartnerService::getById().
      */
-    public function getById(int $id, int $tenantId): ?array
+    public static function getById(int $id, int $tenantId): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class FederationExternalPartnerService
     /**
      * Delegates to legacy FederationExternalPartnerService::urlExists().
      */
-    public function urlExists(string $baseUrl, int $tenantId, ?int $excludeId = null): bool
+    public static function urlExists(string $baseUrl, int $tenantId, ?int $excludeId = null): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -46,7 +46,7 @@ class FederationExternalPartnerService
     /**
      * Delegates to legacy FederationExternalPartnerService::create().
      */
-    public function create(array $data, int $tenantId, int $userId): array
+    public static function create(array $data, int $tenantId, int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class FederationExternalPartnerService
     /**
      * Delegates to legacy FederationExternalPartnerService::update().
      */
-    public function update(int $id, array $data, int $tenantId, int $userId): array
+    public static function update(int $id, array $data, int $tenantId, int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

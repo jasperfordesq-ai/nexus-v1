@@ -29,12 +29,12 @@ class ChallengeService
     /**
      * Get all challenges for a tenant.
      */
-    public function getAll(int $tenantId, array $filters = []): array
+    public static function getAll(int $tenantId, array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $offset = max(0, (int) ($filters['offset'] ?? 0));
 
-        $query = $this->challenge->newQuery();
+        $query = Challenge::query();
 
         if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -54,18 +54,18 @@ class ChallengeService
     /**
      * Get a single challenge by ID.
      */
-    public function getById(int $id, int $tenantId): ?array
+    public static function getById(int $id, int $tenantId): ?array
     {
-        $challenge = $this->challenge->newQuery()->find($id);
+        $challenge = Challenge::query()->find($id);
         return $challenge ? $challenge->toArray() : null;
     }
 
     /**
      * Create a new challenge.
      */
-    public function create(int $tenantId, array $data): ?int
+    public static function create(int $tenantId, array $data): ?int
     {
-        $challenge = $this->challenge->newInstance([
+        $challenge = new Challenge([
             'title'          => $data['title'],
             'description'    => $data['description'] ?? null,
             'challenge_type' => $data['challenge_type'] ?? 'weekly',
@@ -89,9 +89,9 @@ class ChallengeService
     /**
      * Claim (complete) a challenge for a user.
      */
-    public function claim(int $challengeId, int $userId, int $tenantId): bool
+    public static function claim(int $challengeId, int $userId, int $tenantId): bool
     {
-        $challenge = $this->challenge->newQuery()
+        $challenge = Challenge::query()
             ->where('id', $challengeId)
             ->where('status', 'active')
             ->first();
@@ -122,11 +122,11 @@ class ChallengeService
     /**
      * Get active challenges for current tenant.
      */
-    public function getActiveChallenges(): array
+    public static function getActiveChallenges(): array
     {
         $today = now()->toDateString();
 
-        return $this->challenge->newQuery()
+        return Challenge::query()
             ->where('is_active', true)
             ->where('start_date', '<=', $today)
             ->where('end_date', '>=', $today)
@@ -138,11 +138,11 @@ class ChallengeService
     /**
      * Get challenges with user progress.
      */
-    public function getChallengesWithProgress(int $userId): array
+    public static function getChallengesWithProgress(int $userId): array
     {
         $today = now()->toDateString();
 
-        $challenges = $this->challenge->newQuery()
+        $challenges = Challenge::query()
             ->where('is_active', true)
             ->where('start_date', '<=', $today)
             ->where('end_date', '>=', $today)
@@ -153,7 +153,7 @@ class ChallengeService
         $challengeIds = $challenges->pluck('id')->all();
         $progressMap = [];
         if (! empty($challengeIds)) {
-            $progressMap = $this->progress->newQuery()
+            $progressMap = UserChallengeProgress::query()
                 ->where('user_id', $userId)
                 ->whereIn('challenge_id', $challengeIds)
                 ->get()
@@ -186,11 +186,11 @@ class ChallengeService
     /**
      * Update progress for a challenge action.
      */
-    public function updateProgress(int $userId, string $actionType, int $increment = 1): array
+    public static function updateProgress(int $userId, string $actionType, int $increment = 1): array
     {
         $today = now()->toDateString();
 
-        $challenges = $this->challenge->newQuery()
+        $challenges = Challenge::query()
             ->where('is_active', true)
             ->where('action_type', $actionType)
             ->where('start_date', '<=', $today)
@@ -202,13 +202,13 @@ class ChallengeService
         foreach ($challenges as $challenge) {
             try {
                 DB::transaction(function () use ($challenge, $userId, $increment, &$completed) {
-                    $prog = $this->progress->newQuery()
+                    $prog = UserChallengeProgress::query()
                         ->where('user_id', $userId)
                         ->where('challenge_id', $challenge->id)
                         ->first();
 
                     if (! $prog) {
-                        $prog = $this->progress->newInstance([
+                        $prog = new UserChallengeProgress([
                             'user_id'      => $userId,
                             'challenge_id' => $challenge->id,
                             'current_count' => $increment,
@@ -236,7 +236,7 @@ class ChallengeService
 
                 // Award rewards outside transaction for completed challenges
                 if (! empty($completed) && $completed[array_key_last($completed)]['id'] === $challenge->id) {
-                    $this->awardChallengeReward($userId, $challenge);
+                    self::awardChallengeReward($userId, $challenge);
                 }
             } catch (\Throwable $e) {
                 Log::error('ChallengeService::updateProgress error: ' . $e->getMessage());
@@ -249,19 +249,19 @@ class ChallengeService
     /**
      * Get a challenge by ID (legacy compatibility alias).
      */
-    public function getLegacyById(int $id): ?array
+    public static function getLegacyById(int $id): ?array
     {
-        $challenge = $this->challenge->newQuery()->find($id);
+        $challenge = Challenge::query()->find($id);
         return $challenge ? $challenge->toArray() : null;
     }
 
     /**
      * Award challenge completion rewards.
      */
-    private function awardChallengeReward(int $userId, Challenge $challenge): void
+    private static function awardChallengeReward(int $userId, Challenge $challenge): void
     {
         if ($challenge->xp_reward > 0) {
-            $this->gamificationService->awardXP(
+            GamificationService::awardXP(
                 $userId,
                 $challenge->xp_reward,
                 'challenge_complete',
@@ -270,7 +270,7 @@ class ChallengeService
         }
 
         if (! empty($challenge->badge_reward)) {
-            $this->gamificationService->awardBadgeByKey($userId, $challenge->badge_reward);
+            GamificationService::awardBadgeByKey($userId, $challenge->badge_reward);
         }
 
         Notification::create([

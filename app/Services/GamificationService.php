@@ -75,9 +75,9 @@ class GamificationService
     /**
      * Get gamification profile for a user (XP, level, badge count, showcased badges).
      */
-    public function getProfile(int $userId, ?int $tenantId = null): array
+    public static function getProfile(int $userId, ?int $tenantId = null): array
     {
-        $user = $this->user->newQuery()
+        $user = User::query()
             ->find($userId, ['id', 'first_name', 'last_name', 'avatar_url', 'xp', 'level', 'points']);
 
         if (! $user) {
@@ -100,8 +100,8 @@ class GamificationService
             ? min(100, round(($xp - $currentThreshold) / ($nextThreshold - $currentThreshold) * 100, 1))
             : 100;
 
-        $badgeCount = $this->userBadge->where('user_id', $userId)->count();
-        $showcased = $this->userBadge->newQuery()
+        $badgeCount = UserBadge::where('user_id', $userId)->count();
+        $showcased = UserBadge::newQuery()
             ->where('user_id', $userId)
             ->where('is_showcased', true)
             ->orderBy('showcase_order')
@@ -140,9 +140,9 @@ class GamificationService
     /**
      * Get all badges earned by a user, enriched with definitions.
      */
-    public function getBadges(int $userId, ?int $tenantId = null): array
+    public static function getBadges(int $userId, ?int $tenantId = null): array
     {
-        $badges = $this->userBadge->newQuery()
+        $badges = UserBadge::newQuery()
             ->where('user_id', $userId)
             ->orderByDesc('awarded_at')
             ->get()
@@ -162,9 +162,9 @@ class GamificationService
     /**
      * Get XP leaderboard for the current tenant.
      */
-    public function getLeaderboard(?int $tenantId = null, string $period = 'all_time', int $limit = 20): array
+    public static function getLeaderboard(?int $tenantId = null, string $period = 'all_time', int $limit = 20): array
     {
-        $query = $this->user->newQuery()
+        $query = User::query()
             ->select(['id', 'first_name', 'last_name', 'avatar_url', 'xp', 'level', 'points'])
             ->where('is_approved', true);
 
@@ -190,7 +190,7 @@ class GamificationService
     /**
      * Claim daily login reward (idempotent per calendar day).
      */
-    public function claimDailyReward(int $userId, ?int $tenantId = null): ?array
+    public static function claimDailyReward(int $userId, ?int $tenantId = null): ?array
     {
         $today = now()->toDateString();
 
@@ -206,7 +206,7 @@ class GamificationService
 
         $xp = self::XP_VALUES['daily_login'];
 
-        $this->user->newQuery()->where('id', $userId)->increment('xp', $xp);
+        User::query()->where('id', $userId)->increment('xp', $xp);
 
         DB::table('activity_log')->insert([
             'user_id'     => $userId,
@@ -226,7 +226,7 @@ class GamificationService
     /**
      * Get all system badge definitions.
      */
-    public function getBadgeDefinitions(): array
+    public static function getBadgeDefinitions(): array
     {
         return self::getStaticBadgeDefinitions();
     }
@@ -369,7 +369,7 @@ class GamificationService
     /**
      * Award a badge to a user (idempotent — skips if already earned).
      */
-    public function awardBadge(int $userId, $badge): void
+    public static function awardBadge(int $userId, $badge): void
     {
         // Accept either array definition or badge key string
         if (is_string($badge)) {
@@ -379,7 +379,7 @@ class GamificationService
             }
         }
 
-        $exists = $this->userBadge->newQuery()
+        $exists = UserBadge::newQuery()
             ->where('user_id', $userId)
             ->where('badge_key', $badge['key'])
             ->exists();
@@ -388,7 +388,7 @@ class GamificationService
             return;
         }
 
-        $this->userBadge->newInstance([
+        UserBadge::newInstance([
             'user_id'   => $userId,
             'badge_key' => $badge['key'],
             'name'      => $badge['name'],
@@ -404,17 +404,17 @@ class GamificationService
         ]);
 
         // Award XP for earning badge
-        $this->awardXP($userId, self::XP_VALUES['earn_badge'], 'earn_badge', "Badge: {$badge['name']}");
+        self::awardXP($userId, self::XP_VALUES['earn_badge'], 'earn_badge', "Badge: {$badge['name']}");
     }
 
     /**
      * Award a badge by key (admin use).
      */
-    public function awardBadgeByKey(int $userId, string $badgeKey): void
+    public static function awardBadgeByKey(int $userId, string $badgeKey): void
     {
         $def = self::getBadgeByKey($badgeKey);
         if ($def) {
-            $this->awardBadge($userId, $def);
+            self::awardBadge($userId, $def);
         }
     }
 
@@ -425,7 +425,7 @@ class GamificationService
     /**
      * Award XP to a user and check for level up.
      */
-    public function awardXP(int $userId, int $amount, string $action, string $description = ''): void
+    public static function awardXP(int $userId, int $amount, string $action, string $description = ''): void
     {
         if ($amount <= 0) {
             return;
@@ -453,11 +453,11 @@ class GamificationService
                 ]);
 
                 // Update user XP
-                $this->user->newQuery()->where('id', $userId)->increment('xp', $amount);
+                User::query()->where('id', $userId)->increment('xp', $amount);
             });
 
             // Check for level up (outside transaction — non-critical)
-            $this->checkLevelUp($userId);
+            self::checkLevelUp($userId);
         } catch (\Throwable $e) {
             Log::error('XP Award Error: ' . $e->getMessage());
         }
@@ -466,11 +466,11 @@ class GamificationService
     /**
      * Check if user leveled up and award level badge.
      */
-    private function checkLevelUp(int $userId): void
+    private static function checkLevelUp(int $userId): void
     {
         try {
             /** @var User|null $user */
-            $user = $this->user->newQuery()->find($userId, ['id', 'xp', 'level']);
+            $user = User::query()->find($userId, ['id', 'xp', 'level']);
             if (! $user) {
                 return;
             }
@@ -493,11 +493,11 @@ class GamificationService
                 // Milestone bonus XP
                 $milestones = [5 => 50, 10 => 100, 15 => 150, 20 => 200, 25 => 300, 30 => 400, 50 => 500, 100 => 1000];
                 if (isset($milestones[$newLevel])) {
-                    $this->awardXP($userId, $milestones[$newLevel], 'level_milestone', "Level $newLevel milestone bonus");
+                    self::awardXP($userId, $milestones[$newLevel], 'level_milestone', "Level $newLevel milestone bonus");
                 }
 
                 // Check level badges
-                $this->checkStreakBadges($userId, $newLevel);
+                self::checkStreakBadges($userId, $newLevel);
             }
         } catch (\Throwable $e) {
             Log::error('Level Up Check Error: ' . $e->getMessage());
@@ -521,7 +521,7 @@ class GamificationService
     /**
      * Get level progress percentage (0–100).
      */
-    public function getLevelProgress(int $xp, int $level): float|int
+    public static function getLevelProgress(int $xp, int $level): float|int
     {
         $currentThreshold = self::LEVEL_THRESHOLDS[$level] ?? 0;
         $nextThreshold = self::LEVEL_THRESHOLDS[$level + 1] ?? null;
@@ -547,30 +547,30 @@ class GamificationService
     /**
      * Run all badge checks for a user.
      */
-    public function runAllBadgeChecks(int $userId): void
+    public static function runAllBadgeChecks(int $userId): void
     {
-        $this->checkVolunteeringBadges($userId);
-        $this->checkTimebankingBadges($userId);
-        $this->checkListingBadges($userId);
-        $this->checkConnectionBadges($userId);
-        $this->checkMessageBadges($userId);
-        $this->checkEventBadges($userId, 'attend');
-        $this->checkEventBadges($userId, 'host');
-        $this->checkGroupBadges($userId, 'join');
-        $this->checkPostBadges($userId);
-        $this->checkLikesBadges($userId);
-        $this->checkProfileBadge($userId);
-        $this->checkMembershipBadges($userId);
+        self::checkVolunteeringBadges($userId);
+        self::checkTimebankingBadges($userId);
+        self::checkListingBadges($userId);
+        self::checkConnectionBadges($userId);
+        self::checkMessageBadges($userId);
+        self::checkEventBadges($userId, 'attend');
+        self::checkEventBadges($userId, 'host');
+        self::checkGroupBadges($userId, 'join');
+        self::checkPostBadges($userId);
+        self::checkLikesBadges($userId);
+        self::checkProfileBadge($userId);
+        self::checkMembershipBadges($userId);
     }
 
     /**
      * Check and award streak badges.
      */
-    public function checkStreakBadges(int $userId, int $streakLength): void
+    public static function checkStreakBadges(int $userId, int $streakLength): void
     {
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'streak' && $streakLength >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
@@ -578,15 +578,15 @@ class GamificationService
     /**
      * Get badge progress for a user — shows progress towards next badges.
      */
-    public function getBadgeProgress(int $userId): array
+    public static function getBadgeProgress(int $userId): array
     {
         $progress = [];
-        $earnedKeys = $this->userBadge->newQuery()
+        $earnedKeys = UserBadge::newQuery()
             ->where('user_id', $userId)
             ->pluck('badge_key')
             ->all();
 
-        $stats = $this->getUserStatsForProgress($userId);
+        $stats = self::getUserStatsForProgress($userId);
 
         // Group by type and find next unlockable
         $badgesByType = [];
@@ -628,7 +628,7 @@ class GamificationService
     // PRIVATE BADGE CHECK METHODS (Eloquent)
     // =========================================================================
 
-    private function checkVolunteeringBadges(int $userId): void
+    private static function checkVolunteeringBadges(int $userId): void
     {
         $totalHours = (int) VolLog::where('user_id', $userId)
             ->where('status', 'verified')
@@ -636,12 +636,12 @@ class GamificationService
 
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'vol' && $totalHours >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkTimebankingBadges(int $userId): void
+    private static function checkTimebankingBadges(int $userId): void
     {
         $creditsEarned = (int) Transaction::where('receiver_id', $userId)
             ->where('status', 'completed')
@@ -668,12 +668,12 @@ class GamificationService
                 case 'diversity':   $qualifies = $uniqueReceivers >= $def['threshold']; break;
             }
             if ($qualifies) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkListingBadges(int $userId): void
+    private static function checkListingBadges(int $userId): void
     {
         $offerCount = Listing::where('user_id', $userId)->where('type', 'offer')->count();
         $requestCount = Listing::where('user_id', $userId)->where('type', 'request')->count();
@@ -684,12 +684,12 @@ class GamificationService
             if ($def['type'] === 'request') { $count = $requestCount; }
 
             if ($count > 0 && $count >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkConnectionBadges(int $userId): void
+    private static function checkConnectionBadges(int $userId): void
     {
         $count = Connection::where('status', 'accepted')
             ->where(function ($q) use ($userId) {
@@ -698,23 +698,23 @@ class GamificationService
 
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'connection' && $count >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkMessageBadges(int $userId): void
+    private static function checkMessageBadges(int $userId): void
     {
         $count = Message::where('sender_id', $userId)->count();
 
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'message' && $count >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkEventBadges(int $userId, string $action = 'attend'): void
+    private static function checkEventBadges(int $userId, string $action = 'attend'): void
     {
         if ($action === 'attend') {
             $count = EventRsvp::where('user_id', $userId)->where('status', 'going')->count();
@@ -726,41 +726,41 @@ class GamificationService
 
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === $type && $count >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkGroupBadges(int $userId, string $action = 'join'): void
+    private static function checkGroupBadges(int $userId, string $action = 'join'): void
     {
         if ($action === 'join') {
             $count = GroupMember::where('user_id', $userId)->where('status', 'active')->count();
             foreach (self::getStaticBadgeDefinitions() as $def) {
                 if ($def['type'] === 'group_join' && $count >= $def['threshold']) {
-                    $this->awardBadge($userId, $def);
+                    self::awardBadge($userId, $def);
                 }
             }
         } elseif ($action === 'create') {
             foreach (self::getStaticBadgeDefinitions() as $def) {
                 if ($def['type'] === 'group_create') {
-                    $this->awardBadge($userId, $def);
+                    self::awardBadge($userId, $def);
                 }
             }
         }
     }
 
-    private function checkPostBadges(int $userId): void
+    private static function checkPostBadges(int $userId): void
     {
         $count = FeedPost::where('user_id', $userId)->count();
 
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'post' && $count >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkLikesBadges(int $userId): void
+    private static function checkLikesBadges(int $userId): void
     {
         try {
             $count = (int) DB::table('post_likes')
@@ -770,7 +770,7 @@ class GamificationService
 
             foreach (self::getStaticBadgeDefinitions() as $def) {
                 if ($def['type'] === 'likes_received' && $count >= $def['threshold']) {
-                    $this->awardBadge($userId, $def);
+                    self::awardBadge($userId, $def);
                 }
             }
         } catch (\Throwable $e) {
@@ -778,24 +778,24 @@ class GamificationService
         }
     }
 
-    private function checkProfileBadge(int $userId): void
+    private static function checkProfileBadge(int $userId): void
     {
-        $completion = $this->getProfileCompletion($userId);
+        $completion = self::getProfileCompletion($userId);
 
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'profile' && $completion >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
 
-    private function checkMembershipBadges(int $userId): void
+    private static function checkMembershipBadges(int $userId): void
     {
-        $days = $this->getDaysSinceJoined($userId);
+        $days = self::getDaysSinceJoined($userId);
 
         foreach (self::getStaticBadgeDefinitions() as $def) {
             if ($def['type'] === 'membership' && $days >= $def['threshold']) {
-                $this->awardBadge($userId, $def);
+                self::awardBadge($userId, $def);
             }
         }
     }
@@ -804,7 +804,7 @@ class GamificationService
     // STAT HELPERS (Eloquent)
     // =========================================================================
 
-    private function getUserStatsForProgress(int $userId): array
+    private static function getUserStatsForProgress(int $userId): array
     {
         $stats = [
             'vol' => 0, 'offer' => 0, 'request' => 0, 'earn' => 0,
@@ -832,17 +832,17 @@ class GamificationService
         try { $stats['group_join'] = (int) GroupMember::where('user_id', $userId)->where('status', 'active')->count(); } catch (\Throwable $e) {}
         try { $stats['post'] = (int) FeedPost::where('user_id', $userId)->count(); } catch (\Throwable $e) {}
         try { $stats['likes_received'] = (int) DB::table('post_likes')->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')->where('feed_posts.user_id', $userId)->count(); } catch (\Throwable $e) {}
-        try { $stats['profile'] = $this->getProfileCompletion($userId); } catch (\Throwable $e) {}
-        try { $stats['membership'] = $this->getDaysSinceJoined($userId); } catch (\Throwable $e) {}
+        try { $stats['profile'] = self::getProfileCompletion($userId); } catch (\Throwable $e) {}
+        try { $stats['membership'] = self::getDaysSinceJoined($userId); } catch (\Throwable $e) {}
         try { $stats['streak'] = (int) (UserStreak::where('user_id', $userId)->where('streak_type', 'login')->value('current_streak') ?? 0); } catch (\Throwable $e) {}
-        try { $stats['level'] = (int) ($this->user->newQuery()->where('id', $userId)->value('level') ?? 1); } catch (\Throwable $e) {}
+        try { $stats['level'] = (int) (User::query()->where('id', $userId)->value('level') ?? 1); } catch (\Throwable $e) {}
 
         return $stats;
     }
 
-    private function getProfileCompletion(int $userId): int
+    private static function getProfileCompletion(int $userId): int
     {
-        $user = $this->user->newQuery()->find($userId, ['first_name', 'last_name', 'email', 'bio', 'avatar_url', 'location', 'phone']);
+        $user = User::query()->find($userId, ['first_name', 'last_name', 'email', 'bio', 'avatar_url', 'location', 'phone']);
         if (! $user) {
             return 0;
         }
@@ -858,9 +858,9 @@ class GamificationService
         return (int) round(($filled / count($fields)) * 100);
     }
 
-    private function getDaysSinceJoined(int $userId): int
+    private static function getDaysSinceJoined(int $userId): int
     {
-        $user = $this->user->newQuery()->find($userId, ['created_at']);
+        $user = User::query()->find($userId, ['created_at']);
         if (! $user || ! $user->created_at) {
             return 0;
         }

@@ -23,6 +23,11 @@ class CommunityProjectServiceTest extends DatabaseTestCase
 {
     protected static ?int $testTenantId = null;
     protected static ?int $testUserId = null;
+
+    private static function svc(): CommunityProjectService
+    {
+        return new CommunityProjectService();
+    }
     protected static ?int $testUser2Id = null;
     protected static ?int $testOrgId = null;
     protected static ?int $testProjectId = null;
@@ -135,61 +140,61 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testGetErrorsIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'getErrors');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testProposeIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'propose');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testGetProposalsIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'getProposals');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testGetProposalIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'getProposal');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testUpdateProposalIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'updateProposal');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testReviewIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'review');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testSupportIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'support');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testUnsupportIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'unsupport');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testGetSupportersIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'getSupporters');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     public function testConvertToOpportunityIsStatic(): void
     {
         $ref = new \ReflectionMethod(CommunityProjectService::class, 'convertToOpportunity');
-        $this->assertTrue($ref->isStatic());
+        $this->assertFalse($ref->isStatic());
     }
 
     // ==========================================
@@ -199,7 +204,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testProposeWithValidDataReturnsArray(): void
     {
         $ts = time();
-        $result = CommunityProjectService::propose(self::$testUserId, [
+        $result = self::svc()->propose(self::$testUserId, [
             'title' => "Community Garden {$ts}",
             'description' => 'A shared garden for the neighbourhood',
         ]);
@@ -219,7 +224,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testProposeWithAllOptionalFields(): void
     {
         $ts = time();
-        $result = CommunityProjectService::propose(self::$testUserId, [
+        $result = self::svc()->propose(self::$testUserId, [
             'title' => "Full Project {$ts}",
             'description' => 'A fully detailed project proposal',
             'category' => 'environment',
@@ -239,26 +244,26 @@ class CommunityProjectServiceTest extends DatabaseTestCase
 
     public function testProposeRequiresTitle(): void
     {
-        $result = CommunityProjectService::propose(self::$testUserId, [
+        $result = self::svc()->propose(self::$testUserId, [
             'title' => '',
             'description' => 'Some description',
         ]);
 
         $this->assertEmpty($result);
-        $errors = CommunityProjectService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertEquals('title', $errors[0]['field']);
     }
 
     public function testProposeRequiresDescription(): void
     {
-        $result = CommunityProjectService::propose(self::$testUserId, [
+        $result = self::svc()->propose(self::$testUserId, [
             'title' => 'Valid Title',
             'description' => '',
         ]);
 
         $this->assertEmpty($result);
-        $errors = CommunityProjectService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertEquals('description', $errors[0]['field']);
     }
@@ -269,7 +274,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
 
     public function testGetProposalsReturnsPaginatedStructure(): void
     {
-        $result = CommunityProjectService::getProposals();
+        $result = self::svc()->getProposals();
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('items', $result);
@@ -281,7 +286,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
 
     public function testGetProposalsWithStatusFilter(): void
     {
-        $result = CommunityProjectService::getProposals(['status' => 'proposed']);
+        $result = self::svc()->getProposals(['status' => 'proposed']);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('items', $result);
@@ -298,13 +303,13 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     {
         // Create a project to retrieve
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Retrieve Test {$ts}",
             'description' => 'Project to test retrieval',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $result = CommunityProjectService::getProposal($created['id']);
+        $result = self::svc()->getProposal($created['id']);
 
         $this->assertIsArray($result);
         $this->assertEquals($created['id'], $result['id']);
@@ -314,7 +319,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
 
     public function testGetProposalByIdReturnsNullForNonExistent(): void
     {
-        $result = CommunityProjectService::getProposal(999999999);
+        $result = self::svc()->getProposal(999999999);
 
         $this->assertNull($result);
     }
@@ -326,13 +331,13 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testUpdateProposalByOwnerSucceeds(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Update Test {$ts}",
             'description' => 'Original description',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $result = CommunityProjectService::updateProposal($created['id'], self::$testUserId, [
+        $result = self::svc()->updateProposal($created['id'], self::$testUserId, [
             'title' => "Updated Title {$ts}",
             'description' => 'Updated description',
         ]);
@@ -340,7 +345,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
         $this->assertTrue($result);
 
         // Verify the update
-        $updated = CommunityProjectService::getProposal($created['id']);
+        $updated = self::svc()->getProposal($created['id']);
         $this->assertStringContainsString("Updated Title {$ts}", $updated['title']);
         $this->assertEquals('Updated description', $updated['description']);
     }
@@ -348,18 +353,18 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testUpdateProposalByNonOwnerFails(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Owner Test {$ts}",
             'description' => 'Only owner should edit',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $result = CommunityProjectService::updateProposal($created['id'], self::$testUser2Id, [
+        $result = self::svc()->updateProposal($created['id'], self::$testUser2Id, [
             'title' => 'Hijacked Title',
         ]);
 
         $this->assertFalse($result);
-        $errors = CommunityProjectService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertEquals('FORBIDDEN', $errors[0]['code']);
     }
@@ -371,17 +376,17 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testReviewApproveChangesStatus(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Approve Test {$ts}",
             'description' => 'Project to approve',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $result = CommunityProjectService::review($created['id'], self::$testUser2Id, 'approved', 'Looks great');
+        $result = self::svc()->review($created['id'], self::$testUser2Id, 'approved', 'Looks great');
 
         $this->assertTrue($result);
 
-        $reviewed = CommunityProjectService::getProposal($created['id']);
+        $reviewed = self::svc()->getProposal($created['id']);
         // After approval, convertToOpportunity sets status to 'active'
         $this->assertContains($reviewed['status'], ['approved', 'active']);
 
@@ -394,17 +399,17 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testReviewRejectChangesStatus(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Reject Test {$ts}",
             'description' => 'Project to reject',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $result = CommunityProjectService::review($created['id'], self::$testUser2Id, 'rejected', 'Not feasible');
+        $result = self::svc()->review($created['id'], self::$testUser2Id, 'rejected', 'Not feasible');
 
         $this->assertTrue($result);
 
-        $reviewed = CommunityProjectService::getProposal($created['id']);
+        $reviewed = self::svc()->getProposal($created['id']);
         $this->assertEquals('rejected', $reviewed['status']);
         $this->assertEquals('Not feasible', $reviewed['review_notes']);
     }
@@ -412,16 +417,16 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testReviewInvalidStatusFails(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Invalid Review {$ts}",
             'description' => 'Project with invalid review status',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $result = CommunityProjectService::review($created['id'], self::$testUser2Id, 'invalid_status');
+        $result = self::svc()->review($created['id'], self::$testUser2Id, 'invalid_status');
 
         $this->assertFalse($result);
-        $errors = CommunityProjectService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertEquals('VALIDATION_ERROR', $errors[0]['code']);
     }
@@ -433,40 +438,40 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testSupportIncrementsUpvotes(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Support Test {$ts}",
             'description' => 'Project to support',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $before = CommunityProjectService::getProposal($created['id']);
+        $before = self::svc()->getProposal($created['id']);
         $upvotesBefore = $before['upvotes'];
 
-        $result = CommunityProjectService::support($created['id'], self::$testUser2Id, 'Great idea!');
+        $result = self::svc()->support($created['id'], self::$testUser2Id, 'Great idea!');
         $this->assertTrue($result);
 
-        $after = CommunityProjectService::getProposal($created['id']);
+        $after = self::svc()->getProposal($created['id']);
         $this->assertEquals($upvotesBefore + 1, $after['upvotes']);
     }
 
     public function testDoubleSupportReturnsFalse(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Double Support Test {$ts}",
             'description' => 'Project for double support test',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
         // First support should succeed
-        $first = CommunityProjectService::support($created['id'], self::$testUser2Id);
+        $first = self::svc()->support($created['id'], self::$testUser2Id);
         $this->assertTrue($first);
 
         // Second support by same user should fail
-        $second = CommunityProjectService::support($created['id'], self::$testUser2Id);
+        $second = self::svc()->support($created['id'], self::$testUser2Id);
         $this->assertFalse($second);
 
-        $errors = CommunityProjectService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertEquals('DUPLICATE', $errors[0]['code']);
     }
@@ -474,35 +479,35 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testUnsupportDecrementsUpvotes(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Unsupport Test {$ts}",
             'description' => 'Project for unsupport test',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
         // Support first
-        CommunityProjectService::support($created['id'], self::$testUser2Id);
-        $afterSupport = CommunityProjectService::getProposal($created['id']);
+        self::svc()->support($created['id'], self::$testUser2Id);
+        $afterSupport = self::svc()->getProposal($created['id']);
         $upvotesAfterSupport = $afterSupport['upvotes'];
 
         // Unsupport
-        $result = CommunityProjectService::unsupport($created['id'], self::$testUser2Id);
+        $result = self::svc()->unsupport($created['id'], self::$testUser2Id);
         $this->assertTrue($result);
 
-        $afterUnsupport = CommunityProjectService::getProposal($created['id']);
+        $afterUnsupport = self::svc()->getProposal($created['id']);
         $this->assertEquals($upvotesAfterSupport - 1, $afterUnsupport['upvotes']);
     }
 
     public function testUnsupportWithoutSupportReturnsFalse(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Unsupport Fail {$ts}",
             'description' => 'Project never supported',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $result = CommunityProjectService::unsupport($created['id'], self::$testUser2Id);
+        $result = self::svc()->unsupport($created['id'], self::$testUser2Id);
         $this->assertFalse($result);
     }
 
@@ -513,16 +518,16 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testGetSupportersReturnsArray(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Supporters List {$ts}",
             'description' => 'Project with supporters',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
         // Add a supporter
-        CommunityProjectService::support($created['id'], self::$testUser2Id, 'I support this');
+        self::svc()->support($created['id'], self::$testUser2Id, 'I support this');
 
-        $supporters = CommunityProjectService::getSupporters($created['id']);
+        $supporters = self::svc()->getSupporters($created['id']);
 
         $this->assertIsArray($supporters);
         $this->assertGreaterThanOrEqual(1, count($supporters));
@@ -532,13 +537,13 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testGetSupportersEmptyForNewProject(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "No Supporters {$ts}",
             'description' => 'Project with no supporters yet',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
-        $supporters = CommunityProjectService::getSupporters($created['id']);
+        $supporters = self::svc()->getSupporters($created['id']);
 
         $this->assertIsArray($supporters);
         $this->assertCount(0, $supporters);
@@ -551,7 +556,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testConvertApprovedProjectToOpportunity(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Convert Test {$ts}",
             'description' => 'Project to convert to opportunity',
             'location' => 'Main Street',
@@ -567,7 +572,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
             [$created['id'], self::$testTenantId]
         );
 
-        $opportunityId = CommunityProjectService::convertToOpportunity($created['id']);
+        $opportunityId = self::svc()->convertToOpportunity($created['id']);
 
         $this->assertIsInt($opportunityId);
         $this->assertGreaterThan(0, $opportunityId);
@@ -575,7 +580,7 @@ class CommunityProjectServiceTest extends DatabaseTestCase
         self::$createdOpportunityIds[] = $opportunityId;
 
         // Verify the project is now linked and active
-        $updated = CommunityProjectService::getProposal($created['id']);
+        $updated = self::svc()->getProposal($created['id']);
         $this->assertEquals($opportunityId, $updated['opportunity_id']);
         $this->assertEquals('active', $updated['status']);
     }
@@ -583,17 +588,17 @@ class CommunityProjectServiceTest extends DatabaseTestCase
     public function testConvertNonApprovedProjectReturnsNull(): void
     {
         $ts = time();
-        $created = CommunityProjectService::propose(self::$testUserId, [
+        $created = self::svc()->propose(self::$testUserId, [
             'title' => "Convert Fail {$ts}",
             'description' => 'This project is still pending, cannot convert',
         ]);
         self::$createdProjectIds[] = $created['id'];
 
         // Project is 'pending' status, should not convert
-        $result = CommunityProjectService::convertToOpportunity($created['id']);
+        $result = self::svc()->convertToOpportunity($created['id']);
 
         $this->assertNull($result);
-        $errors = CommunityProjectService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertEquals('VALIDATION_ERROR', $errors[0]['code']);
     }

@@ -12,19 +12,17 @@ use App\Helpers\HtmlSanitizer;
 /**
  * Tests for HtmlSanitizer — security-critical XSS prevention.
  *
- * Two sanitizer classes exist in the codebase:
- *   - Nexus\Helpers\HtmlSanitizer  (lightweight, for user-generated content)
- *   - Nexus\Core\HtmlSanitizer     (CMS / page builder, allows styles)
+ * Tests for App\Helpers\HtmlSanitizer — security-critical XSS prevention.
  *
- * This test file covers both, focusing heavily on XSS attack vectors.
+ * Covers both the lightweight sanitizer (sanitize/stripAll) and the CMS
+ * sanitizer methods (sanitizeCms/stripTags/excerpt/sanitizeStyle).
  *
- * @covers \Nexus\Helpers\HtmlSanitizer
- * @covers \Nexus\Core\HtmlSanitizer
+ * @covers \App\Helpers\HtmlSanitizer
  */
 class HtmlSanitizerTest extends TestCase
 {
     // =================================================================
-    //  PART 1 — Nexus\Helpers\HtmlSanitizer (lightweight)
+    //  PART 1 — App\Helpers\HtmlSanitizer (lightweight)
     // =================================================================
 
     // ---------------------------------------------------------------
@@ -38,7 +36,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizerClassExists(): void
     {
-        $this->assertTrue(class_exists(\Nexus\Core\HtmlSanitizer::class));
+        $this->assertTrue(class_exists(\App\Helpers\HtmlSanitizer::class));
     }
 
     public function testSanitizeMethodIsPublicAndStatic(): void
@@ -64,7 +62,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeReturnsEmptyStringForEmptyInput(): void
     {
-        $this->assertEquals('', \Nexus\Core\HtmlSanitizer::sanitize(''));
+        $this->assertEquals('', \App\Helpers\HtmlSanitizer::sanitize(''));
     }
 
     // ---------------------------------------------------------------
@@ -306,7 +304,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizerRemovesExpressionInStyles(): void
     {
         $html = '<div style="width: expression(alert(1))">Content</div>';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, true);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, true);
 
         $this->assertStringNotContainsStringIgnoringCase('expression(', $result);
     }
@@ -314,7 +312,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizerRemovesMozBindingInStyles(): void
     {
         $html = '<div style="-moz-binding: url(evil.xml)">Content</div>';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, true);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, true);
 
         $this->assertStringNotContainsStringIgnoringCase('-moz-binding', $result);
     }
@@ -322,7 +320,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizerRemovesBehaviorInStyles(): void
     {
         $html = '<div style="behavior: url(evil.htc)">Content</div>';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, true);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, true);
 
         $this->assertStringNotContainsStringIgnoringCase('behavior:', $result);
     }
@@ -343,7 +341,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizerAddsRelForBlankTargetLinks(): void
     {
         $html = '<a href="https://example.com" target="_blank">Link</a>';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, true);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, true);
 
         $this->assertStringContainsString('noopener', $result);
         $this->assertStringContainsString('noreferrer', $result);
@@ -378,7 +376,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizerAllowsDataImageUris(): void
     {
         $html = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Pixel">';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, true);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, true);
 
         $this->assertStringContainsString('data:image/png;base64,', $result);
     }
@@ -387,7 +385,7 @@ class HtmlSanitizerTest extends TestCase
     {
         // data:text/html should be blocked
         $html = '<img src="data:text/html,<script>alert(1)</script>" alt="Evil">';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, true);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, true);
 
         $this->assertStringNotContainsString('data:text/html', $result);
     }
@@ -508,7 +506,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreStripTagsRemovesScriptContent(): void
     {
         $html = '<p>Safe</p><script>alert("XSS")</script><p>Also safe</p>';
-        $result = \Nexus\Core\HtmlSanitizer::stripTags($html);
+        $result = \App\Helpers\HtmlSanitizer::stripTags($html);
 
         $this->assertStringContainsString('Safe', $result);
         $this->assertStringContainsString('Also safe', $result);
@@ -518,7 +516,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreStripTagsRemovesStyleContent(): void
     {
         $html = '<style>.evil { background: red; }</style><p>Content</p>';
-        $result = \Nexus\Core\HtmlSanitizer::stripTags($html);
+        $result = \App\Helpers\HtmlSanitizer::stripTags($html);
 
         $this->assertStringContainsString('Content', $result);
         $this->assertStringNotContainsString('.evil', $result);
@@ -527,7 +525,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreStripTagsNormalizesWhitespace(): void
     {
         $html = "<p>Word1    \n\n   Word2</p>";
-        $result = \Nexus\Core\HtmlSanitizer::stripTags($html);
+        $result = \App\Helpers\HtmlSanitizer::stripTags($html);
 
         // Whitespace is normalized to single spaces
         $this->assertStringNotContainsString("\n", $result);
@@ -540,7 +538,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreExcerptTruncatesLongContent(): void
     {
         $html = '<p>' . str_repeat('word ', 100) . '</p>';
-        $result = \Nexus\Core\HtmlSanitizer::excerpt($html, 50);
+        $result = \App\Helpers\HtmlSanitizer::excerpt($html, 50);
 
         $this->assertLessThanOrEqual(53, strlen($result)); // 50 + '...'
         $this->assertStringEndsWith('...', $result);
@@ -549,7 +547,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreExcerptReturnsShortContentUnchanged(): void
     {
         $html = '<p>Short text</p>';
-        $result = \Nexus\Core\HtmlSanitizer::excerpt($html, 160);
+        $result = \App\Helpers\HtmlSanitizer::excerpt($html, 160);
 
         $this->assertEquals('Short text', $result);
         $this->assertStringNotContainsString('...', $result);
@@ -561,13 +559,13 @@ class HtmlSanitizerTest extends TestCase
         // excerpt() only cuts at word boundary when last space is >= 80% of length.
         // Here last space is at position 11 (73%), so it keeps the hard cut at 15.
         $html = '<p>Hello world this is a test</p>';
-        $result = \Nexus\Core\HtmlSanitizer::excerpt($html, 15);
+        $result = \App\Helpers\HtmlSanitizer::excerpt($html, 15);
 
         $this->assertStringEndsWith('...', $result);
         $this->assertEquals('Hello world thi...', $result);
 
         // With a longer limit (20), last space at 16 (80%) triggers word-boundary cut
-        $result2 = \Nexus\Core\HtmlSanitizer::excerpt($html, 20);
+        $result2 = \App\Helpers\HtmlSanitizer::excerpt($html, 20);
         $this->assertStringEndsWith('...', $result2);
         $textPart = rtrim($result2, '.');
         $this->assertStringNotContainsString('is a', $textPart);
@@ -580,7 +578,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizeRemovesNullBytes(): void
     {
         $html = "<p>Hello\0World</p>";
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html);
 
         $this->assertStringNotContainsString("\0", $result);
         $this->assertStringContainsString('Hello', $result);
@@ -594,7 +592,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizeKeepsTextFromRemovedTags(): void
     {
         $html = '<marquee>Important text</marquee>';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html);
 
         // The marquee tag should be removed but text preserved
         $this->assertStringNotContainsString('<marquee', $result);
@@ -608,7 +606,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizeWithStylesDisabled(): void
     {
         $html = '<div style="color: red;">Text</div>';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, false);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, false);
 
         $this->assertStringNotContainsString('style=', $result);
     }
@@ -616,7 +614,7 @@ class HtmlSanitizerTest extends TestCase
     public function testCoreSanitizeWithStylesEnabled(): void
     {
         $html = '<div style="color: red;">Text</div>';
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($html, true);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($html, true);
 
         // Styles are allowed when enabled
         $this->assertStringContainsString('color: red', $result);
@@ -631,7 +629,7 @@ class HtmlSanitizerTest extends TestCase
      */
     public function testCoreSanitizeBlocksCombinedXssVectors(string $xssInput, string $mustNotContain): void
     {
-        $result = \Nexus\Core\HtmlSanitizer::sanitize($xssInput);
+        $result = \App\Helpers\HtmlSanitizer::sanitizeCms($xssInput);
         $this->assertStringNotContainsStringIgnoringCase($mustNotContain, $result);
     }
 
@@ -687,7 +685,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeUrlAllowsRelativeUrls(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeUrl');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeUrl');
         $ref->setAccessible(true);
 
         $this->assertEquals('/path/to/page', $ref->invoke(null, '/path/to/page'));
@@ -697,7 +695,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeUrlAllowsHttpAndHttps(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeUrl');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeUrl');
         $ref->setAccessible(true);
 
         $this->assertEquals('https://example.com', $ref->invoke(null, 'https://example.com'));
@@ -706,7 +704,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeUrlAllowsMailtoAndTel(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeUrl');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeUrl');
         $ref->setAccessible(true);
 
         $this->assertEquals('mailto:test@example.com', $ref->invoke(null, 'mailto:test@example.com'));
@@ -715,7 +713,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeUrlBlocksJavascript(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeUrl');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeUrl');
         $ref->setAccessible(true);
 
         $this->assertFalse($ref->invoke(null, 'javascript:alert(1)'));
@@ -723,7 +721,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeUrlBlocksUnknownSchemes(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeUrl');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeUrl');
         $ref->setAccessible(true);
 
         $this->assertFalse($ref->invoke(null, 'ftp://example.com/file'));
@@ -735,7 +733,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeStyleRemovesJavascriptUrls(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeStyle');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeStyle');
         $ref->setAccessible(true);
 
         $result = $ref->invoke(null, 'background: url(javascript:alert(1))');
@@ -744,7 +742,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeStyleRemovesDataNonImageUrls(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeStyle');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeStyle');
         $ref->setAccessible(true);
 
         $result = $ref->invoke(null, "background: url(data:text/html,<h1>evil</h1>)");
@@ -753,7 +751,7 @@ class HtmlSanitizerTest extends TestCase
 
     public function testCoreSanitizeStyleAllowsSafeProperties(): void
     {
-        $ref = new \ReflectionMethod(\Nexus\Core\HtmlSanitizer::class, 'sanitizeStyle');
+        $ref = new \ReflectionMethod(\App\Helpers\HtmlSanitizer::class, 'sanitizeStyle');
         $ref->setAccessible(true);
 
         $result = $ref->invoke(null, 'color: red; font-size: 16px;');

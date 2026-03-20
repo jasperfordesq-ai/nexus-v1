@@ -19,7 +19,7 @@ class SmartGroupRankingService
     /**
      * Delegates to legacy SmartGroupRankingService::updateFeaturedLocalHubs().
      */
-    public function updateFeaturedLocalHubs($tenantId = null, $limit = 6)
+    public static function updateFeaturedLocalHubs($tenantId = null, $limit = 6)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class SmartGroupRankingService
     /**
      * Delegates to legacy SmartGroupRankingService::updateFeaturedCommunityGroups().
      */
-    public function updateFeaturedCommunityGroups($tenantId = null, $limit = 6)
+    public static function updateFeaturedCommunityGroups($tenantId = null, $limit = 6)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class SmartGroupRankingService
     /**
      * Delegates to legacy SmartGroupRankingService::updateAllFeaturedGroups().
      */
-    public function updateAllFeaturedGroups($tenantId = null)
+    public static function updateAllFeaturedGroups($tenantId = null)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class SmartGroupRankingService
     /**
      * Delegates to legacy SmartGroupRankingService::getFeaturedGroupsWithScores().
      */
-    public function getFeaturedGroupsWithScores($type = 'local_hubs', $tenantId = null)
+    public static function getFeaturedGroupsWithScores($type = 'local_hubs', $tenantId = null)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -55,7 +55,7 @@ class SmartGroupRankingService
     /**
      * Delegates to legacy SmartGroupRankingService::getLastUpdateTime().
      */
-    public function getLastUpdateTime($tenantId = null)
+    public static function getLastUpdateTime($tenantId = null)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

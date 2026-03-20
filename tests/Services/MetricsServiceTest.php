@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use Nexus\Tests\TestCase;
-use Nexus\Services\Enterprise\MetricsService;
+use App\Services\Enterprise\MetricsService;
 
 /**
  * MetricsService Tests
@@ -28,7 +28,7 @@ use Nexus\Services\Enterprise\MetricsService;
  * - Global tags
  * - Metric formatting
  *
- * @covers \Nexus\Services\Enterprise\MetricsService
+ * @covers \App\Services\Enterprise\MetricsService
  */
 class MetricsServiceTest extends TestCase
 {

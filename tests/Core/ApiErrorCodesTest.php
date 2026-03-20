@@ -19,7 +19,7 @@ use App\Core\ApiErrorCodes;
  * - HTTP status code mapping
  * - Error type detection (auth, validation, retryable)
  *
- * @covers \Nexus\Core\ApiErrorCodes
+ * @covers \App\Core\ApiErrorCodes
  */
 class ApiErrorCodesTest extends TestCase
 {

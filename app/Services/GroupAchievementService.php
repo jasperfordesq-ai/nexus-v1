@@ -19,7 +19,7 @@ class GroupAchievementService
     /**
      * Delegates to legacy GroupAchievementService::getGroupAchievements().
      */
-    public function getGroupAchievements($groupId)
+    public static function getGroupAchievements($groupId)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class GroupAchievementService
     /**
      * Delegates to legacy GroupAchievementService::calculateProgress().
      */
-    public function calculateProgress($groupId, $targetType, $targetValue)
+    public static function calculateProgress($groupId, $targetType, $targetValue)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class GroupAchievementService
     /**
      * Delegates to legacy GroupAchievementService::getEarnedAchievements().
      */
-    public function getEarnedAchievements($groupId)
+    public static function getEarnedAchievements($groupId)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class GroupAchievementService
     /**
      * Delegates to legacy GroupAchievementService::checkAndAwardAchievements().
      */
-    public function checkAndAwardAchievements($groupId)
+    public static function checkAndAwardAchievements($groupId)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -55,7 +55,7 @@ class GroupAchievementService
     /**
      * Delegates to legacy GroupAchievementService::awardAchievement().
      */
-    public function awardAchievement($groupId, $achievementKey, $achievement)
+    public static function awardAchievement($groupId, $achievementKey, $achievement)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

@@ -31,19 +31,19 @@ class FederationPartnershipService
     /**
      * Request a partnership with another tenant.
      */
-    public function requestPartnership(
+    public static function requestPartnership(
         int $requestingTenantId,
         int $targetTenantId,
         int $requestedBy,
         int $federationLevel = self::LEVEL_DISCOVERY,
         ?string $notes = null
     ): array {
-        $check = $this->featureService->isOperationAllowed('profiles', $requestingTenantId);
+        $check = FederationFeatureService::isOperationAllowed('profiles', $requestingTenantId);
         if (!$check['allowed']) {
             return ['success' => false, 'error' => $check['reason']];
         }
 
-        $targetCheck = $this->featureService->isTenantFeatureEnabled(
+        $targetCheck = FederationFeatureService::isTenantFeatureEnabled(
             FederationFeatureService::TENANT_APPEAR_IN_DIRECTORY,
             $targetTenantId
         );
@@ -51,7 +51,7 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Target tenant is not accepting federation requests'];
         }
 
-        $existing = $this->getPartnership($requestingTenantId, $targetTenantId);
+        $existing = self::getPartnership($requestingTenantId, $targetTenantId);
         if ($existing) {
             if ($existing['status'] === 'active') {
                 return ['success' => false, 'error' => 'Partnership already exists'];
@@ -79,7 +79,7 @@ class FederationPartnershipService
                 [$requestingTenantId, $targetTenantId, $federationLevel, $requestedBy, $notes]
             );
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_requested',
                 $requestingTenantId, $targetTenantId, $requestedBy,
                 ['federation_level' => $federationLevel, 'notes' => $notes]
@@ -95,9 +95,9 @@ class FederationPartnershipService
     /**
      * Approve a partnership request.
      */
-    public function approvePartnership(int $partnershipId, int $approvedBy, array $permissions = []): array
+    public static function approvePartnership(int $partnershipId, int $approvedBy, array $permissions = []): array
     {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -105,7 +105,7 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Partnership is not pending approval'];
         }
 
-        $defaultPermissions = $this->getDefaultPermissions($partnership['federation_level']);
+        $defaultPermissions = self::getDefaultPermissions($partnership['federation_level']);
         $permissions = array_merge($defaultPermissions, $permissions);
 
         try {
@@ -122,7 +122,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_approved',
                 $partnership['partner_tenant_id'], $partnership['tenant_id'], $approvedBy,
                 ['permissions' => $permissions]
@@ -138,14 +138,14 @@ class FederationPartnershipService
     /**
      * Counter-propose a partnership request with different terms.
      */
-    public function counterPropose(
+    public static function counterPropose(
         int $partnershipId,
         int $proposedBy,
         int $newLevel,
         array $proposedPermissions = [],
         ?string $message = null
     ): array {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -164,7 +164,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_counter_proposed',
                 $partnership['partner_tenant_id'], $partnership['tenant_id'], $proposedBy,
                 [
@@ -185,9 +185,9 @@ class FederationPartnershipService
     /**
      * Accept a counter-proposal.
      */
-    public function acceptCounterProposal(int $partnershipId, int $acceptedBy): array
+    public static function acceptCounterProposal(int $partnershipId, int $acceptedBy): array
     {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -202,7 +202,7 @@ class FederationPartnershipService
         if (!empty($partnership['counter_proposed_permissions'])) {
             $proposedPermissions = json_decode($partnership['counter_proposed_permissions'], true) ?: [];
         }
-        $defaultPermissions = $this->getDefaultPermissions($partnership['federation_level']);
+        $defaultPermissions = self::getDefaultPermissions($partnership['federation_level']);
         $permissions = array_merge($defaultPermissions, $proposedPermissions);
 
         try {
@@ -219,7 +219,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_counter_accepted',
                 $partnership['tenant_id'], $partnership['partner_tenant_id'], $acceptedBy,
                 ['accepted_level' => $partnership['federation_level']]
@@ -235,9 +235,9 @@ class FederationPartnershipService
     /**
      * Reject a partnership request.
      */
-    public function rejectPartnership(int $partnershipId, int $rejectedBy, ?string $reason = null): array
+    public static function rejectPartnership(int $partnershipId, int $rejectedBy, ?string $reason = null): array
     {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -251,7 +251,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_rejected',
                 $partnership['partner_tenant_id'], $partnership['tenant_id'], $rejectedBy,
                 ['reason' => $reason]
@@ -267,9 +267,9 @@ class FederationPartnershipService
     /**
      * Suspend an active partnership.
      */
-    public function suspendPartnership(int $partnershipId, int $suspendedBy, ?string $reason = null): array
+    public static function suspendPartnership(int $partnershipId, int $suspendedBy, ?string $reason = null): array
     {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -284,7 +284,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_suspended',
                 $partnership['tenant_id'], $partnership['partner_tenant_id'], $suspendedBy,
                 ['reason' => $reason],
@@ -301,9 +301,9 @@ class FederationPartnershipService
     /**
      * Reactivate a suspended partnership.
      */
-    public function reactivatePartnership(int $partnershipId, int $reactivatedBy): array
+    public static function reactivatePartnership(int $partnershipId, int $reactivatedBy): array
     {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -318,7 +318,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_reactivated',
                 $partnership['tenant_id'], $partnership['partner_tenant_id'], $reactivatedBy,
                 []
@@ -334,9 +334,9 @@ class FederationPartnershipService
     /**
      * Terminate a partnership permanently.
      */
-    public function terminatePartnership(int $partnershipId, int $terminatedBy, ?string $reason = null): array
+    public static function terminatePartnership(int $partnershipId, int $terminatedBy, ?string $reason = null): array
     {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -350,7 +350,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_terminated',
                 $partnership['tenant_id'], $partnership['partner_tenant_id'], $terminatedBy,
                 ['reason' => $reason],
@@ -367,9 +367,9 @@ class FederationPartnershipService
     /**
      * Update partnership permissions.
      */
-    public function updatePermissions(int $partnershipId, int $updatedBy, array $permissions): array
+    public static function updatePermissions(int $partnershipId, int $updatedBy, array $permissions): array
     {
-        $partnership = $this->getPartnershipById($partnershipId);
+        $partnership = self::getPartnershipById($partnershipId);
         if (!$partnership) {
             return ['success' => false, 'error' => 'Partnership not found'];
         }
@@ -385,7 +385,7 @@ class FederationPartnershipService
                 'updated_at' => now(),
             ]);
 
-            $this->auditService->log(
+            FederationAuditService::log(
                 'partnership_permissions_updated',
                 $partnership['tenant_id'], $partnership['partner_tenant_id'], $updatedBy,
                 ['permissions' => $permissions]
@@ -405,7 +405,7 @@ class FederationPartnershipService
     /**
      * Get partnership by ID.
      */
-    public function getPartnershipById(int $id): ?array
+    public static function getPartnershipById(int $id): ?array
     {
         try {
             $result = DB::table('federation_partnerships as p')
@@ -429,7 +429,7 @@ class FederationPartnershipService
     /**
      * Get partnership between two tenants.
      */
-    public function getPartnership(int $tenantId1, int $tenantId2): ?array
+    public static function getPartnership(int $tenantId1, int $tenantId2): ?array
     {
         try {
             $result = DB::table('federation_partnerships')
@@ -451,7 +451,7 @@ class FederationPartnershipService
     /**
      * Get all partnerships for a tenant.
      */
-    public function getTenantPartnerships(int $tenantId, ?string $status = null): array
+    public static function getTenantPartnerships(int $tenantId, ?string $status = null): array
     {
         try {
             $query = DB::table('federation_partnerships as p')
@@ -485,7 +485,7 @@ class FederationPartnershipService
     /**
      * Get pending requests for a tenant (incoming).
      */
-    public function getPendingRequests(int $tenantId): array
+    public static function getPendingRequests(int $tenantId): array
     {
         try {
             return DB::table('federation_partnerships as p')
@@ -507,7 +507,7 @@ class FederationPartnershipService
     /**
      * Get outgoing requests that have counter-proposals awaiting response.
      */
-    public function getCounterProposals(int $tenantId): array
+    public static function getCounterProposals(int $tenantId): array
     {
         try {
             return DB::table('federation_partnerships as p')
@@ -534,7 +534,7 @@ class FederationPartnershipService
     /**
      * Get outgoing pending requests.
      */
-    public function getOutgoingRequests(int $tenantId): array
+    public static function getOutgoingRequests(int $tenantId): array
     {
         try {
             return DB::table('federation_partnerships as p')
@@ -556,7 +556,7 @@ class FederationPartnershipService
     /**
      * Get all partnerships (for super admin).
      */
-    public function getAllPartnerships(?string $status = null, int $limit = 100): array
+    public static function getAllPartnerships(?string $status = null, int $limit = 100): array
     {
         try {
             $query = DB::table('federation_partnerships as p')
@@ -586,7 +586,7 @@ class FederationPartnershipService
     /**
      * Get partnership statistics.
      */
-    public function getStats(): array
+    public static function getStats(): array
     {
         try {
             $stats = DB::table('federation_partnerships')
@@ -628,7 +628,7 @@ class FederationPartnershipService
     /**
      * Get default permissions for a federation level.
      */
-    public function getDefaultPermissions(int $level): array
+    public static function getDefaultPermissions(int $level): array
     {
         return match ($level) {
             self::LEVEL_INTEGRATED => [
@@ -653,7 +653,7 @@ class FederationPartnershipService
     /**
      * Get human-readable level name.
      */
-    public function getLevelName(int $level): string
+    public static function getLevelName(int $level): string
     {
         return match ($level) {
             self::LEVEL_DISCOVERY => 'Discovery',
@@ -667,7 +667,7 @@ class FederationPartnershipService
     /**
      * Get level description.
      */
-    public function getLevelDescription(int $level): string
+    public static function getLevelDescription(int $level): string
     {
         return match ($level) {
             self::LEVEL_DISCOVERY => 'Basic visibility - can see tenant exists and view basic profiles',

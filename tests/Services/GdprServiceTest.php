@@ -11,7 +11,7 @@ namespace Nexus\Tests\Services;
 use Nexus\Tests\TestCase;
 use App\Services\Enterprise\GdprService;
 use Nexus\Services\Enterprise\LoggerService;
-use Nexus\Services\Enterprise\MetricsService;
+use App\Services\Enterprise\MetricsService;
 
 /**
  * GdprService Tests
@@ -26,7 +26,7 @@ use Nexus\Services\Enterprise\MetricsService;
  * - Data breach reporting
  * - Audit logging
  *
- * @covers \Nexus\Services\Enterprise\GdprService
+ * @covers \App\Services\Enterprise\GdprService
  */
 class GdprServiceTest extends TestCase
 {

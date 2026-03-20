@@ -16,7 +16,7 @@ use App\Helpers\CorsHelper;
  *
  * Tests CORS header management for cross-origin requests.
  *
- * @covers \Nexus\Helpers\CorsHelper
+ * @covers \App\Helpers\CorsHelper
  */
 class CorsHelperTest extends TestCase
 {

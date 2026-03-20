@@ -23,7 +23,7 @@ class XPShopService
     /**
      * Get all available shop items for the current tenant.
      */
-    public function getItems(int $tenantId): array
+    public static function getItems(int $tenantId): array
     {
         return DB::table('xp_shop_items')
             ->where('tenant_id', $tenantId)
@@ -38,16 +38,16 @@ class XPShopService
     /**
      * Purchase an item (with explicit tenant_id parameter).
      */
-    public function purchase(int $tenantId, int $userId, int $itemId): bool
+    public static function purchase(int $tenantId, int $userId, int $itemId): bool
     {
-        $result = $this->purchaseItem($userId, $itemId);
+        $result = self::purchaseItem($userId, $itemId);
         return $result['success'] ?? false;
     }
 
     /**
      * Get user's purchases.
      */
-    public function getUserPurchases(int $tenantId, int $userId): array
+    public static function getUserPurchases(int $tenantId, int $userId): array
     {
         return DB::table('user_xp_purchases as uxp')
             ->join('xp_shop_items as xsi', 'uxp.item_id', '=', 'xsi.id')
@@ -63,7 +63,7 @@ class XPShopService
     /**
      * Get user's XP balance.
      */
-    public function getBalance(int $tenantId, int $userId): int
+    public static function getBalance(int $tenantId, int $userId): int
     {
         $user = DB::table('users')
             ->where('id', $userId)
@@ -76,7 +76,7 @@ class XPShopService
     /**
      * Get items with user purchase status.
      */
-    public function getItemsWithUserStatus(int $userId): array
+    public static function getItemsWithUserStatus(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -105,8 +105,8 @@ class XPShopService
 
         foreach ($items as &$item) {
             $item['user_purchases'] = $purchases[$item['id']] ?? 0;
-            $item['can_purchase'] = $this->canPurchaseItem($userId, $item, $userXP);
-            $item['reason'] = $this->getPurchaseBlockReason($userId, $item, $userXP);
+            $item['can_purchase'] = self::canPurchaseItem($userId, $item, $userXP);
+            $item['reason'] = self::getPurchaseBlockReason($userId, $item, $userXP);
             $item['cost_xp'] = $item['xp_cost'] ?? 0;
         }
 
@@ -119,7 +119,7 @@ class XPShopService
     /**
      * Purchase an item for a user (uses TenantContext for tenant scoping).
      */
-    public function purchaseItem(int $userId, $itemId): array
+    public static function purchaseItem(int $userId, $itemId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -135,8 +135,8 @@ class XPShopService
 
         $itemArr = (array) $item;
 
-        if (!$this->canPurchaseItem($userId, $itemArr)) {
-            $reason = $this->getPurchaseBlockReason($userId, $itemArr, null);
+        if (!self::canPurchaseItem($userId, $itemArr)) {
+            $reason = self::getPurchaseBlockReason($userId, $itemArr, null);
             return ['success' => false, 'error' => $reason ?? 'Cannot purchase'];
         }
 
@@ -187,7 +187,7 @@ class XPShopService
     /**
      * Get all available items (active, for current tenant).
      */
-    public function getAvailableItems(): array
+    public static function getAvailableItems(): array
     {
         return XpShopItem::where('is_active', 1)
             ->orderBy('display_order')
@@ -200,7 +200,7 @@ class XPShopService
     /**
      * Get user's active perks.
      */
-    public function getUserActivePerks(int $userId): array
+    public static function getUserActivePerks(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -222,7 +222,7 @@ class XPShopService
     /**
      * Check if user can purchase an item.
      */
-    private function canPurchaseItem(int $userId, array $item, ?int $userXP = null): bool
+    private static function canPurchaseItem(int $userId, array $item, ?int $userXP = null): bool
     {
         if ($userXP === null) {
             $tenantId = TenantContext::getId();
@@ -261,7 +261,7 @@ class XPShopService
     /**
      * Get reason why purchase is blocked.
      */
-    private function getPurchaseBlockReason(int $userId, array $item, ?int $userXP): ?string
+    private static function getPurchaseBlockReason(int $userId, array $item, ?int $userXP): ?string
     {
         if ($userXP === null) {
             $tenantId = TenantContext::getId();

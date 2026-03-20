@@ -22,6 +22,11 @@ class FederationSearchServiceTest extends DatabaseTestCase
 {
     protected static ?int $testTenantId = null;
 
+    private static function svc(): FederationSearchService
+    {
+        return new FederationSearchService();
+    }
+
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
@@ -35,7 +40,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchMembersWithEmptyPartnerIdsReturnsEmptyResult(): void
     {
-        $result = FederationSearchService::searchMembers([], []);
+        $result = self::svc()->searchMembers([], []);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('members', $result);
@@ -47,7 +52,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchMembersReturnsExpectedStructure(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], []);
+        $result = self::svc()->searchMembers([1, 2], []);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('members', $result);
@@ -60,7 +65,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchMembersWithSearchFilter(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], ['search' => 'gardening']);
+        $result = self::svc()->searchMembers([1, 2], ['search' => 'gardening']);
 
         $this->assertIsArray($result);
         if (!empty($result['filters_applied'])) {
@@ -70,7 +75,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchMembersWithTenantFilter(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], ['tenant_id' => 1]);
+        $result = self::svc()->searchMembers([1, 2], ['tenant_id' => 1]);
 
         $this->assertIsArray($result);
     }
@@ -80,28 +85,28 @@ class FederationSearchServiceTest extends DatabaseTestCase
         $reachFilters = ['remote_ok', 'travel_ok', 'local_only'];
 
         foreach ($reachFilters as $reach) {
-            $result = FederationSearchService::searchMembers([1, 2], ['service_reach' => $reach]);
+            $result = self::svc()->searchMembers([1, 2], ['service_reach' => $reach]);
             $this->assertIsArray($result);
         }
     }
 
     public function testSearchMembersWithSkillsFilter(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], ['skills' => 'cooking,gardening']);
+        $result = self::svc()->searchMembers([1, 2], ['skills' => 'cooking,gardening']);
 
         $this->assertIsArray($result);
     }
 
     public function testSearchMembersWithLocationFilter(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], ['location' => 'Dublin']);
+        $result = self::svc()->searchMembers([1, 2], ['location' => 'Dublin']);
 
         $this->assertIsArray($result);
     }
 
     public function testSearchMembersWithRadiusFilter(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], [
+        $result = self::svc()->searchMembers([1, 2], [
             'latitude' => 53.3498,
             'longitude' => -6.2603,
             'radius_km' => 50,
@@ -112,21 +117,21 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchMembersWithMessagingFilter(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], ['messaging_enabled' => true]);
+        $result = self::svc()->searchMembers([1, 2], ['messaging_enabled' => true]);
 
         $this->assertIsArray($result);
     }
 
     public function testSearchMembersWithTransactionsFilter(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], ['transactions_enabled' => true]);
+        $result = self::svc()->searchMembers([1, 2], ['transactions_enabled' => true]);
 
         $this->assertIsArray($result);
     }
 
     public function testSearchMembersWithPagination(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], [
+        $result = self::svc()->searchMembers([1, 2], [
             'limit' => 5,
             'offset' => 0,
         ]);
@@ -140,14 +145,14 @@ class FederationSearchServiceTest extends DatabaseTestCase
         $sortOptions = ['name', 'recent', 'active'];
 
         foreach ($sortOptions as $sort) {
-            $result = FederationSearchService::searchMembers([1, 2], ['sort' => $sort]);
+            $result = self::svc()->searchMembers([1, 2], ['sort' => $sort]);
             $this->assertIsArray($result);
         }
     }
 
     public function testSearchMembersLimitCappedAt100(): void
     {
-        $result = FederationSearchService::searchMembers([1, 2], ['limit' => 500]);
+        $result = self::svc()->searchMembers([1, 2], ['limit' => 500]);
 
         $this->assertIsArray($result);
         // The service caps limit at 100
@@ -160,7 +165,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testGetAvailableSkillsWithEmptyPartnerIdsReturnsEmpty(): void
     {
-        $result = FederationSearchService::getAvailableSkills([]);
+        $result = self::svc()->getAvailableSkills([]);
 
         $this->assertIsArray($result);
         $this->assertEmpty($result);
@@ -168,21 +173,21 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testGetAvailableSkillsReturnsArray(): void
     {
-        $result = FederationSearchService::getAvailableSkills([1, 2]);
+        $result = self::svc()->getAvailableSkills([1, 2]);
 
         $this->assertIsArray($result);
     }
 
     public function testGetAvailableSkillsWithQuery(): void
     {
-        $result = FederationSearchService::getAvailableSkills([1, 2], 'cook');
+        $result = self::svc()->getAvailableSkills([1, 2], 'cook');
 
         $this->assertIsArray($result);
     }
 
     public function testGetAvailableSkillsWithLimit(): void
     {
-        $result = FederationSearchService::getAvailableSkills([1, 2], '', 5);
+        $result = self::svc()->getAvailableSkills([1, 2], '', 5);
 
         $this->assertIsArray($result);
         $this->assertLessThanOrEqual(5, count($result));
@@ -194,7 +199,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testGetAvailableLocationsWithEmptyPartnerIdsReturnsEmpty(): void
     {
-        $result = FederationSearchService::getAvailableLocations([]);
+        $result = self::svc()->getAvailableLocations([]);
 
         $this->assertIsArray($result);
         $this->assertEmpty($result);
@@ -202,14 +207,14 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testGetAvailableLocationsReturnsArray(): void
     {
-        $result = FederationSearchService::getAvailableLocations([1, 2]);
+        $result = self::svc()->getAvailableLocations([1, 2]);
 
         $this->assertIsArray($result);
     }
 
     public function testGetAvailableLocationsWithQuery(): void
     {
-        $result = FederationSearchService::getAvailableLocations([1, 2], 'Dublin');
+        $result = self::svc()->getAvailableLocations([1, 2], 'Dublin');
 
         $this->assertIsArray($result);
     }
@@ -220,7 +225,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testGetSearchStatsWithEmptyPartnerIdsReturnsZeros(): void
     {
-        $result = FederationSearchService::getSearchStats([]);
+        $result = self::svc()->getSearchStats([]);
 
         $this->assertIsArray($result);
         $this->assertEquals(0, $result['total_members']);
@@ -232,7 +237,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testGetSearchStatsReturnsExpectedStructure(): void
     {
-        $result = FederationSearchService::getSearchStats([1, 2]);
+        $result = self::svc()->getSearchStats([1, 2]);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('total_members', $result);
@@ -248,7 +253,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchExternalMembersReturnsExpectedStructure(): void
     {
-        $result = FederationSearchService::searchExternalMembers(self::$testTenantId, []);
+        $result = self::svc()->searchExternalMembers(self::$testTenantId, []);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('members', $result);
@@ -263,7 +268,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchAllFederatedMembersReturnsExpectedStructure(): void
     {
-        $result = FederationSearchService::searchAllFederatedMembers(
+        $result = self::svc()->searchAllFederatedMembers(
             [1, 2],
             self::$testTenantId,
             []
@@ -283,7 +288,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testSearchExternalListingsReturnsExpectedStructure(): void
     {
-        $result = FederationSearchService::searchExternalListings(self::$testTenantId, []);
+        $result = self::svc()->searchExternalListings(self::$testTenantId, []);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('listings', $result);
@@ -298,7 +303,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testFindMembersBySkillsWithEmptyPartnerIdsReturnsEmpty(): void
     {
-        $result = FederationSearchService::findMembersBySkills([], ['cooking']);
+        $result = self::svc()->findMembersBySkills([], ['cooking']);
 
         $this->assertIsArray($result);
         $this->assertEmpty($result);
@@ -306,7 +311,7 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testFindMembersBySkillsWithEmptySkillsReturnsEmpty(): void
     {
-        $result = FederationSearchService::findMembersBySkills([1, 2], []);
+        $result = self::svc()->findMembersBySkills([1, 2], []);
 
         $this->assertIsArray($result);
         $this->assertEmpty($result);
@@ -314,14 +319,14 @@ class FederationSearchServiceTest extends DatabaseTestCase
 
     public function testFindMembersBySkillsReturnsArray(): void
     {
-        $result = FederationSearchService::findMembersBySkills([1, 2], ['cooking', 'gardening']);
+        $result = self::svc()->findMembersBySkills([1, 2], ['cooking', 'gardening']);
 
         $this->assertIsArray($result);
     }
 
     public function testFindMembersBySkillsWithExcludeUser(): void
     {
-        $result = FederationSearchService::findMembersBySkills([1, 2], ['cooking'], 1, 10);
+        $result = self::svc()->findMembersBySkills([1, 2], ['cooking'], 1, 10);
 
         $this->assertIsArray($result);
     }

@@ -19,7 +19,7 @@ class FederationJwtService
     /**
      * Delegates to legacy FederationJwtService::generateToken().
      */
-    public function generateToken(string $platformId, string $userId, int $tenantId, array $scopes = [], int $lifetime = self::DEFAULT_TOKEN_LIFETIME): ?array
+    public static function generateToken(string $platformId, string $userId, int $tenantId, array $scopes = [], int $lifetime = self::DEFAULT_TOKEN_LIFETIME): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class FederationJwtService
     /**
      * Delegates to legacy FederationJwtService::validateToken().
      */
-    public function validateToken(string $token): ?array
+    public static function validateToken(string $token): ?array
     {
         return static::validateTokenStatic($token);
     }
@@ -45,7 +45,7 @@ class FederationJwtService
     /**
      * Delegates to legacy FederationJwtService::handleTokenRequest().
      */
-    public function handleTokenRequest(): array
+    public static function handleTokenRequest(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

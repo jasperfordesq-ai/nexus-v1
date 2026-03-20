@@ -29,7 +29,7 @@ use App\Services\TotpService as AppTotpService;
  * The integration tests in tests/Services/TotpServiceTest.php cover
  * database-dependent flows (setup, login verification, trusted devices).
  *
- * @covers \Nexus\Services\TotpService
+ * @covers \App\Services\TotpService
  */
 class TotpServiceUnitTest extends TestCase
 {

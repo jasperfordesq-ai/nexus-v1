@@ -19,7 +19,7 @@ class DailyRewardService
     /**
      * Delegates to legacy DailyRewardService::claim().
      */
-    public function claim(int $tenantId, int $userId): ?array
+    public static function claim(int $tenantId, int $userId): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class DailyRewardService
     /**
      * Delegates to legacy DailyRewardService::canClaim().
      */
-    public function canClaim(int $tenantId, int $userId): bool
+    public static function canClaim(int $tenantId, int $userId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class DailyRewardService
     /**
      * Delegates to legacy DailyRewardService::getStreak().
      */
-    public function getStreak(int $tenantId, int $userId): int
+    public static function getStreak(int $tenantId, int $userId): int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return 0;
@@ -46,7 +46,7 @@ class DailyRewardService
     /**
      * Delegates to legacy DailyRewardService::getRewardConfig().
      */
-    public function getRewardConfig(int $tenantId): array
+    public static function getRewardConfig(int $tenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -57,7 +57,7 @@ class DailyRewardService
      *
      * Returns reward data if awarded, null if already claimed today.
      */
-    public function checkAndAwardDailyReward(int $userId): ?array
+    public static function checkAndAwardDailyReward(int $userId): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -68,7 +68,7 @@ class DailyRewardService
      *
      * Returns today's reward status for the given user.
      */
-    public function getTodayStatus(int $userId): array
+    public static function getTodayStatus(int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -77,7 +77,7 @@ class DailyRewardService
     /**
      * Delegates to legacy DailyRewardService::getHistory().
      */
-    public function getHistory(int $userId, int $limit = 30): array
+    public static function getHistory(int $userId, int $limit = 30): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -86,7 +86,7 @@ class DailyRewardService
     /**
      * Delegates to legacy DailyRewardService::getTotalEarned().
      */
-    public function getTotalEarned(int $userId): int
+    public static function getTotalEarned(int $userId): int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return 0;

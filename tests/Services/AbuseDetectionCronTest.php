@@ -20,7 +20,7 @@ use App\Services\AbuseDetectionService;
  * - Alert creation and management
  * - Threshold configuration
  *
- * @covers \Nexus\Services\AbuseDetectionService
+ * @covers \App\Services\AbuseDetectionService
  */
 class AbuseDetectionCronTest extends TestCase
 {

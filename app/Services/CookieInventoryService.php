@@ -25,7 +25,7 @@ class CookieInventoryService
      * @param int|null $tenantId Tenant ID (null = global cookies only)
      * @return array
      */
-    public function getCookiesByCategory(string $category, ?int $tenantId = null): array
+    public static function getCookiesByCategory(string $category, ?int $tenantId = null): array
     {
         $query = CookieInventoryItem::where('category', $category)
             ->where('is_active', true)
@@ -48,7 +48,7 @@ class CookieInventoryService
      * @param int|null $tenantId Tenant ID (null = global only)
      * @return array Cookies grouped by category
      */
-    public function getAllCookies(?int $tenantId = null): array
+    public static function getAllCookies(?int $tenantId = null): array
     {
         $query = CookieInventoryItem::where('is_active', true)
             ->orderBy('category')
@@ -84,10 +84,10 @@ class CookieInventoryService
      * @param int|null $tenantId Tenant ID
      * @return array Cookies grouped by category
      */
-    public function getBannerCookieList(?int $tenantId = null): array
+    public static function getBannerCookieList(?int $tenantId = null): array
     {
         $tenantId = $tenantId ?? TenantContext::getId();
-        return $this->getAllCookies($tenantId);
+        return self::getAllCookies($tenantId);
     }
 
     /**
@@ -97,7 +97,7 @@ class CookieInventoryService
      * @return int Cookie ID
      * @throws \InvalidArgumentException
      */
-    public function addCookie(array $data): int
+    public static function addCookie(array $data): int
     {
         $requiredFields = ['cookie_name', 'category', 'purpose', 'duration'];
         foreach ($requiredFields as $field) {
@@ -131,7 +131,7 @@ class CookieInventoryService
      * @param array $data Fields to update
      * @return bool
      */
-    public function updateCookie(int $id, array $data): bool
+    public static function updateCookie(int $id, array $data): bool
     {
         $cookie = CookieInventoryItem::find($id);
         if (!$cookie) {

@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Log;
 class VolunteerEmergencyAlertService
 {
     /** @var array */
-    private array $errors = [];
+    private static array $errors = [];
 
     public function __construct()
     {
@@ -38,9 +38,9 @@ class VolunteerEmergencyAlertService
     /**
      * Get errors from the last operation.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
@@ -50,9 +50,9 @@ class VolunteerEmergencyAlertService
      * @param array $data [shift_id, message, priority, required_skills, expires_hours]
      * @return int|null Alert ID or null on failure
      */
-    public function createAlert(int $createdBy, array $data): ?int
+    public static function createAlert(int $createdBy, array $data): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $shiftId = (int) ($data['shift_id'] ?? 0);
@@ -62,37 +62,37 @@ class VolunteerEmergencyAlertService
         $expiresHours = (int) ($data['expires_hours'] ?? 24);
 
         if (!$shiftId) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Shift ID is required', 'field' => 'shift_id'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Shift ID is required', 'field' => 'shift_id'];
             return null;
         }
 
         if (!$message) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message is required', 'field' => 'message'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message is required', 'field' => 'message'];
             return null;
         }
 
         if (!in_array($priority, ['normal', 'urgent', 'critical'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Priority must be normal, urgent, or critical', 'field' => 'priority'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Priority must be normal, urgent, or critical', 'field' => 'priority'];
             return null;
         }
 
         // Verify shift exists
         $shift = VolShift::find($shiftId);
         if (!$shift) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
             return null;
         }
 
         // Verify coordinator owns the opportunity's org
         $opportunity = VolOpportunity::with('organization')->find($shift->opportunity_id);
         if (!$opportunity || !$opportunity->organization) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
             return null;
         }
 
         // Allow org owner or tenant admin
-        if (!$this->isAdminOrOrgOwner($createdBy, (int) $opportunity->organization->user_id)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only coordinators or admins can create emergency alerts'];
+        if (!self::isAdminOrOrgOwner($createdBy, (int) $opportunity->organization->user_id)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only coordinators or admins can create emergency alerts'];
             return null;
         }
 
@@ -123,12 +123,12 @@ class VolunteerEmergencyAlertService
             ]);
 
             // Notify qualified volunteers (best-effort, non-blocking)
-            $this->notifyQualifiedVolunteers($alert->id, $shiftId, $skillsJson, $tenantId, $priority, $message);
+            self::notifyQualifiedVolunteers($alert->id, $shiftId, $skillsJson, $tenantId, $priority, $message);
 
             return $alert->id;
         } catch (\Exception $e) {
             Log::error('VolunteerEmergencyAlertService::createAlert error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create emergency alert'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create emergency alert'];
             return null;
         }
     }
@@ -141,12 +141,12 @@ class VolunteerEmergencyAlertService
      * @param string $response 'accepted' or 'declined'
      * @return bool Success
      */
-    public function respond(int $alertId, int $userId, string $response): bool
+    public static function respond(int $alertId, int $userId, string $response): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         if (!in_array($response, ['accepted', 'declined'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Response must be accepted or declined'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Response must be accepted or declined'];
             return false;
         }
 
@@ -160,7 +160,7 @@ class VolunteerEmergencyAlertService
             ->first();
 
         if (!$recipient) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'You were not invited for this alert or have already responded'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You were not invited for this alert or have already responded'];
             return false;
         }
 
@@ -170,7 +170,7 @@ class VolunteerEmergencyAlertService
             ->first();
 
         if (!$alert) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This alert is no longer active'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This alert is no longer active'];
             return false;
         }
 
@@ -213,7 +213,7 @@ class VolunteerEmergencyAlertService
             return true;
         } catch (\Exception $e) {
             Log::error('VolunteerEmergencyAlertService::respond error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process response'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process response'];
             return false;
         }
     }
@@ -224,7 +224,7 @@ class VolunteerEmergencyAlertService
      * @param int $userId User ID
      * @return array Active alerts
      */
-    public function getUserAlerts(int $userId): array
+    public static function getUserAlerts(int $userId): array
     {
         $alerts = VolEmergencyAlert::query()
             ->join('vol_emergency_alert_recipients as r', 'r.alert_id', '=', 'vol_emergency_alerts.id')
@@ -281,7 +281,7 @@ class VolunteerEmergencyAlertService
      * @param int $coordinatorId Coordinator user ID
      * @return array Alerts with response stats
      */
-    public function getCoordinatorAlerts(int $coordinatorId): array
+    public static function getCoordinatorAlerts(int $coordinatorId): array
     {
         $alerts = VolEmergencyAlert::query()
             ->join('vol_shifts as s', 'vol_emergency_alerts.shift_id', '=', 's.id')
@@ -332,9 +332,9 @@ class VolunteerEmergencyAlertService
      * @param int $tenantId Tenant ID
      * @return bool Success
      */
-    public function cancelAlert(int $alertId, int $userId, int $tenantId): bool
+    public static function cancelAlert(int $alertId, int $userId, int $tenantId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         $alert = VolEmergencyAlert::where('id', $alertId)
             ->where('created_by', $userId)
@@ -342,7 +342,7 @@ class VolunteerEmergencyAlertService
             ->first();
 
         if (!$alert) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Alert not found or cannot be cancelled'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Alert not found or cannot be cancelled'];
             return false;
         }
 
@@ -351,7 +351,7 @@ class VolunteerEmergencyAlertService
             return true;
         } catch (\Exception $e) {
             Log::error('VolunteerEmergencyAlertService::cancelAlert error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel alert'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel alert'];
             return false;
         }
     }
@@ -359,15 +359,15 @@ class VolunteerEmergencyAlertService
     /**
      * Get errors from the last cancelAlert() call.
      */
-    public function getCancelErrors(): array
+    public static function getCancelErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
      * Find and notify qualified volunteers for an emergency alert.
      */
-    private function notifyQualifiedVolunteers(int $alertId, int $shiftId, ?string $skillsJson, int $tenantId, string $priority, string $message): int
+    private static function notifyQualifiedVolunteers(int $alertId, int $shiftId, ?string $skillsJson, int $tenantId, string $priority, string $message): int
     {
         // Find volunteers who:
         // 1. Have approved applications for the opportunity's org
@@ -456,7 +456,7 @@ class VolunteerEmergencyAlertService
     /**
      * Check if user is admin or org owner.
      */
-    private function isAdminOrOrgOwner(int $userId, int $orgOwnerId): bool
+    private static function isAdminOrOrgOwner(int $userId, int $orgOwnerId): bool
     {
         if ($userId === $orgOwnerId) {
             return true;

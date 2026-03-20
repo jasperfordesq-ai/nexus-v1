@@ -19,7 +19,7 @@ class TenantSettingsService
     /**
      * Delegates to legacy TenantSettingsService::get().
      */
-    public function get(int $tenantId, string $key, $default = null)
+    public static function get(int $tenantId, string $key, $default = null)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class TenantSettingsService
     /**
      * Delegates to legacy TenantSettingsService::getBool().
      */
-    public function getBool(int $tenantId, string $key, bool $default = false): bool
+    public static function getBool(int $tenantId, string $key, bool $default = false): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class TenantSettingsService
     /**
      * Delegates to legacy TenantSettingsService::getAllGeneral().
      */
-    public function getAllGeneral(int $tenantId): array
+    public static function getAllGeneral(int $tenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class TenantSettingsService
     /**
      * Delegates to legacy TenantSettingsService::clearCache().
      */
-    public function clearCache(): void
+    public static function clearCache(): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
@@ -54,7 +54,7 @@ class TenantSettingsService
     /**
      * Delegates to legacy TenantSettingsService::isRegistrationOpen().
      */
-    public function isRegistrationOpen(int $tenantId): bool
+    public static function isRegistrationOpen(int $tenantId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -68,7 +68,7 @@ class TenantSettingsService
      * @param int $tenantId Tenant ID
      * @return array|null Null = passes, or ['code' => ..., 'message' => ..., 'extra' => [...]]
      */
-    public function checkLoginGates(int $tenantId): ?array
+    public static function checkLoginGates(int $tenantId): ?array
     {
         // Delegate to legacy which accepts a user array.
         // When called from a controller the caller typically has a user row;
@@ -102,7 +102,7 @@ class TenantSettingsService
      * @param array $user User row from DB
      * @return array|null Null = passes, or error array
      */
-    public function checkLoginGatesForUser(array $user): ?array
+    public static function checkLoginGatesForUser(array $user): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

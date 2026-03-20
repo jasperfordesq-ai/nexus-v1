@@ -20,19 +20,19 @@ use Illuminate\Support\Facades\Log;
  */
 class ShiftSwapService
 {
-    private array $errors = [];
+    private static array $errors = [];
 
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
      * Alias for getErrors() used by the cancel flow.
      */
-    public function getCancelErrors(): array
+    public static function getCancelErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
@@ -42,9 +42,9 @@ class ShiftSwapService
      * @param array $data       [from_shift_id, to_shift_id, to_user_id, message]
      * @return int|null Swap request ID or null on failure
      */
-    public function requestSwap(int $fromUserId, array $data): ?int
+    public static function requestSwap(int $fromUserId, array $data): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $fromShiftId = (int) ($data['from_shift_id'] ?? 0);
@@ -53,12 +53,12 @@ class ShiftSwapService
         $message     = trim($data['message'] ?? '');
 
         if (! $fromShiftId || ! $toShiftId || ! $toUserId) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'from_shift_id, to_shift_id, and to_user_id are required'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'from_shift_id, to_shift_id, and to_user_id are required'];
             return null;
         }
 
         if ($fromUserId === $toUserId) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot swap with yourself'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot swap with yourself'];
             return null;
         }
 
@@ -69,7 +69,7 @@ class ShiftSwapService
             ->first();
 
         if (! $fromApp) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not signed up for the source shift'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not signed up for the source shift'];
             return null;
         }
 
@@ -80,7 +80,7 @@ class ShiftSwapService
             ->first();
 
         if (! $toApp) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Target user is not signed up for the requested shift'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Target user is not signed up for the requested shift'];
             return null;
         }
 
@@ -89,12 +89,12 @@ class ShiftSwapService
         $toShift   = VolShift::find($toShiftId);
 
         if (! $fromShift || ! $toShift) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'One or both shifts not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'One or both shifts not found'];
             return null;
         }
 
         if ($fromShift->start_time->isPast() || $toShift->start_time->isPast()) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot swap shifts that have already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot swap shifts that have already started'];
             return null;
         }
 
@@ -109,12 +109,12 @@ class ShiftSwapService
             ->exists();
 
         if ($duplicate) {
-            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'A swap request already exists for these shifts'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'A swap request already exists for these shifts'];
             return null;
         }
 
         // Check if admin approval is required (tenant setting)
-        $requiresAdmin = $this->requiresAdminApproval($tenantId);
+        $requiresAdmin = self::requiresAdminApproval($tenantId);
 
         try {
             $swapId = DB::table('vol_shift_swap_requests')->insertGetId([
@@ -132,7 +132,7 @@ class ShiftSwapService
             return (int) $swapId;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::requestSwap error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create swap request'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create swap request'];
             return null;
         }
     }
@@ -140,13 +140,13 @@ class ShiftSwapService
     /**
      * Respond to a swap request (accept/reject by target user).
      */
-    public function respond(int $swapId, int $userId, string $action): bool
+    public static function respond(int $swapId, int $userId, string $action): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         if (! in_array($action, ['accept', 'reject'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject'];
             return false;
         }
 
@@ -157,12 +157,12 @@ class ShiftSwapService
             ->first();
 
         if (! $swap) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or already processed'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or already processed'];
             return false;
         }
 
         if ((int) $swap->to_user_id !== $userId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'This swap request is not addressed to you'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'This swap request is not addressed to you'];
             return false;
         }
 
@@ -185,10 +185,10 @@ class ShiftSwapService
             }
 
             // Execute swap directly
-            return $this->executeSwap($swap, $tenantId);
+            return self::executeSwap($swap, $tenantId);
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::respond error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process swap response'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process swap response'];
             return false;
         }
     }
@@ -196,13 +196,13 @@ class ShiftSwapService
     /**
      * Admin approve/reject a swap.
      */
-    public function adminDecision(int $swapId, int $adminId, string $action): bool
+    public static function adminDecision(int $swapId, int $adminId, string $action): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         if (! in_array($action, ['approve', 'reject'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or reject'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or reject'];
             return false;
         }
 
@@ -213,7 +213,7 @@ class ShiftSwapService
             ->first();
 
         if (! $swap) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or not pending admin approval'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or not pending admin approval'];
             return false;
         }
 
@@ -227,7 +227,7 @@ class ShiftSwapService
             }
 
             // Execute the swap
-            $result = $this->executeSwap($swap, $tenantId);
+            $result = self::executeSwap($swap, $tenantId);
 
             if ($result) {
                 DB::table('vol_shift_swap_requests')
@@ -239,7 +239,7 @@ class ShiftSwapService
             return $result;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::adminDecision error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process admin decision'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process admin decision'];
             return false;
         }
     }
@@ -247,7 +247,7 @@ class ShiftSwapService
     /**
      * Get swap requests for a user (incoming and outgoing).
      */
-    public function getSwapRequests(int $userId, string $direction = 'all'): array
+    public static function getSwapRequests(int $userId, string $direction = 'all'): array
     {
         $tenantId = TenantContext::getId();
 
@@ -313,9 +313,9 @@ class ShiftSwapService
     /**
      * Cancel a pending swap request.
      */
-    public function cancel(int $swapId, int $userId, int $tenantId): bool
+    public static function cancel(int $swapId, int $userId, int $tenantId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         $swap = DB::table('vol_shift_swap_requests')
             ->where('id', $swapId)
@@ -325,7 +325,7 @@ class ShiftSwapService
             ->first();
 
         if (! $swap) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or cannot be cancelled'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or cannot be cancelled'];
             return false;
         }
 
@@ -337,7 +337,7 @@ class ShiftSwapService
             return true;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::cancel error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel swap request'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel swap request'];
             return false;
         }
     }
@@ -345,7 +345,7 @@ class ShiftSwapService
     /**
      * Execute the actual swap (move shift assignments) within a transaction.
      */
-    private function executeSwap(object $swap, int $tenantId): bool
+    private static function executeSwap(object $swap, int $tenantId): bool
     {
         try {
             return DB::transaction(function () use ($swap, $tenantId) {
@@ -367,7 +367,7 @@ class ShiftSwapService
                     ->first();
 
                 if (! $fromApp || ! $toApp) {
-                    $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'One or both volunteers are no longer assigned to the requested shifts'];
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'One or both volunteers are no longer assigned to the requested shifts'];
                     return false;
                 }
 
@@ -384,7 +384,7 @@ class ShiftSwapService
                     ->update(['shift_id' => $swap->from_shift_id]);
 
                 if ($updatedFrom !== 1 || $updatedTo !== 1) {
-                    $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to apply swap assignments atomically'];
+                    self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to apply swap assignments atomically'];
                     throw new \RuntimeException('Swap update mismatch');
                 }
 
@@ -400,7 +400,7 @@ class ShiftSwapService
             return false;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::executeSwap error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to execute shift swap'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to execute shift swap'];
             return false;
         }
     }
@@ -408,7 +408,7 @@ class ShiftSwapService
     /**
      * Check if admin approval is required for swaps (tenant setting).
      */
-    private function requiresAdminApproval(int $tenantId): bool
+    private static function requiresAdminApproval(int $tenantId): bool
     {
         try {
             $result = DB::table('tenant_settings')

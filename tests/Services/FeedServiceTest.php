@@ -11,6 +11,8 @@ namespace Nexus\Tests\Services;
 use Nexus\Tests\DatabaseTestCase;
 use App\Core\Database;
 use App\Core\TenantContext;
+use App\Models\FeedActivity;
+use App\Models\FeedPost;
 use App\Services\FeedService;
 use App\Services\FeedActivityService;
 
@@ -26,6 +28,16 @@ class FeedServiceTest extends DatabaseTestCase
     protected static ?int $testUser2Id = null;
     protected static ?int $testPostId = null;
     protected static ?int $testGroupId = null;
+
+    private static function svc(): FeedService
+    {
+        return new FeedService(new FeedActivity(), new FeedPost());
+    }
+
+    private static function activitySvc(): FeedActivityService
+    {
+        return new FeedActivityService();
+    }
 
     public static function setUpBeforeClass(): void
     {
@@ -127,7 +139,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedReturnsValidStructure(): void
     {
         try {
-            $result = FeedService::getFeed(self::$testUserId);
+            $result = self::svc()->getFeed(self::$testUserId);
 
             $this->assertIsArray($result);
             $this->assertArrayHasKey('items', $result);
@@ -141,7 +153,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedRespectsLimit(): void
     {
         try {
-            $result = FeedService::getFeed(self::$testUserId, ['limit' => 5]);
+            $result = self::svc()->getFeed(self::$testUserId, ['limit' => 5]);
 
             $this->assertLessThanOrEqual(5, count($result['items']));
         } catch (\Exception $e) {
@@ -152,7 +164,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedEnforcesMaxLimit(): void
     {
         try {
-            $result = FeedService::getFeed(self::$testUserId, ['limit' => 500]);
+            $result = self::svc()->getFeed(self::$testUserId, ['limit' => 500]);
 
             $this->assertLessThanOrEqual(100, count($result['items']));
         } catch (\Exception $e) {
@@ -163,7 +175,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedFiltersByType(): void
     {
         try {
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'posts']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'posts']);
 
             foreach ($result['items'] as $item) {
                 $this->assertEquals('post', $item['type']);
@@ -176,7 +188,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedIncludesAuthorInfo(): void
     {
         try {
-            $result = FeedService::getFeed(self::$testUserId);
+            $result = self::svc()->getFeed(self::$testUserId);
 
             if (!empty($result['items'])) {
                 $item = $result['items'][0];
@@ -194,7 +206,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedIncludesLikesInfo(): void
     {
         try {
-            $result = FeedService::getFeed(self::$testUserId);
+            $result = self::svc()->getFeed(self::$testUserId);
 
             if (!empty($result['items'])) {
                 $item = $result['items'][0];
@@ -209,7 +221,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedWorksWithoutAuthenticatedUser(): void
     {
         try {
-            $result = FeedService::getFeed(null);
+            $result = self::svc()->getFeed(null);
 
             $this->assertIsArray($result);
             $this->assertArrayHasKey('items', $result);
@@ -225,7 +237,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testGetFeedFiltersByUserId(): void
     {
         try {
-            $result = FeedService::getFeed(null, ['user_id' => self::$testUserId]);
+            $result = self::svc()->getFeed(null, ['user_id' => self::$testUserId]);
 
             foreach ($result['items'] as $item) {
                 // Author ID is in nested 'author' object
@@ -247,7 +259,7 @@ class FeedServiceTest extends DatabaseTestCase
         }
 
         try {
-            $result = FeedService::getFeed(null, ['group_id' => self::$testGroupId]);
+            $result = self::svc()->getFeed(null, ['group_id' => self::$testGroupId]);
             $this->assertIsArray($result['items']);
 
             foreach ($result['items'] as $item) {
@@ -265,7 +277,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testCreatePostReturnsIdForValidPost(): void
     {
         try {
-            $postId = FeedService::createPost(self::$testUserId, [
+            $postId = self::svc()->createPost(self::$testUserId, [
                 'content' => 'Test post content from unit test',
                 'visibility' => 'public',
             ]);
@@ -284,7 +296,7 @@ class FeedServiceTest extends DatabaseTestCase
     {
         try {
             // createPost returns ?int (null on failure)
-            $result = FeedService::createPost(self::$testUserId, [
+            $result = self::svc()->createPost(self::$testUserId, [
                 'content' => '',
             ]);
 
@@ -307,12 +319,12 @@ class FeedServiceTest extends DatabaseTestCase
     public function testCreatePostAcceptsVisibilityOptions(): void
     {
         try {
-            $postId1 = FeedService::createPost(self::$testUserId, [
+            $postId1 = self::svc()->createPost(self::$testUserId, [
                 'content' => 'Public post',
                 'visibility' => 'public',
             ]);
 
-            $postId2 = FeedService::createPost(self::$testUserId, [
+            $postId2 = self::svc()->createPost(self::$testUserId, [
                 'content' => 'Connections only post',
                 'visibility' => 'connections',
             ]);
@@ -338,7 +350,7 @@ class FeedServiceTest extends DatabaseTestCase
         }
 
         // toggleLike(userId, targetType, targetId) returns array with action/likes_count
-        $result = FeedService::toggleLike(self::$testUser2Id, 'post', self::$testPostId);
+        $result = self::svc()->toggleLike(self::$testUser2Id, 'post', self::$testPostId);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('action', $result);
@@ -356,10 +368,10 @@ class FeedServiceTest extends DatabaseTestCase
         }
 
         // Like once
-        FeedService::toggleLike(self::$testUser2Id, 'post', self::$testPostId);
+        self::svc()->toggleLike(self::$testUser2Id, 'post', self::$testPostId);
 
         // Toggle again (unlike)
-        $result = FeedService::toggleLike(self::$testUser2Id, 'post', self::$testPostId);
+        $result = self::svc()->toggleLike(self::$testUser2Id, 'post', self::$testPostId);
 
         $this->assertIsArray($result);
         $this->assertEquals('unliked', $result['action']);
@@ -375,7 +387,7 @@ class FeedServiceTest extends DatabaseTestCase
     public function testDeletePostNotImplemented(): void
     {
         // FeedService does not have deletePost() method
-        $this->markTestSkipped('FeedService::deletePost() does not exist - no delete functionality in feed service');
+        $this->markTestSkipped('self::svc()->deletePost() does not exist - no delete functionality in feed service');
     }
 
     // ==========================================
@@ -407,10 +419,10 @@ class FeedServiceTest extends DatabaseTestCase
 
         try {
             try {
-                $result = FeedService::getFeed(self::$testUserId, ['type' => 'listings']);
+                $result = self::svc()->getFeed(self::$testUserId, ['type' => 'listings']);
             } catch (\Exception $e) {
                 // feed_activity table may not exist or schema mismatch
-                $this->markTestIncomplete('FeedService::getFeed failed: ' . $e->getMessage());
+                $this->markTestIncomplete('self::svc()->getFeed failed: ' . $e->getMessage());
                 return;
             }
 
@@ -440,7 +452,7 @@ class FeedServiceTest extends DatabaseTestCase
 
     /**
      * Regression test: Pending (moderated) listings must NOT appear on the feed.
-     * Bug: FeedActivityService::recordActivity was called unconditionally,
+     * Bug: self::activitySvc()->recordActivity was called unconditionally,
      * making pending listings visible via feed_activity. Fixed 2026-03-04.
      */
     public function testPendingListingsExcludedFromFeed(): void
@@ -461,7 +473,7 @@ class FeedServiceTest extends DatabaseTestCase
         }
 
         try {
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'listings']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'listings']);
 
             foreach ($result['items'] as $item) {
                 if ($item['type'] === 'listing') {
@@ -560,7 +572,7 @@ class FeedServiceTest extends DatabaseTestCase
                 ]
             );
 
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'listings']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'listings']);
 
             $found = null;
             foreach ($result['items'] as $item) {
@@ -626,7 +638,7 @@ class FeedServiceTest extends DatabaseTestCase
                 ]
             );
 
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'events']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'events']);
 
             $found = null;
             foreach ($result['items'] as $item) {
@@ -708,7 +720,7 @@ class FeedServiceTest extends DatabaseTestCase
             );
 
             // Use 'all' type since there's no 'reviews' filter — source_type is 'review'
-            $result = FeedService::getFeed(self::$testUserId);
+            $result = self::svc()->getFeed(self::$testUserId);
 
             $found = null;
             foreach ($result['items'] as $item) {
@@ -784,7 +796,7 @@ class FeedServiceTest extends DatabaseTestCase
                 ]
             );
 
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'jobs']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'jobs']);
 
             $found = null;
             foreach ($result['items'] as $item) {
@@ -854,7 +866,7 @@ class FeedServiceTest extends DatabaseTestCase
                 ]
             );
 
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'challenges']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'challenges']);
 
             $found = null;
             foreach ($result['items'] as $item) {
@@ -941,7 +953,7 @@ class FeedServiceTest extends DatabaseTestCase
                 ]
             );
 
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'volunteering']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'volunteering']);
 
             $found = null;
             foreach ($result['items'] as $item) {
@@ -1010,7 +1022,7 @@ class FeedServiceTest extends DatabaseTestCase
 
         try {
             // Fetch all feed items (no type filter) and verify the hidden item is absent
-            $result = FeedService::getFeed(self::$testUserId);
+            $result = self::svc()->getFeed(self::$testUserId);
 
             foreach ($result['items'] as $item) {
                 $this->assertFalse(
@@ -1020,7 +1032,7 @@ class FeedServiceTest extends DatabaseTestCase
             }
 
             // Also check with type filter
-            $result = FeedService::getFeed(self::$testUserId, ['type' => 'posts']);
+            $result = self::svc()->getFeed(self::$testUserId, ['type' => 'posts']);
 
             foreach ($result['items'] as $item) {
                 $this->assertFalse(
@@ -1040,7 +1052,7 @@ class FeedServiceTest extends DatabaseTestCase
     // ==========================================
 
     /**
-     * FeedActivityService::recordActivity() creates a visible row,
+     * self::activitySvc()->recordActivity() creates a visible row,
      * hideActivity() sets is_visible = 0, showActivity() restores is_visible = 1.
      */
     public function testFeedActivityServiceRecordHideShow(): void
@@ -1072,7 +1084,7 @@ class FeedServiceTest extends DatabaseTestCase
             TenantContext::setById(self::$testTenantId);
 
             // Step 1: recordActivity should create a visible row
-            FeedActivityService::recordActivity(
+            self::activitySvc()->recordActivity(
                 self::$testTenantId,
                 self::$testUserId,
                 'listing',
@@ -1095,7 +1107,7 @@ class FeedServiceTest extends DatabaseTestCase
             $this->assertEquals(1, (int)$row['is_visible'], "recordActivity() must create row with is_visible = 1");
 
             // Step 2: hideActivity should set is_visible = 0
-            FeedActivityService::hideActivity('listing', $sourceId);
+            self::activitySvc()->hideActivity('listing', $sourceId);
 
             $stmt = Database::query(
                 "SELECT is_visible FROM feed_activity WHERE tenant_id = ? AND source_type = 'listing' AND source_id = ?",
@@ -1106,7 +1118,7 @@ class FeedServiceTest extends DatabaseTestCase
             $this->assertEquals(0, (int)$row['is_visible'], "hideActivity() must set is_visible = 0");
 
             // Step 3: showActivity should restore is_visible = 1
-            FeedActivityService::showActivity('listing', $sourceId);
+            self::activitySvc()->showActivity('listing', $sourceId);
 
             $stmt = Database::query(
                 "SELECT is_visible FROM feed_activity WHERE tenant_id = ? AND source_type = 'listing' AND source_id = ?",

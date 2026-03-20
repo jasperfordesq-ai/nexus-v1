@@ -64,7 +64,7 @@ class BrokerControlConfigService
      * @param string|null $section Optional section to retrieve
      * @return array Configuration array
      */
-    public function getConfig(?string $section = null): array
+    public static function getConfig(?string $section = null): array
     {
         $tenantId = TenantContext::getId();
 
@@ -110,7 +110,7 @@ class BrokerControlConfigService
      * @param array $data Configuration data to update
      * @return bool
      */
-    public function updateConfig(array $data): bool
+    public static function updateConfig(array $data): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -139,29 +139,29 @@ class BrokerControlConfigService
      * @param array $data Section data
      * @return bool
      */
-    public function updateSection(string $section, array $data): bool
+    public static function updateSection(string $section, array $data): bool
     {
-        $config = $this->getConfig();
+        $config = self::getConfig();
         $config[$section] = array_merge($config[$section] ?? [], $data);
-        return $this->updateConfig($config);
+        return self::updateConfig($config);
     }
 
     // =========================================================================
     // MESSAGING FEATURE CHECKS
     // =========================================================================
 
-    public function isDirectMessagingEnabled(): bool
+    public static function isDirectMessagingEnabled(): bool
     {
-        $config = $this->getConfig('messaging');
+        $config = self::getConfig('messaging');
         return (bool) ($config['direct_messaging_enabled'] ?? true);
     }
 
-    public function isFirstContactMonitoringEnabled(): bool
+    public static function isFirstContactMonitoringEnabled(): bool
     {
-        if (!$this->isBrokerVisibilityEnabled()) {
+        if (!self::isBrokerVisibilityEnabled()) {
             return false;
         }
-        $config = $this->getConfig('broker_visibility');
+        $config = self::getConfig('broker_visibility');
         return (bool) ($config['copy_first_contact'] ?? true);
     }
 
@@ -169,9 +169,9 @@ class BrokerControlConfigService
     // EXCHANGE WORKFLOW FEATURE CHECKS
     // =========================================================================
 
-    public function isExchangeWorkflowEnabled(): bool
+    public static function isExchangeWorkflowEnabled(): bool
     {
-        $config = $this->getConfig('exchange_workflow');
+        $config = self::getConfig('exchange_workflow');
         return (bool) ($config['enabled'] ?? false);
     }
 
@@ -179,9 +179,9 @@ class BrokerControlConfigService
     // BROKER VISIBILITY FEATURE CHECKS
     // =========================================================================
 
-    public function isBrokerVisibilityEnabled(): bool
+    public static function isBrokerVisibilityEnabled(): bool
     {
-        $config = $this->getConfig('broker_visibility');
+        $config = self::getConfig('broker_visibility');
         return (bool) ($config['enabled'] ?? true);
     }
 
@@ -189,7 +189,7 @@ class BrokerControlConfigService
     // COMPLIANCE FEATURE TOGGLES
     // =========================================================================
 
-    private function getComplianceSetting(string $key, mixed $default = false): mixed
+    private static function getComplianceSetting(string $key, mixed $default = false): mixed
     {
         $tenantId = TenantContext::getId();
         try {
@@ -208,14 +208,14 @@ class BrokerControlConfigService
         return $default;
     }
 
-    public function isVettingEnabled(): bool
+    public static function isVettingEnabled(): bool
     {
-        return (bool) $this->getComplianceSetting('vetting_enabled', false);
+        return (bool) self::getComplianceSetting('vetting_enabled', false);
     }
 
-    public function isInsuranceEnabled(): bool
+    public static function isInsuranceEnabled(): bool
     {
-        return (bool) $this->getComplianceSetting('insurance_enabled', false);
+        return (bool) self::getComplianceSetting('insurance_enabled', false);
     }
 
     // =========================================================================

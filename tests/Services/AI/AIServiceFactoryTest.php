@@ -8,11 +8,11 @@ namespace Nexus\Tests\Services\AI;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\AI\AIServiceFactory;
-use Nexus\Services\AI\Contracts\AIProviderInterface;
-use Nexus\Services\AI\Providers\OpenAIProvider;
-use Nexus\Services\AI\Providers\AnthropicProvider;
-use Nexus\Services\AI\Providers\GeminiProvider;
-use Nexus\Services\AI\Providers\OllamaProvider;
+use App\Services\AI\Contracts\AIProviderInterface;
+use App\Services\AI\Providers\OpenAIProvider;
+use App\Services\AI\Providers\AnthropicProvider;
+use App\Services\AI\Providers\GeminiProvider;
+use App\Services\AI\Providers\OllamaProvider;
 use App\Core\TenantContext;
 
 /**

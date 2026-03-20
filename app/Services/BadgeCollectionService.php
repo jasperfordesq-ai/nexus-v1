@@ -32,9 +32,9 @@ class BadgeCollectionService
      *
      * OPTIMIZED: Uses batch queries instead of N+1 pattern.
      */
-    public function getCollectionsWithProgress(int $userId): array
+    public static function getCollectionsWithProgress(int $userId): array
     {
-        $collections = $this->collection->newQuery()
+        $collections = BadgeCollection::query()
             ->orderBy('display_order')
             ->get();
 
@@ -68,7 +68,7 @@ class BadgeCollectionService
             ->all();
 
         // Build badge definitions map (in-memory)
-        $badgeDefsMap = $this->getBadgeDefinitionsMap($allBadgeKeys);
+        $badgeDefsMap = self::getBadgeDefinitionsMap($allBadgeKeys);
 
         // Assemble collections with progress
         $result = [];
@@ -107,9 +107,9 @@ class BadgeCollectionService
     /**
      * Check and award collection completion.
      */
-    public function checkCollectionCompletion(int $userId): array
+    public static function checkCollectionCompletion(int $userId): array
     {
-        $collections = $this->collection->newQuery()->get();
+        $collections = BadgeCollection::query()->get();
 
         if ($collections->isEmpty()) {
             return [];
@@ -153,7 +153,7 @@ class BadgeCollectionService
             }
 
             if ($allEarned) {
-                $this->awardCollectionCompletion($userId, $collection);
+                self::awardCollectionCompletion($userId, $collection);
                 $completedCollections[] = $collection->toArray();
             }
         }
@@ -164,9 +164,9 @@ class BadgeCollectionService
     /**
      * Create a new collection (admin).
      */
-    public function create(array $data): ?int
+    public static function create(array $data): ?int
     {
-        $collection = $this->collection->newInstance([
+        $collection = new BadgeCollection([
             'collection_key' => $data['collection_key'],
             'name'           => $data['name'],
             'description'    => $data['description'] ?? '',
@@ -183,7 +183,7 @@ class BadgeCollectionService
     /**
      * Add badge to collection.
      */
-    public function addBadgeToCollection(int $collectionId, string $badgeKey, int $order = 0): void
+    public static function addBadgeToCollection(int $collectionId, string $badgeKey, int $order = 0): void
     {
         BadgeCollectionItem::firstOrCreate(
             ['collection_id' => $collectionId, 'badge_key' => $badgeKey],
@@ -194,10 +194,10 @@ class BadgeCollectionService
     /**
      * Remove badge from collection (with tenant check via collection).
      */
-    public function removeBadgeFromCollection(int $collectionId, string $badgeKey): void
+    public static function removeBadgeFromCollection(int $collectionId, string $badgeKey): void
     {
         // Verify the collection belongs to current tenant
-        $collection = $this->collection->newQuery()->find($collectionId);
+        $collection = BadgeCollection::query()->find($collectionId);
         if (! $collection) {
             return;
         }
@@ -210,7 +210,7 @@ class BadgeCollectionService
     /**
      * Build a map of badge definitions for fast O(1) lookup.
      */
-    private function getBadgeDefinitionsMap(array $keys = []): array
+    private static function getBadgeDefinitionsMap(array $keys = []): array
     {
         $allDefs = GamificationService::getStaticBadgeDefinitions();
         $map = [];
@@ -228,7 +228,7 @@ class BadgeCollectionService
     /**
      * Award collection completion bonus.
      */
-    private function awardCollectionCompletion(int $userId, BadgeCollection $collection): void
+    private static function awardCollectionCompletion(int $userId, BadgeCollection $collection): void
     {
         try {
             DB::transaction(function () use ($userId, $collection) {
@@ -239,7 +239,7 @@ class BadgeCollectionService
                 ]);
 
                 if ($collection->bonus_xp > 0) {
-                    $this->gamificationService->awardXP(
+                    GamificationService::awardXP(
                         $userId,
                         $collection->bonus_xp,
                         'collection_complete',
@@ -248,7 +248,7 @@ class BadgeCollectionService
                 }
 
                 if (! empty($collection->bonus_badge_key)) {
-                    $this->gamificationService->awardBadgeByKey($userId, $collection->bonus_badge_key);
+                    GamificationService::awardBadgeByKey($userId, $collection->bonus_badge_key);
                 }
             });
 

@@ -8,6 +8,7 @@ namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\SmartMatchingEngine;
+use App\Services\EmbeddingService;
 use App\Core\Database;
 use App\Core\TenantContext;
 
@@ -19,6 +20,11 @@ use App\Core\TenantContext;
 class SmartMatchingEngineTest extends TestCase
 {
     private static $testTenantId = 1;
+
+    private static function svc(): SmartMatchingEngine
+    {
+        return new SmartMatchingEngine(new EmbeddingService());
+    }
     private static $testUser1Id;
     private static $testUser2Id;
     private static $testUser3Id;
@@ -133,7 +139,7 @@ class SmartMatchingEngineTest extends TestCase
 
     protected function setUp(): void
     {
-        SmartMatchingEngine::clearCache();
+        self::svc()->clearCache();
     }
 
     // =========================================================================
@@ -142,7 +148,7 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testGetConfigReturnsArray(): void
     {
-        $config = SmartMatchingEngine::getConfig();
+        $config = self::svc()->getConfig();
 
         $this->assertIsArray($config);
         $this->assertArrayHasKey('enabled', $config);
@@ -155,7 +161,7 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testWeightsSumToOne(): void
     {
-        $config = SmartMatchingEngine::getConfig();
+        $config = self::svc()->getConfig();
         $weights = $config['weights'];
 
         $total = array_sum($weights);
@@ -165,7 +171,7 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testProximityTiersAreOrdered(): void
     {
-        $config = SmartMatchingEngine::getConfig();
+        $config = self::svc()->getConfig();
         $prox = $config['proximity'];
 
         $this->assertLessThan($prox['local_km'], $prox['walking_km']);
@@ -211,7 +217,7 @@ class SmartMatchingEngineTest extends TestCase
             'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore(
+        $result = self::svc()->calculateMatchScore(
             $userData,
             $userListings,
             $myListing,
@@ -253,7 +259,7 @@ class SmartMatchingEngineTest extends TestCase
             'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         $this->assertEqualsWithDelta(1.0, $result['breakdown']['proximity'], 0.1, 'Walking distance should have ~1.0 proximity score');
     }
@@ -280,7 +286,7 @@ class SmartMatchingEngineTest extends TestCase
                 'longitude' => $d['lon'], 'created_at' => date('Y-m-d H:i:s')
             ];
 
-            $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+            $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
             $proxScore = $result['breakdown']['proximity'];
 
             $this->assertLessThanOrEqual($prevScore, $proxScore, 'Proximity score should decrease with distance');
@@ -301,7 +307,7 @@ class SmartMatchingEngineTest extends TestCase
             'longitude' => -0.1280, 'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         $this->assertEquals(1.0, $result['breakdown']['freshness'], 'New listing should have 1.0 freshness score');
     }
@@ -320,7 +326,7 @@ class SmartMatchingEngineTest extends TestCase
             'longitude' => -0.1280, 'created_at' => $oldDate
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         $this->assertLessThan(1.0, $result['breakdown']['freshness'], 'Old listing should have lower freshness score');
         $this->assertGreaterThanOrEqual(0.3, $result['breakdown']['freshness'], 'Freshness should not go below minimum');
@@ -339,7 +345,7 @@ class SmartMatchingEngineTest extends TestCase
             'longitude' => -0.1280, 'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         $this->assertEquals(1.0, $result['breakdown']['category'], 'Same category should have 1.0 category score');
     }
@@ -357,7 +363,7 @@ class SmartMatchingEngineTest extends TestCase
             'longitude' => -0.1280, 'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         $this->assertLessThan(1.0, $result['breakdown']['category'], 'Different category should have lower score');
     }
@@ -379,7 +385,7 @@ class SmartMatchingEngineTest extends TestCase
             'latitude' => 51.5080, 'longitude' => -0.1280, 'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         $this->assertGreaterThan(0.7, $result['breakdown']['quality'], 'High quality listing should have high quality score');
     }
@@ -390,14 +396,14 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testFindMatchesForUserReturnsArray(): void
     {
-        $matches = SmartMatchingEngine::findMatchesForUser(self::$testUser1Id);
+        $matches = self::svc()->findMatchesForUser(self::$testUser1Id);
 
         $this->assertIsArray($matches);
     }
 
     public function testFindMatchesForUserWithOptions(): void
     {
-        $matches = SmartMatchingEngine::findMatchesForUser(self::$testUser1Id, [
+        $matches = self::svc()->findMatchesForUser(self::$testUser1Id, [
             'max_distance' => 100,
             'min_score' => 20,
             'limit' => 5
@@ -409,7 +415,7 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testMatchesAreSortedByScoreDescending(): void
     {
-        $matches = SmartMatchingEngine::findMatchesForUser(self::$testUser1Id, [
+        $matches = self::svc()->findMatchesForUser(self::$testUser1Id, [
             'max_distance' => 200,
             'min_score' => 10,
             'limit' => 20
@@ -428,7 +434,7 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testMatchesExcludeOwnListings(): void
     {
-        $matches = SmartMatchingEngine::findMatchesForUser(self::$testUser1Id, [
+        $matches = self::svc()->findMatchesForUser(self::$testUser1Id, [
             'max_distance' => 200,
             'min_score' => 0
         ]);
@@ -444,14 +450,14 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testGetHotMatchesReturnsArray(): void
     {
-        $hotMatches = SmartMatchingEngine::getHotMatches(self::$testUser1Id, 5);
+        $hotMatches = self::svc()->getHotMatches(self::$testUser1Id, 5);
 
         $this->assertIsArray($hotMatches);
     }
 
     public function testHotMatchesHaveHighScores(): void
     {
-        $hotMatches = SmartMatchingEngine::getHotMatches(self::$testUser1Id, 10);
+        $hotMatches = self::svc()->getHotMatches(self::$testUser1Id, 10);
 
         foreach ($hotMatches as $match) {
             $this->assertGreaterThanOrEqual(80, $match['match_score'], 'Hot matches should have score >= 80');
@@ -464,14 +470,14 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testGetMutualMatchesReturnsArray(): void
     {
-        $mutualMatches = SmartMatchingEngine::getMutualMatches(self::$testUser1Id, 10);
+        $mutualMatches = self::svc()->getMutualMatches(self::$testUser1Id, 10);
 
         $this->assertIsArray($mutualMatches);
     }
 
     public function testMutualMatchesHaveMutualType(): void
     {
-        $mutualMatches = SmartMatchingEngine::getMutualMatches(self::$testUser1Id, 10);
+        $mutualMatches = self::svc()->getMutualMatches(self::$testUser1Id, 10);
 
         // Array may be empty in test env without real data — that's valid
         $this->assertIsArray($mutualMatches);
@@ -488,24 +494,24 @@ class SmartMatchingEngineTest extends TestCase
     public function testClearCacheDoesNotThrow(): void
     {
         $this->expectNotToPerformAssertions();
-        SmartMatchingEngine::clearCache();
+        self::svc()->clearCache();
     }
 
     public function testInvalidateCacheForCategoryDoesNotThrow(): void
     {
         $this->expectNotToPerformAssertions();
-        SmartMatchingEngine::invalidateCacheForCategory(self::$testCategoryId);
+        self::svc()->invalidateCacheForCategory(self::$testCategoryId);
     }
 
     public function testInvalidateCacheForUserDoesNotThrow(): void
     {
         $this->expectNotToPerformAssertions();
-        SmartMatchingEngine::invalidateCacheForUser(self::$testUser1Id);
+        self::svc()->invalidateCacheForUser(self::$testUser1Id);
     }
 
     public function testClearExpiredCacheReturnsInteger(): void
     {
-        $count = SmartMatchingEngine::clearExpiredCache();
+        $count = self::svc()->clearExpiredCache();
 
         $this->assertIsInt($count);
         $this->assertGreaterThanOrEqual(0, $count);
@@ -513,7 +519,7 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testWarmUpCacheReturnsExpectedStructure(): void
     {
-        $result = SmartMatchingEngine::warmUpCache(5);
+        $result = self::svc()->warmUpCache(5);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('processed', $result);
@@ -526,7 +532,7 @@ class SmartMatchingEngineTest extends TestCase
 
     public function testFindMatchesForNonexistentUserReturnsEmpty(): void
     {
-        $matches = SmartMatchingEngine::findMatchesForUser(999999999);
+        $matches = self::svc()->findMatchesForUser(999999999);
 
         $this->assertIsArray($matches);
         $this->assertEmpty($matches);
@@ -544,7 +550,7 @@ class SmartMatchingEngineTest extends TestCase
             'longitude' => null, 'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         // Should still return a valid result, just with very low proximity score
         $this->assertIsArray($result);
@@ -563,7 +569,7 @@ class SmartMatchingEngineTest extends TestCase
             'longitude' => -0.1280, 'created_at' => date('Y-m-d H:i:s')
         ];
 
-        $result = SmartMatchingEngine::calculateMatchScore($userData, $userListings, $myListing, $candidate);
+        $result = self::svc()->calculateMatchScore($userData, $userListings, $myListing, $candidate);
 
         // Should handle empty skills gracefully
         $this->assertIsArray($result);

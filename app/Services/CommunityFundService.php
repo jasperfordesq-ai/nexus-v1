@@ -23,7 +23,7 @@ class CommunityFundService
     /**
      * Get or create the community fund for the current tenant.
      */
-    public function getOrCreateFund(): array
+    public static function getOrCreateFund(): array
     {
         $tenantId = TenantContext::getId();
 
@@ -53,9 +53,9 @@ class CommunityFundService
     /**
      * Get fund balance and statistics.
      */
-    public function getBalance(): array
+    public static function getBalance(): array
     {
-        $fund = $this->getOrCreateFund();
+        $fund = self::getOrCreateFund();
 
         return [
             'id' => (int) $fund['id'],
@@ -70,14 +70,14 @@ class CommunityFundService
     /**
      * Admin deposits credits into the community fund.
      */
-    public function adminDeposit(int $adminId, float $amount, string $description = ''): array
+    public static function adminDeposit(int $adminId, float $amount, string $description = ''): array
     {
         if ($amount <= 0) {
             return ['success' => false, 'error' => 'Amount must be greater than 0'];
         }
 
         $tenantId = TenantContext::getId();
-        $fund = $this->getOrCreateFund();
+        $fund = self::getOrCreateFund();
 
         DB::beginTransaction();
         try {
@@ -117,14 +117,14 @@ class CommunityFundService
     /**
      * Admin withdraws credits from the community fund and grants to a member.
      */
-    public function adminWithdraw(int $adminId, int $recipientId, float $amount, string $description = ''): array
+    public static function adminWithdraw(int $adminId, int $recipientId, float $amount, string $description = ''): array
     {
         if ($amount <= 0) {
             return ['success' => false, 'error' => 'Amount must be greater than 0'];
         }
 
         $tenantId = TenantContext::getId();
-        $fund = $this->getOrCreateFund();
+        $fund = self::getOrCreateFund();
 
         if ((float) $fund['balance'] < $amount) {
             return ['success' => false, 'error' => 'Insufficient community fund balance'];
@@ -189,7 +189,7 @@ class CommunityFundService
     /**
      * Member donates credits to the community fund.
      */
-    public function receiveDonation(int $donorId, float $amount, string $message = ''): array
+    public static function receiveDonation(int $donorId, float $amount, string $message = ''): array
     {
         if ($amount <= 0) {
             return ['success' => false, 'error' => 'Amount must be greater than 0'];
@@ -207,7 +207,7 @@ class CommunityFundService
             return ['success' => false, 'error' => 'Insufficient balance'];
         }
 
-        $fund = $this->getOrCreateFund();
+        $fund = self::getOrCreateFund();
 
         DB::beginTransaction();
         try {

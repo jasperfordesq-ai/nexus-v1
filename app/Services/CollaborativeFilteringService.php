@@ -40,7 +40,7 @@ class CollaborativeFilteringService
      *
      * @return int[] Similar listing IDs, ranked by similarity
      */
-    public function getSimilarListings(int $listingId, int $tenantId, int $limit = 5): array
+    public static function getSimilarListings(int $listingId, int $tenantId, int $limit = 5): array
     {
         $cacheKey = "cf_listings_{$tenantId}_{$listingId}_{$limit}";
         $cached = Cache::get($cacheKey);
@@ -56,15 +56,15 @@ class CollaborativeFilteringService
             return array_slice($knnFiltered, 0, $limit);
         }
 
-        $interactions = $this->loadListingInteractions($tenantId);
+        $interactions = self::loadListingInteractions($tenantId);
 
         if (empty($interactions)) {
-            $fallback = $this->getPopularListingsFallback($tenantId, $limit + 1);
+            $fallback = self::getPopularListingsFallback($tenantId, $limit + 1);
             $fallback = array_values(array_filter($fallback, fn (int $id) => $id !== $listingId));
             return array_slice($fallback, 0, $limit);
         }
 
-        $similar = $this->itemBasedRecommendations($listingId, $interactions, $limit + 1);
+        $similar = self::itemBasedRecommendations($listingId, $interactions, $limit + 1);
         $similar = array_values(array_filter($similar, fn (int $id) => $id !== $listingId));
         $similar = array_slice($similar, 0, $limit);
 
@@ -78,7 +78,7 @@ class CollaborativeFilteringService
      *
      * @return int[] Similar user IDs, ranked by similarity
      */
-    public function getSuggestedMembers(int $userId, int $tenantId, int $limit = 5): array
+    public static function getSuggestedMembers(int $userId, int $tenantId, int $limit = 5): array
     {
         $cacheKey = "cf_members_{$tenantId}_{$userId}_{$limit}";
         $cached = Cache::get($cacheKey);
@@ -92,13 +92,13 @@ class CollaborativeFilteringService
             return array_slice($knnCached, 0, $limit);
         }
 
-        $interactions = $this->loadMemberInteractions($tenantId);
+        $interactions = self::loadMemberInteractions($tenantId);
 
         if (empty($interactions)) {
-            return $this->getPopularMembersFallback($tenantId, $limit);
+            return self::getPopularMembersFallback($tenantId, $limit);
         }
 
-        $similar = $this->itemBasedRecommendations($userId, $interactions, $limit);
+        $similar = self::itemBasedRecommendations($userId, $interactions, $limit);
         Cache::put($cacheKey, $similar, self::CACHE_TTL_SECONDS);
 
         return $similar;
@@ -112,7 +112,7 @@ class CollaborativeFilteringService
      *
      * @return int[] Recommended listing IDs, ranked by aggregated similarity
      */
-    public function getSuggestedListingsForUser(int $userId, int $tenantId, int $limit = 10): array
+    public static function getSuggestedListingsForUser(int $userId, int $tenantId, int $limit = 10): array
     {
         $cacheKey = "cf_uu_listings_{$tenantId}_{$userId}_{$limit}";
         $cached = Cache::get($cacheKey);
@@ -121,9 +121,9 @@ class CollaborativeFilteringService
         }
 
         // Step 1 — Find similar users via transaction graph
-        $memberInteractions = $this->loadMemberInteractions($tenantId);
+        $memberInteractions = self::loadMemberInteractions($tenantId);
         if (empty($memberInteractions) || !isset($memberInteractions[$userId])) {
-            return $this->getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
+            return self::getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
         }
 
         $sourceVector = $memberInteractions[$userId];
@@ -136,23 +136,23 @@ class CollaborativeFilteringService
             if (count($commonPartners) < self::MIN_COMMON_USERS) {
                 continue;
             }
-            $sim = $this->cosineSimilarity($sourceVector, $candidateVector);
+            $sim = self::cosineSimilarity($sourceVector, $candidateVector);
             if ($sim > 0.0) {
                 $similarities[$candidateId] = $sim;
             }
         }
 
         if (empty($similarities)) {
-            return $this->getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
+            return self::getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
         }
 
         arsort($similarities);
         $topUserIds = array_keys(array_slice($similarities, 0, 20, true));
 
         // Step 2 — Load listing saves for those similar users
-        $listingInteractions = $this->loadListingInteractions($tenantId);
+        $listingInteractions = self::loadListingInteractions($tenantId);
         if (empty($listingInteractions)) {
-            return $this->getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
+            return self::getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
         }
 
         // Aggregate: listing score = sum(user_similarity * save_weight)
@@ -206,7 +206,7 @@ class CollaborativeFilteringService
      * @param int   $limit         Max results
      * @return int[]               Similar item IDs (most similar first)
      */
-    private function itemBasedRecommendations(int $sourceItemId, array $interactions, int $limit): array
+    private static function itemBasedRecommendations(int $sourceItemId, array $interactions, int $limit): array
     {
         // Build item->user index
         $itemUsers = [];
@@ -233,7 +233,7 @@ class CollaborativeFilteringService
                 continue;
             }
 
-            $sim = $this->cosineSimilarity($sourceVector, $candidateVector);
+            $sim = self::cosineSimilarity($sourceVector, $candidateVector);
             if ($sim > 0.0) {
                 $similarities[$candidateId] = $sim;
             }
@@ -251,7 +251,7 @@ class CollaborativeFilteringService
      * @param float[] $b Vector B [key => value]
      * @return float    Similarity in [0, 1]
      */
-    private function cosineSimilarity(array $a, array $b): float
+    private static function cosineSimilarity(array $a, array $b): float
     {
         $dotProduct = 0.0;
         $normA = 0.0;
@@ -275,7 +275,7 @@ class CollaborativeFilteringService
     // COLD-START FALLBACKS
     // =========================================================================
 
-    private function getPopularListingsFallback(int $tenantId, int $limit): array
+    private static function getPopularListingsFallback(int $tenantId, int $limit): array
     {
         try {
             return DB::table('listings')
@@ -291,9 +291,9 @@ class CollaborativeFilteringService
         }
     }
 
-    private function getPopularListingsFallbackExcludingSaved(int $userId, int $tenantId, int $limit): array
+    private static function getPopularListingsFallbackExcludingSaved(int $userId, int $tenantId, int $limit): array
     {
-        $fallback = $this->getPopularListingsFallback($tenantId, $limit + 20);
+        $fallback = self::getPopularListingsFallback($tenantId, $limit + 20);
 
         try {
             $savedRows = DB::table('listing_favorites as lf')
@@ -311,7 +311,7 @@ class CollaborativeFilteringService
         return array_slice($fallback, 0, $limit);
     }
 
-    private function getPopularMembersFallback(int $tenantId, int $limit): array
+    private static function getPopularMembersFallback(int $tenantId, int $limit): array
     {
         try {
             return DB::table('users')
@@ -334,7 +334,7 @@ class CollaborativeFilteringService
     /**
      * Load listing save interactions: [userId => [listingId => 1.0, ...], ...]
      */
-    private function loadListingInteractions(int $tenantId): array
+    private static function loadListingInteractions(int $tenantId): array
     {
         try {
             $rows = DB::select(
@@ -364,7 +364,7 @@ class CollaborativeFilteringService
     /**
      * Load member interaction graph: [userId => [partnerId => count, ...], ...]
      */
-    private function loadMemberInteractions(int $tenantId): array
+    private static function loadMemberInteractions(int $tenantId): array
     {
         try {
             $rows = DB::select(

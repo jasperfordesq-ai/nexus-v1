@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\DB;
  */
 class SkillTaxonomyService
 {
-    private array $errors = [];
+    private static array $errors = [];
 
     public function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     // =========================================================================
@@ -99,12 +99,12 @@ class SkillTaxonomyService
      */
     public function createCategory(array $data): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $name = trim($data['name'] ?? '');
         if (empty($name) || strlen($name) > 100) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required (max 100 chars)', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required (max 100 chars)', 'field' => 'name'];
             return null;
         }
 
@@ -119,7 +119,7 @@ class SkillTaxonomyService
                 ->exists();
 
             if (! $parentExists) {
-                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Parent category not found', 'field' => 'parent_id'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Parent category not found', 'field' => 'parent_id'];
                 return null;
             }
         }
@@ -156,7 +156,7 @@ class SkillTaxonomyService
      */
     public function updateCategory(int $id, array $data): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $exists = DB::table('skill_categories')
@@ -165,7 +165,7 @@ class SkillTaxonomyService
             ->exists();
 
         if (! $exists) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Category not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Category not found'];
             return false;
         }
 
@@ -174,7 +174,7 @@ class SkillTaxonomyService
         if (isset($data['name'])) {
             $name = trim($data['name']);
             if (empty($name) || strlen($name) > 100) {
-                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required (max 100 chars)', 'field' => 'name'];
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required (max 100 chars)', 'field' => 'name'];
                 return false;
             }
             $updates['name'] = $name;
@@ -214,7 +214,7 @@ class SkillTaxonomyService
      */
     public function deleteCategory(int $id, bool $hard = false): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         if ($hard) {
@@ -225,7 +225,7 @@ class SkillTaxonomyService
                 ->count();
 
             if ($count > 0) {
-                $this->errors[] = ['code' => 'HAS_DEPENDENCIES', 'message' => 'Category has assigned skills; deactivate instead'];
+                self::$errors[] = ['code' => 'HAS_DEPENDENCIES', 'message' => 'Category has assigned skills; deactivate instead'];
                 return false;
             }
 
@@ -342,12 +342,12 @@ class SkillTaxonomyService
      */
     public function addUserSkill(int $userId, array $data): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $skillName = trim($data['skill_name'] ?? '');
         if (empty($skillName) || strlen($skillName) > 100) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Skill name is required (max 100 chars)', 'field' => 'skill_name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Skill name is required (max 100 chars)', 'field' => 'skill_name'];
             return null;
         }
 
@@ -366,7 +366,7 @@ class SkillTaxonomyService
             ->exists();
 
         if ($existing) {
-            $this->errors[] = ['code' => 'DUPLICATE', 'message' => 'You already have this skill', 'field' => 'skill_name'];
+            self::$errors[] = ['code' => 'DUPLICATE', 'message' => 'You already have this skill', 'field' => 'skill_name'];
             return null;
         }
 
@@ -397,7 +397,7 @@ class SkillTaxonomyService
      */
     public function updateUserSkill(int $userId, int $skillId, array $data): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $exists = DB::table('user_skills')
@@ -407,7 +407,7 @@ class SkillTaxonomyService
             ->exists();
 
         if (! $exists) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Skill not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Skill not found'];
             return false;
         }
 

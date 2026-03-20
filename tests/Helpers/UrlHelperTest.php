@@ -20,7 +20,7 @@ use App\Helpers\UrlHelper;
  * - Absolute URL conversion
  * - Avatar URL handling
  *
- * @covers \Nexus\Helpers\UrlHelper
+ * @covers \App\Helpers\UrlHelper
  */
 class UrlHelperTest extends TestCase
 {

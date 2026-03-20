@@ -146,9 +146,9 @@ class NewsletterService
 
         // Resolve recipients
         if ($segmentId) {
-            $recipients = $this->getSegmentRecipients($segmentId);
+            $recipients = self::getSegmentRecipients($segmentId);
         } else {
-            $recipients = $this->getRecipientsList($targetAudience);
+            $recipients = self::getRecipientsList($targetAudience);
         }
 
         if (empty($recipients)) {
@@ -158,7 +158,7 @@ class NewsletterService
         // Clear old queue and queue new recipients
         DB::table('newsletter_queue')->where('newsletter_id', $newsletterId)->delete();
 
-        $queued = $this->queueRecipientsWithTokens($newsletterId, $recipients);
+        $queued = self::queueRecipientsWithTokens($newsletterId, $recipients);
 
         // Update newsletter status
         $newsletter->update([
@@ -212,7 +212,7 @@ class NewsletterService
                 ];
 
                 $unsubscribeToken = $item->unsubscribe_token ?? null;
-                $emailHtml = $this->renderEmail(
+                $emailHtml = self::renderEmail(
                     (array) $newsletter->getAttributes(),
                     $tenantName,
                     $unsubscribeToken,
@@ -276,7 +276,7 @@ class NewsletterService
      *
      * @return int Number of recipients queued
      */
-    private function queueRecipientsWithTokens(int $newsletterId, array $recipients): int
+    private static function queueRecipientsWithTokens(int $newsletterId, array $recipients): int
     {
         $queued = 0;
 
@@ -316,7 +316,7 @@ class NewsletterService
      * @param array|null $recipient Recipient data for personalization
      * @return string Full HTML email
      */
-    public function renderEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken = null, ?array $recipient = null): string
+    public static function renderEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken = null, ?array $recipient = null): string
     {
         $content = $newsletter['content'] ?? '';
         $subject = $newsletter['subject'] ?? '';
@@ -333,7 +333,7 @@ class NewsletterService
 
         // Personalize content if recipient data available
         if ($recipient) {
-            $content = $this->personalizeContent($content, $recipient);
+            $content = self::personalizeContent($content, $recipient);
         }
 
         // Build unsubscribe URL
@@ -443,7 +443,7 @@ HTML;
     /**
      * Personalize email content by replacing {{variable}} placeholders.
      */
-    private function personalizeContent(string $content, array $recipient): string
+    private static function personalizeContent(string $content, array $recipient): string
     {
         $replacements = [
             '{{first_name}}' => $recipient['first_name'] ?? '',
@@ -465,7 +465,7 @@ HTML;
      * Evaluates the segment's rules against the users table using
      * dynamic condition building.
      */
-    public function getSegmentRecipientCount(int $segmentId): int
+    public static function getSegmentRecipientCount(int $segmentId): int
     {
         $segment = NewsletterSegment::find($segmentId);
 
@@ -475,7 +475,7 @@ HTML;
 
         $rules = $segment->rules; // Cast to array via $casts
 
-        return $this->countUsersByRules($rules);
+        return self::countUsersByRules($rules);
     }
 
     /**
@@ -484,9 +484,9 @@ HTML;
      * @param string $targetAudience 'all_members', 'subscribers_only', or 'both'
      * @return int
      */
-    public function getRecipientCount(string $targetAudience = 'all_members'): int
+    public static function getRecipientCount(string $targetAudience = 'all_members'): int
     {
-        return count($this->getRecipientsList($targetAudience));
+        return count(self::getRecipientsList($targetAudience));
     }
 
     /**
@@ -494,7 +494,7 @@ HTML;
      *
      * @return array Array of recipient arrays with email, user_id, name, etc.
      */
-    private function getRecipientsList(string $targetAudience = 'all_members'): array
+    private static function getRecipientsList(string $targetAudience = 'all_members'): array
     {
         $tenantId = TenantContext::getId();
         $recipients = [];
@@ -601,7 +601,7 @@ HTML;
      *
      * @return array Array of recipient arrays
      */
-    private function getSegmentRecipients(int $segmentId): array
+    private static function getSegmentRecipients(int $segmentId): array
     {
         $segment = NewsletterSegment::find($segmentId);
 
@@ -610,7 +610,7 @@ HTML;
         }
 
         $rules = $segment->rules;
-        $users = $this->queryUsersByRules($rules);
+        $users = self::queryUsersByRules($rules);
 
         $tenantId = TenantContext::getId();
         $recipients = [];
@@ -647,7 +647,7 @@ HTML;
      *
      * @return \Illuminate\Support\Collection
      */
-    private function queryUsersByRules(array $rules): \Illuminate\Support\Collection
+    private static function queryUsersByRules(array $rules): \Illuminate\Support\Collection
     {
         $tenantId = TenantContext::getId();
         $conditions = [];
@@ -655,7 +655,7 @@ HTML;
         $matchType = $rules['match'] ?? 'all';
 
         foreach ($rules['conditions'] ?? [] as $condition) {
-            $clause = $this->buildConditionClause($condition, $params);
+            $clause = self::buildConditionClause($condition, $params);
             if ($clause) {
                 $conditions[] = $clause;
             }
@@ -676,7 +676,7 @@ HTML;
     /**
      * Count users matching segment rules.
      */
-    private function countUsersByRules(array $rules): int
+    private static function countUsersByRules(array $rules): int
     {
         $tenantId = TenantContext::getId();
         $conditions = [];
@@ -684,7 +684,7 @@ HTML;
         $matchType = $rules['match'] ?? 'all';
 
         foreach ($rules['conditions'] ?? [] as $condition) {
-            $clause = $this->buildConditionClause($condition, $params);
+            $clause = self::buildConditionClause($condition, $params);
             if ($clause) {
                 $conditions[] = $clause;
             }
@@ -711,7 +711,7 @@ HTML;
      * @param array &$params Bind parameters (appended to)
      * @return string|null SQL clause or null if unsupported
      */
-    private function buildConditionClause(array $condition, array &$params): ?string
+    private static function buildConditionClause(array $condition, array &$params): ?string
     {
         $field = $condition['field'] ?? '';
         $operator = $condition['operator'] ?? '';
@@ -719,16 +719,16 @@ HTML;
 
         switch ($field) {
             case 'role':
-                return $this->buildStringCondition('role', $operator, $value, $params);
+                return self::buildStringCondition('role', $operator, $value, $params);
 
             case 'profile_type':
-                return $this->buildStringCondition('profile_type', $operator, $value, $params);
+                return self::buildStringCondition('profile_type', $operator, $value, $params);
 
             case 'location':
-                return $this->buildStringCondition('location', $operator, $value, $params);
+                return self::buildStringCondition('location', $operator, $value, $params);
 
             case 'created_at':
-                return $this->buildDateCondition('created_at', $operator, $value, $params);
+                return self::buildDateCondition('created_at', $operator, $value, $params);
 
             case 'has_listings':
                 if ($value == '1' || $value === true || $value === 'yes') {
@@ -737,37 +737,37 @@ HTML;
                 return "id NOT IN (SELECT DISTINCT user_id FROM listings WHERE status = 'active')";
 
             case 'listing_count':
-                return $this->buildNumericSubqueryCondition(
+                return self::buildNumericSubqueryCondition(
                     "(SELECT COUNT(*) FROM listings WHERE listings.user_id = users.id AND listings.status = 'active')",
                     $operator, $value, $params
                 );
 
             case 'geo_radius':
-                return $this->buildGeoRadiusCondition($value, $params);
+                return self::buildGeoRadiusCondition($value, $params);
 
             case 'county':
-                return $this->buildLocationLikeCondition($operator, $value, $params);
+                return self::buildLocationLikeCondition($operator, $value, $params);
 
             case 'town':
-                return $this->buildLocationLikeCondition($operator, $value, $params);
+                return self::buildLocationLikeCondition($operator, $value, $params);
 
             case 'group_membership':
-                return $this->buildGroupMembershipCondition($operator, $value, $params);
+                return self::buildGroupMembershipCondition($operator, $value, $params);
 
             case 'activity_score':
-                return $this->buildNumericSubqueryCondition(
+                return self::buildNumericSubqueryCondition(
                     "(SELECT COALESCE(activity_score, 0) FROM user_metrics WHERE user_metrics.user_id = users.id LIMIT 1)",
                     $operator, $value, $params
                 );
 
             case 'login_recency':
-                return $this->buildLoginRecencyCondition($operator, $value);
+                return self::buildLoginRecencyCondition($operator, $value);
 
             case 'bio':
-                return $this->buildStringCondition('bio', $operator, $value, $params);
+                return self::buildStringCondition('bio', $operator, $value, $params);
 
             case 'avatar':
-                return $this->buildStringCondition('avatar_url', $operator, $value, $params);
+                return self::buildStringCondition('avatar_url', $operator, $value, $params);
 
             default:
                 return null;
@@ -777,7 +777,7 @@ HTML;
     /**
      * Build a string comparison condition.
      */
-    private function buildStringCondition(string $field, string $operator, string $value, array &$params): ?string
+    private static function buildStringCondition(string $field, string $operator, string $value, array &$params): ?string
     {
         switch ($operator) {
             case 'equals':
@@ -810,7 +810,7 @@ HTML;
     /**
      * Build a date comparison condition.
      */
-    private function buildDateCondition(string $field, string $operator, mixed $value, array &$params): ?string
+    private static function buildDateCondition(string $field, string $operator, mixed $value, array &$params): ?string
     {
         switch ($operator) {
             case 'older_than_days':
@@ -845,7 +845,7 @@ HTML;
     /**
      * Build a numeric comparison against a subquery expression.
      */
-    private function buildNumericSubqueryCondition(string $subquery, string $operator, mixed $value, array &$params): ?string
+    private static function buildNumericSubqueryCondition(string $subquery, string $operator, mixed $value, array &$params): ?string
     {
         switch ($operator) {
             case 'equals':
@@ -871,7 +871,7 @@ HTML;
     /**
      * Build a geographic radius condition using Haversine formula.
      */
-    private function buildGeoRadiusCondition(mixed $value, array &$params): ?string
+    private static function buildGeoRadiusCondition(mixed $value, array &$params): ?string
     {
         if (!is_array($value) || !isset($value['lat'], $value['lng'], $value['radius_km'])) {
             return null;
@@ -892,7 +892,7 @@ HTML;
     /**
      * Build a LIKE condition for location-based fields (county, town).
      */
-    private function buildLocationLikeCondition(string $operator, mixed $value, array &$params): ?string
+    private static function buildLocationLikeCondition(string $operator, mixed $value, array &$params): ?string
     {
         $locations = is_array($value) ? $value : array_map('trim', explode(',', (string) $value));
         $locations = array_filter($locations);
@@ -917,7 +917,7 @@ HTML;
     /**
      * Build a group membership condition.
      */
-    private function buildGroupMembershipCondition(string $operator, mixed $value, array &$params): ?string
+    private static function buildGroupMembershipCondition(string $operator, mixed $value, array &$params): ?string
     {
         $groupIds = is_array($value) ? $value : [$value];
         $groupIds = array_filter(array_map('intval', $groupIds));
@@ -943,7 +943,7 @@ HTML;
     /**
      * Build a login recency condition.
      */
-    private function buildLoginRecencyCondition(string $operator, mixed $value): ?string
+    private static function buildLoginRecencyCondition(string $operator, mixed $value): ?string
     {
         if ($value === 'never') {
             return "(last_login_at IS NULL)";

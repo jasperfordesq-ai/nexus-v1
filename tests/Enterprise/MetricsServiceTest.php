@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Enterprise;
 
-use Nexus\Services\Enterprise\MetricsService;
+use App\Services\Enterprise\MetricsService;
 use Nexus\Tests\TestCase;
 
 /**

@@ -28,13 +28,13 @@ class EventService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getAll(array $filters = []): array
+    public static function getAll(array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $when = $filters['when'] ?? 'upcoming';
         $cursor = $filters['cursor'] ?? null;
 
-        $query = $this->event->newQuery()
+        $query = Event::query()
             ->with([
                 'user:id,first_name,last_name,avatar_url,organization_name,profile_type',
                 'category:id,name,color',
@@ -84,7 +84,7 @@ class EventService
         }
 
         $eventIds = $items->pluck('id');
-        $rsvpCounts = $this->rsvp->newQuery()
+        $rsvpCounts = EventRsvp::newQuery()
             ->selectRaw('event_id, COUNT(*) as count')
             ->whereIn('event_id', $eventIds)
             ->where('status', 'going')
@@ -92,7 +92,7 @@ class EventService
             ->pluck('count', 'event_id');
 
         // Also get interested counts for the same events
-        $interestedCounts = $this->rsvp->newQuery()
+        $interestedCounts = EventRsvp::newQuery()
             ->selectRaw('event_id, COUNT(*) as count')
             ->whereIn('event_id', $eventIds)
             ->where('status', 'interested')
@@ -126,10 +126,10 @@ class EventService
     /**
      * Get a single event by ID with attendees.
      */
-    public function getById(int $id, ?int $currentUserId = null): ?array
+    public static function getById(int $id, ?int $currentUserId = null): ?array
     {
         /** @var Event|null $event */
-        $event = $this->event->newQuery()
+        $event = Event::query()
             ->with(['user', 'category', 'group', 'rsvps.user:id,first_name,last_name,avatar_url'])
             ->find($id);
 
@@ -164,7 +164,7 @@ class EventService
      *
      * @throws ValidationException
      */
-    public function create(int $userId, array $data): Event
+    public static function create(int $userId, array $data): Event
     {
         validator($data, [
             'title'       => 'required|string|max:255',
@@ -175,7 +175,7 @@ class EventService
         ])->validate();
 
         return DB::transaction(function () use ($userId, $data) {
-            $event = $this->event->newInstance([
+            $event = new Event([
                 'user_id'              => $userId,
                 'title'                => trim($data['title']),
                 'description'          => trim($data['description']),
@@ -184,7 +184,7 @@ class EventService
                 'location'             => $data['location'] ?? null,
                 'latitude'             => $data['latitude'] ?? null,
                 'longitude'            => $data['longitude'] ?? null,
-                'category_id'          => $this->resolveCategoryId($data),
+                'category_id'          => self::resolveCategoryId($data),
                 'group_id'             => $data['group_id'] ?? null,
                 'max_attendees'        => $data['max_attendees'] ?? null,
                 'is_online'            => $data['is_online'] ?? false,
@@ -202,14 +202,14 @@ class EventService
     /**
      * Update an existing event.
      */
-    public function update(int $id, array $data): Event
+    public static function update(int $id, array $data): Event
     {
         /** @var Event $event */
-        $event = $this->event->newQuery()->findOrFail($id);
+        $event = Event::query()->findOrFail($id);
 
         // Resolve category_name slug to category_id if provided
         if (!empty($data['category_name']) && empty($data['category_id'])) {
-            $data['category_id'] = $this->resolveCategoryId($data);
+            $data['category_id'] = self::resolveCategoryId($data);
         }
 
         $allowed = [
@@ -227,7 +227,7 @@ class EventService
     /**
      * Resolve category_id from data — supports both numeric ID and string slug.
      */
-    private function resolveCategoryId(array $data): ?int
+    private static function resolveCategoryId(array $data): ?int
     {
         if (!empty($data['category_id'])) {
             return (int) $data['category_id'];
@@ -247,10 +247,10 @@ class EventService
     /**
      * Delete an event.
      */
-    public function delete(int $id): bool
+    public static function delete(int $id): bool
     {
         /** @var Event|null $event */
-        $event = $this->event->newQuery()->find($id);
+        $event = Event::query()->find($id);
 
         if (! $event) {
             return false;
@@ -262,7 +262,7 @@ class EventService
     }
 
     /** @var array Validation error messages */
-    private array $errors = [];
+    private static array $errors = [];
 
     // ================================================================
     // CONVERTED FROM LEGACY — Direct DB facade calls
@@ -271,15 +271,15 @@ class EventService
     /**
      * Get validation errors from the last operation.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
      * Get user's RSVP status for an event.
      */
-    public function getUserRsvp(int $eventId, int $userId): ?string
+    public static function getUserRsvp(int $eventId, int $userId): ?string
     {
         $tenantId = \App\Core\TenantContext::getId();
         $row = DB::selectOne(
@@ -292,25 +292,25 @@ class EventService
     /**
      * RSVP to an event with capacity enforcement.
      */
-    public function rsvp(int $eventId, int $userId, string $status): bool
+    public static function rsvp(int $eventId, int $userId, string $status): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         $validStatuses = ['going', 'interested', 'not_going', 'declined'];
         if (!in_array($status, $validStatuses)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid RSVP status', 'field' => 'status'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid RSVP status', 'field' => 'status'];
             return false;
         }
 
         $tenantId = \App\Core\TenantContext::getId();
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
         if (($event->status ?? 'active') === 'cancelled') {
-            $this->errors[] = ['code' => 'EVENT_CANCELLED', 'message' => 'This event has been cancelled'];
+            self::$errors[] = ['code' => 'EVENT_CANCELLED', 'message' => 'This event has been cancelled'];
             return false;
         }
 
@@ -318,12 +318,12 @@ class EventService
         if ($status === 'going' && !empty($event->max_attendees)) {
             $maxAttendees = (int) $event->max_attendees;
             $currentGoing = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status = 'going'", [$eventId, $tenantId])->cnt;
-            $currentUserStatus = $this->getUserRsvp($eventId, $userId);
+            $currentUserStatus = self::getUserRsvp($eventId, $userId);
             $isAlreadyGoing = ($currentUserStatus === 'going');
 
             if (!$isAlreadyGoing && $currentGoing >= $maxAttendees) {
-                $this->addToWaitlist($eventId, $userId);
-                $this->errors[] = [
+                self::addToWaitlist($eventId, $userId);
+                self::$errors[] = [
                     'code' => 'EVENT_FULL',
                     'message' => 'This event is full. You have been added to the waitlist.',
                     'waitlisted' => true,
@@ -343,13 +343,13 @@ class EventService
 
             // If going, remove from waitlist
             if ($status === 'going') {
-                $this->removeFromWaitlist($eventId, $userId);
+                self::removeFromWaitlist($eventId, $userId);
             }
 
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::rsvp error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update RSVP'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update RSVP'];
             return false;
         }
     }
@@ -357,19 +357,19 @@ class EventService
     /**
      * Remove RSVP from an event (with waitlist promotion).
      */
-    public function removeRsvp(int $eventId, int $userId): bool
+    public static function removeRsvp(int $eventId, int $userId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         $event = DB::selectOne("SELECT id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
         try {
-            $currentStatus = $this->getUserRsvp($eventId, $userId);
+            $currentStatus = self::getUserRsvp($eventId, $userId);
 
             DB::delete("DELETE FROM event_rsvps WHERE event_id = ? AND user_id = ? AND tenant_id = ?", [$eventId, $userId, $tenantId]);
 
@@ -382,7 +382,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::removeRsvp error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to remove RSVP'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to remove RSVP'];
             return false;
         }
     }
@@ -392,7 +392,7 @@ class EventService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getAttendees(int $eventId, array $filters = []): array
+    public static function getAttendees(int $eventId, array $filters = []): array
     {
         $limit = min($filters['limit'] ?? 20, 100);
         $status = $filters['status'] ?? 'going';
@@ -468,7 +468,7 @@ class EventService
      *
      * @return array{items: array, has_more: bool}
      */
-    public function getNearby(float $lat, float $lon, array $filters = []): array
+    public static function getNearby(float $lat, float $lon, array $filters = []): array
     {
         $radiusKm = (float) ($filters['radius_km'] ?? 25);
         $limit = min((int) ($filters['limit'] ?? 20), 100);
@@ -586,14 +586,14 @@ class EventService
     /**
      * Update event cover image.
      */
-    public function updateImage(int $eventId, int $userId, string $imageUrl): bool
+    public static function updateImage(int $eventId, int $userId, string $imageUrl): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         $event = DB::selectOne("SELECT id, user_id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
@@ -601,7 +601,7 @@ class EventService
             // Check admin
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this event'];
                 return false;
             }
         }
@@ -611,7 +611,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::updateImage error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update image'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update image'];
             return false;
         }
     }
@@ -619,14 +619,14 @@ class EventService
     /**
      * Cancel an event and notify all RSVPs.
      */
-    public function cancelEvent(int $eventId, int $userId, string $reason = ''): bool
+    public static function cancelEvent(int $eventId, int $userId, string $reason = ''): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
@@ -634,13 +634,13 @@ class EventService
         if ((int) $event->user_id !== $userId) {
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to cancel this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to cancel this event'];
                 return false;
             }
         }
 
         if (($event->status ?? 'active') === 'cancelled') {
-            $this->errors[] = ['code' => 'ALREADY_CANCELLED', 'message' => 'This event is already cancelled'];
+            self::$errors[] = ['code' => 'ALREADY_CANCELLED', 'message' => 'This event is already cancelled'];
             return false;
         }
 
@@ -697,7 +697,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             Log::error("EventService::cancelEvent error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel event'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel event'];
             return false;
         }
     }
@@ -705,7 +705,7 @@ class EventService
     /**
      * Add user to event waitlist.
      */
-    public function addToWaitlist(int $eventId, int $userId): bool
+    public static function addToWaitlist(int $eventId, int $userId): bool
     {
         $tenantId = \App\Core\TenantContext::getId();
 
@@ -734,7 +734,7 @@ class EventService
     /**
      * Remove user from event waitlist.
      */
-    public function removeFromWaitlist(int $eventId, int $userId): void
+    public static function removeFromWaitlist(int $eventId, int $userId): void
     {
         $tenantId = \App\Core\TenantContext::getId();
         try {
@@ -752,7 +752,7 @@ class EventService
      *
      * @return array{items: array, has_more: bool}
      */
-    public function getWaitlist(int $eventId, array $filters = []): array
+    public static function getWaitlist(int $eventId, array $filters = []): array
     {
         $limit = min($filters['limit'] ?? 20, 100);
 
@@ -794,7 +794,7 @@ class EventService
     /**
      * Get user's waitlist position.
      */
-    public function getUserWaitlistPosition(int $eventId, int $userId): ?int
+    public static function getUserWaitlistPosition(int $eventId, int $userId): ?int
     {
         try {
             $tenantId = \App\Core\TenantContext::getId();
@@ -811,7 +811,7 @@ class EventService
     /**
      * Get user's reminders for an event.
      */
-    public function getUserReminders(int $eventId, int $userId): array
+    public static function getUserReminders(int $eventId, int $userId): array
     {
         try {
             $tenantId = \App\Core\TenantContext::getId();
@@ -831,7 +831,7 @@ class EventService
     /**
      * Update reminders for an event.
      */
-    public function updateReminders(int $eventId, int $userId, array $reminders): bool
+    public static function updateReminders(int $eventId, int $userId, array $reminders): bool
     {
         $tenantId = \App\Core\TenantContext::getId();
 
@@ -883,7 +883,7 @@ class EventService
     /**
      * Get attendance records for an event.
      */
-    public function getAttendanceRecords(int $eventId): array
+    public static function getAttendanceRecords(int $eventId): array
     {
         $tenantId = \App\Core\TenantContext::getId();
 
@@ -924,14 +924,14 @@ class EventService
     /**
      * Mark a user as attended at an event.
      */
-    public function markAttended(int $eventId, int $attendeeId, int $markedById, ?float $hoursOverride = null, ?string $notes = null): bool
+    public static function markAttended(int $eventId, int $attendeeId, int $markedById, ?float $hoursOverride = null, ?string $notes = null): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
@@ -939,7 +939,7 @@ class EventService
         if ((int) $event->user_id !== $markedById) {
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$markedById, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the organizer or admin can mark attendance'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the organizer or admin can mark attendance'];
                 return false;
             }
         }
@@ -977,7 +977,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             Log::error("EventService::markAttended error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to mark attendance'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to mark attendance'];
             return false;
         }
     }
@@ -987,13 +987,13 @@ class EventService
      *
      * @return array{marked: int, failed: int}
      */
-    public function bulkMarkAttended(int $eventId, array $attendeeIds, int $markedById): array
+    public static function bulkMarkAttended(int $eventId, array $attendeeIds, int $markedById): array
     {
         $marked = 0;
         $failed = 0;
 
         foreach ($attendeeIds as $attendeeId) {
-            if ($this->markAttended($eventId, (int) $attendeeId, $markedById)) {
+            if (self::markAttended($eventId, (int) $attendeeId, $markedById)) {
                 $marked++;
             } else {
                 $failed++;
@@ -1008,7 +1008,7 @@ class EventService
      *
      * @return array{items: array, has_more: bool}
      */
-    public function getAllSeries(array $filters = []): array
+    public static function getAllSeries(array $filters = []): array
     {
         $tenantId = \App\Core\TenantContext::getId();
         $limit = min($filters['limit'] ?? 20, 100);
@@ -1055,13 +1055,13 @@ class EventService
     /**
      * Create an event series.
      */
-    public function createSeries(int $userId, string $title, ?string $description = null): ?int
+    public static function createSeries(int $userId, string $title, ?string $description = null): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         if (empty(trim($title))) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Series title is required', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Series title is required', 'field' => 'title'];
             return null;
         }
 
@@ -1073,7 +1073,7 @@ class EventService
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
             Log::error("EventService::createSeries error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create series'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create series'];
             return null;
         }
     }
@@ -1081,7 +1081,7 @@ class EventService
     /**
      * Get series info.
      */
-    public function getSeriesInfo(int $seriesId): ?array
+    public static function getSeriesInfo(int $seriesId): ?array
     {
         $tenantId = \App\Core\TenantContext::getId();
 
@@ -1114,7 +1114,7 @@ class EventService
     /**
      * Get events in a series.
      */
-    public function getSeriesEvents(int $seriesId): array
+    public static function getSeriesEvents(int $seriesId): array
     {
         $tenantId = \App\Core\TenantContext::getId();
 
@@ -1151,14 +1151,14 @@ class EventService
     /**
      * Link an event to a series.
      */
-    public function linkToSeries(int $eventId, int $seriesId, int $userId): bool
+    public static function linkToSeries(int $eventId, int $seriesId, int $userId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         $event = DB::selectOne("SELECT id, user_id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
@@ -1166,7 +1166,7 @@ class EventService
         if ((int) $event->user_id !== $userId) {
             $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
             if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this event'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this event'];
                 return false;
             }
         }
@@ -1176,7 +1176,7 @@ class EventService
             return true;
         } catch (\Exception $e) {
             Log::error("EventService::linkToSeries error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to link event to series'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to link event to series'];
             return false;
         }
     }
@@ -1186,20 +1186,20 @@ class EventService
      *
      * @return array{template_id: int, occurrences: int}|null
      */
-    public function createRecurring(int $userId, array $data): ?array
+    public static function createRecurring(int $userId, array $data): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
         // Validate recurrence frequency
         $frequency = $data['recurrence_frequency'] ?? null;
         $validFrequencies = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
         if (!$frequency || !in_array($frequency, $validFrequencies)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Valid recurrence frequency is required', 'field' => 'recurrence_frequency'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Valid recurrence frequency is required', 'field' => 'recurrence_frequency'];
             return null;
         }
 
         // Create the template event
-        $template = $this->create($userId, $data);
+        $template = self::create($userId, $data);
         if (!$template) {
             return null;
         }
@@ -1228,7 +1228,7 @@ class EventService
             );
 
             // Generate occurrences
-            $occurrenceCount = $this->generateOccurrences($templateId, $data);
+            $occurrenceCount = self::generateOccurrences($templateId, $data);
 
             return [
                 'template_id' => $templateId,
@@ -1236,7 +1236,7 @@ class EventService
             ];
         } catch (\Exception $e) {
             Log::error("EventService::createRecurring error: " . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create recurring event'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create recurring event'];
             return null;
         }
     }
@@ -1244,7 +1244,7 @@ class EventService
     /**
      * Generate occurrence events from a recurrence template.
      */
-    private function generateOccurrences(int $templateId, array $data): int
+    private static function generateOccurrences(int $templateId, array $data): int
     {
         $tenantId = \App\Core\TenantContext::getId();
 
@@ -1335,21 +1335,21 @@ class EventService
      *
      * @param string $scope 'single' to update only this occurrence, 'all' for all future occurrences
      */
-    public function updateRecurring(int $eventId, int $userId, array $data, string $scope = 'single'): bool
+    public static function updateRecurring(int $eventId, int $userId, array $data, string $scope = 'single'): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         if ($scope === 'single') {
             // Detach from parent (make independent) and update
             DB::update("UPDATE events SET parent_event_id = NULL WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
-            return $this->update($eventId, $data) instanceof Event;
+            return self::update($eventId, $data) instanceof Event;
         }
 
         // scope === 'all': update all future occurrences
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Event not found'];
             return false;
         }
 
@@ -1363,7 +1363,7 @@ class EventService
         $updated = 0;
         foreach ($ids as $row) {
             try {
-                $this->update((int) $row->id, $data);
+                self::update((int) $row->id, $data);
                 $updated++;
             } catch (\Exception $e) {
                 Log::error("EventService::updateRecurring failed for event {$row->id}: " . $e->getMessage());

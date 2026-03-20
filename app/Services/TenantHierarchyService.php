@@ -19,7 +19,7 @@ class TenantHierarchyService
     /**
      * Delegates to legacy TenantHierarchyService::createTenant().
      */
-    public function createTenant(array $data, int $parentId): array
+    public static function createTenant(array $data, int $parentId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class TenantHierarchyService
     /**
      * Delegates to legacy TenantHierarchyService::updateTenant().
      */
-    public function updateTenant(int $tenantId, array $data): array
+    public static function updateTenant(int $tenantId, array $data): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class TenantHierarchyService
     /**
      * Delegates to legacy TenantHierarchyService::deleteTenant().
      */
-    public function deleteTenant(int $tenantId, bool $hardDelete = false): array
+    public static function deleteTenant(int $tenantId, bool $hardDelete = false): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class TenantHierarchyService
     /**
      * Delegates to legacy TenantHierarchyService::moveTenant().
      */
-    public function moveTenant(int $tenantId, int $newParentId): array
+    public static function moveTenant(int $tenantId, int $newParentId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class TenantHierarchyService
     /**
      * Delegates to legacy TenantHierarchyService::toggleSubtenantCapability().
      */
-    public function toggleSubtenantCapability(int $tenantId, bool $enable): array
+    public static function toggleSubtenantCapability(int $tenantId, bool $enable): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -64,7 +64,7 @@ class TenantHierarchyService
     /**
      * Delegates to legacy TenantHierarchyService::assignTenantSuperAdmin().
      */
-    public function assignTenantSuperAdmin(int $userId, int $tenantId): array
+    public static function assignTenantSuperAdmin(int $userId, int $tenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -73,7 +73,7 @@ class TenantHierarchyService
     /**
      * Delegates to legacy TenantHierarchyService::revokeTenantSuperAdmin().
      */
-    public function revokeTenantSuperAdmin(int $userId): array
+    public static function revokeTenantSuperAdmin(int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

@@ -19,7 +19,7 @@ class WebhookDispatchService
     /**
      * Delegates to legacy WebhookDispatchService::dispatch().
      */
-    public function dispatch(string $eventType, array $payload): void
+    public static function dispatch(string $eventType, array $payload): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
@@ -27,7 +27,7 @@ class WebhookDispatchService
     /**
      * Delegates to legacy WebhookDispatchService::getWebhooks().
      */
-    public function getWebhooks(): array
+    public static function getWebhooks(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -36,7 +36,7 @@ class WebhookDispatchService
     /**
      * Delegates to legacy WebhookDispatchService::createWebhook().
      */
-    public function createWebhook(int $userId, array $data): array
+    public static function createWebhook(int $userId, array $data): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -45,7 +45,7 @@ class WebhookDispatchService
     /**
      * Delegates to legacy WebhookDispatchService::updateWebhook().
      */
-    public function updateWebhook(int $id, array $data): bool
+    public static function updateWebhook(int $id, array $data): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -54,7 +54,7 @@ class WebhookDispatchService
     /**
      * Delegates to legacy WebhookDispatchService::deleteWebhook().
      */
-    public function deleteWebhook(int $id): bool
+    public static function deleteWebhook(int $id): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -63,7 +63,7 @@ class WebhookDispatchService
     /**
      * Delegates to legacy WebhookDispatchService::testWebhook().
      */
-    public function testWebhook(int $id): array
+    public static function testWebhook(int $id): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -72,7 +72,7 @@ class WebhookDispatchService
     /**
      * Delegates to legacy WebhookDispatchService::getLogs().
      */
-    public function getLogs(int $id, array $filters = []): array
+    public static function getLogs(int $id, array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

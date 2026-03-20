@@ -34,7 +34,7 @@ class VolunteerFormService
      * @param string $appliesTo Context: 'application', 'profile', 'shift', etc.
      * @return array List of custom field definitions ordered by display_order
      */
-    public function getCustomFields(?int $organizationId = null, string $appliesTo = 'application'): array
+    public static function getCustomFields(?int $organizationId = null, string $appliesTo = 'application'): array
     {
         try {
             $query = VolCustomField::where('applies_to', $appliesTo)
@@ -65,7 +65,7 @@ class VolunteerFormService
      * @param array $data Field definition data
      * @return array The created field record
      */
-    public function createField(array $data): array
+    public static function createField(array $data): array
     {
         try {
             $field = VolCustomField::create([
@@ -97,7 +97,7 @@ class VolunteerFormService
      * @param array $data Fields to update
      * @return bool
      */
-    public function updateField(int $id, array $data): bool
+    public static function updateField(int $id, array $data): bool
     {
         try {
             $field = VolCustomField::find($id);
@@ -134,7 +134,7 @@ class VolunteerFormService
      * @param int $id Field ID
      * @return bool
      */
-    public function deleteField(int $id): bool
+    public static function deleteField(int $id): bool
     {
         try {
             $field = VolCustomField::find($id);
@@ -156,7 +156,7 @@ class VolunteerFormService
      * @param int $entityId The entity ID
      * @param array $values Associative array [field_id => value]
      */
-    public function saveFieldValues(string $entityType, int $entityId, array $values): void
+    public static function saveFieldValues(string $entityType, int $entityId, array $values): void
     {
         $tenantId = TenantContext::getId();
 
@@ -186,7 +186,7 @@ class VolunteerFormService
      * @param int $tenantId
      * @return array List of accessibility need records
      */
-    public function getAccessibilityNeeds(int $userId, int $tenantId): array
+    public static function getAccessibilityNeeds(int $userId, int $tenantId): array
     {
         try {
             return VolAccessibilityNeed::where('user_id', $userId)
@@ -208,7 +208,7 @@ class VolunteerFormService
      * @param int $tenantId
      * @return bool True on success
      */
-    public function updateAccessibilityNeeds(int $userId, array $data, int $tenantId): bool
+    public static function updateAccessibilityNeeds(int $userId, array $data, int $tenantId): bool
     {
         try {
             DB::transaction(function () use ($userId, $data, $tenantId) {

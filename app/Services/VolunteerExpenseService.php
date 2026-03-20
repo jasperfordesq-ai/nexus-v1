@@ -32,7 +32,7 @@ class VolunteerExpenseService
      * @return array The created expense record
      * @throws \InvalidArgumentException On validation failure
      */
-    public function submitExpense(int $userId, array $data): array
+    public static function submitExpense(int $userId, array $data): array
     {
         $tenantId = TenantContext::getId();
 
@@ -55,7 +55,7 @@ class VolunteerExpenseService
         }
 
         // Validate against expense policy
-        $policy = $this->getApplicablePolicy($tenantId, (int) $data['organization_id'], $data['expense_type']);
+        $policy = self::getApplicablePolicy($tenantId, (int) $data['organization_id'], $data['expense_type']);
 
         if ($policy) {
             if (!empty($policy->max_amount) && $amount > (float) $policy->max_amount) {
@@ -108,7 +108,7 @@ class VolunteerExpenseService
             'submitted_at' => now(),
         ]);
 
-        return $this->getExpense($expense->id) ?? [];
+        return self::getExpense($expense->id) ?? [];
     }
 
     /**
@@ -117,7 +117,7 @@ class VolunteerExpenseService
      * @param array $filters Keys: user_id, organization_id, status, date_from, date_to, cursor, limit
      * @return array ['items' => [], 'cursor' => string|null, 'has_more' => bool]
      */
-    public function getExpenses(array $filters = []): array
+    public static function getExpenses(array $filters = []): array
     {
         $limit = min($filters['limit'] ?? 20, 50);
         $cursorId = null;
@@ -181,7 +181,7 @@ class VolunteerExpenseService
     /**
      * Get a single expense by ID (tenant-scoped).
      */
-    public function getExpense(int $id): ?array
+    public static function getExpense(int $id): ?array
     {
         $expense = VolExpense::with(['user', 'organization'])->find($id);
 
@@ -207,7 +207,7 @@ class VolunteerExpenseService
      * @param string|null $notes Optional reviewer notes
      * @return bool
      */
-    public function reviewExpense(int $id, int $reviewerId, string $status, ?string $notes = null): bool
+    public static function reviewExpense(int $id, int $reviewerId, string $status, ?string $notes = null): bool
     {
         if (!in_array($status, ['approved', 'rejected'], true)) {
             throw new \InvalidArgumentException("Review status must be 'approved' or 'rejected'.");
@@ -233,7 +233,7 @@ class VolunteerExpenseService
      * @param string|null $paymentReference Optional payment reference/transaction ID
      * @return bool
      */
-    public function markPaid(int $id, int $adminId, ?string $paymentReference = null): bool
+    public static function markPaid(int $id, int $adminId, ?string $paymentReference = null): bool
     {
         $affected = VolExpense::where('id', $id)
             ->where('status', 'approved')
@@ -253,7 +253,7 @@ class VolunteerExpenseService
      * @param array|null $filters Optional filters: user_id, organization_id, status, date_from, date_to
      * @return array Array of associative arrays (one per expense row)
      */
-    public function exportExpenses(int $tenantId, ?array $filters): array
+    public static function exportExpenses(int $tenantId, ?array $filters): array
     {
         $query = VolExpense::query()
             ->join('users as u', 'vol_expenses.user_id', '=', 'u.id')
@@ -306,7 +306,7 @@ class VolunteerExpenseService
      * @param int $tenantId
      * @return array List of policy records
      */
-    public function getPolicies(int $tenantId): array
+    public static function getPolicies(int $tenantId): array
     {
         return VolExpensePolicy::orderBy('organization_id')
             ->orderBy('expense_type')
@@ -323,7 +323,7 @@ class VolunteerExpenseService
      * @param int $tenantId
      * @return bool True if a row was updated
      */
-    public function updatePolicy(int $policyId, array $data, int $tenantId): bool
+    public static function updatePolicy(int $policyId, array $data, int $tenantId): bool
     {
         $affected = VolExpensePolicy::where('id', $policyId)
             ->update([
@@ -341,7 +341,7 @@ class VolunteerExpenseService
      * Get the most specific applicable policy for an expense type.
      * Org-level policy takes precedence over tenant-level.
      */
-    private function getApplicablePolicy(int $tenantId, int $organizationId, string $expenseType): ?VolExpensePolicy
+    private static function getApplicablePolicy(int $tenantId, int $organizationId, string $expenseType): ?VolExpensePolicy
     {
         // Try org-specific policy first
         $policy = VolExpensePolicy::where('organization_id', $organizationId)

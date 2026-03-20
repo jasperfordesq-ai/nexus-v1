@@ -28,7 +28,7 @@ use App\Services\WebAuthnChallengeStore;
  * is not available in the unit test environment. The file-based backend
  * is the fallback path when Redis is unavailable.
  *
- * @covers \Nexus\Services\WebAuthnChallengeStore
+ * @covers \App\Services\WebAuthnChallengeStore
  */
 class WebAuthnChallengeStoreTest extends TestCase
 {

@@ -21,9 +21,9 @@ use App\Services\GroupService;
  * - Opt-out handling via notification frequency settings
  * - Digest scheduling and frequency hierarchy (thread > group > global)
  *
- * @covers \Nexus\Services\DigestService
- * @covers \Nexus\Services\NotificationDispatcher
- * @covers \Nexus\Services\GroupService
+ * @covers \App\Services\DigestService
+ * @covers \App\Services\NotificationDispatcher
+ * @covers \App\Services\GroupService
  */
 class GroupDigestCronTest extends TestCase
 {

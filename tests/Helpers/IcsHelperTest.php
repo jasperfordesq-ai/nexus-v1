@@ -16,7 +16,7 @@ use App\Helpers\IcsHelper;
  *
  * Tests ICS (iCalendar) file generation for events.
  *
- * @covers \Nexus\Helpers\IcsHelper
+ * @covers \App\Helpers\IcsHelper
  */
 class IcsHelperTest extends TestCase
 {

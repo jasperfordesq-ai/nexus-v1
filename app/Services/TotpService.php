@@ -35,7 +35,7 @@ class TotpService
     /**
      * Generate a new TOTP secret.
      */
-    public function generateSecret(): string
+    public static function generateSecret(): string
     {
         $totp = TOTP::generate();
         return $totp->getSecret();
@@ -44,7 +44,7 @@ class TotpService
     /**
      * Get the provisioning URI for authenticator apps.
      */
-    public function getProvisioningUri(string $secret, string $email, ?string $issuer = null): string
+    public static function getProvisioningUri(string $secret, string $email, ?string $issuer = null): string
     {
         $totp = TOTP::createFromSecret($secret);
         $totp->setLabel($email);
@@ -55,7 +55,7 @@ class TotpService
     /**
      * Generate a QR code SVG for the provisioning URI.
      */
-    public function generateQrCode(string $provisioningUri): string
+    public static function generateQrCode(string $provisioningUri): string
     {
         $builder = new Builder(
             writer: new SvgWriter(),
@@ -73,7 +73,7 @@ class TotpService
     /**
      * Verify a TOTP code against a secret.
      */
-    public function verifyCode(string $secret, string $code, int $window = 1): bool
+    public static function verifyCode(string $secret, string $code, int $window = 1): bool
     {
         $totp = TOTP::createFromSecret($secret);
         return $totp->verify($code, null, $window);
@@ -84,7 +84,7 @@ class TotpService
      *
      * @return array{limited: bool, retry_after: int|null, message: string|null}
      */
-    public function checkRateLimit(int $userId): array
+    public static function checkRateLimit(int $userId): array
     {
         $tenantId = TenantContext::getId();
         $cutoff = date('Y-m-d H:i:s', time() - self::LOCKOUT_SECONDS);
@@ -118,7 +118,7 @@ class TotpService
     /**
      * Check if user has 2FA enabled.
      */
-    public function isEnabled(int $userId): bool
+    public static function isEnabled(int $userId): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -134,7 +134,7 @@ class TotpService
     /**
      * Check if current device is trusted for this user.
      */
-    public function isTrustedDevice(int $userId, ?string $deviceHash = null): bool
+    public static function isTrustedDevice(int $userId, ?string $deviceHash = null): bool
     {
         $token = $_COOKIE[self::TRUSTED_DEVICE_COOKIE] ?? null;
         if (!$token) {
@@ -165,7 +165,7 @@ class TotpService
     /**
      * Trust the current device for this user.
      */
-    public function trustDevice(int $userId, ?string $deviceHash = null): void
+    public static function trustDevice(int $userId, ?string $deviceHash = null): void
     {
         $tenantId = TenantContext::getId();
         $token = bin2hex(random_bytes(32));
@@ -173,7 +173,7 @@ class TotpService
 
         $ip = request()->ip();
         $userAgent = request()->userAgent();
-        $deviceName = $this->parseDeviceName($userAgent);
+        $deviceName = self::parseDeviceName($userAgent);
         $expiresAt = date('Y-m-d H:i:s', time() + (self::TRUSTED_DEVICE_DAYS * 24 * 60 * 60));
 
         try {
@@ -208,11 +208,11 @@ class TotpService
      *
      * @return array{success: bool, error?: string}
      */
-    public function verifyLogin(int $userId, string $code): array
+    public static function verifyLogin(int $userId, string $code): array
     {
         $tenantId = TenantContext::getId();
 
-        $rateLimit = $this->checkRateLimit($userId);
+        $rateLimit = self::checkRateLimit($userId);
         if ($rateLimit['limited']) {
             return ['success' => false, 'error' => $rateLimit['message']];
         }
@@ -234,8 +234,8 @@ class TotpService
             return ['success' => false, 'error' => 'Authentication error. Please contact support.'];
         }
 
-        if (!$this->verifyCode($secret, $code)) {
-            $this->recordAttempt($userId, false, 'totp', 'invalid_code');
+        if (!self::verifyCode($secret, $code)) {
+            self::recordAttempt($userId, false, 'totp', 'invalid_code');
             return ['success' => false, 'error' => 'Invalid code. Please try again.'];
         }
 
@@ -247,7 +247,7 @@ class TotpService
             [$userId, $tenantId]
         );
 
-        $this->recordAttempt($userId, true, 'totp');
+        self::recordAttempt($userId, true, 'totp');
 
         return ['success' => true];
     }
@@ -257,11 +257,11 @@ class TotpService
      *
      * @return array{success: bool, error?: string, codes_remaining?: int}
      */
-    public function verifyBackupCode(int $userId, string $code): array
+    public static function verifyBackupCode(int $userId, string $code): array
     {
         $tenantId = TenantContext::getId();
 
-        $rateLimit = $this->checkRateLimit($userId);
+        $rateLimit = self::checkRateLimit($userId);
         if ($rateLimit['limited']) {
             return ['success' => false, 'error' => $rateLimit['message']];
         }
@@ -283,7 +283,7 @@ class TotpService
         }
 
         if (!$matchedCodeId) {
-            $this->recordAttempt($userId, false, 'backup_code', 'invalid_backup_code');
+            self::recordAttempt($userId, false, 'backup_code', 'invalid_backup_code');
             return ['success' => false, 'error' => 'Invalid backup code.'];
         }
 
@@ -306,7 +306,7 @@ class TotpService
             [$userId, $tenantId]
         );
 
-        $this->recordAttempt($userId, true, 'backup_code');
+        self::recordAttempt($userId, true, 'backup_code');
 
         return ['success' => true, 'codes_remaining' => (int) ($remaining->remaining ?? 0)];
     }
@@ -314,7 +314,7 @@ class TotpService
     /**
      * Check if user needs to set up 2FA (tenant requirement).
      */
-    public function isSetupRequired(int $userId): bool
+    public static function isSetupRequired(int $userId): bool
     {
         $user = DB::selectOne(
             "SELECT totp_setup_required FROM users WHERE id = ? AND tenant_id = ?",
@@ -327,7 +327,7 @@ class TotpService
     /**
      * Get the count of remaining unused backup codes.
      */
-    public function getBackupCodeCount(int $userId): int
+    public static function getBackupCodeCount(int $userId): int
     {
         $tenantId = TenantContext::getId();
 
@@ -343,7 +343,7 @@ class TotpService
     /**
      * Get count of active trusted devices for a user.
      */
-    public function getTrustedDeviceCount(int $userId): int
+    public static function getTrustedDeviceCount(int $userId): int
     {
         $tenantId = TenantContext::getId();
 
@@ -361,7 +361,7 @@ class TotpService
      *
      * @return array{secret: string, provisioning_uri: string, qr_code: string}
      */
-    public function initializeSetup(int $userId): array
+    public static function initializeSetup(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -371,7 +371,7 @@ class TotpService
             throw new \RuntimeException('User not found');
         }
 
-        $secret = $this->generateSecret();
+        $secret = self::generateSecret();
         $encryptedSecret = TotpEncryption::encrypt($secret);
 
         DB::insert(
@@ -386,8 +386,8 @@ class TotpService
             [$userId, $tenantId, $encryptedSecret]
         );
 
-        $provisioningUri = $this->getProvisioningUri($secret, $user->email);
-        $qrCode = $this->generateQrCode($provisioningUri);
+        $provisioningUri = self::getProvisioningUri($secret, $user->email);
+        $qrCode = self::generateQrCode($provisioningUri);
 
         return [
             'secret' => $secret,
@@ -401,11 +401,11 @@ class TotpService
      *
      * @return array{success: bool, error?: string, backup_codes?: array}
      */
-    public function completeSetup(int $userId, string $code): array
+    public static function completeSetup(int $userId, string $code): array
     {
         $tenantId = TenantContext::getId();
 
-        $rateLimit = $this->checkRateLimit($userId);
+        $rateLimit = self::checkRateLimit($userId);
         if ($rateLimit['limited']) {
             return ['success' => false, 'error' => $rateLimit['message']];
         }
@@ -427,8 +427,8 @@ class TotpService
             return ['success' => false, 'error' => 'Encryption error. Please start setup again.'];
         }
 
-        if (!$this->verifyCode($secret, $code)) {
-            $this->recordAttempt($userId, false, 'totp', 'invalid_code_during_setup');
+        if (!self::verifyCode($secret, $code)) {
+            self::recordAttempt($userId, false, 'totp', 'invalid_code_during_setup');
             return ['success' => false, 'error' => 'Invalid code. Please check the code and try again.'];
         }
 
@@ -450,9 +450,9 @@ class TotpService
                 [$userId, $tenantId]
             );
 
-            $backupCodes = $this->generateBackupCodes($userId);
+            $backupCodes = self::generateBackupCodes($userId);
 
-            $this->recordAttempt($userId, true, 'totp');
+            self::recordAttempt($userId, true, 'totp');
 
             DB::commit();
 
@@ -469,7 +469,7 @@ class TotpService
      *
      * @return array{success: bool, error?: string}
      */
-    public function disable(int $userId, string $password = ''): array
+    public static function disable(int $userId, string $password = ''): array
     {
         $tenantId = TenantContext::getId();
 
@@ -498,7 +498,7 @@ class TotpService
      *
      * @return array  List of plain-text backup codes
      */
-    public function generateBackupCodes(int $userId): array
+    public static function generateBackupCodes(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -506,7 +506,7 @@ class TotpService
 
         $codes = [];
         for ($i = 0; $i < self::BACKUP_CODE_COUNT; $i++) {
-            $code = $this->generateRandomCode();
+            $code = self::generateRandomCode();
             $normalizedCode = str_replace('-', '', $code);
             $hash = password_hash($normalizedCode, PASSWORD_DEFAULT);
 
@@ -524,7 +524,7 @@ class TotpService
     /**
      * Get all trusted devices for a user.
      */
-    public function getTrustedDevices(int $userId): array
+    public static function getTrustedDevices(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -542,7 +542,7 @@ class TotpService
     /**
      * Revoke a specific trusted device.
      */
-    public function revokeDevice(int $userId, int $deviceId, string $reason = 'user_action'): bool
+    public static function revokeDevice(int $userId, int $deviceId, string $reason = 'user_action'): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -561,7 +561,7 @@ class TotpService
      *
      * @return int  Number of devices revoked
      */
-    public function revokeAllDevices(int $userId, string $reason = 'user_action'): int
+    public static function revokeAllDevices(int $userId, string $reason = 'user_action'): int
     {
         $tenantId = TenantContext::getId();
 
@@ -582,7 +582,7 @@ class TotpService
      *
      * @return array{success: bool, error?: string}
      */
-    public function adminReset(int $userId, int $adminId, string $reason): array
+    public static function adminReset(int $userId, int $adminId, string $reason): array
     {
         $tenantId = TenantContext::getId();
 
@@ -618,7 +618,7 @@ class TotpService
     /**
      * Record a 2FA verification attempt.
      */
-    public function recordAttempt(int $userId, bool $successful, string $type = 'totp', ?string $failureReason = null): void
+    public static function recordAttempt(int $userId, bool $successful, string $type = 'totp', ?string $failureReason = null): void
     {
         $tenantId = TenantContext::getId();
         $ip = request()->ip();
@@ -645,7 +645,7 @@ class TotpService
     /**
      * Generate a random backup code (format: XXXX-XXXX).
      */
-    private function generateRandomCode(): string
+    private static function generateRandomCode(): string
     {
         $chars = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
         $code = '';
@@ -660,7 +660,7 @@ class TotpService
     /**
      * Parse user agent string to get a human-readable device name.
      */
-    private function parseDeviceName(?string $userAgent): string
+    private static function parseDeviceName(?string $userAgent): string
     {
         if (!$userAgent) {
             return 'Unknown device';

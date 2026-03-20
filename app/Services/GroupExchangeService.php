@@ -19,7 +19,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::create().
      */
-    public function create(int $organizerId, array $data): ?int
+    public static function create(int $organizerId, array $data): ?int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::get().
      */
-    public function get(int $id): ?array
+    public static function get(int $id): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::listForUser().
      */
-    public function listForUser(int $userId, array $filters = []): array
+    public static function listForUser(int $userId, array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::addParticipant().
      */
-    public function addParticipant(int $exchangeId, int $userId, string $role, float $hours = 0, float $weight = 1.0): bool
+    public static function addParticipant(int $exchangeId, int $userId, string $role, float $hours = 0, float $weight = 1.0): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -55,7 +55,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::removeParticipant().
      */
-    public function removeParticipant(int $exchangeId, int $userId): bool
+    public static function removeParticipant(int $exchangeId, int $userId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -64,7 +64,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::calculateSplit().
      */
-    public function calculateSplit(int $exchangeId): array
+    public static function calculateSplit(int $exchangeId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -73,7 +73,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::update().
      */
-    public function update(int $id, array $data): bool
+    public static function update(int $id, array $data): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -82,7 +82,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::updateStatus().
      */
-    public function updateStatus(int $id, string $status): bool
+    public static function updateStatus(int $id, string $status): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -91,7 +91,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::confirmParticipation().
      */
-    public function confirmParticipation(int $exchangeId, int $userId): bool
+    public static function confirmParticipation(int $exchangeId, int $userId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -100,7 +100,7 @@ class GroupExchangeService
     /**
      * Delegates to legacy GroupExchangeService::complete().
      */
-    public function complete(int $exchangeId): array
+    public static function complete(int $exchangeId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

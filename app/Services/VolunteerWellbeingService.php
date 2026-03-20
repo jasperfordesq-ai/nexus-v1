@@ -19,7 +19,7 @@ class VolunteerWellbeingService
     /**
      * Delegates to legacy VolunteerWellbeingService::getErrors().
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class VolunteerWellbeingService
     /**
      * Delegates to legacy VolunteerWellbeingService::detectBurnoutRisk().
      */
-    public function detectBurnoutRisk(int $userId): array
+    public static function detectBurnoutRisk(int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class VolunteerWellbeingService
     /**
      * Delegates to legacy VolunteerWellbeingService::runTenantAssessment().
      */
-    public function runTenantAssessment(): array
+    public static function runTenantAssessment(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class VolunteerWellbeingService
     /**
      * Delegates to legacy VolunteerWellbeingService::getActiveAlerts().
      */
-    public function getActiveAlerts(): array
+    public static function getActiveAlerts(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class VolunteerWellbeingService
     /**
      * Delegates to legacy VolunteerWellbeingService::updateAlert().
      */
-    public function updateAlert(int $alertId, string $action, ?string $notes = null): bool
+    public static function updateAlert(int $alertId, string $action, ?string $notes = null): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;

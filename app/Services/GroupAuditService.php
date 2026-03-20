@@ -19,7 +19,7 @@ class GroupAuditService
     /**
      * Delegates to legacy GroupAuditService::log().
      */
-    public function log($action, $groupId = null, $userId = null, $details = [], $targetUserId = null)
+    public static function log($action, $groupId = null, $userId = null, $details = [], $targetUserId = null)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class GroupAuditService
     /**
      * Delegates to legacy GroupAuditService::logGroupCreated().
      */
-    public function logGroupCreated($groupId, $userId, $groupData = [])
+    public static function logGroupCreated($groupId, $userId, $groupData = [])
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class GroupAuditService
     /**
      * Delegates to legacy GroupAuditService::logGroupUpdated().
      */
-    public function logGroupUpdated($groupId, $userId, $changes = [])
+    public static function logGroupUpdated($groupId, $userId, $changes = [])
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class GroupAuditService
     /**
      * Delegates to legacy GroupAuditService::logGroupDeleted().
      */
-    public function logGroupDeleted($groupId, $userId, $reason = '')
+    public static function logGroupDeleted($groupId, $userId, $reason = '')
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -55,7 +55,7 @@ class GroupAuditService
     /**
      * Delegates to legacy GroupAuditService::logGroupFeatured().
      */
-    public function logGroupFeatured($groupId, $userId, $featured = true)
+    public static function logGroupFeatured($groupId, $userId, $featured = true)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

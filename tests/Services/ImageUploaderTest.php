@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use App\Core\ImageUploader;
 
 /**
- * @covers \Nexus\Core\ImageUploader
+ * @covers \App\Core\ImageUploader
  */
 class ImageUploaderTest extends TestCase
 {

@@ -19,7 +19,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getVisibleTenantIds().
      */
-    public function getVisibleTenantIds(): array
+    public static function getVisibleTenantIds(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getTenantList().
      */
-    public function getTenantList(array $filters = []): array
+    public static function getTenantList(array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getTenant().
      */
-    public function getTenant(int $tenantId): ?array
+    public static function getTenant(int $tenantId): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getUserList().
      */
-    public function getUserList(array $filters = []): array
+    public static function getUserList(array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getTenantAdmins().
      */
-    public function getTenantAdmins(int $tenantId): array
+    public static function getTenantAdmins(int $tenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -64,7 +64,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getHierarchyTree().
      */
-    public function getHierarchyTree(): array
+    public static function getHierarchyTree(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -73,7 +73,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getDashboardStats().
      */
-    public function getDashboardStats(): array
+    public static function getDashboardStats(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -82,7 +82,7 @@ class TenantVisibilityService
     /**
      * Delegates to legacy TenantVisibilityService::getAvailableParents().
      */
-    public function getAvailableParents(): array
+    public static function getAvailableParents(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

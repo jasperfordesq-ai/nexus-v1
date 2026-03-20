@@ -42,7 +42,7 @@ class ListingRiskTagService
     /**
      * Tag a listing with a risk assessment.
      */
-    public function tagListing(int $listingId, array $data, int $brokerId): ?int
+    public static function tagListing(int $listingId, array $data, int $brokerId): ?int
     {
         $tenantId = TenantContext::getId();
 
@@ -56,7 +56,7 @@ class ListingRiskTagService
             $category = 'other';
         }
 
-        $existing = $this->getTagForListing($listingId);
+        $existing = self::getTagForListing($listingId);
 
         $memberVisibleNotes = $data['member_visible_notes'] ?? null;
         $insuranceRequired = ($data['insurance_required'] ?? false) ? 1 : 0;
@@ -83,7 +83,7 @@ class ListingRiskTagService
             // Notify admins if risk level was upgraded to high/critical
             $highLevels = [self::RISK_HIGH, self::RISK_CRITICAL];
             if (in_array($riskLevel, $highLevels, true) && !in_array($oldRiskLevel, $highLevels, true)) {
-                $this->notifyAdminsOfRiskTag($listingId, $riskLevel, $brokerId);
+                self::notifyAdminsOfRiskTag($listingId, $riskLevel, $brokerId);
             }
 
             return $existing['id'];
@@ -105,7 +105,7 @@ class ListingRiskTagService
         ]);
 
         if (in_array($riskLevel, [self::RISK_HIGH, self::RISK_CRITICAL], true)) {
-            $this->notifyAdminsOfRiskTag($listingId, $riskLevel, $brokerId);
+            self::notifyAdminsOfRiskTag($listingId, $riskLevel, $brokerId);
         }
 
         return $tagId;
@@ -114,7 +114,7 @@ class ListingRiskTagService
     /**
      * Get risk tag for a listing.
      */
-    public function getTagForListing(int $listingId): ?array
+    public static function getTagForListing(int $listingId): ?array
     {
         $tenantId = TenantContext::getId();
 
@@ -131,11 +131,11 @@ class ListingRiskTagService
     /**
      * Remove risk tag from a listing.
      */
-    public function removeTag(int $listingId, ?int $removedBy = null): bool
+    public static function removeTag(int $listingId, ?int $removedBy = null): bool
     {
         $tenantId = TenantContext::getId();
 
-        $existing = $this->getTagForListing($listingId);
+        $existing = self::getTagForListing($listingId);
         if (!$existing) {
             return false;
         }
@@ -153,7 +153,7 @@ class ListingRiskTagService
      *
      * @return array{items: array, total: int, pages: int|float}
      */
-    public function getTaggedListings(?string $riskLevel = null, int $page = 1, int $perPage = 20): array
+    public static function getTaggedListings(?string $riskLevel = null, int $page = 1, int $perPage = 20): array
     {
         $tenantId = TenantContext::getId();
         $offset = ($page - 1) * $perPage;
@@ -194,7 +194,7 @@ class ListingRiskTagService
     /**
      * Get high-risk listings (high or critical level).
      */
-    public function getHighRiskListings(): array
+    public static function getHighRiskListings(): array
     {
         $tenantId = TenantContext::getId();
 
@@ -218,7 +218,7 @@ class ListingRiskTagService
     /**
      * Notify admins when a high/critical risk tag is created.
      */
-    private function notifyAdminsOfRiskTag(int $listingId, string $riskLevel, int $brokerId): void
+    private static function notifyAdminsOfRiskTag(int $listingId, string $riskLevel, int $brokerId): void
     {
         try {
             $listing = DB::table('listings as l')

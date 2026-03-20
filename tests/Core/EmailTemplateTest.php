@@ -13,7 +13,7 @@ use App\Core\EmailTemplate;
 
 /**
  * EmailTemplate Tests
- * @covers \Nexus\Core\EmailTemplate
+ * @covers \App\Core\EmailTemplate
  */
 class EmailTemplateTest extends TestCase
 {

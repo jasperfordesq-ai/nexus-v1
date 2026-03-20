@@ -13,7 +13,7 @@ use App\Core\Env;
 
 /**
  * Env Tests
- * @covers \Nexus\Core\Env
+ * @covers \App\Core\Env
  */
 class EnvTest extends TestCase
 {

@@ -25,6 +25,18 @@ class UnifiedSearchServiceTest extends DatabaseTestCase
     protected static ?int $testListingId = null;
     protected static ?int $testEventId = null;
     protected static ?int $testGroupId = null;
+    protected static ?UnifiedSearchService $svc = null;
+
+    /**
+     * Get shared service instance.
+     */
+    protected static function svc(): UnifiedSearchService
+    {
+        if (self::$svc === null) {
+            self::$svc = new UnifiedSearchService();
+        }
+        return self::$svc;
+    }
 
     public static function setUpBeforeClass(): void
     {
@@ -105,7 +117,7 @@ class UnifiedSearchServiceTest extends DatabaseTestCase
     private function safeSearch(string $query, ?int $userId, array $filters = []): array
     {
         try {
-            return UnifiedSearchService::search($query, $userId, $filters);
+            return self::svc()->search($query, $userId, $filters);
         } catch (\Exception $e) {
             if (str_contains($e->getMessage(), 'Unknown column') || str_contains($e->getMessage(), "doesn't exist")) {
                 $this->markTestIncomplete('Search query failed due to missing DB column/table: ' . $e->getMessage());
@@ -197,7 +209,7 @@ class UnifiedSearchServiceTest extends DatabaseTestCase
 
         $this->assertArrayHasKey('items', $result);
         $this->assertCount(0, $result['items']);
-        $this->assertNotEmpty(UnifiedSearchService::getErrors());
+        $this->assertNotEmpty(self::svc()->getErrors());
     }
 
     // ==========================================
@@ -207,7 +219,7 @@ class UnifiedSearchServiceTest extends DatabaseTestCase
     public function testGetSuggestionsReturnsStructure(): void
     {
         try {
-            $suggestions = UnifiedSearchService::getSuggestions('SearchGardening', self::$testTenantId);
+            $suggestions = self::svc()->getSuggestions('SearchGardening', self::$testTenantId);
         } catch (\Exception $e) {
             if (str_contains($e->getMessage(), 'Unknown column') || str_contains($e->getMessage(), "doesn't exist")) {
                 $this->markTestIncomplete('getSuggestions failed due to missing DB column/table: ' . $e->getMessage());
@@ -223,7 +235,7 @@ class UnifiedSearchServiceTest extends DatabaseTestCase
 
     public function testGetSuggestionsWithShortQuery(): void
     {
-        $suggestions = UnifiedSearchService::getSuggestions('a', self::$testTenantId);
+        $suggestions = self::svc()->getSuggestions('a', self::$testTenantId);
 
         $this->assertEmpty($suggestions['listings']);
         $this->assertEmpty($suggestions['users']);

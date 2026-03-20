@@ -19,11 +19,11 @@ use Illuminate\Support\Facades\Log;
  */
 class ShiftGroupReservationService
 {
-    private array $errors = [];
+    private static array $errors = [];
 
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
@@ -31,43 +31,43 @@ class ShiftGroupReservationService
      *
      * @return int|null Reservation ID or null on failure
      */
-    public function reserve(int $shiftId, int $groupId, int $reservedBy, int $slots, ?string $notes = null): ?int
+    public static function reserve(int $shiftId, int $groupId, int $reservedBy, int $slots, ?string $notes = null): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         if ($slots < 1) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Must reserve at least 1 slot', 'field' => 'reserved_slots'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Must reserve at least 1 slot', 'field' => 'reserved_slots'];
             return null;
         }
 
         $shift = VolShift::find($shiftId);
         if (! $shift) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
             return null;
         }
 
         if ($shift->start_time->isPast()) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot reserve slots for a shift that has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot reserve slots for a shift that has already started'];
             return null;
         }
 
         // Verify group exists
         $group = Group::find($groupId);
         if (! $group) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
             return null;
         }
 
-        if (! $this->canManageGroup($groupId, $reservedBy, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can reserve slots for this group'];
+        if (! self::canManageGroup($groupId, $reservedBy, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can reserve slots for this group'];
             return null;
         }
 
         // Check available capacity
-        $availableSlots = $this->getAvailableSlots($shiftId, $shift);
+        $availableSlots = self::getAvailableSlots($shiftId, $shift);
         if ($availableSlots !== null && $slots > $availableSlots) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => "Only {$availableSlots} slots available", 'field' => 'reserved_slots'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => "Only {$availableSlots} slots available", 'field' => 'reserved_slots'];
             return null;
         }
 
@@ -80,7 +80,7 @@ class ShiftGroupReservationService
             ->exists();
 
         if ($existing) {
-            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'This group already has a reservation for this shift'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'This group already has a reservation for this shift'];
             return null;
         }
 
@@ -98,7 +98,7 @@ class ShiftGroupReservationService
             ]);
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::reserve error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create reservation'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create reservation'];
             return null;
         }
     }
@@ -106,9 +106,9 @@ class ShiftGroupReservationService
     /**
      * Add a member to a group reservation.
      */
-    public function addMember(int $reservationId, int $userId, int $leaderUserId): bool
+    public static function addMember(int $reservationId, int $userId, int $leaderUserId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $reservation = DB::table('vol_shift_group_reservations')
@@ -118,17 +118,17 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $reservation) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
             return false;
         }
 
-        if (! $this->canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
+        if (! self::canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
             return false;
         }
 
         if ((int) $reservation->filled_slots >= (int) $reservation->reserved_slots) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'All reserved slots are filled'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'All reserved slots are filled'];
             return false;
         }
 
@@ -140,7 +140,7 @@ class ShiftGroupReservationService
             ->exists();
 
         if ($alreadyMember) {
-            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'User is already in this group reservation'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'User is already in this group reservation'];
             return false;
         }
 
@@ -162,7 +162,7 @@ class ShiftGroupReservationService
             });
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::addMember error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to add member'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to add member'];
             return false;
         }
     }
@@ -170,9 +170,9 @@ class ShiftGroupReservationService
     /**
      * Remove a member from a group reservation.
      */
-    public function removeMember(int $reservationId, int $userId, int $leaderUserId): bool
+    public static function removeMember(int $reservationId, int $userId, int $leaderUserId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $reservation = DB::table('vol_shift_group_reservations')
@@ -181,12 +181,12 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $reservation) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
             return false;
         }
 
-        if (! $this->canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
+        if (! self::canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
             return false;
         }
 
@@ -197,7 +197,7 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $member) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Member not found in this reservation'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Member not found in this reservation'];
             return false;
         }
 
@@ -216,7 +216,7 @@ class ShiftGroupReservationService
             });
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::removeMember error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to remove member'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to remove member'];
             return false;
         }
     }
@@ -224,9 +224,9 @@ class ShiftGroupReservationService
     /**
      * Cancel an entire group reservation.
      */
-    public function cancelReservation(int $reservationId, int $leaderUserId): bool
+    public static function cancelReservation(int $reservationId, int $leaderUserId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $reservation = DB::table('vol_shift_group_reservations')
@@ -236,12 +236,12 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $reservation) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
             return false;
         }
 
-        if (! $this->canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can cancel this reservation'];
+        if (! self::canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can cancel this reservation'];
             return false;
         }
 
@@ -260,7 +260,7 @@ class ShiftGroupReservationService
             });
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::cancelReservation error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel reservation'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel reservation'];
             return false;
         }
     }
@@ -268,7 +268,7 @@ class ShiftGroupReservationService
     /**
      * Get all group reservations a user is involved in (as leader or member).
      */
-    public function getUserReservations(int $userId, int $tenantId): array
+    public static function getUserReservations(int $userId, int $tenantId): array
     {
         try {
             $rows = DB::table('vol_shift_group_reservations as r')
@@ -360,7 +360,7 @@ class ShiftGroupReservationService
     /**
      * Calculate available slots for a shift (accounting for regular signups + group reservations).
      */
-    private function getAvailableSlots(int $shiftId, VolShift $shift): ?int
+    private static function getAvailableSlots(int $shiftId, VolShift $shift): ?int
     {
         if (! $shift->capacity) {
             return null; // Unlimited
@@ -383,18 +383,18 @@ class ShiftGroupReservationService
         return max(0, (int) $shift->capacity - $regularSignups - $reservedSlots);
     }
 
-    private function canManageReservation(int $groupId, int $reservedBy, int $userId, int $tenantId): bool
+    private static function canManageReservation(int $groupId, int $reservedBy, int $userId, int $tenantId): bool
     {
         if ($reservedBy === $userId) {
             return true;
         }
 
-        return $this->canManageGroup($groupId, $userId, $tenantId);
+        return self::canManageGroup($groupId, $userId, $tenantId);
     }
 
-    private function canManageGroup(int $groupId, int $userId, int $tenantId): bool
+    private static function canManageGroup(int $groupId, int $userId, int $tenantId): bool
     {
-        if ($this->isTenantAdmin($userId, $tenantId)) {
+        if (self::isTenantAdmin($userId, $tenantId)) {
             return true;
         }
 
@@ -418,7 +418,7 @@ class ShiftGroupReservationService
             ->exists();
     }
 
-    private function isTenantAdmin(int $userId, int $tenantId): bool
+    private static function isTenantAdmin(int $userId, int $tenantId): bool
     {
         $role = DB::table('users')
             ->where('id', $userId)

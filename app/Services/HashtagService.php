@@ -19,7 +19,7 @@ class HashtagService
     /**
      * Delegates to legacy HashtagService::getTrending().
      */
-    public function getTrending(int $tenantId, int $limit = 10): array
+    public static function getTrending(int $tenantId, int $limit = 10): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class HashtagService
     /**
      * Delegates to legacy HashtagService::getPostsByTag().
      */
-    public function getPostsByTag(int $tenantId, string $tag, int $limit = 20): array
+    public static function getPostsByTag(int $tenantId, string $tag, int $limit = 20): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class HashtagService
     /**
      * Delegates to legacy HashtagService::extractTags().
      */
-    public function extractTags(string $content): array
+    public static function extractTags(string $content): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class HashtagService
     /**
      * Delegates to legacy HashtagService::syncTags().
      */
-    public function syncTags(int $tenantId, int $postId, array $tags): void
+    public static function syncTags(int $tenantId, int $postId, array $tags): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }

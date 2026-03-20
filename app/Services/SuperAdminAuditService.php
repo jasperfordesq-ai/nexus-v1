@@ -19,7 +19,7 @@ class SuperAdminAuditService
     /**
      * Delegates to legacy SuperAdminAuditService::log().
      */
-    public function log(string $actionType, string $targetType, ?int $targetId = null, ?string $targetName = null, ?array $oldValues = null, ?array $newValues = null, ?string $description = null): bool
+    public static function log(string $actionType, string $targetType, ?int $targetId = null, ?string $targetName = null, ?array $oldValues = null, ?array $newValues = null, ?string $description = null): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -28,7 +28,7 @@ class SuperAdminAuditService
     /**
      * Delegates to legacy SuperAdminAuditService::getLog().
      */
-    public function getLog(array $filters = []): array
+    public static function getLog(array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class SuperAdminAuditService
     /**
      * Delegates to legacy SuperAdminAuditService::getStats().
      */
-    public function getStats(int $days = 30): array
+    public static function getStats(int $days = 30): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -46,7 +46,7 @@ class SuperAdminAuditService
     /**
      * Delegates to legacy SuperAdminAuditService::getActionLabel().
      */
-    public function getActionLabel(string $actionType): string
+    public static function getActionLabel(string $actionType): string
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return '';
@@ -55,7 +55,7 @@ class SuperAdminAuditService
     /**
      * Delegates to legacy SuperAdminAuditService::getActionIcon().
      */
-    public function getActionIcon(string $actionType): string
+    public static function getActionIcon(string $actionType): string
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return '';

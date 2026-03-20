@@ -17,7 +17,7 @@ use App\Helpers\SDG;
  * Tests SDG data helpers for the 17 UN Sustainable Development Goals.
  * Includes goals labels, colors, and icons.
  *
- * @covers \Nexus\Helpers\SDG
+ * @covers \App\Helpers\SDG
  */
 class SDGTest extends TestCase
 {

@@ -39,7 +39,7 @@ class FederationAuditService
     /**
      * Log a federation action.
      */
-    public function log(
+    public static function log(
         string $actionType,
         ?int $sourceTenantId = null,
         ?int $targetTenantId = null,
@@ -75,7 +75,7 @@ class FederationAuditService
             }
         }
 
-        $category = $this->getCategoryFromAction($actionType);
+        $category = self::getCategoryFromAction($actionType);
         $actionType = substr($actionType, 0, 255);
 
         try {
@@ -113,9 +113,9 @@ class FederationAuditService
     /**
      * Log a federated search query.
      */
-    public function logSearch(string $searchType, array $filters, int $resultsCount, ?int $actorUserId = null): bool
+    public static function logSearch(string $searchType, array $filters, int $resultsCount, ?int $actorUserId = null): bool
     {
-        return $this->log(
+        return self::log(
             'federated_search',
             null,
             null,
@@ -128,9 +128,9 @@ class FederationAuditService
     /**
      * Log a cross-tenant profile view.
      */
-    public function logProfileView(int $viewerUserId, int $viewerTenantId, int $viewedUserId, int $viewedTenantId): bool
+    public static function logProfileView(int $viewerUserId, int $viewerTenantId, int $viewedUserId, int $viewedTenantId): bool
     {
-        return $this->log(
+        return self::log(
             'cross_tenant_profile_view',
             $viewerTenantId,
             $viewedTenantId,
@@ -143,9 +143,9 @@ class FederationAuditService
     /**
      * Log a cross-tenant message.
      */
-    public function logMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId, ?int $messageId = null): bool
+    public static function logMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId, ?int $messageId = null): bool
     {
-        return $this->log(
+        return self::log(
             'cross_tenant_message',
             $senderTenantId,
             $recipientTenantId,
@@ -158,9 +158,9 @@ class FederationAuditService
     /**
      * Log a cross-tenant transaction.
      */
-    public function logTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId, int $transactionId, string $transactionType, float $amount): bool
+    public static function logTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId, int $transactionId, string $transactionType, float $amount): bool
     {
-        return $this->log(
+        return self::log(
             'cross_tenant_transaction',
             $initiatorTenantId,
             $counterpartyTenantId,
@@ -178,9 +178,9 @@ class FederationAuditService
     /**
      * Log a partnership status change.
      */
-    public function logPartnershipChange(int $tenantId, int $partnerTenantId, string $newStatus, ?int $actorUserId = null, ?string $reason = null): bool
+    public static function logPartnershipChange(int $tenantId, int $partnerTenantId, string $newStatus, ?int $actorUserId = null, ?string $reason = null): bool
     {
-        return $this->log(
+        return self::log(
             'partnership_status_changed',
             $tenantId,
             $partnerTenantId,
@@ -193,7 +193,7 @@ class FederationAuditService
     /**
      * Get audit log entries with filters.
      */
-    public function getLog(array $filters = []): array
+    public static function getLog(array $filters = []): array
     {
         try {
             $query = DB::table('federation_audit_log');
@@ -254,7 +254,7 @@ class FederationAuditService
     /**
      * Get audit statistics.
      */
-    public function getStats(int $days = 30): array
+    public static function getStats(int $days = 30): array
     {
         $since = now()->subDays($days);
 
@@ -318,15 +318,15 @@ class FederationAuditService
     /**
      * Get recent critical events.
      */
-    public function getRecentCritical(int $limit = 10): array
+    public static function getRecentCritical(int $limit = 10): array
     {
-        return $this->getLog(['level' => self::LEVEL_CRITICAL, 'limit' => $limit]);
+        return self::getLog(['level' => self::LEVEL_CRITICAL, 'limit' => $limit]);
     }
 
     /**
      * Purge old audit logs (retention policy).
      */
-    public function purgeOld(int $retentionDays = 365): int
+    public static function purgeOld(int $retentionDays = 365): int
     {
         $cutoffDate = now()->subDays($retentionDays);
         $criticalCutoff = now()->subDays($retentionDays * 2);
@@ -344,7 +344,7 @@ class FederationAuditService
                 })
                 ->delete();
 
-            $this->log(
+            self::log(
                 'audit_log_purged',
                 null, null, null,
                 ['deleted_count' => $deleted, 'retention_days' => $retentionDays, 'cutoff_date' => $cutoffDate->toDateTimeString()],
@@ -361,7 +361,7 @@ class FederationAuditService
     /**
      * Get human-readable action label.
      */
-    public function getActionLabel(string $actionType): string
+    public static function getActionLabel(string $actionType): string
     {
         $labels = [
             'emergency_lockdown_triggered' => 'Emergency Lockdown Triggered',
@@ -387,7 +387,7 @@ class FederationAuditService
     /**
      * Get icon class for action type.
      */
-    public function getActionIcon(string $actionType): string
+    public static function getActionIcon(string $actionType): string
     {
         $icons = [
             'emergency_lockdown_triggered' => 'fa-exclamation-triangle text-danger',
@@ -409,7 +409,7 @@ class FederationAuditService
     /**
      * Get level badge class.
      */
-    public function getLevelBadge(string $level): string
+    public static function getLevelBadge(string $level): string
     {
         $badges = [
             self::LEVEL_DEBUG => 'badge-secondary',
@@ -424,7 +424,7 @@ class FederationAuditService
     /**
      * Determine category from action type.
      */
-    private function getCategoryFromAction(string $actionType): string
+    private static function getCategoryFromAction(string $actionType): string
     {
         $categoryMap = [
             'emergency_lockdown_triggered' => self::CATEGORY_SYSTEM,

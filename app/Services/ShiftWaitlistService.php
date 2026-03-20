@@ -18,11 +18,11 @@ use Illuminate\Support\Facades\Log;
  */
 class ShiftWaitlistService
 {
-    private array $errors = [];
+    private static array $errors = [];
 
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
@@ -30,19 +30,19 @@ class ShiftWaitlistService
      *
      * @return int|null Waitlist entry ID or null on failure
      */
-    public function join(int $shiftId, int $userId): ?int
+    public static function join(int $shiftId, int $userId): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $shift = VolShift::find($shiftId);
         if (! $shift) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
             return null;
         }
 
         if ($shift->start_time->isPast()) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
             return null;
         }
 
@@ -55,7 +55,7 @@ class ShiftWaitlistService
             ->exists();
 
         if ($onWaitlist) {
-            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already on the waitlist for this shift'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already on the waitlist for this shift'];
             return null;
         }
 
@@ -68,7 +68,7 @@ class ShiftWaitlistService
             ->exists();
 
         if ($signedUp) {
-            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already signed up for this shift'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already signed up for this shift'];
             return null;
         }
 
@@ -93,7 +93,7 @@ class ShiftWaitlistService
             });
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::join error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to join waitlist'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to join waitlist'];
             return null;
         }
     }
@@ -101,9 +101,9 @@ class ShiftWaitlistService
     /**
      * Leave the waitlist for a shift.
      */
-    public function leave(int $shiftId, int $userId): bool
+    public static function leave(int $shiftId, int $userId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
         $tenantId = TenantContext::getId();
 
         $entry = DB::table('vol_shift_waitlist')
@@ -114,7 +114,7 @@ class ShiftWaitlistService
             ->first();
 
         if (! $entry) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not on the waitlist for this shift'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not on the waitlist for this shift'];
             return false;
         }
 
@@ -136,7 +136,7 @@ class ShiftWaitlistService
             return true;
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::leave error: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to leave waitlist'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to leave waitlist'];
             return false;
         }
     }
@@ -144,7 +144,7 @@ class ShiftWaitlistService
     /**
      * Get waitlist entries for a shift.
      */
-    public function getWaitlist(int $shiftId): array
+    public static function getWaitlist(int $shiftId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -174,7 +174,7 @@ class ShiftWaitlistService
     /**
      * Get user's waitlist position for a shift.
      */
-    public function getUserPosition(int $shiftId, int $userId): ?array
+    public static function getUserPosition(int $shiftId, int $userId): ?array
     {
         $tenantId = TenantContext::getId();
 
@@ -205,7 +205,7 @@ class ShiftWaitlistService
     /**
      * Get all waitlist entries for a user across all shifts.
      */
-    public function getUserWaitlists(int $userId, int $tenantId): array
+    public static function getUserWaitlists(int $userId, int $tenantId): array
     {
         try {
             $rows = DB::table('vol_shift_waitlist as w')
@@ -256,7 +256,7 @@ class ShiftWaitlistService
     /**
      * Promote a user from the waitlist to the shift.
      */
-    public function promoteUser(int $waitlistId, int $tenantId): bool
+    public static function promoteUser(int $waitlistId, int $tenantId): bool
     {
         $entry = DB::table('vol_shift_waitlist')
             ->where('id', $waitlistId)

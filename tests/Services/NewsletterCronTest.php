@@ -20,7 +20,7 @@ use App\Services\NewsletterService;
  * - A/B test initialization
  * - Resend to non-openers
  *
- * @covers \Nexus\Services\NewsletterService
+ * @covers \App\Services\NewsletterService
  */
 class NewsletterCronTest extends TestCase
 {

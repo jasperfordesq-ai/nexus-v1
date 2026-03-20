@@ -27,13 +27,13 @@ class ConnectionService
      * @param array{status?: string, cursor?: string|null, limit?: int} $filters
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getAll(int $userId, array $filters = []): array
+    public static function getAll(int $userId, array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $status = $filters['status'] ?? 'accepted';
         $cursor = $filters['cursor'] ?? null;
 
-        $query = $this->connection->newQuery()
+        $query = Connection::query()
             ->with([
                 'requester:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
                 'receiver:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
@@ -86,14 +86,14 @@ class ConnectionService
      *
      * @throws \RuntimeException
      */
-    public function request(int $requesterId, int $receiverId): Connection
+    public static function request(int $requesterId, int $receiverId): Connection
     {
         if ($requesterId === $receiverId) {
             throw new \RuntimeException('Cannot connect with yourself');
         }
 
         // Check for existing connection in either direction
-        $existing = $this->connection->newQuery()
+        $existing = Connection::query()
             ->where(function (Builder $q) use ($requesterId, $receiverId) {
                 $q->where(function (Builder $q2) use ($requesterId, $receiverId) {
                     $q2->where('requester_id', $requesterId)->where('receiver_id', $receiverId);
@@ -107,7 +107,7 @@ class ConnectionService
             throw new \RuntimeException('Connection already exists (status: ' . $existing->status . ')');
         }
 
-        $connection = $this->connection->newInstance([
+        $connection = new Connection([
             'requester_id' => $requesterId,
             'receiver_id'  => $receiverId,
             'status'       => 'pending',
@@ -123,10 +123,10 @@ class ConnectionService
      *
      * @throws \RuntimeException
      */
-    public function accept(int $connectionId, int $userId): Connection
+    public static function accept(int $connectionId, int $userId): Connection
     {
         /** @var Connection $connection */
-        $connection = $this->connection->newQuery()->findOrFail($connectionId);
+        $connection = Connection::query()->findOrFail($connectionId);
 
         if ($connection->receiver_id !== $userId) {
             throw new \RuntimeException('Only the receiver can accept a connection request');
@@ -145,10 +145,10 @@ class ConnectionService
     /**
      * Remove/cancel a connection.
      */
-    public function destroy(int $connectionId, int $userId): bool
+    public static function destroy(int $connectionId, int $userId): bool
     {
         /** @var Connection|null $connection */
-        $connection = $this->connection->newQuery()
+        $connection = Connection::query()
             ->where('id', $connectionId)
             ->where(fn (Builder $q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))
             ->first();
@@ -165,10 +165,10 @@ class ConnectionService
     /**
      * Get a single connection by ID, verifying the user is a participant.
      */
-    public function getById(int $connectionId, int $userId): ?array
+    public static function getById(int $connectionId, int $userId): ?array
     {
         /** @var Connection|null $connection */
-        $connection = $this->connection->newQuery()
+        $connection = Connection::query()
             ->with(['requester:id,first_name,last_name,avatar_url', 'receiver:id,first_name,last_name,avatar_url'])
             ->where('id', $connectionId)
             ->where(fn (Builder $q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))
@@ -186,19 +186,19 @@ class ConnectionService
      *
      * @return array{received: int, sent: int, total_friends: int}
      */
-    public function getPendingCounts(int $userId): array
+    public static function getPendingCounts(int $userId): array
     {
-        $received = $this->connection->newQuery()
+        $received = Connection::query()
             ->where('receiver_id', $userId)
             ->where('status', 'pending')
             ->count();
 
-        $sent = $this->connection->newQuery()
+        $sent = Connection::query()
             ->where('requester_id', $userId)
             ->where('status', 'pending')
             ->count();
 
-        $totalFriends = $this->connection->newQuery()
+        $totalFriends = Connection::query()
             ->where('status', 'accepted')
             ->where(fn (Builder $q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))
             ->count();
@@ -215,10 +215,10 @@ class ConnectionService
      *
      * @return array{status: string, connection_id: int|null, direction: string|null}
      */
-    public function getStatus(int $userId, int $otherUserId): array
+    public static function getStatus(int $userId, int $otherUserId): array
     {
         /** @var Connection|null $connection */
-        $connection = $this->connection->newQuery()
+        $connection = Connection::query()
             ->where(function (Builder $q) use ($userId, $otherUserId) {
                 $q->where(function (Builder $q2) use ($userId, $otherUserId) {
                     $q2->where('requester_id', $userId)->where('receiver_id', $otherUserId);
@@ -258,7 +258,7 @@ class ConnectionService
      *
      * @throws \RuntimeException
      */
-    public function sendRequest(int $requesterId, array $data): array
+    public static function sendRequest(int $requesterId, array $data): array
     {
         $receiverId = (int) ($data['user_id'] ?? 0);
 
@@ -266,9 +266,9 @@ class ConnectionService
             throw new \RuntimeException('User ID is required');
         }
 
-        $connection = $this->request($requesterId, $receiverId);
+        $connection = self::request($requesterId, $receiverId);
 
-        $status = $this->getStatus($requesterId, $receiverId);
+        $status = self::getStatus($requesterId, $receiverId);
 
         return [
             'status'        => $status['status'],
@@ -282,8 +282,8 @@ class ConnectionService
     /**
      * Delete a connection (alias for destroy, used by controller).
      */
-    public function delete(int $connectionId, int $userId): bool
+    public static function delete(int $connectionId, int $userId): bool
     {
-        return $this->destroy($connectionId, $userId);
+        return self::destroy($connectionId, $userId);
     }
 }

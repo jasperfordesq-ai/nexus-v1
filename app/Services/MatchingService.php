@@ -19,7 +19,7 @@ class MatchingService
     /**
      * Delegates to legacy MatchingService::getSuggestionsForUser().
      */
-    public function getSuggestionsForUser($userId, $limit = 5, array $options = [])
+    public static function getSuggestionsForUser($userId, $limit = 5, array $options = [])
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class MatchingService
     /**
      * Delegates to legacy MatchingService::getHotMatches().
      */
-    public function getHotMatches($userId, $limit = 5)
+    public static function getHotMatches($userId, $limit = 5)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class MatchingService
     /**
      * Delegates to legacy MatchingService::getMutualMatches().
      */
-    public function getMutualMatches($userId, $limit = 10)
+    public static function getMutualMatches($userId, $limit = 10)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class MatchingService
     /**
      * Delegates to legacy MatchingService::getMatchesByType().
      */
-    public function getMatchesByType($userId)
+    public static function getMatchesByType($userId)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -55,7 +55,7 @@ class MatchingService
     /**
      * Delegates to legacy MatchingService::savePreferences().
      */
-    public function savePreferences($userId, array $preferences)
+    public static function savePreferences($userId, array $preferences)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -64,7 +64,7 @@ class MatchingService
     /**
      * Delegates to legacy MatchingService::getPreferences().
      */
-    public function getPreferences($userId)
+    public static function getPreferences($userId)
     {
         return static::getPreferencesStatic($userId);
     }

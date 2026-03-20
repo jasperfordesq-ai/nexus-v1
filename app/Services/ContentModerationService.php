@@ -47,13 +47,13 @@ class ContentModerationService
      *
      * @return array{items: array, total: int}
      */
-    public function getReports(int $tenantId, array $filters = []): array
+    public static function getReports(int $tenantId, array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $offset = max(0, (int) ($filters['offset'] ?? 0));
         $status = $filters['status'] ?? null;
 
-        $query = $this->queue->newQuery()
+        $query = ContentModerationQueue::newQuery()
             ->with(['author:id,first_name,last_name,name,avatar_url', 'reviewer:id,first_name,last_name,name']);
 
         if ($status !== null) {
@@ -83,9 +83,9 @@ class ContentModerationService
     /**
      * Approve moderation queue item (dismiss the report).
      */
-    public function approve(int $reportId, int $tenantId, int $moderatorId): bool
+    public static function approve(int $reportId, int $tenantId, int $moderatorId): bool
     {
-        return $this->queue->newQuery()
+        return ContentModerationQueue::newQuery()
             ->where('id', $reportId)
             ->where('status', self::STATUS_PENDING)
             ->update([
@@ -98,9 +98,9 @@ class ContentModerationService
     /**
      * Reject moderation queue item (take action — hide or remove).
      */
-    public function reject(int $reportId, int $tenantId, int $moderatorId, ?string $reason = null): bool
+    public static function reject(int $reportId, int $tenantId, int $moderatorId, ?string $reason = null): bool
     {
-        return $this->queue->newQuery()
+        return ContentModerationQueue::newQuery()
             ->where('id', $reportId)
             ->where('status', self::STATUS_PENDING)
             ->update([
@@ -114,10 +114,10 @@ class ContentModerationService
     /**
      * Get moderation statistics for a tenant.
      */
-    public function getStats(int $tenantId): array
+    public static function getStats(int $tenantId): array
     {
         try {
-            $rows = $this->queue->newQuery()
+            $rows = ContentModerationQueue::newQuery()
                 ->selectRaw('status, COUNT(*) as count')
                 ->groupBy('status')
                 ->pluck('count', 'status')
@@ -140,12 +140,12 @@ class ContentModerationService
      *
      * @return array{items: array, total: int}
      */
-    public function getQueue(int $tenantId, array $filters = [], int $limit = 50, int $offset = 0): array
+    public static function getQueue(int $tenantId, array $filters = [], int $limit = 50, int $offset = 0): array
     {
         $limit = min(200, max(1, $limit));
         $offset = max(0, $offset);
 
-        $query = $this->queue->newQuery()
+        $query = ContentModerationQueue::newQuery()
             ->with(['author:id,first_name,last_name,email,avatar_url', 'reviewer:id,first_name,last_name']);
 
         if (!empty($filters['status']) && in_array($filters['status'], [self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED, self::STATUS_FLAGGED], true)) {
@@ -210,13 +210,13 @@ class ContentModerationService
      *
      * @return array{success: bool, message: string}
      */
-    public function review(int $id, int $tenantId, int $adminId, string $decision, ?string $rejectionReason = null): array
+    public static function review(int $id, int $tenantId, int $adminId, string $decision, ?string $rejectionReason = null): array
     {
         if (!in_array($decision, [self::STATUS_APPROVED, self::STATUS_REJECTED], true)) {
             return ['success' => false, 'message' => 'Invalid decision. Must be approved or rejected.'];
         }
 
-        $item = $this->queue->newQuery()->find($id);
+        $item = ContentModerationQueue::newQuery()->find($id);
 
         if (!$item) {
             return ['success' => false, 'message' => 'Moderation queue item not found.'];
@@ -238,7 +238,7 @@ class ContentModerationService
         ]);
 
         // Apply decision to actual content
-        $this->applyDecision($item, $decision);
+        self::applyDecision($item, $decision);
 
         return [
             'success' => true,
@@ -251,7 +251,7 @@ class ContentModerationService
     /**
      * Get moderation settings for a tenant.
      */
-    public function getModerationSettings(int $tenantId): array
+    public static function getModerationSettings(int $tenantId): array
     {
         $settings = [
             'enabled' => false,
@@ -280,7 +280,7 @@ class ContentModerationService
     /**
      * Update moderation settings for a tenant.
      */
-    public function updateSettings(int $tenantId, array $settings): bool
+    public static function updateSettings(int $tenantId, array $settings): bool
     {
         $allowedKeys = ['enabled', 'require_post', 'require_listing', 'require_event', 'require_comment', 'auto_filter'];
 
@@ -303,7 +303,7 @@ class ContentModerationService
     /**
      * Apply moderation decision to the actual content.
      */
-    private function applyDecision(ContentModerationQueue $item, string $decision): void
+    private static function applyDecision(ContentModerationQueue $item, string $decision): void
     {
         $contentType = $item->content_type;
         $contentId = (int) $item->content_id;

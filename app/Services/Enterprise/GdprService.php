@@ -208,7 +208,7 @@ class GdprService
         $data = $this->collectUserData($userId);
 
         // Create export directory
-        $exportDir = $this->getStoragePath("exports/gdpr/{$userId}_" . time());
+        $exportDir = self::getStoragePath("exports/gdpr/{$userId}_" . time());
         if (!is_dir($exportDir)) {
             mkdir($exportDir, 0755, true);
         }
@@ -219,24 +219,24 @@ class GdprService
 
         // Create HTML export
         $htmlPath = "{$exportDir}/data.html";
-        file_put_contents($htmlPath, $this->generateHtmlExport($data));
+        file_put_contents($htmlPath, self::generateHtmlExport($data));
 
         // Create README
         $readmePath = "{$exportDir}/README.txt";
-        file_put_contents($readmePath, $this->generateExportReadme($data));
+        file_put_contents($readmePath, self::generateExportReadme($data));
 
         // Copy user uploads
-        $this->copyUserUploads($userId, $exportDir);
+        self::copyUserUploads($userId, $exportDir);
 
         // Create ZIP archive
         $timestamp = date('Ymd_His');
         $zipFilename = "nexus_data_export_{$userId}_{$timestamp}.zip";
-        $zipPath = $this->getStoragePath("exports/{$zipFilename}");
+        $zipPath = self::getStoragePath("exports/{$zipFilename}");
 
-        $this->createZipArchive($exportDir, $zipPath);
+        self::createZipArchive($exportDir, $zipPath);
 
         // Cleanup temp directory
-        $this->deleteDirectory($exportDir);
+        self::deleteDirectory($exportDir);
 
         // Update request if provided
         $expiresAt = date('Y-m-d H:i:s', strtotime('+7 days'));
@@ -294,8 +294,8 @@ class GdprService
             'activity_log' => $this->getActivityLogData($userId),
             'consents' => $this->getConsentsData($userId),
             'notifications' => $this->getNotificationsData($userId),
-            'connections' => $this->getConnectionsData($userId),
-            'login_history' => $this->getLoginHistoryData($userId),
+            'connections' => self::getConnectionsData($userId),
+            'login_history' => self::getLoginHistoryData($userId),
             'messaging_restrictions' => $this->getMessagingRestrictionsData($userId),
         ];
     }
@@ -837,7 +837,7 @@ class GdprService
             );
 
             // 6. Delete uploaded files
-            $this->deleteUserUploads($userId);
+            self::deleteUserUploads($userId);
 
             // 7. Invalidate all sessions
             $this->query("DELETE FROM sessions WHERE user_id = ?", [$userId]);
@@ -1089,7 +1089,7 @@ class GdprService
 
         foreach ($consentSlugs as $slug) {
             try {
-                $results[$slug] = $this->updateUserConsent($userId, $slug, true);
+                $results[$slug] = self::updateUserConsent($userId, $slug, true);
             } catch (\Exception $e) {
                 $results[$slug] = ['error' => $e->getMessage()];
             }
@@ -1492,13 +1492,13 @@ class GdprService
     // HELPER METHODS
     // =========================================================================
 
-    private function getStoragePath(string $path): string
+    private static function getStoragePath(string $path): string
     {
         $basePath = getenv('STORAGE_PATH') ?: __DIR__ . '/../../../storage';
         return rtrim($basePath, '/') . '/' . ltrim($path, '/');
     }
 
-    private function generateHtmlExport(array $data): string
+    private static function generateHtmlExport(array $data): string
     {
         $html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
         $html .= '<title>Your Data Export - NEXUS</title>';
@@ -1546,7 +1546,7 @@ class GdprService
         return $html;
     }
 
-    private function generateExportReadme(array $data): string
+    private static function generateExportReadme(array $data): string
     {
         return "NEXUS DATA EXPORT
 ==================
@@ -1568,9 +1568,9 @@ This export will expire in 7 days.
 ";
     }
 
-    private function copyUserUploads(int $userId, string $destDir): void
+    private static function copyUserUploads(int $userId, string $destDir): void
     {
-        $uploadsDir = $this->getStoragePath("uploads/users/{$userId}");
+        $uploadsDir = self::getStoragePath("uploads/users/{$userId}");
 
         if (is_dir($uploadsDir)) {
             $destUploads = "{$destDir}/uploads";
@@ -1592,15 +1592,15 @@ This export will expire in 7 days.
         }
     }
 
-    private function deleteUserUploads(int $userId): void
+    private static function deleteUserUploads(int $userId): void
     {
-        $uploadsDir = $this->getStoragePath("uploads/users/{$userId}");
+        $uploadsDir = self::getStoragePath("uploads/users/{$userId}");
         if (is_dir($uploadsDir)) {
-            $this->deleteDirectory($uploadsDir);
+            self::deleteDirectory($uploadsDir);
         }
     }
 
-    private function createZipArchive(string $sourceDir, string $zipPath): void
+    private static function createZipArchive(string $sourceDir, string $zipPath): void
     {
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
@@ -1623,7 +1623,7 @@ This export will expire in 7 days.
         $zip->close();
     }
 
-    private function deleteDirectory(string $dir): void
+    private static function deleteDirectory(string $dir): void
     {
         if (!is_dir($dir)) return;
 

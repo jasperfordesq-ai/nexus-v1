@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 class EndorsementService
 {
     /** @var array Collected errors from the last operation */
-    private array $errors = [];
+    private static array $errors = [];
 
     public function __construct(
         private readonly SkillEndorsement $endorsement,
@@ -31,39 +31,39 @@ class EndorsementService
      *
      * @return int|null Endorsement ID or null on failure.
      */
-    public function endorse(int $endorserId, int $endorsedId, string $skillName, ?int $skillId = null, ?string $comment = null): ?int
+    public static function endorse(int $endorserId, int $endorsedId, string $skillName, ?int $skillId = null, ?string $comment = null): ?int
     {
-        $this->errors = [];
+        self::$errors = [];
 
         // Cannot endorse yourself
         if ($endorserId === $endorsedId) {
-            $this->errors[] = ['code' => 'SELF_ENDORSEMENT', 'message' => 'You cannot endorse yourself'];
+            self::$errors[] = ['code' => 'SELF_ENDORSEMENT', 'message' => 'You cannot endorse yourself'];
             return null;
         }
 
         // Validate skill name
         $skillName = trim($skillName);
         if (empty($skillName) || strlen($skillName) > 100) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Skill name is required (max 100 chars)', 'field' => 'skill_name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Skill name is required (max 100 chars)', 'field' => 'skill_name'];
             return null;
         }
 
         // Check endorsed user exists in same tenant
         $endorsed = User::where('id', $endorsedId)->first(['id', 'first_name', 'last_name']);
         if (!$endorsed) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Member not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Member not found'];
             return null;
         }
 
         // Check for existing endorsement
-        $existing = $this->endorsement->newQuery()
+        $existing = SkillEndorsement::newQuery()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
             ->exists();
 
         if ($existing) {
-            $this->errors[] = ['code' => 'ALREADY_ENDORSED', 'message' => 'You have already endorsed this skill'];
+            self::$errors[] = ['code' => 'ALREADY_ENDORSED', 'message' => 'You have already endorsed this skill'];
             return null;
         }
 
@@ -75,7 +75,7 @@ class EndorsementService
             }
         }
 
-        $endorsementRecord = $this->endorsement->newQuery()->create([
+        $endorsementRecord = SkillEndorsement::newQuery()->create([
             'endorser_id' => $endorserId,
             'endorsed_id' => $endorsedId,
             'skill_id' => $skillId,
@@ -89,9 +89,9 @@ class EndorsementService
     /**
      * Remove an endorsement.
      */
-    public function removeEndorsement(int $endorserId, int $endorsedId, string $skillName): bool
+    public static function removeEndorsement(int $endorserId, int $endorsedId, string $skillName): bool
     {
-        return $this->endorsement->newQuery()
+        return SkillEndorsement::newQuery()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
@@ -101,9 +101,9 @@ class EndorsementService
     /**
      * Get all endorsements for a user, grouped by skill.
      */
-    public function getEndorsements(int $userId): array
+    public static function getEndorsements(int $userId): array
     {
-        $rows = $this->endorsement->newQuery()
+        $rows = SkillEndorsement::newQuery()
             ->with(['endorser:id,first_name,last_name,avatar_url'])
             ->where('endorsed_id', $userId)
             ->orderBy('skill_name')
@@ -131,9 +131,9 @@ class EndorsementService
     /**
      * Check if a user has endorsed another's specific skill.
      */
-    public function hasEndorsed(int $endorserId, int $endorsedId, string $skillName): bool
+    public static function hasEndorsed(int $endorserId, int $endorsedId, string $skillName): bool
     {
-        return $this->endorsement->newQuery()
+        return SkillEndorsement::newQuery()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
@@ -143,17 +143,17 @@ class EndorsementService
     /**
      * Get collected errors from the last operation.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
      * Get detailed endorsements for a specific skill.
      */
-    public function getSkillEndorsements(int $userId, string $skillName): array
+    public static function getSkillEndorsements(int $userId, string $skillName): array
     {
-        return $this->endorsement->newQuery()
+        return SkillEndorsement::newQuery()
             ->with(['endorser:id,first_name,last_name,avatar_url'])
             ->where('endorsed_id', $userId)
             ->where('skill_name', $skillName)
@@ -173,7 +173,7 @@ class EndorsementService
     /**
      * Get endorsements received by a user, grouped by skill (with endorser details).
      */
-    public function getEndorsementsForUser(int $userId): array
+    public static function getEndorsementsForUser(int $userId): array
     {
         $rows = DB::table('skill_endorsements as se')
             ->join('users as u', 'se.endorser_id', '=', 'u.id')
@@ -199,17 +199,17 @@ class EndorsementService
     /**
      * Get endorsement stats for a user (for badges).
      */
-    public function getStats(int $userId): array
+    public static function getStats(int $userId): array
     {
-        $received = (int) $this->endorsement->newQuery()
+        $received = (int) SkillEndorsement::newQuery()
             ->where('endorsed_id', $userId)
             ->count();
 
-        $given = (int) $this->endorsement->newQuery()
+        $given = (int) SkillEndorsement::newQuery()
             ->where('endorser_id', $userId)
             ->count();
 
-        $uniqueSkills = (int) $this->endorsement->newQuery()
+        $uniqueSkills = (int) SkillEndorsement::newQuery()
             ->where('endorsed_id', $userId)
             ->distinct('skill_name')
             ->count('skill_name');
@@ -224,7 +224,7 @@ class EndorsementService
     /**
      * Get top endorsed members across the tenant.
      */
-    public function getTopEndorsedMembers(int $limit = 10): array
+    public static function getTopEndorsedMembers(int $limit = 10): array
     {
         $tenantId = TenantContext::getId();
 

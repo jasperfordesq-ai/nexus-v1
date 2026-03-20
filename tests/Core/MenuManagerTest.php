@@ -13,7 +13,7 @@ use App\Core\MenuManager;
 
 /**
  * MenuManager Tests
- * @covers \Nexus\Core\MenuManager
+ * @covers \App\Core\MenuManager
  */
 class MenuManagerTest extends TestCase
 {

@@ -32,7 +32,7 @@ class AchievementUnlockablesService
     /**
      * Get all available unlockables with their requirements.
      */
-    public function getAllUnlockables(): array
+    public static function getAllUnlockables(): array
     {
         return [
             'themes' => [
@@ -180,11 +180,11 @@ class AchievementUnlockablesService
     /**
      * Get unlockables available to a user.
      */
-    public function getUserUnlockables(int $userId): array
+    public static function getUserUnlockables(int $userId): array
     {
-        $allUnlockables = $this->getAllUnlockables();
-        $userLevel = $this->getUserLevel($userId);
-        $userBadges = $this->getUserBadgeKeys($userId);
+        $allUnlockables = self::getAllUnlockables();
+        $userLevel = self::getUserLevel($userId);
+        $userBadges = self::getUserBadgeKeys($userId);
         $badgeCount = count($userBadges);
 
         $available = [];
@@ -192,7 +192,7 @@ class AchievementUnlockablesService
 
         foreach ($allUnlockables as $category => $items) {
             foreach ($items as $key => $item) {
-                $isUnlocked = $this->checkRequirement($item['requirement'], $userLevel, $userBadges, $badgeCount);
+                $isUnlocked = self::checkRequirement($item['requirement'], $userLevel, $userBadges, $badgeCount);
 
                 $item['key'] = $key;
                 $item['category'] = $category;
@@ -215,7 +215,7 @@ class AchievementUnlockablesService
     /**
      * Get user's active unlockables (what they have equipped).
      */
-    public function getUserActiveUnlockables(int $userId): array
+    public static function getUserActiveUnlockables(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -236,10 +236,10 @@ class AchievementUnlockablesService
     /**
      * Set a user's active unlockable.
      */
-    public function setActiveUnlockable(int $userId, string $type, string $key): bool
+    public static function setActiveUnlockable(int $userId, string $type, string $key): bool
     {
         // Verify user has unlocked this item
-        $unlockables = $this->getUserUnlockables($userId);
+        $unlockables = self::getUserUnlockables($userId);
         $found = false;
 
         foreach ($unlockables['available'] as $category => $items) {
@@ -274,7 +274,7 @@ class AchievementUnlockablesService
     /**
      * Remove an active unlockable.
      */
-    public function removeActiveUnlockable(int $userId, string $type): bool
+    public static function removeActiveUnlockable(int $userId, string $type): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -290,7 +290,7 @@ class AchievementUnlockablesService
     /**
      * Check if a requirement is met.
      */
-    private function checkRequirement(array $requirement, int $userLevel, array $userBadges, int $badgeCount): bool
+    private static function checkRequirement(array $requirement, int $userLevel, array $userBadges, int $badgeCount): bool
     {
         return match ($requirement['type']) {
             'level' => $userLevel >= $requirement['value'],
@@ -303,7 +303,7 @@ class AchievementUnlockablesService
     /**
      * Get user's current level.
      */
-    private function getUserLevel(int $userId): int
+    private static function getUserLevel(int $userId): int
     {
         $tenantId = TenantContext::getId();
 
@@ -318,7 +318,7 @@ class AchievementUnlockablesService
     /**
      * Get user's badge keys.
      */
-    private function getUserBadgeKeys(int $userId): array
+    private static function getUserBadgeKeys(int $userId): array
     {
         $tenantId = TenantContext::getId();
 

@@ -17,6 +17,11 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
 {
     private const TENANT_ID = 2;
 
+    private static function svc(): VolunteerCheckInService
+    {
+        return new VolunteerCheckInService();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -29,9 +34,9 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $ownerId = $this->createUser("token-owner");
         $volunteerId = $this->createUser("token-volunteer");
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
-        $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
+        $token = self::svc()->generateToken($shiftId, $volunteerId);
         $this->assertNull($token);
-        $errors = VolunteerCheckInService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame("FORBIDDEN", $errors[0]["code"]);
     }
@@ -43,7 +48,7 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $volunteerId = $this->createUser("token-volunteer2");
         [$opportunityId, $shiftId] = $this->createOpportunityAndShift($ownerId);
         $this->approveVolunteerForShift($opportunityId, $shiftId, $volunteerId);
-        $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
+        $token = self::svc()->generateToken($shiftId, $volunteerId);
         $this->assertNotNull($token);
         $this->assertIsString($token);
         $this->assertNotEmpty($token);
@@ -56,8 +61,8 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $volunteerId = $this->createUser("token-idem-vol");
         [$opportunityId, $shiftId] = $this->createOpportunityAndShift($ownerId);
         $this->approveVolunteerForShift($opportunityId, $shiftId, $volunteerId);
-        $token1 = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
-        $token2 = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
+        $token1 = self::svc()->generateToken($shiftId, $volunteerId);
+        $token2 = self::svc()->generateToken($shiftId, $volunteerId);
         $this->assertSame($token1, $token2);
     }
 
@@ -68,9 +73,9 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $volunteerId = $this->createUser("checkins-vol");
         [$opportunityId, $shiftId] = $this->createOpportunityAndShift($ownerId);
         $this->approveVolunteerForShift($opportunityId, $shiftId, $volunteerId);
-        $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
+        $token = self::svc()->generateToken($shiftId, $volunteerId);
         $this->assertNotNull($token);
-        $checkins = VolunteerCheckInService::getShiftCheckIns($shiftId);
+        $checkins = self::svc()->getShiftCheckIns($shiftId);
         $this->assertNotEmpty($checkins);
         $this->assertArrayNotHasKey("qr_token", $checkins[0]);
         $this->assertArrayHasKey("user", $checkins[0]);
@@ -84,9 +89,9 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $volunteerId = $this->createUser("ucheckin-vol");
         [$opportunityId, $shiftId] = $this->createOpportunityAndShift($ownerId);
         $this->approveVolunteerForShift($opportunityId, $shiftId, $volunteerId);
-        $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
+        $token = self::svc()->generateToken($shiftId, $volunteerId);
         $this->assertNotNull($token);
-        $checkin = VolunteerCheckInService::getUserCheckIn($shiftId, $volunteerId);
+        $checkin = self::svc()->getUserCheckIn($shiftId, $volunteerId);
         $this->assertNotNull($checkin);
         $this->assertArrayHasKey("qr_token", $checkin);
         $this->assertArrayHasKey("qr_url", $checkin);
@@ -100,7 +105,7 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $ownerId = $this->createUser("ucheckin-noapp-owner");
         $volunteerId = $this->createUser("ucheckin-noapp-vol");
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
-        $result = VolunteerCheckInService::getUserCheckIn($shiftId, $volunteerId);
+        $result = self::svc()->getUserCheckIn($shiftId, $volunteerId);
         $this->assertNull($result);
     }
 
@@ -111,11 +116,11 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $volunteerId = $this->createUser("verify-early-vol");
         [$opportunityId, $shiftId] = $this->createFutureShift($ownerId, 3600 * 2);
         $this->approveVolunteerForShift($opportunityId, $shiftId, $volunteerId);
-        $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
+        $token = self::svc()->generateToken($shiftId, $volunteerId);
         $this->assertNotNull($token);
-        $result = VolunteerCheckInService::verifyCheckIn($token);
+        $result = self::svc()->verifyCheckIn($token);
         $this->assertNull($result);
-        $errors = VolunteerCheckInService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame("VALIDATION_ERROR", $errors[0]["code"]);
     }
@@ -127,11 +132,11 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
         $volunteerId = $this->createUser("checkout-vol");
         [$opportunityId, $shiftId] = $this->createOpportunityAndShift($ownerId);
         $this->approveVolunteerForShift($opportunityId, $shiftId, $volunteerId);
-        $token = VolunteerCheckInService::generateToken($shiftId, $volunteerId);
+        $token = self::svc()->generateToken($shiftId, $volunteerId);
         $this->assertNotNull($token);
-        $result = VolunteerCheckInService::checkOut($token);
+        $result = self::svc()->checkOut($token);
         $this->assertFalse($result);
-        $errors = VolunteerCheckInService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame("VALIDATION_ERROR", $errors[0]["code"]);
     }
@@ -139,9 +144,9 @@ class VolunteerCheckInServiceTest extends DatabaseTestCase
     public function testVerifyCheckInFailsForInvalidToken(): void
     {
         $this->requireTables(["vol_shift_checkins"]);
-        $result = VolunteerCheckInService::verifyCheckIn("invalidtoken000000000000000000000000000");
+        $result = self::svc()->verifyCheckIn("invalidtoken000000000000000000000000000");
         $this->assertNull($result);
-        $errors = VolunteerCheckInService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $this->assertSame("NOT_FOUND", $errors[0]["code"]);
     }

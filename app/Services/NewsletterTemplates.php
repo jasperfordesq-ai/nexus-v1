@@ -19,7 +19,7 @@ class NewsletterTemplates
     /**
      * Delegates to legacy NewsletterTemplates::getTemplates().
      */
-    public function getTemplates(): array
+    public static function getTemplates(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class NewsletterTemplates
     /**
      * Delegates to legacy NewsletterTemplates::getTemplate().
      */
-    public function getTemplate(string $templateId): array
+    public static function getTemplate(string $templateId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class NewsletterTemplates
     /**
      * Delegates to legacy NewsletterTemplates::processTemplate().
      */
-    public function processTemplate(array $template, string $tenantName): array
+    public static function processTemplate(array $template, string $tenantName): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

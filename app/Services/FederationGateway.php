@@ -19,7 +19,7 @@ class FederationGateway
     /**
      * Delegates to legacy FederationGateway::canViewProfile().
      */
-    public function canViewProfile(int $viewerTenantId, int $targetTenantId, int $targetUserId, ?int $viewerUserId = null): array
+    public static function canViewProfile(int $viewerTenantId, int $targetTenantId, int $targetUserId, ?int $viewerUserId = null): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class FederationGateway
     /**
      * Delegates to legacy FederationGateway::canSendMessage().
      */
-    public function canSendMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId): array
+    public static function canSendMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -37,7 +37,7 @@ class FederationGateway
     /**
      * Delegates to legacy FederationGateway::recordMessage().
      */
-    public function recordMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId, int $messageId): void
+    public static function recordMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId, int $messageId): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
@@ -45,7 +45,7 @@ class FederationGateway
     /**
      * Delegates to legacy FederationGateway::canPerformTransaction().
      */
-    public function canPerformTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId): array
+    public static function canPerformTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -54,7 +54,7 @@ class FederationGateway
     /**
      * Delegates to legacy FederationGateway::recordTransaction().
      */
-    public function recordTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId, int $transactionId, string $transactionType, float $amount): void
+    public static function recordTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId, int $transactionId, string $transactionType, float $amount): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }

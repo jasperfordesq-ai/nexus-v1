@@ -7,8 +7,8 @@
 namespace Nexus\Tests\Services\AI;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\AI\Providers\BaseProvider;
-use Nexus\Services\AI\Contracts\AIProviderInterface;
+use App\Services\AI\Providers\BaseProvider;
+use App\Services\AI\Contracts\AIProviderInterface;
 
 /**
  * Unit tests for the abstract BaseProvider class.

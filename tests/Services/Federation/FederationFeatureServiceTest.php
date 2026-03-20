@@ -11,6 +11,7 @@ namespace Nexus\Tests\Services\Federation;
 use Nexus\Tests\DatabaseTestCase;
 use App\Core\Database;
 use App\Core\TenantContext;
+use App\Services\FederationAuditService;
 use App\Services\FederationFeatureService;
 
 /**
@@ -21,6 +22,18 @@ use App\Services\FederationFeatureService;
 class FederationFeatureServiceTest extends DatabaseTestCase
 {
     protected static ?int $testTenantId = null;
+    protected static ?FederationFeatureService $svc = null;
+
+    /**
+     * Get shared service instance.
+     */
+    protected static function svc(): FederationFeatureService
+    {
+        if (self::$svc === null) {
+            self::$svc = new FederationFeatureService(new FederationAuditService());
+        }
+        return self::$svc;
+    }
 
     public static function setUpBeforeClass(): void
     {
@@ -35,7 +48,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
 
     public function testIsSystemFederationEnabledReturnsBool(): void
     {
-        $result = FederationFeatureService::isGloballyEnabled();
+        $result = self::svc()->isGloballyEnabled();
 
         $this->assertIsBool($result);
     }
@@ -46,7 +59,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
             $this->markTestSkipped('getSystemFeatures not implemented');
         }
 
-        $result = FederationFeatureService::getSystemFeatures();
+        $result = self::svc()->getSystemFeatures();
 
         $this->assertIsArray($result);
     }
@@ -57,14 +70,14 @@ class FederationFeatureServiceTest extends DatabaseTestCase
 
     public function testIsTenantFederationEnabledReturnsBool(): void
     {
-        $result = FederationFeatureService::isTenantFederationEnabled(self::$testTenantId);
+        $result = self::svc()->isTenantFederationEnabled(self::$testTenantId);
 
         $this->assertIsBool($result);
     }
 
     public function testIsTenantFederationEnabledWithInvalidTenant(): void
     {
-        $result = FederationFeatureService::isTenantFederationEnabled(999999);
+        $result = self::svc()->isTenantFederationEnabled(999999);
 
         // Should return false for non-existent tenant
         $this->assertFalse($result);
@@ -76,7 +89,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
             $this->markTestSkipped('getTenantFeatures not implemented');
         }
 
-        $result = FederationFeatureService::getTenantFeatures(self::$testTenantId);
+        $result = self::svc()->getTenantFeatures(self::$testTenantId);
 
         $this->assertIsArray($result);
     }
@@ -90,7 +103,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
         $operations = ['profiles', 'messaging', 'listings', 'transactions', 'groups'];
 
         foreach ($operations as $operation) {
-            $result = FederationFeatureService::isOperationAllowed($operation, self::$testTenantId);
+            $result = self::svc()->isOperationAllowed($operation, self::$testTenantId);
 
             $this->assertIsArray($result, "isOperationAllowed('{$operation}') should return array");
             $this->assertArrayHasKey('allowed', $result, "Result for '{$operation}' should have 'allowed' key");
@@ -101,7 +114,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
 
     public function testIsOperationAllowedWithInvalidOperation(): void
     {
-        $result = FederationFeatureService::isOperationAllowed('invalid_operation', self::$testTenantId);
+        $result = self::svc()->isOperationAllowed('invalid_operation', self::$testTenantId);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('allowed', $result);
@@ -111,7 +124,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
 
     public function testIsOperationAllowedWithInvalidTenant(): void
     {
-        $result = FederationFeatureService::isOperationAllowed('profiles', 999999);
+        $result = self::svc()->isOperationAllowed('profiles', 999999);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('allowed', $result);
@@ -127,36 +140,36 @@ class FederationFeatureServiceTest extends DatabaseTestCase
     {
         if (!method_exists(FederationFeatureService::class, 'isProfilesEnabled')) {
             // Use generic method
-            $result = FederationFeatureService::isOperationAllowed('profiles', self::$testTenantId);
+            $result = self::svc()->isOperationAllowed('profiles', self::$testTenantId);
             $this->assertIsBool($result['allowed']);
             return;
         }
 
-        $result = FederationFeatureService::isProfilesEnabled(self::$testTenantId);
+        $result = self::svc()->isProfilesEnabled(self::$testTenantId);
         $this->assertIsBool($result);
     }
 
     public function testIsMessagingEnabledReturnsBool(): void
     {
         if (!method_exists(FederationFeatureService::class, 'isMessagingEnabled')) {
-            $result = FederationFeatureService::isOperationAllowed('messaging', self::$testTenantId);
+            $result = self::svc()->isOperationAllowed('messaging', self::$testTenantId);
             $this->assertIsBool($result['allowed']);
             return;
         }
 
-        $result = FederationFeatureService::isMessagingEnabled(self::$testTenantId);
+        $result = self::svc()->isMessagingEnabled(self::$testTenantId);
         $this->assertIsBool($result);
     }
 
     public function testIsTransactionsEnabledReturnsBool(): void
     {
         if (!method_exists(FederationFeatureService::class, 'isTransactionsEnabled')) {
-            $result = FederationFeatureService::isOperationAllowed('transactions', self::$testTenantId);
+            $result = self::svc()->isOperationAllowed('transactions', self::$testTenantId);
             $this->assertIsBool($result['allowed']);
             return;
         }
 
-        $result = FederationFeatureService::isTransactionsEnabled(self::$testTenantId);
+        $result = self::svc()->isTransactionsEnabled(self::$testTenantId);
         $this->assertIsBool($result);
     }
 
@@ -168,7 +181,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
     {
         // PHP 8 should handle this, but we test the behavior
         try {
-            $result = FederationFeatureService::isOperationAllowed('profiles', 0);
+            $result = self::svc()->isOperationAllowed('profiles', 0);
             $this->assertIsArray($result);
             $this->assertFalse($result['allowed']);
         } catch (\TypeError $e) {
@@ -179,7 +192,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
 
     public function testIsOperationAllowedWithEmptyOperation(): void
     {
-        $result = FederationFeatureService::isOperationAllowed('', self::$testTenantId);
+        $result = self::svc()->isOperationAllowed('', self::$testTenantId);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('allowed', $result);
@@ -191,9 +204,9 @@ class FederationFeatureServiceTest extends DatabaseTestCase
 
     public function testMultipleCallsReturnConsistentResults(): void
     {
-        $result1 = FederationFeatureService::isTenantFederationEnabled(self::$testTenantId);
-        $result2 = FederationFeatureService::isTenantFederationEnabled(self::$testTenantId);
-        $result3 = FederationFeatureService::isTenantFederationEnabled(self::$testTenantId);
+        $result1 = self::svc()->isTenantFederationEnabled(self::$testTenantId);
+        $result2 = self::svc()->isTenantFederationEnabled(self::$testTenantId);
+        $result3 = self::svc()->isTenantFederationEnabled(self::$testTenantId);
 
         $this->assertEquals($result1, $result2);
         $this->assertEquals($result2, $result3);
@@ -206,7 +219,7 @@ class FederationFeatureServiceTest extends DatabaseTestCase
         }
 
         // Should not throw
-        FederationFeatureService::clearCache();
+        self::svc()->clearCache();
         $this->assertTrue(true);
     }
 }

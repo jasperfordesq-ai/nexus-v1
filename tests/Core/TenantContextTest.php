@@ -13,7 +13,7 @@ use App\Core\TenantContext;
 
 /**
  * TenantContext Tests
- * @covers \Nexus\Core\TenantContext
+ * @covers \App\Core\TenantContext
  */
 class TenantContextTest extends DatabaseTestCase
 {

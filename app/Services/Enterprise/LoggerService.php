@@ -154,7 +154,7 @@ class LoggerService
         if ($this->jsonFormat) {
             $output = json_encode($record, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
         } else {
-            $output = $this->formatTextRecord($record);
+            $output = self::formatTextRecord($record);
         }
 
         $this->write($output, $level);
@@ -163,7 +163,7 @@ class LoggerService
     /**
      * Log an exception
      */
-    public function exception(\Throwable $exception, array $context = []): void
+    public static function exception(\Throwable $exception, array $context = []): void
     {
         $context['exception'] = [
             'class' => get_class($exception),
@@ -171,7 +171,7 @@ class LoggerService
             'code' => $exception->getCode(),
             'file' => $exception->getFile(),
             'line' => $exception->getLine(),
-            'trace' => $this->formatTrace($exception->getTrace()),
+            'trace' => self::formatTrace($exception->getTrace()),
         ];
 
         if ($previous = $exception->getPrevious()) {
@@ -181,7 +181,7 @@ class LoggerService
             ];
         }
 
-        $this->error($exception->getMessage(), $context);
+        self::error($exception->getMessage(), $context);
     }
 
     /**
@@ -193,17 +193,17 @@ class LoggerService
             'timestamp' => date('c'),
             'level' => strtoupper($level),
             'channel' => $this->channel,
-            'message' => $this->interpolate($message, $context),
+            'message' => self::interpolate($message, $context),
         ];
 
         // Add trace correlation for DataDog APM
-        $record['dd'] = $this->getTraceContext();
+        $record['dd'] = self::getTraceContext();
 
         // Add request context
-        $record['http'] = $this->getHttpContext();
+        $record['http'] = self::getHttpContext();
 
         // Add user context if available
-        if ($userId = $this->getUserId()) {
+        if ($userId = self::getUserId()) {
             $record['usr'] = ['id' => $userId];
         }
 
@@ -228,7 +228,7 @@ class LoggerService
     /**
      * Get DataDog trace context
      */
-    private function getTraceContext(): array
+    private static function getTraceContext(): array
     {
         $context = [];
 
@@ -252,7 +252,7 @@ class LoggerService
     /**
      * Get HTTP request context
      */
-    private function getHttpContext(): array
+    private static function getHttpContext(): array
     {
         if (php_sapi_name() === 'cli') {
             return ['cli' => true];
@@ -262,7 +262,7 @@ class LoggerService
             'method' => $_SERVER['REQUEST_METHOD'] ?? null,
             'url' => $_SERVER['REQUEST_URI'] ?? null,
             'status_code' => http_response_code() ?: null,
-            'client_ip' => $this->getClientIp(),
+            'client_ip' => self::getClientIp(),
             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null,
             'referer' => $_SERVER['HTTP_REFERER'] ?? null,
         ];
@@ -271,7 +271,7 @@ class LoggerService
     /**
      * Get client IP address
      */
-    private function getClientIp(): ?string
+    private static function getClientIp(): ?string
     {
         return \App\Core\ClientIp::get();
     }
@@ -279,7 +279,7 @@ class LoggerService
     /**
      * Get current user ID
      */
-    private function getUserId(): ?int
+    private static function getUserId(): ?int
     {
         // Try session
         if (isset($_SESSION['user_id'])) {
@@ -297,7 +297,7 @@ class LoggerService
     /**
      * Interpolate message placeholders
      */
-    private function interpolate(string $message, array $context): string
+    private static function interpolate(string $message, array $context): string
     {
         $replace = [];
         foreach ($context as $key => $value) {
@@ -311,7 +311,7 @@ class LoggerService
     /**
      * Format stack trace
      */
-    private function formatTrace(array $trace): array
+    private static function formatTrace(array $trace): array
     {
         $formatted = [];
         foreach (array_slice($trace, 0, 10) as $frame) {
@@ -330,7 +330,7 @@ class LoggerService
     /**
      * Format record as text
      */
-    private function formatTextRecord(array $record): string
+    private static function formatTextRecord(array $record): string
     {
         return sprintf(
             "[%s] %s.%s: %s %s\n",
@@ -348,7 +348,7 @@ class LoggerService
     private function write(string $output, string $level): void
     {
         // Write to file
-        $filename = $this->getLogFilename($level);
+        $filename = self::getLogFilename($level);
         $filepath = "{$this->logPath}/{$filename}";
 
         if (!is_dir($this->logPath)) {
@@ -370,7 +370,7 @@ class LoggerService
     /**
      * Get log filename based on level
      */
-    private function getLogFilename(string $level): string
+    private static function getLogFilename(string $level): string
     {
         $date = date('Y-m-d');
 

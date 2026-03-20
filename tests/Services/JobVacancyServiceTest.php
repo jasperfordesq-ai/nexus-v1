@@ -10,6 +10,7 @@ namespace Nexus\Tests\Services;
 
 use App\Core\Database;
 use App\Core\TenantContext;
+use App\Models\JobVacancy;
 use App\Services\JobVacancyService;
 use Nexus\Tests\DatabaseTestCase;
 
@@ -31,6 +32,19 @@ class JobVacancyServiceTest extends DatabaseTestCase
     protected static bool $hasAlertsTable       = false;
     protected static bool $hasHistoryTable      = false;
     protected static bool $hasViewsTable        = false;
+
+    protected static ?JobVacancyService $svc = null;
+
+    /**
+     * Get a shared service instance for tests.
+     */
+    protected static function svc(): JobVacancyService
+    {
+        if (self::$svc === null) {
+            self::$svc = new JobVacancyService(new JobVacancy());
+        }
+        return self::$svc;
+    }
 
     public static function setUpBeforeClass(): void
     {
@@ -180,14 +194,14 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAllReturnsArray(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAll([], self::$ownerUserId);
+        $result = self::svc()->getAll([], self::$ownerUserId);
         $this->assertIsArray($result);
     }
 
     public function testGetAllHasPaginationShape(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAll([], self::$ownerUserId);
+        $result = self::svc()->getAll([], self::$ownerUserId);
         $this->assertArrayHasKey("items", $result);
         $this->assertArrayHasKey("has_more", $result);
     }
@@ -195,7 +209,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAllItemsAreArrays(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAll([], self::$ownerUserId);
+        $result = self::svc()->getAll([], self::$ownerUserId);
         foreach ($result["items"] as $item) {
             $this->assertIsArray($item);
         }
@@ -204,7 +218,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAllWithOpenStatusFilter(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAll(["status" => "open"], self::$ownerUserId);
+        $result = self::svc()->getAll(["status" => "open"], self::$ownerUserId);
         $this->assertArrayHasKey("items", $result);
         foreach ($result["items"] as $item) {
             $this->assertSame("open", $item["status"]);
@@ -214,7 +228,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAllWithCategoryFilter(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAll(["category" => "technology"], self::$ownerUserId);
+        $result = self::svc()->getAll(["category" => "technology"], self::$ownerUserId);
         $this->assertArrayHasKey("items", $result);
         foreach ($result["items"] as $item) {
             $this->assertSame("technology", $item["category"]);
@@ -224,14 +238,14 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAllCursorPaginationHasCursorKey(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAll(["limit" => 1], self::$ownerUserId);
+        $result = self::svc()->getAll(["limit" => 1], self::$ownerUserId);
         $this->assertArrayHasKey("cursor", $result);
     }
 
     public function testGetByIdReturnsCorrectVacancy(): void
     {
         $this->requireJobsTable();
-        $vacancy = JobVacancyService::getById(self::$jobId, self::$ownerUserId);
+        $vacancy = self::svc()->getById(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($vacancy);
         $this->assertIsArray($vacancy);
         $this->assertSame(self::$jobId, $vacancy["id"]);
@@ -240,7 +254,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetByIdIncludesRequiredFields(): void
     {
         $this->requireJobsTable();
-        $vacancy = JobVacancyService::getById(self::$jobId, self::$ownerUserId);
+        $vacancy = self::svc()->getById(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($vacancy);
         $this->assertArrayHasKey("title", $vacancy);
         $this->assertArrayHasKey("description", $vacancy);
@@ -251,7 +265,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetByIdIncludesCreatorSubArray(): void
     {
         $this->requireJobsTable();
-        $vacancy = JobVacancyService::getById(self::$jobId, self::$ownerUserId);
+        $vacancy = self::svc()->getById(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($vacancy);
         $this->assertArrayHasKey("creator", $vacancy);
         $this->assertIsArray($vacancy["creator"]);
@@ -259,14 +273,14 @@ class JobVacancyServiceTest extends DatabaseTestCase
 
     public function testGetByIdReturnsNullForNonexistentId(): void
     {
-        $result = JobVacancyService::getById(99999999, self::$ownerUserId);
+        $result = self::svc()->getById(99999999, self::$ownerUserId);
         $this->assertNull($result);
     }
 
     public function testCreateReturnsPositiveInteger(): void
     {
         $this->requireJobsTable();
-        $id = JobVacancyService::create(self::$ownerUserId, [
+        $id = self::svc()->create(self::$ownerUserId, [
             "title"       => "Created in test",
             "description" => "Test create description",
             "category"    => "technology",
@@ -283,14 +297,14 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testCreateJobAppearsInGetAll(): void
     {
         $this->requireJobsTable();
-        $id = JobVacancyService::create(self::$ownerUserId, [
+        $id = self::svc()->create(self::$ownerUserId, [
             "title"       => "Findable vacancy",
             "description" => "Should appear in listing",
             "category"    => "education",
             "location"    => "Online",
         ]);
         $this->assertNotNull($id);
-        $result = JobVacancyService::getAll([], self::$ownerUserId);
+        $result = self::svc()->getAll([], self::$ownerUserId);
         $ids = array_column($result["items"], "id");
         $this->assertContains($id, $ids);
     }
@@ -298,34 +312,34 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testUpdateChangesTitle(): void
     {
         $this->requireJobsTable();
-        $updated = JobVacancyService::update(self::$jobId, self::$ownerUserId, ["title" => "Updated Title " . time()]);
+        $updated = self::svc()->update(self::$jobId, self::$ownerUserId, ["title" => "Updated Title " . time()]);
         $this->assertTrue($updated);
     }
 
     public function testUpdateReturnsFalseForNonexistentId(): void
     {
-        $result = JobVacancyService::update(99999999, self::$ownerUserId, ["title" => "Ghost update"]);
+        $result = self::svc()->update(99999999, self::$ownerUserId, ["title" => "Ghost update"]);
         $this->assertFalse($result);
     }
 
     public function testDeleteJobRemovesIt(): void
     {
         $this->requireJobsTable();
-        $id = JobVacancyService::create(self::$ownerUserId, [
+        $id = self::svc()->create(self::$ownerUserId, [
             "title"       => "To be deleted",
             "description" => "Will be deleted in this test",
             "category"    => "other",
             "location"    => "N/A",
         ]);
         $this->assertNotNull($id);
-        $deleted = JobVacancyService::delete($id, self::$ownerUserId);
+        $deleted = self::svc()->delete($id, self::$ownerUserId);
         $this->assertTrue($deleted);
-        $this->assertNull(JobVacancyService::getById($id, self::$ownerUserId));
+        $this->assertNull(self::svc()->getById($id, self::$ownerUserId));
     }
 
     public function testDeleteReturnsFalseForNonexistentId(): void
     {
-        $result = JobVacancyService::delete(99999999, self::$ownerUserId);
+        $result = self::svc()->delete(99999999, self::$ownerUserId);
         $this->assertFalse($result);
     }
 
@@ -337,7 +351,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireSavedJobsTable();
-        $result = JobVacancyService::saveJob(self::$jobId, self::$applicantUserId);
+        $result = self::svc()->saveJob(self::$jobId, self::$applicantUserId);
         $this->assertIsBool($result);
     }
 
@@ -345,8 +359,8 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireSavedJobsTable();
-        JobVacancyService::saveJob(self::$jobId, self::$applicantUserId);
-        $saved = JobVacancyService::getSavedJobs(self::$applicantUserId);
+        self::svc()->saveJob(self::$jobId, self::$applicantUserId);
+        $saved = self::svc()->getSavedJobs(self::$applicantUserId);
         $this->assertArrayHasKey("items", $saved);
         $ids = array_column($saved["items"], "id");
         $this->assertContains(self::$jobId, $ids);
@@ -356,10 +370,10 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireSavedJobsTable();
-        JobVacancyService::saveJob(self::$jobId, self::$applicantUserId);
-        $result = JobVacancyService::unsaveJob(self::$jobId, self::$applicantUserId);
+        self::svc()->saveJob(self::$jobId, self::$applicantUserId);
+        $result = self::svc()->unsaveJob(self::$jobId, self::$applicantUserId);
         $this->assertTrue($result);
-        $saved = JobVacancyService::getSavedJobs(self::$applicantUserId);
+        $saved = self::svc()->getSavedJobs(self::$applicantUserId);
         $ids = array_column($saved["items"], "id");
         $this->assertNotContains(self::$jobId, $ids);
     }
@@ -367,7 +381,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetSavedJobsHasItemsKey(): void
     {
         $this->requireSavedJobsTable();
-        $saved = JobVacancyService::getSavedJobs(self::$ownerUserId);
+        $saved = self::svc()->getSavedJobs(self::$ownerUserId);
         $this->assertArrayHasKey("items", $saved);
         $this->assertIsArray($saved["items"]);
     }
@@ -376,8 +390,8 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireSavedJobsTable();
-        JobVacancyService::saveJob(self::$jobId, self::$applicantUserId);
-        $vacancy = JobVacancyService::getById(self::$jobId, self::$applicantUserId);
+        self::svc()->saveJob(self::$jobId, self::$applicantUserId);
+        $vacancy = self::svc()->getById(self::$jobId, self::$applicantUserId);
         $this->assertNotNull($vacancy);
         if (array_key_exists("is_saved", $vacancy)) {
             $this->assertTrue((bool) $vacancy["is_saved"]);
@@ -393,21 +407,21 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testCalculateMatchPercentageReturnsArray(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::calculateMatchPercentage(self::$applicantUserId, self::$jobId);
+        $result = self::svc()->calculateMatchPercentage(self::$applicantUserId, self::$jobId);
         $this->assertIsArray($result);
     }
 
     public function testCalculateMatchPercentageHasPercentageKey(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::calculateMatchPercentage(self::$applicantUserId, self::$jobId);
+        $result = self::svc()->calculateMatchPercentage(self::$applicantUserId, self::$jobId);
         $this->assertArrayHasKey("percentage", $result);
     }
 
     public function testCalculateMatchPercentageIsInValidRange(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::calculateMatchPercentage(self::$applicantUserId, self::$jobId);
+        $result = self::svc()->calculateMatchPercentage(self::$applicantUserId, self::$jobId);
         $pct = $result["percentage"];
         $this->assertGreaterThanOrEqual(0, $pct);
         $this->assertLessThanOrEqual(100, $pct);
@@ -421,7 +435,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
             . " (" . self::$applicantUserId . ", 'php', 2),"
             . " (" . self::$applicantUserId . ", 'testing', 2)"
         );
-        $result = JobVacancyService::calculateMatchPercentage(self::$applicantUserId, self::$jobId);
+        $result = self::svc()->calculateMatchPercentage(self::$applicantUserId, self::$jobId);
         $this->assertGreaterThan(0, $result["percentage"]);
     }
 
@@ -433,7 +447,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "Test application message");
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "Test application message");
         $this->assertNotNull($appId);
         $this->assertIsInt($appId);
         $this->assertGreaterThan(0, $appId);
@@ -443,8 +457,8 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        JobVacancyService::apply(self::$jobId, self::$applicantUserId, "Applying");
-        $applications = JobVacancyService::getApplications(self::$jobId, self::$ownerUserId);
+        self::svc()->apply(self::$jobId, self::$applicantUserId, "Applying");
+        $applications = self::svc()->getApplications(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($applications);
         $this->assertIsArray($applications);
     }
@@ -453,8 +467,8 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        JobVacancyService::apply(self::$jobId, self::$applicantUserId, "Check fields");
-        $applications = JobVacancyService::getApplications(self::$jobId, self::$ownerUserId);
+        self::svc()->apply(self::$jobId, self::$applicantUserId, "Check fields");
+        $applications = self::svc()->getApplications(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($applications);
         $this->assertNotEmpty($applications);
         $app = $applications[0];
@@ -466,9 +480,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "Status update test");
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "Status update test");
         $this->assertNotNull($appId);
-        $result = JobVacancyService::updateApplicationStatus($appId, self::$ownerUserId, "screening", "Moving to screening");
+        $result = self::svc()->updateApplicationStatus($appId, self::$ownerUserId, "screening", "Moving to screening");
         $this->assertTrue($result);
     }
 
@@ -476,9 +490,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "Interview stage test");
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "Interview stage test");
         $this->assertNotNull($appId);
-        $result = JobVacancyService::updateApplicationStatus($appId, self::$ownerUserId, "interview");
+        $result = self::svc()->updateApplicationStatus($appId, self::$ownerUserId, "interview");
         $this->assertTrue($result);
     }
 
@@ -486,9 +500,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "Offer stage test");
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "Offer stage test");
         $this->assertNotNull($appId);
-        $result = JobVacancyService::updateApplicationStatus($appId, self::$ownerUserId, "offer", "Extending an offer");
+        $result = self::svc()->updateApplicationStatus($appId, self::$ownerUserId, "offer", "Extending an offer");
         $this->assertTrue($result);
     }
 
@@ -496,16 +510,16 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "Rejection test");
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "Rejection test");
         $this->assertNotNull($appId);
-        $result = JobVacancyService::updateApplicationStatus($appId, self::$ownerUserId, "rejected", "Not the right fit");
+        $result = self::svc()->updateApplicationStatus($appId, self::$ownerUserId, "rejected", "Not the right fit");
         $this->assertTrue($result);
     }
 
     public function testGetMyApplicationsReturnsItemsKey(): void
     {
         $this->requireApplicationsTable();
-        $result = JobVacancyService::getMyApplications(self::$applicantUserId);
+        $result = self::svc()->getMyApplications(self::$applicantUserId);
         $this->assertIsArray($result);
         $this->assertArrayHasKey("items", $result);
     }
@@ -514,8 +528,8 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "My application test");
-        $result = JobVacancyService::getMyApplications(self::$applicantUserId);
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "My application test");
+        $result = self::svc()->getMyApplications(self::$applicantUserId);
         $this->assertArrayHasKey("items", $result);
         $appIds = array_column($result["items"], "id");
         $this->assertContains($appId, $appIds);
@@ -529,9 +543,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
         $this->requireJobsTable();
         $this->requireApplicationsTable();
         $this->requireHistoryTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "History test");
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "History test");
         $this->assertNotNull($appId);
-        $history = JobVacancyService::getApplicationHistory($appId, self::$ownerUserId);
+        $history = self::svc()->getApplicationHistory($appId, self::$ownerUserId);
         $this->assertNotNull($history);
         $this->assertIsArray($history);
     }
@@ -541,10 +555,10 @@ class JobVacancyServiceTest extends DatabaseTestCase
         $this->requireJobsTable();
         $this->requireApplicationsTable();
         $this->requireHistoryTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, "History status change");
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, "History status change");
         $this->assertNotNull($appId);
-        JobVacancyService::updateApplicationStatus($appId, self::$ownerUserId, "reviewed", "Reviewed notes");
-        $history = JobVacancyService::getApplicationHistory($appId, self::$ownerUserId);
+        self::svc()->updateApplicationStatus($appId, self::$ownerUserId, "reviewed", "Reviewed notes");
+        $history = self::svc()->getApplicationHistory($appId, self::$ownerUserId);
         $this->assertNotNull($history);
         $this->assertNotEmpty($history);
     }
@@ -552,7 +566,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetApplicationHistoryReturnsNullForNonexistentId(): void
     {
         $this->requireHistoryTable();
-        $history = JobVacancyService::getApplicationHistory(99999999, self::$ownerUserId);
+        $history = self::svc()->getApplicationHistory(99999999, self::$ownerUserId);
         $this->assertNull($history);
     }
 
@@ -563,14 +577,14 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetQualificationAssessmentReturnsNullOrArray(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getQualificationAssessment(self::$applicantUserId, self::$jobId);
+        $result = self::svc()->getQualificationAssessment(self::$applicantUserId, self::$jobId);
         $this->assertTrue($result === null || is_array($result));
     }
 
     public function testQualificationAssessmentHasScoreFieldWhenPresent(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getQualificationAssessment(self::$applicantUserId, self::$jobId);
+        $result = self::svc()->getQualificationAssessment(self::$applicantUserId, self::$jobId);
         if ($result === null) {
             $this->markTestSkipped("Qualification assessment returned null for this job.");
         }
@@ -580,7 +594,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testQualificationAssessmentScoreInValidRange(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getQualificationAssessment(self::$applicantUserId, self::$jobId);
+        $result = self::svc()->getQualificationAssessment(self::$applicantUserId, self::$jobId);
         if ($result === null) {
             $this->markTestSkipped("Qualification assessment returned null for this job.");
         }
@@ -595,7 +609,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testSubscribeAlertReturnsPositiveId(): void
     {
         $this->requireAlertsTable();
-        $alertId = JobVacancyService::subscribeAlert(self::$applicantUserId, [
+        $alertId = self::svc()->subscribeAlert(self::$applicantUserId, [
             "keywords"  => "php developer",
             "category"  => "technology",
             "location"  => "Remote",
@@ -609,12 +623,12 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAlertsReturnsCreatedAlert(): void
     {
         $this->requireAlertsTable();
-        $alertId = JobVacancyService::subscribeAlert(self::$applicantUserId, [
+        $alertId = self::svc()->subscribeAlert(self::$applicantUserId, [
             "keywords"  => "volunteer coordinator",
             "frequency" => "daily",
         ]);
         $this->assertNotNull($alertId);
-        $alerts = JobVacancyService::getAlerts(self::$applicantUserId);
+        $alerts = self::svc()->getAlerts(self::$applicantUserId);
         $this->assertIsArray($alerts);
         $ids = array_column($alerts, "id");
         $this->assertContains($alertId, $ids);
@@ -623,31 +637,31 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testDeleteAlertReturnsTrueForOwnAlert(): void
     {
         $this->requireAlertsTable();
-        $alertId = JobVacancyService::subscribeAlert(self::$applicantUserId, [
+        $alertId = self::svc()->subscribeAlert(self::$applicantUserId, [
             "keywords"  => "alert to delete",
             "frequency" => "weekly",
         ]);
         $this->assertNotNull($alertId);
-        $result = JobVacancyService::deleteAlert($alertId, self::$applicantUserId);
+        $result = self::svc()->deleteAlert($alertId, self::$applicantUserId);
         $this->assertTrue($result);
     }
 
     public function testDeleteAlertReturnsFalseForAnotherUsersAlert(): void
     {
         $this->requireAlertsTable();
-        $alertId = JobVacancyService::subscribeAlert(self::$applicantUserId, [
+        $alertId = self::svc()->subscribeAlert(self::$applicantUserId, [
             "keywords"  => "protected alert",
             "frequency" => "weekly",
         ]);
         $this->assertNotNull($alertId);
-        $result = JobVacancyService::deleteAlert($alertId, self::$ownerUserId);
+        $result = self::svc()->deleteAlert($alertId, self::$ownerUserId);
         $this->assertFalse($result);
     }
 
     public function testGetAlertsReturnsArrayForUserWithNoAlerts(): void
     {
         $this->requireAlertsTable();
-        $alerts = JobVacancyService::getAlerts(self::$ownerUserId);
+        $alerts = self::svc()->getAlerts(self::$ownerUserId);
         $this->assertIsArray($alerts);
     }
 
@@ -658,7 +672,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testExpireOverdueJobsReturnsNonNegativeInt(): void
     {
         $this->requireJobsTable();
-        $count = JobVacancyService::expireOverdueJobs();
+        $count = self::svc()->expireOverdueJobs();
         $this->assertIsInt($count);
         $this->assertGreaterThanOrEqual(0, $count);
     }
@@ -671,31 +685,31 @@ class JobVacancyServiceTest extends DatabaseTestCase
             . " VALUES (?, ?, ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL 1 DAY), 0, 0, NOW())",
             [2, self::$ownerUserId, 'Expired job', 'Past due', 'paid', 'flexible', 'open']
         );
-        $count = JobVacancyService::expireOverdueJobs();
+        $count = self::svc()->expireOverdueJobs();
         $this->assertGreaterThanOrEqual(1, $count);
     }
 
     public function testRenewJobReturnsTrueForOwner(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::renewJob(self::$jobId, self::$ownerUserId, 30);
+        $result = self::svc()->renewJob(self::$jobId, self::$ownerUserId, 30);
         $this->assertTrue($result);
     }
 
     public function testRenewJobReturnsFalseForNonexistentId(): void
     {
-        $result = JobVacancyService::renewJob(99999999, self::$ownerUserId, 30);
+        $result = self::svc()->renewJob(99999999, self::$ownerUserId, 30);
         $this->assertFalse($result);
     }
 
     public function testRenewJobDoesNotDecreaseExpiryDate(): void
     {
         $this->requireJobsTable();
-        $before = JobVacancyService::getById(self::$jobId, self::$ownerUserId);
+        $before = self::svc()->getById(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($before);
         $expiryBefore = $before["expires_at"] ?? null;
-        JobVacancyService::renewJob(self::$jobId, self::$ownerUserId, 30);
-        $after = JobVacancyService::getById(self::$jobId, self::$ownerUserId);
+        self::svc()->renewJob(self::$jobId, self::$ownerUserId, 30);
+        $after = self::svc()->getById(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($after);
         $expiryAfter = $after["expires_at"] ?? null;
         if ($expiryBefore !== null && $expiryAfter !== null) {
@@ -712,7 +726,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAnalyticsReturnsArrayForOwner(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAnalytics(self::$jobId, self::$ownerUserId);
+        $result = self::svc()->getAnalytics(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($result);
         $this->assertIsArray($result);
     }
@@ -720,7 +734,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAnalyticsHasViewsField(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAnalytics(self::$jobId, self::$ownerUserId);
+        $result = self::svc()->getAnalytics(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($result);
         $this->assertArrayHasKey("views", $result);
     }
@@ -728,7 +742,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAnalyticsReturnsNullOrArrayForNonOwner(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAnalytics(self::$jobId, self::$applicantUserId);
+        $result = self::svc()->getAnalytics(self::$jobId, self::$applicantUserId);
         $this->assertTrue($result === null || is_array($result));
     }
 
@@ -739,7 +753,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testCreateJobWithSalaryFieldsReturnsId(): void
     {
         $this->requireJobsTable();
-        $id = JobVacancyService::create(self::$ownerUserId, [
+        $id = self::svc()->create(self::$ownerUserId, [
             "title"           => "Salaried role test",
             "description"     => "Test with salary fields",
             "category"        => "finance",
@@ -756,7 +770,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testSalaryFieldsArePersisted(): void
     {
         $this->requireJobsTable();
-        $id = JobVacancyService::create(self::$ownerUserId, [
+        $id = self::svc()->create(self::$ownerUserId, [
             "title"           => "Salary persistence test",
             "description"     => "Check salary is stored",
             "category"        => "finance",
@@ -767,7 +781,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
             "salary_period"   => "annual",
         ]);
         $this->assertNotNull($id);
-        $vacancy = JobVacancyService::getById($id, self::$ownerUserId);
+        $vacancy = self::svc()->getById($id, self::$ownerUserId);
         $this->assertNotNull($vacancy);
         if (!isset($vacancy["salary_min"])) {
             $this->markTestSkipped("Salary fields not present in vacancy shape for this build.");
@@ -779,7 +793,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAllAcceptsSalaryMinFilter(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::getAll(["salary_min" => 20000], self::$ownerUserId);
+        $result = self::svc()->getAll(["salary_min" => 20000], self::$ownerUserId);
         $this->assertArrayHasKey("items", $result);
         $this->assertIsArray($result["items"]);
     }
@@ -791,30 +805,30 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testFeatureJobReturnsTrueForAdminUser(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::featureJob(self::$jobId, self::$adminUserId, 7);
+        $result = self::svc()->featureJob(self::$jobId, self::$adminUserId, 7);
         $this->assertTrue($result);
     }
 
     public function testUnfeatureJobReturnsTrueAfterFeature(): void
     {
         $this->requireJobsTable();
-        JobVacancyService::featureJob(self::$jobId, self::$adminUserId, 7);
-        $result = JobVacancyService::unfeatureJob(self::$jobId, self::$adminUserId);
+        self::svc()->featureJob(self::$jobId, self::$adminUserId, 7);
+        $result = self::svc()->unfeatureJob(self::$jobId, self::$adminUserId);
         $this->assertTrue($result);
     }
 
     public function testFeatureJobReturnsFalseForNonAdminUser(): void
     {
         $this->requireJobsTable();
-        $result = JobVacancyService::featureJob(self::$jobId, self::$applicantUserId, 7);
+        $result = self::svc()->featureJob(self::$jobId, self::$applicantUserId, 7);
         $this->assertFalse($result);
     }
 
     public function testFeaturedFlagAppearsInGetByIdAfterFeature(): void
     {
         $this->requireJobsTable();
-        JobVacancyService::featureJob(self::$jobId, self::$adminUserId, 7);
-        $vacancy = JobVacancyService::getById(self::$jobId, self::$ownerUserId);
+        self::svc()->featureJob(self::$jobId, self::$adminUserId, 7);
+        $vacancy = self::svc()->getById(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($vacancy);
         if (!array_key_exists("is_featured", $vacancy)) {
             $this->markTestSkipped("is_featured field not present in vacancy shape.");
@@ -825,8 +839,8 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testGetAllWithFeaturedFilterReturnsOnlyFeatured(): void
     {
         $this->requireJobsTable();
-        JobVacancyService::featureJob(self::$jobId, self::$adminUserId, 7);
-        $result = JobVacancyService::getAll(["featured" => true], self::$ownerUserId);
+        self::svc()->featureJob(self::$jobId, self::$adminUserId, 7);
+        $result = self::svc()->getAll(["featured" => true], self::$ownerUserId);
         $this->assertArrayHasKey("items", $result);
         foreach ($result["items"] as $item) {
             if (array_key_exists("is_featured", $item)) {
@@ -838,9 +852,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
     public function testIsFeaturedFlagFalseAfterUnfeature(): void
     {
         $this->requireJobsTable();
-        JobVacancyService::featureJob(self::$jobId, self::$adminUserId, 7);
-        JobVacancyService::unfeatureJob(self::$jobId, self::$adminUserId);
-        $vacancy = JobVacancyService::getById(self::$jobId, self::$ownerUserId);
+        self::svc()->featureJob(self::$jobId, self::$adminUserId, 7);
+        self::svc()->unfeatureJob(self::$jobId, self::$adminUserId);
+        $vacancy = self::svc()->getById(self::$jobId, self::$ownerUserId);
         $this->assertNotNull($vacancy);
         if (!array_key_exists("is_featured", $vacancy)) {
             $this->markTestSkipped("is_featured field not present in vacancy shape.");
@@ -856,9 +870,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $result = JobVacancyService::apply(self::$jobId, self::$ownerUserId, 'Owner applying to own job');
+        $result = self::svc()->apply(self::$jobId, self::$ownerUserId, 'Owner applying to own job');
         $this->assertNull($result);
-        $errors = JobVacancyService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
         $codes = array_column($errors, 'code');
         $this->assertContains('CONFLICT', $codes);
@@ -868,10 +882,10 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        JobVacancyService::apply(self::$jobId, self::$applicantUserId, 'First apply');
-        $result = JobVacancyService::apply(self::$jobId, self::$applicantUserId, 'Second apply');
+        self::svc()->apply(self::$jobId, self::$applicantUserId, 'First apply');
+        $result = self::svc()->apply(self::$jobId, self::$applicantUserId, 'Second apply');
         $this->assertNull($result);
-        $errors = JobVacancyService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
     }
 
@@ -879,9 +893,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $result = JobVacancyService::getApplications(self::$jobId, self::$applicantUserId);
+        $result = self::svc()->getApplications(self::$jobId, self::$applicantUserId);
         $this->assertNull($result);
-        $errors = JobVacancyService::getErrors();
+        $errors = self::svc()->getErrors();
         $codes = array_column($errors, 'code');
         $this->assertContains('FORBIDDEN', $codes);
     }
@@ -890,7 +904,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, 'Auth test');
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, 'Auth test');
         $this->assertNotNull($appId);
         $ts = time();
         self::$pdo->exec(
@@ -898,9 +912,9 @@ class JobVacancyServiceTest extends DatabaseTestCase
             . " VALUES (2, 'Stranger', 'stranger_{$ts}@test.invalid', 'x', 'member', 'active', NOW())"
         );
         $strangerId = (int) self::$pdo->lastInsertId();
-        $result = JobVacancyService::updateApplicationStatus($appId, $strangerId, 'rejected');
+        $result = self::svc()->updateApplicationStatus($appId, $strangerId, 'rejected');
         $this->assertFalse($result);
-        $errors = JobVacancyService::getErrors();
+        $errors = self::svc()->getErrors();
         $codes = array_column($errors, 'code');
         $this->assertContains('FORBIDDEN', $codes);
         self::$pdo->exec("DELETE FROM users WHERE id = {$strangerId}");
@@ -910,22 +924,22 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $this->requireJobsTable();
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, 'Invalid status test');
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, 'Invalid status test');
         $this->assertNotNull($appId);
-        $result = JobVacancyService::updateApplicationStatus($appId, self::$ownerUserId, 'totally_invalid_status');
+        $result = self::svc()->updateApplicationStatus($appId, self::$ownerUserId, 'totally_invalid_status');
         $this->assertFalse($result);
-        $errors = JobVacancyService::getErrors();
+        $errors = self::svc()->getErrors();
         $this->assertNotEmpty($errors);
     }
 
     public function testGetMyApplicationsWithStatusFilter(): void
     {
         $this->requireApplicationsTable();
-        $appId = JobVacancyService::apply(self::$jobId, self::$applicantUserId, 'Filter test');
+        $appId = self::svc()->apply(self::$jobId, self::$applicantUserId, 'Filter test');
         if ($appId) {
-            JobVacancyService::updateApplicationStatus($appId, self::$ownerUserId, 'accepted');
+            self::svc()->updateApplicationStatus($appId, self::$ownerUserId, 'accepted');
         }
-        $result = JobVacancyService::getMyApplications(self::$applicantUserId, ['status' => 'accepted']);
+        $result = self::svc()->getMyApplications(self::$applicantUserId, ['status' => 'accepted']);
         $this->assertArrayHasKey('items', $result);
         foreach ($result['items'] as $item) {
             $this->assertSame('accepted', $item['status']);

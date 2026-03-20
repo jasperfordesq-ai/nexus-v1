@@ -16,7 +16,7 @@ use App\Core\Auth;
  *
  * Tests core authentication helper methods.
  *
- * @covers \Nexus\Core\Auth
+ * @covers \App\Core\Auth
  */
 class AuthTest extends DatabaseTestCase
 {

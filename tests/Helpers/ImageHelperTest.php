@@ -16,7 +16,7 @@ use App\Helpers\ImageHelper;
  *
  * Tests image manipulation and optimization utilities.
  *
- * @covers \Nexus\Helpers\ImageHelper
+ * @covers \App\Helpers\ImageHelper
  */
 class ImageHelperTest extends TestCase
 {

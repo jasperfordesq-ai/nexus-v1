@@ -16,7 +16,7 @@ use App\Helpers\NavigationConfig;
  *
  * Tests navigation configuration helper.
  *
- * @covers \Nexus\Helpers\NavigationConfig
+ * @covers \App\Helpers\NavigationConfig
  */
 class NavigationConfigTest extends TestCase
 {

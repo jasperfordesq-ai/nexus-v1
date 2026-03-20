@@ -8,12 +8,18 @@ namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\MemberRankingService;
+use App\Models\User;
 use App\Core\Database;
 use App\Core\TenantContext;
 
 class MemberRankingServiceTest extends TestCase
 {
     private static int $testTenantId = 2;
+
+    private static function svc(): MemberRankingService
+    {
+        return new MemberRankingService(new User());
+    }
     private static int $otherTenantId = 1;
     private static ?int $viewerUserId = null;
     private static ?int $activeUserId = null;
@@ -97,7 +103,7 @@ class MemberRankingServiceTest extends TestCase
     protected function setUp(): void
     {
         TenantContext::setById(self::$testTenantId);
-        MemberRankingService::clearCache();
+        self::svc()->clearCache();
     }
 
     public static function tearDownAfterClass(): void
@@ -132,12 +138,12 @@ class MemberRankingServiceTest extends TestCase
 
     public function testIsEnabledReturnsBoolean(): void
     {
-        $this->assertIsBool(MemberRankingService::isEnabled());
+        $this->assertIsBool(self::svc()->isEnabled());
     }
 
     public function testGetConfigReturnsAllKeys(): void
     {
-        $config = MemberRankingService::getConfig();
+        $config = self::svc()->getConfig();
         foreach (['enabled', 'activity_login_weight', 'activity_minimum',
             'reputation_minimum', 'connectivity_mutual_connection',
             'complementary_enabled', 'geo_enabled'] as $key) {
@@ -147,14 +153,14 @@ class MemberRankingServiceTest extends TestCase
 
     public function testClearCacheResetsConfig(): void
     {
-        MemberRankingService::getConfig();
-        MemberRankingService::clearCache();
-        $this->assertNotEmpty(MemberRankingService::getConfig());
+        self::svc()->getConfig();
+        self::svc()->clearCache();
+        $this->assertNotEmpty(self::svc()->getConfig());
     }
 
     public function testRankMembersExcludesViewer(): void
     {
-        $ranked = MemberRankingService::rankMembers($this->getTestMembers(), self::$viewerUserId);
+        $ranked = self::svc()->rankMembers($this->getTestMembers(), self::$viewerUserId);
         $this->assertIsArray($ranked);
         foreach ($ranked as $m) {
             $this->assertNotEquals(self::$viewerUserId, $m['id']);
@@ -163,7 +169,7 @@ class MemberRankingServiceTest extends TestCase
 
     public function testRankMembersAddsScoreFields(): void
     {
-        $ranked = MemberRankingService::rankMembers($this->getTestMembers(), self::$viewerUserId);
+        $ranked = self::svc()->rankMembers($this->getTestMembers(), self::$viewerUserId);
         if (empty($ranked)) { $this->markTestSkipped('No ranked members'); }
         $this->assertArrayHasKey('_community_rank', $ranked[0]);
         $this->assertArrayHasKey('_score_breakdown', $ranked[0]);
@@ -172,7 +178,7 @@ class MemberRankingServiceTest extends TestCase
 
     public function testRankMembersScoresAreBounded(): void
     {
-        foreach (MemberRankingService::rankMembers($this->getTestMembers(), self::$viewerUserId) as $m) {
+        foreach (self::svc()->rankMembers($this->getTestMembers(), self::$viewerUserId) as $m) {
             $this->assertGreaterThanOrEqual(0.0, $m['_community_rank']);
             $this->assertLessThanOrEqual(1.0, $m['_community_rank']);
         }
@@ -180,7 +186,7 @@ class MemberRankingServiceTest extends TestCase
 
     public function testRankMembersOrderedDescending(): void
     {
-        $ranked = MemberRankingService::rankMembers($this->getTestMembers(), self::$viewerUserId);
+        $ranked = self::svc()->rankMembers($this->getTestMembers(), self::$viewerUserId);
         for ($i = 1; $i < count($ranked); $i++) {
             $this->assertGreaterThanOrEqual($ranked[$i]['_community_rank'], $ranked[$i - 1]['_community_rank']);
         }
@@ -188,7 +194,7 @@ class MemberRankingServiceTest extends TestCase
 
     public function testBreakdownHasAllComponents(): void
     {
-        $ranked = MemberRankingService::rankMembers($this->getTestMembers(), self::$viewerUserId);
+        $ranked = self::svc()->rankMembers($this->getTestMembers(), self::$viewerUserId);
         if (empty($ranked)) { $this->markTestSkipped('No ranked members'); }
         foreach (array_keys(MemberRankingService::SCORE_WEIGHTS) as $key) {
             $this->assertArrayHasKey($key, $ranked[0]['_score_breakdown']);
@@ -197,7 +203,7 @@ class MemberRankingServiceTest extends TestCase
 
     public function testWeightedAdditiveFormula(): void
     {
-        foreach (MemberRankingService::rankMembers($this->getTestMembers(), self::$viewerUserId) as $m) {
+        foreach (self::svc()->rankMembers($this->getTestMembers(), self::$viewerUserId) as $m) {
             $base = 0.0;
             foreach (MemberRankingService::SCORE_WEIGHTS as $c => $w) {
                 $base += ($m['_score_breakdown'][$c] ?? 0.5) * $w;
@@ -208,19 +214,19 @@ class MemberRankingServiceTest extends TestCase
 
     public function testRankMembersEmptyArray(): void
     {
-        $this->assertEmpty(MemberRankingService::rankMembers([], self::$viewerUserId));
+        $this->assertEmpty(self::svc()->rankMembers([], self::$viewerUserId));
     }
 
     public function testRankMembersNullViewer(): void
     {
-        $ranked = MemberRankingService::rankMembers($this->getTestMembers(), null);
+        $ranked = self::svc()->rankMembers($this->getTestMembers(), null);
         $this->assertIsArray($ranked);
         $this->assertNotEmpty($ranked);
     }
 
     public function testNewUserNeutralScore(): void
     {
-        $ranked = MemberRankingService::rankMembers(
+        $ranked = self::svc()->rankMembers(
             [$this->buildMemberRow(self::$newUserId, ['created_at' => date('Y-m-d H:i:s')])],
             self::$viewerUserId
         );
@@ -232,14 +238,14 @@ class MemberRankingServiceTest extends TestCase
 
     public function testBuildRankedQueryScopesByTenant(): void
     {
-        $q = MemberRankingService::buildRankedQuery(self::$viewerUserId, ['limit' => 100]);
+        $q = self::svc()->buildRankedQuery(self::$viewerUserId, ['limit' => 100]);
         $this->assertStringContainsString('u.tenant_id = ?', $q['sql']);
         $this->assertContains(self::$testTenantId, $q['params']);
     }
 
     public function testBuildRankedQueryExcludesOtherTenants(): void
     {
-        $q = MemberRankingService::buildRankedQuery(self::$viewerUserId, ['limit' => 100]);
+        $q = self::svc()->buildRankedQuery(self::$viewerUserId, ['limit' => 100]);
         foreach (Database::query($q['sql'], $q['params'])->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             $this->assertEquals(self::$testTenantId, (int) $row['tenant_id'],
                 "Cross-tenant leak: user {$row['id']}");
@@ -248,20 +254,20 @@ class MemberRankingServiceTest extends TestCase
 
     public function testBuildRankedQueryExecutes(): void
     {
-        $q = MemberRankingService::buildRankedQuery(self::$viewerUserId, ['limit' => 5]);
+        $q = self::svc()->buildRankedQuery(self::$viewerUserId, ['limit' => 5]);
         $this->assertIsArray(Database::query($q['sql'], $q['params'])->fetchAll(\PDO::FETCH_ASSOC));
     }
 
     public function testBuildRankedQueryExcludesViewer(): void
     {
-        $q = MemberRankingService::buildRankedQuery(self::$viewerUserId, ['limit' => 100]);
+        $q = self::svc()->buildRankedQuery(self::$viewerUserId, ['limit' => 100]);
         $ids = array_column(Database::query($q['sql'], $q['params'])->fetchAll(\PDO::FETCH_ASSOC), 'id');
         $this->assertNotContains((string) self::$viewerUserId, $ids);
     }
 
     public function testBuildRankedQueryHasScoreColumns(): void
     {
-        $q = MemberRankingService::buildRankedQuery(self::$viewerUserId, ['limit' => 1]);
+        $q = self::svc()->buildRankedQuery(self::$viewerUserId, ['limit' => 1]);
         $rows = Database::query($q['sql'], $q['params'])->fetchAll(\PDO::FETCH_ASSOC);
         if (!empty($rows)) {
             foreach (['community_rank', 'activity_score', 'contribution_score', 'reputation_score'] as $col) {
@@ -272,13 +278,13 @@ class MemberRankingServiceTest extends TestCase
 
     public function testBuildRankedQuerySearchFilter(): void
     {
-        $q = MemberRankingService::buildRankedQuery(self::$viewerUserId, ['search' => 'nonexistent_xyz_9999', 'limit' => 10]);
+        $q = self::svc()->buildRankedQuery(self::$viewerUserId, ['search' => 'nonexistent_xyz_9999', 'limit' => 10]);
         $this->assertEmpty(Database::query($q['sql'], $q['params'])->fetchAll(\PDO::FETCH_ASSOC));
     }
 
     public function testDebugMemberScoreBreakdown(): void
     {
-        $r = MemberRankingService::debugMemberScore(self::$activeUserId, self::$viewerUserId);
+        $r = self::svc()->debugMemberScore(self::$activeUserId, self::$viewerUserId);
         if (isset($r['error'])) { $this->markTestSkipped($r['error']); }
         $this->assertArrayHasKey('scores', $r);
         $this->assertArrayHasKey('final_score', $r);
@@ -288,14 +294,14 @@ class MemberRankingServiceTest extends TestCase
 
     public function testDebugNonexistentMember(): void
     {
-        $this->assertArrayHasKey('error', MemberRankingService::debugMemberScore(999999999));
+        $this->assertArrayHasKey('error', self::svc()->debugMemberScore(999999999));
     }
 
     public function testDebugConsistentWithRankMembers(): void
     {
-        $debug = MemberRankingService::debugMemberScore(self::$activeUserId, self::$viewerUserId);
+        $debug = self::svc()->debugMemberScore(self::$activeUserId, self::$viewerUserId);
         if (isset($debug['error'])) { $this->markTestSkipped($debug['error']); }
-        $ranked = MemberRankingService::rankMembers($this->getTestMembers([self::$activeUserId]), self::$viewerUserId);
+        $ranked = self::svc()->rankMembers($this->getTestMembers([self::$activeUserId]), self::$viewerUserId);
         $found = null;
         foreach ($ranked as $m) { if ((int)$m['id'] === self::$activeUserId) { $found = $m; break; } }
         if ($found) {
@@ -307,13 +313,13 @@ class MemberRankingServiceTest extends TestCase
 
     public function testGetActiveMembersExcludesViewer(): void
     {
-        $ids = array_map('intval', array_column(MemberRankingService::getActiveMembers(self::$viewerUserId, 50), 'id'));
+        $ids = array_map('intval', array_column(self::svc()->getActiveMembers(self::$viewerUserId, 50), 'id'));
         $this->assertNotContains(self::$viewerUserId, $ids);
     }
 
     public function testGetActiveMembersFields(): void
     {
-        $members = MemberRankingService::getActiveMembers(null, 5);
+        $members = self::svc()->getActiveMembers(null, 5);
         if (empty($members)) { $this->markTestSkipped('No active members'); }
         foreach (['id', 'first_name', 'last_name', 'avatar_url', 'last_active_at', 'display_name'] as $f) {
             $this->assertArrayHasKey($f, $members[0]);
@@ -322,20 +328,20 @@ class MemberRankingServiceTest extends TestCase
 
     public function testGetSuggestedMembersReturnsArray(): void
     {
-        $s = MemberRankingService::getSuggestedMembers(self::$viewerUserId, 5);
+        $s = self::svc()->getSuggestedMembers(self::$viewerUserId, 5);
         $this->assertIsArray($s);
         $this->assertLessThanOrEqual(5, count($s));
     }
 
     public function testGetSuggestedMembersExcludesViewer(): void
     {
-        $ids = array_map('intval', array_column(MemberRankingService::getSuggestedMembers(self::$viewerUserId, 20), 'id'));
+        $ids = array_map('intval', array_column(self::svc()->getSuggestedMembers(self::$viewerUserId, 20), 'id'));
         $this->assertNotContains(self::$viewerUserId, $ids);
     }
 
     public function testSqlScoresAreBounded(): void
     {
-        $q = MemberRankingService::buildRankedQuery(null, ['limit' => 20]);
+        $q = self::svc()->buildRankedQuery(null, ['limit' => 20]);
         foreach (Database::query($q['sql'], $q['params'])->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             foreach (['activity_score', 'contribution_score', 'reputation_score', 'community_rank'] as $col) {
                 $this->assertGreaterThanOrEqual(0.0, (float) $row[$col]);
@@ -436,6 +442,6 @@ class MemberRankingServiceTest extends TestCase
     {
         $ref = new \ReflectionMethod(MemberRankingService::class, $method);
         $ref->setAccessible(true);
-        return $ref->invokeArgs(null, $args);
+        return $ref->invokeArgs(self::svc(), $args);
     }
 }

@@ -19,7 +19,7 @@ class GuardianConsentService
     /**
      * Delegates to legacy GuardianConsentService::requestConsent().
      */
-    public function requestConsent(int $minorUserId, array $guardianData, ?int $opportunityId = null): array
+    public static function requestConsent(int $minorUserId, array $guardianData, ?int $opportunityId = null): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class GuardianConsentService
     /**
      * Delegates to legacy GuardianConsentService::grantConsent().
      */
-    public function grantConsent(string $token, string $ip): bool
+    public static function grantConsent(string $token, string $ip): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class GuardianConsentService
     /**
      * Delegates to legacy GuardianConsentService::withdrawConsent().
      */
-    public function withdrawConsent(int $consentId, int $userId): bool
+    public static function withdrawConsent(int $consentId, int $userId): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -46,7 +46,7 @@ class GuardianConsentService
     /**
      * Delegates to legacy GuardianConsentService::checkConsent().
      */
-    public function checkConsent(int $minorUserId, ?int $opportunityId = null): bool
+    public static function checkConsent(int $minorUserId, ?int $opportunityId = null): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -55,7 +55,7 @@ class GuardianConsentService
     /**
      * Delegates to legacy GuardianConsentService::getConsentsForMinor().
      */
-    public function getConsentsForMinor(int $minorUserId): array
+    public static function getConsentsForMinor(int $minorUserId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -64,7 +64,7 @@ class GuardianConsentService
     /**
      * Delegates to legacy GuardianConsentService::getConsentsForAdmin().
      */
-    public function getConsentsForAdmin(array $filters = []): array
+    public static function getConsentsForAdmin(array $filters = []): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

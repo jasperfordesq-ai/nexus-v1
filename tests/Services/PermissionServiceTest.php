@@ -25,7 +25,7 @@ use Nexus\Services\Enterprise\PermissionService;
  * - Audit logging toggle
  * - Edge cases: unknown role, no permissions, multiple roles
  *
- * @covers \Nexus\Services\Enterprise\PermissionService
+ * @covers \App\Services\Enterprise\PermissionService
  */
 class PermissionServiceTest extends TestCase
 {

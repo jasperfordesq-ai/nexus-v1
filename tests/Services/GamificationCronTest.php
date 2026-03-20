@@ -20,10 +20,10 @@ use App\Services\ChallengeService;
  * - Daily reward processing
  * - Challenge lifecycle (expired challenges, progress tracking)
  *
- * @covers \Nexus\Services\StreakService
- * @covers \Nexus\Services\DailyRewardService
- * @covers \Nexus\Services\GamificationService
- * @covers \Nexus\Services\ChallengeService
+ * @covers \App\Services\StreakService
+ * @covers \App\Services\DailyRewardService
+ * @covers \App\Services\GamificationService
+ * @covers \App\Services\ChallengeService
  */
 class GamificationCronTest extends TestCase
 {

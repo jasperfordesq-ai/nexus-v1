@@ -19,7 +19,7 @@ class VolunteerCertificateService
     /**
      * Delegates to legacy VolunteerCertificateService::getErrors().
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -28,7 +28,7 @@ class VolunteerCertificateService
     /**
      * Delegates to legacy VolunteerCertificateService::generate().
      */
-    public function generate(int $userId, array $options = []): ?array
+    public static function generate(int $userId, array $options = []): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class VolunteerCertificateService
     /**
      * Delegates to legacy VolunteerCertificateService::verify().
      */
-    public function verify(string $code): ?array
+    public static function verify(string $code): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class VolunteerCertificateService
     /**
      * Delegates to legacy VolunteerCertificateService::getUserCertificates().
      */
-    public function getUserCertificates(int $userId): array
+    public static function getUserCertificates(int $userId): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class VolunteerCertificateService
     /**
      * Delegates to legacy VolunteerCertificateService::generateHtml().
      */
-    public function generateHtml(string $code): ?string
+    public static function generateHtml(string $code): ?string
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -64,7 +64,7 @@ class VolunteerCertificateService
     /**
      * Delegates to legacy VolunteerCertificateService::markDownloaded().
      */
-    public function markDownloaded(string $code): void
+    public static function markDownloaded(string $code): void
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }

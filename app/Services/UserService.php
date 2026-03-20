@@ -22,7 +22,7 @@ use App\Core\TenantContext;
 class UserService
 {
     /** @var array<int, array{code: string, message: string}> */
-    private array $errors = [];
+    private static array $errors = [];
 
     public function __construct(
         private readonly User $user,
@@ -31,9 +31,9 @@ class UserService
     /**
      * Get a user by ID with related data.
      */
-    public function getById(int $id): ?array
+    public static function getById(int $id): ?array
     {
-        $user = $this->user->newQuery()
+        $user = User::query()
             ->with(['listings', 'badges'])
             ->find($id);
 
@@ -53,17 +53,17 @@ class UserService
      * Get the authenticated user's own profile (for /me endpoint).
      * Matches the legacy UserService::getOwnProfile() response shape.
      */
-    public function getOwnProfile(int $userId): ?array
+    public static function getOwnProfile(int $userId): ?array
     {
-        return $this->getMe($userId);
+        return self::getMe($userId);
     }
 
     /**
      * Get the authenticated user's own profile (alias).
      */
-    public function getMe(int $userId): ?array
+    public static function getMe(int $userId): ?array
     {
-        $user = $this->user->newQuery()
+        $user = User::query()
             ->with(['listings', 'badges'])
             ->find($userId);
 
@@ -71,16 +71,16 @@ class UserService
             return null;
         }
 
-        $profile = $this->formatProfile($user, true);
+        $profile = self::formatProfile($user, true);
 
         // Add notification preferences
-        $profile['notification_preferences'] = $this->getNotificationPreferences($userId);
+        $profile['notification_preferences'] = self::getNotificationPreferences($userId);
 
         // Add statistics
-        $profile['stats'] = $this->getUserStats($userId);
+        $profile['stats'] = self::getUserStats($userId);
 
         // Add badges
-        $profile['badges'] = $this->getUserBadges($userId);
+        $profile['badges'] = self::getUserBadges($userId);
 
         return $profile;
     }
@@ -89,9 +89,9 @@ class UserService
      * Get a user's public profile with privacy checks.
      * Matches the legacy UserService::getPublicProfile() response shape.
      */
-    public function getPublicProfile(int $userId, ?int $viewerId = null): ?array
+    public static function getPublicProfile(int $userId, ?int $viewerId = null): ?array
     {
-        $user = $this->user->newQuery()
+        $user = User::query()
             ->with(['listings', 'badges'])
             ->find($userId);
 
@@ -107,21 +107,21 @@ class UserService
                 return null;
             }
             if ($privacyLevel === 'connections') {
-                if (! $viewerId || ! $this->areConnected($userId, $viewerId)) {
+                if (! $viewerId || ! self::areConnected($userId, $viewerId)) {
                     return null;
                 }
             }
         }
 
-        $profile = $this->formatProfile($user, false);
+        $profile = self::formatProfile($user, false);
 
         // Add connection status if viewer is logged in
         if ($viewerId && $viewerId !== $userId) {
-            $profile['connection_status'] = $this->getConnectionStatus($userId, $viewerId);
+            $profile['connection_status'] = self::getConnectionStatus($userId, $viewerId);
         }
 
         // Add public stats
-        $stats = $this->getPublicStats($userId);
+        $stats = self::getPublicStats($userId);
         $profile['stats'] = $stats;
 
         // Flatten key stats to root for frontend compatibility
@@ -132,7 +132,7 @@ class UserService
         $profile['rating'] = $stats['average_rating'] ?? null;
 
         // Add badges
-        $profile['badges'] = $this->getUserBadges($userId);
+        $profile['badges'] = self::getUserBadges($userId);
 
         return $profile;
     }
@@ -140,10 +140,10 @@ class UserService
     /**
      * Update a user profile.
      */
-    public function update(int $id, array $data): User
+    public static function update(int $id, array $data): User
     {
         /** @var User $user */
-        $user = $this->user->newQuery()->findOrFail($id);
+        $user = User::query()->findOrFail($id);
 
         $allowed = [
             'first_name', 'last_name', 'bio', 'tagline', 'location', 'latitude', 'longitude',
@@ -161,12 +161,12 @@ class UserService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function search(string $term, int $limit = 20): array
+    public static function search(string $term, int $limit = 20): array
     {
         $limit = min($limit, 100);
         $like = '%' . $term . '%';
 
-        $items = $this->user->newQuery()
+        $items = User::query()
             ->where(function (Builder $q) use ($like) {
                 $q->where('first_name', 'LIKE', $like)
                   ->orWhere('last_name', 'LIKE', $like)
@@ -195,7 +195,7 @@ class UserService
      * Get profile stats for sidebar widget.
      * Matches legacy UserService::getProfileStats() response shape.
      */
-    public function getProfileStats(int $userId): array
+    public static function getProfileStats(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -234,7 +234,7 @@ class UserService
             ->sum('amount');
 
         // Wallet balance
-        $balance = (float) ($this->user->newQuery()->where('id', $userId)->value('balance') ?? 0);
+        $balance = (float) (User::query()->where('id', $userId)->value('balance') ?? 0);
 
         return [
             'listings_count'  => $offersCount + $requestsCount,
@@ -251,14 +251,14 @@ class UserService
      *
      * @return bool True on success, false on failure (check getErrors()).
      */
-    public function updateProfile(int $userId, array $data): bool
+    public static function updateProfile(int $userId, array $data): bool
     {
         try {
-            $this->update($userId, $data);
+            self::update($userId, $data);
             return true;
         } catch (\Throwable $e) {
             Log::warning('Profile update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            $this->setError('UPDATE_FAILED', $e->getMessage());
+            self::setError('UPDATE_FAILED', $e->getMessage());
             return false;
         }
     }
@@ -266,22 +266,22 @@ class UserService
     /**
      * Update user password after verifying the current one.
      */
-    public function updatePassword(int $userId, string $currentPassword, string $newPassword): bool
+    public static function updatePassword(int $userId, string $currentPassword, string $newPassword): bool
     {
-        $user = $this->user->newQuery()->find($userId);
+        $user = User::query()->find($userId);
 
         if (! $user) {
-            $this->setError('NOT_FOUND', 'User not found');
+            self::setError('NOT_FOUND', 'User not found');
             return false;
         }
 
         if (! Hash::check($currentPassword, $user->password_hash)) {
-            $this->setError('INVALID_PASSWORD', 'Current password is incorrect');
+            self::setError('INVALID_PASSWORD', 'Current password is incorrect');
             return false;
         }
 
         if (strlen($newPassword) < 8) {
-            $this->setError('VALIDATION_ERROR', 'New password must be at least 8 characters');
+            self::setError('VALIDATION_ERROR', 'New password must be at least 8 characters');
             return false;
         }
 
@@ -297,7 +297,7 @@ class UserService
      * @param array $fileArray $_FILES-compatible array
      * @return string|null The new avatar URL, or null on failure (check getErrors()).
      */
-    public function updateAvatar(int $userId, array $fileArray): ?string
+    public static function updateAvatar(int $userId, array $fileArray): ?string
     {
         try {
             $avatarUrl = \App\Core\ImageUploader::upload($fileArray, 'profiles', [
@@ -307,18 +307,18 @@ class UserService
             ]);
 
             if (! $avatarUrl) {
-                $this->setError('UPLOAD_FAILED', 'Avatar upload returned empty result');
+                self::setError('UPLOAD_FAILED', 'Avatar upload returned empty result');
                 return null;
             }
 
-            $user = $this->user->newQuery()->findOrFail($userId);
+            $user = User::query()->findOrFail($userId);
             $user->avatar_url = $avatarUrl;
             $user->save();
 
             return $avatarUrl;
         } catch (\Throwable $e) {
             Log::warning('Avatar upload failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            $this->setError('UPLOAD_FAILED', $e->getMessage());
+            self::setError('UPLOAD_FAILED', $e->getMessage());
             return null;
         }
     }
@@ -326,12 +326,12 @@ class UserService
     /**
      * Soft-delete a user account: set status to 'deleted' and anonymize PII.
      */
-    public function deleteAccount(int $userId): bool
+    public static function deleteAccount(int $userId): bool
     {
-        $user = $this->user->newQuery()->find($userId);
+        $user = User::query()->find($userId);
 
         if (! $user) {
-            $this->setError('NOT_FOUND', 'User not found');
+            self::setError('NOT_FOUND', 'User not found');
             return false;
         }
 
@@ -352,7 +352,7 @@ class UserService
             return true;
         } catch (\Throwable $e) {
             Log::error('Account deletion failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            $this->setError('DELETE_FAILED', $e->getMessage());
+            self::setError('DELETE_FAILED', $e->getMessage());
             return false;
         }
     }
@@ -360,12 +360,12 @@ class UserService
     /**
      * Update user privacy settings.
      */
-    public function updatePrivacy(int $userId, array $privacyData): bool
+    public static function updatePrivacy(int $userId, array $privacyData): bool
     {
-        $user = $this->user->newQuery()->find($userId);
+        $user = User::query()->find($userId);
 
         if (! $user) {
-            $this->setError('NOT_FOUND', 'User not found');
+            self::setError('NOT_FOUND', 'User not found');
             return false;
         }
 
@@ -374,7 +374,7 @@ class UserService
             $filtered = collect($privacyData)->only($allowed)->all();
 
             if (empty($filtered)) {
-                $this->setError('VALIDATION_ERROR', 'No valid privacy fields provided');
+                self::setError('VALIDATION_ERROR', 'No valid privacy fields provided');
                 return false;
             }
 
@@ -384,7 +384,7 @@ class UserService
             return true;
         } catch (\Throwable $e) {
             Log::warning('Privacy update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            $this->setError('UPDATE_FAILED', $e->getMessage());
+            self::setError('UPDATE_FAILED', $e->getMessage());
             return false;
         }
     }
@@ -392,7 +392,7 @@ class UserService
     /**
      * Update notification preferences for a user.
      */
-    public function updateNotificationPreferences(int $userId, array $prefs): bool
+    public static function updateNotificationPreferences(int $userId, array $prefs): bool
     {
         try {
             DB::table('user_notification_preferences')->updateOrInsert(
@@ -402,7 +402,7 @@ class UserService
             return true;
         } catch (\Throwable $e) {
             Log::warning('Notification preferences update failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
-            $this->setError('UPDATE_FAILED', $e->getMessage());
+            self::setError('UPDATE_FAILED', $e->getMessage());
             return false;
         }
     }
@@ -412,7 +412,7 @@ class UserService
      *
      * @return array{items: array, has_more: bool}
      */
-    public function getNearby(float $lat, float $lon, array $filters = [], ?int $currentUserId = null): array
+    public static function getNearby(float $lat, float $lon, array $filters = [], ?int $currentUserId = null): array
     {
         $radiusKm = (float) ($filters['radius_km'] ?? 50);
         $limit    = (int) ($filters['limit'] ?? 20);
@@ -427,7 +427,7 @@ class UserService
             )
         )";
 
-        $query = $this->user->newQuery()
+        $query = User::query()
             ->selectRaw("*, $haversine AS distance", [$lat, $lon, $lat])
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
@@ -476,17 +476,17 @@ class UserService
      *
      * @return array<int, array{code: string, message: string}>
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     /**
      * Record an error for the current operation.
      */
-    protected function setError(string $code, string $message): void
+    protected static function setError(string $code, string $message): void
     {
-        $this->errors[] = ['code' => $code, 'message' => $message];
+        self::$errors[] = ['code' => $code, 'message' => $message];
     }
 
     // ================================================================
@@ -496,7 +496,7 @@ class UserService
     /**
      * Format user model for API response.
      */
-    private function formatProfile(User $user, bool $includePrivate = false): array
+    private static function formatProfile(User $user, bool $includePrivate = false): array
     {
         $profile = [
             'id'                => $user->id,
@@ -516,7 +516,7 @@ class UserService
             'organization_name' => $user->organization_name,
             'created_at'        => $user->created_at?->toISOString(),
             'is_online'         => $user->last_active_at && $user->last_active_at->diffInMinutes(now()) < 5,
-            'online_status'     => $this->getOnlineStatusText($user->last_active_at),
+            'online_status'     => self::getOnlineStatusText($user->last_active_at),
         ];
 
         // Gamification fields
@@ -556,7 +556,7 @@ class UserService
     /**
      * Get user stats (own profile).
      */
-    private function getUserStats(int $userId): array
+    private static function getUserStats(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
@@ -595,11 +595,11 @@ class UserService
     /**
      * Get public stats (includes hours, groups, events).
      */
-    private function getPublicStats(int $userId): array
+    private static function getPublicStats(int $userId): array
     {
         $tenantId = TenantContext::getId();
 
-        $stats = $this->getUserStats($userId);
+        $stats = self::getUserStats($userId);
         unset($stats['transactions_count']);
 
         $stats['total_hours_given'] = round((float) DB::table('transactions')
@@ -634,7 +634,7 @@ class UserService
     /**
      * Get user badges.
      */
-    private function getUserBadges(int $userId): array
+    private static function getUserBadges(int $userId): array
     {
         try {
             $tenantId = TenantContext::getId();
@@ -660,7 +660,7 @@ class UserService
     /**
      * Get notification preferences for a user.
      */
-    private function getNotificationPreferences(int $userId): array
+    private static function getNotificationPreferences(int $userId): array
     {
         try {
             // user_notification_preferences has no tenant_id column;
@@ -683,7 +683,7 @@ class UserService
     /**
      * Check if two users are connected.
      */
-    private function areConnected(int $userId1, int $userId2): bool
+    private static function areConnected(int $userId1, int $userId2): bool
     {
         $tenantId = TenantContext::getId();
 
@@ -703,7 +703,7 @@ class UserService
     /**
      * Get connection status between two users.
      */
-    private function getConnectionStatus(int $targetUserId, int $viewerId): ?string
+    private static function getConnectionStatus(int $targetUserId, int $viewerId): ?string
     {
         $tenantId = TenantContext::getId();
 
@@ -728,7 +728,7 @@ class UserService
     /**
      * Get online status text.
      */
-    private function getOnlineStatusText($lastActiveAt): string
+    private static function getOnlineStatusText($lastActiveAt): string
     {
         if (! $lastActiveAt) {
             return 'offline';

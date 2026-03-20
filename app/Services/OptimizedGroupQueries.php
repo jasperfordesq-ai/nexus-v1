@@ -19,7 +19,7 @@ class OptimizedGroupQueries
     /**
      * Delegates to legacy OptimizedGroupQueries::getLeafGroups().
      */
-    public function getLeafGroups($tenantId = null, $typeId = null, $limit = 100)
+    public static function getLeafGroups($tenantId = null, $typeId = null, $limit = 100)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class OptimizedGroupQueries
     /**
      * Delegates to legacy OptimizedGroupQueries::getGroupHierarchyTree().
      */
-    public function getGroupHierarchyTree($groupId)
+    public static function getGroupHierarchyTree($groupId)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -37,7 +37,7 @@ class OptimizedGroupQueries
     /**
      * Delegates to legacy OptimizedGroupQueries::getAncestors().
      */
-    public function getAncestors($groupId)
+    public static function getAncestors($groupId)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -46,7 +46,7 @@ class OptimizedGroupQueries
     /**
      * Delegates to legacy OptimizedGroupQueries::getDescendants().
      */
-    public function getDescendants($groupId, $maxDepth = null)
+    public static function getDescendants($groupId, $maxDepth = null)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -55,7 +55,7 @@ class OptimizedGroupQueries
     /**
      * Delegates to legacy OptimizedGroupQueries::getGroupDepth().
      */
-    public function getGroupDepth($groupId)
+    public static function getGroupDepth($groupId)
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;

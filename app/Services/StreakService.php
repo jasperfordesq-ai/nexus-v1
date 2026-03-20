@@ -28,9 +28,9 @@ class StreakService
     /**
      * Get current streak for a user and type.
      */
-    public function getCurrentStreak(int $tenantId, int $userId): int
+    public static function getCurrentStreak(int $tenantId, int $userId): int
     {
-        return (int) ($this->userStreak->newQuery()
+        return (int) (UserStreak::query()
             ->where('user_id', $userId)
             ->where('streak_type', 'activity')
             ->value('current_streak') ?? 0);
@@ -39,18 +39,18 @@ class StreakService
     /**
      * Record activity and update streak.
      */
-    public function recordActivity(int $tenantId, int $userId): bool
+    public static function recordActivity(int $tenantId, int $userId): bool
     {
-        $result = $this->updateStreak($userId, 'activity');
+        $result = self::updateStreak($userId, 'activity');
         return $result !== false;
     }
 
     /**
      * Get longest streak for a user.
      */
-    public function getLongestStreak(int $tenantId, int $userId): int
+    public static function getLongestStreak(int $tenantId, int $userId): int
     {
-        return (int) ($this->userStreak->newQuery()
+        return (int) (UserStreak::query()
             ->where('user_id', $userId)
             ->where('streak_type', 'activity')
             ->value('longest_streak') ?? 0);
@@ -59,9 +59,9 @@ class StreakService
     /**
      * Get streak leaderboard.
      */
-    public function getStreakLeaderboard(int $tenantId, int $limit = 10): array
+    public static function getStreakLeaderboard(int $tenantId, int $limit = 10): array
     {
-        return $this->userStreak->newQuery()
+        return UserStreak::query()
             ->join('users', 'user_streaks.user_id', '=', 'users.id')
             ->where('user_streaks.streak_type', 'login')
             ->where('user_streaks.current_streak', '>', 0)
@@ -80,11 +80,11 @@ class StreakService
     /**
      * Get all streaks for a user (all types).
      */
-    public function getAllStreaks(int $userId): array
+    public static function getAllStreaks(int $userId): array
     {
         $streaks = [];
         foreach (self::STREAK_TYPES as $type) {
-            $streaks[$type] = $this->getStreak($userId, $type);
+            $streaks[$type] = self::getStreak($userId, $type);
         }
         return $streaks;
     }
@@ -92,7 +92,7 @@ class StreakService
     /**
      * Get streak icon based on length.
      */
-    public function getStreakIcon(int $streakLength): string
+    public static function getStreakIcon(int $streakLength): string
     {
         if ($streakLength >= 365) { return "\xF0\x9F\x94\xA5\xF0\x9F\x8F\x86"; }
         if ($streakLength >= 100) { return "\xF0\x9F\x94\xA5\xF0\x9F\x92\x8E"; }
@@ -105,7 +105,7 @@ class StreakService
     /**
      * Get streak status message for display.
      */
-    public function getStreakMessage(?array $streak): string
+    public static function getStreakMessage(?array $streak): string
     {
         if (! $streak || ($streak['current'] ?? 0) === 0) {
             return 'Start your streak today!';
@@ -129,10 +129,10 @@ class StreakService
     /**
      * Get user's current streak for a specific type.
      */
-    public function getStreak(int $userId, string $streakType = 'activity'): ?array
+    public static function getStreak(int $userId, string $streakType = 'activity'): ?array
     {
         try {
-            $streak = $this->userStreak->newQuery()
+            $streak = UserStreak::query()
                 ->where('user_id', $userId)
                 ->where('streak_type', $streakType)
                 ->first();
@@ -172,9 +172,9 @@ class StreakService
     /**
      * Record login streak specifically.
      */
-    public function recordLogin(int $userId): array|false
+    public static function recordLogin(int $userId): array|false
     {
-        return $this->updateStreak($userId, 'login');
+        return self::updateStreak($userId, 'login');
     }
 
     // =========================================================================
@@ -184,7 +184,7 @@ class StreakService
     /**
      * Core streak update logic — handles creation, continuation, and reset.
      */
-    private function updateStreak(int $userId, string $streakType): array|false
+    private static function updateStreak(int $userId, string $streakType): array|false
     {
         if (! in_array($streakType, self::STREAK_TYPES)) {
             return false;
@@ -193,22 +193,22 @@ class StreakService
         try {
             $today = now()->toDateString();
 
-            $streak = $this->userStreak->newQuery()
+            $streak = UserStreak::query()
                 ->where('user_id', $userId)
                 ->where('streak_type', $streakType)
                 ->first();
 
             if (! $streak) {
                 // First activity — create streak record
-                $this->userStreak->newInstance([
+                UserStreak::create([
                     'user_id'            => $userId,
                     'streak_type'        => $streakType,
                     'current_streak'     => 1,
                     'longest_streak'     => 1,
                     'last_activity_date' => $today,
-                ])->save();
+                ]);
 
-                $this->gamificationService->checkStreakBadges($userId, 1);
+                GamificationService::checkStreakBadges($userId, 1);
                 return ['current' => 1, 'longest' => 1, 'is_new' => true];
             }
 
@@ -251,11 +251,11 @@ class StreakService
             $streak->save();
 
             // Check for streak badges
-            $this->gamificationService->checkStreakBadges($userId, $currentStreak);
+            GamificationService::checkStreakBadges($userId, $currentStreak);
 
             // Award XP for daily login streak
             if ($streakType === 'login') {
-                $this->gamificationService->awardXP(
+                GamificationService::awardXP(
                     $userId,
                     GamificationService::XP_VALUES['daily_login'],
                     'daily_login',

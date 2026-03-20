@@ -50,6 +50,19 @@ class PerformanceMonitorService
     }
 
     /**
+     * Static convenience wrapper for trackQuery().
+     *
+     * Called from App\Core\Database::query() which cannot resolve a DI instance.
+     * Silently no-ops to avoid breaking query execution when monitoring is not configured.
+     */
+    public static function trackQueryStatic(string $sql, array $params, float $duration): void
+    {
+        // No-op: performance monitoring is not yet wired in the Laravel migration.
+        // When a real implementation is added, resolve via the container:
+        //   app(static::class)->trackQuery($sql, $params, $duration);
+    }
+
+    /**
      * Delegates to legacy PerformanceMonitorService::trackMetric().
      */
     public function trackMetric(string $name, $value, array $context = []): void

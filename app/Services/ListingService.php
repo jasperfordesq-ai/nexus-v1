@@ -52,7 +52,7 @@ class ListingService
      * } $filters
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getAll(array $filters = []): array
+    public static function getAll(array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
@@ -60,7 +60,7 @@ class ListingService
             ? (int) $filters['current_user_id']
             : null;
 
-        $query = $this->listing->newQuery()
+        $query = Listing::query()
             ->with(['user:id,first_name,last_name,organization_name,profile_type,avatar_url,tagline',
                      'category:id,name,color,slug']);
 
@@ -202,9 +202,9 @@ class ListingService
      *
      * Accepts the same filter array as getAll(), but ignores cursor and limit.
      */
-    public function countAll(array $filters = []): int
+    public static function countAll(array $filters = []): int
     {
-        $query = $this->listing->newQuery();
+        $query = Listing::query();
 
         // Status filter
         if (empty($filters['include_deleted'])) {
@@ -273,9 +273,9 @@ class ListingService
     /**
      * Get a single listing by ID.
      */
-    public function getById(int $id, bool $includeDeleted = false, ?int $currentUserId = null): ?array
+    public static function getById(int $id, bool $includeDeleted = false, ?int $currentUserId = null): ?array
     {
-        $query = $this->listing->newQuery()
+        $query = Listing::query()
             ->with(['user', 'category', 'skillTags']);
 
         if (! $includeDeleted) {
@@ -372,7 +372,7 @@ class ListingService
      * @param array{radius_km?: float, limit?: int, type?: string|string[], category_id?: int} $filters
      * @return array{items: array, has_more: bool}
      */
-    public function getNearby(float $lat, float $lon, array $filters = []): array
+    public static function getNearby(float $lat, float $lon, array $filters = []): array
     {
         $radiusKm = (float) ($filters['radius_km'] ?? 25);
         $limit = min((int) ($filters['limit'] ?? 20), 100);
@@ -382,7 +382,7 @@ class ListingService
             . 'sin(radians(?)) * sin(radians(latitude))'
             . '))))';
 
-        $query = $this->listing->newQuery()
+        $query = Listing::query()
             ->with([
                 'user:id,first_name,last_name,organization_name,profile_type,avatar_url',
                 'category:id,name,color',
@@ -442,9 +442,9 @@ class ListingService
      * @param int $limit Max listings to return
      * @return array Featured listings
      */
-    public function getFeatured(int $limit = 10): array
+    public static function getFeatured(int $limit = 10): array
     {
-        return $this->listing->newQuery()
+        return Listing::query()
             ->with([
                 'user:id,first_name,last_name,organization_name,profile_type,avatar_url',
                 'category:id,name,color',
@@ -481,7 +481,7 @@ class ListingService
      *
      * @return int[]
      */
-    public function getSavedListingIds(int $userId): array
+    public static function getSavedListingIds(int $userId): array
     {
         return DB::table('user_saved_listings')
             ->where('user_id', $userId)
@@ -495,10 +495,10 @@ class ListingService
      *
      * @return bool False if listing not found in tenant
      */
-    public function saveListing(int $userId, int $listingId): bool
+    public static function saveListing(int $userId, int $listingId): bool
     {
         // Verify listing exists in tenant
-        $exists = $this->listing->newQuery()->where('id', $listingId)->exists();
+        $exists = Listing::query()->where('id', $listingId)->exists();
 
         if (! $exists) {
             return false;
@@ -516,7 +516,7 @@ class ListingService
     /**
      * Unsave (un-favourite) a listing. Always succeeds (idempotent).
      */
-    public function unsaveListing(int $userId, int $listingId): void
+    public static function unsaveListing(int $userId, int $listingId): void
     {
         DB::table('user_saved_listings')
             ->where('user_id', $userId)
@@ -537,9 +537,9 @@ class ListingService
      *
      * @throws ValidationException
      */
-    public function create(int $userId, array $data): Listing
+    public static function create(int $userId, array $data): Listing
     {
-        $this->validateData($data);
+        self::validateData($data);
 
         // Fall back to user's location when not provided
         if (empty($data['location']) || empty($data['latitude']) || empty($data['longitude'])) {
@@ -552,7 +552,7 @@ class ListingService
         }
 
         return DB::transaction(function () use ($userId, $data) {
-            $listing = $this->listing->newInstance([
+            $listing = new Listing([
                 'user_id'               => $userId,
                 'title'                 => trim($data['title']),
                 'description'           => trim($data['description']),
@@ -592,12 +592,12 @@ class ListingService
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      * @throws ValidationException
      */
-    public function update(int $id, array $data): Listing
+    public static function update(int $id, array $data): Listing
     {
-        $this->validateData($data, isUpdate: true);
+        self::validateData($data, isUpdate: true);
 
         /** @var Listing $listing */
-        $listing = $this->listing->newQuery()->findOrFail($id);
+        $listing = Listing::query()->findOrFail($id);
 
         $allowed = [
             'title', 'description', 'type', 'category_id', 'image_url',
@@ -614,10 +614,10 @@ class ListingService
     /**
      * Soft-delete a listing by setting status = 'deleted'.
      */
-    public function delete(int $id): bool
+    public static function delete(int $id): bool
     {
         /** @var Listing|null $listing */
-        $listing = $this->listing->newQuery()->find($id);
+        $listing = Listing::query()->find($id);
 
         if (! $listing) {
             return false;
@@ -638,7 +638,7 @@ class ListingService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function search(string $term, ?string $type = null, int $limit = 20): array
+    public static function search(string $term, ?string $type = null, int $limit = 20): array
     {
         $filters = ['search' => $term, 'limit' => $limit];
 
@@ -646,7 +646,7 @@ class ListingService
             $filters['type'] = $type;
         }
 
-        return $this->getAll($filters);
+        return self::getAll($filters);
     }
 
     // -----------------------------------------------------------------
@@ -656,7 +656,7 @@ class ListingService
     /**
      * Check if a user can modify a listing (owner or admin).
      */
-    public function canModify(array $listing, int $userId): bool
+    public static function canModify(array $listing, int $userId): bool
     {
         // Owner can always modify
         if ((int) ($listing['user_id'] ?? 0) === $userId) {
@@ -681,14 +681,14 @@ class ListingService
      *
      * @var array
      */
-    private array $errors = [];
+    private static array $errors = [];
 
     /**
      * Get validation errors from the last operation.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     // -----------------------------------------------------------------
@@ -700,7 +700,7 @@ class ListingService
      *
      * @throws ValidationException
      */
-    private function validateData(array $data, bool $isUpdate = false): void
+    private static function validateData(array $data, bool $isUpdate = false): void
     {
         $rules = [];
 

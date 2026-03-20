@@ -19,7 +19,7 @@ class GeocodingService
     /**
      * Delegates to legacy GeocodingService::geocode().
      */
-    public function geocode(string $address): ?array
+    public static function geocode(string $address): ?array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class GeocodingService
     /**
      * Delegates to legacy GeocodingService::updateUserCoordinates().
      */
-    public function updateUserCoordinates(int $userId, ?string $location): bool
+    public static function updateUserCoordinates(int $userId, ?string $location): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class GeocodingService
     /**
      * Delegates to legacy GeocodingService::updateListingCoordinates().
      */
-    public function updateListingCoordinates(int $listingId, ?string $location): bool
+    public static function updateListingCoordinates(int $listingId, ?string $location): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -46,7 +46,7 @@ class GeocodingService
     /**
      * Delegates to legacy GeocodingService::batchGeocodeUsers().
      */
-    public function batchGeocodeUsers(int $limit = 100): array
+    public static function batchGeocodeUsers(int $limit = 100): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];
@@ -55,7 +55,7 @@ class GeocodingService
     /**
      * Delegates to legacy GeocodingService::batchGeocodeListings().
      */
-    public function batchGeocodeListings(int $limit = 100): array
+    public static function batchGeocodeListings(int $limit = 100): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

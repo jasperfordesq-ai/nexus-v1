@@ -19,7 +19,7 @@ class MatchApprovalWorkflowService
     /**
      * Delegates to legacy MatchApprovalWorkflowService::submitForApproval().
      */
-    public function submitForApproval(int $userId, int $listingId, array $matchData): ?int
+    public static function submitForApproval(int $userId, int $listingId, array $matchData): ?int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return null;
@@ -28,7 +28,7 @@ class MatchApprovalWorkflowService
     /**
      * Delegates to legacy MatchApprovalWorkflowService::approveMatch().
      */
-    public function approveMatch(int $requestId, int $approvedBy, string $notes = ''): bool
+    public static function approveMatch(int $requestId, int $approvedBy, string $notes = ''): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -37,7 +37,7 @@ class MatchApprovalWorkflowService
     /**
      * Delegates to legacy MatchApprovalWorkflowService::rejectMatch().
      */
-    public function rejectMatch(int $requestId, int $rejectedBy, string $reason = ''): bool
+    public static function rejectMatch(int $requestId, int $rejectedBy, string $reason = ''): bool
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return false;
@@ -46,7 +46,7 @@ class MatchApprovalWorkflowService
     /**
      * Delegates to legacy MatchApprovalWorkflowService::bulkApprove().
      */
-    public function bulkApprove(array $requestIds, int $approvedBy, string $notes = ''): int
+    public static function bulkApprove(array $requestIds, int $approvedBy, string $notes = ''): int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return 0;
@@ -55,7 +55,7 @@ class MatchApprovalWorkflowService
     /**
      * Delegates to legacy MatchApprovalWorkflowService::bulkReject().
      */
-    public function bulkReject(array $requestIds, int $rejectedBy, string $reason = ''): int
+    public static function bulkReject(array $requestIds, int $rejectedBy, string $reason = ''): int
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return 0;
@@ -64,7 +64,7 @@ class MatchApprovalWorkflowService
     /**
      * Delegates to legacy MatchApprovalWorkflowService::getStatistics().
      */
-    public function getStatistics(int $days = 30): array
+    public static function getStatistics(int $days = 30): array
     {
         \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return [];

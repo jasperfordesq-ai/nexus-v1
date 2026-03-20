@@ -30,12 +30,12 @@ class GroupService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getAll(array $filters = []): array
+    public static function getAll(array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
-        $query = $this->group->newQuery()
+        $query = Group::query()
             ->with(['creator:id,first_name,last_name,avatar_url'])
             ->withCount('activeMembers');
 
@@ -78,7 +78,7 @@ class GroupService
 
         $enriched = $items->map(function (Group $group) {
             $data = $group->toArray();
-            return $this->enrichGroupData($data, $group);
+            return self::enrichGroupData($data, $group);
         })->all();
 
         return [
@@ -91,10 +91,10 @@ class GroupService
     /**
      * Get a single group by ID.
      */
-    public function getById(int $id, ?int $currentUserId = null): ?array
+    public static function getById(int $id, ?int $currentUserId = null): ?array
     {
         /** @var Group|null $group */
-        $group = $this->group->newQuery()
+        $group = Group::query()
             ->with(['creator'])
             ->withCount('activeMembers')
             ->find($id);
@@ -104,7 +104,7 @@ class GroupService
         }
 
         $data = $group->toArray();
-        $data = $this->enrichGroupData($data, $group);
+        $data = self::enrichGroupData($data, $group);
 
         if ($currentUserId) {
             $membership = DB::table('group_members')
@@ -149,7 +149,7 @@ class GroupService
     /**
      * Enrich group data with frontend-compatible field aliases.
      */
-    private function enrichGroupData(array $data, Group $group): array
+    private static function enrichGroupData(array $data, Group $group): array
     {
         $memberCount = $data['active_members_count'] ?? $group->cached_member_count ?? 0;
         $data['member_count'] = $memberCount;
@@ -161,10 +161,10 @@ class GroupService
     /**
      * Create a new group.
      */
-    public function create(int $userId, array $data): Group
+    public static function create(int $userId, array $data): Group
     {
         return DB::transaction(function () use ($userId, $data) {
-            $group = $this->group->newInstance([
+            $group = new Group([
                 'owner_id'             => $userId,
                 'name'                 => trim($data['name']),
                 'description'          => trim($data['description'] ?? ''),
@@ -195,10 +195,10 @@ class GroupService
     /**
      * Join a group.
      */
-    public function join(int $groupId, int $userId): array
+    public static function join(int $groupId, int $userId): array
     {
         /** @var Group $group */
-        $group = $this->group->newQuery()->findOrFail($groupId);
+        $group = Group::query()->findOrFail($groupId);
 
         $existing = DB::table('group_members')
             ->where('group_id', $groupId)
@@ -226,10 +226,10 @@ class GroupService
     /**
      * Leave a group.
      */
-    public function leave(int $groupId, int $userId): bool
+    public static function leave(int $groupId, int $userId): bool
     {
         /** @var Group $group */
-        $group = $this->group->newQuery()->findOrFail($groupId);
+        $group = Group::query()->findOrFail($groupId);
 
         $detached = $group->members()->detach($userId);
 
@@ -245,14 +245,14 @@ class GroupService
     // -----------------------------------------------------------------
 
     /** @var array */
-    private array $errors = [];
+    private static array $errors = [];
 
     /**
      * Get validation errors from the last operation.
      */
-    public function getErrors(): array
+    public static function getErrors(): array
     {
-        return $this->errors;
+        return self::$errors;
     }
 
     // -----------------------------------------------------------------
@@ -262,20 +262,20 @@ class GroupService
     /**
      * Update a group.
      */
-    public function update(int $id, int $userId, array $data): bool
+    public static function update(int $id, int $userId, array $data): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         /** @var Group|null $group */
-        $group = $this->group->newQuery()->find($id);
+        $group = Group::query()->find($id);
 
         if (! $group) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
             return false;
         }
 
-        if (! $this->canModify($id, $userId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to edit this group'];
+        if (! self::canModify($id, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to edit this group'];
             return false;
         }
 
@@ -297,21 +297,21 @@ class GroupService
     /**
      * Delete a group.
      */
-    public function delete(int $id, int $userId): bool
+    public static function delete(int $id, int $userId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         /** @var Group|null $group */
-        $group = $this->group->newQuery()->find($id);
+        $group = Group::query()->find($id);
 
         if (! $group) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
             return false;
         }
 
         // Only owner or platform admin can delete
-        if ((int) $group->owner_id !== $userId && ! $this->isPlatformAdmin($userId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the group owner can delete this group'];
+        if ((int) $group->owner_id !== $userId && ! self::isPlatformAdmin($userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the group owner can delete this group'];
             return false;
         }
 
@@ -357,7 +357,7 @@ class GroupService
     /**
      * Get members of a group with cursor-based pagination.
      */
-    public function getMembers(int $groupId, array $filters = []): array
+    public static function getMembers(int $groupId, array $filters = []): array
     {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $role = $filters['role'] ?? null;
@@ -418,17 +418,17 @@ class GroupService
     /**
      * Update a member's role in a group.
      */
-    public function updateMemberRole(int $groupId, int $targetUserId, int $actingUserId, string $role): bool
+    public static function updateMemberRole(int $groupId, int $targetUserId, int $actingUserId, string $role): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         if (! in_array($role, ['admin', 'member'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid role', 'field' => 'role'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid role', 'field' => 'role'];
             return false;
         }
 
-        if (! $this->canModify($groupId, $actingUserId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage members'];
+        if (! self::canModify($groupId, $actingUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage members'];
             return false;
         }
 
@@ -439,15 +439,15 @@ class GroupService
             ->first();
 
         if (! $membership || $membership->status !== 'active') {
-            $this->errors[] = ['code' => 'NOT_MEMBER', 'message' => 'User is not a member of this group'];
+            self::$errors[] = ['code' => 'NOT_MEMBER', 'message' => 'User is not a member of this group'];
             return false;
         }
 
         // Can't change owner's role
         /** @var Group $group */
-        $group = $this->group->newQuery()->findOrFail($groupId);
+        $group = Group::query()->findOrFail($groupId);
         if ((int) $group->owner_id === $targetUserId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot change the owner\'s role'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot change the owner\'s role'];
             return false;
         }
 
@@ -462,26 +462,26 @@ class GroupService
     /**
      * Remove a member from a group.
      */
-    public function removeMember(int $groupId, int $targetUserId, int $actingUserId): bool
+    public static function removeMember(int $groupId, int $targetUserId, int $actingUserId): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
-        if (! $this->canModify($groupId, $actingUserId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to remove members'];
+        if (! self::canModify($groupId, $actingUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to remove members'];
             return false;
         }
 
         // Can't remove the owner
         /** @var Group $group */
-        $group = $this->group->newQuery()->findOrFail($groupId);
+        $group = Group::query()->findOrFail($groupId);
         if ((int) $group->owner_id === $targetUserId) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot remove the group owner'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot remove the group owner'];
             return false;
         }
 
         // Can't remove yourself this way (use leave instead)
         if ($targetUserId === $actingUserId) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Use leave endpoint to remove yourself'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Use leave endpoint to remove yourself'];
             return false;
         }
 
@@ -501,12 +501,12 @@ class GroupService
     /**
      * Get pending join requests for a group (admin only).
      */
-    public function getPendingRequests(int $groupId, int $adminUserId): ?array
+    public static function getPendingRequests(int $groupId, int $adminUserId): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
-        if (! $this->canModify($groupId, $adminUserId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to view join requests'];
+        if (! self::canModify($groupId, $adminUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to view join requests'];
             return null;
         }
 
@@ -527,17 +527,17 @@ class GroupService
     /**
      * Handle a join request (accept/reject).
      */
-    public function handleJoinRequest(int $groupId, int $requesterId, int $adminUserId, string $action): bool
+    public static function handleJoinRequest(int $groupId, int $requesterId, int $adminUserId, string $action): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
         if (! in_array($action, ['accept', 'reject'])) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject', 'field' => 'action'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject', 'field' => 'action'];
             return false;
         }
 
-        if (! $this->canModify($groupId, $adminUserId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to handle join requests'];
+        if (! self::canModify($groupId, $adminUserId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to handle join requests'];
             return false;
         }
 
@@ -548,7 +548,7 @@ class GroupService
             ->first();
 
         if (! $membership || $membership->status !== 'pending') {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'No pending request found for this user'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'No pending request found for this user'];
             return false;
         }
 
@@ -559,7 +559,7 @@ class GroupService
                 ->update(['status' => 'active']);
 
             /** @var Group $group */
-            $group = $this->group->newQuery()->find($groupId);
+            $group = Group::query()->find($groupId);
             if ($group) {
                 $group->increment('cached_member_count');
             }
@@ -581,9 +581,9 @@ class GroupService
     /**
      * Get discussions in a group.
      */
-    public function getDiscussions(int $groupId, int $userId, array $filters = []): ?array
+    public static function getDiscussions(int $groupId, int $userId, array $filters = []): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
         // Check membership
         $isMember = DB::table('group_members')
@@ -593,7 +593,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
             return null;
         }
 
@@ -647,9 +647,9 @@ class GroupService
     /**
      * Create a discussion in a group.
      */
-    public function createDiscussion(int $groupId, int $userId, array $data): ?array
+    public static function createDiscussion(int $groupId, int $userId, array $data): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
         // Check membership
         $isMember = DB::table('group_members')
@@ -659,7 +659,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to create discussions'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to create discussions'];
             return null;
         }
 
@@ -667,12 +667,12 @@ class GroupService
         $content = trim($data['content'] ?? '');
 
         if (empty($title)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
             return null;
         }
 
         if (empty($content)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
             return null;
         }
 
@@ -712,9 +712,9 @@ class GroupService
     /**
      * Get messages in a group discussion.
      */
-    public function getDiscussionMessages(int $groupId, int $discussionId, int $userId, array $filters = []): ?array
+    public static function getDiscussionMessages(int $groupId, int $discussionId, int $userId, array $filters = []): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
         // Check membership
         $isMember = DB::table('group_members')
@@ -724,7 +724,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
             return null;
         }
 
@@ -735,7 +735,7 @@ class GroupService
             ->find($discussionId);
 
         if (! $discussion) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
             return null;
         }
 
@@ -816,9 +816,9 @@ class GroupService
     /**
      * Post a message to a group discussion.
      */
-    public function postToDiscussion(int $groupId, int $discussionId, int $userId, array $data): ?array
+    public static function postToDiscussion(int $groupId, int $discussionId, int $userId, array $data): ?array
     {
-        $this->errors = [];
+        self::$errors = [];
 
         // Check membership
         $isMember = DB::table('group_members')
@@ -828,7 +828,7 @@ class GroupService
             ->exists();
 
         if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to post'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to post'];
             return null;
         }
 
@@ -838,13 +838,13 @@ class GroupService
             ->find($discussionId);
 
         if (! $discussion) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
             return null;
         }
 
         $content = trim($data['content'] ?? '');
         if (empty($content)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
             return null;
         }
 
@@ -877,17 +877,17 @@ class GroupService
     /**
      * Update a group's image (avatar or cover).
      */
-    public function updateImage(int $groupId, int $userId, string $imageUrl, string $type = 'avatar'): bool
+    public static function updateImage(int $groupId, int $userId, string $imageUrl, string $type = 'avatar'): bool
     {
-        $this->errors = [];
+        self::$errors = [];
 
-        if (! $this->canModify($groupId, $userId)) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this group'];
+        if (! self::canModify($groupId, $userId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this group'];
             return false;
         }
 
         /** @var Group|null $group */
-        $group = $this->group->newQuery()->find($groupId);
+        $group = Group::query()->find($groupId);
 
         if (! $group) {
             return false;
@@ -907,10 +907,10 @@ class GroupService
     /**
      * Check if a user can modify a group (is admin/owner).
      */
-    private function canModify(int $groupId, int $userId): bool
+    private static function canModify(int $groupId, int $userId): bool
     {
         // Check if platform admin
-        if ($this->isPlatformAdmin($userId)) {
+        if (self::isPlatformAdmin($userId)) {
             return true;
         }
 
@@ -926,7 +926,7 @@ class GroupService
     /**
      * Check if user is a platform admin.
      */
-    private function isPlatformAdmin(int $userId): bool
+    private static function isPlatformAdmin(int $userId): bool
     {
         $user = User::find($userId);
         if (! $user) {

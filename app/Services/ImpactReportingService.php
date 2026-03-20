@@ -23,7 +23,7 @@ class ImpactReportingService
     /**
      * Calculate Social Return on Investment (SROI).
      */
-    public function calculateSROI(array $config = []): array
+    public static function calculateSROI(array $config = []): array
     {
         $tenantId = TenantContext::getId();
         $months = $config['months'] ?? 12;
@@ -62,7 +62,7 @@ class ImpactReportingService
     /**
      * Get community health metrics.
      */
-    public function getCommunityHealthMetrics(): array
+    public static function getCommunityHealthMetrics(): array
     {
         $tenantId = TenantContext::getId();
 
@@ -141,7 +141,7 @@ class ImpactReportingService
     /**
      * Get impact timeline (monthly breakdown).
      */
-    public function getImpactTimeline(int $months = 12): array
+    public static function getImpactTimeline(int $months = 12): array
     {
         $tenantId = TenantContext::getId();
 
@@ -185,7 +185,7 @@ class ImpactReportingService
     /**
      * Get tenant report configuration.
      */
-    public function getReportConfig(): array
+    public static function getReportConfig(): array
     {
         $tenantId = TenantContext::getId();
 

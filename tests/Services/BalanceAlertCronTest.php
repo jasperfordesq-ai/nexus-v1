@@ -20,7 +20,7 @@ use App\Services\BalanceAlertService;
  * - Notification sending to org admins
  * - Balance status reporting
  *
- * @covers \Nexus\Services\BalanceAlertService
+ * @covers \App\Services\BalanceAlertService
  */
 class BalanceAlertCronTest extends TestCase
 {
