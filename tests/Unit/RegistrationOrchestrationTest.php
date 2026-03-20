@@ -95,7 +95,7 @@ class RegistrationOrchestrationTest extends TestCase
 
     public function testNotificationDispatcherVerificationMethodsExist(): void
     {
-        $ref = new ReflectionClass(\Nexus\Services\NotificationDispatcher::class);
+        $ref = new ReflectionClass(\App\Services\NotificationDispatcher::class);
         $methods = ['dispatchVerificationPassed', 'dispatchVerificationFailed', 'dispatchVerificationCompletedToAdmins', 'dispatchVerificationReminder'];
         foreach ($methods as $m) {
             $this->assertTrue($ref->hasMethod($m), "Missing: {$m}");
