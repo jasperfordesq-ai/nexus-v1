@@ -130,8 +130,8 @@ class CollaborativeFilteringServiceTest extends DatabaseTestCase
         foreach ($favPairs as [$uid, $lid]) {
             try {
                 Database::query(
-                    "INSERT INTO listing_favorites (user_id, listing_id, created_at) VALUES (?, ?, NOW())",
-                    [$uid, $lid]
+                    "INSERT INTO listing_favorites (user_id, listing_id, tenant_id, created_at) VALUES (?, ?, ?, NOW())",
+                    [$uid, $lid, self::$tenantA]
                 );
                 self::$createdFavoriteIds[] = (int) Database::getInstance()->lastInsertId();
             } catch (\Throwable $e) {

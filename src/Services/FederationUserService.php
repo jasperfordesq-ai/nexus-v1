@@ -28,15 +28,15 @@ class FederationUserService
             )->fetch(\PDO::FETCH_ASSOC);
 
             if (!$settings) {
-                // Return defaults - all ON (users opt out if they want)
+                // Return defaults - all OFF (users must opt in)
                 return [
                     'user_id' => $userId,
-                    'federation_optin' => true,
-                    'profile_visible_federated' => true,
-                    'messaging_enabled_federated' => true,
-                    'transactions_enabled_federated' => true,
-                    'appear_in_federated_search' => true,
-                    'show_skills_federated' => true,
+                    'federation_optin' => false,
+                    'profile_visible_federated' => false,
+                    'messaging_enabled_federated' => false,
+                    'transactions_enabled_federated' => false,
+                    'appear_in_federated_search' => false,
+                    'show_skills_federated' => false,
                     'show_location_federated' => false,
                     'service_reach' => 'local_only',
                     'travel_radius_km' => null,
@@ -62,12 +62,12 @@ class FederationUserService
             error_log("FederationUserService::getUserSettings error: " . $e->getMessage());
             return [
                 'user_id' => $userId,
-                'federation_optin' => true,
-                'profile_visible_federated' => true,
-                'messaging_enabled_federated' => true,
-                'transactions_enabled_federated' => true,
-                'appear_in_federated_search' => true,
-                'show_skills_federated' => true,
+                'federation_optin' => false,
+                'profile_visible_federated' => false,
+                'messaging_enabled_federated' => false,
+                'transactions_enabled_federated' => false,
+                'appear_in_federated_search' => false,
+                'show_skills_federated' => false,
                 'show_location_federated' => false,
                 'service_reach' => 'local_only',
                 'travel_radius_km' => null,
@@ -189,8 +189,8 @@ class FederationUserService
                 [$userId]
             )->fetch(\PDO::FETCH_ASSOC);
 
-            // No row means default (opted in)
-            return (bool)($result['federation_optin'] ?? true);
+            // No row means default (not opted in)
+            return (bool)($result['federation_optin'] ?? false);
 
         } catch (\Exception $e) {
             return false;

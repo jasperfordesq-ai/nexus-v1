@@ -31,7 +31,8 @@ class HashtagService
     {
         $matches = [];
         // Match #hashtag (letters, numbers, underscores, hyphens; 2-50 chars)
-        preg_match_all('/#([a-zA-Z][a-zA-Z0-9_-]{1,49})/', $content, $matches);
+        // Negative lookahead ensures tags >50 chars are excluded entirely
+        preg_match_all('/#([a-zA-Z][a-zA-Z0-9_-]{1,49})(?![a-zA-Z0-9_-])/', $content, $matches);
 
         if (empty($matches[1])) {
             return [];

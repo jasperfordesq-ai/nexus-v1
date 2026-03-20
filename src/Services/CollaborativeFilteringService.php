@@ -58,7 +58,8 @@ class CollaborativeFilteringService
         $knnKey    = "recs_listings_{$tenantId}_{$listingId}";
         $knnCached = RedisCache::get($knnKey, $tenantId);
         if ($knnCached !== null && !empty($knnCached)) {
-            return array_slice($knnCached, 0, $limit);
+            $knnFiltered = array_values(array_filter($knnCached, fn(int $id) => $id !== $listingId));
+            return array_slice($knnFiltered, 0, $limit);
         }
 
         // Load user→listing interaction matrix (implicit: save = 1)
@@ -66,10 +67,17 @@ class CollaborativeFilteringService
 
         if (empty($interactions)) {
             // Cold-start: no interaction data yet — fall back to recently active listings
-            return self::getPopularListingsFallback($tenantId, $limit);
+            $fallback = self::getPopularListingsFallback($tenantId, $limit + 1);
+            $fallback = array_values(array_filter($fallback, fn(int $id) => $id !== $listingId));
+            return array_slice($fallback, 0, $limit);
         }
 
-        $similar = self::itemBasedRecommendations($listingId, $interactions, $limit);
+        $similar = self::itemBasedRecommendations($listingId, $interactions, $limit + 1);
+
+        // Exclude source listing from results
+        $similar = array_values(array_filter($similar, fn(int $id) => $id !== $listingId));
+        $similar = array_slice($similar, 0, $limit);
+
         RedisCache::set($cacheKey, $similar, self::CACHE_TTL_SECONDS, $tenantId);
 
         return $similar;
@@ -139,7 +147,7 @@ class CollaborativeFilteringService
         // Step 1 — Find similar users via transaction graph (user-user matrix)
         $memberInteractions = self::loadMemberInteractions($tenantId);
         if (empty($memberInteractions) || !isset($memberInteractions[$userId])) {
-            return self::getPopularListingsFallback($tenantId, $limit);
+            return self::getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
         }
 
         // Compute similarity between $userId and all other users
@@ -160,7 +168,7 @@ class CollaborativeFilteringService
         }
 
         if (empty($similarities)) {
-            return self::getPopularListingsFallback($tenantId, $limit);
+            return self::getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
         }
 
         // Top-N similar users (enough to get a rich listing pool without over-fetching)
@@ -170,7 +178,7 @@ class CollaborativeFilteringService
         // Step 2 — Load listing saves for those similar users
         $listingInteractions = self::loadListingInteractions($tenantId);
         if (empty($listingInteractions)) {
-            return self::getPopularListingsFallback($tenantId, $limit);
+            return self::getPopularListingsFallbackExcludingSaved($userId, $tenantId, $limit);
         }
 
         // Aggregate: listing score = Σ (user_similarity × save_weight)
@@ -183,10 +191,25 @@ class CollaborativeFilteringService
             }
         }
 
-        // Remove listings the source user has already interacted with
+        // Remove listings the source user has already saved/interacted with
         $userSaved = $listingInteractions[$userId] ?? [];
         foreach (array_keys($userSaved) as $alreadySeen) {
             unset($listingScores[$alreadySeen]);
+        }
+
+        // Also exclude listings saved in DB (listing_favorites) that may not be in the matrix
+        try {
+            $savedRows = Database::query(
+                "SELECT lf.listing_id FROM listing_favorites lf
+                 JOIN listings l ON lf.listing_id = l.id
+                 WHERE lf.user_id = ? AND l.tenant_id = ?",
+                [$userId, $tenantId]
+            )->fetchAll(\PDO::FETCH_COLUMN);
+            foreach ($savedRows as $savedId) {
+                unset($listingScores[(int)$savedId]);
+            }
+        } catch (\Throwable $e) {
+            // listing_favorites table may not exist
         }
 
         arsort($listingScores);
@@ -309,6 +332,35 @@ class CollaborativeFilteringService
         } catch (\Throwable $e) {
             return [];
         }
+    }
+
+    /**
+     * Popular listings fallback that excludes the user's already-saved listings.
+     *
+     * @param int $userId
+     * @param int $tenantId
+     * @param int $limit
+     * @return int[]
+     */
+    private static function getPopularListingsFallbackExcludingSaved(int $userId, int $tenantId, int $limit): array
+    {
+        $fallback = self::getPopularListingsFallback($tenantId, $limit + 20);
+
+        // Exclude listings the user has already saved
+        try {
+            $savedRows = Database::query(
+                "SELECT lf.listing_id FROM listing_favorites lf
+                 JOIN listings l ON lf.listing_id = l.id
+                 WHERE lf.user_id = ? AND l.tenant_id = ?",
+                [$userId, $tenantId]
+            )->fetchAll(\PDO::FETCH_COLUMN);
+            $savedIds = array_map('intval', $savedRows);
+            $fallback = array_values(array_filter($fallback, fn(int $id) => !in_array($id, $savedIds, true)));
+        } catch (\Throwable $e) {
+            // listing_favorites table may not exist
+        }
+
+        return array_slice($fallback, 0, $limit);
     }
 
     /**

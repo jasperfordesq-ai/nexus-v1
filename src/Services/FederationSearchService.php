@@ -79,7 +79,8 @@ class FederationSearchService
             return [
                 'members' => [],
                 'total' => 0,
-                'filters_applied' => []
+                'filters_applied' => [],
+                'has_more' => false
             ];
         }
 
@@ -257,6 +258,7 @@ class FederationSearchService
                 'members' => [],
                 'total' => 0,
                 'filters_applied' => [],
+                'has_more' => false,
                 'error' => 'Search failed'
             ];
         }

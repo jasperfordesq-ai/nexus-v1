@@ -65,9 +65,9 @@ class ConnectionServiceTest extends DatabaseTestCase
         // Create test connection (pending)
         try {
             Database::query(
-                "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-                 VALUES (?, ?, 'pending', NOW())",
-                [self::$testUserId, self::$testUser2Id]
+                "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+                 VALUES (?, ?, ?, 'pending', NOW())",
+                [self::$testTenantId, self::$testUserId, self::$testUser2Id]
             );
             self::$testConnectionId = (int)Database::getInstance()->lastInsertId();
         } catch (\Exception $e) {
@@ -216,9 +216,9 @@ class ConnectionServiceTest extends DatabaseTestCase
         try {
             // Create an accepted connection first
             Database::query(
-                "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-                 VALUES (?, ?, 'accepted', NOW())",
-                [self::$testUser3Id, self::$testUser2Id]
+                "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+                 VALUES (?, ?, ?, 'accepted', NOW())",
+                [self::$testTenantId, self::$testUser3Id, self::$testUser2Id]
             );
             $tempId = (int)Database::getInstance()->lastInsertId();
 
@@ -274,9 +274,9 @@ class ConnectionServiceTest extends DatabaseTestCase
         // Create a new pending connection for this test
         try {
             Database::query(
-                "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-                 VALUES (?, ?, 'pending', NOW())",
-                [self::$testUser2Id, self::$testUser3Id]
+                "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+                 VALUES (?, ?, ?, 'pending', NOW())",
+                [self::$testTenantId, self::$testUser2Id, self::$testUser3Id]
             );
             $tempId = (int)Database::getInstance()->lastInsertId();
 
@@ -301,9 +301,9 @@ class ConnectionServiceTest extends DatabaseTestCase
         try {
             // Create a new pending connection to reject
             Database::query(
-                "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-                 VALUES (?, ?, 'pending', NOW())",
-                [self::$testUser2Id, self::$testUser3Id]
+                "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+                 VALUES (?, ?, ?, 'pending', NOW())",
+                [self::$testTenantId, self::$testUser2Id, self::$testUser3Id]
             );
             $tempId = (int)Database::getInstance()->lastInsertId();
 
@@ -340,9 +340,9 @@ class ConnectionServiceTest extends DatabaseTestCase
         try {
             // Create an accepted connection to remove
             Database::query(
-                "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-                 VALUES (?, ?, 'accepted', NOW())",
-                [self::$testUser2Id, self::$testUser3Id]
+                "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+                 VALUES (?, ?, ?, 'accepted', NOW())",
+                [self::$testTenantId, self::$testUser2Id, self::$testUser3Id]
             );
             $tempId = (int)Database::getInstance()->lastInsertId();
 
@@ -391,9 +391,9 @@ class ConnectionServiceTest extends DatabaseTestCase
     {
         // Create a fresh pending connection for this test
         Database::query(
-            "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-             VALUES (?, ?, 'pending', NOW())",
-            [self::$testUser3Id, self::$testUserId]
+            "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+             VALUES (?, ?, ?, 'pending', NOW())",
+            [self::$testTenantId, self::$testUser3Id, self::$testUserId]
         );
         $tempId = (int)Database::getInstance()->lastInsertId();
 
@@ -411,9 +411,9 @@ class ConnectionServiceTest extends DatabaseTestCase
     {
         // Create a fresh pending connection for this test
         Database::query(
-            "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-             VALUES (?, ?, 'pending', NOW())",
-            [self::$testUser3Id, self::$testUserId]
+            "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+             VALUES (?, ?, ?, 'pending', NOW())",
+            [self::$testTenantId, self::$testUser3Id, self::$testUserId]
         );
         $tempId = (int)Database::getInstance()->lastInsertId();
 
@@ -431,9 +431,9 @@ class ConnectionServiceTest extends DatabaseTestCase
     {
         // Create an accepted connection
         Database::query(
-            "INSERT INTO connections (requester_id, receiver_id, status, created_at)
-             VALUES (?, ?, 'accepted', NOW())",
-            [self::$testUser2Id, self::$testUser3Id]
+            "INSERT INTO connections (tenant_id, requester_id, receiver_id, status, created_at)
+             VALUES (?, ?, ?, 'accepted', NOW())",
+            [self::$testTenantId, self::$testUser2Id, self::$testUser3Id]
         );
         $tempId = (int)Database::getInstance()->lastInsertId();
 

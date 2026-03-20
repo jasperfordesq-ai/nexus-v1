@@ -197,6 +197,19 @@ class FederationFeatureService
     {
         $tenantId = $tenantId ?? TenantContext::getId();
 
+        // Reject non-existent tenants
+        try {
+            $exists = Database::query(
+                "SELECT 1 FROM tenants WHERE id = ?",
+                [$tenantId]
+            )->fetch();
+            if (!$exists) {
+                return false;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+
         // First check system-level
         if (!self::isGloballyEnabled()) {
             return false;
@@ -376,6 +389,27 @@ class FederationFeatureService
     public static function isOperationAllowed(string $operation, ?int $tenantId = null): array
     {
         $tenantId = $tenantId ?? TenantContext::getId();
+
+        // 0. Reject non-existent tenants
+        try {
+            $exists = Database::query(
+                "SELECT 1 FROM tenants WHERE id = ?",
+                [$tenantId]
+            )->fetch();
+            if (!$exists) {
+                return [
+                    'allowed' => false,
+                    'reason' => 'Tenant does not exist',
+                    'level' => 'invalid'
+                ];
+            }
+        } catch (\Exception $e) {
+            return [
+                'allowed' => false,
+                'reason' => 'Unable to verify tenant',
+                'level' => 'error'
+            ];
+        }
 
         // 1. Check emergency lockdown
         $controls = self::getSystemControls();

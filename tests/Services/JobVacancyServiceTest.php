@@ -30,6 +30,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
     protected static bool $hasSavedJobsTable    = false;
     protected static bool $hasAlertsTable       = false;
     protected static bool $hasHistoryTable      = false;
+    protected static bool $hasViewsTable        = false;
 
     public static function setUpBeforeClass(): void
     {
@@ -89,17 +90,17 @@ class JobVacancyServiceTest extends DatabaseTestCase
     {
         $ts = time();
         self::$pdo->exec(
-            "INSERT INTO users (tenant_id, name, email, password, role, status, created_at)"
+            "INSERT INTO users (tenant_id, name, email, password_hash, role, status, created_at)"
             . " VALUES (2, 'JV Owner', 'jv_owner_{$ts}@test.invalid', 'x', 'member', 'active', NOW())"
         );
         self::$ownerUserId = (int) self::$pdo->lastInsertId();
         self::$pdo->exec(
-            "INSERT INTO users (tenant_id, name, email, password, role, status, created_at)"
+            "INSERT INTO users (tenant_id, name, email, password_hash, role, status, created_at)"
             . " VALUES (2, 'JV Applicant', 'jv_app_{$ts}@test.invalid', 'x', 'member', 'active', NOW())"
         );
         self::$applicantUserId = (int) self::$pdo->lastInsertId();
         self::$pdo->exec(
-            "INSERT INTO users (tenant_id, name, email, password, role, status, created_at)"
+            "INSERT INTO users (tenant_id, name, email, password_hash, role, status, created_at)"
             . " VALUES (2, 'JV Admin', 'jv_admin_{$ts}@test.invalid', 'x', 'admin', 'active', NOW())"
         );
         self::$adminUserId = (int) self::$pdo->lastInsertId();
@@ -124,6 +125,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
             "saved_jobs"                => "hasSavedJobsTable",
             "job_alert_subscriptions"   => "hasAlertsTable",
             "job_application_history"   => "hasHistoryTable",
+            "job_vacancy_views"         => "hasViewsTable",
         ];
         foreach ($map as $table => $flag) {
             try {
@@ -892,7 +894,7 @@ class JobVacancyServiceTest extends DatabaseTestCase
         $this->assertNotNull($appId);
         $ts = time();
         self::$pdo->exec(
-            "INSERT INTO users (tenant_id, name, email, password, role, status, created_at)"
+            "INSERT INTO users (tenant_id, name, email, password_hash, role, status, created_at)"
             . " VALUES (2, 'Stranger', 'stranger_{$ts}@test.invalid', 'x', 'member', 'active', NOW())"
         );
         $strangerId = (int) self::$pdo->lastInsertId();

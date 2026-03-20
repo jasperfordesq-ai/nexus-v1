@@ -221,7 +221,7 @@ class MatchingServiceTest extends TestCase
         $prefsToSave = [
             'max_distance_km' => 75,
             'min_match_score' => 40,
-            'notification_frequency' => 'instant',
+            'notification_frequency' => 'daily',
             'notify_hot_matches' => false,
             'notify_mutual_matches' => true,
             'categories' => []
@@ -236,7 +236,7 @@ class MatchingServiceTest extends TestCase
 
         $this->assertEquals(75, $retrieved['max_distance_km']);
         $this->assertEquals(40, $retrieved['min_match_score']);
-        $this->assertEquals('instant', $retrieved['notification_frequency']);
+        $this->assertEquals('daily', $retrieved['notification_frequency']);
         // Note: savePreferences uses isset() which returns true for false values,
         // so both booleans are stored as 1 regardless of the input value.
         $this->assertTrue($retrieved['notify_hot_matches']);

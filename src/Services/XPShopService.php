@@ -45,7 +45,7 @@ class XPShopService
         )->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         // Get user's current XP
-        $user = Database::query("SELECT xp FROM users WHERE id = ? AND tenant_id = ?", [$userId])->fetch();
+        $user = Database::query("SELECT xp FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
         $userXP = (int)($user['xp'] ?? 0);
 
         foreach ($items as &$item) {
@@ -67,7 +67,8 @@ class XPShopService
     public static function canPurchase($userId, $item, $userXP = null)
     {
         if ($userXP === null) {
-            $user = Database::query("SELECT xp FROM users WHERE id = ? AND tenant_id = ?", [$userId])->fetch();
+            $tenantId = TenantContext::getId();
+            $user = Database::query("SELECT xp FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId])->fetch();
             $userXP = (int)($user['xp'] ?? 0);
         }
 

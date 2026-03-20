@@ -240,8 +240,7 @@ class BrokerControlConfigService
     public static function isExchangeWorkflowEnabled(): bool
     {
         $config = self::getConfig('exchange_workflow');
-        // Check both broker config AND tenant feature flag
-        return (bool) ($config['enabled'] ?? false) || TenantContext::hasFeature('exchange_workflow');
+        return (bool) ($config['enabled'] ?? false);
     }
 
     /**

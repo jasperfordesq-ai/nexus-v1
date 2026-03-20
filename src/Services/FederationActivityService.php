@@ -145,8 +145,8 @@ class FederationActivityService
             'total_messages' => 0,
             'transactions_sent' => 0,
             'transactions_received' => 0,
-            'hours_sent' => 0,
-            'hours_received' => 0,
+            'hours_sent' => 0.0,
+            'hours_received' => 0.0,
             'partner_count' => 0
         ];
 
