@@ -6,7 +6,7 @@
 
 namespace App\Services;
 
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\Mailer;
 use App\Core\Env;
 use App\Core\TenantContext;

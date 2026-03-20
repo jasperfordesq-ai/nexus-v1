@@ -47,7 +47,7 @@ class TenantContext
             return DB::connection()->getPdo();
         } catch (\Throwable $e) {
             // Fallback for contexts where Laravel hasn't fully booted
-            return \Nexus\Core\Database::getConnection();
+            return \App\Core\Database::getConnection();
         }
     }
 

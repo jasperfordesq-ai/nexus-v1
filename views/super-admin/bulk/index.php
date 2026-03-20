@@ -5,7 +5,7 @@
  * Perform bulk actions on users and tenants.
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Bulk Operations';
 require __DIR__ . '/../partials/header.php';

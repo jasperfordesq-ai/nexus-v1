@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Middleware\SuperPanelAccess;
 
 $basePath = TenantContext::getBasePath();

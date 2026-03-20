@@ -6,7 +6,7 @@
  * search, filtering, stats, and smooth animations.
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Tenant Hierarchy';
 require __DIR__ . '/../partials/header.php';

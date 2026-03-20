@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests;
 
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 /**

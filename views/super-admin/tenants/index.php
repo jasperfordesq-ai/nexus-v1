@@ -3,7 +3,7 @@
  * Super Admin - Tenant List
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Manage Tenants';
 require __DIR__ . '/../partials/header.php';

@@ -4,7 +4,7 @@
  * STANDALONE admin interface
  */
 
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 // Admin check

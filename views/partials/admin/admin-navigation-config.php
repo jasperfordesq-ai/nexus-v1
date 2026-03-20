@@ -6,7 +6,7 @@
  * @package Nexus\Admin
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * Get the admin navigation modules configuration

@@ -3,7 +3,7 @@
  * Smart Match Monitoring Dashboard - Admin Interface
  */
 
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 $tenantId = TenantContext::getId();

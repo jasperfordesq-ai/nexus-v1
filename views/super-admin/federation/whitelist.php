@@ -4,7 +4,7 @@
  * Manage which tenants can participate in federation
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Federation Whitelist';
 require __DIR__ . '/../partials/header.php';

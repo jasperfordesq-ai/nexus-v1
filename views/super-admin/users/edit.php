@@ -10,7 +10,7 @@
  * - Grant/Revoke Super Admin for current tenant
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Edit User';
 require __DIR__ . '/../partials/header.php';

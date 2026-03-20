@@ -6,7 +6,7 @@
 // Seed missing category types for T3 (Public Sector Demo)
 // Only inserts types that have zero categories for this tenant.
 require '/var/www/html/vendor/autoload.php';
-$db = \Nexus\Core\Database::getInstance();
+$db = \App\Core\Database::getInstance();
 $tenantId = 3;
 
 // Check existing types

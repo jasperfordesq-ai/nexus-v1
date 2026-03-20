@@ -88,7 +88,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
 $app->booted(function () use ($app) {
     try {
         $pdo = $app->make('db')->connection()->getPdo();
-        \Nexus\Core\Database::setLaravelConnection($pdo);
+        \App\Core\Database::setLaravelConnection($pdo);
     } catch (\Throwable $e) {
         // If Laravel DB isn't configured yet, legacy Database creates its own connection
         error_log('[Laravel Bridge] DB bridge skipped: ' . $e->getMessage());

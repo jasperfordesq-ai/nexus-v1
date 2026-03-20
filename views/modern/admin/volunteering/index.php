@@ -5,7 +5,7 @@
  */
 
 use App\Core\TenantContext;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();

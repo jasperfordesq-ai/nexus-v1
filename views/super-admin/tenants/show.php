@@ -3,7 +3,7 @@
  * Super Admin - View Tenant Details
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Tenant Details';
 require __DIR__ . '/../partials/header.php';
@@ -157,7 +157,7 @@ require __DIR__ . '/../partials/header.php';
                                 </td>
                                 <td>
                                     <?php
-                                    $childUsers = \Nexus\Core\Database::query(
+                                    $childUsers = \App\Core\Database::query(
                                         "SELECT COUNT(*) FROM users WHERE tenant_id = ?",
                                         [$child['id']]
                                     )->fetchColumn();

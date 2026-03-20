@@ -3,7 +3,7 @@
  * Super Admin - Create User Form
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Create User';
 require __DIR__ . '/../partials/header.php';

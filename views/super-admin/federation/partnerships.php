@@ -4,7 +4,7 @@
  * View and manage all partnerships across the platform
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Federation Partnerships';
 require __DIR__ . '/../partials/header.php';

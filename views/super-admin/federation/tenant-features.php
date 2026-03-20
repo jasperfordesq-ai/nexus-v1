@@ -4,7 +4,7 @@
  * View and manage federation features for a specific tenant
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Tenant Federation Settings';
 require __DIR__ . '/../partials/header.php';

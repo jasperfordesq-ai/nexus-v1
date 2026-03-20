@@ -4,7 +4,7 @@
  * Renders collapsible vertical sidebar from centralized config
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Services\AdminBadgeCountService;
 
 // Load navigation config

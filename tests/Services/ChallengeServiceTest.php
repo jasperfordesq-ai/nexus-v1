@@ -8,7 +8,7 @@ namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\ChallengeService;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 class ChallengeServiceTest extends TestCase

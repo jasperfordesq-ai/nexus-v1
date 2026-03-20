@@ -11,8 +11,8 @@
  * - $tenantName: Organization name
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Env;
+use App\Core\TenantContext;
+use App\Core\Env;
 
 // Theme colors - Hot match uses orange/red gradient
 $primaryColor = '#f97316';

@@ -469,7 +469,7 @@ class TenantIsolationTest extends TestCase
      */
     public function testIsTokenUserSuperAdminIsPrivate(): void
     {
-        $reflection = new ReflectionClass(\Nexus\Core\TenantContext::class);
+        $reflection = new ReflectionClass(\App\Core\TenantContext::class);
         $method = $reflection->getMethod('isTokenUserSuperAdmin');
 
         $this->assertTrue(

@@ -13,8 +13,8 @@
  * - $tenantName: Organization name
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Env;
+use App\Core\TenantContext;
+use App\Core\Env;
 
 // Theme colors - Digest uses purple/indigo gradient
 $primaryColor = '#6366f1';

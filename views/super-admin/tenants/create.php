@@ -3,7 +3,7 @@
  * Super Admin - Create Tenant Form
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Create Tenant';
 $parentTenant = $parentTenant ?? null;

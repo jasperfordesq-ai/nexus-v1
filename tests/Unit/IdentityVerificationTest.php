@@ -256,7 +256,7 @@ class IdentityVerificationTest extends TestCase
         $result = RegistrationPolicyService::decryptConfig($plainJson);
 
         $this->assertIsArray($result);
-        if (!empty(\Nexus\Core\Env::get('APP_KEY'))) {
+        if (!empty(\App\Core\Env::get('APP_KEY'))) {
             // AES decryption of plain JSON fails → empty array
             $this->assertEmpty($result);
         } else {

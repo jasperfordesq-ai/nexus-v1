@@ -8,7 +8,7 @@ namespace Nexus\Tests\Models;
 
 use PHPUnit\Framework\TestCase;
 use App\Models\OrgMember;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 class OrgMemberTest extends TestCase

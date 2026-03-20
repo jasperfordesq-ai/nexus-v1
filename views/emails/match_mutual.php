@@ -12,8 +12,8 @@
  * - $tenantName: Organization name
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Env;
+use App\Core\TenantContext;
+use App\Core\Env;
 
 // Theme colors - Mutual match uses green/teal gradient
 $primaryColor = '#10b981';

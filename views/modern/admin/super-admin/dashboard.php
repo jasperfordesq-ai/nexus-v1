@@ -5,7 +5,7 @@
  * Path: views/modern/admin/super-admin/dashboard.php
  */
 
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 use App\Core\Env;
 

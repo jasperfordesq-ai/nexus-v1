@@ -3,7 +3,7 @@
  * Super Admin - Edit Tenant Form
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Edit Tenant';
 

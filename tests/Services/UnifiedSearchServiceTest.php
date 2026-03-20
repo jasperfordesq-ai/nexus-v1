@@ -10,7 +10,7 @@ namespace Nexus\Tests\Services;
 
 use App\Services\UnifiedSearchService;
 use App\Core\TenantContext;
-use Nexus\Core\Database;
+use App\Core\Database;
 use Nexus\Tests\DatabaseTestCase;
 
 /**

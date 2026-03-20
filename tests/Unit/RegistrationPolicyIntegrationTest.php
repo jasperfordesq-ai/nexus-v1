@@ -228,7 +228,7 @@ class RegistrationPolicyIntegrationTest extends TestCase
         $this->assertIsArray($result);
         // If APP_KEY is set, plain JSON goes through decryption path (returns empty)
         // If APP_KEY is not set, it falls through to JSON decode (returns decoded)
-        if (\Nexus\Core\Env::get('APP_KEY')) {
+        if (\App\Core\Env::get('APP_KEY')) {
             $this->assertEmpty($result);
         } else {
             $this->assertSame('test123', $result['api_key']);

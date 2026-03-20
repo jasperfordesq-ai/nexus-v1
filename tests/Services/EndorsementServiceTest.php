@@ -10,7 +10,7 @@ namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\EndorsementService;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 /**

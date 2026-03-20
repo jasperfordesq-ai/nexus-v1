@@ -3,7 +3,7 @@
  * Super Admin - View User Details
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'User Details';
 require __DIR__ . '/../partials/header.php';

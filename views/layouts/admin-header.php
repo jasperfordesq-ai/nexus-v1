@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $tenant = TenantContext::get();
@@ -1739,7 +1739,7 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
             <?php
             $unreadNotifications = 0;
             try {
-                $unreadNotifications = \Nexus\Core\Database::query(
+                $unreadNotifications = \App\Core\Database::query(
                     "SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0 AND deleted_at IS NULL",
                     [$_SESSION['user_id'] ?? 0]
                 )->fetch()['c'] ?? 0;

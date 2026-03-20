@@ -7,7 +7,7 @@
 namespace App\Services;
 
 use App\Models\NewsletterAnalytics;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * Newsletter tracking service — relocated from Nexus\Controllers\NewsletterTrackingController.
@@ -32,7 +32,7 @@ class NewsletterTrackingService
                     $trackingToken,
                     $data['email'] ?? 'unknown',
                     $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    \Nexus\Core\ClientIp::get()
+                    \App\Core\ClientIp::get()
                 );
             } catch (\Exception $e) {
                 // Silently fail - don't disrupt email viewing
@@ -72,7 +72,7 @@ class NewsletterTrackingService
                     $url,
                     $linkId,
                     $_SERVER['HTTP_USER_AGENT'] ?? null,
-                    \Nexus\Core\ClientIp::get()
+                    \App\Core\ClientIp::get()
                 );
             } catch (\Exception $e) {
                 // Silently fail - still redirect
@@ -214,7 +214,7 @@ class NewsletterTrackingService
      */
     public static function addTracking($html, $newsletterId, $trackingToken, $basePath)
     {
-        $appUrl = \Nexus\Core\Env::get('APP_URL') ?? '';
+        $appUrl = \App\Core\Env::get('APP_URL') ?? '';
         $baseUrl = rtrim($appUrl, '/') . $basePath;
 
         // Add tracking pixel before </body>

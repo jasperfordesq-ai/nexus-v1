@@ -11,7 +11,7 @@ use App\Models\OrgWallet;
 use App\Models\OrgMember;
 use App\Models\OrgTransaction;
 use App\Models\User;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 class OrgWalletTest extends TestCase

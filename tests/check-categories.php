@@ -4,7 +4,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 require '/var/www/html/vendor/autoload.php';
-$db = \Nexus\Core\Database::getInstance();
+$db = \App\Core\Database::getInstance();
 $r = $db->prepare('SELECT tenant_id, type, COUNT(*) as n FROM categories GROUP BY tenant_id, type ORDER BY tenant_id, type');
 $r->execute();
 echo "tenant_id | type | count\n";

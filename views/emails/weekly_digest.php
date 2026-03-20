@@ -13,8 +13,8 @@
  * - $unsubscribeToken: (optional) Token for unsubscribe link
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Env;
+use App\Core\TenantContext;
+use App\Core\Env;
 
 $brandColor = '#6366f1';
 $brandColorDark = '#4f46e5';

@@ -5,9 +5,9 @@
  * Used by the legacy PHP admin panel for session-based authentication.
  * Regular users log in via the React frontend at app.project-nexus.ie.
  */
-$basePath = \Nexus\Core\TenantContext::getBasePath();
-$csrfToken = \Nexus\Core\Csrf::token();
-$tenantName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
+$basePath = \App\Core\TenantContext::getBasePath();
+$csrfToken = \App\Core\Csrf::token();
+$tenantName = \App\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
 $error = $error ?? '';
 ?>
 <!DOCTYPE html>
@@ -57,7 +57,7 @@ $error = $error ?? '';
             <button type="submit" class="btn-login">Sign In</button>
         </form>
 
-        <p class="admin-note">This login is for admin panel access. Members should use the <a href="<?= htmlspecialchars(\Nexus\Core\TenantContext::getFrontendUrl()) ?>">main app</a>.</p>
+        <p class="admin-note">This login is for admin panel access. Members should use the <a href="<?= htmlspecialchars(\App\Core\TenantContext::getFrontendUrl()) ?>">main app</a>.</p>
     </div>
 </body>
 </html>

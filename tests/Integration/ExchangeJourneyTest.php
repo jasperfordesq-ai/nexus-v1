@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Integration;
 
 use Nexus\Tests\DatabaseTestCase;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 use App\Services\WalletService;
 use App\Services\ReviewService;

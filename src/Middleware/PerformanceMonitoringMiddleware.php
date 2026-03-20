@@ -56,8 +56,8 @@ class PerformanceMonitoringMiddleware
     private static function addPerformanceHeaders(): void
     {
         // Get database query stats if profiling is enabled
-        if (class_exists('\Nexus\Core\Database')) {
-            $stats = \Nexus\Core\Database::getQueryStats();
+        if (class_exists('\App\Core\Database')) {
+            $stats = \App\Core\Database::getQueryStats();
 
             if (!empty($stats)) {
                 header('X-Query-Count: ' . ($stats['total_queries'] ?? 0));

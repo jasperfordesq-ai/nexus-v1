@@ -4,7 +4,7 @@
  * Overview of all federation activity and controls
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Federation Control Center';
 require __DIR__ . '/../partials/header.php';

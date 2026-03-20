@@ -305,23 +305,23 @@ class DeliverableTest extends DatabaseTestCase
             $email = "deliverable_test_{$uniqueSuffix}@test.com";
         }
         $passwordHash = password_hash('password', PASSWORD_DEFAULT);
-        \Nexus\Core\Database::query(
+        \App\Core\Database::query(
             "INSERT INTO users (tenant_id, email, name, first_name, last_name, password_hash, role, balance, is_approved, created_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())",
             [$this->testTenantId, $email, 'Test User', 'Test', 'User', $passwordHash, 'member', 0]
         );
-        return (int)\Nexus\Core\Database::lastInsertId();
+        return (int)\App\Core\Database::lastInsertId();
     }
 
     protected function tearDown(): void
     {
         // Clean up test data using Database::query() (same connection as the models)
         try {
-            \Nexus\Core\Database::query("DELETE FROM deliverable_history WHERE deliverable_id IN (SELECT id FROM deliverables WHERE tenant_id = ?)", [$this->testTenantId]);
-            \Nexus\Core\Database::query("DELETE FROM deliverables WHERE tenant_id = ?", [$this->testTenantId]);
+            \App\Core\Database::query("DELETE FROM deliverable_history WHERE deliverable_id IN (SELECT id FROM deliverables WHERE tenant_id = ?)", [$this->testTenantId]);
+            \App\Core\Database::query("DELETE FROM deliverables WHERE tenant_id = ?", [$this->testTenantId]);
             // Clean up test users created during this test (email pattern match)
-            \Nexus\Core\Database::query("DELETE FROM users WHERE email LIKE 'deliverable_test_%@test.com' AND tenant_id = ?", [$this->testTenantId]);
-            \Nexus\Core\Database::query("DELETE FROM users WHERE email LIKE 'assignee_%@test.com' AND tenant_id = ?", [$this->testTenantId]);
+            \App\Core\Database::query("DELETE FROM users WHERE email LIKE 'deliverable_test_%@test.com' AND tenant_id = ?", [$this->testTenantId]);
+            \App\Core\Database::query("DELETE FROM users WHERE email LIKE 'assignee_%@test.com' AND tenant_id = ?", [$this->testTenantId]);
         } catch (\Exception $e) {
             // Ignore cleanup errors
         }

@@ -4,7 +4,7 @@
  * Master kill switch and global feature toggles
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Federation System Controls';
 require __DIR__ . '/../partials/header.php';

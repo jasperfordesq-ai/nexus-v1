@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services\Federation;
 
 use Nexus\Tests\DatabaseTestCase;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 use App\Services\FederationDirectoryService;
 

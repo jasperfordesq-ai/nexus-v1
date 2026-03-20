@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Not Found - Project Nexus</title>
     <?php
-    $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContext::getBasePath() : '';
+    $basePath = class_exists('\App\Core\TenantContext') ? \App\Core\TenantContext::getBasePath() : '';
     ?>
     <link href="<?= $basePath ?>/assets/css/nexus-phoenix.css" rel="stylesheet">
     <link href="<?= $basePath ?>/assets/css/error-states.css" rel="stylesheet">

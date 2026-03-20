@@ -4,7 +4,7 @@
  * Infrastructure Overview - Tenant Hierarchy Management
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Dashboard';
 require __DIR__ . '/partials/header.php';

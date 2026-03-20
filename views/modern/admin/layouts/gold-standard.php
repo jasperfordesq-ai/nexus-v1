@@ -6,7 +6,7 @@
  */
 
 use App\Core\TenantContext;
-use Nexus\Core\Database;
+use App\Core\Database;
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';

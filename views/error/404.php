@@ -4,7 +4,7 @@
  * This is the fallback 404 view for the modern layout
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $tenant = TenantContext::get();

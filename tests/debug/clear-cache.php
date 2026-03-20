@@ -20,7 +20,7 @@ if (function_exists('opcache_reset')) {
 require_once __DIR__ . '/bootstrap.php';
 
 try {
-    $db = \Nexus\Core\Database::getConnection();
+    $db = \App\Core\Database::getConnection();
     $stmt = $db->query("DELETE FROM menu_cache");
     echo "✅ Menu cache cleared from database\n";
 } catch (\Exception $e) {

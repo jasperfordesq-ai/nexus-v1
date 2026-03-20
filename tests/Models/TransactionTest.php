@@ -9,7 +9,7 @@ namespace Nexus\Tests\Models;
 use PHPUnit\Framework\TestCase;
 use App\Models\Transaction;
 use App\Models\User;
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 class TransactionTest extends TestCase

@@ -96,7 +96,7 @@ class ListingExpiryService
 
         foreach ($tenantIds as $tenantId) {
             try {
-                \Nexus\Core\TenantContext::setById($tenantId);
+                \App\Core\TenantContext::setById($tenantId);
                 $result = $this->processExpiredListings();
                 $totalExpired += $result['expired'];
                 $totalErrors += $result['errors'];

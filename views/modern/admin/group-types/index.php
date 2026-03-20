@@ -4,7 +4,7 @@
  * STANDALONE Admin Interface with Holographic Glassmorphism
  */
 
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 use Nexus\Models\GroupType;
 

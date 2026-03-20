@@ -4,7 +4,7 @@
  * Complete audit trail of all federation activity
  */
 
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $pageTitle = $pageTitle ?? 'Federation Audit Log';
 require __DIR__ . '/../partials/header.php';

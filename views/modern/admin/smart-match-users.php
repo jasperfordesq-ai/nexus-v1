@@ -3,7 +3,7 @@
  * Smart Match Users to Groups - Admin Interface
  */
 
-use Nexus\Core\Database;
+use App\Core\Database;
 use App\Core\TenantContext;
 
 $tenantId = TenantContext::getId();

@@ -3,7 +3,7 @@
  * 403 Forbidden Error Page
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $message = $message ?? 'You do not have permission to access this resource.';

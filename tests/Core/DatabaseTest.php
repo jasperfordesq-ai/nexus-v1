@@ -9,11 +9,11 @@ declare(strict_types=1);
 namespace Nexus\Tests\Core;
 
 use Nexus\Tests\DatabaseTestCase;
-use Nexus\Core\Database;
+use App\Core\Database;
 
 /**
  * Database Tests
- * @covers \Nexus\Core\Database
+ * @covers \App\Core\Database
  */
 class DatabaseTest extends DatabaseTestCase
 {

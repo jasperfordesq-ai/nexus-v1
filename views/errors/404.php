@@ -3,7 +3,7 @@
  * 404 Not Found Error Page
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $message = $message ?? 'The page you are looking for could not be found.';
