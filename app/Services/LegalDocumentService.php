@@ -42,6 +42,48 @@ class LegalDocumentService
     }
 
     /**
+     * Get a legal document by type (alias for getDocument).
+     */
+    public function getByType(string $type): ?array
+    {
+        return $this->getDocument($type);
+    }
+
+    /**
+     * Get a legal document by ID.
+     */
+    public function legacyGetById(int $id): ?array
+    {
+        $record = DB::table('legal_documents as ld')
+            ->leftJoin('legal_document_versions as ldv', 'ld.current_version_id', '=', 'ldv.id')
+            ->where('ld.id', $id)
+            ->where('ld.tenant_id', TenantContext::getId())
+            ->select('ld.*', 'ld.document_type as type', 'ldv.version_number', 'ldv.content', 'ldv.effective_date', 'ldv.summary_of_changes')
+            ->first();
+
+        return $record ? (array) $record : null;
+    }
+
+    /**
+     * Get all active legal documents for a tenant.
+     */
+    public function getAllForTenant(int $tenantId): array
+    {
+        return DB::table('legal_documents as ld')
+            ->leftJoin('legal_document_versions as ldv', 'ld.current_version_id', '=', 'ldv.id')
+            ->where('ld.tenant_id', $tenantId)
+            ->where('ld.is_active', true)
+            ->orderBy('ld.document_type')
+            ->select(
+                'ld.*', 'ld.document_type as type', 'ldv.version_number', 'ldv.effective_date',
+                DB::raw('(SELECT COUNT(*) FROM legal_document_versions WHERE document_id = ld.id) as version_count')
+            )
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+    }
+
+    /**
      * Get all versions of a legal document.
      */
     public function getVersions(int $documentId): array
@@ -52,6 +94,195 @@ class LegalDocumentService
             ->get()
             ->map(fn ($v) => (array) $v)
             ->all();
+    }
+
+    /**
+     * Get legacy versions by document ID (with user names).
+     */
+    public function legacyGetVersions(int $documentId): array
+    {
+        return DB::table('legal_document_versions as ldv')
+            ->join('legal_documents as ld', 'ldv.document_id', '=', 'ld.id')
+            ->leftJoin('users as u', 'ldv.created_by', '=', 'u.id')
+            ->leftJoin('users as u2', 'ldv.published_by', '=', 'u2.id')
+            ->where('ldv.document_id', $documentId)
+            ->where('ld.tenant_id', TenantContext::getId())
+            ->orderByDesc('ldv.created_at')
+            ->select('ldv.*', 'u.name as created_by_name', 'u2.name as published_by_name')
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+    }
+
+    /**
+     * Get a specific version.
+     */
+    public function getVersion(int $vid): ?array
+    {
+        $record = DB::table('legal_document_versions as ldv')
+            ->join('legal_documents as ld', 'ldv.document_id', '=', 'ld.id')
+            ->where('ldv.id', $vid)
+            ->where('ld.tenant_id', TenantContext::getId())
+            ->select('ldv.*', 'ld.document_type', 'ld.title', 'ld.tenant_id')
+            ->first();
+
+        return $record ? (array) $record : null;
+    }
+
+    /**
+     * Create a new legal document.
+     */
+    public function createDocument(array $data): array
+    {
+        $tenantId = $data['tenant_id'] ?? TenantContext::getId();
+
+        $id = DB::table('legal_documents')->insertGetId([
+            'tenant_id'               => $tenantId,
+            'document_type'           => $data['document_type'],
+            'title'                   => $data['title'],
+            'slug'                    => $data['slug'] ?? $data['document_type'],
+            'requires_acceptance'     => $data['requires_acceptance'] ?? 1,
+            'acceptance_required_for' => $data['acceptance_required_for'] ?? 'registration',
+            'notify_on_update'        => $data['notify_on_update'] ?? 1,
+            'is_active'               => $data['is_active'] ?? 1,
+            'created_by'              => auth()->id(),
+        ]);
+
+        return $this->legacyGetById($id) ?? ['id' => $id];
+    }
+
+    /**
+     * Update a legal document.
+     */
+    public function updateDocument(int $id, array $data): ?array
+    {
+        $allowedFields = ['title', 'slug', 'requires_acceptance', 'acceptance_required_for', 'notify_on_update', 'is_active'];
+
+        $updates = [];
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $updates[$field] = $data[$field];
+            }
+        }
+
+        if (empty($updates)) {
+            return null;
+        }
+
+        DB::table('legal_documents')
+            ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->update($updates);
+
+        return $this->legacyGetById($id);
+    }
+
+    /**
+     * Create a new version for a document.
+     */
+    public function createVersion(int $docId, array $data): int
+    {
+        $plainText = ! empty($data['content']) ? strip_tags($data['content']) : null;
+
+        return DB::table('legal_document_versions')->insertGetId([
+            'document_id'        => $docId,
+            'version_number'     => $data['version_number'],
+            'version_label'      => $data['version_label'] ?? null,
+            'content'            => $data['content'],
+            'content_plain'      => $plainText,
+            'summary_of_changes' => $data['summary_of_changes'] ?? null,
+            'effective_date'     => $data['effective_date'],
+            'is_draft'           => $data['is_draft'] ?? 1,
+            'created_by'         => auth()->id(),
+        ]);
+    }
+
+    /**
+     * Update a version.
+     */
+    public function updateVersion(int $vid, array $data): bool
+    {
+        $allowedFields = ['version_number', 'version_label', 'content', 'summary_of_changes', 'effective_date', 'is_draft'];
+
+        $updates = [];
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $updates[$field] = $data[$field];
+            }
+        }
+
+        // Update plain text if content changed
+        if (isset($data['content'])) {
+            $updates['content_plain'] = strip_tags($data['content']);
+        }
+
+        if (empty($updates)) {
+            return false;
+        }
+
+        DB::table('legal_document_versions')
+            ->where('id', $vid)
+            ->whereIn('document_id', function ($q) {
+                $q->select('id')->from('legal_documents')->where('tenant_id', TenantContext::getId());
+            })
+            ->update($updates);
+
+        return true;
+    }
+
+    /**
+     * Publish a version (make it the current version).
+     */
+    public function publishVersion(int $vid): bool
+    {
+        $version = $this->getVersion($vid);
+        if (! $version) {
+            return false;
+        }
+
+        return DB::transaction(function () use ($vid, $version) {
+            // Unset current flag on all other versions
+            DB::table('legal_document_versions')
+                ->where('document_id', $version['document_id'])
+                ->update(['is_current' => 0]);
+
+            // Set this version as current and published
+            DB::table('legal_document_versions')
+                ->where('id', $vid)
+                ->update([
+                    'is_current'   => 1,
+                    'is_draft'     => 0,
+                    'published_at' => now(),
+                    'published_by' => auth()->id(),
+                ]);
+
+            // Update document's current version pointer
+            DB::table('legal_documents')
+                ->where('id', $version['document_id'])
+                ->update(['current_version_id' => $vid]);
+
+            return true;
+        });
+    }
+
+    /**
+     * Delete a version (only drafts can be deleted).
+     */
+    public function deleteVersion(int $vid): bool
+    {
+        $version = $this->getVersion($vid);
+        if (! $version || ! $version['is_draft']) {
+            return false;
+        }
+
+        DB::table('legal_document_versions')
+            ->where('id', $vid)
+            ->whereIn('document_id', function ($q) {
+                $q->select('id')->from('legal_documents')->where('tenant_id', TenantContext::getId());
+            })
+            ->delete();
+
+        return true;
     }
 
     /**
@@ -90,6 +321,29 @@ class LegalDocumentService
     }
 
     /**
+     * Record acceptance from request context.
+     */
+    public function recordAcceptanceFromRequest(int $userId, int $documentId, int $versionId, string $method): void
+    {
+        // Get version number
+        $version       = $this->getVersion($versionId);
+        $versionNumber = $version['version_number'] ?? 'unknown';
+
+        DB::table('user_legal_acceptances')->updateOrInsert(
+            ['user_id' => $userId, 'version_id' => $versionId],
+            [
+                'document_id'       => $documentId,
+                'version_number'    => $versionNumber,
+                'acceptance_method' => $method,
+                'ip_address'        => request()->ip(),
+                'user_agent'        => request()->userAgent(),
+                'session_id'        => session()->getId(),
+                'accepted_at'       => now(),
+            ]
+        );
+    }
+
+    /**
      * Check if a user has accepted the current version of a document type.
      */
     public function hasAccepted(int $userId, string $type): bool
@@ -110,229 +364,241 @@ class LegalDocumentService
             ->exists();
     }
 
-    // =========================================================================
-    // Legacy delegation methods — used by AdminEnterpriseController and
-    // AdminLegalDocController until full Eloquent migration is complete.
-    // =========================================================================
-
     /**
-     * Delegates to legacy LegalDocumentService::getAllForTenant().
-     */
-    public function getAllForTenant(int $tenantId): array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return [];
-        }
-        return \Nexus\Services\LegalDocumentService::getAllForTenant($tenantId);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::createDocument().
-     */
-    public function createDocument(array $data): array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return [];
-        }
-        return \Nexus\Services\LegalDocumentService::createDocument($data);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::updateDocument().
-     */
-    public function updateDocument(int $id, array $data): ?array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return null;
-        }
-        return \Nexus\Services\LegalDocumentService::updateDocument($id, $data);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::compareVersions().
-     */
-    public function compareVersions(int $v1, int $v2): ?array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return null;
-        }
-        return \Nexus\Services\LegalDocumentService::compareVersions($v1, $v2);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::createVersion().
-     */
-    public function createVersion(int $docId, array $data): int
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return 0;
-        }
-        return \Nexus\Services\LegalDocumentService::createVersion($docId, $data);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::publishVersion().
-     */
-    public function publishVersion(int $vid): bool
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return false;
-        }
-        return \Nexus\Services\LegalDocumentService::publishVersion($vid);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::getComplianceSummary().
-     */
-    public function getComplianceSummary(int $tenantId): array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return [];
-        }
-        return \Nexus\Services\LegalDocumentService::getComplianceSummary($tenantId);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::getVersionAcceptances().
-     */
-    public function getVersionAcceptances(int $vid, int $limit = 50, int $offset = 0): array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return [];
-        }
-        return \Nexus\Services\LegalDocumentService::getVersionAcceptances($vid, $limit, $offset);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::exportAcceptanceRecords().
-     */
-    public function exportAcceptanceRecords(int $docId, ?string $startDate = null, ?string $endDate = null): array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return [];
-        }
-        return \Nexus\Services\LegalDocumentService::exportAcceptanceRecords($docId, $startDate, $endDate);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::notifyUsersOfUpdate().
-     */
-    public function notifyUsersOfUpdate(int $docId, int $vid, bool $sendEmail = true): int
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return 0;
-        }
-        return \Nexus\Services\LegalDocumentService::notifyUsersOfUpdate($docId, $vid, $sendEmail);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::getUsersPendingAcceptanceCount().
-     */
-    public function getUsersPendingAcceptanceCount(int $docId, int $vid): int
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return 0;
-        }
-        return \Nexus\Services\LegalDocumentService::getUsersPendingAcceptanceCount($docId, $vid);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::getVersion().
-     */
-    public function getVersion(int $vid): ?array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return null;
-        }
-        return \Nexus\Services\LegalDocumentService::getVersion($vid);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::updateVersion().
-     */
-    public function updateVersion(int $vid, array $data): bool
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return false;
-        }
-        return \Nexus\Services\LegalDocumentService::updateVersion($vid, $data);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::deleteVersion().
-     */
-    public function deleteVersion(int $vid): bool
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return false;
-        }
-        return \Nexus\Services\LegalDocumentService::deleteVersion($vid);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::getByType().
-     */
-    public function getByType(string $type): ?array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return null;
-        }
-        return \Nexus\Services\LegalDocumentService::getByType($type);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::getById().
-     */
-    public function legacyGetById(int $id): ?array
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return null;
-        }
-        return \Nexus\Services\LegalDocumentService::getById($id);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::recordAcceptanceFromRequest().
-     */
-    public function recordAcceptanceFromRequest(int $userId, int $documentId, int $versionId, string $method): void
-    {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return;
-        }
-        \Nexus\Services\LegalDocumentService::recordAcceptanceFromRequest($userId, $documentId, $versionId, $method);
-    }
-
-    /**
-     * Delegates to legacy LegalDocumentService::getUserAcceptanceStatus().
+     * Get user's acceptance status for all required documents.
      */
     public function getUserAcceptanceStatus(int $userId): array
     {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return [];
-        }
-        return \Nexus\Services\LegalDocumentService::getUserAcceptanceStatus($userId);
+        $tenantId = TenantContext::getId();
+
+        return DB::select("
+            SELECT
+                ld.id AS document_id,
+                ld.document_type,
+                ld.title,
+                ld.requires_acceptance,
+                ld.current_version_id,
+                ldv.version_number AS current_version,
+                ldv.effective_date,
+                ula.id AS acceptance_id,
+                ula.version_id AS accepted_version_id,
+                ula.version_number AS accepted_version,
+                ula.accepted_at,
+                CASE
+                    WHEN ula.version_id IS NULL THEN 'not_accepted'
+                    WHEN ula.version_id = ld.current_version_id THEN 'current'
+                    ELSE 'outdated'
+                END AS acceptance_status
+             FROM legal_documents ld
+             LEFT JOIN legal_document_versions ldv ON ld.current_version_id = ldv.id
+             LEFT JOIN user_legal_acceptances ula ON ula.user_id = ?
+                 AND ula.document_id = ld.id
+                 AND ula.version_id = (
+                     SELECT MAX(ula2.version_id)
+                     FROM user_legal_acceptances ula2
+                     WHERE ula2.user_id = ? AND ula2.document_id = ld.id
+                 )
+             WHERE ld.tenant_id = ?
+             AND ld.is_active = 1
+             AND ld.requires_acceptance = 1
+             AND ld.current_version_id IS NOT NULL
+        ", [$userId, $userId, $tenantId]);
     }
 
     /**
-     * Delegates to legacy LegalDocumentService::hasPendingAcceptances().
+     * Check if user has any pending acceptances.
      */
     public function hasPendingAcceptances(int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return false;
+        $statuses = $this->getUserAcceptanceStatus($userId);
+
+        foreach ($statuses as $doc) {
+            if (($doc->acceptance_status ?? '') !== 'current') {
+                return true;
+            }
         }
-        return \Nexus\Services\LegalDocumentService::hasPendingAcceptances($userId);
+
+        return false;
     }
 
     /**
-     * Get legacy versions by document ID (delegates to legacy).
+     * Compare two versions and generate an HTML diff.
      */
-    public function legacyGetVersions(int $documentId): array
+    public function compareVersions(int $v1, int $v2): ?array
     {
-        if (!class_exists('\Nexus\Services\LegalDocumentService')) {
-            return [];
+        $version1 = $this->getVersion($v1);
+        $version2 = $this->getVersion($v2);
+
+        if (! $version1 || ! $version2) {
+            return null;
         }
-        return \Nexus\Services\LegalDocumentService::getVersions($documentId);
+
+        $oldText = $this->stripToPlainSentences($version1['content_plain'] ?: strip_tags($version1['content']));
+        $newText = $this->stripToPlainSentences($version2['content_plain'] ?: strip_tags($version2['content']));
+
+        $diffHtml     = $this->generateSimpleDiff($oldText, $newText);
+        $changesCount = substr_count($diffHtml, 'diff-removed') + substr_count($diffHtml, 'diff-added');
+
+        return [
+            'version1'      => $version1,
+            'version2'      => $version2,
+            'diff_html'     => $diffHtml,
+            'changes_count' => $changesCount,
+        ];
+    }
+
+    /**
+     * Get compliance summary for a tenant.
+     */
+    public function getComplianceSummary(int $tenantId): array
+    {
+        $totalUsers = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->count();
+
+        $documents = DB::table('legal_documents as ld')
+            ->leftJoin('legal_document_versions as ldv', 'ld.current_version_id', '=', 'ldv.id')
+            ->leftJoin('user_legal_acceptances as ula', 'ula.version_id', '=', 'ld.current_version_id')
+            ->where('ld.tenant_id', $tenantId)
+            ->where('ld.is_active', true)
+            ->where('ld.requires_acceptance', true)
+            ->groupBy('ld.id', 'ld.document_type', 'ld.title', 'ld.current_version_id', 'ldv.version_number', 'ldv.effective_date')
+            ->select(
+                'ld.id', 'ld.document_type', 'ld.title', 'ld.current_version_id',
+                'ldv.version_number', 'ldv.effective_date',
+                DB::raw('COUNT(DISTINCT ula.user_id) as users_accepted')
+            )
+            ->get()
+            ->map(function ($doc) use ($totalUsers) {
+                $doc = (array) $doc;
+                $usersAccepted = (int) $doc['users_accepted'];
+                $doc['users_not_accepted'] = $totalUsers - $usersAccepted;
+                $doc['acceptance_rate']    = $totalUsers > 0 ? round(($usersAccepted / $totalUsers) * 100, 1) : 0;
+                return $doc;
+            })
+            ->all();
+
+        $documentCount = count($documents);
+        $totalAccepted = array_sum(array_column($documents, 'users_accepted'));
+
+        return [
+            'total_users'               => $totalUsers,
+            'overall_compliance_rate'    => ($documentCount > 0 && $totalUsers > 0) ? round(($totalAccepted / ($totalUsers * $documentCount)) * 100, 1) : 0,
+            'users_pending_acceptance'   => ($documentCount > 0 && $totalUsers > 0) ? max(0, $totalUsers - (int) ($totalAccepted / max(1, $documentCount))) : 0,
+            'documents'                 => $documents,
+        ];
+    }
+
+    /**
+     * Get acceptances for a document version.
+     */
+    public function getVersionAcceptances(int $vid, int $limit = 50, int $offset = 0): array
+    {
+        return DB::table('user_legal_acceptances as ula')
+            ->join('users as u', 'ula.user_id', '=', 'u.id')
+            ->where('ula.version_id', $vid)
+            ->orderByDesc('ula.accepted_at')
+            ->limit($limit)
+            ->offset($offset)
+            ->select('ula.*', 'u.name as user_name', 'u.email as user_email')
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+    }
+
+    /**
+     * Export acceptance records for compliance audit.
+     */
+    public function exportAcceptanceRecords(int $docId, ?string $startDate = null, ?string $endDate = null): array
+    {
+        $query = DB::table('user_legal_acceptances as ula')
+            ->join('users as u', 'ula.user_id', '=', 'u.id')
+            ->join('legal_document_versions as ldv', 'ula.version_id', '=', 'ldv.id')
+            ->where('ula.document_id', $docId)
+            ->orderByDesc('ula.accepted_at')
+            ->select(
+                'ula.id as acceptance_id', 'u.id as user_id', 'u.name as user_name', 'u.email as user_email',
+                'ldv.version_number', 'ula.accepted_at', 'ula.acceptance_method', 'ula.ip_address'
+            );
+
+        if ($startDate) {
+            $query->where('ula.accepted_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->where('ula.accepted_at', '<=', $endDate);
+        }
+
+        return $query->get()->map(fn ($r) => (array) $r)->all();
+    }
+
+    /**
+     * Notify users of a document update.
+     */
+    public function notifyUsersOfUpdate(int $docId, int $vid, bool $sendEmail = true): int
+    {
+        $document = $this->legacyGetById($docId);
+        $version  = $this->getVersion($vid);
+
+        if (! $document || ! $version || ! ($document['requires_acceptance'] ?? false)) {
+            return 0;
+        }
+
+        $tenantId = $document['tenant_id'];
+
+        // Get users who need to re-accept
+        $users = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->whereNotExists(function ($q) use ($vid) {
+                $q->select(DB::raw(1))
+                  ->from('user_legal_acceptances')
+                  ->whereColumn('user_legal_acceptances.user_id', 'users.id')
+                  ->where('user_legal_acceptances.version_id', $vid);
+            })
+            ->select('id', 'name', 'email')
+            ->get();
+
+        $sentCount = 0;
+        foreach ($users as $user) {
+            try {
+                DB::table('notifications')->insert([
+                    'user_id'    => $user->id,
+                    'type'       => 'legal_update',
+                    'title'      => "Updated: {$document['title']}",
+                    'message'    => "Please review version {$version['version_number']} of our {$document['title']}",
+                    'link'       => '/' . ($document['slug'] ?? ''),
+                    'created_at' => now(),
+                ]);
+                $sentCount++;
+            } catch (\Throwable $e) {
+                // Continue with other users
+            }
+        }
+
+        return $sentCount;
+    }
+
+    /**
+     * Get count of users pending acceptance for a document version.
+     */
+    public function getUsersPendingAcceptanceCount(int $docId, int $vid): int
+    {
+        $document = $this->legacyGetById($docId);
+        if (! $document) {
+            return 0;
+        }
+
+        return (int) DB::table('users')
+            ->where('tenant_id', $document['tenant_id'])
+            ->where('status', 'active')
+            ->whereNotExists(function ($q) use ($vid) {
+                $q->select(DB::raw(1))
+                  ->from('user_legal_acceptances')
+                  ->whereColumn('user_legal_acceptances.user_id', 'users.id')
+                  ->where('user_legal_acceptances.version_id', $vid);
+            })
+            ->count();
     }
 
     /**
@@ -349,5 +615,45 @@ class LegalDocumentService
             ->first();
 
         return $record ? (array) $record : null;
+    }
+
+    // =========================================================================
+    // HELPERS
+    // =========================================================================
+
+    private function stripToPlainSentences(string $text): array
+    {
+        $text = preg_replace('/\s+/', ' ', trim($text));
+        $sentences = preg_split('/(?<=[.!?])\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
+        return array_values(array_filter(array_map('trim', $sentences)));
+    }
+
+    private function generateSimpleDiff(array $old, array $new): string
+    {
+        $html = '<div class="diff-unified">';
+
+        // Simple line-by-line comparison for reasonable-sized documents
+        $maxLines = max(count($old), count($new));
+        for ($i = 0; $i < $maxLines; $i++) {
+            $oldLine = $old[$i] ?? null;
+            $newLine = $new[$i] ?? null;
+
+            if ($oldLine === $newLine) {
+                $escaped = htmlspecialchars($newLine ?? '', ENT_QUOTES, 'UTF-8');
+                $html .= '<div class="diff-line diff-unchanged"><span class="diff-indicator">&nbsp;</span> ' . $escaped . '</div>';
+            } else {
+                if ($oldLine !== null) {
+                    $escaped = htmlspecialchars($oldLine, ENT_QUOTES, 'UTF-8');
+                    $html .= '<div class="diff-line diff-removed"><span class="diff-indicator">−</span> <del>' . $escaped . '</del></div>';
+                }
+                if ($newLine !== null) {
+                    $escaped = htmlspecialchars($newLine, ENT_QUOTES, 'UTF-8');
+                    $html .= '<div class="diff-line diff-added"><span class="diff-indicator">+</span> <ins>' . $escaped . '</ins></div>';
+                }
+            }
+        }
+
+        $html .= '</div>';
+        return $html;
     }
 }

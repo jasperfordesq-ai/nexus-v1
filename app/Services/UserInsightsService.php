@@ -6,68 +6,181 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+
 /**
- * UserInsightsService — Laravel DI wrapper for legacy \Nexus\Services\UserInsightsService.
+ * UserInsightsService — Personal transaction analytics for users.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Shows trends, partner statistics, and activity summaries.
+ * All queries are tenant-scoped.
  */
 class UserInsightsService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy UserInsightsService::getInsights().
+     * Get complete user insights.
      */
     public function getInsights($userId, $months = null)
     {
-        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
-        return \Nexus\Services\UserInsightsService::getInsights($userId, $months);
+        return [
+            'summary' => $this->getSummary($userId),
+            'monthly_trends' => $this->getMonthlyTrends($userId, 12),
+            'partner_stats' => $this->getPartnerStats($userId),
+        ];
     }
 
     /**
-     * Delegates to legacy UserInsightsService::getSummary().
+     * Get transaction summary for user.
      */
     public function getSummary($userId)
     {
-        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
-        return \Nexus\Services\UserInsightsService::getSummary($userId);
+        $tenantId = TenantContext::getId();
+
+        $totalEarned = (float) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('receiver_id', $userId)
+            ->sum('amount');
+
+        $totalSpent = $this->getTotalSpent($userId);
+
+        $balance = (float) (DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->value('balance') ?? 0);
+
+        $monthStats = DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($q) use ($userId) {
+                $q->where('sender_id', $userId)
+                  ->orWhere('receiver_id', $userId);
+            })
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->select([
+                DB::raw("SUM(CASE WHEN receiver_id = {$userId} THEN amount ELSE 0 END) as earned_this_month"),
+                DB::raw("SUM(CASE WHEN sender_id = {$userId} THEN amount ELSE 0 END) as spent_this_month"),
+                DB::raw("COUNT(CASE WHEN receiver_id = {$userId} THEN 1 END) as received_count"),
+                DB::raw("COUNT(CASE WHEN sender_id = {$userId} THEN 1 END) as sent_count"),
+            ])
+            ->first();
+
+        $totalTransactions = (int) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($q) use ($userId) {
+                $q->where('sender_id', $userId)
+                  ->orWhere('receiver_id', $userId);
+            })
+            ->count();
+
+        return [
+            'total_earned' => $totalEarned,
+            'total_spent' => $totalSpent,
+            'current_balance' => $balance,
+            'earned_this_month' => (float) ($monthStats->earned_this_month ?? 0),
+            'spent_this_month' => (float) ($monthStats->spent_this_month ?? 0),
+            'received_count_this_month' => (int) ($monthStats->received_count ?? 0),
+            'sent_count_this_month' => (int) ($monthStats->sent_count ?? 0),
+            'net_this_month' => (float) (($monthStats->earned_this_month ?? 0) - ($monthStats->spent_this_month ?? 0)),
+            'total_transactions' => $totalTransactions,
+        ];
     }
 
     /**
-     * Delegates to legacy UserInsightsService::getTotalSpent().
+     * Get total spent by user.
      */
     public function getTotalSpent($userId)
     {
-        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
-        return \Nexus\Services\UserInsightsService::getTotalSpent($userId);
+        $tenantId = TenantContext::getId();
+
+        return (float) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('sender_id', $userId)
+            ->sum('amount');
     }
 
     /**
-     * Delegates to legacy UserInsightsService::getMonthlyTrends().
+     * Get monthly transaction trends.
      */
     public function getMonthlyTrends($userId, $months = 12)
     {
-        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
-        return \Nexus\Services\UserInsightsService::getMonthlyTrends($userId, $months);
+        $tenantId = TenantContext::getId();
+        $months = (int) $months;
+
+        return DB::select(
+            "SELECT
+                DATE_FORMAT(created_at, '%Y-%m') as month,
+                SUM(CASE WHEN receiver_id = ? THEN amount ELSE 0 END) as earned,
+                SUM(CASE WHEN sender_id = ? THEN amount ELSE 0 END) as spent,
+                COUNT(CASE WHEN receiver_id = ? THEN 1 END) as received_count,
+                COUNT(CASE WHEN sender_id = ? THEN 1 END) as sent_count
+             FROM transactions
+             WHERE tenant_id = ?
+             AND (sender_id = ? OR receiver_id = ?)
+             AND created_at >= DATE_SUB(NOW(), INTERVAL {$months} MONTH)
+             GROUP BY month
+             ORDER BY month ASC",
+            [$userId, $userId, $userId, $userId, $tenantId, $userId, $userId]
+        );
     }
 
     /**
-     * Delegates to legacy UserInsightsService::getWeeklyTrends().
+     * Get weekly transaction trends.
      */
     public function getWeeklyTrends($userId, $weeks = 12)
     {
-        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
-        return \Nexus\Services\UserInsightsService::getWeeklyTrends($userId, $weeks);
+        $tenantId = TenantContext::getId();
+        $weeks = (int) $weeks;
+
+        return DB::select(
+            "SELECT
+                YEARWEEK(created_at, 1) as week,
+                MIN(DATE(created_at)) as week_start,
+                SUM(CASE WHEN receiver_id = ? THEN amount ELSE 0 END) as earned,
+                SUM(CASE WHEN sender_id = ? THEN amount ELSE 0 END) as spent
+             FROM transactions
+             WHERE tenant_id = ?
+             AND (sender_id = ? OR receiver_id = ?)
+             AND created_at >= DATE_SUB(NOW(), INTERVAL {$weeks} WEEK)
+             GROUP BY week
+             ORDER BY week ASC",
+            [$userId, $userId, $tenantId, $userId, $userId]
+        );
     }
 
     /**
-     * Get partner stats for a user.
+     * Get partner diversity statistics.
      */
     public function getPartnerStats($userId, $months = null)
     {
-        if (!class_exists('\Nexus\Services\UserInsightsService')) { return null; }
-        return \Nexus\Services\UserInsightsService::getPartnerStats($userId, $months);
+        $tenantId = TenantContext::getId();
+
+        $peoplePaid = (int) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('sender_id', $userId)
+            ->distinct()
+            ->count('receiver_id');
+
+        $peoplePaidBy = (int) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('receiver_id', $userId)
+            ->distinct()
+            ->count('sender_id');
+
+        $mutualConnections = (int) DB::table('transactions as sent')
+            ->join('transactions as received', function ($join) {
+                $join->on('sent.receiver_id', '=', 'received.sender_id')
+                     ->on('sent.sender_id', '=', 'received.receiver_id');
+            })
+            ->where('sent.tenant_id', $tenantId)
+            ->where('sent.sender_id', $userId)
+            ->distinct()
+            ->count('sent.receiver_id');
+
+        return [
+            'unique_people_paid' => $peoplePaid,
+            'unique_people_received_from' => $peoplePaidBy,
+            'mutual_connections' => $mutualConnections,
+            'total_unique_partners' => $peoplePaid + $peoplePaidBy - $mutualConnections,
+        ];
     }
 }

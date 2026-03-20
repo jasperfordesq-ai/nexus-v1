@@ -6,7 +6,7 @@
 
 namespace App\Core;
 
-use Nexus\Models\EmailSettings;
+use App\Models\EmailSettings;
 use Nexus\Services\EmailMonitorService;
 use Nexus\Services\RedisCache;
 

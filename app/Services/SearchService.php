@@ -372,10 +372,12 @@ class SearchService
 
     /**
      * Check if the search service (Meilisearch) is available.
+     *
+     * Returns false — Meilisearch integration is not yet ported to Laravel.
+     * The Eloquent LIKE-based search in this service is the active implementation.
      */
     public function isAvailable(): bool
     {
-        if (!class_exists('\Nexus\Services\SearchService')) { return false; }
-        return \Nexus\Services\SearchService::isAvailable();
+        return false;
     }
 }

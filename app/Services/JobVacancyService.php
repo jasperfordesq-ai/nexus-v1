@@ -7,16 +7,40 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Models\JobAlert;
+use App\Models\JobApplication;
+use App\Models\JobApplicationHistory;
+use App\Models\JobVacancy;
+use App\Models\SavedJob;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * JobVacancyService — Laravel DI-based service for job vacancy operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\JobVacancyService.
- * Manages job vacancy CRUD and applications with tenant scoping.
+ * Manages job vacancy CRUD, applications, saved jobs, alerts, analytics,
+ * skills matching, featured jobs, and expiry/renewal.
+ * All queries are tenant-scoped via HasTenantScope trait or explicit tenant_id.
  */
 class JobVacancyService
 {
+    /** @var array Collected errors from the last operation */
+    private array $errors = [];
+
+    public function __construct(
+        private readonly JobVacancy $vacancy,
+    ) {}
+
+    /**
+     * Get collected errors.
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
     /**
      * Get all job vacancies with filtering and cursor-based pagination.
      *
@@ -27,37 +51,64 @@ class JobVacancyService
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
-        $tenantId = TenantContext::getId();
+        $query = $this->vacancy->newQuery()
+            ->with(['creator:id,first_name,last_name,avatar_url'])
+            ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
+            ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo');
 
-        $query = DB::table('job_vacancies as jv')
-            ->leftJoin('users as u', 'jv.user_id', '=', 'u.id')
-            ->where('jv.tenant_id', $tenantId)
-            ->select('jv.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
-
-        if (! empty($filters['status'])) {
-            $query->where('jv.status', $filters['status']);
+        if (!empty($filters['status'])) {
+            $query->where('job_vacancies.status', $filters['status']);
         }
-        if (! empty($filters['type'])) {
-            $query->where('jv.type', $filters['type']);
+        if (!empty($filters['type'])) {
+            $query->where('job_vacancies.type', $filters['type']);
         }
-        if (! empty($filters['search'])) {
+        if (!empty($filters['commitment'])) {
+            $query->where('job_vacancies.commitment', $filters['commitment']);
+        }
+        if (!empty($filters['category'])) {
+            $query->where('job_vacancies.category', $filters['category']);
+        }
+        if (!empty($filters['search'])) {
             $term = '%' . $filters['search'] . '%';
-            $query->where(fn ($q) => $q->where('jv.title', 'LIKE', $term)->orWhere('jv.description', 'LIKE', $term));
+            $query->where(function (Builder $q) use ($term) {
+                $q->where('job_vacancies.title', 'LIKE', $term)
+                  ->orWhere('job_vacancies.description', 'LIKE', $term)
+                  ->orWhere('job_vacancies.category', 'LIKE', $term);
+            });
         }
-        if ($cursor !== null) {
-            $query->where('jv.id', '<', (int) base64_decode($cursor));
+        if (!empty($filters['user_id'])) {
+            $query->where('job_vacancies.user_id', (int) $filters['user_id']);
+        }
+        if (!empty($filters['featured'])) {
+            $query->where('job_vacancies.is_featured', true)
+                ->where(function (Builder $q) {
+                    $q->whereNull('job_vacancies.featured_until')
+                      ->orWhere('job_vacancies.featured_until', '>', now());
+                });
         }
 
-        $query->orderByDesc('jv.id');
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('job_vacancies.id', '<', (int) $cursorId);
+            }
+        }
+
+        $query->orderByRaw('(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END) ASC')
+            ->orderByDesc('job_vacancies.created_at')
+            ->orderByDesc('job_vacancies.id');
+
         $items = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
             $items->pop();
         }
 
+        $enriched = $items->map(fn ($item) => $this->enrichVacancy($item, $userId))->values()->all();
+
         return [
-            'items'    => $items->map(fn ($i) => (array) $i)->values()->all(),
-            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'items' => $enriched,
+            'cursor' => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];
     }
@@ -67,15 +118,38 @@ class JobVacancyService
      */
     public function getById(int $id): ?array
     {
-        $job = DB::table('job_vacancies')->where('tenant_id', TenantContext::getId())->where('id', $id)->first();
-        if (! $job) {
+        $job = $this->vacancy->newQuery()
+            ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
+            ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo')
+            ->where('job_vacancies.id', $id)
+            ->first();
+
+        if (!$job) {
             return null;
         }
 
-        $data = (array) $job;
-        $data['applications_count'] = (int) DB::table('job_applications')->where('job_vacancy_id', $id)->count();
+        $data = $this->enrichVacancy($job);
+        $data['applications_count'] = (int) JobApplication::where('vacancy_id', $id)->count();
 
         return $data;
+    }
+
+    /**
+     * Get a single job vacancy by ID with optional userId for has_applied/is_saved checks.
+     */
+    public function legacyGetById(int $id, ?int $userId = null): ?array
+    {
+        $job = $this->vacancy->newQuery()
+            ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
+            ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo')
+            ->where('job_vacancies.id', $id)
+            ->first();
+
+        if (!$job) {
+            return null;
+        }
+
+        return $this->enrichVacancy($job, $userId);
     }
 
     /**
@@ -83,18 +157,101 @@ class JobVacancyService
      */
     public function create(int $userId, array $data): int
     {
-        return DB::table('job_vacancies')->insertGetId([
-            'tenant_id'   => TenantContext::getId(),
-            'title'       => trim($data['title']),
+        $vacancy = $this->vacancy->newQuery()->create([
+            'title' => trim($data['title']),
             'description' => trim($data['description'] ?? ''),
-            'type'        => $data['type'] ?? 'volunteer',
-            'commitment'  => $data['commitment'] ?? 'flexible',
-            'location'    => $data['location'] ?? null,
-            'status'      => 'open',
-            'user_id'     => $userId,
-            'created_at'  => now(),
-            'updated_at'  => now(),
+            'type' => $data['type'] ?? 'volunteer',
+            'commitment' => $data['commitment'] ?? 'flexible',
+            'location' => $data['location'] ?? null,
+            'status' => 'open',
+            'user_id' => $userId,
         ]);
+
+        return $vacancy->id;
+    }
+
+    /**
+     * Update an existing job vacancy.
+     */
+    public function update(int $id, int $userId, array $data): bool
+    {
+        $this->errors = [];
+
+        $vacancy = $this->vacancy->newQuery()->find($id);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return false;
+        }
+
+        // Check ownership or admin
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'You can only edit your own job vacancies'];
+                return false;
+            }
+        }
+
+        $allowedFields = [
+            'title', 'description', 'location', 'is_remote', 'type', 'commitment',
+            'category', 'skills_required', 'hours_per_week', 'time_credits',
+            'contact_email', 'contact_phone', 'deadline', 'status', 'organization_id',
+            'salary_min', 'salary_max', 'salary_type', 'salary_currency', 'salary_negotiable',
+        ];
+
+        $updates = [];
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $updates[$field] = $data[$field];
+            }
+        }
+
+        if (empty($updates)) {
+            return true;
+        }
+
+        try {
+            $vacancy->update($updates);
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('JobVacancyService::update failed: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to update job vacancy'];
+            return false;
+        }
+    }
+
+    /**
+     * Delete a job vacancy.
+     */
+    public function delete(int $id, int $adminId): bool
+    {
+        $this->errors = [];
+
+        $vacancy = $this->vacancy->newQuery()->find($id);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return false;
+        }
+
+        // Check ownership or admin
+        if ((int) $vacancy->user_id !== $adminId) {
+            $user = User::where('id', $adminId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'You can only delete your own job vacancies'];
+                return false;
+            }
+        }
+
+        try {
+            // Delete applications first
+            JobApplication::where('vacancy_id', $id)->delete();
+            $vacancy->delete();
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('JobVacancyService::delete failed: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to delete job vacancy'];
+            return false;
+        }
     }
 
     /**
@@ -104,8 +261,7 @@ class JobVacancyService
      */
     public function apply(int $jobId, int $userId, array $data = []): ?int
     {
-        $exists = DB::table('job_applications')
-            ->where('job_vacancy_id', $jobId)
+        $exists = JobApplication::where('vacancy_id', $jobId)
             ->where('user_id', $userId)
             ->exists();
 
@@ -113,248 +269,893 @@ class JobVacancyService
             return null;
         }
 
-        return DB::table('job_applications')->insertGetId([
-            'job_vacancy_id' => $jobId,
-            'user_id'        => $userId,
-            'cover_letter'   => $data['cover_letter'] ?? null,
-            'status'         => 'pending',
-            'created_at'     => now(),
-            'updated_at'     => now(),
+        $application = JobApplication::create([
+            'vacancy_id' => $jobId,
+            'user_id' => $userId,
+            'message' => $data['cover_letter'] ?? null,
+            'status' => 'pending',
+            'stage' => 'applied',
         ]);
+
+        // Log initial application in history
+        $this->logApplicationHistory($application->id, null, 'applied', $userId, 'Application submitted');
+
+        // Increment applications count
+        $this->vacancy->newQuery()
+            ->where('id', $jobId)
+            ->increment('applications_count');
+
+        return $application->id;
     }
 
     /**
-     * Delegates to legacy JobVacancyService::delete().
-     */
-    public function delete(int $id, int $adminId): bool
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) {
-            return (bool) DB::table('job_vacancies')->where('tenant_id', TenantContext::getId())->where('id', $id)->delete();
-        }
-        return \Nexus\Services\JobVacancyService::delete($id, $adminId);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::featureJob().
-     */
-    public function featureJob(int $id, int $adminId, int $days = 7): bool
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
-        return \Nexus\Services\JobVacancyService::featureJob($id, $adminId, $days);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::unfeatureJob().
-     */
-    public function unfeatureJob(int $id, int $adminId): bool
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
-        return \Nexus\Services\JobVacancyService::unfeatureJob($id, $adminId);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::getApplications().
-     */
-    public function getApplications(int $jobId, int $adminId): ?array
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
-        return \Nexus\Services\JobVacancyService::getApplications($jobId, $adminId);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::updateApplicationStatus().
-     */
-    public function updateApplicationStatus(int $applicationId, int $adminId, string $status, ?string $notes = null): bool
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
-        return \Nexus\Services\JobVacancyService::updateApplicationStatus($applicationId, $adminId, $status, $notes);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
-        return \Nexus\Services\JobVacancyService::getErrors();
-    }
-
-    // =========================================================================
-    // Legacy delegation methods — used by JobVacanciesController
-    // =========================================================================
-
-    /**
-     * Delegates to legacy JobVacancyService::getById() with optional userId.
-     */
-    public function legacyGetById(int $id, ?int $userId = null): ?array
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) {
-            return $this->getById($id);
-        }
-        return \Nexus\Services\JobVacancyService::getById($id, $userId);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::incrementViews().
-     */
-    public function incrementViews(int $id, ?int $userId = null): void
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
-        \Nexus\Services\JobVacancyService::incrementViews($id, $userId);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::update().
-     */
-    public function update(int $id, int $userId, array $data): bool
-    {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
-        return \Nexus\Services\JobVacancyService::update($id, $userId, $data);
-    }
-
-    /**
-     * Delegates to legacy JobVacancyService::apply() with message string.
+     * Apply with message string (legacy signature).
      */
     public function legacyApply(int $jobId, int $userId, ?string $message = null): ?int
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) {
-            return $this->apply($jobId, $userId, ['cover_letter' => $message]);
-        }
-        return \Nexus\Services\JobVacancyService::apply($jobId, $userId, $message);
+        return $this->apply($jobId, $userId, ['cover_letter' => $message]);
     }
 
     /**
-     * Delegates to legacy JobVacancyService::getSavedJobs().
+     * Increment view count for a vacancy.
      */
-    public function getSavedJobs(int $userId, array $filters = []): array
+    public function incrementViews(int $id, ?int $userId = null): void
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
-        return \Nexus\Services\JobVacancyService::getSavedJobs($userId, $filters);
+        $tenantId = TenantContext::getId();
+
+        try {
+            $this->vacancy->newQuery()
+                ->where('id', $id)
+                ->increment('views_count');
+
+            // Log individual view for analytics
+            DB::table('job_vacancy_views')->insert([
+                'vacancy_id' => $id,
+                'user_id' => $userId,
+                'tenant_id' => $tenantId,
+                'viewed_at' => now(),
+                'ip_hash' => null,
+            ]);
+        } catch (\Throwable $e) {
+            // Non-critical
+            Log::warning('JobVacancyService::incrementViews failed: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Delegates to legacy JobVacancyService::saveJob().
+     * Feature a job vacancy (admin only).
+     */
+    public function featureJob(int $id, int $adminId, int $days = 7): bool
+    {
+        $this->errors = [];
+
+        $days = max(1, min(90, $days));
+
+        $user = User::where('id', $adminId)->first(['id', 'role']);
+        if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only admins can feature jobs'];
+            return false;
+        }
+
+        $job = $this->vacancy->newQuery()->find($id);
+        if (!$job) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return false;
+        }
+
+        try {
+            $job->update([
+                'is_featured' => true,
+                'featured_until' => now()->addDays($days),
+            ]);
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('JobVacancyService::featureJob failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Unfeature a job vacancy (admin only).
+     */
+    public function unfeatureJob(int $id, int $adminId): bool
+    {
+        $this->errors = [];
+
+        $user = User::where('id', $adminId)->first(['id', 'role']);
+        if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only admins can unfeature jobs'];
+            return false;
+        }
+
+        try {
+            $this->vacancy->newQuery()
+                ->where('id', $id)
+                ->update(['is_featured' => false, 'featured_until' => null]);
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('JobVacancyService::unfeatureJob failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get applications for a vacancy (owner/admin only).
+     */
+    public function getApplications(int $jobId, int $adminId): ?array
+    {
+        $this->errors = [];
+
+        $vacancy = $this->vacancy->newQuery()->find($jobId);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return null;
+        }
+
+        // Check ownership or admin
+        if ((int) $vacancy->user_id !== $adminId) {
+            $user = User::where('id', $adminId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only the vacancy owner can view applications'];
+                return null;
+            }
+        }
+
+        return JobApplication::with(['applicant:id,first_name,last_name,avatar_url,email'])
+            ->where('vacancy_id', $jobId)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function (JobApplication $app) {
+                $data = $app->toArray();
+                $data['applicant'] = [
+                    'id' => (int) $app->user_id,
+                    'name' => $app->applicant ? trim(($app->applicant->first_name ?? '') . ' ' . ($app->applicant->last_name ?? '')) : null,
+                    'avatar_url' => $app->applicant->avatar_url ?? null,
+                    'email' => $app->applicant->email ?? null,
+                ];
+                return $data;
+            })
+            ->all();
+    }
+
+    /**
+     * Update an application status/stage.
+     */
+    public function updateApplicationStatus(int $applicationId, int $adminId, string $status, ?string $notes = null): bool
+    {
+        $this->errors = [];
+
+        $validStatuses = ['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'];
+        if (!in_array($status, $validStatuses)) {
+            $this->errors[] = ['code' => 'VALIDATION_INVALID_VALUE', 'message' => 'Invalid application status'];
+            return false;
+        }
+
+        $application = JobApplication::with(['vacancy'])->find($applicationId);
+        if (!$application) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
+            return false;
+        }
+
+        // Must be tenant-scoped
+        $tenantId = TenantContext::getId();
+        if (!$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
+            return false;
+        }
+
+        // Check vacancy ownership or admin
+        if ((int) $application->vacancy->user_id !== $adminId) {
+            $user = User::where('id', $adminId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Only the vacancy owner can update applications'];
+                return false;
+            }
+        }
+
+        $previousStatus = $application->stage ?? $application->status ?? 'applied';
+
+        try {
+            $application->update([
+                'status' => $status,
+                'stage' => $status,
+                'reviewer_notes' => $notes ? trim($notes) : null,
+                'reviewed_by' => $adminId,
+                'reviewed_at' => now(),
+            ]);
+
+            $this->logApplicationHistory($applicationId, $previousStatus, $status, $adminId, $notes);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('JobVacancyService::updateApplicationStatus failed: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to update application'];
+            return false;
+        }
+    }
+
+    // =========================================================================
+    // SAVED JOBS
+    // =========================================================================
+
+    /**
+     * Save (bookmark) a job.
      */
     public function saveJob(int $id, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
-        return \Nexus\Services\JobVacancyService::saveJob($id, $userId);
+        $this->errors = [];
+
+        $job = $this->vacancy->newQuery()->find($id);
+        if (!$job) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return false;
+        }
+
+        $existing = SavedJob::where('job_id', $id)->where('user_id', $userId)->exists();
+        if ($existing) {
+            return true; // Idempotent
+        }
+
+        try {
+            SavedJob::create([
+                'user_id' => $userId,
+                'job_id' => $id,
+                'saved_at' => now(),
+            ]);
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('JobVacancyService::saveJob failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy JobVacancyService::unsaveJob().
+     * Unsave (remove bookmark) a job.
      */
     public function unsaveJob(int $id, int $userId): void
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
-        \Nexus\Services\JobVacancyService::unsaveJob($id, $userId);
+        SavedJob::where('job_id', $id)->where('user_id', $userId)->delete();
     }
 
     /**
-     * Delegates to legacy JobVacancyService::getMyApplications().
+     * Get saved jobs for a user.
+     */
+    public function getSavedJobs(int $userId, array $filters = []): array
+    {
+        $limit = (int) ($filters['limit'] ?? 20);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = SavedJob::where('saved_jobs.user_id', $userId)
+            ->join('job_vacancies as jv', 'saved_jobs.job_id', '=', 'jv.id')
+            ->leftJoin('users as u', 'jv.user_id', '=', 'u.id')
+            ->leftJoin('organizations as o', 'jv.organization_id', '=', 'o.id')
+            ->select(
+                'jv.*',
+                'u.first_name as creator_first_name',
+                'u.last_name as creator_last_name',
+                'u.avatar_url as creator_avatar',
+                'o.name as organization_name',
+                'o.logo_url as organization_logo',
+                'saved_jobs.id as saved_id',
+                'saved_jobs.saved_at'
+            );
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('saved_jobs.id', '<', (int) $cursorId);
+            }
+        }
+
+        $query->orderByDesc('saved_jobs.saved_at')->orderByDesc('saved_jobs.id');
+
+        $rows = $query->limit($limit + 1)->get();
+        $hasMore = $rows->count() > $limit;
+        if ($hasMore) {
+            $rows->pop();
+        }
+
+        $enriched = $rows->map(function ($row) use ($userId) {
+            $data = $this->enrichVacancyArray((array) $row->getAttributes(), $userId);
+            $data['saved_at'] = $row->saved_at;
+            $data['is_saved'] = true;
+            return $data;
+        })->values()->all();
+
+        return [
+            'items' => $enriched,
+            'cursor' => $hasMore && $rows->isNotEmpty() ? base64_encode((string) $rows->last()->saved_id) : null,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    // =========================================================================
+    // MY APPLICATIONS / MY POSTINGS
+    // =========================================================================
+
+    /**
+     * Get user's own applications with vacancy info.
      */
     public function getMyApplications(int $userId, array $filters = []): array
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
-        return \Nexus\Services\JobVacancyService::getMyApplications($userId, $filters);
+        $tenantId = TenantContext::getId();
+        $limit = (int) ($filters['limit'] ?? 20);
+        $cursor = $filters['cursor'] ?? null;
+        $status = $filters['status'] ?? null;
+
+        $query = JobApplication::join('job_vacancies as jv', 'job_vacancy_applications.vacancy_id', '=', 'jv.id')
+            ->where('job_vacancy_applications.user_id', $userId)
+            ->where('jv.tenant_id', $tenantId)
+            ->select(
+                'job_vacancy_applications.*',
+                'jv.title as vacancy_title',
+                'jv.type as vacancy_type',
+                'jv.commitment as vacancy_commitment',
+                'jv.status as vacancy_status',
+                'jv.location as vacancy_location',
+                'jv.is_remote as vacancy_is_remote',
+                'jv.deadline as vacancy_deadline'
+            );
+
+        if ($status && in_array($status, ['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'])) {
+            $query->where('job_vacancy_applications.status', $status);
+        }
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('job_vacancy_applications.id', '<', (int) $cursorId);
+            }
+        }
+
+        $query->orderByDesc('job_vacancy_applications.created_at')
+            ->orderByDesc('job_vacancy_applications.id');
+
+        $applications = $query->limit($limit + 1)->get();
+        $hasMore = $applications->count() > $limit;
+        if ($hasMore) {
+            $applications->pop();
+        }
+
+        $items = $applications->map(function ($app) {
+            $data = $app->toArray();
+            $data['id'] = (int) $data['id'];
+            $data['vacancy_id'] = (int) $data['vacancy_id'];
+            $data['user_id'] = (int) $data['user_id'];
+            $data['vacancy'] = [
+                'id' => (int) $data['vacancy_id'],
+                'title' => $data['vacancy_title'] ?? null,
+                'type' => $data['vacancy_type'] ?? null,
+                'commitment' => $data['vacancy_commitment'] ?? null,
+                'status' => $data['vacancy_status'] ?? null,
+                'location' => $data['vacancy_location'] ?? null,
+                'is_remote' => (bool) ($data['vacancy_is_remote'] ?? false),
+                'deadline' => $data['vacancy_deadline'] ?? null,
+            ];
+            unset($data['vacancy_title'], $data['vacancy_type'], $data['vacancy_commitment'],
+                  $data['vacancy_status'], $data['vacancy_location'], $data['vacancy_is_remote'],
+                  $data['vacancy_deadline']);
+            return $data;
+        })->values()->all();
+
+        return [
+            'items' => $items,
+            'cursor' => $hasMore && $applications->isNotEmpty() ? base64_encode((string) $applications->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
-     * Delegates to legacy JobVacancyService::getMyPostings().
+     * Get all job vacancies posted by a specific user.
      */
-    public function getMyPostings(int $userId, int $tenantId, array $params = []): array
+    public function getMyPostings(int $userId, int $_tenantId, array $params = []): array
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
-        return \Nexus\Services\JobVacancyService::getMyPostings($userId, $tenantId, $params);
+        $limit = min((int) ($params['limit'] ?? 20), 50);
+        $cursor = $params['cursor'] ?? null;
+
+        // $_tenantId kept for API compatibility; tenant scoping is via HasTenantScope
+        $query = $this->vacancy->newQuery()
+            ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
+            ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo')
+            ->where('job_vacancies.user_id', $userId);
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('job_vacancies.id', '<', (int) $cursorId);
+            }
+        }
+
+        $query->orderByDesc('job_vacancies.created_at')->orderByDesc('job_vacancies.id');
+
+        $vacancies = $query->limit($limit + 1)->get();
+        $hasMore = $vacancies->count() > $limit;
+        if ($hasMore) {
+            $vacancies->pop();
+        }
+
+        $enriched = $vacancies->map(fn ($v) => $this->enrichVacancy($v, $userId))->values()->all();
+
+        return [
+            'items' => $enriched,
+            'cursor' => $hasMore && $vacancies->isNotEmpty() ? base64_encode((string) $vacancies->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
+    // =========================================================================
+    // ALERTS
+    // =========================================================================
+
     /**
-     * Delegates to legacy JobVacancyService::getAlerts().
+     * Get alerts for a user.
      */
     public function getAlerts(int $userId): array
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
-        return \Nexus\Services\JobVacancyService::getAlerts($userId);
+        return JobAlert::where('user_id', $userId)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function (JobAlert $alert) {
+                $data = $alert->toArray();
+                $data['id'] = (int) $data['id'];
+                $data['user_id'] = (int) $data['user_id'];
+                $data['is_active'] = (bool) $data['is_active'];
+                $data['is_remote_only'] = (bool) $data['is_remote_only'];
+                return $data;
+            })
+            ->all();
     }
 
     /**
-     * Delegates to legacy JobVacancyService::subscribeAlert().
+     * Create a job alert subscription.
      */
     public function subscribeAlert(int $userId, array $data): ?int
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
-        return \Nexus\Services\JobVacancyService::subscribeAlert($userId, $data);
+        $this->errors = [];
+
+        try {
+            $alert = JobAlert::create([
+                'user_id' => $userId,
+                'keywords' => isset($data['keywords']) ? (mb_substr(trim($data['keywords']), 0, 500) ?: null) : null,
+                'categories' => isset($data['categories']) ? (mb_substr(trim($data['categories']), 0, 500) ?: null) : null,
+                'type' => isset($data['type']) && in_array($data['type'], ['paid', 'volunteer', 'timebank']) ? $data['type'] : null,
+                'commitment' => isset($data['commitment']) && in_array($data['commitment'], ['full_time', 'part_time', 'flexible', 'one_off']) ? $data['commitment'] : null,
+                'location' => isset($data['location']) ? (mb_substr(trim($data['location']), 0, 500) ?: null) : null,
+                'is_remote_only' => !empty($data['is_remote_only']),
+                'is_active' => true,
+                'created_at' => now(),
+            ]);
+
+            return $alert->id;
+        } catch (\Throwable $e) {
+            Log::error('JobVacancyService::subscribeAlert failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
-     * Delegates to legacy JobVacancyService::deleteAlert().
+     * Delete a job alert permanently.
      */
     public function deleteAlert(int $id, int $userId): void
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
-        \Nexus\Services\JobVacancyService::deleteAlert($id, $userId);
+        JobAlert::where('id', $id)->where('user_id', $userId)->delete();
     }
 
     /**
-     * Delegates to legacy JobVacancyService::unsubscribeAlert().
+     * Unsubscribe (deactivate) a job alert.
      */
     public function unsubscribeAlert(int $id, int $userId): void
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
-        \Nexus\Services\JobVacancyService::unsubscribeAlert($id, $userId);
+        JobAlert::where('id', $id)->where('user_id', $userId)->update(['is_active' => false]);
     }
 
     /**
-     * Delegates to legacy JobVacancyService::resubscribeAlert().
+     * Resubscribe (reactivate) a paused job alert.
      */
     public function resubscribeAlert(int $id, int $userId): void
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return; }
-        \Nexus\Services\JobVacancyService::resubscribeAlert($id, $userId);
+        JobAlert::where('id', $id)->where('user_id', $userId)->update(['is_active' => true]);
     }
 
+    // =========================================================================
+    // SKILLS MATCHING
+    // =========================================================================
+
     /**
-     * Delegates to legacy JobVacancyService::calculateMatchPercentage().
+     * Calculate match percentage between a user's skills and a job's required skills.
      */
     public function calculateMatchPercentage(int $userId, int $jobId): array
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return []; }
-        return \Nexus\Services\JobVacancyService::calculateMatchPercentage($userId, $jobId);
+        $user = User::find($userId, ['id', 'skills']);
+        $userSkills = [];
+        if ($user && !empty($user->skills)) {
+            $userSkills = array_filter(array_map(fn ($s) => strtolower(trim($s)), explode(',', $user->skills)));
+        }
+
+        $job = $this->vacancy->newQuery()->find($jobId, ['id', 'skills_required']);
+        $requiredSkills = [];
+        if ($job && !empty($job->skills_required)) {
+            $requiredSkills = array_filter(array_map(fn ($s) => strtolower(trim($s)), explode(',', $job->skills_required)));
+        }
+
+        if (empty($requiredSkills)) {
+            return ['percentage' => 100, 'matched' => [], 'missing' => [], 'user_skills' => $userSkills, 'required_skills' => $requiredSkills];
+        }
+        if (empty($userSkills)) {
+            return ['percentage' => 0, 'matched' => [], 'missing' => $requiredSkills, 'user_skills' => $userSkills, 'required_skills' => $requiredSkills];
+        }
+
+        $matched = [];
+        $missing = [];
+
+        foreach ($requiredSkills as $required) {
+            $isMatched = false;
+            foreach ($userSkills as $userSkill) {
+                if ($required === $userSkill || str_contains($required, $userSkill) || str_contains($userSkill, $required)) {
+                    $matched[] = $required;
+                    $isMatched = true;
+                    break;
+                }
+                similar_text($required, $userSkill, $pct);
+                if ($pct >= 75) {
+                    $matched[] = $required;
+                    $isMatched = true;
+                    break;
+                }
+            }
+            if (!$isMatched) {
+                $missing[] = $required;
+            }
+        }
+
+        return [
+            'percentage' => (int) round((count($matched) / count($requiredSkills)) * 100),
+            'matched' => $matched,
+            'missing' => $missing,
+            'user_skills' => $userSkills,
+            'required_skills' => $requiredSkills,
+        ];
     }
 
     /**
-     * Delegates to legacy JobVacancyService::getQualificationAssessment().
+     * Get qualification assessment for a user against a job.
      */
     public function getQualificationAssessment(int $userId, int $jobId): ?array
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
-        return \Nexus\Services\JobVacancyService::getQualificationAssessment($userId, $jobId);
+        $this->errors = [];
+
+        $vacancy = $this->legacyGetById($jobId, $userId);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return null;
+        }
+
+        $matchData = $this->calculateMatchPercentage($userId, $jobId);
+
+        $breakdown = array_map(fn ($skill) => [
+            'skill' => $skill,
+            'matched' => in_array($skill, $matchData['matched']),
+        ], $matchData['required_skills']);
+
+        $level = 'low';
+        if ($matchData['percentage'] >= 80) {
+            $level = 'excellent';
+        } elseif ($matchData['percentage'] >= 60) {
+            $level = 'good';
+        } elseif ($matchData['percentage'] >= 40) {
+            $level = 'moderate';
+        }
+
+        return [
+            'job_id' => $jobId,
+            'job_title' => $vacancy['title'],
+            'percentage' => $matchData['percentage'],
+            'level' => $level,
+            'total_required' => count($matchData['required_skills']),
+            'total_matched' => count($matchData['matched']),
+            'total_missing' => count($matchData['missing']),
+            'breakdown' => $breakdown,
+            'matched_skills' => $matchData['matched'],
+            'missing_skills' => $matchData['missing'],
+            'user_skills' => $matchData['user_skills'],
+        ];
     }
 
+    // =========================================================================
+    // APPLICATION HISTORY
+    // =========================================================================
+
     /**
-     * Delegates to legacy JobVacancyService::getApplicationHistory().
+     * Get status history for an application.
      */
     public function getApplicationHistory(int $applicationId, int $userId): ?array
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
-        return \Nexus\Services\JobVacancyService::getApplicationHistory($applicationId, $userId);
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $application = JobApplication::with(['vacancy'])->find($applicationId);
+        if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
+            return null;
+        }
+
+        // Must be applicant, vacancy owner, or admin
+        $isApplicant = (int) $application->user_id === $userId;
+        $isOwner = (int) $application->vacancy->user_id === $userId;
+
+        if (!$isApplicant && !$isOwner) {
+            $user = User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
+                return null;
+            }
+        }
+
+        return JobApplicationHistory::with(['changer:id,first_name,last_name'])
+            ->where('application_id', $applicationId)
+            ->orderBy('changed_at')
+            ->get()
+            ->map(function (JobApplicationHistory $entry) {
+                $data = $entry->toArray();
+                $data['id'] = (int) $data['id'];
+                $data['application_id'] = (int) $data['application_id'];
+                $data['changed_by_name'] = $entry->changer
+                    ? trim(($entry->changer->first_name ?? '') . ' ' . ($entry->changer->last_name ?? ''))
+                    : null;
+                unset($data['changer']);
+                return $data;
+            })
+            ->all();
     }
 
+    // =========================================================================
+    // ANALYTICS
+    // =========================================================================
+
     /**
-     * Delegates to legacy JobVacancyService::getAnalytics().
+     * Get analytics for a job vacancy.
      */
     public function getAnalytics(int $jobId, int $userId): ?array
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return null; }
-        return \Nexus\Services\JobVacancyService::getAnalytics($jobId, $userId);
+        $this->errors = [];
+
+        $vacancy = $this->legacyGetById($jobId);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return null;
+        }
+
+        $tenantId = TenantContext::getId();
+
+        // Check ownership or admin
+        if ((int) $vacancy['user_id'] !== $userId) {
+            $user = User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
+                return null;
+            }
+        }
+
+        $viewsByDay = DB::table('job_vacancy_views')
+            ->where('vacancy_id', $jobId)
+            ->where('tenant_id', $tenantId)
+            ->where('viewed_at', '>=', now()->subDays(30))
+            ->selectRaw('DATE(viewed_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
+
+        $uniqueViewers = (int) DB::table('job_vacancy_views')
+            ->where('vacancy_id', $jobId)
+            ->where('tenant_id', $tenantId)
+            ->selectRaw('COUNT(DISTINCT COALESCE(user_id, ip_hash)) as count')
+            ->value('count');
+
+        $applicationsByStatus = DB::table('job_vacancy_applications as a')
+            ->join('job_vacancies as jv', 'a.vacancy_id', '=', 'jv.id')
+            ->where('jv.tenant_id', $tenantId)
+            ->where('a.vacancy_id', $jobId)
+            ->selectRaw('COALESCE(a.stage, a.status) as stage, COUNT(*) as count')
+            ->groupByRaw('COALESCE(a.stage, a.status)')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
+
+        $totalViews = (int) $vacancy['views_count'];
+        $totalApps = (int) $vacancy['applications_count'];
+        $conversionRate = $totalViews > 0 ? round(($totalApps / $totalViews) * 100, 1) : 0;
+
+        $avgTimeToApply = DB::table('job_vacancy_applications as a')
+            ->join('job_vacancies as jv', 'a.vacancy_id', '=', 'jv.id')
+            ->where('a.vacancy_id', $jobId)
+            ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, jv.created_at, a.created_at)) as avg_hours')
+            ->value('avg_hours');
+
+        $timeToFill = null;
+        if ($vacancy['status'] === 'filled') {
+            $acceptedAt = JobApplication::where('vacancy_id', $jobId)
+                ->where('status', 'accepted')
+                ->min('reviewed_at');
+            if ($acceptedAt) {
+                $timeToFill = (int) ((strtotime($acceptedAt) - strtotime($vacancy['created_at'])) / 86400);
+            }
+        }
+
+        return [
+            'job_id' => $jobId,
+            'total_views' => $totalViews,
+            'unique_viewers' => $uniqueViewers,
+            'total_applications' => $totalApps,
+            'conversion_rate' => $conversionRate,
+            'avg_time_to_apply_hours' => $avgTimeToApply ? round((float) $avgTimeToApply, 1) : null,
+            'time_to_fill_days' => $timeToFill,
+            'views_by_day' => $viewsByDay,
+            'applications_by_stage' => $applicationsByStatus,
+            'created_at' => $vacancy['created_at'],
+            'status' => $vacancy['status'],
+        ];
     }
 
+    // =========================================================================
+    // JOB RENEWAL
+    // =========================================================================
+
     /**
-     * Delegates to legacy JobVacancyService::renewJob().
+     * Renew a job vacancy (extend deadline).
      */
     public function renewJob(int $id, int $userId, int $days = 30): bool
     {
-        if (!class_exists('\Nexus\Services\JobVacancyService')) { return false; }
-        return \Nexus\Services\JobVacancyService::renewJob($id, $userId, $days);
+        $this->errors = [];
+
+        $vacancy = $this->vacancy->newQuery()->find($id);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            return false;
+        }
+
+        // Check ownership or admin
+        if ((int) $vacancy->user_id !== $userId) {
+            $user = User::where('id', $userId)->first(['id', 'role']);
+            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'You can only renew your own job vacancies'];
+                return false;
+            }
+        }
+
+        try {
+            $baseDate = ($vacancy->deadline && $vacancy->deadline->isFuture())
+                ? $vacancy->deadline
+                : now();
+            $newDeadline = $baseDate->copy()->addDays($days);
+
+            $vacancy->update([
+                'deadline' => $newDeadline,
+                'status' => 'open',
+                'expired_at' => null,
+                'renewed_at' => now(),
+                'renewal_count' => ($vacancy->renewal_count ?? 0) + 1,
+            ]);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error("JobVacancyService::renewJob failed: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // =========================================================================
+    // PRIVATE HELPERS
+    // =========================================================================
+
+    /**
+     * Enrich a vacancy model/row with creator info, skills array, and application status.
+     */
+    private function enrichVacancy($vacancy, ?int $userId = null): array
+    {
+        $data = is_array($vacancy) ? $vacancy : $vacancy->toArray();
+        return $this->enrichVacancyArray($data, $userId);
+    }
+
+    /**
+     * Enrich a vacancy array with formatted fields.
+     */
+    private function enrichVacancyArray(array $data, ?int $userId = null): array
+    {
+        // Format creator info
+        $data['creator'] = [
+            'id' => (int) ($data['user_id'] ?? 0),
+            'name' => trim(($data['creator_first_name'] ?? $data['creator']['first_name'] ?? '') . ' ' . ($data['creator_last_name'] ?? $data['creator']['last_name'] ?? '')),
+            'avatar_url' => $data['creator_avatar'] ?? $data['creator']['avatar_url'] ?? null,
+        ];
+
+        // Format organization info
+        if (!empty($data['organization_id'])) {
+            $data['organization'] = [
+                'id' => (int) $data['organization_id'],
+                'name' => $data['organization_name'] ?? null,
+                'logo_url' => $data['organization_logo'] ?? null,
+            ];
+        } else {
+            $data['organization'] = null;
+        }
+
+        // Parse skills as array
+        $data['skills'] = !empty($data['skills_required'])
+            ? array_map('trim', explode(',', $data['skills_required']))
+            : [];
+
+        // Cast numeric fields
+        $data['id'] = (int) ($data['id'] ?? 0);
+        $data['tenant_id'] = (int) ($data['tenant_id'] ?? 0);
+        $data['user_id'] = (int) ($data['user_id'] ?? 0);
+        $data['views_count'] = (int) ($data['views_count'] ?? 0);
+        $data['applications_count'] = (int) ($data['applications_count'] ?? 0);
+        $data['is_remote'] = (bool) ($data['is_remote'] ?? false);
+        $data['is_featured'] = (bool) ($data['is_featured'] ?? false);
+        $data['salary_negotiable'] = (bool) ($data['salary_negotiable'] ?? false);
+        $data['renewal_count'] = (int) ($data['renewal_count'] ?? 0);
+
+        // Auto-expire featured status
+        if ($data['is_featured'] && !empty($data['featured_until']) && strtotime($data['featured_until']) < time()) {
+            $data['is_featured'] = false;
+        }
+
+        // Check if user has applied / saved
+        if ($userId) {
+            $application = DB::table('job_vacancy_applications as jva')
+                ->join('job_vacancies as jv', 'jva.vacancy_id', '=', 'jv.id')
+                ->where('jv.tenant_id', $data['tenant_id'])
+                ->where('jva.vacancy_id', $data['id'])
+                ->where('jva.user_id', $userId)
+                ->select('jva.id', 'jva.status', 'jva.stage')
+                ->first();
+
+            $data['has_applied'] = !empty($application);
+            $data['application_status'] = $application->status ?? null;
+            $data['application_stage'] = $application->stage ?? $application->status ?? null;
+
+            $data['is_saved'] = SavedJob::where('job_id', $data['id'])
+                ->where('user_id', $userId)
+                ->exists();
+        } else {
+            $data['has_applied'] = false;
+            $data['application_status'] = null;
+            $data['application_stage'] = null;
+            $data['is_saved'] = false;
+        }
+
+        // Clean up redundant fields
+        unset(
+            $data['creator_first_name'],
+            $data['creator_last_name'],
+            $data['creator_avatar'],
+            $data['organization_name'],
+            $data['organization_logo'],
+            $data['saved_id']
+        );
+
+        return $data;
+    }
+
+    /**
+     * Log an application status change to history.
+     */
+    private function logApplicationHistory(int $applicationId, ?string $fromStatus, string $toStatus, int $changedBy, ?string $notes = null): void
+    {
+        try {
+            JobApplicationHistory::create([
+                'tenant_id' => TenantContext::getId(),
+                'application_id' => $applicationId,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+                'changed_by' => $changedBy,
+                'changed_at' => now(),
+                'notes' => $notes ? trim($notes) : null,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('JobVacancyService: Failed to log application history: ' . $e->getMessage());
+        }
     }
 }

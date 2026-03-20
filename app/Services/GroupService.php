@@ -6,7 +6,10 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Group;
+use App\Models\GroupDiscussion;
+use App\Models\GroupPost;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -239,149 +242,701 @@ class GroupService
     }
 
     // -----------------------------------------------------------------
-    //  Delegated to legacy (static methods not yet migrated to Eloquent)
+    //  Validation errors
+    // -----------------------------------------------------------------
+
+    /** @var array */
+    private array $errors = [];
+
+    /**
+     * Get validation errors from the last operation.
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    // -----------------------------------------------------------------
+    //  Update
     // -----------------------------------------------------------------
 
     /**
      * Update a group.
-     *
-     * Delegates to legacy GroupService::update().
      */
     public function update(int $id, int $userId, array $data): bool
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
-        return \Nexus\Services\GroupService::update($id, $userId, $data);
+        $this->errors = [];
+
+        /** @var Group|null $group */
+        $group = $this->group->newQuery()->find($id);
+
+        if (! $group) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            return false;
+        }
+
+        if (! $this->canModify($id, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to edit this group'];
+            return false;
+        }
+
+        $allowed = ['name', 'description', 'visibility', 'location', 'latitude', 'longitude', 'federated_visibility'];
+        $updates = collect($data)->only($allowed)->all();
+
+        if (! empty($updates)) {
+            $group->fill($updates);
+            $group->save();
+        }
+
+        return true;
     }
+
+    // -----------------------------------------------------------------
+    //  Delete
+    // -----------------------------------------------------------------
 
     /**
      * Delete a group.
-     *
-     * Delegates to legacy GroupService::delete().
      */
     public function delete(int $id, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
-        return \Nexus\Services\GroupService::delete($id, $userId);
+        $this->errors = [];
+
+        /** @var Group|null $group */
+        $group = $this->group->newQuery()->find($id);
+
+        if (! $group) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            return false;
+        }
+
+        // Only owner or platform admin can delete
+        if ((int) $group->owner_id !== $userId && ! $this->isPlatformAdmin($userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the group owner can delete this group'];
+            return false;
+        }
+
+        return DB::transaction(function () use ($group, $id, $userId) {
+            // Fetch active members before deleting (to notify them)
+            $memberIds = DB::table('group_members')
+                ->where('group_id', $id)
+                ->where('status', 'active')
+                ->where('user_id', '!=', $userId)
+                ->pluck('user_id')
+                ->all();
+
+            // Delete group members
+            DB::table('group_members')->where('group_id', $id)->delete();
+
+            // Delete discussion posts, then discussions
+            $discussionIds = GroupDiscussion::withoutGlobalScopes()
+                ->where('group_id', $id)
+                ->pluck('id')
+                ->all();
+
+            if (! empty($discussionIds)) {
+                GroupPost::withoutGlobalScopes()
+                    ->whereIn('discussion_id', $discussionIds)
+                    ->delete();
+
+                GroupDiscussion::withoutGlobalScopes()
+                    ->where('group_id', $id)
+                    ->delete();
+            }
+
+            // Delete the group itself
+            $group->delete();
+
+            return true;
+        });
     }
 
+    // -----------------------------------------------------------------
+    //  Members
+    // -----------------------------------------------------------------
+
     /**
-     * Get members of a group with filters/pagination.
-     *
-     * Delegates to legacy GroupService::getMembers().
+     * Get members of a group with cursor-based pagination.
      */
     public function getMembers(int $groupId, array $filters = []): array
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return []; }
-        return \Nexus\Services\GroupService::getMembers($groupId, $filters);
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $role = $filters['role'] ?? null;
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = DB::table('group_members')
+            ->join('users', 'group_members.user_id', '=', 'users.id')
+            ->where('group_members.group_id', $groupId)
+            ->where('group_members.status', 'active')
+            ->select([
+                'group_members.id as membership_id',
+                'group_members.user_id',
+                'group_members.role',
+                'group_members.created_at as joined_at',
+                'users.first_name',
+                'users.last_name',
+                'users.avatar_url',
+            ]);
+
+        if ($role) {
+            $query->where('group_members.role', $role);
+        }
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('group_members.id', '>', (int) $cursorId);
+            }
+        }
+
+        $query->orderByRaw("FIELD(group_members.role, 'owner', 'admin', 'member')")
+              ->orderBy('group_members.id');
+
+        $members = $query->limit($limit + 1)->get();
+
+        $hasMore = $members->count() > $limit;
+        if ($hasMore) {
+            $members->pop();
+        }
+
+        $items = $members->map(fn ($m) => [
+            'id'         => (int) $m->user_id,
+            'name'       => trim(($m->first_name ?? '') . ' ' . ($m->last_name ?? '')),
+            'avatar_url' => $m->avatar_url,
+            'role'       => $m->role,
+            'joined_at'  => $m->joined_at,
+        ])->all();
+
+        $lastId = $members->isNotEmpty() ? $members->last()->membership_id : null;
+
+        return [
+            'items'    => $items,
+            'cursor'   => $hasMore && $lastId ? base64_encode((string) $lastId) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
      * Update a member's role in a group.
-     *
-     * Delegates to legacy GroupService::updateMemberRole().
      */
     public function updateMemberRole(int $groupId, int $targetUserId, int $actingUserId, string $role): bool
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
-        return \Nexus\Services\GroupService::updateMemberRole($groupId, $targetUserId, $actingUserId, $role);
+        $this->errors = [];
+
+        if (! in_array($role, ['admin', 'member'])) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid role', 'field' => 'role'];
+            return false;
+        }
+
+        if (! $this->canModify($groupId, $actingUserId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage members'];
+            return false;
+        }
+
+        // Check target is an active member
+        $membership = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $targetUserId)
+            ->first();
+
+        if (! $membership || $membership->status !== 'active') {
+            $this->errors[] = ['code' => 'NOT_MEMBER', 'message' => 'User is not a member of this group'];
+            return false;
+        }
+
+        // Can't change owner's role
+        /** @var Group $group */
+        $group = $this->group->newQuery()->findOrFail($groupId);
+        if ((int) $group->owner_id === $targetUserId) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot change the owner\'s role'];
+            return false;
+        }
+
+        DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $targetUserId)
+            ->update(['role' => $role]);
+
+        return true;
     }
 
     /**
      * Remove a member from a group.
-     *
-     * Delegates to legacy GroupService::removeMember().
      */
     public function removeMember(int $groupId, int $targetUserId, int $actingUserId): bool
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
-        return \Nexus\Services\GroupService::removeMember($groupId, $targetUserId, $actingUserId);
+        $this->errors = [];
+
+        if (! $this->canModify($groupId, $actingUserId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to remove members'];
+            return false;
+        }
+
+        // Can't remove the owner
+        /** @var Group $group */
+        $group = $this->group->newQuery()->findOrFail($groupId);
+        if ((int) $group->owner_id === $targetUserId) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot remove the group owner'];
+            return false;
+        }
+
+        // Can't remove yourself this way (use leave instead)
+        if ($targetUserId === $actingUserId) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Use leave endpoint to remove yourself'];
+            return false;
+        }
+
+        $detached = $group->members()->detach($targetUserId);
+
+        if ($detached > 0) {
+            $group->decrement('cached_member_count');
+        }
+
+        return true;
     }
 
+    // -----------------------------------------------------------------
+    //  Join requests
+    // -----------------------------------------------------------------
+
     /**
-     * Get pending join requests for a group.
-     *
-     * Delegates to legacy GroupService::getPendingRequests().
+     * Get pending join requests for a group (admin only).
      */
     public function getPendingRequests(int $groupId, int $adminUserId): ?array
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
-        return \Nexus\Services\GroupService::getPendingRequests($groupId, $adminUserId);
+        $this->errors = [];
+
+        if (! $this->canModify($groupId, $adminUserId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to view join requests'];
+            return null;
+        }
+
+        $pending = DB::table('group_members')
+            ->join('users', 'group_members.user_id', '=', 'users.id')
+            ->where('group_members.group_id', $groupId)
+            ->where('group_members.status', 'pending')
+            ->select(['users.id', 'users.first_name', 'users.last_name', 'users.avatar_url'])
+            ->get();
+
+        return $pending->map(fn ($p) => [
+            'id'         => (int) $p->id,
+            'name'       => trim(($p->first_name ?? '') . ' ' . ($p->last_name ?? '')),
+            'avatar_url' => $p->avatar_url,
+        ])->all();
     }
 
     /**
-     * Handle a join request (approve/deny).
-     *
-     * Delegates to legacy GroupService::handleJoinRequest().
+     * Handle a join request (accept/reject).
      */
     public function handleJoinRequest(int $groupId, int $requesterId, int $adminUserId, string $action): bool
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
-        return \Nexus\Services\GroupService::handleJoinRequest($groupId, $requesterId, $adminUserId, $action);
+        $this->errors = [];
+
+        if (! in_array($action, ['accept', 'reject'])) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject', 'field' => 'action'];
+            return false;
+        }
+
+        if (! $this->canModify($groupId, $adminUserId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to handle join requests'];
+            return false;
+        }
+
+        // Check requester has pending status
+        $membership = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $requesterId)
+            ->first();
+
+        if (! $membership || $membership->status !== 'pending') {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'No pending request found for this user'];
+            return false;
+        }
+
+        if ($action === 'accept') {
+            DB::table('group_members')
+                ->where('group_id', $groupId)
+                ->where('user_id', $requesterId)
+                ->update(['status' => 'active']);
+
+            /** @var Group $group */
+            $group = $this->group->newQuery()->find($groupId);
+            if ($group) {
+                $group->increment('cached_member_count');
+            }
+        } else {
+            // Reject — remove the pending row
+            DB::table('group_members')
+                ->where('group_id', $groupId)
+                ->where('user_id', $requesterId)
+                ->delete();
+        }
+
+        return true;
     }
+
+    // -----------------------------------------------------------------
+    //  Discussions
+    // -----------------------------------------------------------------
 
     /**
      * Get discussions in a group.
-     *
-     * Delegates to legacy GroupService::getDiscussions().
      */
     public function getDiscussions(int $groupId, int $userId, array $filters = []): ?array
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
-        return \Nexus\Services\GroupService::getDiscussions($groupId, $userId, $filters);
+        $this->errors = [];
+
+        // Check membership
+        $isMember = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (! $isMember) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
+            return null;
+        }
+
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = GroupDiscussion::query()
+            ->with(['user:id,first_name,last_name,avatar_url'])
+            ->withCount('posts')
+            ->where('group_id', $groupId);
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('id', '<', (int) $cursorId);
+            }
+        }
+
+        $query->orderByDesc('is_pinned')->orderByDesc('id');
+
+        $discussions = $query->limit($limit + 1)->get();
+        $hasMore = $discussions->count() > $limit;
+        if ($hasMore) {
+            $discussions->pop();
+        }
+
+        $items = $discussions->map(function (GroupDiscussion $d) {
+            $user = $d->user;
+            return [
+                'id'            => $d->id,
+                'title'         => $d->title,
+                'author'        => [
+                    'id'         => (int) $d->user_id,
+                    'name'       => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                    'avatar_url' => $user?->avatar_url,
+                ],
+                'reply_count'   => (int) ($d->posts_count ?? 0),
+                'is_pinned'     => (bool) $d->is_pinned,
+                'created_at'    => $d->created_at?->toISOString(),
+                'last_reply_at' => null,
+            ];
+        })->all();
+
+        return [
+            'items'    => $items,
+            'cursor'   => $hasMore && $discussions->isNotEmpty() ? base64_encode((string) $discussions->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
      * Create a discussion in a group.
-     *
-     * Delegates to legacy GroupService::createDiscussion().
      */
     public function createDiscussion(int $groupId, int $userId, array $data): ?array
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
-        return \Nexus\Services\GroupService::createDiscussion($groupId, $userId, $data);
+        $this->errors = [];
+
+        // Check membership
+        $isMember = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (! $isMember) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to create discussions'];
+            return null;
+        }
+
+        $title = trim($data['title'] ?? '');
+        $content = trim($data['content'] ?? '');
+
+        if (empty($title)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            return null;
+        }
+
+        if (empty($content)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+            return null;
+        }
+
+        return DB::transaction(function () use ($groupId, $userId, $title, $content) {
+            $discussion = GroupDiscussion::create([
+                'group_id' => $groupId,
+                'user_id'  => $userId,
+                'title'    => $title,
+            ]);
+
+            GroupPost::create([
+                'discussion_id' => $discussion->id,
+                'user_id'       => $userId,
+                'content'       => $content,
+            ]);
+
+            $discussion->load('user:id,first_name,last_name,avatar_url');
+            $user = $discussion->user;
+
+            return [
+                'id'            => $discussion->id,
+                'title'         => $discussion->title,
+                'content'       => $content,
+                'author'        => [
+                    'id'         => (int) $discussion->user_id,
+                    'name'       => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                    'avatar_url' => $user?->avatar_url,
+                ],
+                'reply_count'   => 0,
+                'is_pinned'     => false,
+                'created_at'    => $discussion->created_at?->toISOString(),
+                'last_reply_at' => null,
+            ];
+        });
     }
 
     /**
      * Get messages in a group discussion.
-     *
-     * Delegates to legacy GroupService::getDiscussionMessages().
      */
     public function getDiscussionMessages(int $groupId, int $discussionId, int $userId, array $filters = []): ?array
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
-        return \Nexus\Services\GroupService::getDiscussionMessages($groupId, $discussionId, $userId, $filters);
+        $this->errors = [];
+
+        // Check membership
+        $isMember = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (! $isMember) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to view discussions'];
+            return null;
+        }
+
+        // Verify discussion belongs to group
+        $discussion = GroupDiscussion::query()
+            ->with(['user:id,first_name,last_name,avatar_url'])
+            ->where('group_id', $groupId)
+            ->find($discussionId);
+
+        if (! $discussion) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
+            return null;
+        }
+
+        $limit = min((int) ($filters['limit'] ?? 50), 100);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = GroupPost::query()
+            ->with(['user:id,first_name,last_name,avatar_url'])
+            ->where('discussion_id', $discussionId);
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('id', '>', (int) $cursorId);
+            }
+        }
+
+        $query->orderBy('id');
+
+        $posts = $query->limit($limit + 1)->get();
+        $hasMore = $posts->count() > $limit;
+        if ($hasMore) {
+            $posts->pop();
+        }
+
+        $items = $posts->map(function (GroupPost $p) use ($userId) {
+            $user = $p->user;
+            return [
+                'id'         => $p->id,
+                'content'    => $p->content,
+                'author'     => [
+                    'id'         => (int) $p->user_id,
+                    'name'       => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                    'avatar_url' => $user?->avatar_url,
+                ],
+                'is_own'     => (int) $p->user_id === $userId,
+                'created_at' => $p->created_at?->toISOString(),
+            ];
+        })->all();
+
+        // Get metadata
+        $totalReplies = GroupPost::withoutGlobalScopes()
+            ->where('discussion_id', $discussionId)
+            ->count();
+
+        $firstContent = GroupPost::withoutGlobalScopes()
+            ->where('discussion_id', $discussionId)
+            ->orderBy('id')
+            ->value('content');
+
+        $lastReplyAt = GroupPost::withoutGlobalScopes()
+            ->where('discussion_id', $discussionId)
+            ->max('created_at');
+
+        $user = $discussion->user;
+
+        return [
+            'discussion' => [
+                'id'            => $discussion->id,
+                'title'         => $discussion->title,
+                'content'       => $firstContent ?? '',
+                'author'        => [
+                    'id'         => (int) $discussion->user_id,
+                    'name'       => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                    'avatar_url' => $user?->avatar_url,
+                ],
+                'reply_count'   => $totalReplies,
+                'is_pinned'     => (bool) $discussion->is_pinned,
+                'created_at'    => $discussion->created_at?->toISOString(),
+                'last_reply_at' => $lastReplyAt,
+            ],
+            'items'    => $items,
+            'cursor'   => $hasMore && $posts->isNotEmpty() ? base64_encode((string) $posts->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
      * Post a message to a group discussion.
-     *
-     * Delegates to legacy GroupService::postToDiscussion().
      */
     public function postToDiscussion(int $groupId, int $discussionId, int $userId, array $data): ?array
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return null; }
-        return \Nexus\Services\GroupService::postToDiscussion($groupId, $discussionId, $userId, $data);
+        $this->errors = [];
+
+        // Check membership
+        $isMember = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
+
+        if (! $isMember) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a member to post'];
+            return null;
+        }
+
+        // Verify discussion belongs to group
+        $discussion = GroupDiscussion::query()
+            ->where('group_id', $groupId)
+            ->find($discussionId);
+
+        if (! $discussion) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Discussion not found'];
+            return null;
+        }
+
+        $content = trim($data['content'] ?? '');
+        if (empty($content)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Content is required', 'field' => 'content'];
+            return null;
+        }
+
+        $post = GroupPost::create([
+            'discussion_id' => $discussionId,
+            'user_id'       => $userId,
+            'content'       => $content,
+        ]);
+
+        $post->load('user:id,first_name,last_name,avatar_url');
+        $user = $post->user;
+
+        return [
+            'id'         => $post->id,
+            'content'    => $post->content,
+            'author'     => [
+                'id'         => (int) $post->user_id,
+                'name'       => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                'avatar_url' => $user?->avatar_url,
+            ],
+            'is_own'     => true,
+            'created_at' => $post->created_at?->toISOString(),
+        ];
     }
 
-    /**
-     * Get validation errors from the last operation.
-     *
-     * Delegates to legacy GroupService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        if (!class_exists('\Nexus\Services\GroupService')) { return []; }
-        return \Nexus\Services\GroupService::getErrors();
-    }
+    // -----------------------------------------------------------------
+    //  Images
+    // -----------------------------------------------------------------
 
     /**
      * Update a group's image (avatar or cover).
-     *
-     * Delegates to legacy GroupService::updateImage().
      */
     public function updateImage(int $groupId, int $userId, string $imageUrl, string $type = 'avatar'): bool
     {
-        if (!class_exists('\Nexus\Services\GroupService')) { return false; }
-        return \Nexus\Services\GroupService::updateImage($groupId, $userId, $imageUrl, $type);
+        $this->errors = [];
+
+        if (! $this->canModify($groupId, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to modify this group'];
+            return false;
+        }
+
+        /** @var Group|null $group */
+        $group = $this->group->newQuery()->find($groupId);
+
+        if (! $group) {
+            return false;
+        }
+
+        $field = $type === 'cover' ? 'cover_image_url' : 'image_url';
+        $group->{$field} = $imageUrl;
+        $group->save();
+
+        return true;
+    }
+
+    // -----------------------------------------------------------------
+    //  Helpers
+    // -----------------------------------------------------------------
+
+    /**
+     * Check if a user can modify a group (is admin/owner).
+     */
+    private function canModify(int $groupId, int $userId): bool
+    {
+        // Check if platform admin
+        if ($this->isPlatformAdmin($userId)) {
+            return true;
+        }
+
+        $membership = DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->first();
+
+        return $membership && in_array($membership->role, ['owner', 'admin']);
+    }
+
+    /**
+     * Check if user is a platform admin.
+     */
+    private function isPlatformAdmin(int $userId): bool
+    {
+        $user = User::find($userId);
+        if (! $user) {
+            return false;
+        }
+
+        $role = $user->role ?? '';
+        return in_array($role, ['admin', 'super_admin', 'god'])
+            || $user->is_super_admin
+            || $user->is_tenant_super_admin;
     }
 }

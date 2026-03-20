@@ -6,41 +6,164 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- * AdminBadgeCountService — Laravel DI wrapper for legacy \Nexus\Services\AdminBadgeCountService.
+ * AdminBadgeCountService — Provides badge counts for admin sidebar navigation.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Counts pending approvals, alerts, and other actionable items for the current tenant.
+ * Results are cached for the request lifetime.
  */
 class AdminBadgeCountService
 {
-    public function __construct()
-    {
-    }
+    private ?array $cachedCounts = null;
 
     /**
-     * Delegates to legacy AdminBadgeCountService::getCounts().
+     * Get all badge counts for the current tenant.
+     * Results are cached for the request lifetime.
      */
     public function getCounts(): array
     {
-        if (!class_exists('\Nexus\Services\AdminBadgeCountService')) { return []; }
-        return \Nexus\Services\AdminBadgeCountService::getCounts();
+        if ($this->cachedCounts !== null) {
+            return $this->cachedCounts;
+        }
+
+        $tenantId = TenantContext::getId();
+        $counts = [];
+
+        try {
+            $counts['pending_users'] = $this->countPendingUsers($tenantId);
+            $counts['pending_listings'] = $this->countPendingListings($tenantId);
+            $counts['pending_orgs'] = $this->countPendingOrganizations($tenantId);
+            $counts['fraud_alerts'] = $this->countFraudAlerts($tenantId);
+            $counts['gdpr_requests'] = $this->countGdprRequests($tenantId);
+            $counts['404_errors'] = $this->count404Errors();
+            $counts['pending_exchanges'] = $this->countPendingExchanges($tenantId);
+            $counts['unreviewed_messages'] = $this->countUnreviewedMessages($tenantId);
+        } catch (\Exception $e) {
+            Log::warning('AdminBadgeCountService error: ' . $e->getMessage());
+        }
+
+        $this->cachedCounts = $counts;
+        return $counts;
     }
 
     /**
-     * Delegates to legacy AdminBadgeCountService::getCount().
+     * Get a specific badge count.
      */
     public function getCount(string $key): int
     {
-        if (!class_exists('\Nexus\Services\AdminBadgeCountService')) { return 0; }
-        return \Nexus\Services\AdminBadgeCountService::getCount($key);
+        $counts = $this->getCounts();
+        return $counts[$key] ?? 0;
     }
 
     /**
-     * Delegates to legacy AdminBadgeCountService::clearCache().
+     * Clear cached counts (useful after an action that changes counts).
      */
     public function clearCache(): void
     {
-        if (!class_exists('\Nexus\Services\AdminBadgeCountService')) { return; }
-        \Nexus\Services\AdminBadgeCountService::clearCache();
+        $this->cachedCounts = null;
+    }
+
+    private function countPendingUsers(int $tenantId): int
+    {
+        try {
+            return (int) DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function countPendingListings(int $tenantId): int
+    {
+        try {
+            return (int) DB::table('listings')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($query) {
+                    $query->where('status', 'pending')
+                          ->orWhereNull('status')
+                          ->orWhere('status', '');
+                })
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function countPendingOrganizations(int $tenantId): int
+    {
+        try {
+            return (int) DB::table('vol_organizations')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function countFraudAlerts(int $tenantId): int
+    {
+        try {
+            return (int) DB::table('fraud_alerts')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'new')
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function countGdprRequests(int $tenantId): int
+    {
+        try {
+            return (int) DB::table('gdpr_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function count404Errors(): int
+    {
+        try {
+            return (int) DB::table('error_404_log')
+                ->where('resolved', 0)
+                ->where('last_seen_at', '>', DB::raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'))
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function countPendingExchanges(int $tenantId): int
+    {
+        try {
+            return (int) DB::table('exchange_requests')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending_broker')
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    private function countUnreviewedMessages(int $tenantId): int
+    {
+        try {
+            return (int) DB::table('broker_message_copies')
+                ->where('tenant_id', $tenantId)
+                ->whereNull('reviewed_at')
+                ->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 }

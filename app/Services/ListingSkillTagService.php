@@ -6,81 +6,210 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\ListingSkillTag;
+use Illuminate\Support\Facades\DB;
+
 /**
- * ListingSkillTagService — Laravel DI wrapper for legacy \Nexus\Services\ListingSkillTagService.
+ * ListingSkillTagService — skill tag management for listings.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Provides adding/removing skill tags, filtering listings by tags,
+ * tag autocomplete/suggestions, and popular tags for the tenant.
  */
 class ListingSkillTagService
 {
-    public function __construct()
-    {
-    }
+    private const MAX_TAGS_PER_LISTING = 10;
 
     /**
-     * Delegates to legacy ListingSkillTagService::setTags().
+     * Set skill tags for a listing (replaces existing tags).
      */
     public function setTags(int $listingId, array $tags): bool
     {
-        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return false; }
-        return \Nexus\Services\ListingSkillTagService::setTags($listingId, $tags);
+        $tenantId = TenantContext::getId();
+
+        // Validate listing belongs to tenant
+        $exists = DB::table('listings')
+            ->where('id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (!$exists) {
+            return false;
+        }
+
+        // Normalize and deduplicate tags
+        $normalizedTags = [];
+        foreach ($tags as $tag) {
+            $normalized = $this->normalizeTag($tag);
+            if ($normalized !== '' && !in_array($normalized, $normalizedTags, true)) {
+                $normalizedTags[] = $normalized;
+            }
+        }
+
+        $normalizedTags = array_slice($normalizedTags, 0, self::MAX_TAGS_PER_LISTING);
+
+        // Remove existing tags
+        ListingSkillTag::where('listing_id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        // Insert new tags
+        foreach ($normalizedTags as $tag) {
+            DB::statement(
+                "INSERT IGNORE INTO listing_skill_tags (tenant_id, listing_id, tag) VALUES (?, ?, ?)",
+                [$tenantId, $listingId, $tag]
+            );
+        }
+
+        return true;
     }
 
     /**
-     * Delegates to legacy ListingSkillTagService::getTags().
+     * Get tags for a listing.
+     *
+     * @return string[]
      */
     public function getTags(int $listingId): array
     {
-        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
-        return \Nexus\Services\ListingSkillTagService::getTags($listingId);
+        $tenantId = TenantContext::getId();
+
+        return ListingSkillTag::where('listing_id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->orderBy('tag')
+            ->pluck('tag')
+            ->all();
     }
 
     /**
-     * Delegates to legacy ListingSkillTagService::addTag().
+     * Add a single tag to a listing.
      */
     public function addTag(int $listingId, string $tag): bool
     {
-        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return false; }
-        return \Nexus\Services\ListingSkillTagService::addTag($listingId, $tag);
+        $tenantId = TenantContext::getId();
+        $normalized = $this->normalizeTag($tag);
+        if ($normalized === '') {
+            return false;
+        }
+
+        $count = ListingSkillTag::where('listing_id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        if ($count >= self::MAX_TAGS_PER_LISTING) {
+            return false;
+        }
+
+        DB::statement(
+            "INSERT IGNORE INTO listing_skill_tags (tenant_id, listing_id, tag) VALUES (?, ?, ?)",
+            [$tenantId, $listingId, $normalized]
+        );
+
+        return true;
     }
 
     /**
-     * Delegates to legacy ListingSkillTagService::removeTag().
+     * Remove a single tag from a listing.
      */
     public function removeTag(int $listingId, string $tag): void
     {
-        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return; }
-        \Nexus\Services\ListingSkillTagService::removeTag($listingId, $tag);
+        $tenantId = TenantContext::getId();
+        $normalized = $this->normalizeTag($tag);
+
+        ListingSkillTag::where('listing_id', $listingId)
+            ->where('tenant_id', $tenantId)
+            ->where('tag', $normalized)
+            ->delete();
     }
 
     /**
-     * Delegates to legacy ListingSkillTagService::findListingsByTags().
+     * Find listing IDs that match ANY of the given skill tags.
+     *
+     * @return int[]
      */
     public function findListingsByTags(array $tags, int $limit = 100): array
     {
-        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
-        return \Nexus\Services\ListingSkillTagService::findListingsByTags($tags, $limit);
+        $tenantId = TenantContext::getId();
+
+        if (empty($tags)) {
+            return [];
+        }
+
+        $normalizedTags = array_filter(array_map([$this, 'normalizeTag'], $tags), fn ($t) => $t !== '');
+        if (empty($normalizedTags)) {
+            return [];
+        }
+
+        return DB::table('listing_skill_tags as lst')
+            ->join('listings as l', function ($join) {
+                $join->on('lst.listing_id', '=', 'l.id')
+                     ->where('l.status', '=', 'active');
+            })
+            ->where('lst.tenant_id', $tenantId)
+            ->whereIn('lst.tag', $normalizedTags)
+            ->distinct()
+            ->orderByDesc('lst.listing_id')
+            ->limit($limit)
+            ->pluck('lst.listing_id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
     }
 
     /**
-     * Get popular/trending skill tags.
+     * Get popular tags for the tenant.
      *
-     * Delegates to legacy ListingSkillTagService::getPopularTags().
+     * @return array<array{tag: string, count: int}>
      */
     public function getPopularTags(int $limit = 20): array
     {
-        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
-        return \Nexus\Services\ListingSkillTagService::getPopularTags($limit);
+        $tenantId = TenantContext::getId();
+
+        return DB::table('listing_skill_tags as lst')
+            ->join('listings as l', function ($join) {
+                $join->on('lst.listing_id', '=', 'l.id')
+                     ->where('l.status', '=', 'active');
+            })
+            ->where('lst.tenant_id', $tenantId)
+            ->selectRaw('lst.tag, COUNT(*) as count')
+            ->groupBy('lst.tag')
+            ->orderByDesc('count')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => ['tag' => $r->tag, 'count' => (int) $r->count])
+            ->all();
     }
 
     /**
-     * Autocomplete skill tags by prefix.
+     * Autocomplete tags based on a prefix.
      *
-     * Delegates to legacy ListingSkillTagService::autocompleteTags().
+     * @return string[]
      */
     public function autocompleteTags(string $prefix, int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\ListingSkillTagService')) { return []; }
-        return \Nexus\Services\ListingSkillTagService::autocompleteTags($prefix, $limit);
+        $tenantId = TenantContext::getId();
+        $normalized = $this->normalizeTag($prefix);
+
+        if (strlen($normalized) < 2) {
+            return [];
+        }
+
+        return DB::table('listing_skill_tags')
+            ->where('tenant_id', $tenantId)
+            ->where('tag', 'LIKE', $normalized . '%')
+            ->distinct()
+            ->orderBy('tag')
+            ->limit($limit)
+            ->pluck('tag')
+            ->all();
+    }
+
+    /**
+     * Normalize a tag string.
+     */
+    private function normalizeTag(string $tag): string
+    {
+        $tag = strtolower(trim($tag));
+        $tag = preg_replace('/[^a-z0-9\- ]/', '', $tag);
+        $tag = preg_replace('/\s+/', ' ', $tag);
+        return substr(trim($tag), 0, 100);
     }
 }

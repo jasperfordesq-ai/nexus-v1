@@ -15,8 +15,10 @@ use Nexus\Models\PayPlan;
 /**
  * MenuManager - Tenant-aware, Pay Layout-aware Menu System
  *
- * Replaces/extends MenuGenerator with support for:
- * - Custom menu management
+ * Provides:
+ * - Custom menu management (DB-driven)
+ * - Default fallback menus (built-in)
+ * - Page-builder menu pages (from pages table)
  * - Pay plan restrictions
  * - Layout-specific menus
  * - Advanced visibility rules
@@ -85,14 +87,12 @@ class MenuManager
 
         if (empty($menus)) {
             // Use default platform menu if available
-            if (class_exists('\Nexus\Core\DefaultMenus')) {
-                $defaultMenu = DefaultMenus::getDefaultMenu($location, TenantContext::getBasePath());
-                if (!empty($defaultMenu)) {
-                    return [$defaultMenu];
-                }
+            $defaultMenu = self::getDefaultMenu($location, TenantContext::getBasePath());
+            if (!empty($defaultMenu)) {
+                return [$defaultMenu];
             }
 
-            // Fallback to legacy MenuGenerator for backwards compatibility
+            // Fallback to pages-table menu for backwards compatibility
             return self::getLegacyMenu($location);
         }
 
@@ -352,7 +352,7 @@ class MenuManager
     }
 
     /**
-     * Legacy support - fallback to old MenuGenerator for backwards compatibility
+     * Legacy support - get menu pages from the pages table for a location
      */
     private static function getLegacyMenu($location)
     {
@@ -366,7 +366,7 @@ class MenuManager
         $legacyLocation = $legacyMap[$location] ?? $location;
 
         try {
-            $pages = \Nexus\Core\MenuGenerator::getMenuPages($legacyLocation);
+            $pages = self::getMenuPages($legacyLocation);
 
             if (empty($pages)) {
                 return [];
@@ -395,26 +395,139 @@ class MenuManager
     }
 
     /**
-     * Legacy method support for backwards compatibility
+     * Get pages from the pages table for a specific menu location.
+     * Inlined from the former MenuGenerator class.
+     *
+     * @param string $location Menu location (about, main, footer)
+     * @return array List of pages with title, slug, url
+     */
+    public static function getMenuPages(string $location = 'about'): array
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            if (!$tenantId) {
+                return [];
+            }
+
+            // Check if page builder module is enabled (gracefully handle missing column)
+            try {
+                $tenant = Database::query("SELECT module_page_builder_enabled FROM tenants WHERE id = ?", [$tenantId])->fetch();
+                if ($tenant && empty($tenant['module_page_builder_enabled'])) {
+                    return []; // Module explicitly disabled
+                }
+            } catch (\Exception $e) {
+                // Column doesn't exist - assume page builder is enabled by default
+            }
+
+            $basePath = TenantContext::getBasePath();
+
+            // Fetch published pages for the specified menu location
+            try {
+                $pages = Database::query(
+                    "SELECT title, slug FROM pages
+                     WHERE tenant_id = ?
+                     AND is_published = 1
+                     AND show_in_menu = 1
+                     AND menu_location = ?
+                     ORDER BY sort_order ASC, title ASC",
+                    [$tenantId, $location]
+                )->fetchAll();
+            } catch (\Exception $e) {
+                // Fallback: columns don't exist yet, show all published pages in About
+                if ($location === 'about') {
+                    $pages = Database::query(
+                        "SELECT title, slug FROM pages
+                         WHERE tenant_id = ? AND is_published = 1
+                         ORDER BY sort_order ASC, title ASC",
+                        [$tenantId]
+                    )->fetchAll();
+                } else {
+                    $pages = [];
+                }
+            }
+
+            // Add full URL to each page
+            foreach ($pages as &$page) {
+                $page['url'] = $basePath . '/page/' . $page['slug'];
+            }
+
+            return $pages;
+
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Render the "About" dropdown menu HTML for the current tenant.
+     * Inlined from the former MenuGenerator class.
+     *
+     * @return string HTML markup
      */
     public static function renderAboutMenu()
     {
-        return \Nexus\Core\MenuGenerator::renderAboutMenu();
+        try {
+            $tenantId = TenantContext::getId();
+            if (!$tenantId) {
+                return '';
+            }
+
+            $pages = self::getMenuPages('about');
+            if (empty($pages)) {
+                return '';
+            }
+
+            $basePath = TenantContext::getBasePath();
+            $html = '<li>';
+            $html .= '<details role="list" dir="rtl">';
+            $html .= '<summary aria-haspopup="listbox" role="link">About</summary>';
+            $html .= '<ul role="listbox">';
+
+            foreach ($pages as $page) {
+                $slug = htmlspecialchars($page['slug']);
+                $title = htmlspecialchars($page['title']);
+                $html .= "<li><a href=\"{$basePath}/page/{$slug}\">{$title}</a></li>";
+            }
+
+            $html .= '</ul>';
+            $html .= '</details>';
+            $html .= '</li>';
+
+            return $html;
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 
+    /**
+     * Get pages for the main navigation bar.
+     *
+     * @return array List of pages
+     */
     public static function getMainNavPages()
     {
-        return \Nexus\Core\MenuGenerator::getMainNavPages();
+        return self::getMenuPages('main');
     }
 
+    /**
+     * Get pages for the footer.
+     *
+     * @return array List of pages
+     */
     public static function getFooterPages()
     {
-        return \Nexus\Core\MenuGenerator::getFooterPages();
+        return self::getMenuPages('footer');
     }
 
+    /**
+     * Check if there are any pages for a menu location.
+     *
+     * @param string $location Menu location
+     * @return bool
+     */
     public static function hasMenuPages($location)
     {
-        return \Nexus\Core\MenuGenerator::hasMenuPages($location);
+        return !empty(self::getMenuPages($location));
     }
 
     /**
@@ -457,12 +570,10 @@ class MenuManager
         $navClass = $config['original_nav_config'] ?? 'Nexus\Config\Navigation';
 
         if (!class_exists($navClass)) {
-            // Ultimate fallback - use DefaultMenus
-            if (class_exists('\Nexus\Core\DefaultMenus')) {
-                $defaultMenu = DefaultMenus::getDefaultMenu($location, TenantContext::getBasePath());
-                if (!empty($defaultMenu)) {
-                    return [$defaultMenu];
-                }
+            // Ultimate fallback - use built-in default menus
+            $defaultMenu = self::getDefaultMenu($location, TenantContext::getBasePath());
+            if (!empty($defaultMenu)) {
+                return [$defaultMenu];
             }
             return [];
         }
@@ -632,5 +743,300 @@ class MenuManager
         }
 
         return $result;
+    }
+
+    // ---------------------------------------------------------------
+    // Default Menu Builders (inlined from the former DefaultMenus class)
+    // ---------------------------------------------------------------
+
+    /**
+     * Get default platform menu for a specific location.
+     *
+     * @param string $location Menu location (header-main, footer, mobile)
+     * @param string $basePath Tenant base path
+     * @return array Menu structure compatible with MenuManager, or empty array
+     */
+    public static function getDefaultMenu($location, $basePath = '')
+    {
+        $basePath = $basePath ?: TenantContext::getBasePath();
+
+        switch ($location) {
+            case 'header-main':
+                return self::getDefaultMainMenu($basePath);
+            case 'footer':
+                return self::getDefaultFooterMenu($basePath);
+            case 'mobile':
+                return self::getDefaultMobileMenu($basePath);
+            default:
+                return [];
+        }
+    }
+
+    /**
+     * Get default main navigation menu.
+     */
+    private static function getDefaultMainMenu($basePath)
+    {
+        $items = [];
+
+        $items[] = [
+            'type' => 'link',
+            'label' => 'News Feed',
+            'url' => $basePath . '/',
+            'icon' => 'fa-solid fa-newspaper',
+            'sort_order' => 10,
+            'is_active' => 1
+        ];
+
+        $items[] = [
+            'type' => 'link',
+            'label' => 'Listings',
+            'url' => $basePath . '/listings',
+            'icon' => 'fa-solid fa-list',
+            'sort_order' => 20,
+            'is_active' => 1
+        ];
+
+        if (TenantContext::hasFeature('volunteering')) {
+            $items[] = [
+                'type' => 'link',
+                'label' => 'Volunteering',
+                'url' => $basePath . '/volunteering',
+                'icon' => 'fa-solid fa-hands-helping',
+                'sort_order' => 25,
+                'is_active' => 1
+            ];
+        }
+
+        $items[] = [
+            'type' => 'link',
+            'label' => 'Groups',
+            'url' => $basePath . '/community-groups',
+            'icon' => 'fa-solid fa-users',
+            'sort_order' => 30,
+            'is_active' => 1
+        ];
+
+        $items[] = [
+            'type' => 'link',
+            'label' => 'Local Hubs',
+            'url' => $basePath . '/groups',
+            'icon' => 'fa-solid fa-map-marker-alt',
+            'sort_order' => 40,
+            'is_active' => 1
+        ];
+
+        $items[] = [
+            'type' => 'link',
+            'label' => 'Members',
+            'url' => $basePath . '/members',
+            'icon' => 'fa-solid fa-user-group',
+            'sort_order' => 50,
+            'is_active' => 1
+        ];
+
+        $exploreItems = self::getDefaultExploreMenuItems($basePath);
+        if (!empty($exploreItems)) {
+            $items[] = [
+                'type' => 'dropdown',
+                'label' => 'Explore',
+                'icon' => 'fa-solid fa-compass',
+                'sort_order' => 60,
+                'is_active' => 1,
+                'children' => $exploreItems
+            ];
+        }
+
+        return [
+            'id' => 'default-main',
+            'name' => 'Default Main Navigation',
+            'slug' => 'default-main-nav',
+            'location' => 'header-main',
+            'is_active' => 1,
+            'items' => $items
+        ];
+    }
+
+    /**
+     * Get Explore submenu items based on enabled features.
+     */
+    private static function getDefaultExploreMenuItems($basePath)
+    {
+        $items = [];
+        $order = 10;
+
+        $exploreConfig = [
+            'events' => [
+                'label' => 'Events',
+                'url' => '/events',
+                'icon' => 'fa-solid fa-calendar-days',
+                'feature' => 'events'
+            ],
+            'polls' => [
+                'label' => 'Polls',
+                'url' => '/polls',
+                'icon' => 'fa-solid fa-square-poll-vertical',
+                'feature' => 'polls'
+            ],
+            'goals' => [
+                'label' => 'Goals',
+                'url' => '/goals',
+                'icon' => 'fa-solid fa-bullseye',
+                'feature' => 'goals'
+            ],
+            'resources' => [
+                'label' => 'Resources',
+                'url' => '/resources',
+                'icon' => 'fa-solid fa-folder-open',
+                'feature' => 'resources'
+            ],
+            'smart_matching' => [
+                'label' => 'Smart Matching',
+                'url' => '/matches',
+                'icon' => 'fa-solid fa-wand-magic-sparkles',
+                'color' => '#ec4899',
+                'separator_before' => true
+            ],
+            'leaderboard' => [
+                'label' => 'Leaderboards',
+                'url' => '/leaderboard',
+                'icon' => 'fa-solid fa-trophy',
+                'separator_before' => true
+            ],
+            'achievements' => [
+                'label' => 'Achievements',
+                'url' => '/achievements',
+                'icon' => 'fa-solid fa-medal'
+            ],
+            'ai' => [
+                'label' => 'AI Assistant',
+                'url' => '/ai',
+                'icon' => 'fa-solid fa-robot',
+                'color' => '#6366f1',
+                'separator_before' => true
+            ],
+            'get_app' => [
+                'label' => 'Get App',
+                'url' => '/mobile-download',
+                'icon' => 'fa-solid fa-mobile-screen-button',
+                'separator_before' => true
+            ]
+        ];
+
+        foreach ($exploreConfig as $key => $config) {
+            if (!isset($config['feature']) || TenantContext::hasFeature($config['feature'])) {
+                $item = [
+                    'type' => 'link',
+                    'label' => $config['label'],
+                    'url' => $basePath . $config['url'],
+                    'icon' => $config['icon'],
+                    'sort_order' => $order,
+                    'is_active' => 1
+                ];
+
+                if (isset($config['color'])) {
+                    $item['color'] = $config['color'];
+                }
+                if (isset($config['separator_before'])) {
+                    $item['separator_before'] = $config['separator_before'];
+                }
+                if (isset($config['highlight'])) {
+                    $item['highlight'] = $config['highlight'];
+                }
+
+                $items[] = $item;
+                $order += 10;
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * Get default footer menu.
+     */
+    private static function getDefaultFooterMenu($basePath)
+    {
+        $items = [
+            [
+                'type' => 'link',
+                'label' => 'Privacy Policy',
+                'url' => $basePath . '/privacy',
+                'sort_order' => 10,
+                'is_active' => 1
+            ],
+            [
+                'type' => 'link',
+                'label' => 'Terms of Service',
+                'url' => $basePath . '/terms',
+                'sort_order' => 20,
+                'is_active' => 1
+            ],
+            [
+                'type' => 'link',
+                'label' => 'Contact Us',
+                'url' => $basePath . '/contact',
+                'sort_order' => 30,
+                'is_active' => 1
+            ],
+            [
+                'type' => 'link',
+                'label' => 'Help Center',
+                'url' => $basePath . '/help',
+                'sort_order' => 40,
+                'is_active' => 1
+            ]
+        ];
+
+        return [
+            'id' => 'default-footer',
+            'name' => 'Default Footer Navigation',
+            'slug' => 'default-footer-nav',
+            'location' => 'footer',
+            'is_active' => 1,
+            'items' => $items
+        ];
+    }
+
+    /**
+     * Get default mobile menu.
+     */
+    private static function getDefaultMobileMenu($basePath)
+    {
+        $mainMenu = self::getDefaultMainMenu($basePath);
+
+        // For mobile, flatten by excluding dropdown items
+        $items = array_filter($mainMenu['items'], function ($item) {
+            return $item['type'] !== 'dropdown';
+        });
+
+        return [
+            'id' => 'default-mobile',
+            'name' => 'Default Mobile Navigation',
+            'slug' => 'default-mobile-nav',
+            'location' => 'mobile',
+            'is_active' => 1,
+            'items' => array_values($items)
+        ];
+    }
+
+    /**
+     * Check if default menus should be used for a location.
+     * Returns true if no active custom menus exist.
+     *
+     * @param string $location
+     * @param int|null $tenantId
+     * @return bool
+     */
+    public static function shouldUseDefault($location, $tenantId = null)
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+
+        try {
+            $menus = Menu::getByLocation($location, 'modern', $tenantId);
+            return empty($menus);
+        } catch (\Exception $e) {
+            return true;
+        }
     }
 }

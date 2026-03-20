@@ -6,59 +6,180 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+
 /**
- * AchievementAnalyticsService — Laravel DI wrapper for legacy \Nexus\Services\AchievementAnalyticsService.
+ * AchievementAnalyticsService — Eloquent/DB query builder service for gamification analytics.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Provides overall stats, badge trends, popular/rarest badges, top earners, etc.
+ * All queries are tenant-scoped via explicit where clauses.
  */
 class AchievementAnalyticsService
 {
-    public function __construct()
+    /**
+     * Get overall gamification statistics.
+     */
+    public function getOverallStats(): array
     {
+        $tenantId = TenantContext::getId();
+
+        // Total XP earned across all users
+        $xpStats = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->selectRaw('COALESCE(SUM(xp), 0) as total_xp, COALESCE(AVG(xp), 0) as avg_xp, MAX(xp) as max_xp')
+            ->first();
+
+        // Total badges earned
+        $badgeStats = DB::table('user_badges as ub')
+            ->join('users as u', 'ub.user_id', '=', 'u.id')
+            ->where('u.tenant_id', $tenantId)
+            ->selectRaw('COUNT(*) as total_badges, COUNT(DISTINCT ub.user_id) as users_with_badges')
+            ->first();
+
+        // User engagement
+        $userStats = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->selectRaw("
+                COUNT(*) as total_users,
+                SUM(CASE WHEN xp > 0 THEN 1 ELSE 0 END) as engaged_users,
+                SUM(CASE WHEN level >= 5 THEN 1 ELSE 0 END) as advanced_users
+            ")
+            ->first();
+
+        // Level distribution
+        $levelDist = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->select('level', DB::raw('COUNT(*) as count'))
+            ->groupBy('level')
+            ->orderBy('level')
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+
+        return [
+            'total_xp' => (int) ($xpStats->total_xp ?? 0),
+            'avg_xp' => round((float) ($xpStats->avg_xp ?? 0), 1),
+            'max_xp' => (int) ($xpStats->max_xp ?? 0),
+            'total_badges' => (int) ($badgeStats->total_badges ?? 0),
+            'users_with_badges' => (int) ($badgeStats->users_with_badges ?? 0),
+            'total_users' => (int) ($userStats->total_users ?? 0),
+            'engaged_users' => (int) ($userStats->engaged_users ?? 0),
+            'advanced_users' => (int) ($userStats->advanced_users ?? 0),
+            'engagement_rate' => $userStats->total_users > 0
+                ? round(($userStats->engaged_users / $userStats->total_users) * 100, 1)
+                : 0,
+            'level_distribution' => $levelDist,
+        ];
     }
 
     /**
-     * Delegates to legacy AchievementAnalyticsService::getOverallStats().
+     * Get badge earning trends over time.
      */
-    public function getOverallStats()
+    public function getBadgeTrends(int $days = 30): array
     {
-        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
-        return \Nexus\Services\AchievementAnalyticsService::getOverallStats();
+        $tenantId = TenantContext::getId();
+
+        return DB::table('user_badges as ub')
+            ->join('users as u', 'ub.user_id', '=', 'u.id')
+            ->where('u.tenant_id', $tenantId)
+            ->whereRaw('ub.awarded_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [$days])
+            ->selectRaw('DATE(ub.awarded_at) as date, COUNT(*) as count')
+            ->groupByRaw('DATE(ub.awarded_at)')
+            ->orderBy('date')
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
     }
 
     /**
-     * Delegates to legacy AchievementAnalyticsService::getBadgeTrends().
+     * Get most popular badges.
      */
-    public function getBadgeTrends($days = 30)
+    public function getPopularBadges(int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
-        return \Nexus\Services\AchievementAnalyticsService::getBadgeTrends($days);
+        $tenantId = TenantContext::getId();
+
+        $badges = DB::table('user_badges as ub')
+            ->join('users as u', 'ub.user_id', '=', 'u.id')
+            ->where('u.tenant_id', $tenantId)
+            ->select('ub.badge_key', DB::raw('COUNT(*) as award_count'))
+            ->groupBy('ub.badge_key')
+            ->orderByDesc('award_count')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+
+        // Enrich with custom badge definitions from DB
+        foreach ($badges as &$badge) {
+            $custom = DB::table('custom_badges')
+                ->where('id', str_replace('custom_', '', $badge['badge_key']))
+                ->first(['name', 'icon', 'xp']);
+
+            if ($custom) {
+                $badge['name'] = $custom->name ?? $badge['badge_key'];
+                $badge['icon'] = $custom->icon ?? '🏆';
+                $badge['xp'] = $custom->xp ?? 0;
+            } else {
+                $badge['name'] = $badge['badge_key'];
+                $badge['icon'] = '🏆';
+                $badge['xp'] = 0;
+            }
+        }
+
+        return $badges;
     }
 
     /**
-     * Delegates to legacy AchievementAnalyticsService::getPopularBadges().
+     * Get rarest badges (least earned).
      */
-    public function getPopularBadges($limit = 10)
+    public function getRarestBadges(int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
-        return \Nexus\Services\AchievementAnalyticsService::getPopularBadges($limit);
+        $tenantId = TenantContext::getId();
+
+        $totalUsers = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        $badges = DB::table('user_badges as ub')
+            ->join('users as u', 'ub.user_id', '=', 'u.id')
+            ->where('u.tenant_id', $tenantId)
+            ->select('ub.badge_key', DB::raw('COUNT(*) as award_count'))
+            ->groupBy('ub.badge_key')
+            ->orderBy('award_count')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+
+        foreach ($badges as &$badge) {
+            $badge['name'] = $badge['badge_key'];
+            $badge['icon'] = '🏆';
+            $badge['rarity_percent'] = $totalUsers > 0
+                ? round(($badge['award_count'] / $totalUsers) * 100, 1)
+                : 0;
+        }
+
+        return $badges;
     }
 
     /**
-     * Delegates to legacy AchievementAnalyticsService::getRarestBadges().
+     * Get top XP earners.
      */
-    public function getRarestBadges($limit = 10)
+    public function getTopEarners(int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
-        return \Nexus\Services\AchievementAnalyticsService::getRarestBadges($limit);
-    }
+        $tenantId = TenantContext::getId();
 
-    /**
-     * Delegates to legacy AchievementAnalyticsService::getTopEarners().
-     */
-    public function getTopEarners($limit = 10)
-    {
-        if (!class_exists('\Nexus\Services\AchievementAnalyticsService')) { return null; }
-        return \Nexus\Services\AchievementAnalyticsService::getTopEarners($limit);
+        return DB::table('users as u')
+            ->where('u.tenant_id', $tenantId)
+            ->select([
+                'u.id', 'u.first_name', 'u.last_name', 'u.avatar_url', 'u.xp', 'u.level',
+                DB::raw('(SELECT COUNT(*) FROM user_badges WHERE user_id = u.id) as badge_count'),
+            ])
+            ->orderByDesc('u.xp')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
     }
 }

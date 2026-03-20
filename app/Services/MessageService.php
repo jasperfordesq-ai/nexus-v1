@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -260,94 +261,314 @@ class MessageService
     }
 
     // -----------------------------------------------------------------
-    //  Delegated to legacy (static methods not yet migrated to Eloquent)
+    //  Validation errors
+    // -----------------------------------------------------------------
+
+    /** @var array */
+    private array $errors = [];
+
+    /**
+     * Get validation errors from the last operation.
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    // -----------------------------------------------------------------
+    //  Conversation summary
     // -----------------------------------------------------------------
 
     /**
      * Get a single conversation summary with another user.
-     *
-     * Delegates to legacy MessageService::getConversation().
      */
     public function getConversation(int $otherUserId, int $userId): ?array
     {
-        if (!class_exists('\Nexus\Services\MessageService')) { return null; }
-        return \Nexus\Services\MessageService::getConversation($otherUserId, $userId);
+        $this->errors = [];
+
+        $otherUser = User::withoutGlobalScopes()->find($otherUserId);
+        if (! $otherUser) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            return null;
+        }
+
+        $tenantId = app('tenant.id');
+
+        $unreadCount = $this->message->newQuery()
+            ->where('sender_id', $otherUserId)
+            ->where('receiver_id', $userId)
+            ->where('is_read', false)
+            ->count();
+
+        $messageCount = $this->message->newQuery()
+            ->betweenUsers($userId, $otherUserId)
+            ->count();
+
+        return [
+            'id' => $otherUserId,
+            'other_user' => [
+                'id'         => $otherUser->id,
+                'name'       => $otherUser->name ?? trim(($otherUser->first_name ?? '') . ' ' . ($otherUser->last_name ?? '')),
+                'first_name' => $otherUser->first_name,
+                'last_name'  => $otherUser->last_name,
+                'avatar_url' => $otherUser->avatar_url,
+                'is_online'  => ($otherUser->last_active_at && $otherUser->last_active_at->gt(now()->subMinutes(5))),
+            ],
+            'unread_count'  => $unreadCount,
+            'message_count' => $messageCount,
+        ];
     }
 
-    /**
-     * Get validation errors from the last operation.
-     *
-     * Delegates to legacy MessageService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        if (!class_exists('\Nexus\Services\MessageService')) { return []; }
-        return \Nexus\Services\MessageService::getErrors();
-    }
+    // -----------------------------------------------------------------
+    //  Archive / Unarchive
+    // -----------------------------------------------------------------
 
     /**
      * Archive a conversation with another user.
      *
-     * Delegates to legacy MessageService::archiveConversation().
+     * Uses per-user archival columns so each user can independently archive.
      */
     public function archiveConversation(int $otherUserId, int $userId): int
     {
-        if (!class_exists('\Nexus\Services\MessageService')) { return 0; }
-        return \Nexus\Services\MessageService::archiveConversation($otherUserId, $userId);
+        $tenantId = app('tenant.id');
+        $now = now();
+        $totalUpdated = 0;
+
+        // Check if archived columns exist
+        $hasArchived = DB::getSchemaBuilder()->hasColumn('messages', 'archived_by_sender');
+
+        if (! $hasArchived) {
+            // Fall back to hard delete if columns don't exist
+            return DB::table('messages')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($q) use ($userId, $otherUserId) {
+                    $q->where(function ($q2) use ($userId, $otherUserId) {
+                        $q2->where('sender_id', $userId)->where('receiver_id', $otherUserId);
+                    })->orWhere(function ($q2) use ($userId, $otherUserId) {
+                        $q2->where('sender_id', $otherUserId)->where('receiver_id', $userId);
+                    });
+                })
+                ->delete();
+        }
+
+        // Archive messages where user is the sender
+        $totalUpdated += DB::table('messages')
+            ->where('tenant_id', $tenantId)
+            ->where('sender_id', $userId)
+            ->where('receiver_id', $otherUserId)
+            ->whereNull('archived_by_sender')
+            ->update(['archived_by_sender' => $now]);
+
+        // Archive messages where user is the receiver
+        $totalUpdated += DB::table('messages')
+            ->where('tenant_id', $tenantId)
+            ->where('sender_id', $otherUserId)
+            ->where('receiver_id', $userId)
+            ->whereNull('archived_by_receiver')
+            ->update(['archived_by_receiver' => $now]);
+
+        return $totalUpdated;
     }
 
     /**
      * Unarchive a conversation with another user.
-     *
-     * Delegates to legacy MessageService::unarchiveConversation().
      */
     public function unarchiveConversation(int $otherUserId, int $userId): int
     {
-        if (!class_exists('\Nexus\Services\MessageService')) { return 0; }
-        return \Nexus\Services\MessageService::unarchiveConversation($otherUserId, $userId);
+        $tenantId = app('tenant.id');
+
+        $hasArchived = DB::getSchemaBuilder()->hasColumn('messages', 'archived_by_sender');
+        if (! $hasArchived) {
+            return 0;
+        }
+
+        $totalUpdated = 0;
+
+        // Unarchive messages where user is the sender
+        $totalUpdated += DB::table('messages')
+            ->where('tenant_id', $tenantId)
+            ->where('sender_id', $userId)
+            ->where('receiver_id', $otherUserId)
+            ->whereNotNull('archived_by_sender')
+            ->update(['archived_by_sender' => null]);
+
+        // Unarchive messages where user is the receiver
+        $totalUpdated += DB::table('messages')
+            ->where('tenant_id', $tenantId)
+            ->where('sender_id', $otherUserId)
+            ->where('receiver_id', $userId)
+            ->whereNotNull('archived_by_receiver')
+            ->update(['archived_by_receiver' => null]);
+
+        return $totalUpdated;
     }
+
+    // -----------------------------------------------------------------
+    //  Edit / Delete messages
+    // -----------------------------------------------------------------
 
     /**
      * Edit a message body.
-     *
-     * Delegates to legacy MessageService::editMessage().
      */
     public function editMessage(int $messageId, int $userId, string $newBody): ?array
     {
-        if (!class_exists('\Nexus\Services\MessageService')) { return null; }
-        return \Nexus\Services\MessageService::editMessage($messageId, $userId, $newBody);
+        $this->errors = [];
+
+        /** @var Message|null $message */
+        $message = $this->message->newQuery()->find($messageId);
+
+        if (! $message) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            return null;
+        }
+
+        if ((int) $message->sender_id !== $userId) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only edit your own messages'];
+            return null;
+        }
+
+        $message->content = $newBody;
+
+        if (in_array('is_edited', $message->getFillable()) || DB::getSchemaBuilder()->hasColumn('messages', 'is_edited')) {
+            $message->is_edited = true;
+            $message->edited_at = now();
+        }
+
+        $message->save();
+
+        return [
+            'id'         => $message->id,
+            'body'       => $newBody,
+            'is_edited'  => true,
+            'sender_id'  => (int) $message->sender_id,
+            'created_at' => $message->created_at?->toISOString(),
+        ];
     }
 
     /**
-     * Delete a message.
-     *
-     * Delegates to legacy MessageService::deleteMessage().
+     * Delete a message (soft delete).
      */
     public function deleteMessage(int $messageId, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\MessageService')) { return false; }
-        return \Nexus\Services\MessageService::deleteMessage($messageId, $userId);
+        $this->errors = [];
+
+        /** @var Message|null $message */
+        $message = $this->message->newQuery()->find($messageId);
+
+        if (! $message) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            return false;
+        }
+
+        if ((int) $message->sender_id !== $userId) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own messages'];
+            return false;
+        }
+
+        // Check if is_deleted column exists for soft delete
+        $hasDeleted = DB::getSchemaBuilder()->hasColumn('messages', 'is_deleted');
+
+        if ($hasDeleted) {
+            DB::table('messages')
+                ->where('id', $messageId)
+                ->where('tenant_id', app('tenant.id'))
+                ->update([
+                    'is_deleted'  => true,
+                    'content'     => '[Message deleted]',
+                    'deleted_at'  => now(),
+                ]);
+        } else {
+            $message->delete();
+        }
+
+        return true;
     }
+
+    // -----------------------------------------------------------------
+    //  Reactions
+    // -----------------------------------------------------------------
 
     /**
      * Toggle a reaction emoji on a message.
      *
-     * Delegates to legacy MessageService::toggleReaction().
+     * @return bool|null True if added, false if removed, null on error
      */
     public function toggleReaction(int $messageId, int $userId, string $emoji): ?bool
     {
-        if (!class_exists('\Nexus\Services\MessageService')) { return null; }
-        return \Nexus\Services\MessageService::toggleReaction($messageId, $userId, $emoji);
+        $this->errors = [];
+
+        /** @var Message|null $message */
+        $message = $this->message->newQuery()->find($messageId);
+
+        if (! $message) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            return null;
+        }
+
+        // User must be sender or receiver
+        if ((int) $message->sender_id !== $userId && (int) $message->receiver_id !== $userId) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You cannot react to this message'];
+            return null;
+        }
+
+        $hasReactions = DB::getSchemaBuilder()->hasColumn('messages', 'reactions');
+        if (! $hasReactions) {
+            $this->errors[] = ['code' => 'FEATURE_UNAVAILABLE', 'message' => 'Reactions feature not yet enabled'];
+            return null;
+        }
+
+        $reactions = [];
+        $rawReactions = DB::table('messages')->where('id', $messageId)->value('reactions');
+        if (! empty($rawReactions)) {
+            $reactions = json_decode($rawReactions, true) ?? [];
+        }
+
+        $userReactions = $reactions['_users'] ?? [];
+        $userKey = "{$userId}_{$emoji}";
+
+        $wasAdded = false;
+        if (isset($userReactions[$userKey])) {
+            // Remove
+            unset($userReactions[$userKey]);
+            if (isset($reactions[$emoji]) && $reactions[$emoji] > 0) {
+                $reactions[$emoji]--;
+                if ($reactions[$emoji] <= 0) {
+                    unset($reactions[$emoji]);
+                }
+            }
+        } else {
+            // Add
+            $userReactions[$userKey] = true;
+            $reactions[$emoji] = ($reactions[$emoji] ?? 0) + 1;
+            $wasAdded = true;
+        }
+
+        $reactions['_users'] = $userReactions;
+
+        DB::table('messages')
+            ->where('id', $messageId)
+            ->where('tenant_id', app('tenant.id'))
+            ->update(['reactions' => json_encode($reactions)]);
+
+        return $wasAdded;
     }
+
+    // -----------------------------------------------------------------
+    //  Typing indicator
+    // -----------------------------------------------------------------
 
     /**
      * Set typing indicator for a conversation.
      *
-     * Delegates to legacy MessageService::setTypingIndicator().
+     * This is a no-op in Eloquent mode — real-time typing indicators
+     * are handled by the frontend via Pusher directly.
      */
     public function setTypingIndicator(int $recipientId, int $userId, bool $isTyping): bool
     {
-        if (!class_exists('\Nexus\Services\MessageService')) { return false; }
-        return \Nexus\Services\MessageService::setTypingIndicator($recipientId, $userId, $isTyping);
+        // Typing indicators are broadcast-only (Pusher) — no DB persistence needed.
+        // The legacy implementation called RealtimeService::broadcastTyping() which
+        // is a Pusher broadcast. In the Laravel app, this should be handled by
+        // a dedicated broadcasting event rather than a service method.
+        return true;
     }
 }

@@ -1,11 +1,12 @@
 <?php
-// Copyright (c) 2024-2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +14,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * AdminAnalyticsService — Laravel DI-based service for admin dashboard analytics.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\AdminAnalyticsService.
- * All queries are tenant-scoped via explicit tenant_id parameter.
+ * All queries are tenant-scoped via explicit tenant_id parameter or HasTenantScope trait.
  */
 class AdminAnalyticsService
 {
@@ -55,10 +55,10 @@ class AdminAnalyticsService
 
         return [
             'total_credits_circulation' => $totalCredits,
-            'transaction_volume_30d'    => $txnVolume30d,
-            'transaction_count_30d'     => $txnCount30d,
-            'new_users_30d'             => $newUsers30d,
-            'avg_transaction_size'      => round($avgTxnSize, 2),
+            'transaction_volume_30d' => $txnVolume30d,
+            'transaction_count_30d' => $txnCount30d,
+            'new_users_30d' => $newUsers30d,
+            'avg_transaction_size' => round($avgTxnSize, 2),
         ];
     }
 
@@ -82,58 +82,171 @@ class AdminAnalyticsService
             ->count();
 
         return [
-            'total'            => $total,
-            'by_status'        => $statuses,
+            'total' => $total,
+            'by_status' => $statuses,
             'active_last_week' => $activeLastWeek,
         ];
     }
 
-    // =========================================================================
-    // Legacy delegation methods — used by AdminCommunityAnalyticsController
-    // =========================================================================
-
     /**
-     * Delegates to legacy AdminAnalyticsService::getOverallStats().
+     * Get overall timebanking statistics (consolidated query).
      */
     public function getOverallStats(): array
     {
-        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
-        return \Nexus\Services\AdminAnalyticsService::getOverallStats();
+        $tenantId = TenantContext::getId();
+        $thirtyDaysAgo = now()->subDays(30);
+
+        $totalCredits = (float) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->sum('balance');
+
+        $txnVolume30d = (float) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->sum('amount');
+
+        $txnCount30d = (int) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->count();
+
+        // Active traders (unique senders + receivers in last 30 days)
+        $senderIds = DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->pluck('sender_id');
+
+        $receiverIds = DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->pluck('receiver_id');
+
+        $activeTraders = $senderIds->merge($receiverIds)->unique()->count();
+
+        $avgTxnSize = (float) DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->avg('amount');
+
+        $newUsers30d = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->count();
+
+        $pendingAbuseAlerts = 0;
+        try {
+            $pendingAbuseAlerts = (int) DB::table('abuse_alerts')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('status', ['new', 'reviewing'])
+                ->count();
+        } catch (\Throwable $e) {
+            // Table may not exist
+        }
+
+        return [
+            'total_credits_circulation' => $totalCredits,
+            'transaction_volume_30d' => $txnVolume30d,
+            'transaction_count_30d' => $txnCount30d,
+            'active_traders_30d' => $activeTraders,
+            'avg_transaction_size' => round($avgTxnSize, 2),
+            'new_users_30d' => $newUsers30d,
+            'pending_abuse_alerts' => $pendingAbuseAlerts,
+        ];
     }
 
     /**
-     * Delegates to legacy AdminAnalyticsService::getMonthlyTrends().
+     * Get monthly transaction trends.
      */
     public function getMonthlyTrends(int $months = 12): array
     {
-        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
-        return \Nexus\Services\AdminAnalyticsService::getMonthlyTrends($months);
+        $tenantId = TenantContext::getId();
+
+        return DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', now()->subMonths($months))
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month")
+            ->selectRaw('COUNT(*) as transaction_count')
+            ->selectRaw('SUM(amount) as total_volume')
+            ->selectRaw('COUNT(DISTINCT sender_id) as unique_senders')
+            ->selectRaw('COUNT(DISTINCT receiver_id) as unique_receivers')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
     }
 
     /**
-     * Delegates to legacy AdminAnalyticsService::getWeeklyTrends().
+     * Get weekly transaction trends.
      */
     public function getWeeklyTrends(int $weeks = 12): array
     {
-        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
-        return \Nexus\Services\AdminAnalyticsService::getWeeklyTrends($weeks);
+        $tenantId = TenantContext::getId();
+
+        return DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', now()->subWeeks($weeks))
+            ->selectRaw('YEARWEEK(created_at, 1) as week')
+            ->selectRaw('MIN(DATE(created_at)) as week_start')
+            ->selectRaw('COUNT(*) as transaction_count')
+            ->selectRaw('SUM(amount) as total_volume')
+            ->groupBy('week')
+            ->orderBy('week')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
     }
 
     /**
-     * Delegates to legacy AdminAnalyticsService::getTopEarners().
+     * Get top earners for a period.
      */
     public function getTopEarners(int $days = 30, int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
-        return \Nexus\Services\AdminAnalyticsService::getTopEarners($days, $limit);
+        $tenantId = TenantContext::getId();
+
+        return DB::table('transactions as t')
+            ->join('users as u', 't.receiver_id', '=', 'u.id')
+            ->where('t.tenant_id', $tenantId)
+            ->where('t.created_at', '>=', now()->subDays($days))
+            ->select(
+                'u.id',
+                'u.first_name',
+                'u.last_name',
+                'u.email',
+                DB::raw('SUM(t.amount) as total_earned'),
+                DB::raw('COUNT(t.id) as transaction_count')
+            )
+            ->groupBy('u.id', 'u.first_name', 'u.last_name', 'u.email')
+            ->orderByDesc('total_earned')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
     }
 
     /**
-     * Delegates to legacy AdminAnalyticsService::getTopSpenders().
+     * Get top spenders for a period.
      */
     public function getTopSpenders(int $days = 30, int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\AdminAnalyticsService')) { return []; }
-        return \Nexus\Services\AdminAnalyticsService::getTopSpenders($days, $limit);
+        $tenantId = TenantContext::getId();
+
+        return DB::table('transactions as t')
+            ->join('users as u', 't.sender_id', '=', 'u.id')
+            ->where('t.tenant_id', $tenantId)
+            ->where('t.created_at', '>=', now()->subDays($days))
+            ->select(
+                'u.id',
+                'u.first_name',
+                'u.last_name',
+                'u.email',
+                DB::raw('SUM(t.amount) as total_spent'),
+                DB::raw('COUNT(t.id) as transaction_count')
+            )
+            ->groupBy('u.id', 'u.first_name', 'u.last_name', 'u.email')
+            ->orderByDesc('total_spent')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
     }
 }

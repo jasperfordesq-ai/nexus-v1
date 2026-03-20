@@ -1,97 +1,277 @@
 <?php
-// Copyright � 2024�2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\UserStreak;
+use Illuminate\Support\Facades\Log;
+
 /**
- * StreakService � Laravel DI wrapper for legacy \Nexus\Services\StreakService.
+ * StreakService — Eloquent-based service for user streaks.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Manages login, activity, giving, and volunteer streaks with freeze support.
+ * All queries are tenant-scoped via HasTenantScope trait on models.
  */
 class StreakService
 {
-    public function __construct()
-    {
-    }
+    public const STREAK_TYPES = ['login', 'activity', 'giving', 'volunteer'];
+
+    public function __construct(
+        private readonly UserStreak $userStreak,
+        private readonly GamificationService $gamificationService,
+    ) {}
 
     /**
-     * Delegates to legacy StreakService::getCurrentStreak().
+     * Get current streak for a user and type.
      */
     public function getCurrentStreak(int $tenantId, int $userId): int
     {
-        return \Nexus\Services\StreakService::getCurrentStreak($tenantId, $userId);
+        return (int) ($this->userStreak->newQuery()
+            ->where('user_id', $userId)
+            ->where('streak_type', 'activity')
+            ->value('current_streak') ?? 0);
     }
 
     /**
-     * Delegates to legacy StreakService::recordActivity().
+     * Record activity and update streak.
      */
     public function recordActivity(int $tenantId, int $userId): bool
     {
-        return \Nexus\Services\StreakService::recordActivity($tenantId, $userId);
+        $result = $this->updateStreak($userId, 'activity');
+        return $result !== false;
     }
 
     /**
-     * Delegates to legacy StreakService::getLongestStreak().
+     * Get longest streak for a user.
      */
     public function getLongestStreak(int $tenantId, int $userId): int
     {
-        return \Nexus\Services\StreakService::getLongestStreak($tenantId, $userId);
+        return (int) ($this->userStreak->newQuery()
+            ->where('user_id', $userId)
+            ->where('streak_type', 'activity')
+            ->value('longest_streak') ?? 0);
     }
 
     /**
-     * Delegates to legacy StreakService::getStreakLeaderboard().
+     * Get streak leaderboard.
      */
     public function getStreakLeaderboard(int $tenantId, int $limit = 10): array
     {
-        return \Nexus\Services\StreakService::getStreakLeaderboard($tenantId, $limit);
+        return $this->userStreak->newQuery()
+            ->join('users', 'user_streaks.user_id', '=', 'users.id')
+            ->where('user_streaks.streak_type', 'login')
+            ->where('user_streaks.current_streak', '>', 0)
+            ->select([
+                'user_streaks.*',
+                'users.first_name', 'users.last_name',
+                'users.avatar_url', 'users.name',
+            ])
+            ->orderByDesc('user_streaks.current_streak')
+            ->orderByDesc('user_streaks.longest_streak')
+            ->limit($limit)
+            ->get()
+            ->toArray();
     }
 
     /**
-     * Delegates to legacy StreakService::getAllStreaks().
-     *
-     * Returns all streak types (login, activity, giving, volunteer) with current data.
+     * Get all streaks for a user (all types).
      */
     public function getAllStreaks(int $userId): array
     {
-        return \Nexus\Services\StreakService::getAllStreaks($userId);
+        $streaks = [];
+        foreach (self::STREAK_TYPES as $type) {
+            $streaks[$type] = $this->getStreak($userId, $type);
+        }
+        return $streaks;
     }
 
     /**
-     * Delegates to legacy StreakService::getStreakIcon().
-     *
-     * Returns an emoji icon based on streak length.
+     * Get streak icon based on length.
      */
     public function getStreakIcon(int $streakLength): string
     {
-        return \Nexus\Services\StreakService::getStreakIcon($streakLength);
+        if ($streakLength >= 365) { return "\xF0\x9F\x94\xA5\xF0\x9F\x8F\x86"; }
+        if ($streakLength >= 100) { return "\xF0\x9F\x94\xA5\xF0\x9F\x92\x8E"; }
+        if ($streakLength >= 30) { return "\xF0\x9F\x94\xA5\xE2\xAD\x90"; }
+        if ($streakLength >= 7) { return "\xF0\x9F\x94\xA5"; }
+        if ($streakLength > 0) { return "\xE2\x9C\xA8"; }
+        return "\xF0\x9F\x92\xA4";
     }
 
     /**
-     * Delegates to legacy StreakService::getStreakMessage().
-     *
-     * Returns a motivational message based on streak data.
+     * Get streak status message for display.
      */
     public function getStreakMessage(?array $streak): string
     {
-        return \Nexus\Services\StreakService::getStreakMessage($streak);
+        if (! $streak || ($streak['current'] ?? 0) === 0) {
+            return 'Start your streak today!';
+        }
+
+        $current = $streak['current'];
+
+        if ($current >= 365) {
+            return "Incredible! $current day streak! You're a legend!";
+        } elseif ($current >= 100) {
+            return "Amazing! $current day streak! Keep it up!";
+        } elseif ($current >= 30) {
+            return "Fantastic! $current day streak!";
+        } elseif ($current >= 7) {
+            return "Great job! $current day streak!";
+        }
+
+        return "$current day streak - keep going!";
     }
 
     /**
-     * Delegates to legacy StreakService::getStreak().
+     * Get user's current streak for a specific type.
      */
     public function getStreak(int $userId, string $streakType = 'activity'): ?array
     {
-        return \Nexus\Services\StreakService::getStreak($userId, $streakType);
+        try {
+            $streak = $this->userStreak->newQuery()
+                ->where('user_id', $userId)
+                ->where('streak_type', $streakType)
+                ->first();
+
+            if (! $streak) {
+                return [
+                    'current'           => 0,
+                    'longest'           => 0,
+                    'last_activity'     => null,
+                    'is_active'         => false,
+                    'freezes_remaining' => 1,
+                ];
+            }
+
+            $lastDate = $streak->last_activity_date?->toDateString();
+            $today = now()->toDateString();
+            $yesterday = now()->subDay()->toDateString();
+            $twoDaysAgo = now()->subDays(2)->toDateString();
+
+            $isActive = ($lastDate === $today || $lastDate === $yesterday);
+            $canFreeze = ($lastDate === $twoDaysAgo && $streak->streak_freezes_remaining > 0);
+
+            return [
+                'current'            => $streak->current_streak,
+                'longest'            => $streak->longest_streak,
+                'last_activity'      => $lastDate,
+                'is_active'          => $isActive,
+                'can_use_freeze'     => $canFreeze,
+                'freezes_remaining'  => $streak->streak_freezes_remaining,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Get Streak Error: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
-     * Delegates to legacy StreakService::recordLogin().
+     * Record login streak specifically.
      */
-    public function recordLogin(int $userId)
+    public function recordLogin(int $userId): array|false
     {
-        return \Nexus\Services\StreakService::recordLogin($userId);
+        return $this->updateStreak($userId, 'login');
+    }
+
+    // =========================================================================
+    // PRIVATE HELPERS
+    // =========================================================================
+
+    /**
+     * Core streak update logic — handles creation, continuation, and reset.
+     */
+    private function updateStreak(int $userId, string $streakType): array|false
+    {
+        if (! in_array($streakType, self::STREAK_TYPES)) {
+            return false;
+        }
+
+        try {
+            $today = now()->toDateString();
+
+            $streak = $this->userStreak->newQuery()
+                ->where('user_id', $userId)
+                ->where('streak_type', $streakType)
+                ->first();
+
+            if (! $streak) {
+                // First activity — create streak record
+                $this->userStreak->newInstance([
+                    'user_id'            => $userId,
+                    'streak_type'        => $streakType,
+                    'current_streak'     => 1,
+                    'longest_streak'     => 1,
+                    'last_activity_date' => $today,
+                ])->save();
+
+                $this->gamificationService->checkStreakBadges($userId, 1);
+                return ['current' => 1, 'longest' => 1, 'is_new' => true];
+            }
+
+            $lastDate = $streak->last_activity_date?->toDateString();
+            $currentStreak = $streak->current_streak;
+            $longestStreak = $streak->longest_streak;
+            $freezesRemaining = $streak->streak_freezes_remaining;
+
+            // Already recorded today
+            if ($lastDate === $today) {
+                return [
+                    'current' => $currentStreak,
+                    'longest' => $longestStreak,
+                    'is_new'  => false,
+                    'message' => 'Already recorded today',
+                ];
+            }
+
+            $yesterday = now()->subDay()->toDateString();
+            $twoDaysAgo = now()->subDays(2)->toDateString();
+
+            if ($lastDate === $yesterday) {
+                // Consecutive day
+                $currentStreak++;
+                $longestStreak = max($longestStreak, $currentStreak);
+            } elseif ($lastDate === $twoDaysAgo && $freezesRemaining > 0) {
+                // Missed one day but have a freeze
+                $currentStreak++;
+                $freezesRemaining--;
+                $longestStreak = max($longestStreak, $currentStreak);
+            } else {
+                // Streak broken
+                $currentStreak = 1;
+            }
+
+            $streak->current_streak = $currentStreak;
+            $streak->longest_streak = $longestStreak;
+            $streak->last_activity_date = $today;
+            $streak->streak_freezes_remaining = $freezesRemaining;
+            $streak->save();
+
+            // Check for streak badges
+            $this->gamificationService->checkStreakBadges($userId, $currentStreak);
+
+            // Award XP for daily login streak
+            if ($streakType === 'login') {
+                $this->gamificationService->awardXP(
+                    $userId,
+                    GamificationService::XP_VALUES['daily_login'],
+                    'daily_login',
+                    "Day $currentStreak streak"
+                );
+            }
+
+            return [
+                'current'            => $currentStreak,
+                'longest'            => $longestStreak,
+                'is_new'             => true,
+                'freezes_remaining'  => $freezesRemaining,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Streak Error: ' . $e->getMessage());
+            return false;
+        }
     }
 }

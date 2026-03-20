@@ -655,25 +655,41 @@ class ListingService
     // -----------------------------------------------------------------
 
     /**
-     * Check if a user can modify a listing.
-     *
-     * Delegates to legacy ListingService::canModify().
+     * Check if a user can modify a listing (owner or admin).
      */
     public function canModify(array $listing, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\ListingService')) { return false; }
-        return \Nexus\Services\ListingService::canModify($listing, $userId);
+        // Owner can always modify
+        if ((int) ($listing['user_id'] ?? 0) === $userId) {
+            return true;
+        }
+
+        // Check if user is admin
+        $user = User::find($userId);
+
+        if ($user) {
+            $role = $user->role ?? '';
+            if (in_array($role, ['admin', 'tenant_admin']) || $user->is_super_admin || $user->is_tenant_super_admin) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Get validation errors from the last operation.
+     * Validation errors from the last operation.
      *
-     * Delegates to legacy ListingService::getErrors().
+     * @var array
+     */
+    private array $errors = [];
+
+    /**
+     * Get validation errors from the last operation.
      */
     public function getErrors(): array
     {
-        if (!class_exists('\Nexus\Services\ListingService')) { return []; }
-        return \Nexus\Services\ListingService::getErrors();
+        return $this->errors;
     }
 
     // -----------------------------------------------------------------

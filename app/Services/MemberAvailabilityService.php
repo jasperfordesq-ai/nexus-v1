@@ -6,36 +6,66 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\MemberAvailability;
 use Illuminate\Support\Facades\DB;
 
 /**
  * MemberAvailabilityService — Laravel DI-based service for member availability.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\MemberAvailabilityService.
- * Manages recurring weekly availability and compatible time matching.
+ * Manages recurring weekly availability, specific-date slots, compatible time
+ * matching, and available member queries.
+ *
+ * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class MemberAvailabilityService
 {
+    private array $errors = [];
+
+    public function __construct(
+        private readonly MemberAvailability $availability,
+    ) {}
+
+    /**
+     * Get validation errors from the last operation.
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
     /**
      * Get all availability slots for a user.
      */
     public function getAvailability(int $userId): array
     {
-        return DB::table('member_availability')
-            ->where('tenant_id', app('tenant.id'))
+        return $this->availability->newQuery()
             ->where('user_id', $userId)
             ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->get()
-            ->map(fn ($r) => (array) $r)
-            ->all();
+            ->toArray();
+    }
+
+    /**
+     * Get all availability slots for a user (alias).
+     */
+    public function getUserAvailability(int $userId): array
+    {
+        return $this->availability->newQuery()
+            ->where('user_id', $userId)
+            ->select('id', 'day_of_week', 'start_time', 'end_time', 'is_recurring', 'specific_date', 'note')
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get()
+            ->toArray();
     }
 
     /**
      * Set recurring availability for a user on a given day (replaces existing).
      *
-     * @param int $dayOfWeek 0=Sunday, 6=Saturday
-     * @param array $slots Array of ['start_time' => 'HH:MM', 'end_time' => 'HH:MM']
+     * @param int   $dayOfWeek 0=Sunday, 6=Saturday
+     * @param array $slots     Array of ['start_time' => 'HH:MM', 'end_time' => 'HH:MM']
      */
     public function setAvailability(int $userId, int $dayOfWeek, array $slots): bool
     {
@@ -44,10 +74,7 @@ class MemberAvailabilityService
         }
 
         return DB::transaction(function () use ($userId, $dayOfWeek, $slots) {
-            $tenantId = app('tenant.id');
-
-            DB::table('member_availability')
-                ->where('tenant_id', $tenantId)
+            $this->availability->newQuery()
                 ->where('user_id', $userId)
                 ->where('day_of_week', $dayOfWeek)
                 ->where('is_recurring', true)
@@ -61,21 +88,174 @@ class MemberAvailabilityService
                     continue;
                 }
 
-                DB::table('member_availability')->insert([
-                    'tenant_id'    => $tenantId,
-                    'user_id'      => $userId,
-                    'day_of_week'  => $dayOfWeek,
-                    'start_time'   => $slot['start_time'],
-                    'end_time'     => $slot['end_time'],
+                $this->availability->newInstance([
+                    'tenant_id'   => TenantContext::getId(),
+                    'user_id'     => $userId,
+                    'day_of_week' => $dayOfWeek,
+                    'start_time'  => $slot['start_time'],
+                    'end_time'    => $slot['end_time'],
                     'is_recurring' => true,
-                    'note'         => $slot['note'] ?? null,
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ]);
+                    'note'        => $slot['note'] ?? null,
+                ])->save();
             }
 
             return true;
         });
+    }
+
+    /**
+     * Set availability for a user on a given day with validation errors.
+     *
+     * @param int   $dayOfWeek 0=Sunday, 6=Saturday
+     * @param array $slots     Array of ['start_time' => 'HH:MM', 'end_time' => 'HH:MM', 'note' => '']
+     */
+    public function setDayAvailability(int $userId, int $dayOfWeek, array $slots): bool
+    {
+        $this->errors = [];
+
+        if ($dayOfWeek < 0 || $dayOfWeek > 6) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'day_of_week must be 0-6', 'field' => 'day_of_week'];
+            return false;
+        }
+
+        // Validate slots
+        foreach ($slots as $i => $slot) {
+            if (empty($slot['start_time']) || empty($slot['end_time'])) {
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => "Slot {$i}: start_time and end_time required", 'field' => 'slots'];
+                return false;
+            }
+            if ($slot['start_time'] >= $slot['end_time']) {
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => "Slot {$i}: end_time must be after start_time", 'field' => 'slots'];
+                return false;
+            }
+        }
+
+        try {
+            return DB::transaction(function () use ($userId, $dayOfWeek, $slots) {
+                $this->availability->newQuery()
+                    ->where('user_id', $userId)
+                    ->where('day_of_week', $dayOfWeek)
+                    ->where('is_recurring', true)
+                    ->delete();
+
+                foreach ($slots as $slot) {
+                    $this->availability->newInstance([
+                        'tenant_id'    => TenantContext::getId(),
+                        'user_id'      => $userId,
+                        'day_of_week'  => $dayOfWeek,
+                        'start_time'   => $slot['start_time'],
+                        'end_time'     => $slot['end_time'],
+                        'is_recurring' => true,
+                        'note'         => $slot['note'] ?? null,
+                    ])->save();
+                }
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to save availability'];
+            return false;
+        }
+    }
+
+    /**
+     * Set a bulk availability schedule (all 7 days at once).
+     *
+     * @param array $schedule ['0' => [slots], '1' => [slots], ...]
+     */
+    public function setBulkAvailability(int $userId, array $schedule): bool
+    {
+        $this->errors = [];
+
+        try {
+            return DB::transaction(function () use ($userId, $schedule) {
+                // Remove all recurring slots
+                $this->availability->newQuery()
+                    ->where('user_id', $userId)
+                    ->where('is_recurring', true)
+                    ->delete();
+
+                foreach ($schedule as $dayOfWeek => $slots) {
+                    $dayOfWeek = (int) $dayOfWeek;
+                    if ($dayOfWeek < 0 || $dayOfWeek > 6) {
+                        continue;
+                    }
+
+                    foreach ($slots as $slot) {
+                        if (empty($slot['start_time']) || empty($slot['end_time'])) {
+                            continue;
+                        }
+                        if ($slot['start_time'] >= $slot['end_time']) {
+                            continue;
+                        }
+
+                        $this->availability->newInstance([
+                            'tenant_id'    => TenantContext::getId(),
+                            'user_id'      => $userId,
+                            'day_of_week'  => $dayOfWeek,
+                            'start_time'   => $slot['start_time'],
+                            'end_time'     => $slot['end_time'],
+                            'is_recurring' => true,
+                            'note'         => $slot['note'] ?? null,
+                        ])->save();
+                    }
+                }
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to save availability'];
+            return false;
+        }
+    }
+
+    /**
+     * Add a one-off availability slot for a specific date.
+     */
+    public function addSpecificDate(int $userId, array $data): ?int
+    {
+        $this->errors = [];
+
+        $date = $data['date'] ?? '';
+        $startTime = $data['start_time'] ?? '';
+        $endTime = $data['end_time'] ?? '';
+
+        if (empty($date) || empty($startTime) || empty($endTime)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'date, start_time, and end_time are required'];
+            return null;
+        }
+
+        if ($startTime >= $endTime) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'end_time must be after start_time'];
+            return null;
+        }
+
+        $dayOfWeek = (int) date('w', strtotime($date));
+
+        $slot = $this->availability->newInstance([
+            'tenant_id'     => TenantContext::getId(),
+            'user_id'       => $userId,
+            'day_of_week'   => $dayOfWeek,
+            'start_time'    => $startTime,
+            'end_time'      => $endTime,
+            'is_recurring'  => false,
+            'specific_date' => $date,
+            'note'          => $data['note'] ?? null,
+        ]);
+        $slot->save();
+
+        return $slot->id;
+    }
+
+    /**
+     * Delete an availability slot.
+     */
+    public function deleteSlot(int $userId, int $slotId): bool
+    {
+        return $this->availability->newQuery()
+            ->where('id', $slotId)
+            ->where('user_id', $userId)
+            ->delete() > 0;
     }
 
     /**
@@ -115,74 +295,90 @@ class MemberAvailabilityService
     }
 
     /**
-     * Delegates to legacy MemberAvailabilityService::getErrors().
-     */
-    public function getErrors(): array
-    {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
-        return \Nexus\Services\MemberAvailabilityService::getErrors();
-    }
-
-    /**
-     * Delegates to legacy MemberAvailabilityService::getUserAvailability().
-     */
-    public function getUserAvailability(int $userId): array
-    {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
-        return \Nexus\Services\MemberAvailabilityService::getUserAvailability($userId);
-    }
-
-    /**
-     * Delegates to legacy MemberAvailabilityService::setBulkAvailability().
-     */
-    public function setBulkAvailability(int $userId, array $schedule): bool
-    {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return false; }
-        return \Nexus\Services\MemberAvailabilityService::setBulkAvailability($userId, $schedule);
-    }
-
-    /**
-     * Delegates to legacy MemberAvailabilityService::setDayAvailability().
-     */
-    public function setDayAvailability(int $userId, int $dayOfWeek, array $slots): bool
-    {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return false; }
-        return \Nexus\Services\MemberAvailabilityService::setDayAvailability($userId, $dayOfWeek, $slots);
-    }
-
-    /**
-     * Delegates to legacy MemberAvailabilityService::addSpecificDate().
-     */
-    public function addSpecificDate(int $userId, array $data): ?int
-    {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return null; }
-        return \Nexus\Services\MemberAvailabilityService::addSpecificDate($userId, $data);
-    }
-
-    /**
-     * Delegates to legacy MemberAvailabilityService::deleteSlot().
-     */
-    public function deleteSlot(int $userId, int $slotId): bool
-    {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return false; }
-        return \Nexus\Services\MemberAvailabilityService::deleteSlot($userId, $slotId);
-    }
-
-    /**
-     * Delegates to legacy MemberAvailabilityService::findCompatibleTimes().
+     * Find compatible times between two members (full version with day names).
      */
     public function findCompatibleTimes(int $userId1, int $userId2): array
     {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
-        return \Nexus\Services\MemberAvailabilityService::findCompatibleTimes($userId1, $userId2);
+        $dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        $rows = $this->availability->newQuery()
+            ->whereIn('user_id', [$userId1, $userId2])
+            ->where('is_recurring', true)
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get();
+
+        // Group by day and user
+        $byDay = [];
+        foreach ($rows as $row) {
+            $day = $row->day_of_week;
+            $uid = $row->user_id;
+            $byDay[$day][$uid][] = [
+                'start' => $row->start_time,
+                'end'   => $row->end_time,
+            ];
+        }
+
+        $compatible = [];
+
+        foreach ($byDay as $day => $users) {
+            if (! isset($users[$userId1]) || ! isset($users[$userId2])) {
+                continue;
+            }
+
+            foreach ($users[$userId1] as $slot1) {
+                foreach ($users[$userId2] as $slot2) {
+                    $overlapStart = max($slot1['start'], $slot2['start']);
+                    $overlapEnd = min($slot1['end'], $slot2['end']);
+
+                    if ($overlapStart < $overlapEnd) {
+                        $compatible[] = [
+                            'day_of_week' => $day,
+                            'day_name'    => $dayNames[$day],
+                            'start_time'  => $overlapStart,
+                            'end_time'    => $overlapEnd,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $compatible;
     }
 
     /**
-     * Delegates to legacy MemberAvailabilityService::getAvailableMembers().
+     * Get members available on a specific day and time.
+     *
+     * @param int         $dayOfWeek
+     * @param string|null $time  Optional time to check (HH:MM)
+     * @param int         $limit
+     * @return array User IDs with availability
      */
     public function getAvailableMembers(int $dayOfWeek, ?string $time = null, int $limit = 50): array
     {
-        if (!class_exists('\Nexus\Services\MemberAvailabilityService')) { return []; }
-        return \Nexus\Services\MemberAvailabilityService::getAvailableMembers($dayOfWeek, $time, $limit);
+        $query = $this->availability->newQuery()
+            ->join('users as u', 'member_availability.user_id', '=', 'u.id')
+            ->where('member_availability.day_of_week', $dayOfWeek)
+            ->where('member_availability.is_recurring', true)
+            ->select(
+                'member_availability.user_id',
+                'member_availability.start_time',
+                'member_availability.end_time',
+                DB::raw("CONCAT(u.first_name, ' ', u.last_name) as member_name"),
+                'u.avatar_url'
+            )
+            ->distinct();
+
+        if ($time !== null) {
+            $query->where('member_availability.start_time', '<=', $time)
+                ->where('member_availability.end_time', '>', $time);
+        }
+
+        return $query
+            ->orderBy('member_availability.start_time')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => $r->toArray())
+            ->all();
     }
 }

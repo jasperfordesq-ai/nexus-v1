@@ -8,15 +8,27 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * IdeationChallengeService — Laravel DI-based service for ideation challenges.
  *
  * Eloquent/DI counterpart to the legacy static \Nexus\Services\IdeationChallengeService.
- * Manages challenge CRUD, idea submission, and voting with tenant scoping.
+ * Manages challenge CRUD, idea submission, voting, comments, favorites, and drafts.
  */
 class IdeationChallengeService
 {
+    private array $errors = [];
+
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    // ================================================================
+    // CHALLENGE METHODS
+    // ================================================================
+
     /**
      * Get all challenges with cursor-based pagination.
      *
@@ -24,7 +36,7 @@ class IdeationChallengeService
      */
     public function getAll(array $filters = []): array
     {
-        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $limit  = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
         $tenantId = TenantContext::getId();
@@ -43,7 +55,7 @@ class IdeationChallengeService
         }
 
         $query->orderByDesc('c.id');
-        $items = $query->limit($limit + 1)->get();
+        $items   = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
             $items->pop();
@@ -57,17 +69,86 @@ class IdeationChallengeService
     }
 
     /**
+     * Get all challenges (legacy alias returning items array directly).
+     */
+    public function getAllChallenges(array $filters = []): array
+    {
+        return $this->getAll($filters)['items'];
+    }
+
+    /**
      * Get a single challenge by ID with idea count.
      */
     public function getById(int $id): ?array
     {
-        $challenge = DB::table('ideation_challenges')->where('tenant_id', TenantContext::getId())->where('id', $id)->first();
+        $challenge = DB::table('ideation_challenges')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('id', $id)
+            ->first();
+
         if (! $challenge) {
             return null;
         }
 
         $data = (array) $challenge;
         $data['ideas_count'] = (int) DB::table('ideation_ideas')->where('challenge_id', $id)->count();
+
+        return $data;
+    }
+
+    /**
+     * Get a challenge by ID with user context (legacy alias).
+     */
+    public function getChallengeById(int $id, ?int $userId = null): ?array
+    {
+        $tenantId = TenantContext::getId();
+
+        $challenge = DB::table('ideation_challenges as c')
+            ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
+            ->where('c.id', $id)
+            ->where('c.tenant_id', $tenantId)
+            ->select(
+                'c.*',
+                'u.first_name as creator_first_name',
+                'u.last_name as creator_last_name',
+                'u.avatar_url as creator_avatar'
+            )
+            ->first();
+
+        if (! $challenge) {
+            return null;
+        }
+
+        $data = (array) $challenge;
+        $data['ideas_count'] = (int) DB::table('challenge_ideas')
+            ->where('challenge_id', $id)
+            ->whereNotIn('status', ['draft', 'withdrawn'])
+            ->count();
+
+        // User idea count
+        if ($userId) {
+            $data['user_idea_count'] = (int) DB::table('challenge_ideas')
+                ->where('challenge_id', $id)
+                ->where('user_id', $userId)
+                ->whereNotIn('status', ['draft', 'withdrawn'])
+                ->count();
+
+            $data['is_favorited'] = DB::table('challenge_favorites')
+                ->where('challenge_id', $id)
+                ->where('user_id', $userId)
+                ->exists();
+        } else {
+            $data['is_favorited'] = false;
+        }
+
+        // Format creator
+        $data['creator'] = [
+            'id'         => (int) ($data['user_id'] ?? 0),
+            'name'       => trim(($data['creator_first_name'] ?? '') . ' ' . ($data['creator_last_name'] ?? '')),
+            'avatar_url' => $data['creator_avatar'] ?? null,
+        ];
+
+        unset($data['creator_first_name'], $data['creator_last_name'], $data['creator_avatar']);
 
         return $data;
     }
@@ -91,6 +172,163 @@ class IdeationChallengeService
     }
 
     /**
+     * Update a challenge (admin only).
+     */
+    public function updateChallenge(int $id, int $userId, array $data): bool
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        if (! $this->isAdmin($userId, $tenantId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can update challenges'];
+            return false;
+        }
+
+        $challenge = DB::table('ideation_challenges')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $challenge) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            return false;
+        }
+
+        $updates = [];
+        $updatableFields = ['title', 'description', 'category', 'submission_deadline', 'voting_deadline',
+            'prize_description', 'max_ideas_per_user', 'cover_image', 'category_id', 'evaluation_criteria'];
+
+        foreach ($updatableFields as $field) {
+            if (! array_key_exists($field, $data)) {
+                continue;
+            }
+
+            $value = $data[$field];
+
+            if ($field === 'title' && empty(trim((string) $value))) {
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title cannot be empty', 'field' => 'title'];
+                return false;
+            }
+            if ($field === 'description' && empty(trim((string) $value))) {
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description cannot be empty', 'field' => 'description'];
+                return false;
+            }
+
+            if (in_array($field, ['tags', 'evaluation_criteria']) && is_array($value)) {
+                $value = json_encode($value);
+            }
+            if (in_array($field, ['max_ideas_per_user', 'category_id']) && $value !== null) {
+                $value = (int) $value;
+            }
+
+            $updates[$field] = $value;
+        }
+
+        // Handle tags separately
+        if (array_key_exists('tags', $data)) {
+            $updates['tags'] = is_array($data['tags']) ? json_encode($data['tags']) : null;
+        }
+
+        if (empty($updates)) {
+            return true;
+        }
+
+        DB::table('ideation_challenges')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update($updates);
+
+        return true;
+    }
+
+    /**
+     * Delete a challenge (admin only).
+     */
+    public function deleteChallenge(int $id, int $userId): bool
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        if (! $this->isAdmin($userId, $tenantId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can delete challenges'];
+            return false;
+        }
+
+        $exists = DB::table('ideation_challenges')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (! $exists) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            return false;
+        }
+
+        DB::table('ideation_challenges')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        return true;
+    }
+
+    /**
+     * Update challenge status (lifecycle transitions).
+     */
+    public function updateChallengeStatus(int $id, int $userId, string $status): bool
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        if (! $this->isAdmin($userId, $tenantId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can change challenge status'];
+            return false;
+        }
+
+        $validStatuses = ['draft', 'open', 'voting', 'evaluating', 'closed', 'archived'];
+        if (! in_array($status, $validStatuses)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid status value', 'field' => 'status'];
+            return false;
+        }
+
+        $challenge = DB::table('ideation_challenges')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $challenge) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            return false;
+        }
+
+        // Validate status transitions
+        $validTransitions = [
+            'draft'      => ['open'],
+            'open'       => ['voting', 'evaluating', 'closed'],
+            'voting'     => ['evaluating', 'closed'],
+            'evaluating' => ['closed'],
+            'closed'     => ['open', 'archived'],
+            'archived'   => ['closed'],
+        ];
+
+        if (! in_array($status, $validTransitions[$challenge->status] ?? [])) {
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => "Cannot transition from '{$challenge->status}' to '{$status}'"];
+            return false;
+        }
+
+        DB::table('ideation_challenges')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update(['status' => $status]);
+
+        return true;
+    }
+
+    // ================================================================
+    // IDEA METHODS
+    // ================================================================
+
+    /**
      * Submit an idea to a challenge.
      */
     public function submitIdea(int $challengeId, int $userId, array $data): int
@@ -112,9 +350,9 @@ class IdeationChallengeService
      */
     public function getIdeas(int $challengeId, array $filters = []): array
     {
-        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $limit  = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
-        $sort = $filters['sort'] ?? 'votes';
+        $sort   = $filters['sort'] ?? 'votes';
 
         $query = DB::table('ideation_ideas as i')
             ->leftJoin('users as u', 'i.user_id', '=', 'u.id')
@@ -137,7 +375,7 @@ class IdeationChallengeService
             $query->orderByDesc('i.id');
         }
 
-        $items = $query->limit($limit + 1)->get();
+        $items   = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
         if ($hasMore) {
             $items->pop();
@@ -151,9 +389,231 @@ class IdeationChallengeService
     }
 
     /**
+     * Get an idea by ID.
+     */
+    public function getIdeaById(int $id, ?int $userId = null): ?array
+    {
+        $tenantId = TenantContext::getId();
+
+        $idea = DB::table('challenge_ideas as i')
+            ->leftJoin('users as u', 'i.user_id', '=', 'u.id')
+            ->join('ideation_challenges as ic', 'i.challenge_id', '=', 'ic.id')
+            ->where('i.id', $id)
+            ->where('ic.tenant_id', $tenantId)
+            ->select(
+                'i.*',
+                'u.first_name as creator_first_name',
+                'u.last_name as creator_last_name',
+                'u.avatar_url as creator_avatar'
+            )
+            ->first();
+
+        if (! $idea) {
+            return null;
+        }
+
+        $data = (array) $idea;
+        $data['creator'] = [
+            'id'         => (int) ($data['user_id'] ?? 0),
+            'name'       => trim(($data['creator_first_name'] ?? '') . ' ' . ($data['creator_last_name'] ?? '')),
+            'avatar_url' => $data['creator_avatar'] ?? null,
+        ];
+
+        if ($userId) {
+            $data['has_voted'] = DB::table('challenge_idea_votes')
+                ->where('idea_id', $id)
+                ->where('user_id', $userId)
+                ->exists();
+        } else {
+            $data['has_voted'] = false;
+        }
+
+        unset($data['creator_first_name'], $data['creator_last_name'], $data['creator_avatar']);
+
+        return $data;
+    }
+
+    /**
+     * Update an idea (owner only, challenge must be open).
+     */
+    public function updateIdea(int $id, int $userId, array $data): bool
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $idea = $this->getIdeaById($id);
+        if (! $idea) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            return false;
+        }
+
+        if ((int) $idea['user_id'] !== $userId) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only edit your own ideas'];
+            return false;
+        }
+
+        $challenge = DB::table('ideation_challenges')
+            ->where('id', $idea['challenge_id'])
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $challenge || $challenge->status !== 'open') {
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Challenge is no longer open for edits'];
+            return false;
+        }
+
+        $updates = [];
+
+        if (isset($data['title'])) {
+            $title = trim($data['title']);
+            if (empty($title)) {
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title cannot be empty', 'field' => 'title'];
+                return false;
+            }
+            $updates['title'] = $title;
+        }
+
+        if (isset($data['description'])) {
+            $desc = trim($data['description']);
+            if (empty($desc)) {
+                $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description cannot be empty', 'field' => 'description'];
+                return false;
+            }
+            $updates['description'] = $desc;
+        }
+
+        if (empty($updates)) {
+            return true;
+        }
+
+        DB::table('challenge_ideas')
+            ->where('id', $id)
+            ->whereIn('challenge_id', function ($q) use ($tenantId) {
+                $q->select('id')->from('ideation_challenges')->where('tenant_id', $tenantId);
+            })
+            ->update($updates);
+
+        return true;
+    }
+
+    /**
+     * Update a draft idea (only drafts can be edited this way).
+     */
+    public function updateDraftIdea(int $ideaId, int $userId, array $data): bool
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $idea = DB::table('challenge_ideas as ci')
+            ->join('ideation_challenges as c', 'ci.challenge_id', '=', 'c.id')
+            ->where('ci.id', $ideaId)
+            ->where('c.tenant_id', $tenantId)
+            ->where('ci.user_id', $userId)
+            ->select('ci.*')
+            ->first();
+
+        if (! $idea) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            return false;
+        }
+
+        if ($idea->status !== 'draft') {
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Only draft ideas can be edited'];
+            return false;
+        }
+
+        $title       = trim($data['title'] ?? '');
+        $description = trim($data['description'] ?? '');
+        $publish     = ! empty($data['publish']);
+
+        if (empty($title)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+            return false;
+        }
+
+        if ($publish && empty($description)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+            return false;
+        }
+
+        $newStatus = $publish ? 'submitted' : 'draft';
+
+        try {
+            return DB::transaction(function () use ($ideaId, $title, $description, $newStatus, $publish, $idea, $tenantId) {
+                DB::table('challenge_ideas')
+                    ->where('id', $ideaId)
+                    ->update([
+                        'title'       => $title,
+                        'description' => $description,
+                        'status'      => $newStatus,
+                        'updated_at'  => now(),
+                    ]);
+
+                if ($publish) {
+                    DB::table('ideation_challenges')
+                        ->where('id', $idea->challenge_id)
+                        ->where('tenant_id', $tenantId)
+                        ->increment('ideas_count');
+                }
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            Log::error('IdeationChallengeService::updateDraftIdea error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update draft'];
+            return false;
+        }
+    }
+
+    /**
+     * Delete an idea (owner or admin).
+     */
+    public function deleteIdea(int $id, int $userId): bool
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $idea = $this->getIdeaById($id);
+        if (! $idea) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            return false;
+        }
+
+        $isOwner = (int) $idea['user_id'] === $userId;
+        $isAdmin = $this->isAdmin($userId, $tenantId);
+
+        if (! $isOwner && ! $isAdmin) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own ideas'];
+            return false;
+        }
+
+        try {
+            return DB::transaction(function () use ($id, $idea, $tenantId) {
+                DB::table('challenge_ideas')
+                    ->where('id', $id)
+                    ->whereIn('challenge_id', function ($q) use ($tenantId) {
+                        $q->select('id')->from('ideation_challenges')->where('tenant_id', $tenantId);
+                    })
+                    ->delete();
+
+                DB::table('ideation_challenges')
+                    ->where('id', $idea['challenge_id'])
+                    ->where('tenant_id', $tenantId)
+                    ->update(['ideas_count' => DB::raw('GREATEST(0, ideas_count - 1)')]);
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            Log::error('IdeationChallengeService::deleteIdea error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete idea'];
+            return false;
+        }
+    }
+
+    /**
      * Toggle a vote on an idea.
      *
-     * @return array{voted: bool, vote_count: int}
+     * @return array{voted: bool, vote_count: int}|null
      */
     public function vote(int $ideaId, int $userId): array
     {
@@ -179,220 +639,448 @@ class IdeationChallengeService
         return ['voted' => $voted, 'vote_count' => $count];
     }
 
-    // ================================================================
-    // LEGACY DELEGATION METHODS
-    // These delegate to Nexus\Services\IdeationChallengeService (static)
-    // for features not yet ported to Eloquent.
-    // ================================================================
-
     /**
-     * Get validation errors — delegates to legacy IdeationChallengeService.
-     */
-    public function getErrors(): array
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return [];
-        }
-        return \Nexus\Services\IdeationChallengeService::getErrors();
-    }
-
-    /**
-     * Get a challenge by ID (legacy) — delegates to legacy IdeationChallengeService.
-     */
-    public function getChallengeById(int $id, ?int $userId = null): ?array
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return $this->getById($id);
-        }
-        return \Nexus\Services\IdeationChallengeService::getChallengeById($id, $userId);
-    }
-
-    /**
-     * Update a challenge — delegates to legacy IdeationChallengeService.
-     */
-    public function updateChallenge(int $id, int $userId, array $data): bool
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return false;
-        }
-        return \Nexus\Services\IdeationChallengeService::updateChallenge($id, $userId, $data);
-    }
-
-    /**
-     * Delete a challenge — delegates to legacy IdeationChallengeService.
-     */
-    public function deleteChallenge(int $id, int $userId): bool
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return false;
-        }
-        return \Nexus\Services\IdeationChallengeService::deleteChallenge($id, $userId);
-    }
-
-    /**
-     * Update challenge status — delegates to legacy IdeationChallengeService.
-     */
-    public function updateChallengeStatus(int $id, int $userId, string $status): bool
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return false;
-        }
-        return \Nexus\Services\IdeationChallengeService::updateChallengeStatus($id, $userId, $status);
-    }
-
-    /**
-     * Toggle favorite on a challenge — delegates to legacy IdeationChallengeService.
-     */
-    public function toggleFavorite(int $challengeId, int $userId): array
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return ['favorited' => false];
-        }
-        return \Nexus\Services\IdeationChallengeService::toggleFavorite($challengeId, $userId);
-    }
-
-    /**
-     * Duplicate a challenge — delegates to legacy IdeationChallengeService.
-     */
-    public function duplicateChallenge(int $challengeId, int $userId): ?int
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return null;
-        }
-        return \Nexus\Services\IdeationChallengeService::duplicateChallenge($challengeId, $userId);
-    }
-
-    /**
-     * Get an idea by ID — delegates to legacy IdeationChallengeService.
-     */
-    public function getIdeaById(int $id, ?int $userId = null): ?array
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return null;
-        }
-        return \Nexus\Services\IdeationChallengeService::getIdeaById($id, $userId);
-    }
-
-    /**
-     * Update an idea — delegates to legacy IdeationChallengeService.
-     */
-    public function updateIdea(int $id, int $userId, array $data): bool
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return false;
-        }
-        return \Nexus\Services\IdeationChallengeService::updateIdea($id, $userId, $data);
-    }
-
-    /**
-     * Update a draft idea — delegates to legacy IdeationChallengeService.
-     */
-    public function updateDraftIdea(int $ideaId, int $userId, array $data): bool
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return false;
-        }
-        return \Nexus\Services\IdeationChallengeService::updateDraftIdea($ideaId, $userId, $data);
-    }
-
-    /**
-     * Delete an idea — delegates to legacy IdeationChallengeService.
-     */
-    public function deleteIdea(int $id, int $userId): bool
-    {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return false;
-        }
-        return \Nexus\Services\IdeationChallengeService::deleteIdea($id, $userId);
-    }
-
-    /**
-     * Vote on an idea (legacy) — delegates to legacy IdeationChallengeService.
+     * Vote on an idea (legacy alias with validation).
      */
     public function voteIdea(int $ideaId, int $userId): ?array
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return $this->vote($ideaId, $userId);
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $idea = $this->getIdeaById($ideaId, $userId);
+        if (! $idea) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            return null;
         }
-        return \Nexus\Services\IdeationChallengeService::voteIdea($ideaId, $userId);
+
+        // Cannot vote on withdrawn or draft ideas
+        if (in_array($idea['status'] ?? '', ['withdrawn', 'draft'])) {
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Cannot vote on a withdrawn or draft idea'];
+            return null;
+        }
+
+        // Check challenge is in open or voting status
+        $challenge = DB::table('ideation_challenges')
+            ->where('id', $idea['challenge_id'])
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $challenge || ! in_array($challenge->status, ['open', 'voting'])) {
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Voting is not currently allowed for this challenge'];
+            return null;
+        }
+
+        // Can't vote on your own idea
+        if ((int) $idea['user_id'] === $userId) {
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'You cannot vote on your own idea'];
+            return null;
+        }
+
+        try {
+            return DB::transaction(function () use ($ideaId, $userId, $tenantId) {
+                $existingVote = DB::table('challenge_idea_votes')
+                    ->where('idea_id', $ideaId)
+                    ->where('user_id', $userId)
+                    ->first();
+
+                if ($existingVote) {
+                    DB::table('challenge_idea_votes')
+                        ->where('idea_id', $ideaId)
+                        ->where('user_id', $userId)
+                        ->delete();
+                    DB::table('challenge_ideas')
+                        ->where('id', $ideaId)
+                        ->update(['votes_count' => DB::raw('GREATEST(0, votes_count - 1)')]);
+                    $voted = false;
+                } else {
+                    DB::table('challenge_idea_votes')->insert([
+                        'idea_id'    => $ideaId,
+                        'user_id'    => $userId,
+                        'created_at' => now(),
+                    ]);
+                    DB::table('challenge_ideas')
+                        ->where('id', $ideaId)
+                        ->increment('votes_count');
+                    $voted = true;
+                }
+
+                $updated = DB::table('challenge_ideas')->where('id', $ideaId)->first();
+
+                return [
+                    'voted'       => $voted,
+                    'votes_count' => (int) ($updated->votes_count ?? 0),
+                ];
+            });
+        } catch (\Exception $e) {
+            Log::error('IdeationChallengeService::voteIdea error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to toggle vote'];
+            return null;
+        }
     }
 
     /**
-     * Update idea status — delegates to legacy IdeationChallengeService.
+     * Update idea status (admin only).
      */
     public function updateIdeaStatus(int $ideaId, int $userId, string $status): bool
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        if (! $this->isAdmin($userId, $tenantId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can change idea status'];
             return false;
         }
-        return \Nexus\Services\IdeationChallengeService::updateIdeaStatus($ideaId, $userId, $status);
+
+        $validStatuses = ['submitted', 'shortlisted', 'winner', 'withdrawn'];
+        if (! in_array($status, $validStatuses)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid status value', 'field' => 'status'];
+            return false;
+        }
+
+        $idea = $this->getIdeaById($ideaId);
+        if (! $idea) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            return false;
+        }
+
+        DB::table('challenge_ideas')
+            ->where('id', $ideaId)
+            ->whereIn('challenge_id', function ($q) use ($tenantId) {
+                $q->select('id')->from('ideation_challenges')->where('tenant_id', $tenantId);
+            })
+            ->update(['status' => $status]);
+
+        return true;
     }
 
     /**
-     * Get user's draft ideas for a challenge — delegates to legacy IdeationChallengeService.
+     * Get user's draft ideas for a challenge.
      */
     public function getUserDrafts(int $challengeId, int $userId): array
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return [];
-        }
-        return \Nexus\Services\IdeationChallengeService::getUserDrafts($challengeId, $userId);
+        $tenantId = TenantContext::getId();
+
+        return DB::table('challenge_ideas as ci')
+            ->join('ideation_challenges as c', 'ci.challenge_id', '=', 'c.id')
+            ->where('ci.challenge_id', $challengeId)
+            ->where('ci.user_id', $userId)
+            ->where('ci.status', 'draft')
+            ->where('c.tenant_id', $tenantId)
+            ->orderByDesc('ci.updated_at')
+            ->orderByDesc('ci.created_at')
+            ->select('ci.id', 'ci.title', 'ci.description', 'ci.status', 'ci.created_at', 'ci.updated_at')
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
     }
 
+    // ================================================================
+    // COMMENT METHODS
+    // ================================================================
+
     /**
-     * Get comments for an idea — delegates to legacy IdeationChallengeService.
+     * Get comments for an idea with cursor-based pagination.
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
     public function getComments(int $ideaId, array $filters = []): array
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+        $limit  = min((int) ($filters['limit'] ?? 20), 100);
+        $cursor = $filters['cursor'] ?? null;
+
+        // Verify idea exists in our tenant
+        $idea = $this->getIdeaById($ideaId);
+        if (! $idea) {
             return ['items' => [], 'cursor' => null, 'has_more' => false];
         }
-        return \Nexus\Services\IdeationChallengeService::getComments($ideaId, $filters);
+
+        $query = DB::table('challenge_idea_comments as c')
+            ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
+            ->where('c.idea_id', $ideaId)
+            ->select(
+                'c.*',
+                'u.first_name as author_first_name',
+                'u.last_name as author_last_name',
+                'u.avatar_url as author_avatar'
+            );
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor);
+            if ($cursorId !== false) {
+                $query->where('c.id', '<', (int) $cursorId);
+            }
+        }
+
+        $query->orderByDesc('c.created_at')->orderByDesc('c.id');
+
+        $items   = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        $formatted = $items->map(function ($item) {
+            $data = (array) $item;
+            $data['author'] = [
+                'id'         => (int) $item->user_id,
+                'name'       => trim(($item->author_first_name ?? '') . ' ' . ($item->author_last_name ?? '')),
+                'avatar_url' => $item->author_avatar ?? null,
+            ];
+            unset($data['author_first_name'], $data['author_last_name'], $data['author_avatar']);
+            return $data;
+        })->all();
+
+        return [
+            'items'    => $formatted,
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
     }
 
     /**
-     * Add a comment to an idea — delegates to legacy IdeationChallengeService.
+     * Add a comment to an idea.
      */
     public function addComment(int $ideaId, int $userId, string $body): ?int
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+        $this->errors = [];
+        $body = trim($body);
+
+        if (empty($body)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Comment body is required', 'field' => 'body'];
             return null;
         }
-        return \Nexus\Services\IdeationChallengeService::addComment($ideaId, $userId, $body);
+
+        $idea = $this->getIdeaById($ideaId);
+        if (! $idea) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Idea not found'];
+            return null;
+        }
+
+        if (in_array($idea['status'] ?? '', ['withdrawn', 'draft'])) {
+            $this->errors[] = ['code' => 'CONFLICT', 'message' => 'Cannot comment on a withdrawn or draft idea'];
+            return null;
+        }
+
+        try {
+            return DB::transaction(function () use ($ideaId, $userId, $body) {
+                $commentId = DB::table('challenge_idea_comments')->insertGetId([
+                    'idea_id'    => $ideaId,
+                    'user_id'    => $userId,
+                    'body'       => $body,
+                    'created_at' => now(),
+                ]);
+
+                DB::table('challenge_ideas')
+                    ->where('id', $ideaId)
+                    ->increment('comments_count');
+
+                return (int) $commentId;
+            });
+        } catch (\Exception $e) {
+            Log::error('IdeationChallengeService::addComment error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to add comment'];
+            return null;
+        }
     }
 
     /**
-     * Delete a comment — delegates to legacy IdeationChallengeService.
+     * Delete a comment (owner or admin).
      */
     public function deleteComment(int $commentId, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $comment = DB::table('challenge_idea_comments as c')
+            ->leftJoin('challenge_ideas as i', 'c.idea_id', '=', 'i.id')
+            ->leftJoin('ideation_challenges as ic', 'i.challenge_id', '=', 'ic.id')
+            ->where('c.id', $commentId)
+            ->select('c.*', 'ic.tenant_id')
+            ->first();
+
+        if (! $comment || (int) ($comment->tenant_id ?? 0) !== $tenantId) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Comment not found'];
             return false;
         }
-        return \Nexus\Services\IdeationChallengeService::deleteComment($commentId, $userId);
+
+        $isOwner = (int) $comment->user_id === $userId;
+        $isAdmin = $this->isAdmin($userId, $tenantId);
+
+        if (! $isOwner && ! $isAdmin) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only delete your own comments'];
+            return false;
+        }
+
+        try {
+            return DB::transaction(function () use ($commentId, $comment) {
+                DB::table('challenge_idea_comments')->where('id', $commentId)->delete();
+
+                DB::table('challenge_ideas')
+                    ->where('id', $comment->idea_id)
+                    ->update(['comments_count' => DB::raw('GREATEST(0, comments_count - 1)')]);
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            Log::error('IdeationChallengeService::deleteComment error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete comment'];
+            return false;
+        }
+    }
+
+    // ================================================================
+    // FAVORITE METHODS
+    // ================================================================
+
+    /**
+     * Toggle favorite on a challenge.
+     *
+     * @return array{favorited: bool, favorites_count?: int}
+     */
+    public function toggleFavorite(int $challengeId, int $userId): array
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $exists = DB::table('ideation_challenges')
+            ->where('id', $challengeId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (! $exists) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            return ['favorited' => false];
+        }
+
+        try {
+            return DB::transaction(function () use ($challengeId, $userId, $tenantId) {
+                $existing = DB::table('challenge_favorites')
+                    ->where('challenge_id', $challengeId)
+                    ->where('user_id', $userId)
+                    ->first();
+
+                if ($existing) {
+                    DB::table('challenge_favorites')
+                        ->where('challenge_id', $challengeId)
+                        ->where('user_id', $userId)
+                        ->delete();
+                    DB::table('ideation_challenges')
+                        ->where('id', $challengeId)
+                        ->where('tenant_id', $tenantId)
+                        ->update(['favorites_count' => DB::raw('GREATEST(0, favorites_count - 1)')]);
+                    $favorited = false;
+                } else {
+                    DB::table('challenge_favorites')->insert([
+                        'challenge_id' => $challengeId,
+                        'user_id'      => $userId,
+                        'created_at'   => now(),
+                    ]);
+                    DB::table('ideation_challenges')
+                        ->where('id', $challengeId)
+                        ->where('tenant_id', $tenantId)
+                        ->increment('favorites_count');
+                    $favorited = true;
+                }
+
+                $updated = DB::table('ideation_challenges')
+                    ->where('id', $challengeId)
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+
+                return [
+                    'favorited'       => $favorited,
+                    'favorites_count' => (int) ($updated->favorites_count ?? 0),
+                ];
+            });
+        } catch (\Exception $e) {
+            Log::error('IdeationChallengeService::toggleFavorite error: ' . $e->getMessage());
+            return ['favorited' => false];
+        }
     }
 
     /**
-     * Get all tags — delegates to legacy IdeationChallengeService.
+     * Duplicate a challenge as a draft copy (admin only).
+     */
+    public function duplicateChallenge(int $challengeId, int $userId): ?int
+    {
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        if (! $this->isAdmin($userId, $tenantId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can duplicate challenges'];
+            return null;
+        }
+
+        $original = DB::table('ideation_challenges')
+            ->where('id', $challengeId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $original) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Challenge not found'];
+            return null;
+        }
+
+        try {
+            return DB::table('ideation_challenges')->insertGetId([
+                'tenant_id'            => $tenantId,
+                'user_id'              => $userId,
+                'title'                => '[Copy] ' . ($original->title ?? 'Untitled'),
+                'description'          => $original->description ?? '',
+                'category'             => $original->category ?? null,
+                'category_id'          => $original->category_id ?? null,
+                'tags'                 => $original->tags ?? null,
+                'cover_image'          => $original->cover_image ?? null,
+                'prize_description'    => $original->prize_description ?? null,
+                'max_ideas_per_user'   => $original->max_ideas_per_user ?? null,
+                'evaluation_criteria'  => $original->evaluation_criteria ?? null,
+                'status'               => 'draft',
+                'ideas_count'          => 0,
+                'favorites_count'      => 0,
+                'views_count'          => 0,
+                'is_featured'          => 0,
+                'submission_deadline'  => null,
+                'voting_deadline'      => null,
+                'created_at'           => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('IdeationChallengeService::duplicateChallenge error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to duplicate challenge'];
+            return null;
+        }
+    }
+
+    /**
+     * Get all tags used across challenges for this tenant.
      */
     public function getAllTags(): array
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return [];
-        }
-        return \Nexus\Services\IdeationChallengeService::getAllTags();
+        $tenantId = TenantContext::getId();
+
+        return DB::table('challenge_tag_links as ctl')
+            ->join('challenge_tags as ct', 'ctl.tag_id', '=', 'ct.id')
+            ->join('ideation_challenges as c', 'ctl.challenge_id', '=', 'c.id')
+            ->where('c.tenant_id', $tenantId)
+            ->groupBy('ct.name')
+            ->orderByDesc(DB::raw('COUNT(*)'))
+            ->orderBy('ct.name')
+            ->select('ct.name as tag', DB::raw('COUNT(*) as count'))
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
     }
 
-    /**
-     * Delegates to legacy IdeationChallengeService::getAllChallenges().
-     */
-    public function getAllChallenges(array $filters = []): array
+    // ================================================================
+    // HELPERS
+    // ================================================================
+
+    private function isAdmin(int $userId, int $tenantId): bool
     {
-        if (!class_exists('\Nexus\Services\IdeationChallengeService')) {
-            return $this->getAll($filters)['items'];
-        }
-        return \Nexus\Services\IdeationChallengeService::getAllChallenges($filters);
+        $role = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->value('role');
+
+        return in_array($role ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin']);
     }
 }

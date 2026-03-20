@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Log;
 /**
  * RealtimeService — Laravel DI-based service for realtime/WebSocket operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\PusherService
- * and \Nexus\Services\RealtimeService. Manages Pusher broadcasting configuration.
+ * Provides Pusher broadcasting configuration and channel management.
+ * Self-contained — no legacy delegation.
  */
 class RealtimeService
 {
@@ -22,10 +22,23 @@ class RealtimeService
     public function getConfig(): array
     {
         return [
-            'driver'  => config('broadcasting.default', 'pusher'),
-            'key'     => config('broadcasting.connections.pusher.key', ''),
-            'cluster' => config('broadcasting.connections.pusher.options.cluster', 'eu'),
+            'driver'    => config('broadcasting.default', 'pusher'),
+            'key'       => config('broadcasting.connections.pusher.key', ''),
+            'cluster'   => config('broadcasting.connections.pusher.options.cluster', 'eu'),
             'encrypted' => true,
+        ];
+    }
+
+    /**
+     * Get Pusher configuration for frontend initialization.
+     */
+    public function getFrontendConfig(): array
+    {
+        return [
+            'key'          => config('broadcasting.connections.pusher.key', ''),
+            'cluster'      => config('broadcasting.connections.pusher.options.cluster', 'eu'),
+            'authEndpoint' => '/api/pusher/auth',
+            'enabled'      => ! empty(config('broadcasting.connections.pusher.key')),
         ];
     }
 
@@ -60,13 +73,5 @@ class RealtimeService
     public function tenantChannel(int $tenantId, string $suffix): string
     {
         return "private-tenant.{$tenantId}.{$suffix}";
-    }
-
-    /**
-     * Delegates to legacy RealtimeService::getFrontendConfig().
-     */
-    public function getFrontendConfig(): array
-    {
-        return \Nexus\Services\RealtimeService::getFrontendConfig();
     }
 }

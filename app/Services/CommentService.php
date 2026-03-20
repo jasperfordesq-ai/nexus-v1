@@ -6,8 +6,10 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Comment;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * CommentService — Eloquent-based service for comment operations.
@@ -17,6 +19,8 @@ use Illuminate\Support\Facades\DB;
  */
 class CommentService
 {
+    private static array $availableReactions = ['👍', '❤️', '😂', '😮', '😢', '🎉'];
+
     /**
      * Get comments for a given entity, threaded by parent_id.
      *
@@ -35,8 +39,7 @@ class CommentService
         $reactions = [];
         $userReactions = [];
 
-        if (! empty($commentIds)) {
-            // Aggregate reactions
+        if (!empty($commentIds)) {
             $reactionRows = DB::table('comment_reactions')
                 ->whereIn('comment_id', $commentIds)
                 ->selectRaw('comment_id, emoji, COUNT(*) as count')
@@ -47,7 +50,6 @@ class CommentService
                 $reactions[$r->comment_id][$r->emoji] = (int) $r->count;
             }
 
-            // User's own reactions
             if ($currentUserId > 0) {
                 $userReactionRows = DB::table('comment_reactions')
                     ->whereIn('comment_id', $commentIds)
@@ -68,19 +70,19 @@ class CommentService
             $cid = $comment->id;
             $user = $comment->user;
             $item = [
-                'id'             => $cid,
-                'content'        => $comment->content ?? '',
-                'created_at'     => (string) $comment->created_at,
-                'edited'         => $comment->updated_at && $comment->updated_at->gt($comment->created_at),
-                'is_own'         => (int) $comment->user_id === $currentUserId,
-                'author'         => [
-                    'id'     => (int) $comment->user_id,
-                    'name'   => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
+                'id' => $cid,
+                'content' => $comment->content ?? '',
+                'created_at' => (string) $comment->created_at,
+                'edited' => $comment->updated_at && $comment->updated_at->gt($comment->created_at),
+                'is_own' => (int) $comment->user_id === $currentUserId,
+                'author' => [
+                    'id' => (int) $comment->user_id,
+                    'name' => $user ? trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) : 'Unknown',
                     'avatar' => $user->avatar_url ?? null,
                 ],
-                'reactions'      => $reactions[$cid] ?? (object) [],
+                'reactions' => $reactions[$cid] ?? (object) [],
                 'user_reactions' => $userReactions[$cid] ?? [],
-                'replies'        => [],
+                'replies' => [],
             ];
             $byId[$cid] = $item;
         }
@@ -104,7 +106,7 @@ class CommentService
     {
         $count = count($comments);
         foreach ($comments as $c) {
-            if (! empty($c['replies'])) {
+            if (!empty($c['replies'])) {
                 $count += $this->countAll($c['replies']);
             }
         }
@@ -118,11 +120,11 @@ class CommentService
     {
         return Comment::create([
             'target_type' => $targetType,
-            'target_id'   => $targetId,
-            'user_id'     => $userId,
-            'tenant_id'   => $tenantId,
-            'content'     => trim($data['content']),
-            'parent_id'   => $data['parent_id'] ?? null,
+            'target_id' => $targetId,
+            'user_id' => $userId,
+            'tenant_id' => $tenantId,
+            'content' => trim($data['content']),
+            'parent_id' => $data['parent_id'] ?? null,
         ]);
     }
 
@@ -135,7 +137,7 @@ class CommentService
             ->where('user_id', $userId)
             ->first();
 
-        if (! $comment) {
+        if (!$comment) {
             return false;
         }
 
@@ -156,47 +158,225 @@ class CommentService
     }
 
     /**
-     * Fetch threaded comments for a target — delegates to legacy CommentService.
+     * Fetch threaded comments for a target.
+     *
+     * @return array Threaded comments array
      */
     public function fetchComments(string $targetType, int $targetId, int $currentUserId = 0): array
     {
-        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
-        return \Nexus\Services\CommentService::fetchComments($targetType, $targetId, $currentUserId);
+        $tenantId = TenantContext::getId();
+
+        $allComments = DB::table('comments as c')
+            ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
+            ->where('c.target_type', $targetType)
+            ->where('c.target_id', $targetId)
+            ->where('c.tenant_id', $tenantId)
+            ->select([
+                'c.id', 'c.user_id', 'c.content', 'c.parent_id', 'c.created_at', 'c.updated_at',
+                DB::raw("COALESCE(u.name, u.first_name, 'Unknown') as author_name"),
+                DB::raw("COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar"),
+            ])
+            ->orderBy('c.created_at')
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+
+        $commentIds = array_column($allComments, 'id');
+        $reactionsByComment = [];
+        $userReactionsByComment = [];
+
+        if (!empty($commentIds)) {
+            // Get reaction counts grouped by emoji
+            $reactionRows = DB::table('reactions')
+                ->where('target_type', 'comment')
+                ->whereIn('target_id', $commentIds)
+                ->selectRaw('target_id, emoji, COUNT(*) as count')
+                ->groupBy('target_id', 'emoji')
+                ->get();
+
+            foreach ($reactionRows as $row) {
+                $reactionsByComment[$row->target_id][$row->emoji] = (int) $row->count;
+            }
+
+            // Get current user's reactions
+            if ($currentUserId) {
+                $userReactionRows = DB::table('reactions')
+                    ->where('target_type', 'comment')
+                    ->whereIn('target_id', $commentIds)
+                    ->where('user_id', $currentUserId)
+                    ->get();
+
+                foreach ($userReactionRows as $row) {
+                    $userReactionsByComment[$row->target_id][] = $row->emoji;
+                }
+            }
+        }
+
+        // Build threaded structure
+        $commentsById = [];
+        $rootComments = [];
+
+        foreach ($allComments as &$comment) {
+            $comment['reactions'] = $reactionsByComment[$comment['id']] ?? [];
+            $comment['user_reactions'] = $userReactionsByComment[$comment['id']] ?? [];
+            $comment['is_owner'] = ($currentUserId && (int) $comment['user_id'] === $currentUserId);
+            $comment['is_edited'] = ($comment['updated_at'] !== $comment['created_at']);
+            $comment['replies'] = [];
+            $commentsById[$comment['id']] = &$comment;
+        }
+        unset($comment);
+
+        foreach ($allComments as &$comment) {
+            if ($comment['parent_id'] && isset($commentsById[$comment['parent_id']])) {
+                $commentsById[$comment['parent_id']]['replies'][] = &$commentsById[$comment['id']];
+            } else {
+                $rootComments[] = &$commentsById[$comment['id']];
+            }
+        }
+
+        return $rootComments;
     }
 
     /**
-     * Add a comment or reply — delegates to legacy CommentService.
+     * Add a comment or reply.
      */
     public function addComment(int $userId, int $tenantId, string $targetType, int $targetId, string $content, ?int $parentId = null): array
     {
-        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
-        return \Nexus\Services\CommentService::addComment($userId, $tenantId, $targetType, $targetId, $content, $parentId);
+        $content = trim($content);
+        if (empty($content)) {
+            return ['success' => false, 'error' => 'Comment cannot be empty'];
+        }
+
+        // If replying, verify parent exists
+        if ($parentId) {
+            $parentExists = DB::table('comments')
+                ->where('id', $parentId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+
+            if (!$parentExists) {
+                return ['success' => false, 'error' => 'Parent comment not found'];
+            }
+        }
+
+        // Insert comment
+        $commentId = DB::table('comments')->insertGetId([
+            'user_id' => $userId,
+            'tenant_id' => $tenantId,
+            'target_type' => $targetType,
+            'target_id' => $targetId,
+            'parent_id' => $parentId,
+            'content' => $content,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Process @mentions
+        $mentions = $this->extractMentions($content);
+        if (!empty($mentions)) {
+            $this->saveMentions($commentId, $mentions, $userId, $tenantId);
+        }
+
+        // Get the created comment with author info
+        $comment = DB::table('comments as c')
+            ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
+            ->where('c.id', $commentId)
+            ->select([
+                'c.*',
+                DB::raw("COALESCE(u.name, u.first_name, 'Unknown') as author_name"),
+                DB::raw("COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar"),
+            ])
+            ->first();
+
+        return [
+            'success' => true,
+            'status' => 'success',
+            'comment' => $comment ? (array) $comment : null,
+            'is_reply' => $parentId !== null,
+        ];
     }
 
     /**
-     * Delete a comment (owner only) — delegates to legacy CommentService.
+     * Delete a comment (owner or super admin).
      */
     public function deleteComment(int $commentId, int $userId, bool $isSuperAdmin = false): array
     {
-        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
-        return \Nexus\Services\CommentService::deleteComment($commentId, $userId, $isSuperAdmin);
+        $tenantId = TenantContext::getId();
+
+        $comment = DB::table('comments')
+            ->where('id', $commentId)
+            ->where('tenant_id', $tenantId)
+            ->select(['id', 'user_id'])
+            ->first();
+
+        if (!$comment) {
+            return ['success' => false, 'error' => 'Comment not found'];
+        }
+
+        if ((int) $comment->user_id !== $userId && !$isSuperAdmin) {
+            return ['success' => false, 'error' => 'Unauthorized'];
+        }
+
+        DB::table('comments')
+            ->where('id', $commentId)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        return ['success' => true, 'status' => 'success', 'message' => 'Comment deleted'];
     }
 
     /**
-     * Edit a comment (owner only) — delegates to legacy CommentService.
+     * Edit a comment (owner only).
      */
     public function editComment(int $commentId, int $userId, string $newContent): array
     {
-        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
-        return \Nexus\Services\CommentService::editComment($commentId, $userId, $newContent);
+        $tenantId = TenantContext::getId();
+        $newContent = trim($newContent);
+
+        if (empty($newContent)) {
+            return ['success' => false, 'error' => 'Comment cannot be empty'];
+        }
+
+        $comment = DB::table('comments')
+            ->where('id', $commentId)
+            ->where('tenant_id', $tenantId)
+            ->select(['id', 'user_id', 'target_type', 'target_id'])
+            ->first();
+
+        if (!$comment) {
+            return ['success' => false, 'error' => 'Comment not found'];
+        }
+
+        if ((int) $comment->user_id !== $userId) {
+            return ['success' => false, 'error' => 'Unauthorized'];
+        }
+
+        DB::table('comments')
+            ->where('id', $commentId)
+            ->where('tenant_id', $tenantId)
+            ->update(['content' => $newContent, 'updated_at' => now()]);
+
+        // Re-process mentions
+        DB::table('mentions')
+            ->where('comment_id', $commentId)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        $mentions = $this->extractMentions($newContent);
+        if (!empty($mentions)) {
+            $this->saveMentions($commentId, $mentions, $userId, $tenantId);
+        }
+
+        return [
+            'success' => true,
+            'status' => 'success',
+            'content' => $newContent,
+            'is_edited' => true,
+        ];
     }
 
     /**
-     * Get validation errors — delegates to legacy CommentService.
-     *
-     * Note: Legacy CommentService uses inline error arrays in return values
-     * rather than a dedicated $errors array. This returns an empty array
-     * for interface compatibility.
+     * Get validation errors (interface compatibility).
      */
     public function getErrors(): array
     {
@@ -208,8 +388,7 @@ class CommentService
      */
     public function getAvailableReactions(): array
     {
-        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
-        return \Nexus\Services\CommentService::getAvailableReactions();
+        return self::$availableReactions;
     }
 
     /**
@@ -217,8 +396,20 @@ class CommentService
      */
     public function searchUsersForMention(string $query, int $tenantId, int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\CommentService')) { return []; }
-        return \Nexus\Services\CommentService::searchUsersForMention($query, $tenantId, $limit);
+        $searchTerm = '%' . $query . '%';
+
+        return DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', $searchTerm)
+                  ->orWhere('first_name', 'LIKE', $searchTerm)
+                  ->orWhere('username', 'LIKE', $searchTerm);
+            })
+            ->select(['id', 'name', 'first_name', 'avatar_url'])
+            ->limit($limit)
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
     }
 
     /**
@@ -238,9 +429,9 @@ class CommentService
         } else {
             DB::table('comment_reactions')->insert([
                 'comment_id' => $commentId,
-                'user_id'    => $userId,
-                'tenant_id'  => $tenantId,
-                'emoji'      => $emoji,
+                'user_id' => $userId,
+                'tenant_id' => $tenantId,
+                'emoji' => $emoji,
                 'created_at' => now(),
             ]);
             $action = 'added';
@@ -255,8 +446,61 @@ class CommentService
             ->all();
 
         return [
-            'action'    => $action,
+            'action' => $action,
             'reactions' => empty($reactionCounts) ? (object) [] : $reactionCounts,
         ];
+    }
+
+    // =========================================================================
+    // PRIVATE HELPERS
+    // =========================================================================
+
+    /**
+     * Extract @mentions from content.
+     */
+    private function extractMentions(string $content): array
+    {
+        preg_match_all('/@(\w+)/', $content, $matches);
+        return array_unique($matches[1] ?? []);
+    }
+
+    /**
+     * Save mentions to database and notify users.
+     */
+    private function saveMentions(int $commentId, array $usernames, int $mentioningUserId, int $tenantId): void
+    {
+        foreach ($usernames as $username) {
+            $user = DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where(function ($q) use ($username) {
+                    $q->where('username', $username)
+                      ->orWhere('name', 'LIKE', "%{$username}%")
+                      ->orWhere('first_name', $username);
+                })
+                ->select(['id'])
+                ->first();
+
+            if ($user && (int) $user->id !== $mentioningUserId) {
+                try {
+                    DB::table('mentions')->insert([
+                        'comment_id' => $commentId,
+                        'mentioned_user_id' => $user->id,
+                        'mentioning_user_id' => $mentioningUserId,
+                        'tenant_id' => $tenantId,
+                        'created_at' => now(),
+                    ]);
+
+                    \App\Services\SocialNotificationService::notifyComment(
+                        $user->id,
+                        $mentioningUserId,
+                        'mention',
+                        $commentId,
+                        'mentioned you in a comment'
+                    );
+                } catch (\Exception $e) {
+                    // Ignore duplicate mention errors
+                }
+            }
+        }
     }
 }

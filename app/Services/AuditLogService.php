@@ -6,22 +6,19 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\AuditLogService as LegacyAuditLogService;
+use Illuminate\Support\Facades\Log;
 
 /**
- * AuditLogService — Laravel DI-based service for audit logging.
+ * AuditLogService — Audit logging for organization wallet operations and admin actions.
  *
- * Wraps the legacy static \Nexus\Services\AuditLogService and provides
- * all the specialized logging helpers used by AdminUsersController,
- * AdminBrokerController, and other admin controllers.
- *
- * Static helper methods delegate directly to the legacy service so that
- * controllers can call AuditLogService::logUserSuspended(...) etc.
+ * Tracks all significant actions with IP addresses, user agents, and detailed context.
+ * All write operations are tenant-scoped.
  */
 class AuditLogService
 {
-    // ─── Action type constants (mirrored from legacy) ───────────────
+    // ─── Action type constants ───────────────────────────────────────
     public const ACTION_WALLET_DEPOSIT = 'wallet_deposit';
     public const ACTION_WALLET_WITHDRAWAL = 'wallet_withdrawal';
     public const ACTION_TRANSFER_REQUEST = 'transfer_request';
@@ -51,18 +48,40 @@ class AuditLogService
     public const ACTION_ADMIN_SUPER_ADMIN_REVOKED = 'admin_super_admin_revoked';
     public const ACTION_ADMIN_BULK_IMPORT = 'admin_bulk_import';
 
+    // ─── Action labels ───────────────────────────────────────────────
+    private const ACTION_LABELS = [
+        self::ACTION_WALLET_DEPOSIT => 'Wallet Deposit',
+        self::ACTION_WALLET_WITHDRAWAL => 'Wallet Withdrawal',
+        self::ACTION_TRANSFER_REQUEST => 'Transfer Request Created',
+        self::ACTION_TRANSFER_APPROVE => 'Transfer Request Approved',
+        self::ACTION_TRANSFER_REJECT => 'Transfer Request Rejected',
+        self::ACTION_TRANSFER_CANCEL => 'Transfer Request Cancelled',
+        self::ACTION_MEMBER_ADDED => 'Member Added',
+        self::ACTION_MEMBER_REMOVED => 'Member Removed',
+        self::ACTION_MEMBER_ROLE_CHANGED => 'Member Role Changed',
+        self::ACTION_OWNERSHIP_TRANSFERRED => 'Ownership Transferred',
+        self::ACTION_SETTINGS_CHANGED => 'Settings Changed',
+        self::ACTION_LIMITS_CHANGED => 'Limits Changed',
+        self::ACTION_BULK_APPROVE => 'Bulk Approval',
+        self::ACTION_BULK_REJECT => 'Bulk Rejection',
+        self::ACTION_ADMIN_USER_CREATED => 'Admin Created User',
+        self::ACTION_ADMIN_USER_UPDATED => 'Admin Updated User',
+        self::ACTION_ADMIN_USER_DELETED => 'Admin Deleted User',
+        self::ACTION_ADMIN_USER_SUSPENDED => 'Admin Suspended User',
+        self::ACTION_ADMIN_USER_BANNED => 'Admin Banned User',
+        self::ACTION_ADMIN_USER_REACTIVATED => 'Admin Reactivated User',
+        self::ACTION_ADMIN_USER_APPROVED => 'Admin Approved User',
+        self::ACTION_ADMIN_ROLE_CHANGED => 'Admin Changed User Role',
+        self::ACTION_ADMIN_2FA_RESET => 'Admin Reset 2FA',
+        self::ACTION_ADMIN_USER_IMPERSONATED => 'Admin Impersonated User',
+        self::ACTION_ADMIN_SUPER_ADMIN_REVOKED => 'Super Admin Revoked',
+        self::ACTION_ADMIN_BULK_IMPORT => 'Admin Bulk Import Users',
+    ];
+
     // ─── Instance method (DI-friendly) ──────────────────────────────
 
     /**
      * Log an auditable action (instance method for DI usage).
-     *
-     * @param  int          $tenantId
-     * @param  string       $action          Action type constant
-     * @param  int|null     $userId          User performing the action
-     * @param  array        $details         Additional context
-     * @param  int|null     $organizationId
-     * @param  int|null     $targetUserId    User being affected
-     * @return int  Inserted log ID
      */
     public function logAction(
         int $tenantId,
@@ -111,19 +130,31 @@ class AuditLogService
         })->all();
     }
 
-    // ─── Static delegation helpers (called by controllers) ──────────
-    // These delegate to the legacy static service so controllers can
-    // `use App\Services\AuditLogService` and call the same static API.
+    // ─── Static logging helpers ──────────────────────────────────────
 
     /**
-     * Log an action (static — delegates to legacy).
+     * Log an action (static convenience method).
      */
     public static function log($action, $organizationId = null, $userId = null, $details = [], $targetUserId = null)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
+        $tenantId = TenantContext::getId();
+
+        try {
+            return DB::table('org_audit_log')->insertGetId([
+                'tenant_id'       => $tenantId,
+                'organization_id' => $organizationId,
+                'user_id'         => $userId,
+                'target_user_id'  => $targetUserId,
+                'action'          => $action,
+                'details'         => !empty($details) ? json_encode($details) : null,
+                'ip_address'      => request()->ip(),
+                'user_agent'      => request()->userAgent(),
+                'created_at'      => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('AuditLogService: Failed to log action - ' . $e->getMessage());
             return null;
         }
-        return LegacyAuditLogService::log($action, $organizationId, $userId, $details, $targetUserId);
     }
 
     /**
@@ -131,289 +162,253 @@ class AuditLogService
      */
     public static function logAdminAction($action, $adminUserId, $targetUserId = null, $details = [])
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logAdminAction($action, $adminUserId, $targetUserId, $details);
+        return self::log($action, null, $adminUserId, $details, $targetUserId);
     }
 
-    /**
-     * Log user profile update by admin.
-     */
     public static function logUserUpdated($adminUserId, $targetUserId, $changedFields = [])
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserUpdated($adminUserId, $targetUserId, $changedFields);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_UPDATED, $adminUserId, $targetUserId, [
+            'changed_fields' => $changedFields,
+        ]);
     }
 
-    /**
-     * Log role change by admin.
-     */
     public static function logAdminRoleChanged($adminUserId, $targetUserId, $oldRole, $newRole)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logAdminRoleChanged($adminUserId, $targetUserId, $oldRole, $newRole);
+        return self::logAdminAction(self::ACTION_ADMIN_ROLE_CHANGED, $adminUserId, $targetUserId, [
+            'old_role' => $oldRole,
+            'new_role' => $newRole,
+        ]);
     }
 
-    /**
-     * Log user creation by admin.
-     */
     public static function logUserCreated($adminUserId, $targetUserId, $targetEmail = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserCreated($adminUserId, $targetUserId, $targetEmail);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_CREATED, $adminUserId, $targetUserId, [
+            'created_email' => $targetEmail,
+        ]);
     }
 
-    /**
-     * Log user approval by admin.
-     */
     public static function logUserApproved($adminUserId, $targetUserId, $targetEmail = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserApproved($adminUserId, $targetUserId, $targetEmail);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_APPROVED, $adminUserId, $targetUserId, [
+            'approved_email' => $targetEmail,
+        ]);
     }
 
-    /**
-     * Log user suspension by admin.
-     */
     public static function logUserSuspended($adminUserId, $targetUserId, $reason = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserSuspended($adminUserId, $targetUserId, $reason);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_SUSPENDED, $adminUserId, $targetUserId, [
+            'reason' => $reason,
+        ]);
     }
 
-    /**
-     * Log user ban by admin.
-     */
     public static function logUserBanned($adminUserId, $targetUserId, $reason = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserBanned($adminUserId, $targetUserId, $reason);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_BANNED, $adminUserId, $targetUserId, [
+            'reason' => $reason,
+        ]);
     }
 
-    /**
-     * Log user reactivation by admin.
-     */
     public static function logUserReactivated($adminUserId, $targetUserId, $previousStatus = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserReactivated($adminUserId, $targetUserId, $previousStatus);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_REACTIVATED, $adminUserId, $targetUserId, [
+            'previous_status' => $previousStatus,
+        ]);
     }
 
-    /**
-     * Log user deletion by admin.
-     */
     public static function logUserDeleted($adminUserId, $targetUserId, $targetEmail = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserDeleted($adminUserId, $targetUserId, $targetEmail);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_DELETED, $adminUserId, $targetUserId, [
+            'deleted_email' => $targetEmail,
+        ]);
     }
 
-    /**
-     * Log 2FA reset by admin.
-     */
     public static function log2faReset($adminUserId, $targetUserId, $reason = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::log2faReset($adminUserId, $targetUserId, $reason);
+        return self::logAdminAction(self::ACTION_ADMIN_2FA_RESET, $adminUserId, $targetUserId, [
+            'reason' => $reason,
+        ]);
     }
 
-    /**
-     * Log user impersonation by admin.
-     */
     public static function logUserImpersonated($adminUserId, $targetUserId, $targetEmail = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logUserImpersonated($adminUserId, $targetUserId, $targetEmail);
+        return self::logAdminAction(self::ACTION_ADMIN_USER_IMPERSONATED, $adminUserId, $targetUserId, [
+            'impersonated_email' => $targetEmail,
+        ]);
     }
 
-    /**
-     * Log super admin revocation.
-     */
     public static function logSuperAdminRevoked($adminUserId, $targetUserId, $targetEmail = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logSuperAdminRevoked($adminUserId, $targetUserId, $targetEmail);
+        return self::logAdminAction(self::ACTION_ADMIN_SUPER_ADMIN_REVOKED, $adminUserId, $targetUserId, [
+            'revoked_email' => $targetEmail,
+        ]);
     }
 
-    /**
-     * Log bulk user import by admin.
-     */
     public static function logBulkImport($adminUserId, $importedCount, $skippedCount, $totalRows)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logBulkImport($adminUserId, $importedCount, $skippedCount, $totalRows);
+        return self::logAdminAction(self::ACTION_ADMIN_BULK_IMPORT, $adminUserId, null, [
+            'imported_count' => $importedCount,
+            'skipped_count' => $skippedCount,
+            'total_rows' => $totalRows,
+        ]);
     }
 
     // ─── Organization-level audit helpers ────────────────────────────
 
-    /**
-     * Log a wallet transaction.
-     */
     public static function logTransaction($organizationId, $userId, $type, $amount, $recipientId = null, $description = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logTransaction($organizationId, $userId, $type, $amount, $recipientId, $description);
+        $action = $type === 'deposit' ? self::ACTION_WALLET_DEPOSIT : self::ACTION_WALLET_WITHDRAWAL;
+        return self::log($action, $organizationId, $userId, [
+            'amount' => $amount,
+            'description' => $description,
+            'recipient_id' => $recipientId,
+        ], $recipientId);
     }
 
-    /**
-     * Log a transfer request action.
-     */
     public static function logTransferRequest($organizationId, $requesterId, $recipientId, $amount, $description = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logTransferRequest($organizationId, $requesterId, $recipientId, $amount, $description);
+        return self::log(self::ACTION_TRANSFER_REQUEST, $organizationId, $requesterId, [
+            'amount' => $amount,
+            'description' => $description,
+        ], $recipientId);
     }
 
-    /**
-     * Log transfer approval.
-     */
     public static function logTransferApproval($organizationId, $approverId, $requestId, $recipientId, $amount)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logTransferApproval($organizationId, $approverId, $requestId, $recipientId, $amount);
+        return self::log(self::ACTION_TRANSFER_APPROVE, $organizationId, $approverId, [
+            'request_id' => $requestId,
+            'amount' => $amount,
+        ], $recipientId);
     }
 
-    /**
-     * Log transfer rejection.
-     */
     public static function logTransferRejection($organizationId, $approverId, $requestId, $recipientId, $reason = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logTransferRejection($organizationId, $approverId, $requestId, $recipientId, $reason);
+        return self::log(self::ACTION_TRANSFER_REJECT, $organizationId, $approverId, [
+            'request_id' => $requestId,
+            'reason' => $reason,
+        ], $recipientId);
     }
 
-    /**
-     * Log member addition.
-     */
     public static function logMemberAdded($organizationId, $addedBy, $memberId, $role)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logMemberAdded($organizationId, $addedBy, $memberId, $role);
+        return self::log(self::ACTION_MEMBER_ADDED, $organizationId, $addedBy, [
+            'role' => $role,
+        ], $memberId);
     }
 
-    /**
-     * Log member removal.
-     */
     public static function logMemberRemoved($organizationId, $removedBy, $memberId, $reason = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logMemberRemoved($organizationId, $removedBy, $memberId, $reason);
+        return self::log(self::ACTION_MEMBER_REMOVED, $organizationId, $removedBy, [
+            'reason' => $reason,
+        ], $memberId);
     }
 
-    /**
-     * Log role change within an organization.
-     */
     public static function logRoleChanged($organizationId, $changedBy, $memberId, $oldRole, $newRole)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logRoleChanged($organizationId, $changedBy, $memberId, $oldRole, $newRole);
+        return self::log(self::ACTION_MEMBER_ROLE_CHANGED, $organizationId, $changedBy, [
+            'old_role' => $oldRole,
+            'new_role' => $newRole,
+        ], $memberId);
     }
 
-    /**
-     * Log ownership transfer.
-     */
     public static function logOwnershipTransfer($organizationId, $oldOwnerId, $newOwnerId)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logOwnershipTransfer($organizationId, $oldOwnerId, $newOwnerId);
+        return self::log(self::ACTION_OWNERSHIP_TRANSFERRED, $organizationId, $oldOwnerId, [
+            'previous_owner_id' => $oldOwnerId,
+        ], $newOwnerId);
     }
 
-    /**
-     * Log settings change.
-     */
     public static function logSettingsChanged($organizationId, $userId, $changes)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logSettingsChanged($organizationId, $userId, $changes);
+        return self::log(self::ACTION_SETTINGS_CHANGED, $organizationId, $userId, [
+            'changes' => $changes,
+        ]);
     }
 
-    /**
-     * Log limits change.
-     */
     public static function logLimitsChanged($organizationId, $userId, $oldLimits, $newLimits)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logLimitsChanged($organizationId, $userId, $oldLimits, $newLimits);
+        return self::log(self::ACTION_LIMITS_CHANGED, $organizationId, $userId, [
+            'old_limits' => $oldLimits,
+            'new_limits' => $newLimits,
+        ]);
     }
 
-    /**
-     * Log bulk approval.
-     */
     public static function logBulkApproval($organizationId, $approverId, $requestIds, $successCount, $failCount)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logBulkApproval($organizationId, $approverId, $requestIds, $successCount, $failCount);
+        return self::log(self::ACTION_BULK_APPROVE, $organizationId, $approverId, [
+            'request_ids' => $requestIds,
+            'approved_count' => $successCount,
+            'failed_count' => $failCount,
+        ]);
     }
 
-    /**
-     * Log bulk rejection.
-     */
     public static function logBulkRejection($organizationId, $approverId, $requestIds, $successCount, $failCount, $reason = '')
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return null;
-        }
-        return LegacyAuditLogService::logBulkRejection($organizationId, $approverId, $requestIds, $successCount, $failCount, $reason);
+        return self::log(self::ACTION_BULK_REJECT, $organizationId, $approverId, [
+            'request_ids' => $requestIds,
+            'rejected_count' => $successCount,
+            'failed_count' => $failCount,
+            'reason' => $reason,
+        ]);
     }
 
-    // ─── Query helpers (static delegation) ───────────────────────────
+    // ─── Query helpers ───────────────────────────────────────────────
 
     /**
      * Get audit log for an organization.
      */
     public static function getLog($organizationId, $filters = [], $limit = 50, $offset = 0)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
+        $tenantId = TenantContext::getId();
+
+        $query = DB::table('org_audit_log as al')
+            ->leftJoin('users as u', 'al.user_id', '=', 'u.id')
+            ->leftJoin('users as tu', 'al.target_user_id', '=', 'tu.id')
+            ->where('al.tenant_id', $tenantId)
+            ->where('al.organization_id', $organizationId)
+            ->select([
+                'al.*',
+                'u.first_name', 'u.last_name',
+                DB::raw("CONCAT(u.first_name, ' ', u.last_name) as user_name"),
+                DB::raw("tu.first_name as target_first_name"),
+                DB::raw("tu.last_name as target_last_name"),
+                DB::raw("CONCAT(tu.first_name, ' ', tu.last_name) as target_user_name"),
+            ]);
+
+        if (!empty($filters['action'])) {
+            $query->where('al.action', $filters['action']);
+        }
+
+        if (!empty($filters['userId'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('al.user_id', $filters['userId'])
+                  ->orWhere('al.target_user_id', $filters['userId']);
+            });
+        }
+
+        if (!empty($filters['startDate'])) {
+            $query->where('al.created_at', '>=', $filters['startDate'] . ' 00:00:00');
+        }
+
+        if (!empty($filters['endDate'])) {
+            $query->where('al.created_at', '<=', $filters['endDate'] . ' 23:59:59');
+        }
+
+        try {
+            $logs = $query->orderByDesc('al.created_at')
+                ->limit((int) $limit)
+                ->offset((int) $offset)
+                ->get()
+                ->map(function ($row) {
+                    $row = (array) $row;
+                    $row['details'] = $row['details'] ? json_decode($row['details'], true) : [];
+                    return $row;
+                })
+                ->all();
+
+            return $logs;
+        } catch (\Exception $e) {
             return [];
         }
-        return LegacyAuditLogService::getLog($organizationId, $filters, $limit, $offset);
     }
 
     /**
@@ -421,10 +416,28 @@ class AuditLogService
      */
     public static function getLogCount($organizationId, $filters = [])
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
+        $tenantId = TenantContext::getId();
+
+        $query = DB::table('org_audit_log')
+            ->where('tenant_id', $tenantId)
+            ->where('organization_id', $organizationId);
+
+        if (!empty($filters['action'])) {
+            $query->where('action', $filters['action']);
+        }
+
+        if (!empty($filters['userId'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('user_id', $filters['userId'])
+                  ->orWhere('target_user_id', $filters['userId']);
+            });
+        }
+
+        try {
+            return (int) $query->count();
+        } catch (\Exception $e) {
             return 0;
         }
-        return LegacyAuditLogService::getLogCount($organizationId, $filters);
     }
 
     /**
@@ -432,10 +445,22 @@ class AuditLogService
      */
     public static function getActionSummary($organizationId, $days = 30)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
+        $tenantId = TenantContext::getId();
+
+        try {
+            return DB::table('org_audit_log')
+                ->where('tenant_id', $tenantId)
+                ->where('organization_id', $organizationId)
+                ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL {$days} DAY)"))
+                ->select('action', DB::raw('COUNT(*) as count'))
+                ->groupBy('action')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($row) => (array) $row)
+                ->all();
+        } catch (\Exception $e) {
             return [];
         }
-        return LegacyAuditLogService::getActionSummary($organizationId, $days);
     }
 
     /**
@@ -443,10 +468,31 @@ class AuditLogService
      */
     public static function getUserActivity($userId, $limit = 20)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $logs = DB::table('org_audit_log as al')
+                ->leftJoin('vol_organizations as vo', 'al.organization_id', '=', 'vo.id')
+                ->where('al.tenant_id', $tenantId)
+                ->where(function ($q) use ($userId) {
+                    $q->where('al.user_id', $userId)
+                      ->orWhere('al.target_user_id', $userId);
+                })
+                ->select('al.*', 'vo.name as org_name')
+                ->orderByDesc('al.created_at')
+                ->limit($limit)
+                ->get()
+                ->map(function ($row) {
+                    $row = (array) $row;
+                    $row['details'] = $row['details'] ? json_decode($row['details'], true) : [];
+                    return $row;
+                })
+                ->all();
+
+            return $logs;
+        } catch (\Exception $e) {
             return [];
         }
-        return LegacyAuditLogService::getUserActivity($userId, $limit);
     }
 
     /**
@@ -454,10 +500,7 @@ class AuditLogService
      */
     public static function getActionLabel($action)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
-            return $action;
-        }
-        return LegacyAuditLogService::getActionLabel($action);
+        return self::ACTION_LABELS[$action] ?? ucwords(str_replace('_', ' ', $action));
     }
 
     /**
@@ -465,22 +508,61 @@ class AuditLogService
      */
     public static function exportToCSV($organizationId, $filters = [])
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
+        $logs = self::getLog($organizationId, $filters, 10000, 0);
+
+        if (empty($logs)) {
             return '';
         }
-        return LegacyAuditLogService::exportToCSV($organizationId, $filters);
+
+        $output = fopen('php://temp', 'r+');
+        fwrite($output, "\xEF\xBB\xBF"); // UTF-8 BOM
+
+        fputcsv($output, ['Date', 'Action', 'User', 'Target User', 'Details', 'IP Address']);
+
+        foreach ($logs as $log) {
+            $detailsStr = '';
+            if (!empty($log['details'])) {
+                $parts = [];
+                foreach ($log['details'] as $key => $value) {
+                    if (is_array($value)) {
+                        $value = json_encode($value);
+                    }
+                    $parts[] = "$key: $value";
+                }
+                $detailsStr = implode('; ', $parts);
+            }
+
+            fputcsv($output, [
+                $log['created_at'],
+                self::getActionLabel($log['action']),
+                $log['user_name'] ?? 'System',
+                $log['target_user_name'] ?? '-',
+                $detailsStr,
+                $log['ip_address'] ?? '-',
+            ]);
+        }
+
+        rewind($output);
+        $csv = stream_get_contents($output);
+        fclose($output);
+
+        return $csv;
     }
 
     /**
      * Clean up old audit logs.
      *
-     * @return int  Number of deleted entries
+     * @return int Number of deleted entries
      */
     public static function cleanup($daysToKeep = 365)
     {
-        if (!class_exists(LegacyAuditLogService::class)) {
+        try {
+            return DB::table('org_audit_log')
+                ->where('created_at', '<', DB::raw("DATE_SUB(NOW(), INTERVAL {$daysToKeep} DAY)"))
+                ->delete();
+        } catch (\Exception $e) {
+            Log::warning('AuditLogService: Cleanup failed - ' . $e->getMessage());
             return 0;
         }
-        return LegacyAuditLogService::cleanup($daysToKeep);
     }
 }

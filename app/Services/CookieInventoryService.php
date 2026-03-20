@@ -6,59 +6,153 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\CookieInventoryItem;
+use Illuminate\Support\Facades\DB;
+
 /**
- * CookieInventoryService — Laravel DI wrapper for legacy \Nexus\Services\CookieInventoryService.
+ * CookieInventoryService
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Manages the inventory of cookies used by the platform.
+ * Provides information for cookie banners, policy pages, and documentation.
  */
 class CookieInventoryService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy CookieInventoryService::getCookiesByCategory().
+     * Get all cookies for a specific category.
+     *
+     * @param string $category Category (essential, functional, analytics, marketing)
+     * @param int|null $tenantId Tenant ID (null = global cookies only)
+     * @return array
      */
     public function getCookiesByCategory(string $category, ?int $tenantId = null): array
     {
-        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return []; }
-        return \Nexus\Services\CookieInventoryService::getCookiesByCategory($category, $tenantId);
+        $query = CookieInventoryItem::where('category', $category)
+            ->where('is_active', true)
+            ->orderBy('cookie_name');
+
+        if ($tenantId === null) {
+            $query->whereNull('tenant_id');
+        } else {
+            $query->where(function ($q) use ($tenantId) {
+                $q->whereNull('tenant_id')->orWhere('tenant_id', $tenantId);
+            });
+        }
+
+        return $query->get()->toArray();
     }
 
     /**
-     * Delegates to legacy CookieInventoryService::getAllCookies().
+     * Get all cookies grouped by category (for policy page).
+     *
+     * @param int|null $tenantId Tenant ID (null = global only)
+     * @return array Cookies grouped by category
      */
     public function getAllCookies(?int $tenantId = null): array
     {
-        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return []; }
-        return \Nexus\Services\CookieInventoryService::getAllCookies($tenantId);
+        $query = CookieInventoryItem::where('is_active', true)
+            ->orderBy('category')
+            ->orderBy('cookie_name');
+
+        if ($tenantId === null) {
+            $query->whereNull('tenant_id');
+        } else {
+            $query->where(function ($q) use ($tenantId) {
+                $q->whereNull('tenant_id')->orWhere('tenant_id', $tenantId);
+            });
+        }
+
+        $cookies = $query->get();
+
+        $grouped = [
+            'essential' => [],
+            'functional' => [],
+            'analytics' => [],
+            'marketing' => [],
+        ];
+
+        foreach ($cookies as $cookie) {
+            $grouped[$cookie->category][] = $cookie->toArray();
+        }
+
+        return $grouped;
     }
 
     /**
-     * Delegates to legacy CookieInventoryService::getBannerCookieList().
+     * Get cookies formatted for banner display.
+     *
+     * @param int|null $tenantId Tenant ID
+     * @return array Cookies grouped by category
      */
     public function getBannerCookieList(?int $tenantId = null): array
     {
-        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return []; }
-        return \Nexus\Services\CookieInventoryService::getBannerCookieList($tenantId);
+        $tenantId = $tenantId ?? TenantContext::getId();
+        return $this->getAllCookies($tenantId);
     }
 
     /**
-     * Delegates to legacy CookieInventoryService::addCookie().
+     * Add new cookie to inventory (admin only).
+     *
+     * @param array $data Cookie data
+     * @return int Cookie ID
+     * @throws \InvalidArgumentException
      */
     public function addCookie(array $data): int
     {
-        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return 0; }
-        return \Nexus\Services\CookieInventoryService::addCookie($data);
+        $requiredFields = ['cookie_name', 'category', 'purpose', 'duration'];
+        foreach ($requiredFields as $field) {
+            if (empty($data[$field])) {
+                throw new \InvalidArgumentException("Missing required field: {$field}");
+            }
+        }
+
+        $validCategories = ['essential', 'functional', 'analytics', 'marketing'];
+        if (!in_array($data['category'], $validCategories)) {
+            throw new \InvalidArgumentException("Invalid category: {$data['category']}");
+        }
+
+        $cookie = CookieInventoryItem::create([
+            'cookie_name' => $data['cookie_name'],
+            'category' => $data['category'],
+            'purpose' => $data['purpose'],
+            'duration' => $data['duration'],
+            'third_party' => $data['third_party'] ?? 'First-party',
+            'tenant_id' => $data['tenant_id'] ?? null,
+            'is_active' => $data['is_active'] ?? true,
+        ]);
+
+        return $cookie->id;
     }
 
     /**
-     * Delegates to legacy CookieInventoryService::updateCookie().
+     * Update cookie details.
+     *
+     * @param int $id Cookie ID
+     * @param array $data Fields to update
+     * @return bool
      */
     public function updateCookie(int $id, array $data): bool
     {
-        if (!class_exists('Nexus\\Services\\CookieInventoryService')) { return false; }
-        return \Nexus\Services\CookieInventoryService::updateCookie($id, $data);
+        $cookie = CookieInventoryItem::find($id);
+        if (!$cookie) {
+            return false;
+        }
+
+        $allowedFields = ['cookie_name', 'category', 'purpose', 'duration', 'third_party', 'is_active'];
+        $updateData = [];
+
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $updateData[$field] = $data[$field];
+            }
+        }
+
+        if (empty($updateData)) {
+            return false;
+        }
+
+        $cookie->update($updateData);
+
+        return true;
     }
 }

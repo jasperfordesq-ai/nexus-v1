@@ -6,68 +6,324 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+
 /**
- * MemberReportService — Laravel DI wrapper for legacy \Nexus\Services\MemberReportService.
+ * MemberReportService — Comprehensive member reporting for admin dashboards.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Provides active member tracking, registration trends, retention analysis,
+ * engagement metrics, and contributor rankings. All methods are tenant-scoped.
  */
 class MemberReportService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy MemberReportService::getActiveMembers().
+     * Get active members (logged in within N days).
      */
     public function getActiveMembers(int $tenantId, int $days = 30, int $limit = 50, int $offset = 0): array
     {
-        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
-        return \Nexus\Services\MemberReportService::getActiveMembers($tenantId, $days, $limit, $offset);
+        $limit = min(200, max(1, $limit));
+        $offset = max(0, $offset);
+        $cutoff = now()->subDays($days)->toDateTimeString();
+
+        $total = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where('last_login_at', '>=', $cutoff)
+            ->count();
+
+        $rows = DB::table('users as u')
+            ->where('u.tenant_id', $tenantId)
+            ->where('u.status', 'active')
+            ->where('u.last_login_at', '>=', $cutoff)
+            ->select([
+                'u.id', 'u.first_name', 'u.last_name', 'u.email', 'u.last_login_at',
+                'u.created_at', 'u.avatar_url',
+                DB::raw("(SELECT COUNT(*) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = {$tenantId} AND t.status = 'completed') as transaction_count"),
+                DB::raw("(SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed') as hours_given"),
+                DB::raw("(SELECT COALESCE(SUM(t.amount), 0) FROM transactions t WHERE t.receiver_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed') as hours_received"),
+            ])
+            ->orderByDesc('u.last_login_at')
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+
+        $members = $rows->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'name' => trim($row->first_name . ' ' . $row->last_name),
+                'email' => $row->email,
+                'last_login_at' => $row->last_login_at,
+                'created_at' => $row->created_at,
+                'profile_image_url' => $row->avatar_url,
+                'transaction_count' => (int) $row->transaction_count,
+                'hours_given' => round((float) $row->hours_given, 1),
+                'hours_received' => round((float) $row->hours_received, 1),
+            ];
+        })->all();
+
+        return [
+            'members' => $members,
+            'total' => $total,
+            'period_days' => $days,
+        ];
     }
 
     /**
-     * Delegates to legacy MemberReportService::getNewRegistrations().
+     * Get new registrations by period (daily, weekly, monthly).
      */
     public function getNewRegistrations(int $tenantId, string $period = 'monthly', int $months = 12): array
     {
-        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
-        return \Nexus\Services\MemberReportService::getNewRegistrations($tenantId, $period, $months);
+        $from = now()->subMonths($months)->toDateTimeString();
+
+        switch ($period) {
+            case 'daily':
+                $groupBy = DB::raw("DATE(created_at)");
+                $selectAs = DB::raw("DATE(created_at) as period_key");
+                break;
+            case 'weekly':
+                $groupBy = DB::raw("YEARWEEK(created_at, 1)");
+                $selectAs = DB::raw("CONCAT(YEAR(created_at), '-W', LPAD(WEEK(created_at, 1), 2, '0')) as period_key");
+                break;
+            case 'monthly':
+            default:
+                $groupBy = DB::raw("DATE_FORMAT(created_at, '%Y-%m')");
+                $selectAs = DB::raw("DATE_FORMAT(created_at, '%Y-%m') as period_key");
+                break;
+        }
+
+        $data = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', $from)
+            ->select($selectAs, DB::raw('COUNT(*) as registrations'))
+            ->groupBy($groupBy)
+            ->orderBy('period_key')
+            ->get()
+            ->map(fn ($row) => [
+                'period' => $row->period_key,
+                'registrations' => (int) $row->registrations,
+            ])
+            ->all();
+
+        $total = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('created_at', '>=', $from)
+            ->count();
+
+        return [
+            'period_type' => $period,
+            'months_back' => $months,
+            'total_registrations' => $total,
+            'data' => $data,
+        ];
     }
 
     /**
-     * Delegates to legacy MemberReportService::getMemberRetention().
+     * Get member retention metrics.
+     *
+     * Measures what percentage of members who joined N months ago
+     * are still active (logged in within last 30 days).
      */
     public function getMemberRetention(int $tenantId, int $months = 12): array
     {
-        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
-        return \Nexus\Services\MemberReportService::getMemberRetention($tenantId, $months);
+        $cohorts = [];
+        $thirtyDaysAgo = now()->subDays(30)->toDateTimeString();
+
+        for ($i = $months; $i >= 1; $i--) {
+            $cohortStart = now()->subMonths($i)->startOfMonth()->toDateTimeString();
+            $cohortEnd = now()->subMonths($i)->endOfMonth()->toDateTimeString();
+            $cohortLabel = now()->subMonths($i)->format('M Y');
+            $cohortMonth = now()->subMonths($i)->format('Y-m');
+
+            $joined = (int) DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->whereBetween('created_at', [$cohortStart, $cohortEnd])
+                ->count();
+
+            $retained = (int) DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->whereBetween('created_at', [$cohortStart, $cohortEnd])
+                ->where('last_login_at', '>=', $thirtyDaysAgo)
+                ->where('status', 'active')
+                ->count();
+
+            $cohorts[] = [
+                'cohort' => $cohortLabel,
+                'cohort_month' => $cohortMonth,
+                'joined' => $joined,
+                'retained' => $retained,
+                'retention_rate' => $joined > 0 ? round($retained / $joined, 3) : 0,
+            ];
+        }
+
+        $totalJoined = array_sum(array_column($cohorts, 'joined'));
+        $totalRetained = array_sum(array_column($cohorts, 'retained'));
+
+        return [
+            'cohorts' => $cohorts,
+            'overall' => [
+                'total_joined' => $totalJoined,
+                'total_retained' => $totalRetained,
+                'overall_retention_rate' => $totalJoined > 0 ? round($totalRetained / $totalJoined, 3) : 0,
+            ],
+        ];
     }
 
     /**
-     * Delegates to legacy MemberReportService::getEngagementMetrics().
+     * Get engagement metrics overview.
      */
     public function getEngagementMetrics(int $tenantId, int $days = 30): array
     {
-        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
-        return \Nexus\Services\MemberReportService::getEngagementMetrics($tenantId, $days);
+        $cutoff = now()->subDays($days)->toDateTimeString();
+
+        $totalUsers = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->count();
+
+        $loggedIn = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where('last_login_at', '>=', $cutoff)
+            ->count();
+
+        $traders = (int) DB::table(DB::raw(
+            "(SELECT sender_id as user_id FROM transactions WHERE tenant_id = {$tenantId} AND created_at >= '{$cutoff}' AND status = 'completed'
+              UNION
+              SELECT receiver_id as user_id FROM transactions WHERE tenant_id = {$tenantId} AND created_at >= '{$cutoff}' AND status = 'completed') t"
+        ))->distinct()->count('user_id');
+
+        $posts = 0;
+        try {
+            $posts = (int) DB::table('feed_posts')
+                ->where('tenant_id', $tenantId)
+                ->where('created_at', '>=', $cutoff)
+                ->count();
+        } catch (\Exception $e) {}
+
+        $comments = 0;
+        try {
+            $comments = (int) DB::table('comments')
+                ->where('tenant_id', $tenantId)
+                ->where('created_at', '>=', $cutoff)
+                ->count();
+        } catch (\Exception $e) {}
+
+        $rsvps = 0;
+        try {
+            $rsvps = (int) DB::table('event_rsvps')
+                ->where('tenant_id', $tenantId)
+                ->where('created_at', '>=', $cutoff)
+                ->where('status', 'going')
+                ->count();
+        } catch (\Exception $e) {}
+
+        $connections = 0;
+        try {
+            $connections = (int) DB::table('connections')
+                ->where('tenant_id', $tenantId)
+                ->where('created_at', '>=', $cutoff)
+                ->where('status', 'accepted')
+                ->count();
+        } catch (\Exception $e) {}
+
+        return [
+            'period_days' => $days,
+            'total_users' => $totalUsers,
+            'active_users' => $loggedIn,
+            'login_rate' => $totalUsers > 0 ? round($loggedIn / $totalUsers, 3) : 0,
+            'trading_users' => $traders,
+            'trading_rate' => $totalUsers > 0 ? round($traders / $totalUsers, 3) : 0,
+            'posts_created' => $posts,
+            'comments_created' => $comments,
+            'event_rsvps' => $rsvps,
+            'new_connections' => $connections,
+        ];
     }
 
     /**
-     * Delegates to legacy MemberReportService::getTopContributors().
+     * Get top contributors.
      */
     public function getTopContributors(int $tenantId, int $days = 30, int $limit = 20): array
     {
-        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
-        return \Nexus\Services\MemberReportService::getTopContributors($tenantId, $days, $limit);
+        $limit = min(100, max(1, $limit));
+        $cutoff = now()->subDays($days)->toDateTimeString();
+
+        $rows = DB::table('users as u')
+            ->where('u.tenant_id', $tenantId)
+            ->where('u.status', 'active')
+            ->select([
+                'u.id', 'u.first_name', 'u.last_name', 'u.avatar_url',
+                DB::raw("COALESCE((SELECT SUM(t.amount) FROM transactions t WHERE t.sender_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed' AND t.created_at >= '{$cutoff}'), 0) as hours_given"),
+                DB::raw("COALESCE((SELECT SUM(t.amount) FROM transactions t WHERE t.receiver_id = u.id AND t.tenant_id = {$tenantId} AND t.status = 'completed' AND t.created_at >= '{$cutoff}'), 0) as hours_received"),
+                DB::raw("COALESCE((SELECT COUNT(*) FROM transactions t WHERE (t.sender_id = u.id OR t.receiver_id = u.id) AND t.tenant_id = {$tenantId} AND t.status = 'completed' AND t.created_at >= '{$cutoff}'), 0) as transaction_count"),
+            ])
+            ->havingRaw('(hours_given + hours_received) > 0')
+            ->orderByRaw('(hours_given + hours_received) DESC')
+            ->limit($limit)
+            ->get();
+
+        return $rows->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'name' => trim($row->first_name . ' ' . $row->last_name),
+                'profile_image_url' => $row->avatar_url,
+                'hours_given' => round((float) $row->hours_given, 1),
+                'hours_received' => round((float) $row->hours_received, 1),
+                'total_hours' => round((float) $row->hours_given + (float) $row->hours_received, 1),
+                'transaction_count' => (int) $row->transaction_count,
+            ];
+        })->all();
     }
 
     /**
-     * Delegates to legacy MemberReportService::getLeastActiveMembers().
+     * Get least active members.
      */
-    public function getLeastActiveMembers(int $tenantId, int $days = 30, int $limit = 50, int $offset = 0): array
+    public function getLeastActiveMembers(int $tenantId, int $days = 90, int $limit = 50, int $offset = 0): array
     {
-        if (!class_exists('\Nexus\Services\MemberReportService')) { return []; }
-        return \Nexus\Services\MemberReportService::getLeastActiveMembers($tenantId, $days, $limit, $offset);
+        $limit = min(200, max(1, $limit));
+        $offset = max(0, $offset);
+        $cutoff = now()->subDays($days)->toDateTimeString();
+
+        $total = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->where(function ($q) use ($cutoff) {
+                $q->whereNull('last_login_at')
+                  ->orWhere('last_login_at', '<', $cutoff);
+            })
+            ->count();
+
+        $rows = DB::table('users as u')
+            ->where('u.tenant_id', $tenantId)
+            ->where('u.status', 'active')
+            ->where(function ($q) use ($cutoff) {
+                $q->whereNull('u.last_login_at')
+                  ->orWhere('u.last_login_at', '<', $cutoff);
+            })
+            ->select('u.id', 'u.first_name', 'u.last_name', 'u.email', 'u.last_login_at', 'u.created_at')
+            ->orderBy('u.last_login_at')
+            ->orderBy('u.created_at')
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+
+        $members = $rows->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'name' => trim($row->first_name . ' ' . $row->last_name),
+                'email' => $row->email,
+                'last_login_at' => $row->last_login_at,
+                'created_at' => $row->created_at,
+                'days_inactive' => $row->last_login_at
+                    ? (int) ((time() - strtotime($row->last_login_at)) / 86400)
+                    : null,
+            ];
+        })->all();
+
+        return [
+            'members' => $members,
+            'total' => $total,
+            'threshold_days' => $days,
+        ];
     }
 }

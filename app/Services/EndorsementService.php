@@ -6,16 +6,26 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\SkillEndorsement;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
  * EndorsementService — Laravel DI-based service for skill endorsements.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\EndorsementService.
  * Manages LinkedIn-style skill endorsements between members.
+ * All queries are tenant-scoped via HasTenantScope trait.
  */
 class EndorsementService
 {
+    /** @var array Collected errors from the last operation */
+    private array $errors = [];
+
+    public function __construct(
+        private readonly SkillEndorsement $endorsement,
+    ) {}
+
     /**
      * Endorse a member's skill.
      *
@@ -23,8 +33,57 @@ class EndorsementService
      */
     public function endorse(int $endorserId, int $endorsedId, string $skillName, ?int $skillId = null, ?string $comment = null): ?int
     {
-        if (!class_exists('\Nexus\Services\EndorsementService')) { return null; }
-        return \Nexus\Services\EndorsementService::endorse($endorserId, $endorsedId, $skillName, $skillId, $comment);
+        $this->errors = [];
+
+        // Cannot endorse yourself
+        if ($endorserId === $endorsedId) {
+            $this->errors[] = ['code' => 'SELF_ENDORSEMENT', 'message' => 'You cannot endorse yourself'];
+            return null;
+        }
+
+        // Validate skill name
+        $skillName = trim($skillName);
+        if (empty($skillName) || strlen($skillName) > 100) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Skill name is required (max 100 chars)', 'field' => 'skill_name'];
+            return null;
+        }
+
+        // Check endorsed user exists in same tenant
+        $endorsed = User::where('id', $endorsedId)->first(['id', 'first_name', 'last_name']);
+        if (!$endorsed) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Member not found'];
+            return null;
+        }
+
+        // Check for existing endorsement
+        $existing = $this->endorsement->newQuery()
+            ->where('endorser_id', $endorserId)
+            ->where('endorsed_id', $endorsedId)
+            ->where('skill_name', $skillName)
+            ->exists();
+
+        if ($existing) {
+            $this->errors[] = ['code' => 'ALREADY_ENDORSED', 'message' => 'You have already endorsed this skill'];
+            return null;
+        }
+
+        // Validate comment length
+        if ($comment !== null) {
+            $comment = trim($comment);
+            if (strlen($comment) > 500) {
+                $comment = substr($comment, 0, 500);
+            }
+        }
+
+        $endorsementRecord = $this->endorsement->newQuery()->create([
+            'endorser_id' => $endorserId,
+            'endorsed_id' => $endorsedId,
+            'skill_id' => $skillId,
+            'skill_name' => $skillName,
+            'comment' => $comment,
+        ]);
+
+        return $endorsementRecord->id;
     }
 
     /**
@@ -32,7 +91,7 @@ class EndorsementService
      */
     public function removeEndorsement(int $endorserId, int $endorsedId, string $skillName): bool
     {
-        return DB::table('skill_endorsements')
+        return $this->endorsement->newQuery()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
@@ -44,26 +103,25 @@ class EndorsementService
      */
     public function getEndorsements(int $userId): array
     {
-        $rows = DB::table('skill_endorsements as se')
-            ->leftJoin('users as u', 'se.endorser_id', '=', 'u.id')
-            ->where('se.endorsed_id', $userId)
-            ->select('se.*', 'u.first_name', 'u.last_name', 'u.avatar_url')
-            ->orderBy('se.skill_name')
-            ->orderByDesc('se.created_at')
+        $rows = $this->endorsement->newQuery()
+            ->with(['endorser:id,first_name,last_name,avatar_url'])
+            ->where('endorsed_id', $userId)
+            ->orderBy('skill_name')
+            ->orderByDesc('created_at')
             ->get();
 
         $grouped = [];
         foreach ($rows as $row) {
             $skill = $row->skill_name;
-            if (! isset($grouped[$skill])) {
+            if (!isset($grouped[$skill])) {
                 $grouped[$skill] = ['skill_name' => $skill, 'count' => 0, 'endorsers' => []];
             }
             $grouped[$skill]['count']++;
             $grouped[$skill]['endorsers'][] = [
-                'id'         => $row->endorser_id,
-                'name'       => trim($row->first_name . ' ' . $row->last_name),
-                'avatar_url' => $row->avatar_url,
-                'comment'    => $row->comment,
+                'id' => $row->endorser_id,
+                'name' => $row->endorser ? trim(($row->endorser->first_name ?? '') . ' ' . ($row->endorser->last_name ?? '')) : null,
+                'avatar_url' => $row->endorser->avatar_url ?? null,
+                'comment' => $row->comment,
             ];
         }
 
@@ -75,7 +133,7 @@ class EndorsementService
      */
     public function hasEndorsed(int $endorserId, int $endorsedId, string $skillName): bool
     {
-        return DB::table('skill_endorsements')
+        return $this->endorsement->newQuery()
             ->where('endorser_id', $endorserId)
             ->where('endorsed_id', $endorsedId)
             ->where('skill_name', $skillName)
@@ -83,47 +141,108 @@ class EndorsementService
     }
 
     /**
-     * Delegates to legacy EndorsementService::getErrors().
+     * Get collected errors from the last operation.
      */
     public function getErrors(): array
     {
-        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
-        return \Nexus\Services\EndorsementService::getErrors();
+        return $this->errors;
     }
 
     /**
-     * Delegates to legacy EndorsementService::getSkillEndorsements().
+     * Get detailed endorsements for a specific skill.
      */
     public function getSkillEndorsements(int $userId, string $skillName): array
     {
-        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
-        return \Nexus\Services\EndorsementService::getSkillEndorsements($userId, $skillName);
+        return $this->endorsement->newQuery()
+            ->with(['endorser:id,first_name,last_name,avatar_url'])
+            ->where('endorsed_id', $userId)
+            ->where('skill_name', $skillName)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn (SkillEndorsement $se) => [
+                'id' => $se->id,
+                'comment' => $se->comment,
+                'created_at' => $se->created_at?->toDateTimeString(),
+                'endorser_id' => $se->endorser_id,
+                'endorser_name' => $se->endorser ? trim(($se->endorser->first_name ?? '') . ' ' . ($se->endorser->last_name ?? '')) : null,
+                'endorser_avatar' => $se->endorser->avatar_url ?? null,
+            ])
+            ->all();
     }
 
     /**
-     * Delegates to legacy EndorsementService::getEndorsementsForUser().
+     * Get endorsements received by a user, grouped by skill (with endorser details).
      */
     public function getEndorsementsForUser(int $userId): array
     {
-        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
-        return \Nexus\Services\EndorsementService::getEndorsementsForUser($userId);
+        $rows = DB::table('skill_endorsements as se')
+            ->join('users as u', 'se.endorser_id', '=', 'u.id')
+            ->where('se.endorsed_id', $userId)
+            ->where('se.tenant_id', TenantContext::getId())
+            ->select(
+                'se.skill_name',
+                DB::raw('COUNT(*) as count'),
+                DB::raw("GROUP_CONCAT(CONCAT(u.first_name, ' ', u.last_name) ORDER BY se.created_at DESC SEPARATOR ', ') as endorsed_by_names"),
+                DB::raw('GROUP_CONCAT(u.id ORDER BY se.created_at DESC) as endorsed_by_ids'),
+                DB::raw('GROUP_CONCAT(u.avatar_url ORDER BY se.created_at DESC) as endorsed_by_avatars'),
+                DB::raw('MAX(se.created_at) as latest_endorsement')
+            )
+            ->groupBy('se.skill_name')
+            ->orderByDesc('count')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
+
+        return $rows;
     }
 
     /**
-     * Delegates to legacy EndorsementService::getStats().
+     * Get endorsement stats for a user (for badges).
      */
     public function getStats(int $userId): array
     {
-        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
-        return \Nexus\Services\EndorsementService::getStats($userId);
+        $received = (int) $this->endorsement->newQuery()
+            ->where('endorsed_id', $userId)
+            ->count();
+
+        $given = (int) $this->endorsement->newQuery()
+            ->where('endorser_id', $userId)
+            ->count();
+
+        $uniqueSkills = (int) $this->endorsement->newQuery()
+            ->where('endorsed_id', $userId)
+            ->distinct('skill_name')
+            ->count('skill_name');
+
+        return [
+            'endorsements_received' => $received,
+            'endorsements_given' => $given,
+            'skills_endorsed' => $uniqueSkills,
+        ];
     }
 
     /**
-     * Delegates to legacy EndorsementService::getTopEndorsedMembers().
+     * Get top endorsed members across the tenant.
      */
     public function getTopEndorsedMembers(int $limit = 10): array
     {
-        if (!class_exists('\Nexus\Services\EndorsementService')) { return []; }
-        return \Nexus\Services\EndorsementService::getTopEndorsedMembers($limit);
+        $tenantId = TenantContext::getId();
+
+        return DB::table('skill_endorsements as se')
+            ->join('users as u', 'se.endorsed_id', '=', 'u.id')
+            ->where('se.tenant_id', $tenantId)
+            ->select(
+                'se.endorsed_id as user_id',
+                DB::raw("CONCAT(u.first_name, ' ', u.last_name) as name"),
+                'u.avatar_url',
+                DB::raw('COUNT(*) as total_endorsements'),
+                DB::raw('COUNT(DISTINCT se.skill_name) as skills_endorsed')
+            )
+            ->groupBy('se.endorsed_id', 'u.first_name', 'u.last_name', 'u.avatar_url')
+            ->orderByDesc('total_endorsements')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
     }
 }

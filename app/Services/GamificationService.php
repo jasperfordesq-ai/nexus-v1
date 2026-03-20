@@ -6,14 +6,29 @@
 
 namespace App\Services;
 
+use App\Models\Connection;
+use App\Models\Event;
+use App\Models\EventRsvp;
+use App\Models\FeedPost;
+use App\Models\GroupMember;
+use App\Models\Listing;
+use App\Models\Message;
+use App\Models\Notification;
+use App\Models\Review;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserBadge;
+use App\Models\UserStreak;
+use App\Models\UserXpLog;
+use App\Models\VolLog;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * GamificationService — Eloquent-based service for gamification.
  *
  * XP is tracked on the users table (xp/points column). Badges in user_badges.
+ * All queries are tenant-scoped via HasTenantScope trait on models.
  */
 class GamificationService
 {
@@ -30,6 +45,12 @@ class GamificationService
         'create_group'         => 50,
         'create_post'          => 5,
         'daily_login'          => 5,
+        'complete_profile'     => 50,
+        'earn_badge'           => 25,
+        'vote_poll'            => 2,
+        'send_message'         => 2,
+        'make_connection'      => 10,
+        'complete_goal'        => 10,
     ];
 
     public const LEVEL_THRESHOLDS = [
@@ -37,10 +58,19 @@ class GamificationService
         6 => 1500, 7 => 2200, 8 => 3000, 9 => 4000, 10 => 5500,
     ];
 
+    /**
+     * Cache for badge definitions to avoid repeated array creation.
+     */
+    private static ?array $badgeDefinitionsCache = null;
+
     public function __construct(
         private readonly User $user,
         private readonly UserBadge $userBadge,
     ) {}
+
+    // =========================================================================
+    // PROFILE & LEADERBOARD (already Eloquent, kept as-is)
+    // =========================================================================
 
     /**
      * Get gamification profile for a user (XP, level, badge count, showcased badges).
@@ -78,13 +108,11 @@ class GamificationService
             ->get()
             ->toArray();
 
-        // Enrich showcased with definitions from legacy service if available
+        // Enrich showcased with badge definitions
         foreach ($showcased as &$badge) {
-            if (class_exists('\Nexus\Services\GamificationService')) {
-                $def = \Nexus\Services\GamificationService::getBadgeByKey($badge['badge_key']);
-                if ($def) {
-                    $badge = array_merge($badge, $def);
-                }
+            $def = self::getBadgeByKey($badge['badge_key']);
+            if ($def) {
+                $badge = array_merge($badge, $def);
             }
         }
 
@@ -121,12 +149,10 @@ class GamificationService
             ->toArray();
 
         foreach ($badges as &$badge) {
-            if (class_exists('\Nexus\Services\GamificationService')) {
-                $def = \Nexus\Services\GamificationService::getBadgeByKey($badge['badge_key']);
-                if ($def) {
-                    $badge = array_merge($badge, $def);
-                    $badge['description'] = $badge['msg'] ?? $badge['description'] ?? null;
-                }
+            $def = self::getBadgeByKey($badge['badge_key']);
+            if ($def) {
+                $badge = array_merge($badge, $def);
+                $badge['description'] = $badge['msg'] ?? $badge['description'] ?? null;
             }
         }
 
@@ -163,8 +189,6 @@ class GamificationService
 
     /**
      * Claim daily login reward (idempotent per calendar day).
-     *
-     * @return array|null Reward data, or null if already claimed
      */
     public function claimDailyReward(int $userId, ?int $tenantId = null): ?array
     {
@@ -181,7 +205,8 @@ class GamificationService
         }
 
         $xp = self::XP_VALUES['daily_login'];
-        DB::table('users')->where('id', $userId)->increment('xp', $xp);
+
+        $this->user->newQuery()->where('id', $userId)->increment('xp', $xp);
 
         DB::table('activity_log')->insert([
             'user_id'     => $userId,
@@ -195,93 +220,651 @@ class GamificationService
     }
 
     // =========================================================================
-    // Legacy delegation methods — used by AdminGamificationController
+    // BADGE DEFINITIONS (static, no DB needed)
     // =========================================================================
 
     /**
-     * Delegates to legacy GamificationService::getBadgeDefinitions().
+     * Get all system badge definitions.
      */
     public function getBadgeDefinitions(): array
     {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return []; }
-        return \Nexus\Services\GamificationService::getBadgeDefinitions();
+        return self::getStaticBadgeDefinitions();
     }
 
     /**
-     * Delegates to legacy GamificationService::runAllBadgeChecks().
+     * Static accessor for badge definitions (used by other services).
      */
-    public function runAllBadgeChecks(int $userId): void
+    public static function getStaticBadgeDefinitions(): array
     {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
-        \Nexus\Services\GamificationService::runAllBadgeChecks($userId);
+        if (self::$badgeDefinitionsCache !== null) {
+            return self::$badgeDefinitionsCache;
+        }
+
+        self::$badgeDefinitionsCache = [
+            // VOLUNTEERING BADGES
+            ['key' => 'vol_1h',    'name' => 'First Steps',       'icon' => "\xF0\x9F\x91\xA3", 'type' => 'vol', 'threshold' => 1, 'msg' => 'logging your first volunteer hour'],
+            ['key' => 'vol_10h',   'name' => 'Helping Hand',      'icon' => "\xF0\x9F\xA4\xB2", 'type' => 'vol', 'threshold' => 10, 'msg' => 'volunteering 10 hours'],
+            ['key' => 'vol_50h',   'name' => 'Change Maker',      'icon' => "\xF0\x9F\x8C\x8D", 'type' => 'vol', 'threshold' => 50, 'msg' => 'volunteering 50 hours'],
+            ['key' => 'vol_100h',  'name' => 'TimeBank Legend',   'icon' => "\xF0\x9F\x91\x91", 'type' => 'vol', 'threshold' => 100, 'msg' => 'volunteering 100 hours'],
+            ['key' => 'vol_250h',  'name' => 'Volunteer Hero',    'icon' => "\xF0\x9F\xA6\xB8", 'type' => 'vol', 'threshold' => 250, 'msg' => 'volunteering 250 hours'],
+            ['key' => 'vol_500h',  'name' => 'Volunteer Champion','icon' => "\xF0\x9F\x8F\x85", 'type' => 'vol', 'threshold' => 500, 'msg' => 'volunteering 500 hours'],
+
+            // LISTING BADGES (Offers)
+            ['key' => 'offer_1',   'name' => 'First Offer',       'icon' => "\xF0\x9F\x8E\x81", 'type' => 'offer', 'threshold' => 1, 'msg' => 'posting your first offer'],
+            ['key' => 'offer_5',   'name' => 'Generous Soul',     'icon' => "\xF0\x9F\xA4\x9D", 'type' => 'offer', 'threshold' => 5, 'msg' => 'posting 5 offers'],
+            ['key' => 'offer_10',  'name' => 'Gift Giver',        'icon' => "\xF0\x9F\x8E\x80", 'type' => 'offer', 'threshold' => 10, 'msg' => 'posting 10 offers'],
+            ['key' => 'offer_25',  'name' => 'Offer Master',      'icon' => "\xF0\x9F\x8C\x9F", 'type' => 'offer', 'threshold' => 25, 'msg' => 'posting 25 offers'],
+
+            // LISTING BADGES (Requests)
+            ['key' => 'request_1', 'name' => 'First Request',     'icon' => "\xF0\x9F\x99\x8B", 'type' => 'request', 'threshold' => 1, 'msg' => 'posting your first request'],
+            ['key' => 'request_5', 'name' => 'Community Seeker',  'icon' => "\xF0\x9F\x97\xA3\xEF\xB8\x8F", 'type' => 'request', 'threshold' => 5, 'msg' => 'making 5 requests'],
+            ['key' => 'request_10','name' => 'Active Requester',  'icon' => "\xF0\x9F\x93\xA2", 'type' => 'request', 'threshold' => 10, 'msg' => 'making 10 requests'],
+
+            // EARNING BADGES
+            ['key' => 'earn_1',    'name' => 'First Earn',        'icon' => "\xF0\x9F\xAA\x99", 'type' => 'earn', 'threshold' => 1, 'msg' => 'earning your first time credit'],
+            ['key' => 'earn_10',   'name' => 'Go Getter',         'icon' => "\xF0\x9F\x9A\x80", 'type' => 'earn', 'threshold' => 10, 'msg' => 'earning 10 time credits'],
+            ['key' => 'earn_50',   'name' => 'Credit Builder',    'icon' => "\xE2\x9A\xA1", 'type' => 'earn', 'threshold' => 50, 'msg' => 'earning 50 time credits'],
+            ['key' => 'earn_100',  'name' => 'Centurion',         'icon' => "\xF0\x9F\x92\xAF", 'type' => 'earn', 'threshold' => 100, 'msg' => 'earning 100 time credits'],
+            ['key' => 'earn_250',  'name' => 'Credit Master',     'icon' => "\xF0\x9F\x92\x8E", 'type' => 'earn', 'threshold' => 250, 'msg' => 'earning 250 time credits'],
+
+            // SPENDING BADGES
+            ['key' => 'spend_1',   'name' => 'First Spend',       'icon' => "\xF0\x9F\x92\xB8", 'type' => 'spend', 'threshold' => 1, 'msg' => 'spending your first time credit'],
+            ['key' => 'spend_10',  'name' => 'Active Spender',    'icon' => "\xF0\x9F\x92\xB3", 'type' => 'spend', 'threshold' => 10, 'msg' => 'spending 10 time credits'],
+            ['key' => 'spend_50',  'name' => 'Generous Spender',  'icon' => "\xF0\x9F\x8E\x8A", 'type' => 'spend', 'threshold' => 50, 'msg' => 'spending 50 time credits'],
+
+            // TRANSACTION BADGES
+            ['key' => 'transaction_1',  'name' => 'First Exchange',   'icon' => "\xF0\x9F\x94\x84", 'type' => 'transaction', 'threshold' => 1, 'msg' => 'completing your first transaction'],
+            ['key' => 'transaction_10', 'name' => 'Active Trader',    'icon' => "\xF0\x9F\x93\x8A", 'type' => 'transaction', 'threshold' => 10, 'msg' => 'completing 10 transactions'],
+            ['key' => 'transaction_50', 'name' => 'Exchange Master',  'icon' => "\xF0\x9F\x92\xB1", 'type' => 'transaction', 'threshold' => 50, 'msg' => 'completing 50 transactions'],
+
+            // DIVERSITY BADGES
+            ['key' => 'diversity_3',  'name' => 'Community Helper',   'icon' => "\xF0\x9F\x8C\x88", 'type' => 'diversity', 'threshold' => 3, 'msg' => 'helping 3 different people'],
+            ['key' => 'diversity_10', 'name' => 'Diverse Giver',      'icon' => "\xF0\x9F\x8C\x90", 'type' => 'diversity', 'threshold' => 10, 'msg' => 'helping 10 different people'],
+            ['key' => 'diversity_25', 'name' => 'Community Pillar',   'icon' => "\xF0\x9F\x8F\x9B\xEF\xB8\x8F", 'type' => 'diversity', 'threshold' => 25, 'msg' => 'helping 25 different people'],
+
+            // CONNECTION BADGES
+            ['key' => 'connect_1',  'name' => 'First Friend',       'icon' => "\xF0\x9F\x91\x8B", 'type' => 'connection', 'threshold' => 1, 'msg' => 'making your first connection'],
+            ['key' => 'connect_10', 'name' => 'Social Butterfly',   'icon' => "\xF0\x9F\xA6\x8B", 'type' => 'connection', 'threshold' => 10, 'msg' => 'making 10 connections'],
+            ['key' => 'connect_25', 'name' => 'Network Builder',    'icon' => "\xF0\x9F\x95\xB8\xEF\xB8\x8F", 'type' => 'connection', 'threshold' => 25, 'msg' => 'making 25 connections'],
+            ['key' => 'connect_50', 'name' => 'Community Connector','icon' => "\xF0\x9F\x94\x97", 'type' => 'connection', 'threshold' => 50, 'msg' => 'making 50 connections'],
+
+            // MESSAGE BADGES
+            ['key' => 'msg_1',    'name' => 'Conversation Starter', 'icon' => "\xF0\x9F\x92\xAC", 'type' => 'message', 'threshold' => 1, 'msg' => 'sending your first message'],
+            ['key' => 'msg_50',   'name' => 'Active Communicator',  'icon' => "\xF0\x9F\x93\xB1", 'type' => 'message', 'threshold' => 50, 'msg' => 'sending 50 messages'],
+            ['key' => 'msg_200',  'name' => 'Communication Pro',    'icon' => "\xF0\x9F\x93\xA8", 'type' => 'message', 'threshold' => 200, 'msg' => 'sending 200 messages'],
+
+            // REVIEW BADGES
+            ['key' => 'review_1',  'name' => 'First Feedback',     'icon' => "\xE2\xAD\x90", 'type' => 'review_given', 'threshold' => 1, 'msg' => 'leaving your first review'],
+            ['key' => 'review_10', 'name' => 'Trusted Reviewer',   'icon' => "\xF0\x9F\x93\x9D", 'type' => 'review_given', 'threshold' => 10, 'msg' => 'leaving 10 reviews'],
+            ['key' => 'review_25', 'name' => 'Review Expert',      'icon' => "\xF0\x9F\x8E\xAF", 'type' => 'review_given', 'threshold' => 25, 'msg' => 'leaving 25 reviews'],
+
+            // 5-STAR BADGES
+            ['key' => '5star_1',   'name' => 'First 5-Star',       'icon' => "\xF0\x9F\x8C\x9F", 'type' => '5star', 'threshold' => 1, 'msg' => 'receiving your first 5-star review'],
+            ['key' => '5star_10',  'name' => 'Highly Rated',       'icon' => "\xF0\x9F\x8F\x86", 'type' => '5star', 'threshold' => 10, 'msg' => 'receiving 10 five-star reviews'],
+            ['key' => '5star_25',  'name' => 'Excellence Award',   'icon' => "\xF0\x9F\x91\x8F", 'type' => '5star', 'threshold' => 25, 'msg' => 'receiving 25 five-star reviews'],
+
+            // EVENT BADGES
+            ['key' => 'event_attend_1',  'name' => 'First Event',      'icon' => "\xF0\x9F\x8E\x9F\xEF\xB8\x8F", 'type' => 'event_attend', 'threshold' => 1, 'msg' => 'attending your first event'],
+            ['key' => 'event_attend_10', 'name' => 'Event Regular',    'icon' => "\xF0\x9F\x93\x85", 'type' => 'event_attend', 'threshold' => 10, 'msg' => 'attending 10 events'],
+            ['key' => 'event_attend_25', 'name' => 'Event Enthusiast', 'icon' => "\xF0\x9F\x8E\x89", 'type' => 'event_attend', 'threshold' => 25, 'msg' => 'attending 25 events'],
+            ['key' => 'event_host_1',    'name' => 'Event Host',       'icon' => "\xF0\x9F\x8E\xA4", 'type' => 'event_host', 'threshold' => 1, 'msg' => 'hosting your first event'],
+            ['key' => 'event_host_5',    'name' => 'Event Organizer',  'icon' => "\xF0\x9F\x8E\xAA", 'type' => 'event_host', 'threshold' => 5, 'msg' => 'hosting 5 events'],
+
+            // GROUP BADGES
+            ['key' => 'group_join_1',  'name' => 'Team Player',        'icon' => "\xF0\x9F\x91\xA5", 'type' => 'group_join', 'threshold' => 1, 'msg' => 'joining your first group'],
+            ['key' => 'group_join_5',  'name' => 'Community Member',   'icon' => "\xF0\x9F\x8F\x98\xEF\xB8\x8F", 'type' => 'group_join', 'threshold' => 5, 'msg' => 'joining 5 groups'],
+            ['key' => 'group_create',  'name' => 'Group Founder',      'icon' => "\xF0\x9F\x9A\x80", 'type' => 'group_create', 'threshold' => 1, 'msg' => 'creating your first group'],
+
+            // POST BADGES
+            ['key' => 'post_1',   'name' => 'First Post',          'icon' => "\xE2\x9C\x8F\xEF\xB8\x8F", 'type' => 'post', 'threshold' => 1, 'msg' => 'creating your first post'],
+            ['key' => 'post_25',  'name' => 'Content Creator',     'icon' => "\xF0\x9F\x93\xB0", 'type' => 'post', 'threshold' => 25, 'msg' => 'creating 25 posts'],
+            ['key' => 'post_100', 'name' => 'Prolific Poster',     'icon' => "\xF0\x9F\x93\x9A", 'type' => 'post', 'threshold' => 100, 'msg' => 'creating 100 posts'],
+
+            // LIKES RECEIVED BADGES
+            ['key' => 'likes_50',  'name' => 'Getting Noticed',    'icon' => "\xE2\x9D\xA4\xEF\xB8\x8F", 'type' => 'likes_received', 'threshold' => 50, 'msg' => 'receiving 50 likes'],
+            ['key' => 'likes_200', 'name' => 'Popular Voice',      'icon' => "\xF0\x9F\x92\x95", 'type' => 'likes_received', 'threshold' => 200, 'msg' => 'receiving 200 likes'],
+
+            // PROFILE & LOYALTY BADGES
+            ['key' => 'profile_complete', 'name' => 'Profile Pro',    'icon' => "\xF0\x9F\x91\xA4", 'type' => 'profile', 'threshold' => 100, 'msg' => 'completing your profile'],
+            ['key' => 'member_30d',  'name' => 'Monthly Member',      'icon' => "\xF0\x9F\x93\x86", 'type' => 'membership', 'threshold' => 30, 'msg' => 'being a member for 30 days'],
+            ['key' => 'member_180d', 'name' => 'Semester Member',     'icon' => "\xF0\x9F\x93\x85", 'type' => 'membership', 'threshold' => 180, 'msg' => 'being a member for 6 months'],
+            ['key' => 'member_365d', 'name' => 'Annual Member',       'icon' => "\xF0\x9F\x8E\x82", 'type' => 'membership', 'threshold' => 365, 'msg' => 'being a member for one year'],
+
+            // STREAK BADGES
+            ['key' => 'streak_7d',   'name' => 'Week Warrior',       'icon' => "\xF0\x9F\x94\xA5", 'type' => 'streak', 'threshold' => 7, 'msg' => 'maintaining a 7-day streak'],
+            ['key' => 'streak_30d',  'name' => 'Monthly Dedication', 'icon' => "\xF0\x9F\x94\xA5", 'type' => 'streak', 'threshold' => 30, 'msg' => 'maintaining a 30-day streak'],
+            ['key' => 'streak_100d', 'name' => 'Streak Master',      'icon' => "\xF0\x9F\x94\xA5", 'type' => 'streak', 'threshold' => 100, 'msg' => 'maintaining a 100-day streak'],
+            ['key' => 'streak_365d', 'name' => 'Year-Long Legend',   'icon' => "\xF0\x9F\x94\xA5", 'type' => 'streak', 'threshold' => 365, 'msg' => 'maintaining a 365-day streak'],
+
+            // LEVEL BADGES
+            ['key' => 'level_5',  'name' => 'Rising Star',         'icon' => "\xF0\x9F\x8C\x9F", 'type' => 'level', 'threshold' => 5, 'msg' => 'reaching level 5'],
+            ['key' => 'level_10', 'name' => 'Community Champion',  'icon' => "\xF0\x9F\x8F\x86", 'type' => 'level', 'threshold' => 10, 'msg' => 'reaching level 10'],
+
+            // SPECIAL BADGES
+            ['key' => 'early_adopter', 'name' => 'Early Adopter',   'icon' => "\xF0\x9F\x8C\xB1", 'type' => 'special', 'threshold' => 0, 'msg' => 'being an early adopter'],
+            ['key' => 'verified',      'name' => 'Verified Member', 'icon' => "\xE2\x9C\x85", 'type' => 'special', 'threshold' => 0, 'msg' => 'being a verified member'],
+            ['key' => 'volunteer_org', 'name' => 'Organization Partner', 'icon' => "\xF0\x9F\x8F\xA2", 'type' => 'vol_org', 'threshold' => 1, 'msg' => 'creating a volunteer organization'],
+        ];
+
+        return self::$badgeDefinitionsCache;
     }
 
     /**
-     * Delegates to legacy GamificationService::awardBadgeByKey().
+     * Get badge definition by key.
      */
-    public function awardBadgeByKey(int $userId, string $badgeKey): void
+    public static function getBadgeByKey(string $key): ?array
     {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
-        \Nexus\Services\GamificationService::awardBadgeByKey($userId, $badgeKey);
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['key'] === $key) {
+                return $def;
+            }
+        }
+        return null;
     }
 
-    /**
-     * Delegates to legacy GamificationService::getBadgeProgress().
-     *
-     * Returns badge progress data for a user (earned vs. available badges).
-     */
-    public function getBadgeProgress(int $userId): array
-    {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return []; }
-        return \Nexus\Services\GamificationService::getBadgeProgress($userId);
-    }
+    // =========================================================================
+    // BADGE AWARDING (Eloquent)
+    // =========================================================================
 
     /**
-     * Delegates to legacy GamificationService::getLevelProgress().
-     *
-     * Returns level progress percentage (0–100).
-     */
-    public function getLevelProgress(int $xp, int $level): float|int
-    {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return 0; }
-        return \Nexus\Services\GamificationService::getLevelProgress($xp, $level);
-    }
-
-    /**
-     * Delegates to legacy GamificationService::getBadgeByKey().
-     *
-     * Returns a single badge definition array by its key, or null if not found.
-     */
-    public function getBadgeByKey(string $key): ?array
-    {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return null; }
-        return \Nexus\Services\GamificationService::getBadgeByKey($key);
-    }
-
-    /**
-     * Delegates to legacy GamificationService::awardXP().
-     */
-    public function awardXP(int $userId, int $amount, string $action, string $description = ''): void
-    {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
-        \Nexus\Services\GamificationService::awardXP($userId, $amount, $action, $description);
-    }
-
-    /**
-     * Delegates to legacy GamificationService::awardBadge().
+     * Award a badge to a user (idempotent — skips if already earned).
      */
     public function awardBadge(int $userId, $badge): void
     {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
-        \Nexus\Services\GamificationService::awardBadge($userId, $badge);
+        // Accept either array definition or badge key string
+        if (is_string($badge)) {
+            $badge = self::getBadgeByKey($badge);
+            if (! $badge) {
+                return;
+            }
+        }
+
+        $exists = $this->userBadge->newQuery()
+            ->where('user_id', $userId)
+            ->where('badge_key', $badge['key'])
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        $this->userBadge->newInstance([
+            'user_id'   => $userId,
+            'badge_key' => $badge['key'],
+            'name'      => $badge['name'],
+            'icon'      => $badge['icon'],
+        ])->save();
+
+        // Create notification
+        Notification::create([
+            'user_id' => $userId,
+            'type'    => 'achievement',
+            'message' => "You earned the '{$badge['name']}' badge! {$badge['icon']}",
+            'link'    => '/profile',
+        ]);
+
+        // Award XP for earning badge
+        $this->awardXP($userId, self::XP_VALUES['earn_badge'], 'earn_badge', "Badge: {$badge['name']}");
     }
 
     /**
-     * Delegates to legacy GamificationService::checkStreakBadges().
+     * Award a badge by key (admin use).
+     */
+    public function awardBadgeByKey(int $userId, string $badgeKey): void
+    {
+        $def = self::getBadgeByKey($badgeKey);
+        if ($def) {
+            $this->awardBadge($userId, $def);
+        }
+    }
+
+    // =========================================================================
+    // XP & LEVELING (Eloquent)
+    // =========================================================================
+
+    /**
+     * Award XP to a user and check for level up.
+     */
+    public function awardXP(int $userId, int $amount, string $action, string $description = ''): void
+    {
+        if ($amount <= 0) {
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($userId, $amount, $action, $description) {
+                // Prevent duplicate one-time XP awards
+                $oneTimeActions = ['complete_profile'];
+                if (in_array($action, $oneTimeActions)) {
+                    $existing = UserXpLog::where('user_id', $userId)
+                        ->where('action', $action)
+                        ->exists();
+                    if ($existing) {
+                        return;
+                    }
+                }
+
+                // Log XP
+                UserXpLog::create([
+                    'user_id'     => $userId,
+                    'xp_amount'   => $amount,
+                    'action'      => $action,
+                    'description' => $description,
+                ]);
+
+                // Update user XP
+                $this->user->newQuery()->where('id', $userId)->increment('xp', $amount);
+            });
+
+            // Check for level up (outside transaction — non-critical)
+            $this->checkLevelUp($userId);
+        } catch (\Throwable $e) {
+            Log::error('XP Award Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Check if user leveled up and award level badge.
+     */
+    private function checkLevelUp(int $userId): void
+    {
+        try {
+            /** @var User|null $user */
+            $user = $this->user->newQuery()->find($userId, ['id', 'xp', 'level']);
+            if (! $user) {
+                return;
+            }
+
+            $currentXP = (int) ($user->xp ?? 0);
+            $currentLevel = (int) ($user->level ?? 1);
+            $newLevel = self::calculateLevel($currentXP);
+
+            if ($newLevel > $currentLevel) {
+                $user->level = $newLevel;
+                $user->save();
+
+                Notification::create([
+                    'user_id' => $userId,
+                    'type'    => 'achievement',
+                    'message' => "Congratulations! You've reached Level $newLevel!",
+                    'link'    => '/profile',
+                ]);
+
+                // Milestone bonus XP
+                $milestones = [5 => 50, 10 => 100, 15 => 150, 20 => 200, 25 => 300, 30 => 400, 50 => 500, 100 => 1000];
+                if (isset($milestones[$newLevel])) {
+                    $this->awardXP($userId, $milestones[$newLevel], 'level_milestone', "Level $newLevel milestone bonus");
+                }
+
+                // Check level badges
+                $this->checkStreakBadges($userId, $newLevel);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Level Up Check Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Calculate level from XP.
+     */
+    public static function calculateLevel(int $xp): int
+    {
+        $level = 1;
+        foreach (self::LEVEL_THRESHOLDS as $lvl => $threshold) {
+            if ($xp >= $threshold) {
+                $level = $lvl;
+            }
+        }
+        return $level;
+    }
+
+    /**
+     * Get level progress percentage (0–100).
+     */
+    public function getLevelProgress(int $xp, int $level): float|int
+    {
+        $currentThreshold = self::LEVEL_THRESHOLDS[$level] ?? 0;
+        $nextThreshold = self::LEVEL_THRESHOLDS[$level + 1] ?? null;
+
+        if ($nextThreshold === null) {
+            return 100;
+        }
+
+        $xpInLevel = $xp - $currentThreshold;
+        $xpNeeded = $nextThreshold - $currentThreshold;
+
+        if ($xpNeeded <= 0) {
+            return 100;
+        }
+
+        return min(100, round(($xpInLevel / $xpNeeded) * 100));
+    }
+
+    // =========================================================================
+    // BADGE CHECKING (Eloquent)
+    // =========================================================================
+
+    /**
+     * Run all badge checks for a user.
+     */
+    public function runAllBadgeChecks(int $userId): void
+    {
+        $this->checkVolunteeringBadges($userId);
+        $this->checkTimebankingBadges($userId);
+        $this->checkListingBadges($userId);
+        $this->checkConnectionBadges($userId);
+        $this->checkMessageBadges($userId);
+        $this->checkEventBadges($userId, 'attend');
+        $this->checkEventBadges($userId, 'host');
+        $this->checkGroupBadges($userId, 'join');
+        $this->checkPostBadges($userId);
+        $this->checkLikesBadges($userId);
+        $this->checkProfileBadge($userId);
+        $this->checkMembershipBadges($userId);
+    }
+
+    /**
+     * Check and award streak badges.
      */
     public function checkStreakBadges(int $userId, int $streakLength): void
     {
-        if (!class_exists('\Nexus\Services\GamificationService')) { return; }
-        \Nexus\Services\GamificationService::checkStreakBadges($userId, $streakLength);
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'streak' && $streakLength >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    /**
+     * Get badge progress for a user — shows progress towards next badges.
+     */
+    public function getBadgeProgress(int $userId): array
+    {
+        $progress = [];
+        $earnedKeys = $this->userBadge->newQuery()
+            ->where('user_id', $userId)
+            ->pluck('badge_key')
+            ->all();
+
+        $stats = $this->getUserStatsForProgress($userId);
+
+        // Group by type and find next unlockable
+        $badgesByType = [];
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            $badgesByType[$def['type']][] = $def;
+        }
+
+        foreach ($badgesByType as $type => $badges) {
+            usort($badges, fn ($a, $b) => $a['threshold'] - $b['threshold']);
+
+            foreach ($badges as $badge) {
+                if (in_array($badge['key'], $earnedKeys)) {
+                    continue;
+                }
+
+                $current = $stats[$type] ?? 0;
+                $threshold = $badge['threshold'];
+
+                if ($threshold > 0 && $current < $threshold) {
+                    $percent = min(99, round(($current / $threshold) * 100));
+                    $progress[] = [
+                        'badge'     => $badge,
+                        'current'   => $current,
+                        'target'    => $threshold,
+                        'percent'   => $percent,
+                        'remaining' => $threshold - $current,
+                    ];
+                    break; // Only next badge per category
+                }
+            }
+        }
+
+        usort($progress, fn ($a, $b) => $b['percent'] - $a['percent']);
+
+        return array_slice($progress, 0, 6);
+    }
+
+    // =========================================================================
+    // PRIVATE BADGE CHECK METHODS (Eloquent)
+    // =========================================================================
+
+    private function checkVolunteeringBadges(int $userId): void
+    {
+        $totalHours = (int) VolLog::where('user_id', $userId)
+            ->where('status', 'verified')
+            ->sum('hours');
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'vol' && $totalHours >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkTimebankingBadges(int $userId): void
+    {
+        $creditsEarned = (int) Transaction::where('receiver_id', $userId)
+            ->where('status', 'completed')
+            ->sum('amount');
+
+        $creditsSpent = (int) Transaction::where('sender_id', $userId)
+            ->where('deleted_for_sender', false)
+            ->sum('amount');
+
+        $totalTransactions = (int) Transaction::where(function ($q) use ($userId) {
+            $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+        })->count();
+
+        $uniqueReceivers = (int) Transaction::where('sender_id', $userId)
+            ->distinct('receiver_id')
+            ->count('receiver_id');
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            $qualifies = false;
+            switch ($def['type']) {
+                case 'earn':        $qualifies = $creditsEarned >= $def['threshold']; break;
+                case 'spend':       $qualifies = $creditsSpent >= $def['threshold']; break;
+                case 'transaction': $qualifies = $totalTransactions >= $def['threshold']; break;
+                case 'diversity':   $qualifies = $uniqueReceivers >= $def['threshold']; break;
+            }
+            if ($qualifies) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkListingBadges(int $userId): void
+    {
+        $offerCount = Listing::where('user_id', $userId)->where('type', 'offer')->count();
+        $requestCount = Listing::where('user_id', $userId)->where('type', 'request')->count();
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            $count = 0;
+            if ($def['type'] === 'offer') { $count = $offerCount; }
+            if ($def['type'] === 'request') { $count = $requestCount; }
+
+            if ($count > 0 && $count >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkConnectionBadges(int $userId): void
+    {
+        $count = Connection::where('status', 'accepted')
+            ->where(function ($q) use ($userId) {
+                $q->where('requester_id', $userId)->orWhere('receiver_id', $userId);
+            })->count();
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'connection' && $count >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkMessageBadges(int $userId): void
+    {
+        $count = Message::where('sender_id', $userId)->count();
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'message' && $count >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkEventBadges(int $userId, string $action = 'attend'): void
+    {
+        if ($action === 'attend') {
+            $count = EventRsvp::where('user_id', $userId)->where('status', 'going')->count();
+            $type = 'event_attend';
+        } else {
+            $count = Event::where('user_id', $userId)->count();
+            $type = 'event_host';
+        }
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === $type && $count >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkGroupBadges(int $userId, string $action = 'join'): void
+    {
+        if ($action === 'join') {
+            $count = GroupMember::where('user_id', $userId)->where('status', 'active')->count();
+            foreach (self::getStaticBadgeDefinitions() as $def) {
+                if ($def['type'] === 'group_join' && $count >= $def['threshold']) {
+                    $this->awardBadge($userId, $def);
+                }
+            }
+        } elseif ($action === 'create') {
+            foreach (self::getStaticBadgeDefinitions() as $def) {
+                if ($def['type'] === 'group_create') {
+                    $this->awardBadge($userId, $def);
+                }
+            }
+        }
+    }
+
+    private function checkPostBadges(int $userId): void
+    {
+        $count = FeedPost::where('user_id', $userId)->count();
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'post' && $count >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkLikesBadges(int $userId): void
+    {
+        try {
+            $count = (int) DB::table('post_likes')
+                ->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')
+                ->where('feed_posts.user_id', $userId)
+                ->count();
+
+            foreach (self::getStaticBadgeDefinitions() as $def) {
+                if ($def['type'] === 'likes_received' && $count >= $def['threshold']) {
+                    $this->awardBadge($userId, $def);
+                }
+            }
+        } catch (\Throwable $e) {
+            // post_likes table may not exist
+        }
+    }
+
+    private function checkProfileBadge(int $userId): void
+    {
+        $completion = $this->getProfileCompletion($userId);
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'profile' && $completion >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    private function checkMembershipBadges(int $userId): void
+    {
+        $days = $this->getDaysSinceJoined($userId);
+
+        foreach (self::getStaticBadgeDefinitions() as $def) {
+            if ($def['type'] === 'membership' && $days >= $def['threshold']) {
+                $this->awardBadge($userId, $def);
+            }
+        }
+    }
+
+    // =========================================================================
+    // STAT HELPERS (Eloquent)
+    // =========================================================================
+
+    private function getUserStatsForProgress(int $userId): array
+    {
+        $stats = [
+            'vol' => 0, 'offer' => 0, 'request' => 0, 'earn' => 0,
+            'spend' => 0, 'transaction' => 0, 'diversity' => 0,
+            'connection' => 0, 'message' => 0, 'review_given' => 0,
+            '5star' => 0, 'event_attend' => 0, 'event_host' => 0,
+            'group_join' => 0, 'group_create' => 0, 'post' => 0,
+            'likes_received' => 0, 'profile' => 0, 'membership' => 0,
+            'streak' => 0, 'level' => 1,
+        ];
+
+        try { $stats['vol'] = (int) VolLog::where('user_id', $userId)->where('status', 'verified')->sum('hours'); } catch (\Throwable $e) {}
+        try { $stats['offer'] = (int) Listing::where('user_id', $userId)->where('type', 'offer')->count(); } catch (\Throwable $e) {}
+        try { $stats['request'] = (int) Listing::where('user_id', $userId)->where('type', 'request')->count(); } catch (\Throwable $e) {}
+        try { $stats['earn'] = (int) Transaction::where('receiver_id', $userId)->where('status', 'completed')->sum('amount'); } catch (\Throwable $e) {}
+        try { $stats['spend'] = (int) Transaction::where('sender_id', $userId)->where('deleted_for_sender', false)->sum('amount'); } catch (\Throwable $e) {}
+        try { $stats['transaction'] = (int) Transaction::where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) {}
+        try { $stats['diversity'] = (int) Transaction::where('sender_id', $userId)->distinct('receiver_id')->count('receiver_id'); } catch (\Throwable $e) {}
+        try { $stats['connection'] = (int) Connection::where('status', 'accepted')->where(fn ($q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId))->count(); } catch (\Throwable $e) {}
+        try { $stats['message'] = (int) Message::where('sender_id', $userId)->count(); } catch (\Throwable $e) {}
+        try { $stats['review_given'] = (int) Review::where('reviewer_id', $userId)->count(); } catch (\Throwable $e) {}
+        try { $stats['5star'] = (int) Review::where('receiver_id', $userId)->where('rating', 5)->count(); } catch (\Throwable $e) {}
+        try { $stats['event_attend'] = (int) EventRsvp::where('user_id', $userId)->where('status', 'going')->count(); } catch (\Throwable $e) {}
+        try { $stats['event_host'] = (int) Event::where('user_id', $userId)->count(); } catch (\Throwable $e) {}
+        try { $stats['group_join'] = (int) GroupMember::where('user_id', $userId)->where('status', 'active')->count(); } catch (\Throwable $e) {}
+        try { $stats['post'] = (int) FeedPost::where('user_id', $userId)->count(); } catch (\Throwable $e) {}
+        try { $stats['likes_received'] = (int) DB::table('post_likes')->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')->where('feed_posts.user_id', $userId)->count(); } catch (\Throwable $e) {}
+        try { $stats['profile'] = $this->getProfileCompletion($userId); } catch (\Throwable $e) {}
+        try { $stats['membership'] = $this->getDaysSinceJoined($userId); } catch (\Throwable $e) {}
+        try { $stats['streak'] = (int) (UserStreak::where('user_id', $userId)->where('streak_type', 'login')->value('current_streak') ?? 0); } catch (\Throwable $e) {}
+        try { $stats['level'] = (int) ($this->user->newQuery()->where('id', $userId)->value('level') ?? 1); } catch (\Throwable $e) {}
+
+        return $stats;
+    }
+
+    private function getProfileCompletion(int $userId): int
+    {
+        $user = $this->user->newQuery()->find($userId, ['first_name', 'last_name', 'email', 'bio', 'avatar_url', 'location', 'phone']);
+        if (! $user) {
+            return 0;
+        }
+
+        $fields = ['first_name', 'last_name', 'email', 'bio', 'avatar_url', 'location', 'phone'];
+        $filled = 0;
+        foreach ($fields as $field) {
+            if (! empty($user->{$field})) {
+                $filled++;
+            }
+        }
+
+        return (int) round(($filled / count($fields)) * 100);
+    }
+
+    private function getDaysSinceJoined(int $userId): int
+    {
+        $user = $this->user->newQuery()->find($userId, ['created_at']);
+        if (! $user || ! $user->created_at) {
+            return 0;
+        }
+
+        return (int) $user->created_at->diffInDays(now());
     }
 }

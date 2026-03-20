@@ -6,50 +6,200 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\ActivityLog;
+use App\Models\Listing;
+use App\Models\Notification;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- * ListingExpiryService — Laravel DI wrapper for legacy \Nexus\Services\ListingExpiryService.
+ * ListingExpiryService — auto-expiry and renewal workflow for listings.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Handles:
+ * - Processing expired listings (marking them as 'expired')
+ * - One-click renewal (extends expiry by 30 days)
+ * - Renewal tracking (renewed_at, renewal_count)
  */
 class ListingExpiryService
 {
-    public function __construct()
-    {
-    }
+    private const RENEWAL_DAYS = 30;
+    private const MAX_RENEWALS = 12;
 
     /**
-     * Delegates to legacy ListingExpiryService::processExpiredListings().
+     * Process all expired listings for the current tenant.
+     *
+     * @return array{expired: int, errors: int}
      */
     public function processExpiredListings(): array
     {
-        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return []; }
-        return \Nexus\Services\ListingExpiryService::processExpiredListings();
+        $tenantId = TenantContext::getId();
+        $expired = 0;
+        $errors = 0;
+
+        try {
+            $listings = Listing::where('tenant_id', $tenantId)
+                ->where(function ($q) {
+                    $q->whereNull('status')->orWhere('status', 'active');
+                })
+                ->whereNotNull('expires_at')
+                ->where('expires_at', '<=', now())
+                ->select(['id', 'title', 'type', 'user_id', 'expires_at'])
+                ->get();
+        } catch (\Exception $e) {
+            Log::error("[ListingExpiryService] Query error: " . $e->getMessage());
+            return ['expired' => 0, 'errors' => 1];
+        }
+
+        foreach ($listings as $listing) {
+            try {
+                $listing->update(['status' => 'expired']);
+
+                $title = htmlspecialchars($listing->title, ENT_QUOTES, 'UTF-8');
+                Notification::create([
+                    'user_id' => $listing->user_id,
+                    'message' => "Your listing \"{$title}\" has expired. You can renew it to make it active again.",
+                    'link' => "/listings/{$listing->id}",
+                    'type' => 'listing_expired',
+                    'created_at' => now(),
+                ]);
+
+                $expired++;
+            } catch (\Exception $e) {
+                Log::error("[ListingExpiryService] Failed to expire listing {$listing->id}: " . $e->getMessage());
+                $errors++;
+            }
+        }
+
+        return ['expired' => $expired, 'errors' => $errors];
     }
 
     /**
-     * Delegates to legacy ListingExpiryService::processAllTenants().
+     * Process expired listings across ALL tenants (for cron job).
+     *
+     * @return array{total_expired: int, total_errors: int, tenants_processed: int}
      */
     public function processAllTenants(): array
     {
-        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return []; }
-        return \Nexus\Services\ListingExpiryService::processAllTenants();
+        $totalExpired = 0;
+        $totalErrors = 0;
+        $tenantsProcessed = 0;
+
+        try {
+            $tenantIds = DB::table('tenants')
+                ->where('is_active', 1)
+                ->pluck('id');
+        } catch (\Exception $e) {
+            Log::error("[ListingExpiryService] Failed to fetch tenants: " . $e->getMessage());
+            return ['total_expired' => 0, 'total_errors' => 1, 'tenants_processed' => 0];
+        }
+
+        foreach ($tenantIds as $tenantId) {
+            try {
+                \Nexus\Core\TenantContext::setById($tenantId);
+                $result = $this->processExpiredListings();
+                $totalExpired += $result['expired'];
+                $totalErrors += $result['errors'];
+                $tenantsProcessed++;
+            } catch (\Exception $e) {
+                Log::error("[ListingExpiryService] Error processing tenant {$tenantId}: " . $e->getMessage());
+                $totalErrors++;
+            }
+        }
+
+        return [
+            'total_expired' => $totalExpired,
+            'total_errors' => $totalErrors,
+            'tenants_processed' => $tenantsProcessed,
+        ];
     }
 
     /**
-     * Delegates to legacy ListingExpiryService::renewListing().
+     * Renew a listing (extend expiry by RENEWAL_DAYS).
+     *
+     * @return array{success: bool, error: string|null, new_expires_at: string|null}
      */
     public function renewListing(int $listingId, int $userId): array
     {
-        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return []; }
-        return \Nexus\Services\ListingExpiryService::renewListing($listingId, $userId);
+        $tenantId = TenantContext::getId();
+
+        $listing = Listing::where('tenant_id', $tenantId)
+            ->where('id', $listingId)
+            ->first();
+
+        if (!$listing) {
+            return ['success' => false, 'error' => 'Listing not found', 'new_expires_at' => null];
+        }
+
+        // Authorization: owner or admin
+        if ((int) $listing->user_id !== $userId) {
+            $user = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->select(['role', 'is_super_admin', 'is_tenant_super_admin'])
+                ->first();
+
+            if (!$user || (!in_array($user->role, ['admin', 'tenant_admin']) && !$user->is_super_admin && !$user->is_tenant_super_admin)) {
+                return ['success' => false, 'error' => 'You do not have permission to renew this listing', 'new_expires_at' => null];
+            }
+        }
+
+        // Check renewal limit
+        $currentCount = (int) ($listing->renewal_count ?? 0);
+        if ($currentCount >= self::MAX_RENEWALS) {
+            return ['success' => false, 'error' => 'Maximum renewal limit reached (' . self::MAX_RENEWALS . ' renewals)', 'new_expires_at' => null];
+        }
+
+        // Calculate new expiry date
+        if ($listing->status === 'active' && $listing->expires_at && $listing->expires_at > now()) {
+            $baseDate = $listing->expires_at;
+        } else {
+            $baseDate = now();
+        }
+
+        $newExpiresAt = $baseDate->copy()->addDays(self::RENEWAL_DAYS)->format('Y-m-d H:i:s');
+
+        $listing->update([
+            'status' => 'active',
+            'expires_at' => $newExpiresAt,
+            'renewed_at' => now(),
+            'renewal_count' => DB::raw('renewal_count + 1'),
+        ]);
+
+        // Log activity
+        try {
+            ActivityLog::log(
+                $userId,
+                'listing_renewed',
+                "Renewed listing #{$listingId}: " . ($listing->title ?? 'Unknown')
+            );
+        } catch (\Exception $e) {
+            // Non-critical
+        }
+
+        return [
+            'success' => true,
+            'error' => null,
+            'new_expires_at' => $newExpiresAt,
+        ];
     }
 
     /**
-     * Delegates to legacy ListingExpiryService::setExpiry().
+     * Set expiry date for a listing.
      */
     public function setExpiry(int $listingId, ?string $expiresAt): bool
     {
-        if (!class_exists('\Nexus\Services\ListingExpiryService')) { return false; }
-        return \Nexus\Services\ListingExpiryService::setExpiry($listingId, $expiresAt);
+        $tenantId = TenantContext::getId();
+
+        try {
+            $affected = Listing::where('id', $listingId)
+                ->where('tenant_id', $tenantId)
+                ->update(['expires_at' => $expiresAt]);
+
+            return $affected > 0;
+        } catch (\Exception $e) {
+            Log::error("[ListingExpiryService] setExpiry error: " . $e->getMessage());
+            return false;
+        }
     }
 }

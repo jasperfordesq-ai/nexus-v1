@@ -1,86 +1,343 @@
 <?php
-// Copyright � 2024�2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- * LeaderboardSeasonService � Laravel DI wrapper for legacy \Nexus\Services\LeaderboardSeasonService.
+ * LeaderboardSeasonService — Seasonal leaderboard management.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Manages leaderboard seasons with auto-creation, ranking, reward distribution,
+ * and user-specific season data. All methods are tenant-scoped.
  */
 class LeaderboardSeasonService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy LeaderboardSeasonService::getCurrentSeason().
+     * Get the current active season.
      */
     public function getCurrentSeason(int $tenantId): ?array
     {
-        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
-        return \Nexus\Services\LeaderboardSeasonService::getCurrentSeason($tenantId);
+        try {
+            $tableCheck = DB::select("SHOW TABLES LIKE 'leaderboard_seasons'");
+            if (empty($tableCheck)) {
+                return null;
+            }
+
+            $season = DB::table('leaderboard_seasons')
+                ->where('tenant_id', $tenantId)
+                ->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->where('status', 'active')
+                ->orderByDesc('start_date')
+                ->first();
+
+            return $season ? (array) $season : null;
+        } catch (\Throwable $e) {
+            Log::warning('[LeaderboardSeason] getCurrentSeason error: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
-     * Delegates to legacy LeaderboardSeasonService::getSeasonLeaderboard().
+     * Get season leaderboard rankings.
      */
     public function getSeasonLeaderboard(int $tenantId, int $seasonId, int $limit = 20): array
     {
-        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return []; }
-        return \Nexus\Services\LeaderboardSeasonService::getSeasonLeaderboard($tenantId, $seasonId, $limit);
+        $rankings = [];
+
+        try {
+            $tableCheck = DB::select("SHOW TABLES LIKE 'season_rankings'");
+            if (!empty($tableCheck)) {
+                $rankings = DB::table('season_rankings as sr')
+                    ->join('users as u', 'sr.user_id', '=', 'u.id')
+                    ->where('sr.season_id', $seasonId)
+                    ->select('sr.*', 'u.first_name', 'u.last_name', 'u.avatar_url', 'u.level')
+                    ->orderByDesc('sr.season_xp')
+                    ->limit($limit)
+                    ->get()
+                    ->map(fn ($r) => (array) $r)
+                    ->all();
+            }
+        } catch (\Throwable $e) {
+            // Table may not exist
+        }
+
+        if (empty($rankings)) {
+            $season = DB::table('leaderboard_seasons')->where('id', $seasonId)->first();
+            if ($season) {
+                $rankings = $this->calculateSeasonRankings($tenantId);
+            }
+        }
+
+        return $rankings;
     }
 
     /**
-     * Delegates to legacy LeaderboardSeasonService::endSeason().
+     * End a season and distribute rewards.
      */
     public function endSeason(int $tenantId, int $seasonId): bool
     {
-        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return false; }
-        return \Nexus\Services\LeaderboardSeasonService::endSeason($tenantId, $seasonId);
+        $season = DB::table('leaderboard_seasons')
+            ->where('id', $seasonId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$season || $season->status !== 'active') {
+            return false;
+        }
+
+        $rewards = json_decode($season->rewards, true);
+        $rankings = $this->getSeasonLeaderboard($tenantId, $seasonId, 100);
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($rankings as $index => $ranking) {
+                $position = $index + 1;
+                $reward = null;
+
+                if (isset($rewards[$position])) {
+                    $reward = $rewards[$position];
+                } elseif ($position <= 10 && isset($rewards['top10'])) {
+                    $reward = $rewards['top10'];
+                } elseif ($position <= 25 && isset($rewards['top25'])) {
+                    $reward = $rewards['top25'];
+                } elseif (isset($rewards['participant'])) {
+                    $reward = $rewards['participant'];
+                }
+
+                if ($reward) {
+                    $userId = $ranking['user_id'];
+                    $seasonXp = $ranking['season_xp'] ?? $ranking['xp'] ?? 0;
+
+                    // Store final ranking
+                    DB::statement(
+                        "INSERT INTO season_rankings (season_id, user_id, season_xp, final_rank, rewards_claimed)
+                         VALUES (?, ?, ?, ?, 1)
+                         ON DUPLICATE KEY UPDATE final_rank = ?, rewards_claimed = 1",
+                        [$seasonId, $userId, $seasonXp, $position, $position]
+                    );
+                }
+            }
+
+            DB::table('leaderboard_seasons')
+                ->where('id', $seasonId)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'completed']);
+
+            DB::commit();
+            return true;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('[LeaderboardSeason] endSeason error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy LeaderboardSeasonService::getAllSeasons().
-     *
-     * Returns all seasons for the current tenant, ordered by start_date DESC.
+     * Get all seasons for the current tenant.
      */
     public function getAllSeasons(int $limit = 12): array
     {
-        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return []; }
-        return \Nexus\Services\LeaderboardSeasonService::getAllSeasons($limit);
+        $tenantId = TenantContext::getId();
+
+        try {
+            return DB::table('leaderboard_seasons')
+                ->where('tenant_id', $tenantId)
+                ->orderByDesc('start_date')
+                ->limit($limit)
+                ->get()
+                ->map(fn ($r) => (array) $r)
+                ->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
-     * Delegates to legacy LeaderboardSeasonService::getSeasonWithUserData().
-     *
-     * Returns the current season with user-specific rank, leaderboard, and rewards.
+     * Get the current season with user-specific rank, leaderboard, and rewards.
      */
     public function getSeasonWithUserData(int $userId): ?array
     {
-        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
-        return \Nexus\Services\LeaderboardSeasonService::getSeasonWithUserData($userId);
+        $tenantId = TenantContext::getId();
+        $season = $this->getOrCreateCurrentSeason($tenantId);
+
+        if (!$season) {
+            return null;
+        }
+
+        $userRank = $this->getUserSeasonRank($userId, $season['id']);
+        $leaderboard = $this->getSeasonLeaderboard($tenantId, $season['id'], 10);
+        $rewards = json_decode($season['rewards'] ?? '{}', true);
+
+        $endDate = strtotime($season['end_date']);
+        $daysRemaining = max(0, (int) ceil(($endDate - time()) / 86400));
+
+        $totalParticipants = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('is_approved', 1)
+            ->where(DB::raw('COALESCE(xp, 0)'), '>', 0)
+            ->count();
+
+        return [
+            'season' => $season,
+            'user_rank' => $userRank,
+            'user_data' => $userRank ? [
+                'xp_earned' => (int) ($userRank['xp_earned'] ?? $userRank['xp'] ?? $userRank['season_xp'] ?? 0),
+                'rank' => $userRank['rank'] ?? null,
+                'position' => $userRank['position'] ?? null,
+            ] : null,
+            'leaderboard' => $leaderboard,
+            'rewards' => $rewards,
+            'days_remaining' => $daysRemaining,
+            'is_ending_soon' => $daysRemaining <= 7,
+            'total_participants' => $totalParticipants,
+        ];
     }
 
     /**
-     * Delegates to legacy LeaderboardSeasonService::getOrCreateCurrentSeason().
+     * Get or create the current month's season.
      */
-    public function getOrCreateCurrentSeason(): ?array
+    public function getOrCreateCurrentSeason(?int $tenantId = null): ?array
     {
-        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
-        return \Nexus\Services\LeaderboardSeasonService::getOrCreateCurrentSeason();
+        $tenantId = $tenantId ?? TenantContext::getId();
+        $season = $this->getCurrentSeason($tenantId);
+
+        if (!$season) {
+            try {
+                $tableCheck = DB::select("SHOW TABLES LIKE 'leaderboard_seasons'");
+                if (!empty($tableCheck)) {
+                    $season = $this->createMonthlySeason($tenantId);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[LeaderboardSeason] getOrCreateCurrentSeason error: ' . $e->getMessage());
+                return null;
+            }
+        }
+
+        return $season;
     }
 
     /**
-     * Delegates to legacy LeaderboardSeasonService::getUserSeasonRank().
+     * Get user's season ranking.
      */
     public function getUserSeasonRank(int $userId, ?int $seasonId = null): ?array
     {
-        if (!class_exists('\Nexus\Services\LeaderboardSeasonService')) { return null; }
-        return \Nexus\Services\LeaderboardSeasonService::getUserSeasonRank($userId, $seasonId);
+        $tenantId = TenantContext::getId();
+
+        if (!$seasonId) {
+            $season = $this->getCurrentSeason($tenantId);
+            $seasonId = $season['id'] ?? null;
+        }
+
+        if (!$seasonId) {
+            return null;
+        }
+
+        // Check season_rankings table
+        $ranking = null;
+        try {
+            $tableCheck = DB::select("SHOW TABLES LIKE 'season_rankings'");
+            if (!empty($tableCheck)) {
+                $row = DB::table('season_rankings')
+                    ->where('season_id', $seasonId)
+                    ->where('user_id', $userId)
+                    ->first();
+                if ($row) {
+                    $ranking = (array) $row;
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        if ($ranking) {
+            $position = (int) DB::table('season_rankings')
+                ->where('season_id', $seasonId)
+                ->where('season_xp', '>', $ranking['season_xp'])
+                ->count() + 1;
+
+            $ranking['position'] = $position;
+            return $ranking;
+        }
+
+        // Fallback: calculate from users table
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select('xp')
+            ->first();
+
+        if (!$user) {
+            return null;
+        }
+
+        $position = (int) DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('xp', '>', $user->xp)
+            ->count() + 1;
+
+        return [
+            'user_id' => $userId,
+            'season_id' => $seasonId,
+            'season_xp' => $user->xp,
+            'position' => $position,
+        ];
+    }
+
+    // ─── Private helpers ─────────────────────────────────────────────
+
+    private function calculateSeasonRankings(int $tenantId): array
+    {
+        return DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where(DB::raw('COALESCE(xp, 0)'), '>', 0)
+            ->select('id as user_id', 'first_name', 'last_name', 'avatar_url', 'level', 'xp as season_xp')
+            ->orderByDesc('xp')
+            ->limit(50)
+            ->get()
+            ->map(fn ($r) => (array) $r)
+            ->all();
+    }
+
+    private function createMonthlySeason(int $tenantId, ?int $month = null, ?int $year = null): ?array
+    {
+        $month = $month ?? (int) date('n');
+        $year = $year ?? (int) date('Y');
+
+        $startDate = date('Y-m-01 00:00:00', strtotime("{$year}-{$month}-01"));
+        $endDate = date('Y-m-t 23:59:59', strtotime("{$year}-{$month}-01"));
+
+        $monthNames = [
+            1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+            5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December',
+        ];
+
+        $name = $monthNames[$month] . ' ' . $year;
+
+        $rewards = json_encode([
+            1 => ['xp' => 500, 'badge' => 'season_champion', 'title' => 'Season Champion'],
+            2 => ['xp' => 300, 'badge' => 'season_runner_up', 'title' => 'Runner Up'],
+            3 => ['xp' => 200, 'badge' => 'season_third', 'title' => 'Third Place'],
+            'top10' => ['xp' => 100, 'badge' => 'season_top10'],
+            'top25' => ['xp' => 50],
+            'participant' => ['xp' => 25],
+        ]);
+
+        DB::table('leaderboard_seasons')->insert([
+            'tenant_id' => $tenantId,
+            'name' => $name,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'rewards' => $rewards,
+            'status' => 'active',
+        ]);
+
+        return $this->getCurrentSeason($tenantId);
     }
 }

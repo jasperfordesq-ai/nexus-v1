@@ -6,77 +6,163 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\AchievementCampaign;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- * AchievementCampaignService — Laravel DI wrapper for legacy \Nexus\Services\AchievementCampaignService.
+ * AchievementCampaignService — Eloquent-based service for achievement campaigns.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Manages campaigns that award badges, XP, or trigger challenges for targeted user groups.
+ * All queries are tenant-scoped via HasTenantScope trait on the model.
  */
 class AchievementCampaignService
 {
-    public function __construct()
+    /**
+     * Campaign types.
+     */
+    public const TYPES = [
+        'one_time' => 'One Time - Award once to qualifying users',
+        'recurring' => 'Recurring - Award on schedule (daily/weekly/monthly)',
+        'triggered' => 'Triggered - Award when user meets conditions',
+    ];
+
+    /**
+     * Target audience options.
+     */
+    public const AUDIENCES = [
+        'all_users' => 'All Active Users',
+        'new_users' => 'New Users (joined in last 30 days)',
+        'active_users' => 'Active Users (logged in this week)',
+        'inactive_users' => 'Inactive Users (no login in 30+ days)',
+        'level_range' => 'Users at specific level range',
+        'badge_holders' => 'Users with specific badge',
+        'custom' => 'Custom filter (SQL)',
+    ];
+
+    private static array $typeToDbMap = [
+        'one_time' => 'badge_award',
+        'recurring' => 'xp_bonus',
+        'triggered' => 'challenge',
+    ];
+
+    private static array $dbToTypeMap = [
+        'badge_award' => 'one_time',
+        'xp_bonus' => 'recurring',
+        'challenge' => 'triggered',
+    ];
+
+    /**
+     * Get all campaigns.
+     */
+    public function getCampaigns(?string $status = null): array
     {
+        $query = AchievementCampaign::query()->orderByDesc('created_at');
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $campaigns = $query->get()->map(function ($c) {
+            $arr = $c->toArray();
+            $arr['type'] = self::$dbToTypeMap[$arr['campaign_type'] ?? 'badge_award'] ?? 'one_time';
+            return $arr;
+        })->all();
+
+        return $campaigns;
     }
 
     /**
-     * Delegates to legacy AchievementCampaignService::getCampaigns().
+     * Get a single campaign.
      */
-    public function getCampaigns($status = null)
+    public function getCampaign(int $id): ?array
     {
-        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
-        return \Nexus\Services\AchievementCampaignService::getCampaigns($status);
+        $campaign = AchievementCampaign::find($id);
+        if (!$campaign) {
+            return null;
+        }
+
+        $arr = $campaign->toArray();
+        $arr['type'] = self::$dbToTypeMap[$arr['campaign_type'] ?? 'badge_award'] ?? 'one_time';
+        return $arr;
     }
 
     /**
-     * Delegates to legacy AchievementCampaignService::getCampaign().
+     * Create a new campaign.
+     *
+     * @return int|string|null Campaign ID
      */
-    public function getCampaign($id)
+    public function createCampaign(array $data): int|string|null
     {
-        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
-        return \Nexus\Services\AchievementCampaignService::getCampaign($id);
+        $campaignType = self::$typeToDbMap[$data['type'] ?? 'one_time'] ?? 'badge_award';
+
+        try {
+            $campaign = AchievementCampaign::create([
+                'name' => $data['name'],
+                'description' => $data['description'] ?? '',
+                'campaign_type' => $campaignType,
+                'badge_key' => $data['badge_key'] ?: null,
+                'xp_amount' => $data['xp_amount'] ?? 0,
+                'target_audience' => $data['target_audience'] ?? 'all_users',
+                'audience_config' => $data['audience_config'] ?? [],
+                'schedule' => $data['schedule'] ?? null,
+                'status' => 'draft',
+            ]);
+
+            return $campaign->id;
+        } catch (\Throwable $e) {
+            Log::error('Achievement campaign creation failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
-     * Delegates to legacy AchievementCampaignService::createCampaign().
+     * Update a campaign.
      */
-    public function createCampaign($data)
+    public function updateCampaign(int $id, array $data): void
     {
-        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
-        return \Nexus\Services\AchievementCampaignService::createCampaign($data);
+        $campaignType = self::$typeToDbMap[$data['type'] ?? 'one_time'] ?? 'badge_award';
+
+        AchievementCampaign::where('id', $id)->update([
+            'name' => $data['name'],
+            'description' => $data['description'] ?? '',
+            'campaign_type' => $campaignType,
+            'badge_key' => $data['badge_key'] ?: null,
+            'xp_amount' => $data['xp_amount'] ?? 0,
+            'target_audience' => $data['target_audience'] ?? 'all_users',
+            'audience_config' => is_array($data['audience_config'] ?? null)
+                ? json_encode($data['audience_config']) : ($data['audience_config'] ?? '{}'),
+            'schedule' => $data['schedule'] ?? null,
+        ]);
     }
 
     /**
-     * Delegates to legacy AchievementCampaignService::updateCampaign().
+     * Activate a campaign.
      */
-    public function updateCampaign($id, $data)
+    public function activateCampaign(int $id): void
     {
-        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
-        return \Nexus\Services\AchievementCampaignService::updateCampaign($id, $data);
+        AchievementCampaign::where('id', $id)->update([
+            'status' => 'active',
+            'activated_at' => now(),
+        ]);
     }
 
     /**
-     * Delegates to legacy AchievementCampaignService::activateCampaign().
+     * Pause a campaign.
      */
-    public function activateCampaign($id)
+    public function pauseCampaign(int $id): void
     {
-        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
-        return \Nexus\Services\AchievementCampaignService::activateCampaign($id);
+        AchievementCampaign::where('id', $id)->update([
+            'status' => 'paused',
+        ]);
     }
 
     /**
-     * Delegates to legacy AchievementCampaignService::pauseCampaign().
+     * Delete a campaign.
      */
-    public function pauseCampaign($id)
+    public function deleteCampaign(int $id): void
     {
-        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
-        return \Nexus\Services\AchievementCampaignService::pauseCampaign($id);
-    }
-
-    /**
-     * Delegates to legacy AchievementCampaignService::deleteCampaign().
-     */
-    public function deleteCampaign($id)
-    {
-        if (!class_exists('\Nexus\Services\AchievementCampaignService')) { return null; }
-        return \Nexus\Services\AchievementCampaignService::deleteCampaign($id);
+        AchievementCampaign::where('id', $id)->delete();
     }
 }

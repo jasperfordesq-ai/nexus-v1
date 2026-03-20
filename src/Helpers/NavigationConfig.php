@@ -326,15 +326,15 @@ class NavigationConfig
 
     /**
      * Get database-driven pages from Page Builder
-     * Wrapper around MenuGenerator for consistency
+     * Delegates to MenuManager::getMenuPages()
      *
      * @param string $location Menu location (main, about, footer)
      * @return array List of pages
      */
     public static function getMenuPages(string $location = 'main'): array
     {
-        if (class_exists('\Nexus\Core\MenuGenerator')) {
-            return \Nexus\Core\MenuGenerator::getMenuPages($location);
+        if (class_exists('\Nexus\Core\MenuManager')) {
+            return \Nexus\Core\MenuManager::getMenuPages($location);
         }
         return [];
     }

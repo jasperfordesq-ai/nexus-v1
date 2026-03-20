@@ -6,68 +6,153 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\SafeguardingAssignment;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * SafeguardingService — Laravel DI wrapper for legacy \Nexus\Services\SafeguardingService.
+ * SafeguardingService — Laravel DI-based service for safeguarding operations.
  *
- * Provides dependency-injectable access to the legacy static service methods.
- * New methods use DB:: facade directly with explicit tenant_id parameter.
+ * Manages guardian assignments, safeguarding training, and incident reporting.
+ * All queries are tenant-scoped via HasTenantScope trait or explicit tenant_id.
  */
 class SafeguardingService
 {
-    public function __construct()
-    {
-    }
+    /** @var array Collected errors from the last operation */
+    private array $errors = [];
+
+    public function __construct(
+        private readonly SafeguardingAssignment $assignment,
+    ) {}
 
     /**
-     * Delegates to legacy SafeguardingService::getErrors().
+     * Get collected errors from the last operation.
      */
     public function getErrors(): array
     {
-        if (!class_exists('\Nexus\Services\SafeguardingService')) { return []; }
-        return \Nexus\Services\SafeguardingService::getErrors();
-    }
-
-    /**
-     * Delegates to legacy SafeguardingService::createAssignment().
-     */
-    public function createAssignment(int $guardianUserId, int $wardUserId, int $assignedBy, ?string $notes = null): array
-    {
-        if (!class_exists('\Nexus\Services\SafeguardingService')) { return []; }
-        return \Nexus\Services\SafeguardingService::createAssignment($guardianUserId, $wardUserId, $assignedBy, $notes);
-    }
-
-    /**
-     * Delegates to legacy SafeguardingService::recordConsent().
-     */
-    public function recordConsent(int $wardUserId): bool
-    {
-        if (!class_exists('\Nexus\Services\SafeguardingService')) { return false; }
-        return \Nexus\Services\SafeguardingService::recordConsent($wardUserId);
-    }
-
-    /**
-     * Delegates to legacy SafeguardingService::revokeAssignment().
-     */
-    public function revokeAssignment(int $assignmentId, int $revokedBy): bool
-    {
-        if (!class_exists('\Nexus\Services\SafeguardingService')) { return false; }
-        return \Nexus\Services\SafeguardingService::revokeAssignment($assignmentId, $revokedBy);
-    }
-
-    /**
-     * Delegates to legacy SafeguardingService::listAssignments().
-     */
-    public function listAssignments(): array
-    {
-        if (!class_exists('\Nexus\Services\SafeguardingService')) { return []; }
-        return \Nexus\Services\SafeguardingService::listAssignments();
+        return $this->errors;
     }
 
     // =========================================================================
-    // TRAINING (DB:: facade — tenant-scoped)
+    // ASSIGNMENT MANAGEMENT
+    // =========================================================================
+
+    /**
+     * Create a safeguarding assignment.
+     */
+    public function createAssignment(int $guardianUserId, int $wardUserId, int $assignedBy, ?string $notes = null): array
+    {
+        $this->errors = [];
+
+        if ($guardianUserId === $wardUserId) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Guardian and ward cannot be the same person'];
+            return ['success' => false, 'errors' => $this->errors];
+        }
+
+        // Check both users exist in tenant
+        $guardianExists = User::where('id', $guardianUserId)->where('status', 'active')->exists();
+        $wardExists = User::where('id', $wardUserId)->where('status', 'active')->exists();
+
+        if (!$guardianExists) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Guardian user not found'];
+            return ['success' => false, 'errors' => $this->errors];
+        }
+        if (!$wardExists) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Ward user not found'];
+            return ['success' => false, 'errors' => $this->errors];
+        }
+
+        try {
+            // Use upsert: if assignment exists but was revoked, re-activate it
+            DB::table('safeguarding_assignments')->updateOrInsert(
+                [
+                    'guardian_user_id' => $guardianUserId,
+                    'ward_user_id' => $wardUserId,
+                    'tenant_id' => TenantContext::getId(),
+                ],
+                [
+                    'revoked_at' => null,
+                    'assigned_by' => $assignedBy,
+                    'assigned_at' => now(),
+                    'notes' => $notes,
+                ]
+            );
+
+            return ['success' => true, 'message' => 'Safeguarding assignment created'];
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::createAssignment error: ' . $e->getMessage());
+            return ['success' => false, 'error' => 'Failed to create assignment'];
+        }
+    }
+
+    /**
+     * Record consent from the ward.
+     */
+    public function recordConsent(int $wardUserId): bool
+    {
+        try {
+            $this->assignment->newQuery()
+                ->where('ward_user_id', $wardUserId)
+                ->whereNull('revoked_at')
+                ->whereNull('consent_given_at')
+                ->update(['consent_given_at' => now()]);
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::recordConsent error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Revoke an assignment.
+     */
+    public function revokeAssignment(int $assignmentId, int $revokedBy): bool
+    {
+        try {
+            $this->assignment->newQuery()
+                ->where('id', $assignmentId)
+                ->update(['revoked_at' => now()]);
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('SafeguardingService::revokeAssignment error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * List all active assignments for the current tenant.
+     */
+    public function listAssignments(): array
+    {
+        try {
+            return $this->assignment->newQuery()
+                ->with([
+                    'guardian:id,name,avatar_url',
+                    'ward:id,name,avatar_url',
+                    'assigner:id,name',
+                ])
+                ->whereNull('revoked_at')
+                ->orderByDesc('assigned_at')
+                ->get()
+                ->map(function (SafeguardingAssignment $sa) {
+                    $data = $sa->toArray();
+                    $data['guardian_name'] = $sa->guardian->name ?? null;
+                    $data['guardian_avatar'] = $sa->guardian->avatar_url ?? null;
+                    $data['ward_name'] = $sa->ward->name ?? null;
+                    $data['ward_avatar'] = $sa->ward->avatar_url ?? null;
+                    $data['assigned_by_name'] = $sa->assigner->name ?? null;
+                    return $data;
+                })
+                ->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    // =========================================================================
+    // TRAINING (tenant-scoped via explicit tenant_id)
     // =========================================================================
 
     /**
@@ -76,15 +161,16 @@ class SafeguardingService
     public function getTrainingForUser(int $userId, int $tenantId): array
     {
         try {
-            return DB::select(
-                "SELECT st.*, v.name as verified_by_name
-                 FROM vol_safeguarding_training st
-                 LEFT JOIN users v ON st.verified_by = v.id
-                 WHERE st.user_id = ? AND st.tenant_id = ?
-                 ORDER BY st.completed_at DESC",
-                [$userId, $tenantId]
-            );
-        } catch (\Exception $e) {
+            return DB::table('vol_safeguarding_training as st')
+                ->leftJoin('users as v', 'st.verified_by', '=', 'v.id')
+                ->where('st.user_id', $userId)
+                ->where('st.tenant_id', $tenantId)
+                ->select('st.*', 'v.name as verified_by_name')
+                ->orderByDesc('st.completed_at')
+                ->get()
+                ->map(fn ($r) => (array) $r)
+                ->all();
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::getTrainingForUser error: ' . $e->getMessage());
             return [];
         }
@@ -93,9 +179,6 @@ class SafeguardingService
     /**
      * Record a training completion for a user.
      *
-     * @param int $userId
-     * @param array $data [training_type, training_name, provider, completed_at, expires_at, certificate_url, notes]
-     * @param int $tenantId
      * @return array|false The created record or false on failure
      */
     public function recordTraining(int $userId, array $data, int $tenantId): array|false
@@ -128,7 +211,7 @@ class SafeguardingService
                 ->first();
 
             return $record ? (array) $record : [];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::recordTraining error: ' . $e->getMessage());
             return false;
         }
@@ -137,7 +220,7 @@ class SafeguardingService
     /**
      * Get training records for admin view with pagination.
      *
-     * @return array ['items' => [], 'total' => int, 'page' => int, 'per_page' => int]
+     * @return array{items: array, total: int, page: int, per_page: int}
      */
     public function getTrainingForAdmin(int $tenantId, ?int $page = null, ?int $perPage = null): array
     {
@@ -154,12 +237,7 @@ class SafeguardingService
                 ->join('users as u', 'st.user_id', '=', 'u.id')
                 ->leftJoin('users as v', 'st.verified_by', '=', 'v.id')
                 ->where('st.tenant_id', $tenantId)
-                ->select(
-                    'st.*',
-                    'u.name as user_name',
-                    'u.avatar_url as user_avatar',
-                    'v.name as verified_by_name'
-                )
+                ->select('st.*', 'u.name as user_name', 'u.avatar_url as user_avatar', 'v.name as verified_by_name')
                 ->orderByDesc('st.created_at')
                 ->offset($offset)
                 ->limit($perPage)
@@ -167,13 +245,8 @@ class SafeguardingService
                 ->map(fn ($row) => (array) $row)
                 ->all();
 
-            return [
-                'items' => $items,
-                'total' => $total,
-                'page' => $page,
-                'per_page' => $perPage,
-            ];
-        } catch (\Exception $e) {
+            return ['items' => $items, 'total' => $total, 'page' => $page, 'per_page' => $perPage];
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::getTrainingForAdmin error: ' . $e->getMessage());
             return ['items' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage];
         }
@@ -194,9 +267,8 @@ class SafeguardingService
                     'verified_at' => now(),
                     'updated_at' => now(),
                 ]);
-
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::verifyTraining error: ' . $e->getMessage());
             return false;
         }
@@ -218,24 +290,20 @@ class SafeguardingService
                     'notes' => $reason,
                     'updated_at' => now(),
                 ]);
-
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::rejectTraining error: ' . $e->getMessage());
             return false;
         }
     }
 
     // =========================================================================
-    // INCIDENTS (DB:: facade — tenant-scoped)
+    // INCIDENTS (tenant-scoped via explicit tenant_id)
     // =========================================================================
 
     /**
      * Report a safeguarding incident.
      *
-     * @param int $reporterId
-     * @param array $data [title, description, severity, incident_type, incident_date, involved_user_id, organization_id, shift_id, category]
-     * @param int $tenantId
      * @return array|false The created incident or false on failure
      */
     public function reportIncident(int $reporterId, array $data, int $tenantId): array|false
@@ -276,7 +344,7 @@ class SafeguardingService
                 ->first();
 
             return $record ? (array) $record : [];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::reportIncident error: ' . $e->getMessage());
             return false;
         }
@@ -285,7 +353,7 @@ class SafeguardingService
     /**
      * Get safeguarding incidents with optional status filter and pagination.
      *
-     * @return array ['items' => [], 'total' => int, 'page' => int, 'per_page' => int]
+     * @return array{items: array, total: int, page: int, per_page: int}
      */
     public function getIncidents(int $tenantId, ?string $status = null, ?int $page = null, ?int $perPage = null): array
     {
@@ -323,13 +391,8 @@ class SafeguardingService
                 ->map(fn ($row) => (array) $row)
                 ->all();
 
-            return [
-                'items' => $items,
-                'total' => $total,
-                'page' => $page,
-                'per_page' => $perPage,
-            ];
-        } catch (\Exception $e) {
+            return ['items' => $items, 'total' => $total, 'page' => $page, 'per_page' => $perPage];
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::getIncidents error: ' . $e->getMessage());
             return ['items' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage];
         }
@@ -360,7 +423,7 @@ class SafeguardingService
                 ->first();
 
             return $record ? (array) $record : null;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::getIncident error: ' . $e->getMessage());
             return null;
         }
@@ -385,7 +448,6 @@ class SafeguardingService
                 return false;
             }
 
-            // If resolving, set resolved_at
             if (isset($data['status']) && in_array($data['status'], ['resolved', 'closed'])) {
                 $updates['resolved_at'] = now();
             }
@@ -398,7 +460,7 @@ class SafeguardingService
                 ->update($updates);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::updateIncident error: ' . $e->getMessage());
             return false;
         }
@@ -417,9 +479,8 @@ class SafeguardingService
                     'assigned_to' => $dlpUserId,
                     'updated_at' => now(),
                 ]);
-
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('SafeguardingService::assignDlp error: ' . $e->getMessage());
             return false;
         }

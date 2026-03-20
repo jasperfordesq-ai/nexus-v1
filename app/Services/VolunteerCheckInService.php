@@ -1,15 +1,27 @@
 <?php
-// Copyright � 2024�2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\VolApplication;
+use App\Models\VolShift;
+use App\Models\VolShiftCheckin;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- * VolunteerCheckInService � Laravel DI wrapper for legacy \Nexus\Services\VolunteerCheckInService.
+ * VolunteerCheckInService — QR-based check-in for volunteer shifts.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Generates unique QR tokens per shift+volunteer combination.
+ * Volunteers scan QR on arrival to mark checked in.
+ * Coordinators can verify check-ins via the admin dashboard.
+ *
+ * All queries are tenant-scoped automatically via the HasTenantScope trait on models.
  */
 class VolunteerCheckInService
 {
@@ -18,39 +30,117 @@ class VolunteerCheckInService
     }
 
     /**
-     * Delegates to legacy VolunteerCheckInService::checkIn().
+     * Check in a volunteer for an opportunity (legacy-compatible signature).
      */
     public function checkIn(int $tenantId, int $opportunityId, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return false; }
-        return \Nexus\Services\VolunteerCheckInService::checkIn($tenantId, $opportunityId, $userId);
+        try {
+            $shift = VolShift::where('opportunity_id', $opportunityId)->first();
+            if (!$shift) {
+                return false;
+            }
+
+            $checkin = VolShiftCheckin::where('shift_id', $shift->id)
+                ->where('user_id', $userId)
+                ->first();
+
+            if (!$checkin) {
+                return false;
+            }
+
+            if ($checkin->status === 'checked_in') {
+                return true; // already checked in
+            }
+
+            $checkin->update([
+                'status' => 'checked_in',
+                'checked_in_at' => now(),
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('VolunteerCheckInService::checkIn error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy VolunteerCheckInService::checkOut().
+     * Check out a volunteer from an opportunity (legacy-compatible signature).
      */
     public function checkOut(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
     {
-        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return false; }
-        return \Nexus\Services\VolunteerCheckInService::checkOut($tenantId, $opportunityId, $userId, $hours);
+        try {
+            $shift = VolShift::where('opportunity_id', $opportunityId)->first();
+            if (!$shift) {
+                return false;
+            }
+
+            $checkin = VolShiftCheckin::where('shift_id', $shift->id)
+                ->where('user_id', $userId)
+                ->where('status', 'checked_in')
+                ->first();
+
+            if (!$checkin) {
+                return false;
+            }
+
+            $checkin->update([
+                'status' => 'checked_out',
+                'checked_out_at' => now(),
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('VolunteerCheckInService::checkOut error: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy VolunteerCheckInService::getCheckIns().
+     * Get all check-ins for an opportunity.
      */
     public function getCheckIns(int $tenantId, int $opportunityId): array
     {
-        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return []; }
-        return \Nexus\Services\VolunteerCheckInService::getCheckIns($tenantId, $opportunityId);
+        try {
+            $shiftIds = VolShift::where('opportunity_id', $opportunityId)->pluck('id');
+
+            return VolShiftCheckin::with('user')
+                ->whereIn('shift_id', $shiftIds)
+                ->orderBy('created_at', 'asc')
+                ->get()
+                ->map(fn ($c) => [
+                    'id' => $c->id,
+                    'user' => [
+                        'id' => $c->user_id,
+                        'name' => $c->user->name ?? '',
+                        'avatar_url' => $c->user->avatar_url ?? null,
+                    ],
+                    'status' => $c->status,
+                    'checked_in_at' => $c->checked_in_at?->toDateTimeString(),
+                    'checked_out_at' => $c->checked_out_at?->toDateTimeString(),
+                ])
+                ->toArray();
+        } catch (\Exception $e) {
+            Log::error('VolunteerCheckInService::getCheckIns error: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
-     * Delegates to legacy VolunteerCheckInService::isCheckedIn().
+     * Check if a volunteer is currently checked in for an opportunity.
      */
     public function isCheckedIn(int $tenantId, int $opportunityId, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return false; }
-        return \Nexus\Services\VolunteerCheckInService::isCheckedIn($tenantId, $opportunityId, $userId);
+        try {
+            $shiftIds = VolShift::where('opportunity_id', $opportunityId)->pluck('id');
+
+            return VolShiftCheckin::whereIn('shift_id', $shiftIds)
+                ->where('user_id', $userId)
+                ->where('status', 'checked_in')
+                ->exists();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -58,34 +148,55 @@ class VolunteerCheckInService
      */
     public function getUserCheckIn(int $userId, int $shiftId, int $tenantId): ?array
     {
-        if (!class_exists('\Nexus\Services\VolunteerCheckInService')) { return null; }
-        return \Nexus\Services\VolunteerCheckInService::getUserCheckIn($shiftId, $userId);
+        $hasApproved = VolApplication::where('shift_id', $shiftId)
+            ->where('user_id', $userId)
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$hasApproved) {
+            return null;
+        }
+
+        $checkin = VolShiftCheckin::where('shift_id', $shiftId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$checkin) {
+            return null;
+        }
+
+        $baseUrl = config('app.url', 'https://api.project-nexus.ie');
+
+        return [
+            'id' => $checkin->id,
+            'qr_token' => $checkin->qr_token,
+            'qr_url' => $baseUrl . '/api/v2/volunteering/checkin/verify/' . $checkin->qr_token,
+            'status' => $checkin->status,
+            'checked_in_at' => $checkin->checked_in_at?->toDateTimeString(),
+            'checked_out_at' => $checkin->checked_out_at?->toDateTimeString(),
+        ];
     }
 
     /**
-     * Generate a QR check-in token for a shift+user.
+     * Generate a QR check-in token for a shift.
      */
     public function generateToken(int $shiftId, int $tenantId): string
     {
-        // Legacy generateToken requires userId; this signature is shift-level.
-        // Delegate with tenantId context — the legacy method uses TenantContext internally.
-        $token = bin2hex(random_bytes(32));
-
-        $existing = \Illuminate\Support\Facades\DB::table('vol_shift_checkins')
-            ->where('shift_id', $shiftId)
-            ->where('tenant_id', $tenantId)
+        $existing = VolShiftCheckin::where('shift_id', $shiftId)
+            ->whereNotNull('qr_token')
             ->value('qr_token');
 
         if ($existing) {
             return $existing;
         }
 
-        \Illuminate\Support\Facades\DB::table('vol_shift_checkins')->insert([
-            'tenant_id'  => $tenantId,
-            'shift_id'   => $shiftId,
-            'qr_token'   => $token,
-            'status'     => 'pending',
-            'created_at' => now(),
+        $token = bin2hex(random_bytes(32));
+
+        VolShiftCheckin::create([
+            'tenant_id' => $tenantId,
+            'shift_id' => $shiftId,
+            'qr_token' => $token,
+            'status' => 'pending',
         ]);
 
         return $token;
@@ -96,9 +207,7 @@ class VolunteerCheckInService
      */
     public function getShiftIdByToken(string $token, int $tenantId): ?int
     {
-        $shiftId = \Illuminate\Support\Facades\DB::table('vol_shift_checkins')
-            ->where('qr_token', $token)
-            ->where('tenant_id', $tenantId)
+        $shiftId = VolShiftCheckin::where('qr_token', $token)
             ->value('shift_id');
 
         return $shiftId !== null ? (int) $shiftId : null;
@@ -111,12 +220,8 @@ class VolunteerCheckInService
     {
         $token = $data['token'] ?? '';
 
-        $checkin = \Illuminate\Support\Facades\DB::table('vol_shift_checkins as c')
-            ->join('vol_shifts as s', 'c.shift_id', '=', 's.id')
-            ->join('users as u', 'c.user_id', '=', 'u.id')
-            ->where('c.qr_token', $token)
-            ->where('c.tenant_id', $tenantId)
-            ->select('c.*', 's.start_time', 's.end_time', 's.opportunity_id', 'u.name as user_name', 'u.avatar_url as user_avatar')
+        $checkin = VolShiftCheckin::with(['shift', 'user'])
+            ->where('qr_token', $token)
             ->first();
 
         if (!$checkin) {
@@ -125,10 +230,18 @@ class VolunteerCheckInService
 
         if ($checkin->status === 'checked_in') {
             return [
-                'status'        => 'already_checked_in',
-                'checked_in_at' => $checkin->checked_in_at,
-                'user'          => ['id' => (int) $checkin->user_id, 'name' => $checkin->user_name, 'avatar_url' => $checkin->user_avatar],
-                'shift'         => ['id' => (int) $checkin->shift_id, 'start_time' => $checkin->start_time, 'end_time' => $checkin->end_time],
+                'status' => 'already_checked_in',
+                'checked_in_at' => $checkin->checked_in_at?->toDateTimeString(),
+                'user' => [
+                    'id' => $checkin->user_id,
+                    'name' => $checkin->user->name ?? '',
+                    'avatar_url' => $checkin->user->avatar_url ?? null,
+                ],
+                'shift' => [
+                    'id' => $checkin->shift_id,
+                    'start_time' => $checkin->shift->start_time?->toDateTimeString(),
+                    'end_time' => $checkin->shift->end_time?->toDateTimeString(),
+                ],
             ];
         }
 
@@ -136,16 +249,24 @@ class VolunteerCheckInService
             return false;
         }
 
-        \Illuminate\Support\Facades\DB::table('vol_shift_checkins')
-            ->where('id', $checkin->id)
-            ->where('tenant_id', $tenantId)
-            ->update(['status' => 'checked_in', 'checked_in_at' => now()]);
+        $checkin->update([
+            'status' => 'checked_in',
+            'checked_in_at' => now(),
+        ]);
 
         return [
-            'status'        => 'checked_in',
+            'status' => 'checked_in',
             'checked_in_at' => now()->toDateTimeString(),
-            'user'          => ['id' => (int) $checkin->user_id, 'name' => $checkin->user_name, 'avatar_url' => $checkin->user_avatar],
-            'shift'         => ['id' => (int) $checkin->shift_id, 'start_time' => $checkin->start_time, 'end_time' => $checkin->end_time],
+            'user' => [
+                'id' => $checkin->user_id,
+                'name' => $checkin->user->name ?? '',
+                'avatar_url' => $checkin->user->avatar_url ?? null,
+            ],
+            'shift' => [
+                'id' => $checkin->shift_id,
+                'start_time' => $checkin->shift->start_time?->toDateTimeString(),
+                'end_time' => $checkin->shift->end_time?->toDateTimeString(),
+            ],
         ];
     }
 
@@ -154,8 +275,7 @@ class VolunteerCheckInService
      */
     public function getUserIdByToken(string $token): ?int
     {
-        $userId = \Illuminate\Support\Facades\DB::table('vol_shift_checkins')
-            ->where('qr_token', $token)
+        $userId = VolShiftCheckin::where('qr_token', $token)
             ->value('user_id');
 
         return $userId !== null ? (int) $userId : null;
@@ -166,22 +286,21 @@ class VolunteerCheckInService
      */
     public function getShiftCheckIns(int $shiftId, int $tenantId): array
     {
-        $checkins = \Illuminate\Support\Facades\DB::table('vol_shift_checkins as c')
-            ->join('users as u', 'c.user_id', '=', 'u.id')
-            ->where('c.shift_id', $shiftId)
-            ->where('c.tenant_id', $tenantId)
-            ->orderBy('c.created_at', 'asc')
-            ->select('c.*', 'u.name as user_name', 'u.avatar_url as user_avatar')
-            ->get();
-
-        return $checkins->map(function ($c) {
-            return [
-                'id'             => (int) $c->id,
-                'user'           => ['id' => (int) $c->user_id, 'name' => $c->user_name, 'avatar_url' => $c->user_avatar],
-                'status'         => $c->status,
-                'checked_in_at'  => $c->checked_in_at,
-                'checked_out_at' => $c->checked_out_at,
-            ];
-        })->toArray();
+        return VolShiftCheckin::with('user')
+            ->where('shift_id', $shiftId)
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'user' => [
+                    'id' => $c->user_id,
+                    'name' => $c->user->name ?? '',
+                    'avatar_url' => $c->user->avatar_url ?? null,
+                ],
+                'status' => $c->status,
+                'checked_in_at' => $c->checked_in_at?->toDateTimeString(),
+                'checked_out_at' => $c->checked_out_at?->toDateTimeString(),
+            ])
+            ->toArray();
     }
 }

@@ -9,6 +9,7 @@ namespace App\Models;
 use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GroupDiscussion extends Model
 {
@@ -34,5 +35,10 @@ class GroupDiscussion extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(GroupPost::class, 'discussion_id');
     }
 }

@@ -179,8 +179,7 @@ class SuperPanelAccess
 
         // Check god status via DB
         $isGod = !empty($access['user_id'])
-            && class_exists('Nexus\\Models\\User')
-            && \Nexus\Models\User::isGod($access['user_id']);
+            && \App\Models\User::isGod($access['user_id']);
 
         // Cannot manage own tenant (only view) - unless god
         if ($targetTenantId === $access['tenant_id']) {

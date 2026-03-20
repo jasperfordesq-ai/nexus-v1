@@ -6,10 +6,14 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+
 /**
- * MemberVerificationBadgeService — Laravel DI wrapper for legacy \Nexus\Services\MemberVerificationBadgeService.
+ * MemberVerificationBadgeService — Verification badge system.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Badge types: email_verified, phone_verified, id_verified, address_verified, admin_verified.
+ * Provides grant/revoke badges, get badges for users, batch get badges, and admin badge list.
  */
 class MemberVerificationBadgeService
 {
@@ -29,61 +33,216 @@ class MemberVerificationBadgeService
         'admin_verified' => 'Admin Verified',
     ];
 
-    public function __construct()
-    {
-    }
+    public const BADGE_ICONS = [
+        'email_verified' => 'mail-check',
+        'phone_verified' => 'phone-check',
+        'id_verified' => 'shield-check',
+        'address_verified' => 'badge-check',
+        'admin_verified' => 'user-check',
+    ];
+
+    private array $errors = [];
 
     /**
-     * Delegates to legacy MemberVerificationBadgeService::getErrors().
+     * Get validation errors from the last operation.
      */
     public function getErrors(): array
     {
-        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
-        return \Nexus\Services\MemberVerificationBadgeService::getErrors();
+        return $this->errors;
     }
 
     /**
-     * Delegates to legacy MemberVerificationBadgeService::grantBadge().
+     * Grant a verification badge to a user (admin action).
      */
     public function grantBadge(int $userId, string $badgeType, int $adminId, ?string $note = null, ?string $expiresAt = null): ?int
     {
-        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return null; }
-        return \Nexus\Services\MemberVerificationBadgeService::grantBadge($userId, $badgeType, $adminId, $note, $expiresAt);
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        if (!in_array($badgeType, self::BADGE_TYPES, true)) {
+            $this->errors[] = ['code' => 'INVALID_TYPE', 'message' => 'Invalid badge type: ' . $badgeType, 'field' => 'badge_type'];
+            return null;
+        }
+
+        // Check user exists in tenant
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select('id', 'first_name', 'last_name')
+            ->first();
+
+        if (!$user) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            return null;
+        }
+
+        // Upsert: if badge exists and was revoked, re-grant it
+        $existing = DB::table('member_verification_badges')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('badge_type', $badgeType)
+            ->select('id', 'revoked_at')
+            ->first();
+
+        if ($existing) {
+            if ($existing->revoked_at === null) {
+                $this->errors[] = ['code' => 'ALREADY_GRANTED', 'message' => 'Badge already active'];
+                return (int) $existing->id;
+            }
+
+            // Re-grant
+            DB::table('member_verification_badges')
+                ->where('id', $existing->id)
+                ->where('tenant_id', $tenantId)
+                ->update([
+                    'verified_by' => $adminId,
+                    'verification_note' => $note,
+                    'granted_at' => now(),
+                    'expires_at' => $expiresAt,
+                    'revoked_at' => null,
+                ]);
+
+            $badgeId = (int) $existing->id;
+        } else {
+            $badgeId = DB::table('member_verification_badges')->insertGetId([
+                'user_id' => $userId,
+                'tenant_id' => $tenantId,
+                'badge_type' => $badgeType,
+                'verified_by' => $adminId,
+                'verification_note' => $note,
+                'expires_at' => $expiresAt,
+                'granted_at' => now(),
+            ]);
+        }
+
+        // Send notification
+        try {
+            $label = self::BADGE_LABELS[$badgeType] ?? $badgeType;
+            DB::table('notifications')->insert([
+                'user_id' => $userId,
+                'tenant_id' => $tenantId,
+                'message' => "You have been granted the '{$label}' verification badge",
+                'link' => '/settings',
+                'type' => 'verification',
+                'created_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            // Non-critical
+        }
+
+        return $badgeId;
     }
 
     /**
-     * Delegates to legacy MemberVerificationBadgeService::revokeBadge().
+     * Revoke a verification badge (admin action).
      */
     public function revokeBadge(int $userId, string $badgeType, int $adminId): bool
     {
-        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return false; }
-        return \Nexus\Services\MemberVerificationBadgeService::revokeBadge($userId, $badgeType, $adminId);
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        DB::table('member_verification_badges')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('badge_type', $badgeType)
+            ->whereNull('revoked_at')
+            ->update(['revoked_at' => now()]);
+
+        return true;
     }
 
     /**
-     * Delegates to legacy MemberVerificationBadgeService::getUserBadges().
+     * Get all active verification badges for a user.
      */
     public function getUserBadges(int $userId): array
     {
-        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
-        return \Nexus\Services\MemberVerificationBadgeService::getUserBadges($userId);
+        $tenantId = TenantContext::getId();
+
+        $rows = DB::table('member_verification_badges as mvb')
+            ->leftJoin('users as u', 'mvb.verified_by', '=', 'u.id')
+            ->where('mvb.user_id', $userId)
+            ->where('mvb.tenant_id', $tenantId)
+            ->whereNull('mvb.revoked_at')
+            ->where(function ($q) {
+                $q->whereNull('mvb.expires_at')
+                  ->orWhere('mvb.expires_at', '>', now());
+            })
+            ->select(
+                'mvb.badge_type', 'mvb.granted_at', 'mvb.expires_at',
+                DB::raw("CONCAT(u.first_name, ' ', u.last_name) as verified_by_name")
+            )
+            ->get();
+
+        return $rows->map(function ($row) {
+            $row = (array) $row;
+            $row['label'] = self::BADGE_LABELS[$row['badge_type']] ?? $row['badge_type'];
+            $row['icon'] = self::BADGE_ICONS[$row['badge_type']] ?? 'badge';
+            return $row;
+        })->all();
     }
 
     /**
-     * Delegates to legacy MemberVerificationBadgeService::getBatchUserBadges().
+     * Batch get badges for multiple users (for profile cards).
+     *
+     * @return array Keyed by user_id => [badge_types]
      */
     public function getBatchUserBadges(array $userIds): array
     {
-        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
-        return \Nexus\Services\MemberVerificationBadgeService::getBatchUserBadges($userIds);
+        if (empty($userIds)) {
+            return [];
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $rows = DB::table('member_verification_badges')
+            ->whereIn('user_id', $userIds)
+            ->where('tenant_id', $tenantId)
+            ->whereNull('revoked_at')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>', now());
+            })
+            ->select('user_id', 'badge_type')
+            ->get();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $uid = (int) $row->user_id;
+            if (!isset($result[$uid])) {
+                $result[$uid] = [];
+            }
+            $result[$uid][] = [
+                'type' => $row->badge_type,
+                'label' => self::BADGE_LABELS[$row->badge_type] ?? $row->badge_type,
+                'icon' => self::BADGE_ICONS[$row->badge_type] ?? 'badge',
+            ];
+        }
+
+        return $result;
     }
 
     /**
-     * Delegates to legacy MemberVerificationBadgeService::getAdminBadgeList().
+     * Get all badges for admin management (includes revoked).
      */
     public function getAdminBadgeList(int $userId): array
     {
-        if (!class_exists('\Nexus\Services\MemberVerificationBadgeService')) { return []; }
-        return \Nexus\Services\MemberVerificationBadgeService::getAdminBadgeList($userId);
+        $tenantId = TenantContext::getId();
+
+        $rows = DB::table('member_verification_badges as mvb')
+            ->leftJoin('users as u', 'mvb.verified_by', '=', 'u.id')
+            ->where('mvb.user_id', $userId)
+            ->where('mvb.tenant_id', $tenantId)
+            ->select('mvb.*', DB::raw("CONCAT(u.first_name, ' ', u.last_name) as verified_by_name"))
+            ->orderByDesc('mvb.granted_at')
+            ->get();
+
+        return $rows->map(function ($row) {
+            $row = (array) $row;
+            $row['label'] = self::BADGE_LABELS[$row['badge_type']] ?? $row['badge_type'];
+            $row['icon'] = self::BADGE_ICONS[$row['badge_type']] ?? 'badge';
+            $row['is_active'] = $row['revoked_at'] === null
+                && ($row['expires_at'] === null || strtotime($row['expires_at']) > time());
+            return $row;
+        })->all();
     }
 }

@@ -6,98 +6,226 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\VolShift;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
- * ShiftWaitlistService — Laravel DI wrapper for legacy \Nexus\Services\ShiftWaitlistService.
+ * ShiftWaitlistService — Laravel DI-based service for shift waitlist operations.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Eloquent/DI counterpart to the legacy static \Nexus\Services\ShiftWaitlistService.
+ * Manages waitlist automation for volunteer shifts with tenant scoping.
  */
 class ShiftWaitlistService
 {
-    public function __construct()
-    {
-    }
+    private array $errors = [];
 
-    /**
-     * Delegates to legacy ShiftWaitlistService::getErrors().
-     */
     public function getErrors(): array
     {
-        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return []; }
-        return \Nexus\Services\ShiftWaitlistService::getErrors();
+        return $this->errors;
     }
 
     /**
-     * Delegates to legacy ShiftWaitlistService::join().
+     * Join the waitlist for a shift.
+     *
+     * @return int|null Waitlist entry ID or null on failure
      */
     public function join(int $shiftId, int $userId): ?int
     {
-        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return null; }
-        return \Nexus\Services\ShiftWaitlistService::join($shiftId, $userId);
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $shift = VolShift::find($shiftId);
+        if (! $shift) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            return null;
+        }
+
+        if ($shift->start_time->isPast()) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
+            return null;
+        }
+
+        // Check if already on waitlist
+        $onWaitlist = DB::table('vol_shift_waitlist')
+            ->where('shift_id', $shiftId)
+            ->where('user_id', $userId)
+            ->where('status', 'waiting')
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if ($onWaitlist) {
+            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already on the waitlist for this shift'];
+            return null;
+        }
+
+        // Check if already signed up
+        $signedUp = DB::table('vol_applications')
+            ->where('shift_id', $shiftId)
+            ->where('user_id', $userId)
+            ->where('status', 'approved')
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if ($signedUp) {
+            $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already signed up for this shift'];
+            return null;
+        }
+
+        try {
+            return DB::transaction(function () use ($shiftId, $userId, $tenantId) {
+                // Get next position (locked to prevent race condition)
+                $nextPos = (int) DB::table('vol_shift_waitlist')
+                    ->where('shift_id', $shiftId)
+                    ->where('status', 'waiting')
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->max('position') + 1;
+
+                return DB::table('vol_shift_waitlist')->insertGetId([
+                    'tenant_id'  => $tenantId,
+                    'shift_id'   => $shiftId,
+                    'user_id'    => $userId,
+                    'position'   => $nextPos,
+                    'status'     => 'waiting',
+                    'created_at' => now(),
+                ]);
+            });
+        } catch (\Exception $e) {
+            Log::error('ShiftWaitlistService::join error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to join waitlist'];
+            return null;
+        }
     }
 
     /**
-     * Delegates to legacy ShiftWaitlistService::leave().
+     * Leave the waitlist for a shift.
      */
     public function leave(int $shiftId, int $userId): bool
     {
-        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return false; }
-        return \Nexus\Services\ShiftWaitlistService::leave($shiftId, $userId);
+        $this->errors = [];
+        $tenantId = TenantContext::getId();
+
+        $entry = DB::table('vol_shift_waitlist')
+            ->where('shift_id', $shiftId)
+            ->where('user_id', $userId)
+            ->where('status', 'waiting')
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $entry) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not on the waitlist for this shift'];
+            return false;
+        }
+
+        try {
+            // Cancel the entry
+            DB::table('vol_shift_waitlist')
+                ->where('id', $entry->id)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'cancelled']);
+
+            // Reorder remaining positions
+            DB::table('vol_shift_waitlist')
+                ->where('shift_id', $shiftId)
+                ->where('status', 'waiting')
+                ->where('position', '>', $entry->position)
+                ->where('tenant_id', $tenantId)
+                ->decrement('position');
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('ShiftWaitlistService::leave error: ' . $e->getMessage());
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to leave waitlist'];
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy ShiftWaitlistService::getWaitlist().
+     * Get waitlist entries for a shift.
      */
     public function getWaitlist(int $shiftId): array
     {
-        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return []; }
-        return \Nexus\Services\ShiftWaitlistService::getWaitlist($shiftId);
+        $tenantId = TenantContext::getId();
+
+        $entries = DB::table('vol_shift_waitlist as w')
+            ->join('users as u', 'w.user_id', '=', 'u.id')
+            ->where('w.shift_id', $shiftId)
+            ->where('w.status', 'waiting')
+            ->where('w.tenant_id', $tenantId)
+            ->orderBy('w.position')
+            ->select('w.*', 'u.name as user_name', 'u.avatar_url as user_avatar')
+            ->get();
+
+        return $entries->map(function ($e) {
+            return [
+                'id'       => (int) $e->id,
+                'position' => (int) $e->position,
+                'user'     => [
+                    'id'         => (int) $e->user_id,
+                    'name'       => $e->user_name,
+                    'avatar_url' => $e->user_avatar,
+                ],
+                'created_at' => $e->created_at,
+            ];
+        })->all();
     }
 
     /**
-     * Delegates to legacy ShiftWaitlistService::getUserPosition().
+     * Get user's waitlist position for a shift.
      */
     public function getUserPosition(int $shiftId, int $userId): ?array
     {
-        if (!class_exists('\Nexus\Services\ShiftWaitlistService')) { return null; }
-        return \Nexus\Services\ShiftWaitlistService::getUserPosition($shiftId, $userId);
+        $tenantId = TenantContext::getId();
+
+        $entry = DB::table('vol_shift_waitlist')
+            ->where('shift_id', $shiftId)
+            ->where('user_id', $userId)
+            ->where('status', 'waiting')
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $entry) {
+            return null;
+        }
+
+        $totalWaiting = DB::table('vol_shift_waitlist')
+            ->where('shift_id', $shiftId)
+            ->where('status', 'waiting')
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        return [
+            'id'            => (int) $entry->id,
+            'position'      => (int) $entry->position,
+            'total_waiting' => $totalWaiting,
+        ];
     }
 
     /**
      * Get all waitlist entries for a user across all shifts.
-     *
-     * Returns waitlist entries with shift, opportunity, and organization details.
      */
     public function getUserWaitlists(int $userId, int $tenantId): array
     {
         try {
-            $rows = DB::select("
-                SELECT
-                    w.id,
-                    w.position,
-                    w.created_at AS joined_at,
-                    s.id AS shift_id,
-                    s.start_time,
-                    s.end_time,
-                    s.capacity,
-                    opp.id AS opportunity_id,
-                    opp.title AS opportunity_title,
-                    opp.location AS opportunity_location,
-                    org.id AS organization_id,
-                    org.name AS organization_name,
-                    org.logo_url AS organization_logo_url
-                FROM vol_shift_waitlist w
-                JOIN vol_shifts s ON w.shift_id = s.id
-                JOIN vol_opportunities opp ON s.opportunity_id = opp.id
-                LEFT JOIN vol_organizations org ON opp.organization_id = org.id
-                WHERE w.user_id = ?
-                  AND w.tenant_id = ?
-                  AND w.status = 'waiting'
-                ORDER BY s.start_time ASC
-            ", [$userId, $tenantId]);
+            $rows = DB::table('vol_shift_waitlist as w')
+                ->join('vol_shifts as s', 'w.shift_id', '=', 's.id')
+                ->join('vol_opportunities as opp', 's.opportunity_id', '=', 'opp.id')
+                ->leftJoin('vol_organizations as org', 'opp.organization_id', '=', 'org.id')
+                ->where('w.user_id', $userId)
+                ->where('w.tenant_id', $tenantId)
+                ->where('w.status', 'waiting')
+                ->orderBy('s.start_time')
+                ->select(
+                    'w.id', 'w.position', 'w.created_at as joined_at',
+                    's.id as shift_id', 's.start_time', 's.end_time', 's.capacity',
+                    'opp.id as opportunity_id', 'opp.title as opportunity_title', 'opp.location as opportunity_location',
+                    'org.id as organization_id', 'org.name as organization_name', 'org.logo_url as organization_logo_url'
+                )
+                ->get();
 
-            return array_map(function ($row): array {
+            return $rows->map(function ($row) {
                 return [
                     'id'       => (int) $row->id,
                     'position' => (int) $row->position,
@@ -119,18 +247,15 @@ class ShiftWaitlistService
                     ],
                     'joined_at' => $row->joined_at,
                 ];
-            }, $rows);
+            })->all();
         } catch (\Exception $e) {
-            \Log::error("ShiftWaitlistService::getUserWaitlists error: " . $e->getMessage());
+            Log::error('ShiftWaitlistService::getUserWaitlists error: ' . $e->getMessage());
             return [];
         }
     }
 
     /**
      * Promote a user from the waitlist to the shift.
-     *
-     * Verifies the user has a 'notified' waitlist entry, marks it as promoted,
-     * and signs them up for the shift via the legacy VolunteerService.
      */
     public function promoteUser(int $waitlistId, int $tenantId): bool
     {
@@ -140,7 +265,7 @@ class ShiftWaitlistService
             ->where('status', 'notified')
             ->first();
 
-        if (!$entry) {
+        if (! $entry) {
             return false;
         }
 
@@ -154,23 +279,44 @@ class ShiftWaitlistService
                     'promoted_at' => now(),
                 ]);
 
-            // Sign up for shift via legacy service
-            if (!class_exists('\Nexus\Services\VolunteerService')) { return false; }
-            $result = \Nexus\Services\VolunteerService::signUpForShift($entry->shift_id, $entry->user_id);
+            // Sign up for shift — create an approved application
+            $existingApp = DB::table('vol_applications')
+                ->where('shift_id', $entry->shift_id)
+                ->where('user_id', $entry->user_id)
+                ->where('tenant_id', $tenantId)
+                ->first();
 
-            if (!$result) {
-                // Revert promotion if signup fails
-                DB::table('vol_shift_waitlist')
-                    ->where('id', $waitlistId)
+            if ($existingApp) {
+                // Reactivate existing application
+                DB::table('vol_applications')
+                    ->where('id', $existingApp->id)
                     ->where('tenant_id', $tenantId)
-                    ->update(['status' => 'waiting']);
+                    ->update(['status' => 'approved']);
+            } else {
+                // Get the opportunity_id from the shift
+                $shift = DB::table('vol_shifts')->where('id', $entry->shift_id)->first();
 
-                return false;
+                DB::table('vol_applications')->insert([
+                    'tenant_id'      => $tenantId,
+                    'opportunity_id' => $shift->opportunity_id ?? 0,
+                    'shift_id'       => $entry->shift_id,
+                    'user_id'        => $entry->user_id,
+                    'status'         => 'approved',
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
+                ]);
             }
 
             return true;
         } catch (\Exception $e) {
-            \Log::error("ShiftWaitlistService::promoteUser error: " . $e->getMessage());
+            Log::error('ShiftWaitlistService::promoteUser error: ' . $e->getMessage());
+
+            // Revert promotion on failure
+            DB::table('vol_shift_waitlist')
+                ->where('id', $waitlistId)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'waiting']);
+
             return false;
         }
     }

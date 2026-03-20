@@ -6,16 +6,42 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\ContentModerationQueue;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ContentModerationService — Laravel DI-based service for content moderation.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ContentModerationService.
  * Manages reported content review, approval, and rejection workflows.
+ * All queries are tenant-scoped via HasTenantScope trait on models.
  */
 class ContentModerationService
 {
+    /** Content types that can be moderated */
+    public const CONTENT_TYPES = ['post', 'listing', 'event', 'comment', 'group'];
+
+    /** Moderation statuses */
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_FLAGGED = 'flagged';
+
+    /** Spam patterns for auto-filter */
+    private const SPAM_PATTERNS = [
+        '/\b(buy now|click here|limited offer|free money|act now)\b/i',
+        '/https?:\/\/[^\s]{80,}/',
+        '/(.)\1{15,}/',
+        '/[A-Z\s]{50,}/',
+    ];
+
+    public function __construct(
+        private readonly ContentModerationQueue $queue,
+    ) {}
+
     /**
      * Get all content moderation items for a tenant with pagination.
      *
@@ -27,22 +53,28 @@ class ContentModerationService
         $offset = max(0, (int) ($filters['offset'] ?? 0));
         $status = $filters['status'] ?? null;
 
-        $query = DB::table('content_moderation_queue as cmq')
-            ->leftJoin('users as author', 'cmq.author_id', '=', 'author.id')
-            ->leftJoin('users as reviewer', 'cmq.reviewer_id', '=', 'reviewer.id')
-            ->where('cmq.tenant_id', $tenantId)
-            ->select('cmq.*', 'author.name as author_name', 'reviewer.name as reviewer_name');
+        $query = $this->queue->newQuery()
+            ->with(['author:id,first_name,last_name,name,avatar_url', 'reviewer:id,first_name,last_name,name']);
 
         if ($status !== null) {
-            $query->where('cmq.status', $status);
+            $query->where('status', $status);
         }
 
-        $total = $query->count();
-        $items = $query->orderByDesc('cmq.created_at')
+        $total = (clone $query)->count();
+        $items = $query->orderByDesc('created_at')
             ->offset($offset)
             ->limit($limit)
             ->get()
-            ->map(fn ($r) => (array) $r)
+            ->map(function (ContentModerationQueue $item) {
+                $data = $item->toArray();
+                $data['author_name'] = $item->author
+                    ? trim(($item->author->first_name ?? '') . ' ' . ($item->author->last_name ?? ''))
+                    : null;
+                $data['reviewer_name'] = $item->reviewer
+                    ? trim(($item->reviewer->first_name ?? '') . ' ' . ($item->reviewer->last_name ?? ''))
+                    : null;
+                return $data;
+            })
             ->all();
 
         return ['items' => $items, 'total' => $total];
@@ -53,15 +85,13 @@ class ContentModerationService
      */
     public function approve(int $reportId, int $tenantId, int $moderatorId): bool
     {
-        return DB::table('content_moderation_queue')
+        return $this->queue->newQuery()
             ->where('id', $reportId)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'pending')
+            ->where('status', self::STATUS_PENDING)
             ->update([
-                'status'       => 'approved',
-                'reviewer_id'  => $moderatorId,
-                'reviewed_at'  => now(),
-                'updated_at'   => now(),
+                'status' => self::STATUS_APPROVED,
+                'reviewer_id' => $moderatorId,
+                'reviewed_at' => now(),
             ]) > 0;
     }
 
@@ -70,16 +100,14 @@ class ContentModerationService
      */
     public function reject(int $reportId, int $tenantId, int $moderatorId, ?string $reason = null): bool
     {
-        return DB::table('content_moderation_queue')
+        return $this->queue->newQuery()
             ->where('id', $reportId)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'pending')
+            ->where('status', self::STATUS_PENDING)
             ->update([
-                'status'           => 'rejected',
-                'reviewer_id'      => $moderatorId,
-                'reviewed_at'      => now(),
+                'status' => self::STATUS_REJECTED,
+                'reviewer_id' => $moderatorId,
+                'reviewed_at' => now(),
                 'rejection_reason' => $reason,
-                'updated_at'       => now(),
             ]) > 0;
     }
 
@@ -89,8 +117,7 @@ class ContentModerationService
     public function getStats(int $tenantId): array
     {
         try {
-            $rows = DB::table('content_moderation_queue')
-                ->where('tenant_id', $tenantId)
+            $rows = $this->queue->newQuery()
                 ->selectRaw('status, COUNT(*) as count')
                 ->groupBy('status')
                 ->pluck('count', 'status')
@@ -100,51 +127,208 @@ class ContentModerationService
         }
 
         return [
-            'pending'  => (int) ($rows['pending'] ?? 0),
+            'pending' => (int) ($rows['pending'] ?? 0),
             'approved' => (int) ($rows['approved'] ?? 0),
             'rejected' => (int) ($rows['rejected'] ?? 0),
-            'flagged'  => (int) ($rows['flagged'] ?? 0),
-            'total'    => array_sum(array_map('intval', $rows)),
+            'flagged' => (int) ($rows['flagged'] ?? 0),
+            'total' => array_sum(array_map('intval', $rows)),
         ];
     }
 
-    // =========================================================================
-    // Legacy delegation methods — used by AdminAnalyticsReportsController
-    // =========================================================================
-
     /**
-     * Delegates to legacy ContentModerationService::getQueue().
+     * Get moderation queue with filtering and sorting.
+     *
+     * @return array{items: array, total: int}
      */
     public function getQueue(int $tenantId, array $filters = [], int $limit = 50, int $offset = 0): array
     {
-        if (!class_exists('\Nexus\Services\ContentModerationService')) { return []; }
-        return \Nexus\Services\ContentModerationService::getQueue($tenantId, $filters, $limit, $offset);
+        $limit = min(200, max(1, $limit));
+        $offset = max(0, $offset);
+
+        $query = $this->queue->newQuery()
+            ->with(['author:id,first_name,last_name,email,avatar_url', 'reviewer:id,first_name,last_name']);
+
+        if (!empty($filters['status']) && in_array($filters['status'], [self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED, self::STATUS_FLAGGED], true)) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['content_type']) && in_array($filters['content_type'], self::CONTENT_TYPES, true)) {
+            $query->where('content_type', $filters['content_type']);
+        }
+
+        if (!empty($filters['search'])) {
+            $searchPattern = '%' . $filters['search'] . '%';
+            $query->where(function (Builder $q) use ($searchPattern) {
+                $q->where('title', 'LIKE', $searchPattern)
+                  ->orWhereHas('author', function (Builder $aq) use ($searchPattern) {
+                      $aq->where('first_name', 'LIKE', $searchPattern)
+                         ->orWhere('last_name', 'LIKE', $searchPattern);
+                  });
+            });
+        }
+
+        $total = (clone $query)->count();
+
+        $items = $query
+            ->orderByRaw("CASE status WHEN 'flagged' THEN 1 WHEN 'pending' THEN 2 WHEN 'rejected' THEN 3 WHEN 'approved' THEN 4 END")
+            ->orderBy('created_at', 'asc')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->map(function (ContentModerationQueue $item) {
+                return [
+                    'id' => $item->id,
+                    'content_type' => $item->content_type,
+                    'content_id' => (int) $item->content_id,
+                    'title' => $item->title,
+                    'status' => $item->status,
+                    'author' => [
+                        'id' => (int) $item->author_id,
+                        'name' => $item->author ? trim(($item->author->first_name ?? '') . ' ' . ($item->author->last_name ?? '')) : null,
+                        'email' => $item->author->email ?? null,
+                        'avatar' => $item->author->avatar_url ?? null,
+                    ],
+                    'auto_flagged' => (bool) $item->auto_flagged,
+                    'flag_reason' => $item->flag_reason,
+                    'reviewer' => $item->reviewer_id ? [
+                        'id' => (int) $item->reviewer_id,
+                        'name' => $item->reviewer ? trim(($item->reviewer->first_name ?? '') . ' ' . ($item->reviewer->last_name ?? '')) : null,
+                    ] : null,
+                    'reviewed_at' => $item->reviewed_at?->toDateTimeString(),
+                    'rejection_reason' => $item->rejection_reason,
+                    'created_at' => $item->created_at?->toDateTimeString(),
+                    'updated_at' => $item->updated_at?->toDateTimeString(),
+                ];
+            })
+            ->all();
+
+        return ['items' => $items, 'total' => $total];
     }
 
     /**
-     * Delegates to legacy ContentModerationService::review().
+     * Review (approve/reject) a moderation queue item.
+     *
+     * @return array{success: bool, message: string}
      */
     public function review(int $id, int $tenantId, int $adminId, string $decision, ?string $rejectionReason = null): array
     {
-        if (!class_exists('\Nexus\Services\ContentModerationService')) { return []; }
-        return \Nexus\Services\ContentModerationService::review($id, $tenantId, $adminId, $decision, $rejectionReason);
+        if (!in_array($decision, [self::STATUS_APPROVED, self::STATUS_REJECTED], true)) {
+            return ['success' => false, 'message' => 'Invalid decision. Must be approved or rejected.'];
+        }
+
+        $item = $this->queue->newQuery()->find($id);
+
+        if (!$item) {
+            return ['success' => false, 'message' => 'Moderation queue item not found.'];
+        }
+
+        if ($item->status === self::STATUS_APPROVED || $item->status === self::STATUS_REJECTED) {
+            return ['success' => false, 'message' => 'This item has already been reviewed.'];
+        }
+
+        if ($decision === self::STATUS_REJECTED && empty($rejectionReason)) {
+            return ['success' => false, 'message' => 'Rejection reason is required.'];
+        }
+
+        $item->update([
+            'status' => $decision,
+            'reviewer_id' => $adminId,
+            'reviewed_at' => now(),
+            'rejection_reason' => $rejectionReason,
+        ]);
+
+        // Apply decision to actual content
+        $this->applyDecision($item, $decision);
+
+        return [
+            'success' => true,
+            'message' => "Content has been {$decision}.",
+            'content_type' => $item->content_type,
+            'content_id' => (int) $item->content_id,
+        ];
     }
 
     /**
-     * Delegates to legacy ContentModerationService::getModerationSettings().
+     * Get moderation settings for a tenant.
      */
     public function getModerationSettings(int $tenantId): array
     {
-        if (!class_exists('\Nexus\Services\ContentModerationService')) { return []; }
-        return \Nexus\Services\ContentModerationService::getModerationSettings($tenantId);
+        $settings = [
+            'enabled' => false,
+            'require_post' => false,
+            'require_listing' => false,
+            'require_event' => false,
+            'require_comment' => false,
+            'auto_filter' => false,
+        ];
+
+        try {
+            foreach ($settings as $key => $default) {
+                $value = DB::table('tenant_settings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('setting_key', "moderation.{$key}")
+                    ->value('setting_value');
+                $settings[$key] = (bool) $value;
+            }
+        } catch (\Throwable $e) {
+            // Use defaults if settings table unavailable
+        }
+
+        return $settings;
     }
 
     /**
-     * Delegates to legacy ContentModerationService::updateSettings().
+     * Update moderation settings for a tenant.
      */
     public function updateSettings(int $tenantId, array $settings): bool
     {
-        if (!class_exists('\Nexus\Services\ContentModerationService')) { return false; }
-        return \Nexus\Services\ContentModerationService::updateSettings($tenantId, $settings);
+        $allowedKeys = ['enabled', 'require_post', 'require_listing', 'require_event', 'require_comment', 'auto_filter'];
+
+        try {
+            foreach ($allowedKeys as $key) {
+                if (isset($settings[$key])) {
+                    DB::table('tenant_settings')->updateOrInsert(
+                        ['tenant_id' => $tenantId, 'setting_key' => "moderation.{$key}"],
+                        ['setting_value' => $settings[$key] ? '1' : '0', 'updated_at' => now()]
+                    );
+                }
+            }
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('ContentModerationService::updateSettings failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Apply moderation decision to the actual content.
+     */
+    private function applyDecision(ContentModerationQueue $item, string $decision): void
+    {
+        $contentType = $item->content_type;
+        $contentId = (int) $item->content_id;
+        $tenantId = $item->tenant_id;
+
+        try {
+            if ($decision === self::STATUS_APPROVED) {
+                match ($contentType) {
+                    'post' => DB::table('feed_posts')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 0]),
+                    'listing' => DB::table('listings')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'active']),
+                    'event' => DB::table('events')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'published']),
+                    'comment' => DB::table('comments')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 0]),
+                    default => null,
+                };
+            } elseif ($decision === self::STATUS_REJECTED) {
+                match ($contentType) {
+                    'post' => DB::table('feed_posts')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 1]),
+                    'listing' => DB::table('listings')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'rejected']),
+                    'event' => DB::table('events')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'cancelled']),
+                    'comment' => DB::table('comments')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 1]),
+                    default => null,
+                };
+            }
+        } catch (\Throwable $e) {
+            Log::error("ContentModerationService::applyDecision failed for {$contentType} #{$contentId}: " . $e->getMessage());
+        }
     }
 }

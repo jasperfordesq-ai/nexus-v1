@@ -6,50 +6,280 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use App\Models\Message;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- * ContextualMessageService — Laravel DI wrapper for legacy \Nexus\Services\ContextualMessageService.
+ * ContextualMessageService — Context awareness for messages.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Messages can reference a specific listing, event, job, volunteering opportunity, etc.
+ * via `context_type` and `context_id` columns on the messages table.
+ *
+ * Valid context types: listing, event, job, volunteering, group
  */
 class ContextualMessageService
 {
-    public function __construct()
-    {
-    }
+    private const VALID_TYPES = ['listing', 'event', 'job', 'volunteering', 'group'];
 
     /**
-     * Delegates to legacy ContextualMessageService::sendWithContext().
+     * Send a message with context.
+     *
+     * @param int $senderId
+     * @param int $receiverId
+     * @param string $body Message body
+     * @param string|null $contextType Type of referenced entity
+     * @param int|null $contextId ID of referenced entity
+     * @param string $subject Optional subject
+     * @return int|null Message ID or null on failure
      */
-    public function sendWithContext(int $senderId, int $receiverId, string $body, ?string $contextType = null, ?int $contextId = null, string $subject = ''): ?int
-    {
-        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return null; }
-        return \Nexus\Services\ContextualMessageService::sendWithContext($senderId, $receiverId, $body, $contextType, $contextId, $subject);
+    public function sendWithContext(
+        int $senderId,
+        int $receiverId,
+        string $body,
+        ?string $contextType = null,
+        ?int $contextId = null,
+        string $subject = ''
+    ): ?int {
+        $tenantId = TenantContext::getId();
+
+        // Validate context type
+        if ($contextType !== null && !in_array($contextType, self::VALID_TYPES)) {
+            $contextType = null;
+            $contextId = null;
+        }
+
+        if ($contextType !== null && $contextId === null) {
+            $contextType = null;
+        }
+
+        // Create the message
+        $message = Message::create([
+            'tenant_id' => $tenantId,
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
+            'content' => $body,
+            'created_at' => now(),
+        ]);
+
+        if (!$message) {
+            return null;
+        }
+
+        // Attach context if provided
+        if ($contextType !== null && $contextId !== null) {
+            try {
+                $updateData = ['context_type' => $contextType, 'context_id' => $contextId];
+
+                // Also update listing_id for backward compatibility
+                if ($contextType === 'listing') {
+                    $updateData['listing_id'] = $contextId;
+                }
+
+                Message::where('id', $message->id)
+                    ->where('tenant_id', $tenantId)
+                    ->update($updateData);
+            } catch (\Exception $e) {
+                Log::warning('ContextualMessageService: Failed to attach context: ' . $e->getMessage());
+            }
+        }
+
+        return (int) $message->id;
     }
 
     /**
-     * Delegates to legacy ContextualMessageService::getContextInfo().
+     * Get context info for a message (for display in UI).
+     *
+     * @param string $contextType
+     * @param int $contextId
+     * @return array|null Context card data or null
      */
     public function getContextInfo(string $contextType, int $contextId): ?array
     {
-        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return null; }
-        return \Nexus\Services\ContextualMessageService::getContextInfo($contextType, $contextId);
+        if (!in_array($contextType, self::VALID_TYPES)) {
+            return null;
+        }
+
+        try {
+            return match ($contextType) {
+                'listing' => $this->getListingContext($contextId),
+                'event' => $this->getEventContext($contextId),
+                'job' => $this->getJobContext($contextId),
+                'volunteering' => $this->getVolunteeringContext($contextId),
+                'group' => $this->getGroupContext($contextId),
+                default => null,
+            };
+        } catch (\Exception $e) {
+            Log::warning('ContextualMessageService::getContextInfo error: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
-     * Delegates to legacy ContextualMessageService::getContextInfoBatch().
+     * Get context info for multiple messages in batch.
+     *
+     * @param array $contextPairs Array of ['type' => string, 'id' => int]
+     * @return array Keyed by "type:id"
      */
     public function getContextInfoBatch(array $contextPairs): array
     {
-        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return []; }
-        return \Nexus\Services\ContextualMessageService::getContextInfoBatch($contextPairs);
+        $results = [];
+
+        foreach ($contextPairs as $pair) {
+            $key = $pair['type'] . ':' . $pair['id'];
+            if (!isset($results[$key])) {
+                $info = $this->getContextInfo($pair['type'], (int) $pair['id']);
+                if ($info) {
+                    $results[$key] = $info;
+                }
+            }
+        }
+
+        return $results;
     }
 
     /**
-     * Delegates to legacy ContextualMessageService::enrichMessagesWithContext().
+     * Enrich messages with context card data.
+     *
+     * @param array $messages Array of message data
+     * @return array Messages with context_info added
      */
     public function enrichMessagesWithContext(array $messages): array
     {
-        if (!class_exists('Nexus\\Services\\ContextualMessageService')) { return []; }
-        return \Nexus\Services\ContextualMessageService::enrichMessagesWithContext($messages);
+        $contextPairs = [];
+        foreach ($messages as $msg) {
+            if (!empty($msg['context_type']) && !empty($msg['context_id'])) {
+                $contextPairs[] = ['type' => $msg['context_type'], 'id' => (int) $msg['context_id']];
+            }
+        }
+
+        if (empty($contextPairs)) {
+            return $messages;
+        }
+
+        $contextData = $this->getContextInfoBatch($contextPairs);
+
+        foreach ($messages as &$msg) {
+            if (!empty($msg['context_type']) && !empty($msg['context_id'])) {
+                $key = $msg['context_type'] . ':' . $msg['context_id'];
+                $msg['context_info'] = $contextData[$key] ?? null;
+            } else {
+                $msg['context_info'] = null;
+            }
+        }
+
+        return $messages;
+    }
+
+    // =========================================================================
+    // CONTEXT RESOLVERS
+    // =========================================================================
+
+    private function getListingContext(int $id): ?array
+    {
+        $row = DB::table('listings as l')
+            ->join('users as u', 'l.user_id', '=', 'u.id')
+            ->where('l.id', $id)
+            ->select('l.id', 'l.title', 'l.type', 'l.description', 'u.name as user_name')
+            ->first();
+
+        if (!$row) {
+            return null;
+        }
+
+        return [
+            'type' => 'listing',
+            'id' => (int) $row->id,
+            'title' => $row->title,
+            'subtitle' => ucfirst($row->type ?? 'listing') . ' by ' . $row->user_name,
+            'description' => mb_substr($row->description ?? '', 0, 120),
+            'link' => '/listings/' . $row->id,
+        ];
+    }
+
+    private function getEventContext(int $id): ?array
+    {
+        $row = DB::table('events')->where('id', $id)->first(['id', 'title', 'start_time', 'location']);
+
+        if (!$row) {
+            return null;
+        }
+
+        $subtitle = 'Event';
+        if (!empty($row->start_time)) {
+            $subtitle .= ' on ' . date('M j, Y', strtotime($row->start_time));
+        }
+
+        return [
+            'type' => 'event',
+            'id' => (int) $row->id,
+            'title' => $row->title,
+            'subtitle' => $subtitle,
+            'description' => $row->location ?? '',
+            'link' => '/events/' . $row->id,
+        ];
+    }
+
+    private function getJobContext(int $id): ?array
+    {
+        $row = DB::table('job_vacancies as j')
+            ->leftJoin('organizations as o', 'j.organization_id', '=', 'o.id')
+            ->where('j.id', $id)
+            ->select('j.id', 'j.title', 'j.location', 'o.name as org_name')
+            ->first();
+
+        if (!$row) {
+            return null;
+        }
+
+        return [
+            'type' => 'job',
+            'id' => (int) $row->id,
+            'title' => $row->title,
+            'subtitle' => $row->org_name ? 'at ' . $row->org_name : 'Job vacancy',
+            'description' => $row->location ?? '',
+            'link' => '/jobs/' . $row->id,
+        ];
+    }
+
+    private function getVolunteeringContext(int $id): ?array
+    {
+        $row = DB::table('volunteer_opportunities as v')
+            ->leftJoin('organizations as o', 'v.organization_id', '=', 'o.id')
+            ->where('v.id', $id)
+            ->select('v.id', 'v.title', 'v.location', 'o.name as org_name')
+            ->first();
+
+        if (!$row) {
+            return null;
+        }
+
+        return [
+            'type' => 'volunteering',
+            'id' => (int) $row->id,
+            'title' => $row->title,
+            'subtitle' => $row->org_name ? 'with ' . $row->org_name : 'Volunteer opportunity',
+            'description' => $row->location ?? '',
+            'link' => '/volunteering/' . $row->id,
+        ];
+    }
+
+    private function getGroupContext(int $id): ?array
+    {
+        $row = DB::table('groups')->where('id', $id)->first(['id', 'name', 'description']);
+
+        if (!$row) {
+            return null;
+        }
+
+        return [
+            'type' => 'group',
+            'id' => (int) $row->id,
+            'title' => $row->name,
+            'subtitle' => 'Group',
+            'description' => mb_substr($row->description ?? '', 0, 120),
+            'link' => '/groups/' . $row->id,
+        ];
     }
 }

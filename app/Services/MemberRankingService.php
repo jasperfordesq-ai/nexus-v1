@@ -1,19 +1,21 @@
 <?php
-// Copyright (c) 2024-2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
- * MemberRankingService — Laravel DI-based service for the CommunityRank algorithm.
+ * MemberRankingService — CommunityRank algorithm for ranking members.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\MemberRankingService.
- * Computes weighted scores (activity, contribution, reputation) to rank members.
+ * Computes weighted scores (activity, contribution, reputation) to rank members
+ * within a tenant. Uses Eloquent/DB query builder instead of legacy Database class.
  */
 class MemberRankingService
 {
@@ -47,39 +49,44 @@ class MemberRankingService
         }
 
         $userIds = $users->pluck('id')->all();
-        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
 
         // Activity: transactions in lookback window
-        $txnCounts = DB::select(
-            "SELECT sender_id as user_id, COUNT(*) as cnt FROM transactions
-             WHERE tenant_id = ? AND sender_id IN ({$placeholders}) AND created_at >= ? GROUP BY sender_id",
-            array_merge([$tenantId], $userIds, [$cutoff])
-        );
-        $txnMap = collect($txnCounts)->pluck('cnt', 'user_id')->all();
+        $txnMap = DB::table('transactions')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('sender_id', $userIds)
+            ->where('created_at', '>=', $cutoff)
+            ->select('sender_id as user_id', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('sender_id')
+            ->pluck('cnt', 'user_id')
+            ->all();
 
         // Activity: posts in lookback window
-        $postCounts = DB::select(
-            "SELECT user_id, COUNT(*) as cnt FROM feed_posts
-             WHERE tenant_id = ? AND user_id IN ({$placeholders}) AND created_at >= ? GROUP BY user_id",
-            array_merge([$tenantId], $userIds, [$cutoff])
-        );
-        $postMap = collect($postCounts)->pluck('cnt', 'user_id')->all();
+        $postMap = DB::table('feed_posts')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('user_id', $userIds)
+            ->where('created_at', '>=', $cutoff)
+            ->select('user_id', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('user_id')
+            ->pluck('cnt', 'user_id')
+            ->all();
 
         // Contribution: listings created
-        $listingCounts = DB::select(
-            "SELECT user_id, COUNT(*) as cnt FROM listings
-             WHERE tenant_id = ? AND user_id IN ({$placeholders}) GROUP BY user_id",
-            array_merge([$tenantId], $userIds)
-        );
-        $listingMap = collect($listingCounts)->pluck('cnt', 'user_id')->all();
+        $listingMap = DB::table('listings')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('user_id', $userIds)
+            ->select('user_id', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('user_id')
+            ->pluck('cnt', 'user_id')
+            ->all();
 
         // Reputation: average review rating
-        $avgRatings = DB::select(
-            "SELECT reviewed_user_id as user_id, AVG(rating) as avg_rating
-             FROM reviews WHERE tenant_id = ? AND reviewed_user_id IN ({$placeholders}) GROUP BY reviewed_user_id",
-            array_merge([$tenantId], $userIds)
-        );
-        $ratingMap = collect($avgRatings)->pluck('avg_rating', 'user_id')->all();
+        $ratingMap = DB::table('reviews')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('reviewed_user_id', $userIds)
+            ->select('reviewed_user_id as user_id', DB::raw('AVG(rating) as avg_rating'))
+            ->groupBy('reviewed_user_id')
+            ->pluck('avg_rating', 'user_id')
+            ->all();
 
         // Normalize and score
         $maxActivity = max(1, max(array_merge([0], array_values($txnMap), array_values($postMap))));
@@ -121,8 +128,8 @@ class MemberRankingService
      */
     public function isEnabled(): bool
     {
-        if (!class_exists('\Nexus\Services\MemberRankingService')) { return true; }
-        return \Nexus\Services\MemberRankingService::isEnabled();
+        $config = $this->getConfig();
+        return !empty($config['enabled']);
     }
 
     /**
@@ -130,8 +137,31 @@ class MemberRankingService
      */
     public function getConfig(): array
     {
-        if (!class_exists('\Nexus\Services\MemberRankingService')) { return []; }
-        return \Nexus\Services\MemberRankingService::getConfig();
+        $defaults = [
+            'enabled' => true,
+            'activity_lookback_days' => self::ACTIVITY_LOOKBACK_DAYS,
+            'weight_activity' => self::WEIGHT_ACTIVITY,
+            'weight_contribution' => self::WEIGHT_CONTRIBUTION,
+            'weight_reputation' => self::WEIGHT_REPUTATION,
+        ];
+
+        try {
+            $tenantId = TenantContext::getId();
+            $configJson = DB::table('tenants')
+                ->where('id', $tenantId)
+                ->value('configuration');
+
+            if ($configJson) {
+                $configArr = json_decode($configJson, true);
+                if (is_array($configArr) && isset($configArr['algorithms']['members'])) {
+                    return array_merge($defaults, $configArr['algorithms']['members']);
+                }
+            }
+        } catch (\Exception $e) {
+            // Fall back to defaults
+        }
+
+        return $defaults;
     }
 
     /**
@@ -139,7 +169,7 @@ class MemberRankingService
      */
     public function clearCache(): void
     {
-        if (!class_exists('\Nexus\Services\MemberRankingService')) { return; }
-        \Nexus\Services\MemberRankingService::clearCache();
+        $tenantId = TenantContext::getId();
+        Cache::forget("community_rank:{$tenantId}");
     }
 }

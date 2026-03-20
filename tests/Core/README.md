@@ -16,13 +16,11 @@ This directory contains PHPUnit tests for 30 Core and Helper classes in Project 
 6. **CsrfTest.php** - CSRF token protection (265 lines, comprehensive)
 7. **DatabaseTest.php** - Database wrapper and PDO connection
 8. **DatabaseWrapperTest.php** - Database wrapper utilities
-9. **DefaultMenusTest.php** - Default menu generation
-10. **EmailTemplateTest.php** - Email template rendering
-11. **EnvTest.php** - Environment variable management
-12. **MailerTest.php** - Email sending utilities
-13. **MenuGeneratorTest.php** - Menu generation logic
-14. **MenuManagerTest.php** - Menu management
-15. **RateLimiterTest.php** - Rate limiting for logins and API
+9. **EmailTemplateTest.php** - Email template rendering
+10. **EnvTest.php** - Environment variable management
+11. **MailerTest.php** - Email sending utilities
+12. **MenuManagerTest.php** - Menu management (includes default menus and page-builder menus)
+13. **RateLimiterTest.php** - Rate limiting for logins and API
 16. **RouterTest.php** - Request routing
 17. **SearchServiceTest.php** - Search functionality
 18. **SEOTest.php** - SEO meta tag management
