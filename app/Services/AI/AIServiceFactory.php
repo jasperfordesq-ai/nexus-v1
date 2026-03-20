@@ -6,134 +6,208 @@
 
 namespace App\Services\AI;
 
+use App\Core\TenantContext;
+use App\Models\AiSettings;
 use App\Services\AI\Contracts\AIProviderInterface;
-use App\Services\AI\Providers\AnthropicProvider;
 use App\Services\AI\Providers\GeminiProvider;
-use App\Services\AI\Providers\OllamaProvider;
 use App\Services\AI\Providers\OpenAIProvider;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Services\AI\Providers\AnthropicProvider;
+use App\Services\AI\Providers\OllamaProvider;
 
 /**
- * AIServiceFactory — Laravel DI-based factory for AI providers.
+ * AI Service Factory
  *
- * Reads provider config from config files + database (ai_settings table).
- * Database settings ALWAYS override config/env values.
+ * Creates and manages AI provider instances.
+ * Loads configuration from both config files and database settings.
+ * DATABASE SETTINGS ALWAYS TAKE PRIORITY over config/env values.
  */
 class AIServiceFactory
 {
-    /** @var array<string, AIProviderInterface> */
-    private array $instances = [];
-
-    private ?array $config = null;
-
-    public function __construct()
-    {
-    }
+    private static array $instances = [];
+    private static ?array $config = null;
 
     /**
-     * Get an AI provider instance by ID (or the default).
+     * Get the default AI provider
      */
-    public function getProvider(?string $providerId = null): AIProviderInterface
+    public static function getProvider(?string $providerId = null): AIProviderInterface
     {
-        $providerId = $providerId ?? $this->getDefaultProvider();
+        $config = self::getConfig();
+        $providerId = $providerId ?? self::getDefaultProvider();
 
-        if (!isset($this->instances[$providerId])) {
-            $this->instances[$providerId] = $this->createProvider($providerId);
+        if (!isset(self::$instances[$providerId])) {
+            self::$instances[$providerId] = self::createProvider($providerId);
         }
 
-        return $this->instances[$providerId];
+        return self::$instances[$providerId];
     }
 
     /**
-     * Get a provider with automatic fallback if the preferred one is unavailable.
+     * Get provider with automatic fallback on failure
      *
-     * @return array{provider: AIProviderInterface, provider_id: string, is_fallback: bool}
+     * Attempts the primary provider first, then falls back to alternatives
+     * if the primary fails. Returns both the provider and which one was used.
      */
-    public function getProviderWithFallback(?string $preferredId = null): array
+    public static function getProviderWithFallback(?string $preferredId = null): array
     {
-        $preferredId = $preferredId ?? $this->getDefaultProvider();
-        $fallbackOrder = $this->getFallbackOrder($preferredId);
+        $preferredId = $preferredId ?? self::getDefaultProvider();
+        $fallbackOrder = self::getFallbackOrder($preferredId);
 
         foreach ($fallbackOrder as $providerId) {
             try {
-                $provider = $this->getProvider($providerId);
+                $provider = self::getProvider($providerId);
                 if ($provider->isConfigured()) {
                     return [
-                        'provider'    => $provider,
+                        'provider' => $provider,
                         'provider_id' => $providerId,
                         'is_fallback' => ($providerId !== $preferredId),
                     ];
                 }
             } catch (\Exception $e) {
-                Log::debug("Provider {$providerId} not available: " . $e->getMessage());
+                error_log("Provider $providerId not available: " . $e->getMessage());
                 continue;
             }
         }
 
-        // If all else fails, return the preferred provider — let caller handle error
+        // If all else fails, return the preferred provider anyway
+        // Let the caller handle the error
         return [
-            'provider'    => $this->getProvider($preferredId),
+            'provider' => self::getProvider($preferredId),
             'provider_id' => $preferredId,
             'is_fallback' => false,
         ];
     }
 
     /**
-     * Execute a chat request with automatic provider fallback.
+     * Get fallback order for providers
      *
-     * @return array{content: string, tokens_used: int, model: string, provider: string, used_fallback: bool, ...}
+     * Returns array of provider IDs in order of preference for fallback.
+     * Starts with preferred, then configured providers, then free-tier providers.
      */
-    public function chatWithFallback(array $messages, array $options = [], ?string $preferredProvider = null): array
+    private static function getFallbackOrder(string $preferredId): array
     {
-        $fallbackOrder = $this->getFallbackOrder($preferredProvider ?? $this->getDefaultProvider());
+        $config = self::getConfig();
+        $providers = $config['providers'] ?? [];
+        $order = [$preferredId];
+
+        // Add other configured providers
+        foreach ($providers as $id => $providerConfig) {
+            if ($id === $preferredId) continue;
+
+            try {
+                $provider = self::getProvider($id);
+                if ($provider->isConfigured()) {
+                    // Prioritize free-tier providers in fallback
+                    if (!empty($providerConfig['free_tier'])) {
+                        array_splice($order, 1, 0, [$id]); // Insert after preferred
+                    } else {
+                        $order[] = $id;
+                    }
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return array_unique($order);
+    }
+
+    /**
+     * Execute a chat request with automatic fallback
+     *
+     * If the primary provider fails, automatically tries fallback providers.
+     * Returns the response along with info about which provider was used.
+     */
+    public static function chatWithFallback(array $messages, array $options = [], ?string $preferredProvider = null): array
+    {
+        $fallbackOrder = self::getFallbackOrder($preferredProvider ?? self::getDefaultProvider());
         $lastError = null;
 
         foreach ($fallbackOrder as $providerId) {
             try {
-                $provider = $this->getProvider($providerId);
+                $provider = self::getProvider($providerId);
                 if (!$provider->isConfigured()) {
                     continue;
                 }
 
                 $response = $provider->chat($messages, $options);
                 $response['provider'] = $providerId;
-                $response['used_fallback'] = ($providerId !== ($preferredProvider ?? $this->getDefaultProvider()));
+                $response['used_fallback'] = ($providerId !== ($preferredProvider ?? self::getDefaultProvider()));
 
                 return $response;
             } catch (\Exception $e) {
                 $lastError = $e;
-                Log::warning("AI Provider {$providerId} failed: " . $e->getMessage());
+                error_log("AI Provider $providerId failed: " . $e->getMessage());
+
+                // Check if this is a rate limit or quota error
+                $message = $e->getMessage();
+                if (strpos($message, '429') !== false || stripos($message, 'quota') !== false) {
+                    // Rate limited - try next provider
+                    continue;
+                }
+                if (strpos($message, '401') !== false || strpos($message, '403') !== false) {
+                    // Auth error - try next provider
+                    continue;
+                }
+                if (strpos($message, '500') !== false || strpos($message, '502') !== false || strpos($message, '503') !== false) {
+                    // Server error - try next provider
+                    continue;
+                }
+
+                // For other errors, still try fallback
                 continue;
             }
         }
 
+        // All providers failed
         if ($lastError) {
             throw $lastError;
         }
 
-        throw new \RuntimeException('No AI providers available');
+        throw new \Exception('No AI providers available');
     }
 
     /**
-     * Get configuration for a specific provider.
+     * Create a provider instance
+     */
+    private static function createProvider(string $providerId): AIProviderInterface
+    {
+        $config = self::getProviderConfig($providerId);
+
+        return match ($providerId) {
+            'gemini' => new GeminiProvider($config),
+            'openai' => new OpenAIProvider($config),
+            'anthropic' => new AnthropicProvider($config),
+            'ollama' => new OllamaProvider($config),
+            default => throw new \Exception("Unknown AI provider: $providerId"),
+        };
+    }
+
+    /**
+     * Get configuration for a specific provider
      *
      * CRITICAL: Database settings ALWAYS override config file settings.
+     * This ensures that admin-configured API keys are used in production.
      */
-    public function getProviderConfig(string $providerId): array
+    public static function getProviderConfig(string $providerId): array
     {
-        $config = $this->getConfig();
+        $config = self::getConfig();
         $providerConfig = $config['providers'][$providerId] ?? [];
 
-        $tenantId = \App\Core\TenantContext::getId();
+        $tenantId = TenantContext::getId();
+        $hasDbKey = false;
+        $apiKeySource = 'CONFIG/ENV';
 
+        // CRITICAL FIX: Database settings MUST override config/env settings
         if ($tenantId) {
-            $dbSettings = $this->getDbSettings($tenantId);
+            $dbSettings = AiSettings::getAllForTenant($tenantId);
 
+            // Map database settings to provider config - DB VALUES TAKE PRIORITY
             switch ($providerId) {
                 case 'gemini':
                     if (!empty($dbSettings['gemini_api_key'])) {
                         $providerConfig['api_key'] = $dbSettings['gemini_api_key'];
+                        $hasDbKey = true;
+                        $apiKeySource = 'DATABASE';
                     }
                     if (!empty($dbSettings['gemini_model'])) {
                         $providerConfig['default_model'] = $dbSettings['gemini_model'];
@@ -143,6 +217,8 @@ class AIServiceFactory
                 case 'openai':
                     if (!empty($dbSettings['openai_api_key'])) {
                         $providerConfig['api_key'] = $dbSettings['openai_api_key'];
+                        $hasDbKey = true;
+                        $apiKeySource = 'DATABASE';
                     }
                     if (!empty($dbSettings['openai_model'])) {
                         $providerConfig['default_model'] = $dbSettings['openai_model'];
@@ -155,6 +231,8 @@ class AIServiceFactory
                 case 'anthropic':
                     if (!empty($dbSettings['anthropic_api_key'])) {
                         $providerConfig['api_key'] = $dbSettings['anthropic_api_key'];
+                        $hasDbKey = true;
+                        $apiKeySource = 'DATABASE';
                     }
                     if (!empty($dbSettings['claude_model'])) {
                         $providerConfig['default_model'] = $dbSettings['claude_model'];
@@ -169,223 +247,182 @@ class AIServiceFactory
                         $providerConfig['default_model'] = $dbSettings['ollama_model'];
                     }
                     $providerConfig['self_hosted'] = true;
+                    // Ollama doesn't need an API key
+                    $hasDbKey = true;
+                    $apiKeySource = 'DATABASE (self-hosted)';
                     break;
             }
         }
 
-        // Validation: throw clear error if API key is missing (except Ollama)
-        if ($providerId !== 'ollama' && empty($providerConfig['api_key'])) {
-            Log::error("AI FACTORY ERROR: Provider [{$providerId}] has no API key configured.");
-            throw new \RuntimeException("AI Provider '{$providerId}' is not configured. Missing API key. Please configure it in Admin > AI Settings.");
+        // VALIDATION: Throw clear error if API key is missing (except for Ollama)
+        if ($providerId !== 'ollama') {
+            if (empty($providerConfig['api_key'])) {
+                error_log("AI FACTORY ERROR: Provider [$providerId] has no API key configured. Check database settings and config/ai.php");
+                throw new \Exception("AI Provider '$providerId' is not configured. Missing API key. Please configure it in Admin > AI Settings.");
+            }
         }
 
         return $providerConfig;
     }
 
     /**
-     * Get the default provider ID from DB settings or config.
+     * Get the default provider ID
      */
-    public function getDefaultProvider(): string
+    public static function getDefaultProvider(): string
     {
-        $tenantId = \App\Core\TenantContext::getId();
-
+        $tenantId = TenantContext::getId();
         if ($tenantId) {
-            $dbProvider = $this->getDbSetting($tenantId, 'ai_provider');
+            $dbProvider = AiSettings::get($tenantId, 'ai_provider');
             if ($dbProvider) {
                 return $dbProvider;
             }
         }
 
-        $config = $this->getConfig();
+        $config = self::getConfig();
         return $config['default_provider'] ?? 'gemini';
     }
 
-    // ------------------------------------------------------------------
-    // Private helpers
-    // ------------------------------------------------------------------
-
     /**
-     * Create a provider instance from config.
+     * Check if AI is enabled for the current tenant
      */
-    private function createProvider(string $providerId): AIProviderInterface
+    public static function isEnabled(): bool
     {
-        $config = $this->getProviderConfig($providerId);
-
-        return match ($providerId) {
-            'gemini'    => new GeminiProvider($config),
-            'openai'    => new OpenAIProvider($config),
-            'anthropic' => new AnthropicProvider($config),
-            'ollama'    => new OllamaProvider($config),
-            default     => throw new \RuntimeException("Unknown AI provider: {$providerId}"),
-        };
-    }
-
-    /**
-     * Get fallback order for providers (preferred first, then free-tier, then others).
-     *
-     * @return string[]
-     */
-    private function getFallbackOrder(string $preferredId): array
-    {
-        $config = $this->getConfig();
-        $providers = $config['providers'] ?? [];
-        $order = [$preferredId];
-
-        foreach ($providers as $id => $providerConfig) {
-            if ($id === $preferredId) {
-                continue;
-            }
-            try {
-                $provider = $this->getProvider($id);
-                if ($provider->isConfigured()) {
-                    if (!empty($providerConfig['free_tier'])) {
-                        array_splice($order, 1, 0, [$id]);
-                    } else {
-                        $order[] = $id;
-                    }
-                }
-            } catch (\Exception $e) {
-                continue;
+        $tenantId = TenantContext::getId();
+        if ($tenantId) {
+            $enabled = AiSettings::get($tenantId, 'ai_enabled');
+            if ($enabled !== null) {
+                return (bool) $enabled;
             }
         }
 
-        return array_values(array_unique($order));
+        $config = self::getConfig();
+        return $config['enabled'] ?? true;
     }
 
     /**
-     * Load the AI configuration file.
+     * Check if a specific feature is enabled
      */
-    private function getConfig(): array
+    public static function isFeatureEnabled(string $feature): bool
     {
-        if ($this->config === null) {
-            // Try Laravel config first, then fall back to legacy path
-            $configPath = base_path('config/ai.php');
-            if (!file_exists($configPath)) {
-                $configPath = base_path('src/Config/ai.php');
+        if (!self::isEnabled()) {
+            return false;
+        }
+
+        $tenantId = TenantContext::getId();
+        if ($tenantId) {
+            $enabled = AiSettings::get($tenantId, "ai_{$feature}_enabled");
+            if ($enabled !== null) {
+                return (bool) $enabled;
+            }
+        }
+
+        $config = self::getConfig();
+        return $config['features'][$feature] ?? false;
+    }
+
+    /**
+     * Get all available providers with their configuration status
+     */
+    public static function getAvailableProviders(): array
+    {
+        $config = self::getConfig();
+        $providers = [];
+
+        foreach ($config['providers'] as $id => $providerConfig) {
+            try {
+                $provider = self::getProvider($id);
+                $configured = $provider->isConfigured();
+            } catch (\Exception $e) {
+                // Provider failed to instantiate (likely missing API key)
+                // Mark as not configured instead of throwing error
+                error_log("getAvailableProviders: Provider [$id] could not be instantiated: " . $e->getMessage());
+                $configured = false;
             }
 
+            $providers[$id] = [
+                'id' => $id,
+                'name' => $providerConfig['name'] ?? $id,
+                'configured' => $configured,
+                'free_tier' => $providerConfig['free_tier'] ?? false,
+                'self_hosted' => $providerConfig['self_hosted'] ?? false,
+                'models' => $providerConfig['models'] ?? [],
+                'default_model' => $providerConfig['default_model'] ?? '',
+            ];
+        }
+
+        return $providers;
+    }
+
+    /**
+     * Get the system prompt for the assistant
+     */
+    public static function getSystemPrompt(): string
+    {
+        $tenantId = TenantContext::getId();
+        if ($tenantId) {
+            $customPrompt = AiSettings::get($tenantId, 'ai_system_prompt');
+            if ($customPrompt) {
+                return $customPrompt;
+            }
+        }
+
+        $config = self::getConfig();
+        return $config['system_prompt'] ?? '';
+    }
+
+    /**
+     * Get user limits configuration
+     */
+    public static function getLimitsConfig(): array
+    {
+        $config = self::getConfig();
+        $limits = $config['limits'] ?? [];
+
+        $tenantId = TenantContext::getId();
+        if ($tenantId) {
+            $dailyLimit = AiSettings::get($tenantId, 'default_daily_limit');
+            if ($dailyLimit !== null) {
+                $limits['daily_limit'] = (int) $dailyLimit;
+            }
+
+            $monthlyLimit = AiSettings::get($tenantId, 'default_monthly_limit');
+            if ($monthlyLimit !== null) {
+                $limits['monthly_limit'] = (int) $monthlyLimit;
+            }
+        }
+
+        return $limits;
+    }
+
+    /**
+     * Load the AI configuration file
+     */
+    private static function getConfig(): array
+    {
+        if (self::$config === null) {
+            $configPath = dirname(__DIR__, 2) . '/Config/ai.php';
             if (file_exists($configPath)) {
-                $this->config = require $configPath;
+                self::$config = require $configPath;
             } else {
-                $this->config = [
-                    'enabled'          => false,
+                self::$config = [
+                    'enabled' => false,
                     'default_provider' => 'gemini',
-                    'providers'        => [],
-                    'features'         => [],
-                    'limits'           => [],
+                    'providers' => [],
+                    'features' => [],
+                    'limits' => [],
                 ];
             }
         }
 
-        return $this->config;
+        return self::$config;
     }
 
     /**
-     * Get all AI settings from the database for a tenant.
-     *
-     * @return array<string, string>
+     * Clear cached instances (useful for testing or config changes)
      */
-    private function getDbSettings(int $tenantId): array
+    public static function clearCache(): void
     {
-        try {
-            $rows = DB::select(
-                "SELECT setting_key, setting_value, is_encrypted FROM ai_settings WHERE tenant_id = ?",
-                [$tenantId]
-            );
-
-            $settings = [];
-            foreach ($rows as $row) {
-                $value = $row->setting_value;
-                // Decrypt if encrypted (matches legacy AiSettings behaviour)
-                if ($row->is_encrypted && $value) {
-                    $value = $this->decryptValue($value);
-                }
-                $settings[$row->setting_key] = $value;
-            }
-
-            return $settings;
-        } catch (\Exception $e) {
-            Log::error("AIServiceFactory::getDbSettings error: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
-     * Get a single AI setting from the database.
-     */
-    private function getDbSetting(int $tenantId, string $key): ?string
-    {
-        try {
-            $row = DB::selectOne(
-                "SELECT setting_value, is_encrypted FROM ai_settings WHERE tenant_id = ? AND setting_key = ?",
-                [$tenantId, $key]
-            );
-
-            if (!$row) {
-                return null;
-            }
-
-            $value = $row->setting_value;
-            if ($row->is_encrypted && $value) {
-                $value = $this->decryptValue($value);
-            }
-
-            return $value;
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Decrypt an encrypted setting value (matches legacy AiSettings::decrypt).
-     */
-    private function decryptValue(string $encrypted): string
-    {
-        $key = $this->getEncryptionKey();
-        if (!$key) {
-            return $encrypted;
-        }
-
-        $data = base64_decode($encrypted, true);
-        if ($data === false || strlen($data) < 28) {
-            return $encrypted; // Not encrypted or corrupted
-        }
-
-        $ivLen = openssl_cipher_iv_length('aes-256-gcm');
-        $iv = substr($data, 0, $ivLen);
-        $tag = substr($data, $ivLen, 16);
-        $ciphertext = substr($data, $ivLen + 16);
-
-        $decrypted = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
-
-        return $decrypted !== false ? $decrypted : $encrypted;
-    }
-
-    /**
-     * Get the encryption key for AI settings.
-     */
-    private function getEncryptionKey(): ?string
-    {
-        $key = $_ENV['AI_ENCRYPTION_KEY'] ?? $_SERVER['AI_ENCRYPTION_KEY'] ?? getenv('AI_ENCRYPTION_KEY');
-        if ($key) {
-            return $key;
-        }
-
-        // Fall back to APP_KEY
-        $appKey = $_ENV['APP_KEY'] ?? $_SERVER['APP_KEY'] ?? getenv('APP_KEY');
-        if ($appKey) {
-            return hash('sha256', $appKey, true) ? substr(hash('sha256', $appKey), 0, 32) : null;
-        }
-
-        return null;
-    }
-
-    /**
-     * Clear cached instances (useful for testing or config changes).
-     */
-    public function clearCache(): void
-    {
-        $this->instances = [];
-        $this->config = null;
+        self::$instances = [];
+        self::$config = null;
     }
 }

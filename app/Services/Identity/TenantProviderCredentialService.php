@@ -6,84 +6,147 @@
 
 namespace App\Services\Identity;
 
-use Nexus\Services\Identity\TenantProviderCredentialService as LegacyService;
+use Illuminate\Support\Facades\DB;
 
 /**
- * TenantProviderCredentialService — Laravel DI wrapper for legacy service.
+ * TenantProviderCredentialService
  *
- * Delegates to \Nexus\Services\Identity\TenantProviderCredentialService.
+ * Manages per-tenant, per-provider API credentials with AES-256-GCM encryption at rest.
+ * Tenants can bring their own API keys for any identity verification provider.
  */
 class TenantProviderCredentialService
 {
-    public function __construct()
-    {
-    }
-
     /**
      * Get decrypted credentials for a tenant + provider.
+     *
+     * @return array|null Decrypted credentials array or null if none stored
      */
-    public function get(int $tenantId, string $providerSlug): ?array
+    public static function get(int $tenantId, string $providerSlug): ?array
     {
-        if (!class_exists(LegacyService::class)) {
+        try {
+            $row = DB::statement(
+                "SELECT credentials_encrypted FROM tenant_provider_credentials
+                 WHERE tenant_id = ? AND provider_slug = ? AND is_active = 1
+                 LIMIT 1",
+                [$tenantId, $providerSlug]
+            )->fetch();
+
+            if (!$row || empty($row['credentials_encrypted'])) {
+                return null;
+            }
+
+            return RegistrationPolicyService::decryptConfig($row['credentials_encrypted']);
+        } catch (\Throwable $e) {
+            error_log("[TenantProviderCredentialService] Failed to get credentials for tenant {$tenantId}, provider {$providerSlug}: " . $e->getMessage());
             return null;
         }
-        return LegacyService::get($tenantId, $providerSlug);
     }
 
     /**
      * Save (upsert) encrypted credentials for a tenant + provider.
+     *
+     * @param array $credentials ['api_key' => '...', 'webhook_secret' => '...', ...]
      */
-    public function save(int $tenantId, string $providerSlug, array $credentials): bool
+    public static function save(int $tenantId, string $providerSlug, array $credentials): bool
     {
-        if (!class_exists(LegacyService::class)) {
+        // Filter out empty values
+        $credentials = array_filter($credentials, fn($v) => $v !== '' && $v !== null);
+
+        if (empty($credentials)) {
             return false;
         }
-        return LegacyService::save($tenantId, $providerSlug, $credentials);
+
+        // If existing credentials exist, merge (so partial updates don't wipe other fields)
+        $existing = self::get($tenantId, $providerSlug);
+        if ($existing) {
+            $credentials = array_merge($existing, $credentials);
+        }
+
+        $encrypted = RegistrationPolicyService::encryptConfig($credentials);
+
+        DB::statement(
+            "INSERT INTO tenant_provider_credentials
+                (tenant_id, provider_slug, credentials_encrypted, is_active)
+             VALUES (?, ?, ?, 1)
+             ON DUPLICATE KEY UPDATE
+                credentials_encrypted = VALUES(credentials_encrypted),
+                is_active = 1,
+                updated_at = CURRENT_TIMESTAMP",
+            [$tenantId, $providerSlug, $encrypted]
+        );
+
+        return true;
     }
 
     /**
      * Delete credentials for a tenant + provider.
      */
-    public function delete(int $tenantId, string $providerSlug): bool
+    public static function delete(int $tenantId, string $providerSlug): bool
     {
-        if (!class_exists(LegacyService::class)) {
-            return false;
-        }
-        return LegacyService::delete($tenantId, $providerSlug);
+        $stmt = DB::statement(
+            "DELETE FROM tenant_provider_credentials WHERE tenant_id = ? AND provider_slug = ?",
+            [$tenantId, $providerSlug]
+        );
+
+        return $stmt->rowCount() > 0;
     }
 
     /**
      * Check if a tenant has credentials stored for a provider.
      */
-    public function hasCredentials(int $tenantId, string $providerSlug): bool
+    public static function hasCredentials(int $tenantId, string $providerSlug): bool
     {
-        if (!class_exists(LegacyService::class)) {
+        try {
+            $row = DB::statement(
+                "SELECT 1 FROM tenant_provider_credentials
+                 WHERE tenant_id = ? AND provider_slug = ? AND is_active = 1
+                 LIMIT 1",
+                [$tenantId, $providerSlug]
+            )->fetch();
+
+            return $row !== false;
+        } catch (\Throwable $e) {
             return false;
         }
-        return LegacyService::hasCredentials($tenantId, $providerSlug);
     }
 
     /**
      * List which providers have credentials configured for a tenant.
      *
-     * @return array<string, bool>
+     * @return array<string, bool> Map of provider_slug => has_credentials
      */
-    public function listConfigured(int $tenantId): array
+    public static function listConfigured(int $tenantId): array
     {
-        if (!class_exists(LegacyService::class)) {
+        try {
+            $rows = DB::statement(
+                "SELECT provider_slug FROM tenant_provider_credentials
+                 WHERE tenant_id = ? AND is_active = 1",
+                [$tenantId]
+            )->fetchAll();
+
+            $configured = [];
+            foreach ($rows as $row) {
+                $configured[$row['provider_slug']] = true;
+            }
+            return $configured;
+        } catch (\Throwable $e) {
             return [];
         }
-        return LegacyService::listConfigured($tenantId);
     }
 
     /**
      * Get the credential field names a provider requires.
      */
-    public function getRequiredFields(string $providerSlug): array
+    public static function getRequiredFields(string $providerSlug): array
     {
-        if (!class_exists(LegacyService::class)) {
-            return [];
-        }
-        return LegacyService::getRequiredFields($providerSlug);
+        $fields = [
+            'stripe_identity' => ['api_key', 'webhook_secret'],
+            'veriff'          => ['api_key', 'webhook_secret'],
+            'jumio'           => ['api_key', 'webhook_secret'],
+            'onfido'          => ['api_key', 'webhook_secret'],
+            'idenfy'          => ['api_key', 'webhook_secret'],
+        ];
+
+        return $fields[$providerSlug] ?? ['api_key'];
     }
 }

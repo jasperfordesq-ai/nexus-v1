@@ -6,75 +6,202 @@
 
 namespace App\Services\Identity;
 
-use Nexus\Services\Identity\InviteCodeService as LegacyService;
+use Illuminate\Support\Facades\DB;
 
 /**
- * InviteCodeService — Laravel DI wrapper for legacy service.
+ * InviteCodeService — Manages invite codes for invite-only registration mode.
  *
- * Delegates to \Nexus\Services\Identity\InviteCodeService.
+ * Each code is single-use by default, scoped to a tenant, with optional expiry.
+ * Admins can generate codes individually or in batches.
  */
 class InviteCodeService
 {
-    public function __construct()
-    {
-    }
-
     /**
      * Generate one or more invite codes for a tenant.
      *
+     * @param int      $tenantId
+     * @param int      $createdBy  Admin user ID
+     * @param int      $count      Number of codes to generate
+     * @param int|null $maxUses    Max uses per code (null = 1)
+     * @param string|null $expiresAt DateTime string (null = no expiry)
+     * @param string|null $note      Admin note
      * @return array Generated codes
      */
-    public function generate(int $tenantId, int $createdBy, int $count = 1, ?int $maxUses = 1, ?string $expiresAt = null, ?string $note = null): array
-    {
-        if (!class_exists(LegacyService::class)) {
-            return [];
+    public static function generate(
+        int $tenantId,
+        int $createdBy,
+        int $count = 1,
+        ?int $maxUses = 1,
+        ?string $expiresAt = null,
+        ?string $note = null
+    ): array {
+        $count = max(1, min($count, 100)); // Cap at 100 per batch
+        $maxUses = $maxUses ?? 1;
+        $codes = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $code = self::generateUniqueCode($tenantId);
+            DB::statement(
+                "INSERT INTO tenant_invite_codes
+                    (tenant_id, code, created_by, max_uses, uses_count, expires_at, note, is_active)
+                 VALUES (?, ?, ?, ?, 0, ?, ?, 1)",
+                [$tenantId, $code, $createdBy, $maxUses, $expiresAt, $note]
+            );
+            $codes[] = $code;
         }
-        return LegacyService::generate($tenantId, $createdBy, $count, $maxUses, $expiresAt, $note);
+
+        return $codes;
     }
 
     /**
      * Validate an invite code for use during registration.
+     * Does NOT consume it — call redeem() after successful registration.
      *
+     * @param int    $tenantId
+     * @param string $code
      * @return array{valid: bool, reason?: string, code_id?: int}
      */
-    public function validate(int $tenantId, string $code): array
+    public static function validate(int $tenantId, string $code): array
     {
-        if (!class_exists(LegacyService::class)) {
-            return [];
+        $code = strtoupper(trim($code));
+        $row = DB::statement(
+            "SELECT id, max_uses, uses_count, expires_at, is_active
+             FROM tenant_invite_codes
+             WHERE tenant_id = ? AND code = ?
+             LIMIT 1",
+            [$tenantId, $code]
+        )->fetch();
+
+        if (!$row) {
+            return ['valid' => false, 'reason' => 'invalid_code'];
         }
-        return LegacyService::validate($tenantId, $code);
+
+        if (!$row['is_active']) {
+            return ['valid' => false, 'reason' => 'code_deactivated'];
+        }
+
+        if ($row['uses_count'] >= $row['max_uses']) {
+            return ['valid' => false, 'reason' => 'code_exhausted'];
+        }
+
+        if ($row['expires_at'] && strtotime($row['expires_at']) < time()) {
+            return ['valid' => false, 'reason' => 'code_expired'];
+        }
+
+        return ['valid' => true, 'code_id' => (int) $row['id']];
     }
 
     /**
-     * Redeem an invite code (increment uses_count).
+     * Redeem an invite code (increment uses_count). Call after registration succeeds.
+     *
+     * @param int $tenantId
+     * @param string $code
+     * @param int $userId User who used the code
+     * @return bool
      */
-    public function redeem(int $tenantId, string $code, int $userId): bool
+    public static function redeem(int $tenantId, string $code, int $userId): bool
     {
-        if (!class_exists(LegacyService::class)) {
-            return false;
+        $code = strtoupper(trim($code));
+
+        // Atomic increment with validation
+        $affected = DB::statement(
+            "UPDATE tenant_invite_codes
+             SET uses_count = uses_count + 1, last_used_at = NOW(), last_used_by = ?
+             WHERE tenant_id = ? AND code = ? AND is_active = 1 AND uses_count < max_uses
+               AND (expires_at IS NULL OR expires_at > NOW())",
+            [$userId, $tenantId, $code]
+        )->rowCount();
+
+        if ($affected > 0) {
+            // Log the redemption
+            DB::statement(
+                "INSERT INTO tenant_invite_code_uses (invite_code_id, user_id, used_at)
+                 SELECT id, ?, NOW() FROM tenant_invite_codes WHERE tenant_id = ? AND code = ?",
+                [$userId, $tenantId, $code]
+            );
+            return true;
         }
-        return LegacyService::redeem($tenantId, $code, $userId);
+
+        return false;
     }
 
     /**
      * List invite codes for a tenant (admin view).
+     *
+     * @param int $tenantId
+     * @param int $limit
+     * @param int $offset
+     * @return array
      */
-    public function listForTenant(int $tenantId, int $limit = 50, int $offset = 0): array
+    public static function listForTenant(int $tenantId, int $limit = 50, int $offset = 0): array
     {
-        if (!class_exists(LegacyService::class)) {
-            return [];
-        }
-        return LegacyService::listForTenant($tenantId, $limit, $offset);
+        $limit = max(1, min($limit, 100));
+        $offset = max(0, $offset);
+
+        $rows = DB::statement(
+            "SELECT ic.*, u.first_name AS creator_name
+             FROM tenant_invite_codes ic
+             LEFT JOIN users u ON u.id = ic.created_by
+             WHERE ic.tenant_id = ?
+             ORDER BY ic.created_at DESC
+             LIMIT ? OFFSET ?",
+            [$tenantId, $limit, $offset]
+        )->fetchAll();
+
+        $total = DB::statement(
+            "SELECT COUNT(*) AS cnt FROM tenant_invite_codes WHERE tenant_id = ?",
+            [$tenantId]
+        )->fetch()['cnt'] ?? 0;
+
+        return [
+            'items' => $rows,
+            'total' => (int) $total,
+            'limit' => $limit,
+            'offset' => $offset,
+        ];
     }
 
     /**
      * Deactivate an invite code.
      */
-    public function deactivate(int $tenantId, int $codeId): bool
+    public static function deactivate(int $tenantId, int $codeId): bool
     {
-        if (!class_exists(LegacyService::class)) {
-            return false;
+        return DB::statement(
+            "UPDATE tenant_invite_codes SET is_active = 0 WHERE id = ? AND tenant_id = ?",
+            [$codeId, $tenantId]
+        )->rowCount() > 0;
+    }
+
+    /**
+     * Generate a unique invite code (8 chars, uppercase alphanumeric).
+     */
+    private static function generateUniqueCode(int $tenantId): string
+    {
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No I/O/0/1 to avoid confusion
+        $maxAttempts = 10;
+
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            $code = '';
+            for ($i = 0; $i < 8; $i++) {
+                $code .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+
+            // Ensure uniqueness within tenant
+            $exists = DB::statement(
+                "SELECT 1 FROM tenant_invite_codes WHERE tenant_id = ? AND code = ? LIMIT 1",
+                [$tenantId, $code]
+            )->fetch();
+
+            if (!$exists) {
+                return $code;
+            }
         }
-        return LegacyService::deactivate($tenantId, $codeId);
+
+        // Extremely unlikely fallback — extend to 12 chars
+        $code = '';
+        for ($i = 0; $i < 12; $i++) {
+            $code .= $chars[random_int(0, strlen($chars) - 1)];
+        }
+        return $code;
     }
 }

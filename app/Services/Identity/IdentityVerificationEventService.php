@@ -6,16 +6,17 @@
 
 namespace App\Services\Identity;
 
-use Nexus\Services\Identity\IdentityVerificationEventService as LegacyService;
+use Illuminate\Support\Facades\DB;
 
 /**
- * IdentityVerificationEventService — Laravel DI wrapper for legacy service.
+ * IdentityVerificationEventService — Audit log for all identity verification events.
  *
- * Delegates to \Nexus\Services\Identity\IdentityVerificationEventService.
+ * Every state transition in the registration/verification flow is recorded
+ * for auditability, compliance, and debugging.
  */
 class IdentityVerificationEventService
 {
-    /** Event types (inlined — safe when legacy is removed) */
+    /** Event types */
     public const EVENT_REGISTRATION_STARTED = 'registration_started';
     public const EVENT_VERIFICATION_CREATED = 'verification_created';
     public const EVENT_VERIFICATION_STARTED = 'verification_started';
@@ -30,20 +31,26 @@ class IdentityVerificationEventService
     public const EVENT_ACCOUNT_ACTIVATED = 'account_activated';
     public const EVENT_FALLBACK_TRIGGERED = 'fallback_triggered';
 
-    /** Actor types (inlined — safe when legacy is removed) */
+    /** Actor types */
     public const ACTOR_SYSTEM = 'system';
     public const ACTOR_USER = 'user';
     public const ACTOR_ADMIN = 'admin';
     public const ACTOR_WEBHOOK = 'webhook';
 
-    public function __construct()
-    {
-    }
-
     /**
      * Log an identity verification event.
+     *
+     * @param int         $tenantId
+     * @param int         $userId
+     * @param string      $eventType  One of the EVENT_* constants
+     * @param int|null    $sessionId  identity_verification_sessions.id (if applicable)
+     * @param int|null    $actorId    The user performing the action (admin ID, or null for system)
+     * @param string      $actorType  One of the ACTOR_* constants
+     * @param array|null  $details    Additional context (JSON-serializable)
+     * @param string|null $ipAddress
+     * @param string|null $userAgent
      */
-    public function log(
+    public static function log(
         int $tenantId,
         int $userId,
         string $eventType,
@@ -54,44 +61,99 @@ class IdentityVerificationEventService
         ?string $ipAddress = null,
         ?string $userAgent = null
     ): void {
-        if (!class_exists(LegacyService::class)) {
-            return;
+        try {
+            DB::statement(
+                "INSERT INTO identity_verification_events
+                    (tenant_id, user_id, session_id, event_type, actor_id, actor_type, details, ip_address, user_agent)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [
+                    $tenantId,
+                    $userId,
+                    $sessionId,
+                    $eventType,
+                    $actorId,
+                    $actorType,
+                    $details ? json_encode($details) : null,
+                    $ipAddress,
+                    $userAgent ? substr($userAgent, 0, 500) : null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            // Audit logging should never break the main flow
+            error_log("[IdentityVerificationEventService] Failed to log event '{$eventType}' for user {$userId}: " . $e->getMessage());
         }
-        LegacyService::log($tenantId, $userId, $eventType, $sessionId, $actorId, $actorType, $details, $ipAddress, $userAgent);
     }
 
     /**
      * Get verification events for a user (for admin review).
+     *
+     * @param int $tenantId
+     * @param int $userId
+     * @param int $limit
+     * @return array
      */
-    public function getForUser(int $tenantId, int $userId, int $limit = 50): array
+    public static function getForUser(int $tenantId, int $userId, int $limit = 50): array
     {
-        if (!class_exists(LegacyService::class)) {
-            return [];
-        }
-        return LegacyService::getForUser($tenantId, $userId, $limit);
+        return DB::statement(
+            "SELECT * FROM identity_verification_events
+             WHERE tenant_id = ? AND user_id = ?
+             ORDER BY created_at DESC
+             LIMIT ?",
+            [$tenantId, $userId, $limit]
+        )->fetchAll();
     }
 
     /**
      * Get events for a specific verification session.
+     *
+     * @param int $sessionId
+     * @return array
      */
-    public function getForSession(int $sessionId): array
+    public static function getForSession(int $sessionId): array
     {
-        if (!class_exists(LegacyService::class)) {
-            return [];
-        }
-        return LegacyService::getForSession($sessionId);
+        return DB::statement(
+            "SELECT * FROM identity_verification_events
+             WHERE session_id = ?
+             ORDER BY created_at ASC",
+            [$sessionId]
+        )->fetchAll();
     }
 
     /**
      * Get all verification events for a tenant (admin audit log).
      *
+     * @param int         $tenantId
+     * @param int         $limit
+     * @param int         $offset
+     * @param string|null $eventType  Filter by event type (optional)
      * @return array{events: array, total: int}
      */
-    public function getForTenant(int $tenantId, int $limit = 50, int $offset = 0, ?string $eventType = null): array
+    public static function getForTenant(int $tenantId, int $limit = 50, int $offset = 0, ?string $eventType = null): array
     {
-        if (!class_exists(LegacyService::class)) {
-            return [];
+        $params = [$tenantId];
+        $whereExtra = '';
+        if ($eventType) {
+            $whereExtra = ' AND event_type = ?';
+            $params[] = $eventType;
         }
-        return LegacyService::getForTenant($tenantId, $limit, $offset, $eventType);
+
+        $total = (int) DB::statement(
+            "SELECT COUNT(*) FROM identity_verification_events WHERE tenant_id = ?" . $whereExtra,
+            $params
+        )->fetchColumn();
+
+        $params[] = $limit;
+        $params[] = $offset;
+        $events = DB::statement(
+            "SELECT e.*, u.first_name, u.last_name, u.email as user_email
+             FROM identity_verification_events e
+             LEFT JOIN users u ON u.id = e.user_id
+             WHERE e.tenant_id = ?" . $whereExtra . "
+             ORDER BY e.created_at DESC
+             LIMIT ? OFFSET ?",
+            $params
+        )->fetchAll();
+
+        return ['events' => $events, 'total' => $total];
     }
 }

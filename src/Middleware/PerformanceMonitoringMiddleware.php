@@ -6,71 +6,22 @@
 
 namespace Nexus\Middleware;
 
-use App\Services\PerformanceMonitorService;
+use App\Middleware\PerformanceMonitoringMiddleware as AppPerformanceMonitoringMiddleware;
 
 /**
- * Performance Monitoring Middleware
+ * Legacy delegate — real implementation is now in App\Middleware\PerformanceMonitoringMiddleware.
  *
- * Tracks request-level performance metrics:
- * - Request duration
- * - Memory usage
- * - Database query count
- * - Slow endpoints
- *
- * Automatically injects performance headers in development mode.
+ * @deprecated Use App\Middleware\PerformanceMonitoringMiddleware directly.
  */
 class PerformanceMonitoringMiddleware
 {
-    /**
-     * Initialize performance tracking for the current request
-     */
     public static function before(): void
     {
-        if (!PerformanceMonitorService::isEnabled()) {
-            return;
-        }
-
-        PerformanceMonitorService::startRequest();
+        AppPerformanceMonitoringMiddleware::before();
     }
 
-    /**
-     * Finalize performance tracking and log metrics
-     */
     public static function after(): void
     {
-        if (!PerformanceMonitorService::isEnabled()) {
-            return;
-        }
-
-        PerformanceMonitorService::endRequest();
-
-        // In debug mode, add performance headers to response
-        if (getenv('DEBUG') === 'true' || getenv('DB_PROFILING') === 'true') {
-            self::addPerformanceHeaders();
-        }
-    }
-
-    /**
-     * Add performance metrics to response headers (dev mode only)
-     */
-    private static function addPerformanceHeaders(): void
-    {
-        // Get database query stats if profiling is enabled
-        if (class_exists('\App\Core\Database')) {
-            $stats = \App\Core\Database::getQueryStats();
-
-            if (!empty($stats)) {
-                header('X-Query-Count: ' . ($stats['total_queries'] ?? 0));
-                header('X-Query-Time: ' . ($stats['total_duration'] ?? '0ms'));
-
-                if (isset($stats['slowest_query'])) {
-                    header('X-Slowest-Query: ' . $stats['slowest_query']['duration']);
-                }
-            }
-        }
-
-        // Add memory usage
-        $memoryMB = round(memory_get_peak_usage(true) / 1024 / 1024, 2);
-        header('X-Memory-Peak-MB: ' . $memoryMB);
+        AppPerformanceMonitoringMiddleware::after();
     }
 }

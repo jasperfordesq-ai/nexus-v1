@@ -7,110 +7,43 @@
 namespace Nexus\Services\Identity;
 
 /**
- * IdentityProviderRegistry — Factory/registry for identity verification providers.
+ * IdentityProviderRegistry — Thin delegate forwarding to \App\Services\Identity\IdentityProviderRegistry.
  *
- * Providers register themselves by slug. The orchestration service
- * resolves the correct provider for a tenant's configured policy.
+ * The full implementation now lives in the App namespace.
+ * This file exists for backwards compatibility only.
+ *
+ * @see \App\Services\Identity\IdentityProviderRegistry
  */
 class IdentityProviderRegistry
 {
-    /** @var array<string, IdentityVerificationProviderInterface> */
-    private static array $providers = [];
 
-    /** @var bool */
-    private static bool $initialized = false;
-
-    /**
-     * Register a provider instance.
-     */
-    public static function register(IdentityVerificationProviderInterface $provider): void
+    public static function register($provider): void
     {
-        self::$providers[$provider->getSlug()] = $provider;
+        \App\Services\Identity\IdentityProviderRegistry::register($provider);
     }
 
-    /**
-     * Get a provider by slug.
-     *
-     * @throws \InvalidArgumentException If provider not found
-     */
-    public static function get(string $slug): IdentityVerificationProviderInterface
+    public static function get(string $slug)
     {
-        self::ensureInitialized();
-
-        if (!isset(self::$providers[$slug])) {
-            throw new \InvalidArgumentException("Identity verification provider '{$slug}' is not registered.");
-        }
-
-        return self::$providers[$slug];
+        return \App\Services\Identity\IdentityProviderRegistry::get($slug);
     }
 
-    /**
-     * Check if a provider is registered.
-     */
     public static function has(string $slug): bool
     {
-        self::ensureInitialized();
-        return isset(self::$providers[$slug]);
+        return \App\Services\Identity\IdentityProviderRegistry::has($slug);
     }
 
-    /**
-     * Get all registered providers.
-     *
-     * @return array<string, IdentityVerificationProviderInterface>
-     */
     public static function all(): array
     {
-        self::ensureInitialized();
-        return self::$providers;
+        return \App\Services\Identity\IdentityProviderRegistry::all();
     }
 
-    /**
-     * Get provider listing for admin UI (slug, name, supported levels).
-     *
-     * @return array<int, array{slug: string, name: string, levels: string[]}>
-     */
     public static function listForAdmin(): array
     {
-        self::ensureInitialized();
-        $list = [];
-
-        foreach (self::$providers as $provider) {
-            $list[] = [
-                'slug' => $provider->getSlug(),
-                'name' => $provider->getName(),
-                'levels' => $provider->getSupportedLevels(),
-            ];
-        }
-
-        return $list;
+        return \App\Services\Identity\IdentityProviderRegistry::listForAdmin();
     }
 
-    /**
-     * Initialize built-in providers on first access.
-     */
-    private static function ensureInitialized(): void
-    {
-        if (self::$initialized) {
-            return;
-        }
-
-        self::$initialized = true;
-
-        // Register built-in providers
-        self::register(new MockIdentityProvider());
-        self::register(new StripeIdentityProvider());
-        self::register(new VeriffProvider());
-        self::register(new JumioProvider());
-        self::register(new OnfidoProvider());
-        self::register(new IdenfyProvider());
-    }
-
-    /**
-     * Reset registry (for testing).
-     */
     public static function reset(): void
     {
-        self::$providers = [];
-        self::$initialized = false;
+        \App\Services\Identity\IdentityProviderRegistry::reset();
     }
 }

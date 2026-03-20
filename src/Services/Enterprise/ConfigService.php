@@ -4,446 +4,136 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-declare(strict_types=1);
-
 namespace Nexus\Services\Enterprise;
 
-use Nexus\Core\VaultClient;
-
 /**
- * Unified Configuration Service
+ * ConfigService — Thin delegate forwarding to \App\Services\Enterprise\ConfigService.
  *
- * Provides a single interface for accessing configuration values,
- * with support for HashiCorp Vault secrets management and fallback to environment variables.
+ * The full implementation now lives in the App namespace.
+ * This file exists for backwards compatibility only.
+ *
+ * @see \App\Services\Enterprise\ConfigService
  */
 class ConfigService
 {
-    private static ?ConfigService $instance = null;
-    private ?VaultClient $vault = null;
-    private bool $useVault;
-    private array $localCache = [];
 
-    private function __construct()
+    public static function getInstance(): \App\Services\Enterprise\ConfigService
     {
-        $this->useVault = strtolower(getenv('USE_VAULT') ?: 'false') === 'true';
-
-        if ($this->useVault) {
-            $this->initializeVault();
-        }
+        return \App\Services\Enterprise\ConfigService::getInstance();
     }
 
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    /**
-     * Initialize Vault connection
-     */
-    private function initializeVault(): void
-    {
-        try {
-            $this->vault = new VaultClient();
-
-            // Try AppRole authentication
-            $roleId = getenv('VAULT_ROLE_ID');
-            $secretId = getenv('VAULT_SECRET_ID');
-
-            if ($roleId && $secretId) {
-                $this->vault->authenticateAppRole($roleId, $secretId);
-            } elseif ($token = getenv('VAULT_TOKEN')) {
-                // Fallback to token authentication (development)
-                $this->vault->authenticateToken($token);
-            }
-        } catch (\Exception $e) {
-            error_log("Failed to initialize Vault: " . $e->getMessage());
-            $this->vault = null;
-            $this->useVault = false;
-        }
-    }
-
-    /**
-     * Check if Vault is being used
-     */
     public function isUsingVault(): bool
     {
-        return $this->useVault && $this->vault !== null && $this->vault->isAvailable();
+        return \App\Services\Enterprise\ConfigService::getInstance()->isUsingVault();
     }
 
-    /**
-     * Get database configuration
-     */
     public function getDatabase(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                $env = getenv('APP_ENV') ?: 'production';
-                return $this->vault->getSecret("nexus/database/{$env}");
-            } catch (\Exception $e) {
-                error_log("Vault database config error, falling back to env: " . $e->getMessage());
-            }
-        }
-
-        return [
-            'host' => getenv('DB_HOST') ?: 'localhost',
-            'port' => getenv('DB_PORT') ?: '3306',
-            'database' => getenv('DB_DATABASE') ?: 'nexus',
-            'username' => getenv('DB_USERNAME') ?: 'root',
-            'password' => getenv('DB_PASSWORD') ?: '',
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getDatabase();
     }
 
-    /**
-     * Get Redis configuration
-     */
     public function getRedis(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                return $this->vault->getSecret('nexus/redis');
-            } catch (\Exception $e) {
-                error_log("Vault Redis config error: " . $e->getMessage());
-            }
-        }
-
-        return [
-            'host' => getenv('REDIS_HOST') ?: '127.0.0.1',
-            'port' => (int) (getenv('REDIS_PORT') ?: 6379),
-            'password' => getenv('REDIS_PASSWORD') ?: null,
-            'database' => (int) (getenv('REDIS_DATABASE') ?: 0),
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getRedis();
     }
 
-    /**
-     * Get Pusher configuration
-     */
     public function getPusher(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                return $this->vault->getSecret('nexus/api-keys/pusher');
-            } catch (\Exception $e) {
-                error_log("Vault Pusher config error: " . $e->getMessage());
-            }
-        }
-
-        return [
-            'app_id' => getenv('PUSHER_APP_ID') ?: '',
-            'key' => getenv('PUSHER_APP_KEY') ?: '',
-            'secret' => getenv('PUSHER_APP_SECRET') ?: '',
-            'cluster' => getenv('PUSHER_APP_CLUSTER') ?: 'eu',
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getPusher();
     }
 
-    /**
-     * Get OpenAI configuration
-     */
     public function getOpenAI(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                return $this->vault->getSecret('nexus/api-keys/openai');
-            } catch (\Exception $e) {
-                error_log("Vault OpenAI config error: " . $e->getMessage());
-            }
-        }
-
-        return [
-            'api_key' => getenv('OPENAI_API_KEY') ?: '',
-            'model' => getenv('OPENAI_MODEL') ?: 'gpt-4',
-            'max_tokens' => (int) (getenv('OPENAI_MAX_TOKENS') ?: 2000),
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getOpenAI();
     }
 
-    /**
-     * Get Anthropic configuration
-     */
     public function getAnthropic(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                return $this->vault->getSecret('nexus/api-keys/anthropic');
-            } catch (\Exception $e) {
-                error_log("Vault Anthropic config error: " . $e->getMessage());
-            }
-        }
-
-        return [
-            'api_key' => getenv('ANTHROPIC_API_KEY') ?: '',
-            'model' => getenv('ANTHROPIC_MODEL') ?: 'claude-3-sonnet-20240229',
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getAnthropic();
     }
 
-    /**
-     * Get Google Maps configuration
-     */
     public function getGoogleMaps(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                return $this->vault->getSecret('nexus/api-keys/google-maps');
-            } catch (\Exception $e) {
-                error_log("Vault Google Maps config error: " . $e->getMessage());
-            }
-        }
-
-        return [
-            'api_key' => getenv('GOOGLE_MAPS_API_KEY') ?: '',
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getGoogleMaps();
     }
 
-    /**
-     * Get Firebase configuration
-     */
     public function getFirebase(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                $config = $this->vault->getSecret('nexus/api-keys/firebase');
-                if (isset($config['service_account'])) {
-                    $config['service_account'] = json_decode($config['service_account'], true);
-                }
-                return $config;
-            } catch (\Exception $e) {
-                error_log("Vault Firebase config error: " . $e->getMessage());
-            }
-        }
-
-        // Fallback to file-based service account
-        $path = getenv('FIREBASE_SERVICE_ACCOUNT_PATH') ?: __DIR__ . '/../../../firebase-service-account.json';
-        $serviceAccount = [];
-
-        if (file_exists($path)) {
-            $serviceAccount = json_decode(file_get_contents($path), true) ?: [];
-        }
-
-        return [
-            'service_account' => $serviceAccount,
-            'project_id' => $serviceAccount['project_id'] ?? getenv('FIREBASE_PROJECT_ID') ?: '',
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getFirebase();
     }
 
-    /**
-     * Get SMTP/Email configuration
-     */
     public function getSmtp(): array
     {
-        if ($this->isUsingVault()) {
-            try {
-                return $this->vault->getSecret('nexus/smtp');
-            } catch (\Exception $e) {
-                error_log("Vault SMTP config error: " . $e->getMessage());
-            }
-        }
-
-        return [
-            'host' => getenv('SMTP_HOST') ?: 'smtp.gmail.com',
-            'port' => (int) (getenv('SMTP_PORT') ?: 587),
-            'username' => getenv('SMTP_USERNAME') ?: '',
-            'password' => getenv('SMTP_PASSWORD') ?: '',
-            'encryption' => getenv('SMTP_ENCRYPTION') ?: 'tls',
-            'from_address' => getenv('MAIL_FROM_ADDRESS') ?: '',
-            'from_name' => getenv('MAIL_FROM_NAME') ?: 'NEXUS',
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getSmtp();
     }
 
-    /**
-     * Get application encryption key
-     */
     public function getAppKey(): string
     {
-        if ($this->isUsingVault()) {
-            try {
-                $data = $this->vault->getSecret('nexus/encryption');
-                return $data['app_key'] ?? '';
-            } catch (\Exception $e) {
-                error_log("Vault app key error: " . $e->getMessage());
-            }
-        }
-
-        return getenv('APP_KEY') ?: '';
+        return \App\Services\Enterprise\ConfigService::getInstance()->getAppKey();
     }
 
-    /**
-     * Get a configuration value.
-     *
-     * When Vault is active: treats $path as a Vault secret path and $key as a field within it.
-     * When Vault is not active: treats $path as an environment variable name and $key as the default value.
-     */
     public function get(string $path, $key = null, $default = null)
     {
-        // When Vault is active, use path/key lookup
-        if ($this->isUsingVault()) {
-            $cacheKey = "vault:{$path}";
-            if (!isset($this->localCache[$cacheKey])) {
-                try {
-                    $this->localCache[$cacheKey] = $this->vault->getSecret($path);
-                } catch (\Exception $e) {
-                    $this->localCache[$cacheKey] = [];
-                }
-            }
-
-            $data = $this->localCache[$cacheKey];
-
-            if ($key === null) {
-                return $data ?: $default;
-            }
-
-            return $data[$key] ?? $default;
-        }
-
-        // Without Vault: treat $path as env var key, $key as default value
-        $cacheKey = "env:{$path}";
-        if (isset($this->localCache[$cacheKey])) {
-            return $this->localCache[$cacheKey];
-        }
-
-        $envValue = getenv($path);
-        if ($envValue !== false && $envValue !== '') {
-            $this->localCache[$cacheKey] = $envValue;
-            return $envValue;
-        }
-
-        // $key serves as the default when not using Vault
-        $fallback = $key ?? $default;
-        return $fallback;
+        return \App\Services\Enterprise\ConfigService::getInstance()->get($path, $key, $default);
     }
 
-    /**
-     * Get a required configuration value (throws if missing)
-     */
     public function getRequired(string $key): string
     {
-        $value = $this->get($key);
-        if ($value === null || $value === '' || (is_array($value) && empty($value))) {
-            throw new \RuntimeException("Required configuration key not found: {$key}");
-        }
-        return $value;
+        return \App\Services\Enterprise\ConfigService::getInstance()->getRequired($key);
     }
 
-    /**
-     * Get environment name
-     */
     public function getEnvironment(): string
     {
-        return getenv('APP_ENV') ?: 'production';
+        return \App\Services\Enterprise\ConfigService::getInstance()->getEnvironment();
     }
 
-    /**
-     * Get an integer configuration value
-     */
     public function getInt(string $key, int $default = 0): int
     {
-        $value = $this->get($key);
-        return $value !== null ? (int) $value : $default;
+        return \App\Services\Enterprise\ConfigService::getInstance()->getInt($key, $default);
     }
 
-    /**
-     * Get a boolean configuration value
-     */
     public function getBool(string $key, bool $default = false): bool
     {
-        $value = $this->get($key);
-        if ($value === null) {
-            return $default;
-        }
-        return in_array(strtolower((string) $value), ['true', '1', 'yes', 'on'], true);
+        return \App\Services\Enterprise\ConfigService::getInstance()->getBool($key, $default);
     }
 
-    /**
-     * Get a comma-separated configuration value as array
-     */
     public function getArray(string $key, array $default = []): array
     {
-        $value = $this->get($key);
-        if ($value === null || $value === '') {
-            return $default;
-        }
-        return array_map('trim', explode(',', (string) $value));
+        return \App\Services\Enterprise\ConfigService::getInstance()->getArray($key, $default);
     }
 
-    /**
-     * Get multiple configuration values at once
-     */
     public function getAll(array $keys): array
     {
-        $result = [];
-        foreach ($keys as $key) {
-            $result[$key] = $this->get($key);
-        }
-        return $result;
+        return \App\Services\Enterprise\ConfigService::getInstance()->getAll($keys);
     }
 
-    /**
-     * Validate that required configuration keys are present and non-empty
-     */
     public function validate(array $requiredKeys): array
     {
-        $missing = [];
-        foreach ($requiredKeys as $key) {
-            $value = getenv($key);
-            if ($value === false || $value === '') {
-                $missing[] = $key;
-            }
-        }
-        return [
-            'valid' => empty($missing),
-            'missing' => $missing,
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->validate($requiredKeys);
     }
 
-    /**
-     * Get environment-specific configuration
-     */
     public function getEnv(string $key, $default = null)
     {
-        return getenv($key) ?: $default;
+        return \App\Services\Enterprise\ConfigService::getInstance()->getEnv($key, $default);
     }
 
-    /**
-     * Check if running in production
-     */
     public function isProduction(): bool
     {
-        return getenv('APP_ENV') === 'production';
+        return \App\Services\Enterprise\ConfigService::getInstance()->isProduction();
     }
 
-    /**
-     * Check if debug mode is enabled
-     */
     public function isDebug(): bool
     {
-        return strtolower(getenv('APP_DEBUG') ?: 'false') === 'true';
+        return \App\Services\Enterprise\ConfigService::getInstance()->isDebug();
     }
 
-    /**
-     * Clear configuration cache
-     */
     public function clearCache(): void
     {
-        $this->localCache = [];
-        if ($this->vault) {
-            $this->vault->clearCache();
-        }
+        \App\Services\Enterprise\ConfigService::getInstance()->clearCache();
     }
 
-    /**
-     * Get configuration status for admin dashboard
-     */
     public function getStatus(): array
     {
-        return [
-            'vault_enabled' => $this->useVault,
-            'vault_available' => $this->vault?->isAvailable() ?? false,
-            'environment' => getenv('APP_ENV') ?: 'unknown',
-            'debug_mode' => $this->isDebug(),
-            'cache_entries' => count($this->localCache),
-            'vault_cache' => $this->vault?->getCacheStats() ?? null,
-        ];
+        return \App\Services\Enterprise\ConfigService::getInstance()->getStatus();
     }
 }

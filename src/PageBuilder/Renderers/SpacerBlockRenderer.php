@@ -5,34 +5,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Spacer Block Renderer
+ * Spacer Block Renderer - Thin delegate to App\PageBuilder\Renderers\SpacerBlockRenderer
  *
- * Renders vertical spacing between blocks
+ * @deprecated Use App\PageBuilder\Renderers\SpacerBlockRenderer directly
  */
 
 namespace Nexus\PageBuilder\Renderers;
 
-class SpacerBlockRenderer implements BlockRendererInterface
+class SpacerBlockRenderer extends \App\PageBuilder\Renderers\SpacerBlockRenderer
 {
-    public function render(array $data): string
-    {
-        $height = htmlspecialchars($data['height'] ?? 'medium');
-
-        // Height mapping
-        $heights = [
-            'small' => '20px',
-            'medium' => '40px',
-            'large' => '60px',
-            'xlarge' => '100px'
-        ];
-
-        $heightValue = $heights[$height] ?? $heights['medium'];
-
-        return '<div class="pb-spacer" style="height: ' . $heightValue . '; width: 100%;"></div>';
-    }
-
-    public function validate(array $data): bool
-    {
-        return true; // Spacer always valid
-    }
 }

@@ -7,86 +7,58 @@
 namespace Nexus\Services\Identity;
 
 /**
- * MockIdentityProvider — Test/development provider for the identity verification system.
+ * MockIdentityProvider — Thin delegate forwarding to \App\Services\Identity\MockIdentityProvider.
  *
- * Simulates verification flows without calling any external service.
- * Configurable behaviour via metadata:
- * - 'mock_result' => 'pass' | 'fail' | 'review' (default: 'pass')
- * - 'mock_delay'  => int seconds before result (default: 0)
+ * The full implementation now lives in the App namespace.
+ * This file exists for backwards compatibility only.
+ *
+ * @see \App\Services\Identity\MockIdentityProvider
  */
 class MockIdentityProvider implements IdentityVerificationProviderInterface
 {
+
     public function getSlug(): string
     {
-        return 'mock';
+        return (new \App\Services\Identity\MockIdentityProvider())->getSlug();
     }
 
     public function getName(): string
     {
-        return 'Mock Provider (Testing)';
+        return (new \App\Services\Identity\MockIdentityProvider())->getName();
     }
 
     public function getSupportedLevels(): array
     {
-        return ['document_only', 'document_selfie', 'reusable_digital_id', 'manual_review'];
+        return (new \App\Services\Identity\MockIdentityProvider())->getSupportedLevels();
     }
 
     public function createSession(int $userId, int $tenantId, string $level, array $metadata = []): array
     {
-        $sessionId = 'mock_' . bin2hex(random_bytes(16));
-        $mockResult = $metadata['mock_result'] ?? 'pass';
-
-        return [
-            'provider_session_id' => $sessionId,
-            'redirect_url' => null,
-            'client_token' => 'mock_token_' . $sessionId,
-            'expires_at' => date('Y-m-d\TH:i:s\Z', time() + 3600),
-            'mock_result' => $mockResult,
-        ];
+        return (new \App\Services\Identity\MockIdentityProvider())->createSession($userId, $tenantId, $level, $metadata);
     }
 
     public function getSessionStatus(string $providerSessionId): array
     {
-        // Mock provider: parse expected result from session ID prefix or return passed
-        // In real usage, RegistrationOrchestrationService stores mock_result in session metadata
-        return [
-            'status' => 'passed',
-            'decision' => 'approved',
-            'risk_score' => 0.05,
-            'failure_reason' => null,
-        ];
+        return (new \App\Services\Identity\MockIdentityProvider())->getSessionStatus($providerSessionId);
     }
 
     public function handleWebhook(array $payload, array $headers): array
     {
-        $sessionId = $payload['session_id'] ?? '';
-        $result = $payload['result'] ?? 'passed';
-
-        return [
-            'provider_session_id' => $sessionId,
-            'status' => $result,
-            'decision' => $result === 'passed' ? 'approved' : 'declined',
-            'risk_score' => $result === 'passed' ? 0.05 : 0.95,
-            'failure_reason' => $result === 'failed' ? 'Mock verification failed (test)' : null,
-            'raw_event_type' => 'mock.verification.' . $result,
-        ];
+        return (new \App\Services\Identity\MockIdentityProvider())->handleWebhook($payload, $headers);
     }
 
     public function verifyWebhookSignature(string $rawBody, array $headers): bool
     {
-        // Mock provider always trusts webhooks (testing only)
-        // In production providers, this verifies HMAC/RSA signatures
-        return true;
+        return (new \App\Services\Identity\MockIdentityProvider())->verifyWebhookSignature($rawBody, $headers);
     }
 
     public function cancelSession(string $providerSessionId): bool
     {
-        return true;
+        return (new \App\Services\Identity\MockIdentityProvider())->cancelSession($providerSessionId);
     }
 
     public function isAvailable(int $tenantId): bool
     {
-        // Mock provider is always available
-        return true;
+        return (new \App\Services\Identity\MockIdentityProvider())->isAvailable($tenantId);
     }
 }

@@ -6,31 +6,111 @@
 
 namespace App\Helpers;
 
-use Nexus\Helpers\TimeHelper as LegacyTimeHelper;
-
 /**
- * App-namespace wrapper for Nexus\Helpers\TimeHelper.
+ * TimeHelper - Time formatting utilities
  *
- * Delegates to the legacy implementation. Once the Laravel migration is
- * complete this can be replaced with Carbon helpers.
+ * Provides human-readable time formatting functions.
  */
 class TimeHelper
 {
+    /**
+     * Convert a datetime to a human-readable "time ago" string
+     *
+     * @param string|int $datetime DateTime string or Unix timestamp
+     * @return string Human-readable time difference (e.g., "2 hours ago")
+     */
     public static function timeAgo($datetime): string
     {
-        if (!class_exists(LegacyTimeHelper::class)) { return 'Unknown'; }
-        return LegacyTimeHelper::timeAgo($datetime);
+        if (is_numeric($datetime)) {
+            $timestamp = (int) $datetime;
+        } else {
+            $timestamp = strtotime($datetime);
+        }
+
+        if ($timestamp === false) {
+            return 'Unknown';
+        }
+
+        $now = time();
+        $diff = $now - $timestamp;
+
+        if ($diff < 0) {
+            return 'Just now';
+        }
+
+        if ($diff < 60) {
+            return 'Just now';
+        }
+
+        if ($diff < 3600) {
+            $minutes = floor($diff / 60);
+            return $minutes . ' ' . ($minutes === 1 ? 'minute' : 'minutes') . ' ago';
+        }
+
+        if ($diff < 86400) {
+            $hours = floor($diff / 3600);
+            return $hours . ' ' . ($hours === 1 ? 'hour' : 'hours') . ' ago';
+        }
+
+        if ($diff < 604800) {
+            $days = floor($diff / 86400);
+            return $days . ' ' . ($days === 1 ? 'day' : 'days') . ' ago';
+        }
+
+        if ($diff < 2592000) {
+            $weeks = floor($diff / 604800);
+            return $weeks . ' ' . ($weeks === 1 ? 'week' : 'weeks') . ' ago';
+        }
+
+        if ($diff < 31536000) {
+            $months = floor($diff / 2592000);
+            return $months . ' ' . ($months === 1 ? 'month' : 'months') . ' ago';
+        }
+
+        $years = floor($diff / 31536000);
+        return $years . ' ' . ($years === 1 ? 'year' : 'years') . ' ago';
     }
 
+    /**
+     * Format a datetime for display
+     *
+     * @param string|int $datetime DateTime string or Unix timestamp
+     * @param string $format PHP date format (default: 'M j, Y')
+     * @return string Formatted date
+     */
     public static function format($datetime, string $format = 'M j, Y'): string
     {
-        if (!class_exists(LegacyTimeHelper::class)) { return 'Unknown'; }
-        return LegacyTimeHelper::format($datetime, $format);
+        if (is_numeric($datetime)) {
+            $timestamp = (int) $datetime;
+        } else {
+            $timestamp = strtotime($datetime);
+        }
+
+        if ($timestamp === false) {
+            return 'Unknown';
+        }
+
+        return date($format, $timestamp);
     }
 
+    /**
+     * Format a datetime with time
+     *
+     * @param string|int $datetime DateTime string or Unix timestamp
+     * @return string Formatted date and time (e.g., "Jan 15, 2026 at 3:30 PM")
+     */
     public static function formatWithTime($datetime): string
     {
-        if (!class_exists(LegacyTimeHelper::class)) { return 'Unknown'; }
-        return LegacyTimeHelper::formatWithTime($datetime);
+        if (is_numeric($datetime)) {
+            $timestamp = (int) $datetime;
+        } else {
+            $timestamp = strtotime($datetime);
+        }
+
+        if ($timestamp === false) {
+            return 'Unknown';
+        }
+
+        return date('M j, Y', $timestamp) . ' at ' . date('g:i A', $timestamp);
     }
 }

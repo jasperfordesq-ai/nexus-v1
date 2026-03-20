@@ -5,28 +5,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Block Renderer Interface
+ * Block Renderer Interface - Thin delegate to App\PageBuilder\Renderers\BlockRendererInterface
  *
- * All block renderers must implement this interface
+ * @deprecated Use App\PageBuilder\Renderers\BlockRendererInterface directly
  */
 
 namespace Nexus\PageBuilder\Renderers;
 
-interface BlockRendererInterface
+interface BlockRendererInterface extends \App\PageBuilder\Renderers\BlockRendererInterface
 {
-    /**
-     * Render block HTML from data
-     *
-     * @param array $data Block data
-     * @return string Rendered HTML
-     */
-    public function render(array $data): string;
-
-    /**
-     * Validate block data
-     *
-     * @param array $data Block data to validate
-     * @return bool True if valid
-     */
-    public function validate(array $data): bool;
 }

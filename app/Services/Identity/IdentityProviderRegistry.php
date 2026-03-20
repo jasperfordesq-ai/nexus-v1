@@ -6,25 +6,26 @@
 
 namespace App\Services\Identity;
 
-use Nexus\Services\Identity\IdentityProviderRegistry as LegacyRegistry;
-
 /**
- * IdentityProviderRegistry — Laravel DI wrapper for legacy registry.
+ * IdentityProviderRegistry — Factory/registry for identity verification providers.
  *
- * Delegates to \Nexus\Services\Identity\IdentityProviderRegistry.
- * All methods are static to match the legacy API that tests expect.
+ * Providers register themselves by slug. The orchestration service
+ * resolves the correct provider for a tenant's configured policy.
  */
 class IdentityProviderRegistry
 {
+    /** @var array<string, IdentityVerificationProviderInterface> */
+    private static array $providers = [];
+
+    /** @var bool */
+    private static bool $initialized = false;
+
     /**
      * Register a provider instance.
      */
-    public static function register(\Nexus\Services\Identity\IdentityVerificationProviderInterface $provider): void
+    public static function register(IdentityVerificationProviderInterface $provider): void
     {
-        if (!class_exists(LegacyRegistry::class)) {
-            return;
-        }
-        LegacyRegistry::register($provider);
+        self::$providers[$provider->getSlug()] = $provider;
     }
 
     /**
@@ -32,12 +33,15 @@ class IdentityProviderRegistry
      *
      * @throws \InvalidArgumentException If provider not found
      */
-    public static function get(string $slug): \Nexus\Services\Identity\IdentityVerificationProviderInterface
+    public static function get(string $slug): IdentityVerificationProviderInterface
     {
-        if (!class_exists(LegacyRegistry::class)) {
-            throw new \RuntimeException('Legacy IdentityProviderRegistry is not available');
+        self::ensureInitialized();
+
+        if (!isset(self::$providers[$slug])) {
+            throw new \InvalidArgumentException("Identity verification provider '{$slug}' is not registered.");
         }
-        return LegacyRegistry::get($slug);
+
+        return self::$providers[$slug];
     }
 
     /**
@@ -45,36 +49,60 @@ class IdentityProviderRegistry
      */
     public static function has(string $slug): bool
     {
-        if (!class_exists(LegacyRegistry::class)) {
-            return false;
-        }
-        return LegacyRegistry::has($slug);
+        self::ensureInitialized();
+        return isset(self::$providers[$slug]);
     }
 
     /**
      * Get all registered providers.
      *
-     * @return array<string, \Nexus\Services\Identity\IdentityVerificationProviderInterface>
+     * @return array<string, IdentityVerificationProviderInterface>
      */
     public static function all(): array
     {
-        if (!class_exists(LegacyRegistry::class)) {
-            return [];
-        }
-        return LegacyRegistry::all();
+        self::ensureInitialized();
+        return self::$providers;
     }
 
     /**
-     * Get provider listing for admin UI.
+     * Get provider listing for admin UI (slug, name, supported levels).
      *
      * @return array<int, array{slug: string, name: string, levels: string[]}>
      */
     public static function listForAdmin(): array
     {
-        if (!class_exists(LegacyRegistry::class)) {
-            return [];
+        self::ensureInitialized();
+        $list = [];
+
+        foreach (self::$providers as $provider) {
+            $list[] = [
+                'slug' => $provider->getSlug(),
+                'name' => $provider->getName(),
+                'levels' => $provider->getSupportedLevels(),
+            ];
         }
-        return LegacyRegistry::listForAdmin();
+
+        return $list;
+    }
+
+    /**
+     * Initialize built-in providers on first access.
+     */
+    private static function ensureInitialized(): void
+    {
+        if (self::$initialized) {
+            return;
+        }
+
+        self::$initialized = true;
+
+        // Register built-in providers
+        self::register(new MockIdentityProvider());
+        self::register(new StripeIdentityProvider());
+        self::register(new VeriffProvider());
+        self::register(new JumioProvider());
+        self::register(new OnfidoProvider());
+        self::register(new IdenfyProvider());
     }
 
     /**
@@ -82,9 +110,7 @@ class IdentityProviderRegistry
      */
     public static function reset(): void
     {
-        if (!class_exists(LegacyRegistry::class)) {
-            return;
-        }
-        LegacyRegistry::reset();
+        self::$providers = [];
+        self::$initialized = false;
     }
 }

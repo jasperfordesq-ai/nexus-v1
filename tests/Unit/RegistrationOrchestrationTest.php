@@ -9,9 +9,10 @@ declare(strict_types=1);
 namespace Nexus\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use App\Services\Identity\RegistrationOrchestrationService;
-use App\Services\Identity\RegistrationPolicyService;
-use App\Services\Identity\IdentityVerificationSessionService;
+use Nexus\Services\Identity\RegistrationOrchestrationService;
+use App\Services\Identity\RegistrationOrchestrationService as AppRegistrationOrchestrationService;
+use Nexus\Services\Identity\RegistrationPolicyService;
+use Nexus\Services\Identity\IdentityVerificationSessionService;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -64,7 +65,7 @@ class RegistrationOrchestrationTest extends TestCase
 
     public function testAllSixModeHandlersExist(): void
     {
-        $ref = new ReflectionClass(RegistrationOrchestrationService::class);
+        $ref = new ReflectionClass(AppRegistrationOrchestrationService::class);
         $expected = ['handleOpenRegistration', 'handleOpenWithApproval', 'handleVerifiedIdentity', 'handleInviteOnly', 'handleWaitlist'];
         foreach ($expected as $handler) {
             $this->assertTrue($ref->hasMethod($handler), "Missing: {$handler}");
@@ -79,7 +80,7 @@ class RegistrationOrchestrationTest extends TestCase
 
     public function testProcessRegistrationReturnDocumented(): void
     {
-        $method = new ReflectionMethod(RegistrationOrchestrationService::class, 'processRegistration');
+        $method = new ReflectionMethod(AppRegistrationOrchestrationService::class, 'processRegistration');
         $doc = $method->getDocComment();
         $this->assertNotFalse($doc);
         $this->assertStringContainsString('action', $doc);

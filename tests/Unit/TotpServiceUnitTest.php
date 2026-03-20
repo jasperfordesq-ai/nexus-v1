@@ -9,7 +9,8 @@ declare(strict_types=1);
 namespace Nexus\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use App\Services\TotpService;
+use Nexus\Services\TotpService;
+use App\Services\TotpService as AppTotpService;
 
 /**
  * TotpService Unit Tests
@@ -81,7 +82,7 @@ class TotpServiceUnitTest extends TestCase
 
     public function testClassConstants(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
 
         $this->assertTrue($ref->hasConstant('BACKUP_CODE_COUNT'));
         $this->assertTrue($ref->hasConstant('BACKUP_CODE_LENGTH'));
@@ -94,7 +95,7 @@ class TotpServiceUnitTest extends TestCase
 
     public function testConstantValues(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $constants = $ref->getConstants();
 
         $this->assertEquals(10, $constants['BACKUP_CODE_COUNT']);
@@ -346,11 +347,12 @@ class TotpServiceUnitTest extends TestCase
 
     public function testGenerateRandomCodeFormat(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('generateRandomCode');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
-        $code = $method->invoke(null);
+        $code = $method->invoke($instance);
 
         // Format: XXXX-XXXX
         $this->assertMatchesRegularExpression('/^[A-Z0-9]{4}-[A-Z0-9]{4}$/', $code);
@@ -358,15 +360,16 @@ class TotpServiceUnitTest extends TestCase
 
     public function testGenerateRandomCodeExcludesAmbiguousChars(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('generateRandomCode');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         // Generate many codes and check none contain ambiguous characters
         $ambiguousChars = ['0', 'O', '1', 'I', 'L'];
 
         for ($i = 0; $i < 100; $i++) {
-            $code = $method->invoke(null);
+            $code = $method->invoke($instance);
             $codeWithoutDash = str_replace('-', '', $code);
 
             foreach ($ambiguousChars as $char) {
@@ -381,13 +384,14 @@ class TotpServiceUnitTest extends TestCase
 
     public function testGenerateRandomCodeUniqueness(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('generateRandomCode');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $codes = [];
         for ($i = 0; $i < 50; $i++) {
-            $codes[] = $method->invoke(null);
+            $codes[] = $method->invoke($instance);
         }
 
         $uniqueCodes = array_unique($codes);
@@ -396,11 +400,12 @@ class TotpServiceUnitTest extends TestCase
 
     public function testGenerateRandomCodeHasCorrectLength(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('generateRandomCode');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
-        $code = $method->invoke(null);
+        $code = $method->invoke($instance);
 
         // 4 + dash + 4 = 9 total chars
         $this->assertEquals(9, strlen($code));
@@ -415,95 +420,103 @@ class TotpServiceUnitTest extends TestCase
 
     public function testParseDeviceNameWithNullReturnsUnknown(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
-        $result = $method->invoke(null, null);
+        $result = $method->invoke($instance, null);
 
         $this->assertEquals('Unknown device', $result);
     }
 
     public function testParseDeviceNameChromeOnWindows(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-        $result = $method->invoke(null, $ua);
+        $result = $method->invoke($instance, $ua);
 
         $this->assertEquals('Chrome on Windows', $result);
     }
 
     public function testParseDeviceNameFirefoxOnMacOS(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0';
-        $result = $method->invoke(null, $ua);
+        $result = $method->invoke($instance, $ua);
 
         $this->assertEquals('Firefox on macOS', $result);
     }
 
     public function testParseDeviceNameSafariOnIOS(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $ua = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1';
-        $result = $method->invoke(null, $ua);
+        $result = $method->invoke($instance, $ua);
 
         $this->assertEquals('Safari on iOS', $result);
     }
 
     public function testParseDeviceNameEdgeOnWindows(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0';
-        $result = $method->invoke(null, $ua);
+        $result = $method->invoke($instance, $ua);
 
         $this->assertEquals('Edge on Windows', $result);
     }
 
     public function testParseDeviceNameChromeOnAndroid(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $ua = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0.6099.144 Mobile Safari/537.36';
-        $result = $method->invoke(null, $ua);
+        $result = $method->invoke($instance, $ua);
 
         $this->assertEquals('Chrome on Android', $result);
     }
 
     public function testParseDeviceNameChromeOnLinux(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36';
-        $result = $method->invoke(null, $ua);
+        $result = $method->invoke($instance, $ua);
 
         $this->assertEquals('Chrome on Linux', $result);
     }
 
     public function testParseDeviceNameSafariOnIPad(): void
     {
-        $ref = new \ReflectionClass(TotpService::class);
+        $ref = new \ReflectionClass(AppTotpService::class);
         $method = $ref->getMethod('parseDeviceName');
         $method->setAccessible(true);
+        $instance = $ref->newInstanceWithoutConstructor();
 
         $ua = 'Mozilla/5.0 (iPad; CPU OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1';
-        $result = $method->invoke(null, $ua);
+        $result = $method->invoke($instance, $ua);
 
         // iPad is detected as iOS
         $this->assertEquals('Safari on iOS', $result);
