@@ -110,7 +110,7 @@ class MessageService
             ] : null;
             $data['last_message'] = [
                 'id'         => $msg->id,
-                'content'    => $msg->content,
+                'content'    => $msg->body,
                 'sender_id'  => $msg->sender_id,
                 'created_at' => $msg->created_at?->toISOString(),
                 'is_read'    => $msg->is_read,
@@ -227,7 +227,7 @@ class MessageService
         $message = $this->message->newInstance([
             'sender_id'      => $senderId,
             'receiver_id'    => $receiverId,
-            'content'        => $content,
+            'body'           => $content,
             'is_read'        => false,
             'created_at'     => now(),
         ]);
@@ -427,7 +427,7 @@ class MessageService
             return null;
         }
 
-        $message->content = $newBody;
+        $message->body = $newBody;
 
         if (in_array('is_edited', $message->getFillable()) || DB::getSchemaBuilder()->hasColumn('messages', 'is_edited')) {
             $message->is_edited = true;
@@ -474,7 +474,7 @@ class MessageService
                 ->where('tenant_id', app('tenant.id'))
                 ->update([
                     'is_deleted'  => true,
-                    'content'     => '[Message deleted]',
+                    'body'        => '[Message deleted]',
                     'deleted_at'  => now(),
                 ]);
         } else {

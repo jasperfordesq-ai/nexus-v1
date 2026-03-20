@@ -23,7 +23,7 @@ class Message extends Model
 
     protected $fillable = [
         'tenant_id', 'sender_id', 'receiver_id', 'listing_id',
-        'content', 'is_read', 'is_edited', 'edited_at',
+        'body', 'is_read', 'is_edited', 'edited_at',
         'is_deleted_sender', 'is_deleted_receiver',
         'read_at', 'created_at',
     ];

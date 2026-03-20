@@ -405,7 +405,7 @@ class ListingsController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', 'You do not have permission to modify this listing', null, 403);
         }
 
-        $this->listingService->update($id, $userId, ['image_url' => null]);
+        $this->listingService->update($id, ['image_url' => null]);
 
         return $this->respondWithData(['image_url' => null]);
     }
@@ -539,7 +539,7 @@ class ListingsController extends BaseApiController
             $imageUrl = \App\Core\ImageUploader::upload($fileArray);
 
             // Update listing with new image
-            $this->listingService->update($id, $userId, ['image_url' => $imageUrl]);
+            $this->listingService->update($id, ['image_url' => $imageUrl]);
 
             return $this->respondWithData(['image_url' => $imageUrl]);
         } catch (\Exception $e) {

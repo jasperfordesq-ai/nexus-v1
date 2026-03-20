@@ -29,6 +29,27 @@ class Authenticate
 
         foreach ($guards as $guard) {
             if (auth()->guard($guard)->check()) {
+                // Validate that the authenticated user belongs to the resolved tenant.
+                // Without this check, Sanctum tokens work across any tenant since they
+                // bypass the JWT tenant_id mismatch detection in TenantContext::resolve().
+                $user = auth()->guard($guard)->user();
+                $tenantId = \App\Core\TenantContext::getId();
+                if ($user && $tenantId && (int) $user->tenant_id !== $tenantId) {
+                    if (!$user->is_super_admin && !$user->is_tenant_super_admin) {
+                        \Illuminate\Support\Facades\Log::debug('[Auth] Sanctum user tenant mismatch', [
+                            'user_id' => $user->id,
+                            'user_tenant' => $user->tenant_id,
+                            'request_tenant' => $tenantId,
+                        ]);
+                        return response()->json([
+                            'errors' => [
+                                ['code' => 'tenant_mismatch', 'message' => 'Your account does not belong to this community'],
+                            ],
+                            'success' => false,
+                        ], 403, ['API-Version' => '2.0']);
+                    }
+                }
+
                 auth()->shouldUse($guard);
                 return $next($request);
             }
