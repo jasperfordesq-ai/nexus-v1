@@ -6,7 +6,7 @@
 
 namespace Tests\Services;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\FeedRankingService;
 
 /**
@@ -17,11 +17,8 @@ class FeedRankingServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Reset cached config so each test gets fresh defaults
-        $ref = new \ReflectionClass(FeedRankingService::class);
-        $prop = $ref->getProperty('config');
-        $prop->setAccessible(true);
-        $prop->setValue(null, null);
+        // $config is now an instance property (not static), so no singleton reset needed.
+        // Each new FeedRankingService instance starts with $config = null by default.
     }
 
     // =========================================================================

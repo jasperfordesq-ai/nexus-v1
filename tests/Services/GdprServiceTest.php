@@ -10,7 +10,7 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\TestCase;
 use App\Services\Enterprise\GdprService;
-use Nexus\Services\Enterprise\LoggerService;
+use App\Services\Enterprise\LoggerService;
 use App\Services\Enterprise\MetricsService;
 
 /**

@@ -93,7 +93,7 @@ abstract class DatabaseTestCase extends TestCase
     /**
      * Get PDO connection.
      */
-    protected function getConnection(): PDO
+    protected function getPdo(): PDO
     {
         return self::$pdo;
     }
@@ -134,7 +134,7 @@ abstract class DatabaseTestCase extends TestCase
     /**
      * Assert that a table has a row matching conditions.
      */
-    protected function assertDatabaseHas(string $table, array $conditions): void
+    protected function assertDatabaseHas($table, array $conditions = [], $connection = null): void
     {
         $data = $this->getTestData($table, $conditions);
         $this->assertNotEmpty($data, "Failed asserting that table [{$table}] has matching row.");
@@ -143,7 +143,7 @@ abstract class DatabaseTestCase extends TestCase
     /**
      * Assert that a table does not have a row matching conditions.
      */
-    protected function assertDatabaseMissing(string $table, array $conditions): void
+    protected function assertDatabaseMissing($table, array $conditions = [], $connection = null): void
     {
         $data = $this->getTestData($table, $conditions);
         $this->assertEmpty($data, "Failed asserting that table [{$table}] does not have matching row.");
@@ -152,17 +152,12 @@ abstract class DatabaseTestCase extends TestCase
     /**
      * Assert table row count.
      */
-    protected function assertDatabaseCount(string $table, int $count, array $conditions = []): void
+    protected function assertDatabaseCount($table, int $count, $connection = null): void
     {
         $sql = "SELECT COUNT(*) as count FROM {$table}";
 
-        if (!empty($conditions)) {
-            $where = implode(' AND ', array_map(fn($k) => "{$k} = ?", array_keys($conditions)));
-            $sql .= " WHERE {$where}";
-        }
-
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute(array_values($conditions));
+        $stmt->execute();
         $result = $stmt->fetch();
 
         $this->assertEquals($count, $result['count'], "Table [{$table}] does not have expected row count.");

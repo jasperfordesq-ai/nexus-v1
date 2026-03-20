@@ -6,7 +6,7 @@
 
 namespace Nexus\Tests\Services;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\ExchangeWorkflowService;
 use App\Core\Database;
 use App\Core\TenantContext;

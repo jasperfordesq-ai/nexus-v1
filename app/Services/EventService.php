@@ -264,6 +264,46 @@ class EventService
     /** @var array Validation error messages */
     private static array $errors = [];
 
+    /**
+     * Validate event data and return boolean.
+     *
+     * @return bool True if valid, false if errors (check getErrors()).
+     */
+    public static function validate(array $data): bool
+    {
+        self::$errors = [];
+
+        $title = $data['title'] ?? null;
+        $startTime = $data['start_time'] ?? null;
+        $endTime = $data['end_time'] ?? null;
+
+        // title is required and max 255
+        if ($title === null || $title === '') {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+        } elseif (strlen($title) > 255) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must not exceed 255 characters', 'field' => 'title'];
+        }
+
+        // start_time: validate format if provided
+        if ($startTime !== null) {
+            $parsed = strtotime($startTime);
+            if ($parsed === false) {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid start_time format', 'field' => 'start_time'];
+            }
+        }
+
+        // end_time must be after start_time if both provided
+        if ($startTime !== null && $endTime !== null) {
+            $startParsed = strtotime($startTime);
+            $endParsed = strtotime($endTime);
+            if ($startParsed !== false && $endParsed !== false && $endParsed <= $startParsed) {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'End time must be after start time', 'field' => 'end_time'];
+            }
+        }
+
+        return empty(self::$errors);
+    }
+
     // ================================================================
     // CONVERTED FROM LEGACY — Direct DB facade calls
     // ================================================================

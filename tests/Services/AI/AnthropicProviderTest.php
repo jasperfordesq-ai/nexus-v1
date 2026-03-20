@@ -6,7 +6,7 @@
 
 namespace Nexus\Tests\Services\AI;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\AI\Providers\AnthropicProvider;
 use App\Services\AI\Contracts\AIProviderInterface;
 

@@ -388,8 +388,8 @@
     "title": "Development status: {{stage}}",
     "where_we_are": {
       "title": "Where we are now",
-      "paragraph1": "Project NEXUS is currently in Release Candidate (RC) — the final stage before declaring General Availability. The platform is feature-complete for V1 and is running live across multiple active communities worldwide. Our focus is now on stability hardening, performance tuning, and resolving edge-case issues before the full public launch.",
-      "paragraph2": "Everything you see here runs on production infrastructure (Azure, Cloudflare, MariaDB, Redis). Your data is real and treated with the same care as any live system. This is not a demo or sandbox environment."
+      "paragraph1": "We've basically rewired the brains of Project NEXUS to Laravel. While this short-term transition could cause a few problems and the ride might be a bit bumpy over the next few days, in the long term it makes us an enterprise-grade platform. It's for the overall good of the community.",
+      "paragraph2": "We encourage everyone to bug test the platform and report issues back to us. Rest assured, we are building the best platform we can possibly build, and Laravel is the absolute industry standard for the backend. For those less technical: the \"body\" (front end) has been completely replaced with React, and the \"brains\" (back end) has been completely replaced with Laravel. This platform is very, very new!"
     },
     "whats_stable": {
       "title": "What's stable and working",

@@ -247,12 +247,58 @@ class UserService
     }
 
     /**
+     * Validate profile update data before applying it.
+     *
+     * @return bool True if valid, false if errors (check getErrors()).
+     */
+    public static function validateProfileUpdate(array $data): bool
+    {
+        self::$errors = [];
+
+        // first_name: optional, max 100 chars
+        if (isset($data['first_name']) && strlen($data['first_name']) > 100) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'First name must not exceed 100 characters', 'field' => 'first_name'];
+        }
+
+        // last_name: optional, max 100 chars
+        if (isset($data['last_name']) && strlen($data['last_name']) > 100) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Last name must not exceed 100 characters', 'field' => 'last_name'];
+        }
+
+        // bio: optional, max 5000 chars
+        if (isset($data['bio']) && strlen($data['bio']) > 5000) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Bio must not exceed 5000 characters', 'field' => 'bio'];
+        }
+
+        // profile_type: must be 'individual' or 'organisation'
+        if (isset($data['profile_type']) && !in_array($data['profile_type'], ['individual', 'organisation'], true)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Profile type must be individual or organisation', 'field' => 'profile_type'];
+        }
+
+        // phone: optional, if provided must be valid (7+ digits after stripping non-digits)
+        if (isset($data['phone']) && $data['phone'] !== '') {
+            $digits = preg_replace('/[^0-9]/', '', $data['phone']);
+            if (strlen($digits) < 7) {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Phone number is invalid', 'field' => 'phone'];
+            }
+        }
+
+        return empty(self::$errors);
+    }
+
+    /**
      * Update a user profile (alias for update()).
+     *
+     * Validates data first via validateProfileUpdate(), then applies changes.
      *
      * @return bool True on success, false on failure (check getErrors()).
      */
     public static function updateProfile(int $userId, array $data): bool
     {
+        if (!empty($data) && !self::validateProfileUpdate($data)) {
+            return false;
+        }
+
         try {
             self::update($userId, $data);
             return true;
@@ -268,6 +314,7 @@ class UserService
      */
     public static function updatePassword(int $userId, string $currentPassword, string $newPassword): bool
     {
+        self::$errors = [];
         $user = User::query()->find($userId);
 
         if (! $user) {
@@ -281,7 +328,7 @@ class UserService
         }
 
         if (strlen($newPassword) < 8) {
-            self::setError('VALIDATION_ERROR', 'New password must be at least 8 characters');
+            self::setError('WEAK_PASSWORD', 'New password must be at least 8 characters');
             return false;
         }
 
@@ -362,6 +409,8 @@ class UserService
      */
     public static function updatePrivacy(int $userId, array $privacyData): bool
     {
+        self::$errors = [];
+
         $user = User::query()->find($userId);
 
         if (! $user) {
@@ -375,6 +424,12 @@ class UserService
 
             if (empty($filtered)) {
                 self::setError('VALIDATION_ERROR', 'No valid privacy fields provided');
+                return false;
+            }
+
+            // Validate privacy_profile value
+            if (isset($filtered['privacy_profile']) && !in_array($filtered['privacy_profile'], ['public', 'members', 'connections'], true)) {
+                self::setError('VALIDATION_ERROR', 'Invalid privacy_profile value');
                 return false;
             }
 

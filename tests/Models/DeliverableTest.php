@@ -6,7 +6,6 @@
 
 namespace Nexus\Tests\Models;
 
-use PHPUnit\Framework\TestCase;
 use App\Models\Deliverable;
 use App\Core\TenantContext;
 use Nexus\Tests\DatabaseTestCase;

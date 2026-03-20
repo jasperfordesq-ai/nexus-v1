@@ -255,7 +255,7 @@ class SmartMatchingEngine
     /**
      * Calculate match score between user and a candidate listing.
      */
-    private function calculateMatchScore(
+    public function calculateMatchScore(
         array $userData,
         array $userListings,
         array $myListing,

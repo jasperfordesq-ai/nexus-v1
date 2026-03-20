@@ -6,7 +6,7 @@
 
 namespace Nexus\Tests\Services;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\BalanceAlertService;
 
 /**

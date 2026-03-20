@@ -6,7 +6,7 @@
 
 namespace Nexus\Tests\Services\AI;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\AI\AIServiceFactory;
 use App\Services\AI\Contracts\AIProviderInterface;
 use App\Services\AI\Providers\OpenAIProvider;

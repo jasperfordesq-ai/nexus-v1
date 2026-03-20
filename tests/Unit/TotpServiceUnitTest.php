@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use Nexus\Services\TotpService;
 use App\Services\TotpService as AppTotpService;
 

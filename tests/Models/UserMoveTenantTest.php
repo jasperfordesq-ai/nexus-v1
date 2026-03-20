@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Models;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Models\User;
 use ReflectionMethod;
 

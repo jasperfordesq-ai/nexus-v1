@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Services;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\TenantSettingsService;
 use App\Core\TenantContext;
 

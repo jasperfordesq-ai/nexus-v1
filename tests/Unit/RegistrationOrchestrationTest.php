@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use Nexus\Services\Identity\RegistrationOrchestrationService;
 use App\Services\Identity\RegistrationOrchestrationService as AppRegistrationOrchestrationService;
 use Nexus\Services\Identity\RegistrationPolicyService;

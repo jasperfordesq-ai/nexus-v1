@@ -8,16 +8,36 @@ declare(strict_types=1);
 
 namespace Nexus\Tests;
 
-use PHPUnit\Framework\TestCase as BaseTestCase;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\TestCase as LaravelTestCase;
 
 /**
  * Base Test Case
  *
  * All test classes should extend this class to get access to
- * common testing utilities and setup.
+ * common testing utilities and the Laravel application container.
+ *
+ * Extends Laravel's TestCase so that facades (DB::, Cache::, etc.)
+ * are available in all tests without "connection() on null" errors.
  */
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends LaravelTestCase
 {
+    /**
+     * Creates the application.
+     *
+     * Required by Illuminate\Foundation\Testing\TestCase.
+     * Boots the Laravel app from bootstrap/app.php.
+     */
+    public function createApplication(): Application
+    {
+        $app = require dirname(__DIR__) . '/bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        return $app;
+    }
+
     /**
      * Set up the test environment.
      */

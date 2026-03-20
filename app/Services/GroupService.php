@@ -255,6 +255,33 @@ class GroupService
         return self::$errors;
     }
 
+    /**
+     * Validate group data and return boolean.
+     *
+     * @return bool True if valid, false if errors (check getErrors()).
+     */
+    public static function validate(array $data): bool
+    {
+        self::$errors = [];
+
+        $name = $data['name'] ?? null;
+        $visibility = $data['visibility'] ?? null;
+
+        // name is required and max 255
+        if ($name === null || $name === '') {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required', 'field' => 'name'];
+        } elseif (strlen($name) > 255) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name must not exceed 255 characters', 'field' => 'name'];
+        }
+
+        // visibility must be public or private (if provided)
+        if ($visibility !== null && !in_array($visibility, ['public', 'private'], true)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Visibility must be public or private', 'field' => 'visibility'];
+        }
+
+        return empty(self::$errors);
+    }
+
     // -----------------------------------------------------------------
     //  Update
     // -----------------------------------------------------------------

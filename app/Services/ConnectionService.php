@@ -250,16 +250,32 @@ class ConnectionService
     }
 
     /**
-     * Send a connection request from input array.
+     * Send a connection request.
      *
-     * @param int   $requesterId Requesting user
-     * @param array $data        Must contain 'user_id'
-     * @return array Created connection data
+     * Accepts either (int $requesterId, int $receiverId) returning bool,
+     * or (int $requesterId, array $data) returning array (legacy).
      *
-     * @throws \RuntimeException
+     * @param int       $requesterId Requesting user
+     * @param int|array $receiverIdOrData Receiver user ID (int) or data array with 'user_id'
+     * @return bool|array
      */
-    public static function sendRequest(int $requesterId, array $data): array
+    public static function sendRequest(int $requesterId, int|array $receiverIdOrData): bool|array
     {
+        // New signature: sendRequest(int, int) -> bool
+        if (is_int($receiverIdOrData)) {
+            if ($requesterId === $receiverIdOrData) {
+                return false;
+            }
+            try {
+                self::request($requesterId, $receiverIdOrData);
+                return true;
+            } catch (\RuntimeException $e) {
+                return false;
+            }
+        }
+
+        // Legacy signature: sendRequest(int, array) -> array
+        $data = $receiverIdOrData;
         $receiverId = (int) ($data['user_id'] ?? 0);
 
         if (! $receiverId) {
@@ -283,6 +299,113 @@ class ConnectionService
      * Delete a connection (alias for destroy, used by controller).
      */
     public static function delete(int $connectionId, int $userId): bool
+    {
+        return self::destroy($connectionId, $userId);
+    }
+
+    /**
+     * Get connections for a user with filtering.
+     *
+     * Supports status filters: 'accepted', 'pending_sent', 'pending_received'.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
+     */
+    public static function getConnections(int $userId, array $filters = []): array
+    {
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $status = $filters['status'] ?? 'accepted';
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = Connection::query()
+            ->with([
+                'requester:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
+                'receiver:id,first_name,last_name,avatar_url,organization_name,profile_type,last_active_at',
+            ]);
+
+        if ($status === 'pending_sent') {
+            $query->where('status', 'pending')
+                  ->where('requester_id', $userId);
+        } elseif ($status === 'pending_received') {
+            $query->where('status', 'pending')
+                  ->where('receiver_id', $userId);
+        } elseif ($status === 'pending') {
+            $query->where('status', 'pending')
+                  ->where('receiver_id', $userId);
+        } else {
+            $query->where('status', $status)
+                  ->where(fn (Builder $q) => $q->where('requester_id', $userId)->orWhere('receiver_id', $userId));
+        }
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('id', '<', (int) $cursorId);
+            }
+        }
+
+        $query->orderByDesc('id');
+
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        $result = $items->map(function (Connection $conn) use ($userId) {
+            $data = $conn->toArray();
+            $partner = $conn->requester_id === $userId
+                ? $conn->receiver?->toArray()
+                : $conn->requester?->toArray();
+            $data['partner'] = $partner;
+            $data['user'] = $partner;
+            $data['connection_id'] = $conn->id;
+            return $data;
+        })->all();
+
+        return [
+            'items'    => array_values($result),
+            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
+     * Accept a pending connection request (returns bool).
+     */
+    public static function acceptRequest(int $connectionId, int $userId): bool
+    {
+        try {
+            self::accept($connectionId, $userId);
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Reject a pending connection request (deletes it).
+     */
+    public static function rejectRequest(int $connectionId, int $userId): bool
+    {
+        /** @var Connection|null $connection */
+        $connection = Connection::query()
+            ->where('id', $connectionId)
+            ->where('receiver_id', $userId)
+            ->where('status', 'pending')
+            ->first();
+
+        if (! $connection) {
+            return false;
+        }
+
+        $connection->delete();
+        return true;
+    }
+
+    /**
+     * Remove an existing connection (alias for destroy).
+     */
+    public static function removeConnection(int $connectionId, int $userId): bool
     {
         return self::destroy($connectionId, $userId);
     }

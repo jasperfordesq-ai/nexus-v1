@@ -6,7 +6,7 @@
 
 namespace Nexus\Tests\Services;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\SmartMatchingEngine;
 use App\Services\EmbeddingService;
 use App\Core\Database;

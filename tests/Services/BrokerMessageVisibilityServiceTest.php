@@ -6,7 +6,7 @@
 
 namespace Nexus\Tests\Services;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\BrokerMessageVisibilityService;
 use App\Services\BrokerControlConfigService;
 use App\Core\Database;

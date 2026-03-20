@@ -6,7 +6,7 @@
 
 namespace Nexus\Tests\Models;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Core\Database;

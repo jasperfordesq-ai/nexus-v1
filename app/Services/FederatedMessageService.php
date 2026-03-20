@@ -6,9 +6,11 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- *
- * Provides dependency-injectable access to the legacy static service methods.
+ * FederatedMessageService — cross-tenant messaging between federated timebank members.
  */
 class FederatedMessageService
 {
@@ -17,47 +19,233 @@ class FederatedMessageService
     }
 
     /**
-     * Delegates to legacy FederatedMessageService::sendMessage().
+     * Send a federated message.
+     *
+     * @return array{success: bool, error?: string, message_id?: int}
      */
     public static function sendMessage(int $senderId, int $receiverId, int $receiverTenantId, string $subject, string $body): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        try {
+            $sender = DB::table('users')->where('id', $senderId)->first();
+            if (!$sender) {
+                return ['success' => false, 'error' => 'Sender not found'];
+            }
+
+            $receiver = DB::table('users')
+                ->where('id', $receiverId)
+                ->where('tenant_id', $receiverTenantId)
+                ->first();
+            if (!$receiver) {
+                return ['success' => false, 'error' => 'Receiver not found in specified tenant'];
+            }
+
+            // Check sender has opted into federation
+            $senderSettings = DB::table('federation_user_settings')
+                ->where('user_id', $senderId)
+                ->first();
+
+            if (!$senderSettings || !$senderSettings->federation_optin || !$senderSettings->messaging_enabled_federated) {
+                return ['success' => false, 'error' => 'Sender has not enabled federated messaging'];
+            }
+
+            $messageId = DB::table('federation_messages')->insertGetId([
+                'sender_user_id'    => $senderId,
+                'sender_tenant_id'  => $sender->tenant_id,
+                'receiver_user_id'  => $receiverId,
+                'receiver_tenant_id' => $receiverTenantId,
+                'subject'           => $subject,
+                'body'              => $body,
+                'is_read'           => false,
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]);
+
+            return ['success' => true, 'message_id' => $messageId];
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send federated message', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
     }
 
     /**
-     * Delegates to legacy FederatedMessageService::getInbox().
+     * Get federated inbox for a user.
      */
     public static function getInbox(int $userId, int $limit = 50, int $offset = 0): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        try {
+            return array_map(
+                fn ($row) => (array) $row,
+                DB::select(
+                    "SELECT * FROM federation_messages
+                     WHERE receiver_user_id = ?
+                     ORDER BY created_at DESC
+                     LIMIT ? OFFSET ?",
+                    [$userId, $limit, $offset]
+                )
+            );
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
-     * Delegates to legacy FederatedMessageService::getThread().
+     * Get message thread between two users.
      */
     public static function getThread(int $userId, int $otherUserId, int $otherTenantId, int $limit = 100): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        try {
+            return array_map(
+                fn ($row) => (array) $row,
+                DB::select(
+                    "SELECT * FROM federation_messages
+                     WHERE (sender_user_id = ? AND receiver_user_id = ? AND receiver_tenant_id = ?)
+                        OR (sender_user_id = ? AND receiver_user_id = ?)
+                     ORDER BY created_at ASC
+                     LIMIT ?",
+                    [$userId, $otherUserId, $otherTenantId, $otherUserId, $userId, $limit]
+                )
+            );
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
-     * Delegates to legacy FederatedMessageService::markAsRead().
+     * Mark a single message as read.
      */
     public static function markAsRead(int $messageId, int $userId): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        try {
+            $affected = DB::table('federation_messages')
+                ->where('id', $messageId)
+                ->where('receiver_user_id', $userId)
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'read_at' => now(), 'updated_at' => now()]);
+
+            return $affected > 0;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy FederatedMessageService::markThreadAsRead().
+     * Mark all messages in a thread as read.
+     *
+     * @return int Number of messages marked as read
      */
     public static function markThreadAsRead(int $userId, int $otherUserId, int $otherTenantId): int
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0;
+        try {
+            return DB::table('federation_messages')
+                ->where('receiver_user_id', $userId)
+                ->where('sender_user_id', $otherUserId)
+                ->where('sender_tenant_id', $otherTenantId)
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'read_at' => now(), 'updated_at' => now()]);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Get unread message count for a user.
+     */
+    public static function getUnreadCount(int $userId): int
+    {
+        try {
+            return (int) DB::table('federation_messages')
+                ->where('receiver_user_id', $userId)
+                ->where('is_read', false)
+                ->count();
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Get federated user info for messaging context.
+     *
+     * @return array|null User info array or null if not found
+     */
+    public static function getFederatedUserInfo(int $userId, int $tenantId): ?array
+    {
+        try {
+            $row = DB::selectOne(
+                "SELECT u.id,
+                        COALESCE(NULLIF(u.name, ''), TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')))) as name,
+                        u.avatar_url, u.tenant_id,
+                        t.name as tenant_name,
+                        COALESCE(fus.service_reach, 'local_only') as service_reach,
+                        COALESCE(fus.messaging_enabled_federated, 0) as messaging_enabled_federated,
+                        COALESCE(fus.federation_optin, 0) as federation_optin
+                 FROM users u
+                 INNER JOIN tenants t ON u.tenant_id = t.id
+                 LEFT JOIN federation_user_settings fus ON u.id = fus.user_id
+                 WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active'",
+                [$userId, $tenantId]
+            );
+
+            if (!$row) {
+                return null;
+            }
+
+            return [
+                'id'                          => (int) $row->id,
+                'name'                        => $row->name,
+                'avatar_url'                  => $row->avatar_url,
+                'tenant_id'                   => (int) $row->tenant_id,
+                'tenant_name'                 => $row->tenant_name,
+                'service_reach'               => $row->service_reach,
+                'messaging_enabled_federated' => (bool) $row->messaging_enabled_federated,
+                'federation_optin'            => (bool) $row->federation_optin,
+            ];
+        } catch (\Throwable $e) {
+            Log::warning('Failed to get federated user info', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Store a message received from an external federation partner.
+     *
+     * @return array{success: bool, message_id?: int, error?: string}
+     */
+    public static function storeExternalMessage(
+        int $receiverUserId,
+        int $externalPartnerId,
+        int $externalSenderId,
+        string $senderName,
+        string $partnerName,
+        string $subject,
+        string $body,
+        ?string $externalMessageId = null
+    ): array {
+        try {
+            $receiver = DB::table('users')->where('id', $receiverUserId)->first();
+            if (!$receiver) {
+                return ['success' => false, 'error' => 'Receiver not found'];
+            }
+
+            $messageId = DB::table('federation_messages')->insertGetId([
+                'sender_user_id'      => $externalSenderId,
+                'sender_tenant_id'    => $externalPartnerId,
+                'receiver_user_id'    => $receiverUserId,
+                'receiver_tenant_id'  => $receiver->tenant_id,
+                'subject'             => $subject,
+                'body'                => $body,
+                'sender_name'         => $senderName,
+                'partner_name'        => $partnerName,
+                'external_message_id' => $externalMessageId,
+                'is_read'             => false,
+                'is_external'         => true,
+                'created_at'          => now(),
+                'updated_at'          => now(),
+            ]);
+
+            return ['success' => true, 'message_id' => $messageId];
+        } catch (\Throwable $e) {
+            Log::warning('Failed to store external message', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
     }
 }

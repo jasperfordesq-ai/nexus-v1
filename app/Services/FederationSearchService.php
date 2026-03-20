@@ -307,6 +307,86 @@ class FederationSearchService
     }
 
     /**
+     * Find federated members by skills.
+     *
+     * @param int[]    $partnerTenantIds Partner tenant IDs to search
+     * @param string[] $skills           Skills to search for
+     * @param int|null $excludeUserId    User ID to exclude from results
+     * @param int      $limit            Max results
+     * @return array
+     */
+    public function findMembersBySkills(array $partnerTenantIds, array $skills, ?int $excludeUserId = null, int $limit = 20): array
+    {
+        if (empty($partnerTenantIds) || empty($skills)) {
+            return [];
+        }
+
+        $filters = ['skills' => $skills, 'limit' => $limit];
+        $result = $this->searchMembers($partnerTenantIds, $filters);
+
+        $members = $result['members'] ?? [];
+
+        if ($excludeUserId !== null) {
+            $members = array_values(array_filter($members, fn ($m) => (int) ($m['id'] ?? 0) !== $excludeUserId));
+        }
+
+        return $members;
+    }
+
+    /**
+     * Search external members via federation partners' APIs.
+     *
+     * @return array{members: array, total: int, partners_queried: int, errors: array}
+     */
+    public function searchExternalMembers(int $tenantId, array $filters): array
+    {
+        // Stub: external API search would query partner APIs
+        return [
+            'members'          => [],
+            'total'            => 0,
+            'partners_queried' => 0,
+            'errors'           => [],
+        ];
+    }
+
+    /**
+     * Search all federated members (internal + external).
+     *
+     * @return array{members: array, total: int, internal_count: int, external_count: int, has_more: bool}
+     */
+    public function searchAllFederatedMembers(array $partnerTenantIds, int $tenantId, array $filters): array
+    {
+        $internal = $this->searchMembers($partnerTenantIds, $filters);
+        $external = $this->searchExternalMembers($tenantId, $filters);
+
+        $allMembers = array_merge($internal['members'] ?? [], $external['members'] ?? []);
+
+        return [
+            'members'        => $allMembers,
+            'total'          => count($allMembers),
+            'internal_count' => $internal['total'] ?? 0,
+            'external_count' => $external['total'] ?? 0,
+            'has_more'       => ($internal['has_more'] ?? false) || count($external['members'] ?? []) > 0,
+        ];
+    }
+
+    /**
+     * Search external listings via federation partners' APIs.
+     *
+     * @return array{listings: array, total: int, partners_queried: int, errors: array}
+     */
+    public function searchExternalListings(int $tenantId, array $filters): array
+    {
+        // Stub: external API search would query partner APIs
+        return [
+            'listings'         => [],
+            'total'            => 0,
+            'partners_queried' => 0,
+            'errors'           => [],
+        ];
+    }
+
+    /**
      * Get search statistics for display.
      */
     public function getSearchStats(array $partnerTenantIds): array

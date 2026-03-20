@@ -6,58 +6,198 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
- *
- * Provides dependency-injectable access to the legacy static service methods.
+ * GroupModerationService — content flagging and moderation for groups.
  */
 class GroupModerationService
 {
+    // Action constants
+    public const ACTION_FLAG    = 'flag';
+    public const ACTION_HIDE    = 'hide';
+    public const ACTION_DELETE  = 'delete';
+    public const ACTION_APPROVE = 'approve';
+
+    // Content type constants
+    public const CONTENT_GROUP      = 'group';
+    public const CONTENT_DISCUSSION = 'discussion';
+    public const CONTENT_POST       = 'post';
+
+    // Reason constants
+    public const REASON_SPAM          = 'spam';
+    public const REASON_HARASSMENT    = 'harassment';
+    public const REASON_INAPPROPRIATE = 'inappropriate';
+    public const REASON_HATE_SPEECH   = 'hate_speech';
+    public const REASON_OTHER         = 'other';
+
     public function __construct()
     {
     }
 
     /**
-     * Delegates to legacy GroupModerationService::flagContent().
+     * Flag content for moderation review.
+     *
+     * @return int|null Flag record ID, or null on failure
      */
     public static function flagContent($contentType, $contentId, $reportedBy, $reason = self::REASON_OTHER, $description = '')
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        try {
+            $tenantId = \App\Core\TenantContext::getId();
+
+            $id = DB::table('group_content_flags')->insertGetId([
+                'tenant_id'    => $tenantId,
+                'content_type' => $contentType,
+                'content_id'   => $contentId,
+                'reported_by'  => $reportedBy,
+                'reason'       => $reason,
+                'description'  => $description,
+                'status'       => 'pending',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]);
+
+            return $id;
+        } catch (\Throwable $e) {
+            Log::warning('Failed to flag content', ['error' => $e->getMessage()]);
+            return null;
+        }
     }
 
     /**
-     * Delegates to legacy GroupModerationService::moderateContent().
+     * Moderate flagged content (approve, hide, delete).
      */
     public static function moderateContent($flagId, $action, $moderatorId, $moderatorNotes = '')
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        try {
+            $flag = DB::table('group_content_flags')
+                ->where('id', $flagId)
+                ->first();
+
+            if (!$flag) {
+                return false;
+            }
+
+            DB::table('group_content_flags')
+                ->where('id', $flagId)
+                ->update([
+                    'status'          => $action === self::ACTION_APPROVE ? 'approved' : 'resolved',
+                    'moderated_by'    => $moderatorId,
+                    'moderator_notes' => $moderatorNotes,
+                    'moderated_at'    => now(),
+                    'action_taken'    => $action,
+                    'updated_at'      => now(),
+                ]);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Failed to moderate content', ['flag_id' => $flagId, 'error' => $e->getMessage()]);
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy GroupModerationService::isUserBanned().
+     * Check if a user is banned from groups.
      */
     public static function isUserBanned($userId)
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        try {
+            $tenantId = \App\Core\TenantContext::getId();
+
+            return DB::table('group_bans')
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })
+                ->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy GroupModerationService::getPendingFlags().
+     * Get pending content flags.
      */
     public static function getPendingFlags($filters = [], $limit = 50, $offset = 0)
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        try {
+            $tenantId = \App\Core\TenantContext::getId();
+
+            $query = DB::table('group_content_flags')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->orderByDesc('created_at');
+
+            if (!empty($filters['content_type'])) {
+                $query->where('content_type', $filters['content_type']);
+            }
+
+            return array_map(
+                fn ($row) => (array) $row,
+                $query->limit($limit)->offset($offset)->get()->all()
+            );
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
-     * Delegates to legacy GroupModerationService::getModerationHistory().
+     * Get moderation history (resolved flags).
      */
     public static function getModerationHistory($filters = [], $limit = 50, $offset = 0)
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        try {
+            $tenantId = \App\Core\TenantContext::getId();
+
+            $query = DB::table('group_content_flags')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('status', ['approved', 'resolved'])
+                ->orderByDesc('moderated_at');
+
+            if (!empty($filters['content_type'])) {
+                $query->where('content_type', $filters['content_type']);
+            }
+
+            return array_map(
+                fn ($row) => (array) $row,
+                $query->limit($limit)->offset($offset)->get()->all()
+            );
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get moderation statistics.
+     */
+    public static function getStatistics(): array
+    {
+        try {
+            $tenantId = \App\Core\TenantContext::getId();
+
+            $pending = (int) DB::table('group_content_flags')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'pending')
+                ->count();
+
+            $resolved = (int) DB::table('group_content_flags')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('status', ['approved', 'resolved'])
+                ->count();
+
+            $total = (int) DB::table('group_content_flags')
+                ->where('tenant_id', $tenantId)
+                ->count();
+
+            return [
+                'pending'  => $pending,
+                'resolved' => $resolved,
+                'total'    => $total,
+            ];
+        } catch (\Throwable $e) {
+            return ['pending' => 0, 'resolved' => 0, 'total' => 0];
+        }
     }
 }

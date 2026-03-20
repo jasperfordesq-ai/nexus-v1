@@ -691,6 +691,33 @@ class ListingService
         return self::$errors;
     }
 
+    /**
+     * Validate listing data and return boolean (for test compatibility).
+     *
+     * @return bool True if valid, false if errors (check getErrors()).
+     */
+    public static function validate(array $data): bool
+    {
+        self::$errors = [];
+
+        $title = $data['title'] ?? null;
+        $type = $data['type'] ?? null;
+
+        // title is required and max 255
+        if ($title === null || $title === '') {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title is required', 'field' => 'title'];
+        } elseif (strlen($title) > 255) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Title must not exceed 255 characters', 'field' => 'title'];
+        }
+
+        // type must be offer or request
+        if ($type !== null && !in_array($type, ['offer', 'request'], true)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Type must be offer or request', 'field' => 'type'];
+        }
+
+        return empty(self::$errors);
+    }
+
     // -----------------------------------------------------------------
     //  Validation
     // -----------------------------------------------------------------

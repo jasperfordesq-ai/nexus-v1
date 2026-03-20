@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Nexus\Tests\TestCase;
 use App\Services\Identity\IdentityProviderRegistry;
 use Nexus\Services\Identity\MockIdentityProvider;
 use App\Services\Identity\RegistrationPolicyService;
