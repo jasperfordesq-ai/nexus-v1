@@ -692,13 +692,14 @@ class SocialController extends BaseApiController
                 ]);
             }
 
+            $tenantId = $this->getTenantId();
             $comments = DB::select(
                 "SELECT c.id, c.content, c.created_at, c.user_id,
                     COALESCE(u.name, u.first_name, 'Unknown') as author_name,
                     COALESCE(u.avatar_url, '/assets/img/defaults/default_avatar.png') as author_avatar
                  FROM comments c LEFT JOIN users u ON c.user_id = u.id
-                 WHERE c.target_type = ? AND c.target_id = ? ORDER BY c.created_at ASC",
-                [$targetType, $targetId]
+                 WHERE c.target_type = ? AND c.target_id = ? AND c.tenant_id = ? ORDER BY c.created_at ASC",
+                [$targetType, $targetId, $tenantId]
             );
 
             $comments = array_map(function ($c) use ($userId) {
@@ -1258,7 +1259,7 @@ class SocialController extends BaseApiController
             : '0';
 
         $rows = DB::select(
-            "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count, p.user_id,
+            "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count, p.user_id,
                     'post' as type,
                     COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                     u.avatar_url as author_avatar,
@@ -1287,7 +1288,7 @@ class SocialController extends BaseApiController
             : '0';
 
         $rows = DB::select(
-            "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
+            "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count,
                     'post' as type,
                     COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                     u.avatar_url as author_avatar,
@@ -1325,7 +1326,7 @@ class SocialController extends BaseApiController
             $postLimit = ($filter === 'posts') ? $limit : 30;
 
             $rows = DB::select(
-                "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
+                "SELECT p.id, p.content, p.image as image_url, p.created_at, p.likes_count,
                         'post' as type,
                         COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
                         u.avatar_url as author_avatar,
