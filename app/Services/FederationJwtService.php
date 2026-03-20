@@ -30,6 +30,14 @@ class FederationJwtService
      */
     public function validateToken(string $token): ?array
     {
+        return static::validateTokenStatic($token);
+    }
+
+    /**
+     * Static proxy for validateToken — used by middleware that cannot inject an instance.
+     */
+    public static function validateTokenStatic(string $token): ?array
+    {
         return \Nexus\Services\FederationJwtService::validateToken($token);
     }
 

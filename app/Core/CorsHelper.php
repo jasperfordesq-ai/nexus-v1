@@ -6,6 +6,7 @@
 
 namespace App\Core;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -164,17 +165,15 @@ class CorsHelper
         $cacheKey = 'cors:tenant_domain_origins';
         $cacheTtl = 600;
 
-        // Try Redis cache first
+        // Try cache first (Laravel Cache facade — uses Redis when available)
         try {
-            if (class_exists('\Nexus\Services\RedisCache') && \Nexus\Services\RedisCache::has($cacheKey, null)) {
-                $cached = \Nexus\Services\RedisCache::get($cacheKey, null);
-                if (is_array($cached)) {
-                    self::$tenantDomainOrigins = $cached;
-                    return $cached;
-                }
+            $cached = Cache::get($cacheKey);
+            if (is_array($cached)) {
+                self::$tenantDomainOrigins = $cached;
+                return $cached;
             }
         } catch (\Throwable $e) {
-            // Redis unavailable
+            // Cache unavailable
         }
 
         // Query all active tenant custom domains
@@ -198,9 +197,7 @@ class CorsHelper
 
         // Cache the result
         try {
-            if (class_exists('\Nexus\Services\RedisCache')) {
-                \Nexus\Services\RedisCache::set($cacheKey, $origins, $cacheTtl, null);
-            }
+            Cache::put($cacheKey, $origins, $cacheTtl);
         } catch (\Throwable $e) {
             // Cache write failure is non-fatal
         }

@@ -6,7 +6,6 @@
 
 namespace App\Services;
 
-use App\Core\EmailTemplate;
 use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\Models\Notification;
@@ -71,7 +70,7 @@ class NotificationDispatcher
                 // Also dispatch a real-time web push notification
                 try {
                     $pushTitle = self::getPushTitle($activityType);
-                    \Nexus\Services\WebPushService::sendToUser($userId, $pushTitle, $content, $link);
+                    \App\Services\WebPushService::sendToUserStatic($userId, $pushTitle, $content, $link);
                 } catch (\Throwable $e) {
                     Log::debug('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
                 }
@@ -205,7 +204,7 @@ class NotificationDispatcher
         $link = "/listings/{$listingId}";
 
         // Check user's match notification preferences
-        $prefs = \Nexus\Services\MatchingService::getPreferences($userId);
+        $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
         if (empty($prefs['notify_hot_matches'])) {
             return;
         }
@@ -236,7 +235,7 @@ class NotificationDispatcher
         $content = "Mutual Match! {$userName} can help you with {$theyOffer}, and you can help them with {$youOffer}";
         $link = "/listings/{$listingId}";
 
-        $prefs = \Nexus\Services\MatchingService::getPreferences($userId);
+        $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
         if (empty($prefs['notify_mutual_matches'])) {
             return;
         }

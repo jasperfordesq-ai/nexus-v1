@@ -862,7 +862,7 @@ class UsersController extends BaseApiController
         $whereClause = 'u.tenant_id = ? AND u.status = ?';
 
         if ($search) {
-            $memberIds = \Nexus\Services\SearchService::searchUsers($search, $tenantId);
+            $memberIds = \App\Services\SearchService::searchUsersStatic($search, $tenantId);
             if ($memberIds !== false && !empty($memberIds)) {
                 $placeholders = implode(',', array_fill(0, count($memberIds), '?'));
                 $whereClause .= " AND u.id IN ($placeholders)";

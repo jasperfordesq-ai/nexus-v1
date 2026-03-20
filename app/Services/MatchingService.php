@@ -62,6 +62,14 @@ class MatchingService
      */
     public function getPreferences($userId)
     {
+        return static::getPreferencesStatic($userId);
+    }
+
+    /**
+     * Static proxy for getPreferences — used by code that cannot inject an instance.
+     */
+    public static function getPreferencesStatic($userId)
+    {
         return \Nexus\Services\MatchingService::getPreferences($userId);
     }
 }

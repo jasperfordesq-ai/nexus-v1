@@ -22,7 +22,19 @@ class EmailMonitorService
      */
     public function recordEmailSend(string $provider, bool $success, ?int $tenantId = null): void
     {
-        \Nexus\Services\EmailMonitorService::recordEmailSend($provider, $success, $tenantId);
+        static::recordEmailSendStatic($provider, $success, $tenantId);
+    }
+
+    /**
+     * Static proxy for recordEmailSend — used by code that cannot inject an instance.
+     */
+    public static function recordEmailSendStatic(string $provider, bool $success, ?int $tenantId = null): void
+    {
+        try {
+            \Nexus\Services\EmailMonitorService::recordEmailSend($provider, $success, $tenantId);
+        } catch (\Throwable $e) {
+            // Non-fatal — monitoring should never break sending
+        }
     }
 
     /**

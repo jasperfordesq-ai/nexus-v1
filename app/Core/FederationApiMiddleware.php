@@ -7,7 +7,7 @@
 namespace App\Core;
 
 use Illuminate\Support\Facades\DB;
-use Nexus\Services\FederationJwtService;
+use App\Services\FederationJwtService;
 
 /**
  * Federation API authentication and authorization middleware.
@@ -68,7 +68,7 @@ class FederationApiMiddleware
             self::sendError(500, 'JWT service unavailable', 'SERVICE_UNAVAILABLE');
             return false;
         }
-        $payload = FederationJwtService::validateToken($token);
+        $payload = FederationJwtService::validateTokenStatic($token);
 
         if (!$payload) {
             self::sendError(401, 'Invalid or expired token', 'INVALID_TOKEN');

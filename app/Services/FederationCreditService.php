@@ -26,9 +26,25 @@ class FederationCreditService
     }
 
     /**
+     * Static proxy: list agreements for a tenant.
+     */
+    public static function listAgreementsStatic(int $tenantId): array
+    {
+        return \Nexus\Services\FederationCreditService::listAgreements($tenantId);
+    }
+
+    /**
      * Delegates to legacy FederationCreditService::createAgreement().
      */
     public function createAgreement(int $fromTenantId, int $toTenantId, float $exchangeRate = 1.0, ?float $maxMonthlyCredits = null, int $approvedBy = 0): array
+    {
+        return \Nexus\Services\FederationCreditService::createAgreement($fromTenantId, $toTenantId, $exchangeRate, $maxMonthlyCredits, $approvedBy);
+    }
+
+    /**
+     * Static proxy: create agreement.
+     */
+    public static function createAgreementStatic(int $fromTenantId, int $toTenantId, float $exchangeRate = 1.0, ?float $maxMonthlyCredits = null, int $approvedBy = 0): array
     {
         return \Nexus\Services\FederationCreditService::createAgreement($fromTenantId, $toTenantId, $exchangeRate, $maxMonthlyCredits, $approvedBy);
     }

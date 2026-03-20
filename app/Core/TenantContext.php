@@ -502,10 +502,28 @@ class TenantContext
         }
 
         // Merge with defaults so new tenants (features=NULL) get correct defaults
-        // Use legacy static method which is still the canonical implementation
-        $features = \Nexus\Services\TenantFeatureConfig::mergeFeatures($dbFeatures);
+        $features = self::mergeFeatureDefaults($dbFeatures);
 
         return !empty($features[$feature]);
+    }
+
+    /**
+     * Merge DB feature flags with defaults so new/null tenants get correct values.
+     * Self-contained — no dependency on legacy Nexus\ namespace.
+     */
+    private static function mergeFeatureDefaults(?array $dbFeatures): array
+    {
+        $result = \App\Services\TenantFeatureConfig::FEATURE_DEFAULTS;
+
+        if ($dbFeatures === null) {
+            return $result;
+        }
+
+        foreach ($dbFeatures as $key => $value) {
+            $result[$key] = (bool) $value;
+        }
+
+        return $result;
     }
 
     /**
@@ -716,9 +734,10 @@ class TenantContext
 
         try {
             // Decode the JWT to check claims
-            // Use the TokenService if available, otherwise decode manually
-            if (class_exists('\\Nexus\\Services\\TokenService')) {
-                $payload = \Nexus\Services\TokenService::validateToken($token);
+            // Use the App TokenService (instance method) if available
+            if (class_exists(\App\Services\TokenService::class)) {
+                $tokenService = new \App\Services\TokenService();
+                $payload = $tokenService->validateToken($token);
                 $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
                 if ($payload && $userId) {
                     // Look up user to check super admin status

@@ -7,15 +7,14 @@
 namespace App\Services;
 
 /**
- * TenantFeatureConfig — Laravel DI wrapper for legacy \Nexus\Services\TenantFeatureConfig.
+ * TenantFeatureConfig — Self-contained feature/module defaults and merging.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * No longer delegates to legacy \Nexus\Services\TenantFeatureConfig.
  */
 class TenantFeatureConfig
 {
     /**
      * All known optional features with their default enabled/disabled state.
-     * Mirrors \Nexus\Services\TenantFeatureConfig::FEATURE_DEFAULTS.
      */
     public const FEATURE_DEFAULTS = [
         'events' => true,
@@ -41,7 +40,6 @@ class TenantFeatureConfig
 
     /**
      * All known core modules with their default enabled/disabled state.
-     * Mirrors \Nexus\Services\TenantFeatureConfig::MODULE_DEFAULTS.
      */
     public const MODULE_DEFAULTS = [
         'listings' => true,
@@ -59,18 +57,39 @@ class TenantFeatureConfig
     }
 
     /**
-     * Delegates to legacy TenantFeatureConfig::mergeFeatures().
+     * Merge DB feature flags with defaults.
+     * DB values override defaults; unknown DB keys are preserved.
      */
-    public function mergeFeatures(?array $dbFeatures): array
+    public static function mergeFeatures(?array $dbFeatures): array
     {
-        return \Nexus\Services\TenantFeatureConfig::mergeFeatures($dbFeatures);
+        $result = self::FEATURE_DEFAULTS;
+
+        if ($dbFeatures === null) {
+            return $result;
+        }
+
+        foreach ($dbFeatures as $key => $value) {
+            $result[$key] = (bool) $value;
+        }
+
+        return $result;
     }
 
     /**
-     * Delegates to legacy TenantFeatureConfig::mergeModules().
+     * Merge DB modules with defaults, returning the full module set.
      */
-    public function mergeModules(?array $dbModules): array
+    public static function mergeModules(?array $dbModules): array
     {
-        return \Nexus\Services\TenantFeatureConfig::mergeModules($dbModules);
+        $result = self::MODULE_DEFAULTS;
+
+        if ($dbModules === null) {
+            return $result;
+        }
+
+        foreach ($dbModules as $key => $value) {
+            $result[$key] = (bool) $value;
+        }
+
+        return $result;
     }
 }

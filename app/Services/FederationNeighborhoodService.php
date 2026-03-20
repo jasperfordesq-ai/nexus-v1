@@ -26,9 +26,25 @@ class FederationNeighborhoodService
     }
 
     /**
+     * Static proxy: list all neighborhoods.
+     */
+    public static function listAllStatic(): array
+    {
+        return \Nexus\Services\FederationNeighborhoodService::listAll();
+    }
+
+    /**
      * Delegates to legacy FederationNeighborhoodService::create().
      */
     public function create(string $name, ?string $description = null, ?string $region = null, int $createdBy = 0): ?int
+    {
+        return \Nexus\Services\FederationNeighborhoodService::create($name, $description, $region, $createdBy);
+    }
+
+    /**
+     * Static proxy: create a neighborhood.
+     */
+    public static function createStatic(string $name, ?string $description = null, ?string $region = null, int $createdBy = 0): ?int
     {
         return \Nexus\Services\FederationNeighborhoodService::create($name, $description, $region, $createdBy);
     }

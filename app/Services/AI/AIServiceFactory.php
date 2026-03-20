@@ -6,13 +6,13 @@
 
 namespace App\Services\AI;
 
+use App\Services\AI\Contracts\AIProviderInterface;
+use App\Services\AI\Providers\AnthropicProvider;
+use App\Services\AI\Providers\GeminiProvider;
+use App\Services\AI\Providers\OllamaProvider;
+use App\Services\AI\Providers\OpenAIProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Nexus\Services\AI\Contracts\AIProviderInterface;
-use Nexus\Services\AI\Providers\AnthropicProvider;
-use Nexus\Services\AI\Providers\GeminiProvider;
-use Nexus\Services\AI\Providers\OllamaProvider;
-use Nexus\Services\AI\Providers\OpenAIProvider;
 
 /**
  * AIServiceFactory — Laravel DI-based factory for AI providers.

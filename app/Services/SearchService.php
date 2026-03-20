@@ -380,4 +380,14 @@ class SearchService
     {
         return false;
     }
+
+    /**
+     * Static proxy for searchUsers — delegates to legacy Meilisearch-based search.
+     *
+     * @return array|false Array of user IDs on success, false if search unavailable
+     */
+    public static function searchUsersStatic(string $query, int $tenantId, int $limit = 200, array $extraFilters = []): array|false
+    {
+        return \Nexus\Services\SearchService::searchUsers($query, $tenantId, $limit, $extraFilters);
+    }
 }

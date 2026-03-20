@@ -26,6 +26,14 @@ class WebPushService
     }
 
     /**
+     * Static proxy for sendToUser — used by code that cannot inject an instance.
+     */
+    public static function sendToUserStatic($userId, $title, $body, $link = null, $type = 'general', $options = [])
+    {
+        return \Nexus\Services\WebPushService::sendToUser($userId, $title, $body, $link, $type, $options);
+    }
+
+    /**
      * Delegates to legacy WebPushService::sendToUsers().
      */
     public function sendToUsers($userIds, $title, $body, $link = null, $type = 'general', $options = [])

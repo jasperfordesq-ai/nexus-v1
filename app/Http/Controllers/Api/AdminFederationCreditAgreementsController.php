@@ -29,9 +29,9 @@ class AdminFederationCreditAgreementsController extends BaseApiController
         $this->requireAdmin();
         $tenantId = $this->getTenantId();
 
-        if (class_exists(\Nexus\Services\FederationCreditService::class)) {
+        if (class_exists(\App\Services\FederationCreditService::class)) {
             try {
-                $agreements = \Nexus\Services\FederationCreditService::listAgreements($tenantId);
+                $agreements = \App\Services\FederationCreditService::listAgreementsStatic($tenantId);
                 return $this->respondWithData($agreements);
             } catch (\Exception $e) {
                 return $this->respondWithError('FETCH_FAILED', 'Failed to load credit agreements', null, 500);
@@ -69,9 +69,9 @@ class AdminFederationCreditAgreementsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Monthly limit must be greater than zero', 'monthly_limit');
         }
 
-        if (class_exists(\Nexus\Services\FederationCreditService::class)) {
+        if (class_exists(\App\Services\FederationCreditService::class)) {
             try {
-                $agreement = \Nexus\Services\FederationCreditService::createAgreement(
+                $agreement = \App\Services\FederationCreditService::createAgreementStatic(
                     $tenantId,
                     $partnerTenantId,
                     $exchangeRate,

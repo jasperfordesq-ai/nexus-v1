@@ -28,9 +28,9 @@ class AdminFederationNeighborhoodsController extends BaseApiController
     {
         $this->requireAdmin();
 
-        if (class_exists(\Nexus\Services\FederationNeighborhoodService::class)) {
+        if (class_exists(\App\Services\FederationNeighborhoodService::class)) {
             try {
-                $neighborhoods = \Nexus\Services\FederationNeighborhoodService::listAll();
+                $neighborhoods = \App\Services\FederationNeighborhoodService::listAllStatic();
                 return $this->respondWithData($neighborhoods);
             } catch (\Exception $e) {
                 return $this->respondWithError('FETCH_FAILED', 'Failed to load neighborhoods', null, 500);
@@ -57,9 +57,9 @@ class AdminFederationNeighborhoodsController extends BaseApiController
 
         $description = isset($input['description']) ? trim($input['description']) : null;
 
-        if (class_exists(\Nexus\Services\FederationNeighborhoodService::class)) {
+        if (class_exists(\App\Services\FederationNeighborhoodService::class)) {
             try {
-                $neighborhood = \Nexus\Services\FederationNeighborhoodService::create($name, $description, null, $adminId);
+                $neighborhood = \App\Services\FederationNeighborhoodService::createStatic($name, $description, null, $adminId);
                 return $this->respondWithData($neighborhood, null, 201);
             } catch (\Exception $e) {
                 return $this->respondWithError('CREATE_FAILED', 'Failed to create neighborhood: ' . $e->getMessage());
