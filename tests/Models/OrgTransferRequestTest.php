@@ -90,6 +90,8 @@ class OrgTransferRequestTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Clean up requests before each test
         Database::query("DELETE FROM org_transfer_requests WHERE organization_id = ?", [self::$testOrgId]);
         Database::query("DELETE FROM org_transactions WHERE organization_id = ?", [self::$testOrgId]);

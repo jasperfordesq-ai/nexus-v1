@@ -15,6 +15,8 @@ class CSSSanitizerTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->sanitizer = new CSSSanitizer();
     }
 

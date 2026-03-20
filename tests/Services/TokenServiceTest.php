@@ -18,6 +18,8 @@ class TokenServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Set APP_KEY for token signing
         $_ENV['APP_KEY'] = 'test-app-key-for-unit-testing-only';
         putenv('APP_KEY=test-app-key-for-unit-testing-only');
@@ -30,6 +32,7 @@ class TokenServiceTest extends TestCase
         unset($_SERVER['HTTP_USER_AGENT']);
         unset($_SERVER['HTTP_X_CAPACITOR_APP']);
         unset($_SERVER['HTTP_X_NEXUS_MOBILE']);
+        parent::tearDown();
     }
 
     public function testGenerateTokenReturnsJWTFormat(): void

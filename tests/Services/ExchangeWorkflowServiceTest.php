@@ -81,6 +81,8 @@ class ExchangeWorkflowServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Skip all tests if required tables don't exist
         try {
             Database::query("SELECT 1 FROM exchange_requests LIMIT 0");

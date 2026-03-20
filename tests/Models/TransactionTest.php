@@ -61,6 +61,8 @@ class TransactionTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Reset balances before each test
         Database::query(
             "UPDATE users SET balance = ? WHERE id = ?",

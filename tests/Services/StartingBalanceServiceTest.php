@@ -49,6 +49,8 @@ class StartingBalanceServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         TenantContext::setById(self::$tenantId);
         TenantSettingsService::clearCache();
     }

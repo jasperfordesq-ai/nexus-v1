@@ -101,6 +101,8 @@ class MatchingServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Clear preferences before each test
         try {
             Database::query("DELETE FROM match_preferences WHERE user_id = ?", [self::$testUserId]);

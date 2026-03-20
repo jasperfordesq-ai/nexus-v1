@@ -58,6 +58,8 @@ class EndorsementServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         TenantContext::setById(self::$tenantId);
         if (self::$userId1 && self::$userId2) {
             try {

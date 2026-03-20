@@ -139,6 +139,8 @@ class SmartMatchingEngineTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         self::svc()->clearCache();
     }
 

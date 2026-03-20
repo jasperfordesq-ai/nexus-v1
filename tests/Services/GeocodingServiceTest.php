@@ -65,6 +65,8 @@ class GeocodingServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Reset user/listing coordinates before each test
         try {
             Database::query(

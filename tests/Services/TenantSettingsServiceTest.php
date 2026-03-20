@@ -31,6 +31,8 @@ class TenantSettingsServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         self::svc()->clearCache();
     }
 

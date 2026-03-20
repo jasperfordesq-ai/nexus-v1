@@ -52,6 +52,8 @@ class GamificationServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Reset user XP before each test
         Database::query(
             "UPDATE users SET xp = 0, level = 1 WHERE id = ?",

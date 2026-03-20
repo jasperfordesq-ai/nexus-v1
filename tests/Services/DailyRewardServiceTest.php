@@ -53,6 +53,8 @@ class DailyRewardServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Reset user state
         Database::query(
             "UPDATE users SET xp = 0 WHERE id = ?",

@@ -67,6 +67,8 @@ class ChallengeServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         if (self::$testChallengeId) {
             try {
                 Database::query(

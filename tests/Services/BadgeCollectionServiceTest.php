@@ -70,6 +70,8 @@ class BadgeCollectionServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         TenantContext::setById(self::$testTenantId);
     }
 

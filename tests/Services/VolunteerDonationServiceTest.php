@@ -57,6 +57,8 @@ class VolunteerDonationServiceTest extends DatabaseTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Skip parent setUp() transaction — the service manages its own transactions
         TenantContext::setById(self::$testTenantId);
     }
@@ -64,6 +66,7 @@ class VolunteerDonationServiceTest extends DatabaseTestCase
     protected function tearDown(): void
     {
         // Skip parent tearDown() rollback — we do manual cleanup
+        parent::tearDown();
     }
 
     // =========================================================================

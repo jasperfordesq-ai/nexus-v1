@@ -80,6 +80,8 @@ class OrgMemberTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Clean up members before each test
         Database::query("DELETE FROM org_members WHERE organization_id = ?", [self::$testOrgId]);
 

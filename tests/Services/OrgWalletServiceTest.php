@@ -91,6 +91,8 @@ class OrgWalletServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         // Reset user balances
         Database::query(
             "UPDATE users SET balance = ? WHERE id IN (?, ?, ?)",

@@ -103,6 +103,8 @@ class MatchApprovalWorkflowServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         if (!self::$dbAvailable) {
             $this->markTestSkipped('Database not available for integration test');
         }
