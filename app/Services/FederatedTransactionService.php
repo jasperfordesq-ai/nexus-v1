@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederatedTransactionService — Laravel DI wrapper for legacy \Nexus\Services\FederatedTransactionService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederatedTransactionService
      */
     public function createTransaction(int $senderId, int $receiverId, int $receiverTenantId, float $amount, string $description): array
     {
-        return \Nexus\Services\FederatedTransactionService::createTransaction($senderId, $receiverId, $receiverTenantId, $amount, $description);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederatedTransactionService
      */
     public function getHistory(int $userId, int $limit = 50, int $offset = 0): array
     {
-        return \Nexus\Services\FederatedTransactionService::getHistory($userId, $limit, $offset);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class FederatedTransactionService
      */
     public function getStats(int $userId): array
     {
-        return \Nexus\Services\FederatedTransactionService::getStats($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,6 +48,7 @@ class FederatedTransactionService
      */
     public function canReceiveTransactions(int $userId, int $tenantId): bool
     {
-        return \Nexus\Services\FederatedTransactionService::canReceiveTransactions($userId, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

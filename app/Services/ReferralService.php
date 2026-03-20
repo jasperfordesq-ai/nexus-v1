@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * ReferralService — Laravel DI wrapper for legacy \Nexus\Services\ReferralService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class ReferralService
      */
     public function generateCode(int $tenantId, int $userId): string
     {
-        return \Nexus\Services\ReferralService::generateCode($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -30,7 +30,8 @@ class ReferralService
      */
     public function redeem(int $tenantId, string $code, int $userId): bool
     {
-        return \Nexus\Services\ReferralService::redeem($tenantId, $code, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class ReferralService
      */
     public function getReferrals(int $tenantId, int $userId): array
     {
-        return \Nexus\Services\ReferralService::getReferrals($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,6 +48,7 @@ class ReferralService
      */
     public function getStats(int $tenantId, int $userId): array
     {
-        return \Nexus\Services\ReferralService::getStats($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

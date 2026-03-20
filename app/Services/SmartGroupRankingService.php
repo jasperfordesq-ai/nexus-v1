@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SmartGroupRankingService — Laravel DI wrapper for legacy \Nexus\Services\SmartGroupRankingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SmartGroupRankingService
      */
     public function updateFeaturedLocalHubs($tenantId = null, $limit = 6)
     {
-        return \Nexus\Services\SmartGroupRankingService::updateFeaturedLocalHubs($tenantId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class SmartGroupRankingService
      */
     public function updateFeaturedCommunityGroups($tenantId = null, $limit = 6)
     {
-        return \Nexus\Services\SmartGroupRankingService::updateFeaturedCommunityGroups($tenantId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class SmartGroupRankingService
      */
     public function updateAllFeaturedGroups($tenantId = null)
     {
-        return \Nexus\Services\SmartGroupRankingService::updateAllFeaturedGroups($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class SmartGroupRankingService
      */
     public function getFeaturedGroupsWithScores($type = 'local_hubs', $tenantId = null)
     {
-        return \Nexus\Services\SmartGroupRankingService::getFeaturedGroupsWithScores($type, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class SmartGroupRankingService
      */
     public function getLastUpdateTime($tenantId = null)
     {
-        return \Nexus\Services\SmartGroupRankingService::getLastUpdateTime($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

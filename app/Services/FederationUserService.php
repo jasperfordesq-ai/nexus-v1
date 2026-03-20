@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationUserService — Laravel DI wrapper for legacy \Nexus\Services\FederationUserService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationUserService
      */
     public function getUserSettings(int $userId): array
     {
-        return \Nexus\Services\FederationUserService::getUserSettings($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationUserService
      */
     public function updateSettings(int $userId, array $settings): bool
     {
-        return \Nexus\Services\FederationUserService::updateSettings($userId, $settings);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class FederationUserService
      */
     public function hasOptedIn(int $userId, ?int $tenantId = null): bool
     {
-        return \Nexus\Services\FederationUserService::hasOptedIn($userId, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,7 +48,8 @@ class FederationUserService
      */
     public function optOut(int $userId): bool
     {
-        return \Nexus\Services\FederationUserService::optOut($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,6 +57,7 @@ class FederationUserService
      */
     public function getFederatedUsers(int $tenantId, array $filters = []): array
     {
-        return \Nexus\Services\FederationUserService::getFederatedUsers($tenantId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

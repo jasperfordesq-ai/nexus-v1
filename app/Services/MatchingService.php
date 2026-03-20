@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * MatchingService — Laravel DI wrapper for legacy \Nexus\Services\MatchingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class MatchingService
      */
     public function getSuggestionsForUser($userId, $limit = 5, array $options = [])
     {
-        return \Nexus\Services\MatchingService::getSuggestionsForUser($userId, $limit, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class MatchingService
      */
     public function getHotMatches($userId, $limit = 5)
     {
-        return \Nexus\Services\MatchingService::getHotMatches($userId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class MatchingService
      */
     public function getMutualMatches($userId, $limit = 10)
     {
-        return \Nexus\Services\MatchingService::getMutualMatches($userId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class MatchingService
      */
     public function getMatchesByType($userId)
     {
-        return \Nexus\Services\MatchingService::getMatchesByType($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,7 +57,8 @@ class MatchingService
      */
     public function savePreferences($userId, array $preferences)
     {
-        return \Nexus\Services\MatchingService::savePreferences($userId, $preferences);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -70,6 +74,7 @@ class MatchingService
      */
     public static function getPreferencesStatic($userId)
     {
-        return \Nexus\Services\MatchingService::getPreferences($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\DB;
  *   7. Fallback to Master tenant (ID 1)
  *
  * All public methods are static to maintain backward compatibility with
- * the 633+ call sites across both Nexus\ and App\ namespaces.
  */
 class TenantContext
 {
@@ -37,7 +36,6 @@ class TenantContext
 
     /**
      * Get a PDO connection — uses Laravel DB facade when available,
-     * falls back to legacy Nexus\Core\Database for non-Laravel contexts.
      *
      * @return \PDO
      */
@@ -509,7 +507,6 @@ class TenantContext
 
     /**
      * Merge DB feature flags with defaults so new/null tenants get correct values.
-     * Self-contained — no dependency on legacy Nexus\ namespace.
      */
     private static function mergeFeatureDefaults(?array $dbFeatures): array
     {

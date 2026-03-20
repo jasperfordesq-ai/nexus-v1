@@ -8,7 +8,6 @@ namespace App\Core;
 
 /**
  * Centralized, secure client IP extraction.
- * Direct implementation replacing Nexus\Core\ClientIp delegation.
  *
  * Handles the full proxy chain: Client -> Cloudflare -> Docker -> Apache -> PHP.
  *

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * RankingService — Laravel DI wrapper for legacy \Nexus\Services\RankingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class RankingService
      */
     public function getRankings(int $tenantId, string $type = 'overall', int $limit = 20): array
     {
-        return \Nexus\Services\RankingService::getRankings($tenantId, $type, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class RankingService
      */
     public function getUserRanking(int $tenantId, int $userId): ?array
     {
-        return \Nexus\Services\RankingService::getUserRanking($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,6 +39,7 @@ class RankingService
      */
     public function recalculate(int $tenantId): bool
     {
-        return \Nexus\Services\RankingService::recalculate($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

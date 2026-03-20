@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederatedMessageService — Laravel DI wrapper for legacy \Nexus\Services\FederatedMessageService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederatedMessageService
      */
     public function sendMessage(int $senderId, int $receiverId, int $receiverTenantId, string $subject, string $body): array
     {
-        return \Nexus\Services\FederatedMessageService::sendMessage($senderId, $receiverId, $receiverTenantId, $subject, $body);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederatedMessageService
      */
     public function getInbox(int $userId, int $limit = 50, int $offset = 0): array
     {
-        return \Nexus\Services\FederatedMessageService::getInbox($userId, $limit, $offset);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class FederatedMessageService
      */
     public function getThread(int $userId, int $otherUserId, int $otherTenantId, int $limit = 100): array
     {
-        return \Nexus\Services\FederatedMessageService::getThread($userId, $otherUserId, $otherTenantId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class FederatedMessageService
      */
     public function markAsRead(int $messageId, int $userId): bool
     {
-        return \Nexus\Services\FederatedMessageService::markAsRead($messageId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,6 +57,7 @@ class FederatedMessageService
      */
     public function markThreadAsRead(int $userId, int $otherUserId, int $otherTenantId): int
     {
-        return \Nexus\Services\FederatedMessageService::markThreadAsRead($userId, $otherUserId, $otherTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 }

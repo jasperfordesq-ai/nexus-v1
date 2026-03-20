@@ -8,7 +8,6 @@ namespace App\Core;
 
 /**
  * CSRF protection using direct implementation.
- * Replaces legacy Nexus\Core\Csrf delegation.
  */
 class Csrf
 {

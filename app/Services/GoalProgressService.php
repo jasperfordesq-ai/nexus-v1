@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
  * GoalProgressService — Eloquent-based service for goal progress history.
  *
  * Replaces the legacy DI wrapper that delegated to
- * \Nexus\Services\GoalProgressService.
  */
 class GoalProgressService
 {

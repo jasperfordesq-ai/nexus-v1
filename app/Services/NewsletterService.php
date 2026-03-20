@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * NewsletterService — Laravel DI-based service for newsletter operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\NewsletterService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  *
  * sendNow, renderEmail, getSegmentRecipientCount, and getRecipientCount are
@@ -707,7 +706,6 @@ HTML;
     /**
      * Build a single SQL condition clause from a segment rule condition.
      *
-     * Ported from legacy \Nexus\Models\NewsletterSegment::buildConditionClause().
      *
      * @param array $condition ['field' => string, 'operator' => string, 'value' => mixed]
      * @param array &$params Bind parameters (appended to)

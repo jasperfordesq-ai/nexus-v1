@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupReportingService — Laravel DI wrapper for legacy \Nexus\Services\GroupReportingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupReportingService
      */
     public function generateWeeklyDigest($groupId, $ownerId)
     {
-        return \Nexus\Services\GroupReportingService::generateWeeklyDigest($groupId, $ownerId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupReportingService
      */
     public function generateCustomReport($groupId, $startDate, $endDate)
     {
-        return \Nexus\Services\GroupReportingService::generateCustomReport($groupId, $startDate, $endDate);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,6 +39,7 @@ class GroupReportingService
      */
     public function sendAllWeeklyDigests()
     {
-        return \Nexus\Services\GroupReportingService::sendAllWeeklyDigests();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

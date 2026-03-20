@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationJwtService — Laravel DI wrapper for legacy \Nexus\Services\FederationJwtService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationJwtService
      */
     public function generateToken(string $platformId, string $userId, int $tenantId, array $scopes = [], int $lifetime = self::DEFAULT_TOKEN_LIFETIME): ?array
     {
-        return \Nexus\Services\FederationJwtService::generateToken($platformId, $userId, $tenantId, $scopes, $lifetime);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +38,8 @@ class FederationJwtService
      */
     public static function validateTokenStatic(string $token): ?array
     {
-        return \Nexus\Services\FederationJwtService::validateToken($token);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,6 +47,7 @@ class FederationJwtService
      */
     public function handleTokenRequest(): array
     {
-        return \Nexus\Services\FederationJwtService::handleTokenRequest();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

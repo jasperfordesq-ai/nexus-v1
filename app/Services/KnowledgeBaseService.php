@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * KnowledgeBaseService — Laravel DI-based service for knowledge base articles.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\KnowledgeBaseService.
  * Provides CRUD, search, feedback, and view tracking for self-service articles.
  */
 class KnowledgeBaseService

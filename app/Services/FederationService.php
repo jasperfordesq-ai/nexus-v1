@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * FederationService — Laravel DI-based service for federation/multi-community operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\FederationDirectoryService.
  * Manages cross-timebank directory lookups for federated networks.
  */
 class FederationService

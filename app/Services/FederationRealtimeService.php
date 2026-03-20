@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationRealtimeService — Laravel DI wrapper for legacy \Nexus\Services\FederationRealtimeService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationRealtimeService
      */
     public function getUserFederationChannel(int $userId, int $tenantId): string
     {
-        return \Nexus\Services\FederationRealtimeService::getUserFederationChannel($userId, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationRealtimeService
      */
     public function getConversationChannel(int $user1Id, int $tenant1Id, int $user2Id, int $tenant2Id): string
     {
-        return \Nexus\Services\FederationRealtimeService::getConversationChannel($user1Id, $tenant1Id, $user2Id, $tenant2Id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -38,7 +39,8 @@ class FederationRealtimeService
      */
     public function broadcastNewMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId, array $messageData): bool
     {
-        return \Nexus\Services\FederationRealtimeService::broadcastNewMessage($senderUserId, $senderTenantId, $recipientUserId, $recipientTenantId, $messageData);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,7 +48,8 @@ class FederationRealtimeService
      */
     public function broadcastTyping(int $userId, int $tenantId, int $recipientUserId, int $recipientTenantId, bool $isTyping = true): bool
     {
-        return \Nexus\Services\FederationRealtimeService::broadcastTyping($userId, $tenantId, $recipientUserId, $recipientTenantId, $isTyping);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,7 +57,8 @@ class FederationRealtimeService
      */
     public function broadcastMessageRead(int $readerId, int $readerTenantId, int $senderUserId, int $senderTenantId): bool
     {
-        return \Nexus\Services\FederationRealtimeService::broadcastMessageRead($readerId, $readerTenantId, $senderUserId, $senderTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -62,6 +66,7 @@ class FederationRealtimeService
      */
     public function authFederationChannel(string $channelName, string $socketId, int $userId, int $tenantId): ?string
     {
-        return \Nexus\Services\FederationRealtimeService::authFederationChannel($channelName, $socketId, $userId, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
  * Manages per-tenant email provider configuration stored in the email_settings
  * table. Supports encryption for sensitive values like API keys.
  *
- * Replaces Nexus\Models\EmailSettings with Eloquent/DB facade queries.
  */
 class EmailSettings
 {

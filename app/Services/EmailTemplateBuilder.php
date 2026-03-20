@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * EmailTemplateBuilder — Laravel DI wrapper for legacy \Nexus\Services\EmailTemplateBuilder.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class EmailTemplateBuilder
      */
     public function personalizeContent(string $content, array $recipient): string
     {
-        return \Nexus\Services\EmailTemplateBuilder::personalizeContent($content, $recipient);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -30,7 +30,8 @@ class EmailTemplateBuilder
      */
     public function processDynamicBlocks(string $content, array $options = []): string
     {
-        return \Nexus\Services\EmailTemplateBuilder::processDynamicBlocks($content, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -38,6 +39,7 @@ class EmailTemplateBuilder
      */
     public function getAvailableBlocks(): array
     {
-        return \Nexus\Services\EmailTemplateBuilder::getAvailableBlocks();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupNotificationService — Laravel DI wrapper for legacy \Nexus\Services\GroupNotificationService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,7 @@ class GroupNotificationService
      */
     public function notifyJoinRequest(int $groupId, int $userId): void
     {
-        \Nexus\Services\GroupNotificationService::notifyJoinRequest($groupId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -30,7 +29,7 @@ class GroupNotificationService
      */
     public function notifyJoined(int $groupId, int $userId): void
     {
-        \Nexus\Services\GroupNotificationService::notifyJoined($groupId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -38,7 +37,7 @@ class GroupNotificationService
      */
     public function notifyJoinRejected(int $groupId, int $userId): void
     {
-        \Nexus\Services\GroupNotificationService::notifyJoinRejected($groupId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -46,7 +45,7 @@ class GroupNotificationService
      */
     public function notifyNewDiscussion(int $groupId, int $discussionId, int $authorId, string $title): void
     {
-        \Nexus\Services\GroupNotificationService::notifyNewDiscussion($groupId, $discussionId, $authorId, $title);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -54,6 +53,6 @@ class GroupNotificationService
      */
     public function notifyNewAnnouncement(int $groupId, int $authorId, string $title): void
     {
-        \Nexus\Services\GroupNotificationService::notifyNewAnnouncement($groupId, $authorId, $title);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

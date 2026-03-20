@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationGateway — Laravel DI wrapper for legacy \Nexus\Services\FederationGateway.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationGateway
      */
     public function canViewProfile(int $viewerTenantId, int $targetTenantId, int $targetUserId, ?int $viewerUserId = null): array
     {
-        return \Nexus\Services\FederationGateway::canViewProfile($viewerTenantId, $targetTenantId, $targetUserId, $viewerUserId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationGateway
      */
     public function canSendMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId): array
     {
-        return \Nexus\Services\FederationGateway::canSendMessage($senderUserId, $senderTenantId, $recipientUserId, $recipientTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,7 @@ class FederationGateway
      */
     public function recordMessage(int $senderUserId, int $senderTenantId, int $recipientUserId, int $recipientTenantId, int $messageId): void
     {
-        \Nexus\Services\FederationGateway::recordMessage($senderUserId, $senderTenantId, $recipientUserId, $recipientTenantId, $messageId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -46,7 +47,8 @@ class FederationGateway
      */
     public function canPerformTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId): array
     {
-        return \Nexus\Services\FederationGateway::canPerformTransaction($initiatorUserId, $initiatorTenantId, $counterpartyUserId, $counterpartyTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +56,6 @@ class FederationGateway
      */
     public function recordTransaction(int $initiatorUserId, int $initiatorTenantId, int $counterpartyUserId, int $counterpartyTenantId, int $transactionId, string $transactionType, float $amount): void
     {
-        \Nexus\Services\FederationGateway::recordTransaction($initiatorUserId, $initiatorTenantId, $counterpartyUserId, $counterpartyTenantId, $transactionId, $transactionType, $amount);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * StartingBalanceService — Laravel DI wrapper for legacy \Nexus\Services\StartingBalanceService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class StartingBalanceService
      */
     public function getDefault(int $tenantId): float
     {
-        return \Nexus\Services\StartingBalanceService::getDefault($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0.0;
     }
 
     /**
@@ -30,7 +30,8 @@ class StartingBalanceService
      */
     public function setDefault(int $tenantId, float $amount): bool
     {
-        return \Nexus\Services\StartingBalanceService::setDefault($tenantId, $amount);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,6 +39,7 @@ class StartingBalanceService
      */
     public function applyToUser(int $tenantId, int $userId): bool
     {
-        return \Nexus\Services\StartingBalanceService::applyToUser($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

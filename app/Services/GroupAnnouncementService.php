@@ -12,8 +12,6 @@ use App\Core\TenantContext;
 /**
  * GroupAnnouncementService — Laravel DI-based service for group announcements.
  *
- * Replaces legacy \Nexus\Services\GroupAnnouncementService with direct DB queries,
- * since the legacy Nexus\Models\Group class was removed during the Laravel migration.
  */
 class GroupAnnouncementService
 {

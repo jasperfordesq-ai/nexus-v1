@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * MatchApprovalWorkflowService — Laravel DI wrapper for legacy \Nexus\Services\MatchApprovalWorkflowService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class MatchApprovalWorkflowService
      */
     public function submitForApproval(int $userId, int $listingId, array $matchData): ?int
     {
-        return \Nexus\Services\MatchApprovalWorkflowService::submitForApproval($userId, $listingId, $matchData);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class MatchApprovalWorkflowService
      */
     public function approveMatch(int $requestId, int $approvedBy, string $notes = ''): bool
     {
-        return \Nexus\Services\MatchApprovalWorkflowService::approveMatch($requestId, $approvedBy, $notes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class MatchApprovalWorkflowService
      */
     public function rejectMatch(int $requestId, int $rejectedBy, string $reason = ''): bool
     {
-        return \Nexus\Services\MatchApprovalWorkflowService::rejectMatch($requestId, $rejectedBy, $reason);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,7 +48,8 @@ class MatchApprovalWorkflowService
      */
     public function bulkApprove(array $requestIds, int $approvedBy, string $notes = ''): int
     {
-        return \Nexus\Services\MatchApprovalWorkflowService::bulkApprove($requestIds, $approvedBy, $notes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -54,7 +57,8 @@ class MatchApprovalWorkflowService
      */
     public function bulkReject(array $requestIds, int $rejectedBy, string $reason = ''): int
     {
-        return \Nexus\Services\MatchApprovalWorkflowService::bulkReject($requestIds, $rejectedBy, $reason);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -62,6 +66,7 @@ class MatchApprovalWorkflowService
      */
     public function getStatistics(int $days = 30): array
     {
-        return \Nexus\Services\MatchApprovalWorkflowService::getStatistics($days);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

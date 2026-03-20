@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationActivityService — Laravel DI wrapper for legacy \Nexus\Services\FederationActivityService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationActivityService
      */
     public function getActivityFeed(int $userId, int $limit = 50, int $offset = 0): array
     {
-        return \Nexus\Services\FederationActivityService::getActivityFeed($userId, $limit, $offset);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationActivityService
      */
     public function getUnreadCount(int $userId): int
     {
-        return \Nexus\Services\FederationActivityService::getUnreadCount($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -38,6 +39,7 @@ class FederationActivityService
      */
     public function getActivityStats(int $userId): array
     {
-        return \Nexus\Services\FederationActivityService::getActivityStats($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

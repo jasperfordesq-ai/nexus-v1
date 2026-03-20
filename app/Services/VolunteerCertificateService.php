@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * VolunteerCertificateService — Laravel DI wrapper for legacy \Nexus\Services\VolunteerCertificateService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class VolunteerCertificateService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\VolunteerCertificateService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class VolunteerCertificateService
      */
     public function generate(int $userId, array $options = []): ?array
     {
-        return \Nexus\Services\VolunteerCertificateService::generate($userId, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class VolunteerCertificateService
      */
     public function verify(string $code): ?array
     {
-        return \Nexus\Services\VolunteerCertificateService::verify($code);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class VolunteerCertificateService
      */
     public function getUserCertificates(int $userId): array
     {
-        return \Nexus\Services\VolunteerCertificateService::getUserCertificates($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class VolunteerCertificateService
      */
     public function generateHtml(string $code): ?string
     {
-        return \Nexus\Services\VolunteerCertificateService::generateHtml($code);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -62,6 +66,6 @@ class VolunteerCertificateService
      */
     public function markDownloaded(string $code): void
     {
-        \Nexus\Services\VolunteerCertificateService::markDownloaded($code);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

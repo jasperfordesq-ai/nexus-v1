@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SchemaService — Laravel DI wrapper for legacy \Nexus\Services\SchemaService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SchemaService
      */
     public function organization(?array $tenant = null, ?array $config = null): array
     {
-        return \Nexus\Services\SchemaService::organization($tenant, $config);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class SchemaService
      */
     public function webSite(?array $tenant = null): array
     {
-        return \Nexus\Services\SchemaService::webSite($tenant);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class SchemaService
      */
     public function article(array $post, ?array $author = null): array
     {
-        return \Nexus\Services\SchemaService::article($post, $author);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class SchemaService
      */
     public function event(array $event, ?array $organizer = null): array
     {
-        return \Nexus\Services\SchemaService::event($event, $organizer);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class SchemaService
      */
     public function offer(array $listing, ?array $seller = null): array
     {
-        return \Nexus\Services\SchemaService::offer($listing, $seller);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

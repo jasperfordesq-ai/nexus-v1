@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GeocodingService — Laravel DI wrapper for legacy \Nexus\Services\GeocodingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GeocodingService
      */
     public function geocode(string $address): ?array
     {
-        return \Nexus\Services\GeocodingService::geocode($address);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GeocodingService
      */
     public function updateUserCoordinates(int $userId, ?string $location): bool
     {
-        return \Nexus\Services\GeocodingService::updateUserCoordinates($userId, $location);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class GeocodingService
      */
     public function updateListingCoordinates(int $listingId, ?string $location): bool
     {
-        return \Nexus\Services\GeocodingService::updateListingCoordinates($listingId, $location);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,7 +48,8 @@ class GeocodingService
      */
     public function batchGeocodeUsers(int $limit = 100): array
     {
-        return \Nexus\Services\GeocodingService::batchGeocodeUsers($limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class GeocodingService
      */
     public function batchGeocodeListings(int $limit = 100): array
     {
-        return \Nexus\Services\GeocodingService::batchGeocodeListings($limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

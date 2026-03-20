@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * IdeationChallengeService — Laravel DI-based service for ideation challenges.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\IdeationChallengeService.
  * Manages challenge CRUD, idea submission, voting, comments, favorites, and drafts.
  */
 class IdeationChallengeService

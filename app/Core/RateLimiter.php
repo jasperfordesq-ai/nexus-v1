@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Rate limiting for login attempts and API endpoints.
- * Direct implementation replacing Nexus\Core\RateLimiter delegation.
  *
  * Provides two mechanisms:
  * 1. Login-specific rate limiting (database-based, brute force protection)

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SmartSegmentSuggestionService — Laravel DI wrapper for legacy \Nexus\Services\SmartSegmentSuggestionService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SmartSegmentSuggestionService
      */
     public function getSuggestions(): array
     {
-        return \Nexus\Services\SmartSegmentSuggestionService::getSuggestions();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,7 @@ class SmartSegmentSuggestionService
      */
     public function clearCache(): void
     {
-        \Nexus\Services\SmartSegmentSuggestionService::clearCache();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -38,6 +38,7 @@ class SmartSegmentSuggestionService
      */
     public function getSuggestionById(string $id): ?array
     {
-        return \Nexus\Services\SmartSegmentSuggestionService::getSuggestionById($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

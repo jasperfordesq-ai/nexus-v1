@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupPolicyRepository — Laravel DI wrapper for legacy \Nexus\Services\GroupPolicyRepository.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -35,7 +34,8 @@ class GroupPolicyRepository
      */
     public function setPolicy($key, $value, $category = self::CATEGORY_FEATURES, $type = self::TYPE_STRING, $description = null, $tenantId = null)
     {
-        return \Nexus\Services\GroupPolicyRepository::setPolicy($key, $value, $category, $type, $description, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -43,7 +43,8 @@ class GroupPolicyRepository
      */
     public function getPolicy($key, $default = null, $tenantId = null)
     {
-        return \Nexus\Services\GroupPolicyRepository::getPolicy($key, $default, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -51,7 +52,8 @@ class GroupPolicyRepository
      */
     public function getPoliciesByCategory($category, $tenantId = null)
     {
-        return \Nexus\Services\GroupPolicyRepository::getPoliciesByCategory($category, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -59,7 +61,8 @@ class GroupPolicyRepository
      */
     public function getAllPolicies($tenantId = null)
     {
-        return \Nexus\Services\GroupPolicyRepository::getAllPolicies($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -67,6 +70,7 @@ class GroupPolicyRepository
      */
     public function deletePolicy($key, $tenantId = null)
     {
-        return \Nexus\Services\GroupPolicyRepository::deletePolicy($key, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

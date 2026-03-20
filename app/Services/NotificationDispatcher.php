@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Log;
  * Handles in-app (bell), email, and web-push notifications with a
  * hierarchical frequency-setting system (Thread > Group > Global).
  *
- * Converted from legacy \Nexus\Services\NotificationDispatcher to use
  * DB facade / Eloquent instead of legacy Database class.
  */
 class NotificationDispatcher

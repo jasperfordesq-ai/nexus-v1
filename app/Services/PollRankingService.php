@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
  * PollRankingService — Eloquent-based service for ranked-choice voting.
  *
  * Replaces the legacy DI wrapper that delegated to
- * \Nexus\Services\PollRankingService.
  */
 class PollRankingService
 {

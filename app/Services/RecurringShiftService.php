@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * RecurringShiftService — Laravel DI wrapper for legacy \Nexus\Services\RecurringShiftService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class RecurringShiftService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\RecurringShiftService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class RecurringShiftService
      */
     public function createPattern(int $opportunityId, int $createdBy, array $data): ?int
     {
-        return \Nexus\Services\RecurringShiftService::createPattern($opportunityId, $createdBy, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class RecurringShiftService
      */
     public function generateOccurrences(int $patternId, int $daysAhead = 14): int
     {
-        return \Nexus\Services\RecurringShiftService::generateOccurrences($patternId, $daysAhead);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -46,7 +48,8 @@ class RecurringShiftService
      */
     public function processAllPatterns(int $daysAhead = 14): array
     {
-        return \Nexus\Services\RecurringShiftService::processAllPatterns($daysAhead);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class RecurringShiftService
      */
     public function getPatternsForOpportunity(int $opportunityId, ?int $userId = null): array
     {
-        return \Nexus\Services\RecurringShiftService::getPatternsForOpportunity($opportunityId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -62,7 +66,8 @@ class RecurringShiftService
      */
     public function getPattern(int $patternId): ?array
     {
-        return \Nexus\Services\RecurringShiftService::getPattern($patternId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -70,7 +75,8 @@ class RecurringShiftService
      */
     public function updatePattern(int $patternId, array $data, int $userId): bool
     {
-        return \Nexus\Services\RecurringShiftService::updatePattern($patternId, $data, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -78,7 +84,8 @@ class RecurringShiftService
      */
     public function deactivatePattern(int $patternId, int $userId): bool
     {
-        return \Nexus\Services\RecurringShiftService::deactivatePattern($patternId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -86,6 +93,7 @@ class RecurringShiftService
      */
     public function deleteFutureShifts(int $patternId, int $userId): int
     {
-        return \Nexus\Services\RecurringShiftService::deleteFutureShifts($patternId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * MatchLearningService — Laravel DI wrapper for legacy \Nexus\Services\MatchLearningService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class MatchLearningService
      */
     public function getHistoricalBoost($userId, $candidateListing): float
     {
-        return \Nexus\Services\MatchLearningService::getHistoricalBoost($userId, $candidateListing);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0.0;
     }
 
     /**
@@ -30,7 +30,8 @@ class MatchLearningService
      */
     public function recordInteraction($userId, $listingId, $action, array $metadata = []): bool
     {
-        return \Nexus\Services\MatchLearningService::recordInteraction($userId, $listingId, $action, $metadata);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class MatchLearningService
      */
     public function getCategoryAffinities($userId): array
     {
-        return \Nexus\Services\MatchLearningService::getCategoryAffinities($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class MatchLearningService
      */
     public function getLearnedDistancePreference($userId): array
     {
-        return \Nexus\Services\MatchLearningService::getLearnedDistancePreference($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class MatchLearningService
      */
     public function getLearningStats(): array
     {
-        return \Nexus\Services\MatchLearningService::getLearningStats();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

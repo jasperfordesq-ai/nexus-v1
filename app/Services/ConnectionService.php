@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * ConnectionService — Laravel DI-based service for user connections.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ConnectionService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class ConnectionService

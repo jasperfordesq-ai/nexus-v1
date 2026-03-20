@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederatedConnectionService — Laravel DI wrapper for legacy \Nexus\Services\FederatedConnectionService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederatedConnectionService
      */
     public function sendRequest(int $requesterId, int $receiverId, int $receiverTenantId, ?string $message = null): array
     {
-        return \Nexus\Services\FederatedConnectionService::sendRequest($requesterId, $receiverId, $receiverTenantId, $message);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederatedConnectionService
      */
     public function acceptRequest(int $connectionId, int $userId): array
     {
-        return \Nexus\Services\FederatedConnectionService::acceptRequest($connectionId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class FederatedConnectionService
      */
     public function rejectRequest(int $connectionId, int $userId): array
     {
-        return \Nexus\Services\FederatedConnectionService::rejectRequest($connectionId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class FederatedConnectionService
      */
     public function removeConnection(int $connectionId, int $userId): array
     {
-        return \Nexus\Services\FederatedConnectionService::removeConnection($connectionId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class FederatedConnectionService
      */
     public function getStatus(int $userId, int $otherUserId, int $otherTenantId): array
     {
-        return \Nexus\Services\FederatedConnectionService::getStatus($userId, $otherUserId, $otherTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -62,7 +66,8 @@ class FederatedConnectionService
      */
     public function getConnections(int $userId, string $statusFilter = 'accepted', int $limit = 50, int $offset = 0): array
     {
-        return \Nexus\Services\FederatedConnectionService::getConnections($userId, $statusFilter, $limit, $offset);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -70,6 +75,7 @@ class FederatedConnectionService
      */
     public function getPendingCount(int $userId): int
     {
-        return \Nexus\Services\FederatedConnectionService::getPendingCount($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 }

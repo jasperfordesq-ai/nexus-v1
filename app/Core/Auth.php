@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
  * Provides authentication utilities for the application.
  * Works alongside AdminAuth for admin-level access control.
  *
- * This is the authoritative implementation; Nexus\Core\Auth delegates here.
  */
 class Auth
 {

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TenantVisibilityService — Laravel DI wrapper for legacy \Nexus\Services\TenantVisibilityService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TenantVisibilityService
      */
     public function getVisibleTenantIds(): array
     {
-        return \Nexus\Services\TenantVisibilityService::getVisibleTenantIds();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class TenantVisibilityService
      */
     public function getTenantList(array $filters = []): array
     {
-        return \Nexus\Services\TenantVisibilityService::getTenantList($filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class TenantVisibilityService
      */
     public function getTenant(int $tenantId): ?array
     {
-        return \Nexus\Services\TenantVisibilityService::getTenant($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class TenantVisibilityService
      */
     public function getUserList(array $filters = []): array
     {
-        return \Nexus\Services\TenantVisibilityService::getUserList($filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class TenantVisibilityService
      */
     public function getTenantAdmins(int $tenantId): array
     {
-        return \Nexus\Services\TenantVisibilityService::getTenantAdmins($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -62,7 +66,8 @@ class TenantVisibilityService
      */
     public function getHierarchyTree(): array
     {
-        return \Nexus\Services\TenantVisibilityService::getHierarchyTree();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -70,7 +75,8 @@ class TenantVisibilityService
      */
     public function getDashboardStats(): array
     {
-        return \Nexus\Services\TenantVisibilityService::getDashboardStats();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -78,6 +84,7 @@ class TenantVisibilityService
      */
     public function getAvailableParents(): array
     {
-        return \Nexus\Services\TenantVisibilityService::getAvailableParents();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

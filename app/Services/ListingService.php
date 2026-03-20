@@ -18,7 +18,6 @@ use Illuminate\Validation\ValidationException;
  * ListingService — Laravel DI-based service for listing operations.
  *
  * This is the Eloquent/DI counterpart to the legacy static
- * \Nexus\Services\ListingService. New controllers should inject this
  * class via constructor type-hinting; the legacy static class remains
  * available for existing code that has not yet been migrated.
  *

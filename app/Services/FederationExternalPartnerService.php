@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationExternalPartnerService — Laravel DI wrapper for legacy \Nexus\Services\FederationExternalPartnerService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationExternalPartnerService
      */
     public function getAll(int $tenantId): array
     {
-        return \Nexus\Services\FederationExternalPartnerService::getAll($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationExternalPartnerService
      */
     public function getById(int $id, int $tenantId): ?array
     {
-        return \Nexus\Services\FederationExternalPartnerService::getById($id, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class FederationExternalPartnerService
      */
     public function urlExists(string $baseUrl, int $tenantId, ?int $excludeId = null): bool
     {
-        return \Nexus\Services\FederationExternalPartnerService::urlExists($baseUrl, $tenantId, $excludeId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,7 +48,8 @@ class FederationExternalPartnerService
      */
     public function create(array $data, int $tenantId, int $userId): array
     {
-        return \Nexus\Services\FederationExternalPartnerService::create($data, $tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class FederationExternalPartnerService
      */
     public function update(int $id, array $data, int $tenantId, int $userId): array
     {
-        return \Nexus\Services\FederationExternalPartnerService::update($id, $data, $tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * ShiftSwapService — Laravel DI-based service for shift swap operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ShiftSwapService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class ShiftSwapService

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TwoFactorChallengeManager — Laravel DI wrapper for legacy \Nexus\Services\TwoFactorChallengeManager.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TwoFactorChallengeManager
      */
     public function create(int $userId, array $methods = ['totp']): string
     {
-        return \Nexus\Services\TwoFactorChallengeManager::create($userId, $methods);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -30,7 +30,8 @@ class TwoFactorChallengeManager
      */
     public function get(string $token): ?array
     {
-        return \Nexus\Services\TwoFactorChallengeManager::get($token);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class TwoFactorChallengeManager
      */
     public function recordAttempt(string $token): array
     {
-        return \Nexus\Services\TwoFactorChallengeManager::recordAttempt($token);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class TwoFactorChallengeManager
      */
     public function consume(string $token): bool
     {
-        return \Nexus\Services\TwoFactorChallengeManager::consume($token);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,6 +57,7 @@ class TwoFactorChallengeManager
      */
     public function delete(string $token): bool
     {
-        return \Nexus\Services\TwoFactorChallengeManager::delete($token);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

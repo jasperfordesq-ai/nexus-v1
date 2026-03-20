@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupConfigurationService — Laravel DI wrapper for legacy \Nexus\Services\GroupConfigurationService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupConfigurationService
      */
     public function get($key, $tenantId = null)
     {
-        return \Nexus\Services\GroupConfigurationService::get($key, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupConfigurationService
      */
     public function set($key, $config_value, $tenantId = null)
     {
-        return \Nexus\Services\GroupConfigurationService::set($key, $config_value, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupConfigurationService
      */
     public function setMultiple(array $configs, $tenantId = null)
     {
-        return \Nexus\Services\GroupConfigurationService::setMultiple($configs, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupConfigurationService
      */
     public function getAll($tenantId = null)
     {
-        return \Nexus\Services\GroupConfigurationService::getAll($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupConfigurationService
      */
     public function resetToDefaults($tenantId = null)
     {
-        return \Nexus\Services\GroupConfigurationService::resetToDefaults($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

@@ -14,7 +14,6 @@ use Illuminate\Validation\ValidationException;
 /**
  * ReviewService — Laravel DI-based service for review operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ReviewService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class ReviewService

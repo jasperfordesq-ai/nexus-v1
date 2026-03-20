@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * AdminListingsService — Laravel DI-based service for admin listing management.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ListingModerationService.
  * Handles listing approval, rejection, and moderation statistics.
  */
 class AdminListingsService

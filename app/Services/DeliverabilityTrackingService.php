@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * DeliverabilityTrackingService — Laravel DI wrapper for legacy \Nexus\Services\DeliverabilityTrackingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class DeliverabilityTrackingService
      */
     public function createDeliverable($ownerId, $title, $description = null, $options = [])
     {
-        return \Nexus\Services\DeliverabilityTrackingService::createDeliverable($ownerId, $title, $description, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class DeliverabilityTrackingService
      */
     public function updateDeliverableStatus($deliverableId, $newStatus, $userId)
     {
-        return \Nexus\Services\DeliverabilityTrackingService::updateDeliverableStatus($deliverableId, $newStatus, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class DeliverabilityTrackingService
      */
     public function completeDeliverable($deliverableId, $userId, $options = [])
     {
-        return \Nexus\Services\DeliverabilityTrackingService::completeDeliverable($deliverableId, $userId, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class DeliverabilityTrackingService
      */
     public function recalculateProgress($deliverableId, $userId)
     {
-        return \Nexus\Services\DeliverabilityTrackingService::recalculateProgress($deliverableId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class DeliverabilityTrackingService
      */
     public function getAnalytics($filters = [])
     {
-        return \Nexus\Services\DeliverabilityTrackingService::getAnalytics($filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SavedSearchService — Laravel DI wrapper for legacy \Nexus\Services\SavedSearchService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SavedSearchService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\SavedSearchService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class SavedSearchService
      */
     public function save(int $userId, string $name, array $queryParams, bool $notifyOnNew = false): ?int
     {
-        return \Nexus\Services\SavedSearchService::save($userId, $name, $queryParams, $notifyOnNew);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class SavedSearchService
      */
     public function getAll(int $userId): array
     {
-        return \Nexus\Services\SavedSearchService::getAll($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class SavedSearchService
      */
     public function getById(int $id, int $userId): ?array
     {
-        return \Nexus\Services\SavedSearchService::getById($id, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class SavedSearchService
      */
     public function delete(int $id, int $userId): bool
     {
-        return \Nexus\Services\SavedSearchService::delete($id, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

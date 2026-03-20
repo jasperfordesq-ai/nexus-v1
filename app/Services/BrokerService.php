@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * BrokerService — Laravel DI-based service for broker operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\BrokerControlConfigService
- * and \Nexus\Services\BrokerMessageVisibilityService. Manages broker configuration
  * and message visibility settings.
  */
 class BrokerService

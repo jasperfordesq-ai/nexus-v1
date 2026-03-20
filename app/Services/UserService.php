@@ -16,7 +16,6 @@ use App\Core\TenantContext;
 /**
  * UserService — Laravel DI-based service for user/profile operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\UserService.
  * Eloquent queries on User are tenant-scoped via HasTenantScope.
  * Raw DB::table() queries are explicitly scoped with tenant_id filters.
  */

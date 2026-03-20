@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Email sending with multi-provider support (SMTP, Gmail API, SendGrid).
- * Direct implementation replacing Nexus\Core\Mailer delegation.
  */
 class Mailer
 {

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SearchLogService — Laravel DI wrapper for legacy \Nexus\Services\SearchLogService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,7 @@ class SearchLogService
      */
     public function log(string $query, string $searchType = 'all', int $resultCount = 0, ?int $userId = null, ?array $filters = null): void
     {
-        \Nexus\Services\SearchLogService::log($query, $searchType, $resultCount, $userId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -30,7 +29,8 @@ class SearchLogService
      */
     public function getTrendingSearches(int $days = 7, int $limit = 20): array
     {
-        return \Nexus\Services\SearchLogService::getTrendingSearches($days, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +38,8 @@ class SearchLogService
      */
     public function getZeroResultSearches(int $days = 30, int $limit = 20): array
     {
-        return \Nexus\Services\SearchLogService::getZeroResultSearches($days, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +47,8 @@ class SearchLogService
      */
     public function getAnalyticsSummary(int $days = 30): array
     {
-        return \Nexus\Services\SearchLogService::getAnalyticsSummary($days);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +56,7 @@ class SearchLogService
      */
     public function cleanupOldLogs(): int
     {
-        return \Nexus\Services\SearchLogService::cleanupOldLogs();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 }

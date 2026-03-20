@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * NotificationService — Laravel DI-based service for notification operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\NotificationService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class NotificationService

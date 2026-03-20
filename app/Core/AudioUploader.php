@@ -8,7 +8,6 @@ namespace App\Core;
 
 /**
  * Audio file upload handler for voice messaging.
- * Direct implementation replacing Nexus\Core\AudioUploader delegation.
  */
 class AudioUploader
 {

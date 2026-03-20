@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * WebhookDispatchService — Laravel DI wrapper for legacy \Nexus\Services\WebhookDispatchService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,7 @@ class WebhookDispatchService
      */
     public function dispatch(string $eventType, array $payload): void
     {
-        \Nexus\Services\WebhookDispatchService::dispatch($eventType, $payload);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -30,7 +29,8 @@ class WebhookDispatchService
      */
     public function getWebhooks(): array
     {
-        return \Nexus\Services\WebhookDispatchService::getWebhooks();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +38,8 @@ class WebhookDispatchService
      */
     public function createWebhook(int $userId, array $data): array
     {
-        return \Nexus\Services\WebhookDispatchService::createWebhook($userId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +47,8 @@ class WebhookDispatchService
      */
     public function updateWebhook(int $id, array $data): bool
     {
-        return \Nexus\Services\WebhookDispatchService::updateWebhook($id, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,7 +56,8 @@ class WebhookDispatchService
      */
     public function deleteWebhook(int $id): bool
     {
-        return \Nexus\Services\WebhookDispatchService::deleteWebhook($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -62,7 +65,8 @@ class WebhookDispatchService
      */
     public function testWebhook(int $id): array
     {
-        return \Nexus\Services\WebhookDispatchService::testWebhook($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -70,6 +74,7 @@ class WebhookDispatchService
      */
     public function getLogs(int $id, array $filters = []): array
     {
-        return \Nexus\Services\WebhookDispatchService::getLogs($id, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

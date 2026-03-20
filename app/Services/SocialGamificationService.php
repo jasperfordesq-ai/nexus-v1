@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SocialGamificationService — Laravel DI wrapper for legacy \Nexus\Services\SocialGamificationService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SocialGamificationService
      */
     public function getFriendComparison(int $userId, int $friendId): array
     {
-        return \Nexus\Services\SocialGamificationService::getFriendComparison($userId, $friendId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class SocialGamificationService
      */
     public function getFriendsLeaderboard(int $userId, int $limit = 10): array
     {
-        return \Nexus\Services\SocialGamificationService::getFriendsLeaderboard($userId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class SocialGamificationService
      */
     public function createFriendChallenge(int $challengerId, int $challengedId, array $challengeData): ?int
     {
-        return \Nexus\Services\SocialGamificationService::createFriendChallenge($challengerId, $challengedId, $challengeData);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class SocialGamificationService
      */
     public function acceptChallenge(int $challengeId, int $userId): bool
     {
-        return \Nexus\Services\SocialGamificationService::acceptChallenge($challengeId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,6 +57,7 @@ class SocialGamificationService
      */
     public function declineChallenge(int $challengeId, int $userId): bool
     {
-        return \Nexus\Services\SocialGamificationService::declineChallenge($challengeId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

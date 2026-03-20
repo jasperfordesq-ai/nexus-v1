@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * SeoService — Laravel DI-based service for SEO metadata management.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\SchemaService.
  * Manages page-level metadata, Open Graph tags, and redirect rules.
  */
 class SeoService

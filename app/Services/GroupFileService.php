@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupFileService — Laravel DI wrapper for legacy \Nexus\Services\GroupFileService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupFileService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\GroupFileService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupFileService
      */
     public function listFiles(int $groupId, int $userId, array $filters = []): ?array
     {
-        return \Nexus\Services\GroupFileService::listFiles($groupId, $userId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupFileService
      */
     public function upload(int $groupId, int $userId, array $file): ?array
     {
-        return \Nexus\Services\GroupFileService::upload($groupId, $userId, $file);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupFileService
      */
     public function delete(int $groupId, int $fileId, int $userId): bool
     {
-        return \Nexus\Services\GroupFileService::delete($groupId, $fileId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupFileService
      */
     public function getFile(int $groupId, int $fileId, int $userId): ?array
     {
-        return \Nexus\Services\GroupFileService::getFile($groupId, $fileId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

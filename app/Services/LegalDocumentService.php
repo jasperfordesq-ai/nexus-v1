@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * LegalDocumentService — Laravel DI-based service for legal document management.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\LegalDocumentService.
  * Manages versioned legal documents (ToS, Privacy, etc.) with acceptance tracking.
  */
 class LegalDocumentService

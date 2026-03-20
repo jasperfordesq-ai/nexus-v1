@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * OptimizedGroupQueries — Laravel DI wrapper for legacy \Nexus\Services\OptimizedGroupQueries.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class OptimizedGroupQueries
      */
     public function getLeafGroups($tenantId = null, $typeId = null, $limit = 100)
     {
-        return \Nexus\Services\OptimizedGroupQueries::getLeafGroups($tenantId, $typeId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class OptimizedGroupQueries
      */
     public function getGroupHierarchyTree($groupId)
     {
-        return \Nexus\Services\OptimizedGroupQueries::getGroupHierarchyTree($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class OptimizedGroupQueries
      */
     public function getAncestors($groupId)
     {
-        return \Nexus\Services\OptimizedGroupQueries::getAncestors($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class OptimizedGroupQueries
      */
     public function getDescendants($groupId, $maxDepth = null)
     {
-        return \Nexus\Services\OptimizedGroupQueries::getDescendants($groupId, $maxDepth);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class OptimizedGroupQueries
      */
     public function getGroupDepth($groupId)
     {
-        return \Nexus\Services\OptimizedGroupQueries::getGroupDepth($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

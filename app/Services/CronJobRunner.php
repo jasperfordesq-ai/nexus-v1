@@ -35,7 +35,6 @@ use App\Services\JobVacancyService;
 use App\Services\RecurringShiftService;
 
 /**
- * CronJobRunner — relocated from Nexus\Controllers\CronController.
  * Executes scheduled cron jobs (digests, newsletters, cleanup, matching, etc.).
  */
 class CronJobRunner

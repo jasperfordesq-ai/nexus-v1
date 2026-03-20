@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * ShiftGroupReservationService — Laravel DI-based service for group shift reservations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ShiftGroupReservationService.
  * Allows group leaders to reserve blocks of shift slots for their teams.
  */
 class ShiftGroupReservationService

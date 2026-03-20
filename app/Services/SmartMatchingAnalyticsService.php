@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SmartMatchingAnalyticsService — Laravel DI wrapper for legacy \Nexus\Services\SmartMatchingAnalyticsService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SmartMatchingAnalyticsService
      */
     public function getDashboardSummary(): array
     {
-        return \Nexus\Services\SmartMatchingAnalyticsService::getDashboardSummary();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class SmartMatchingAnalyticsService
      */
     public function getOverallStats(): array
     {
-        return \Nexus\Services\SmartMatchingAnalyticsService::getOverallStats();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class SmartMatchingAnalyticsService
      */
     public function getScoreDistribution(): array
     {
-        return \Nexus\Services\SmartMatchingAnalyticsService::getScoreDistribution();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class SmartMatchingAnalyticsService
      */
     public function getDistanceDistribution(): array
     {
-        return \Nexus\Services\SmartMatchingAnalyticsService::getDistanceDistribution();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class SmartMatchingAnalyticsService
      */
     public function getConversionFunnel(): array
     {
-        return \Nexus\Services\SmartMatchingAnalyticsService::getConversionFunnel();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

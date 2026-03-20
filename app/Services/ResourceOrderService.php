@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * ResourceOrderService — Laravel DI wrapper for legacy \Nexus\Services\ResourceOrderService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class ResourceOrderService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\ResourceOrderService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,6 +30,7 @@ class ResourceOrderService
      */
     public function reorder(array $items): bool
     {
-        return \Nexus\Services\ResourceOrderService::reorder($items);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

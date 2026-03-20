@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * AdminSettingsService — Laravel DI-based service for admin settings management.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\TenantSettingsService.
  * Manages tenant-scoped configuration, feature toggles, and preferences.
  */
 class AdminSettingsService

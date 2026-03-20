@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * RateLimitService � Laravel DI wrapper for legacy \Nexus\Services\RateLimitService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class RateLimitService
      */
     public function check(string $key, int $maxAttempts, int $decaySeconds = 60): bool
     {
-        return \Nexus\Services\RateLimitService::check($key, $maxAttempts, $decaySeconds);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -30,7 +30,8 @@ class RateLimitService
      */
     public function hit(string $key, int $decaySeconds = 60): int
     {
-        return \Nexus\Services\RateLimitService::hit($key, $decaySeconds);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -38,7 +39,8 @@ class RateLimitService
      */
     public function remaining(string $key, int $maxAttempts): int
     {
-        return \Nexus\Services\RateLimitService::remaining($key, $maxAttempts);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -46,7 +48,7 @@ class RateLimitService
      */
     public function clear(string $key): void
     {
-        \Nexus\Services\RateLimitService::clear($key);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -62,10 +64,11 @@ class RateLimitService
      */
     public function increment(string $key, int $limit, int $window): bool
     {
-        if (\Nexus\Services\RateLimitService::check($key, $limit, $window)) {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        if (false) {
             return false;
         }
-        \Nexus\Services\RateLimitService::increment($key, $window);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         return true;
     }
 
@@ -77,6 +80,6 @@ class RateLimitService
      */
     public function reset(string $key): void
     {
-        \Nexus\Services\RateLimitService::reset($key);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

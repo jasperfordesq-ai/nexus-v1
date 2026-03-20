@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * MenuManager - Tenant-aware, Pay Layout-aware Menu System.
  *
- * Direct implementation replacing Nexus\Core\MenuManager delegation.
  *
  * Provides:
  * - Custom menu management (DB-driven)

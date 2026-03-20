@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * PredictiveStaffingService — Laravel DI wrapper for legacy \Nexus\Services\PredictiveStaffingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class PredictiveStaffingService
      */
     public function predictShortages(int $tenantId, int $nextDays = 14): array
     {
-        return \Nexus\Services\PredictiveStaffingService::predictShortages($tenantId, $nextDays);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,7 @@ class PredictiveStaffingService
      */
     public function alertCoordinators(int $tenantId, array $criticalPredictions): void
     {
-        \Nexus\Services\PredictiveStaffingService::alertCoordinators($tenantId, $criticalPredictions);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -38,6 +38,7 @@ class PredictiveStaffingService
      */
     public function getDashboardSummary(int $tenantId): array
     {
-        return \Nexus\Services\PredictiveStaffingService::getDashboardSummary($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

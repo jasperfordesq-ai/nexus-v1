@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TransactionExportService — Laravel DI wrapper for legacy \Nexus\Services\TransactionExportService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TransactionExportService
      */
     public function exportCsv(int $tenantId, array $filters = []): string
     {
-        return \Nexus\Services\TransactionExportService::exportCsv($tenantId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -30,7 +30,8 @@ class TransactionExportService
      */
     public function exportPdf(int $tenantId, array $filters = []): string
     {
-        return \Nexus\Services\TransactionExportService::exportPdf($tenantId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -38,6 +39,7 @@ class TransactionExportService
      */
     public function getExportHistory(int $tenantId): array
     {
-        return \Nexus\Services\TransactionExportService::getExportHistory($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

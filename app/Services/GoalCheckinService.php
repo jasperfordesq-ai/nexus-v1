@@ -12,7 +12,6 @@ use App\Models\GoalCheckin;
  * GoalCheckinService — Eloquent-based service for goal check-ins.
  *
  * Replaces the legacy DI wrapper that delegated to
- * \Nexus\Services\GoalCheckinService.
  */
 class GoalCheckinService
 {

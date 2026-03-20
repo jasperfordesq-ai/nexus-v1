@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * CookieConsentService — Laravel DI-based service for cookie consent management.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\CookieConsentService.
  * Manages GDPR cookie consent recording and validation.
  */
 class CookieConsentService

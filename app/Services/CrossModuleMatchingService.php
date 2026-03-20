@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * CrossModuleMatchingService — Laravel DI wrapper for legacy \Nexus\Services\CrossModuleMatchingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,6 +21,7 @@ class CrossModuleMatchingService
      */
     public function getAllMatches(int $userId, array $options = []): array
     {
-        return \Nexus\Services\CrossModuleMatchingService::getAllMatches($userId, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

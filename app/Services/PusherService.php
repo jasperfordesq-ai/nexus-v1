@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * PusherService — Laravel DI wrapper for legacy \Nexus\Services\PusherService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class PusherService
      */
     public function getInstance(): ?Pusher
     {
-        return \Nexus\Services\PusherService::getInstance();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class PusherService
      */
     public function getConfig(): array
     {
-        return \Nexus\Services\PusherService::getConfig();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class PusherService
      */
     public function getPublicKey(): string
     {
-        return \Nexus\Services\PusherService::getPublicKey();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -46,7 +48,8 @@ class PusherService
      */
     public function getCluster(): string
     {
-        return \Nexus\Services\PusherService::getCluster();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -54,7 +57,8 @@ class PusherService
      */
     public function isConfigured(): bool
     {
-        return \Nexus\Services\PusherService::isConfigured();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -62,7 +66,8 @@ class PusherService
      */
     public function getUserChannel(int $userId): string
     {
-        return \Nexus\Services\PusherService::getUserChannel($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -70,7 +75,8 @@ class PusherService
      */
     public function getPresenceChannel(): string
     {
-        return \Nexus\Services\PusherService::getPresenceChannel();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -78,7 +84,8 @@ class PusherService
      */
     public function authPrivateChannel(string $channelName, string $socketId, int $userId): ?string
     {
-        return \Nexus\Services\PusherService::authPrivateChannel($channelName, $socketId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -86,6 +93,7 @@ class PusherService
      */
     public function authPresenceChannel(string $channelName, string $socketId, int $userId, array $userInfo = []): ?string
     {
-        return \Nexus\Services\PusherService::authPresenceChannel($channelName, $socketId, $userId, $userInfo);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

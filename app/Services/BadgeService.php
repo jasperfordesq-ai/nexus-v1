@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * BadgeService — Laravel DI-based service for badge/achievement management.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\BadgeCollectionService.
  * Manages badge definitions, awarding, and revocation.
  */
 class BadgeService

@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
  * GoalReminderService — Eloquent-based service for goal reminders.
  *
  * Replaces the legacy DI wrapper that delegated to
- * \Nexus\Services\GoalReminderService.
  */
 class GoalReminderService
 {

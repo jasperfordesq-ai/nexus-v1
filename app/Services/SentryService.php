@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SentryService — Laravel DI wrapper for legacy \Nexus\Services\SentryService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,7 @@ class SentryService
      */
     public function init(): void
     {
-        \Nexus\Services\SentryService::init();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -30,7 +29,8 @@ class SentryService
      */
     public function isEnabled(): bool
     {
-        return \Nexus\Services\SentryService::isEnabled();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +38,7 @@ class SentryService
      */
     public function setUser(int $userId, ?string $email = null, ?string $username = null): void
     {
-        \Nexus\Services\SentryService::setUser($userId, $email, $username);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -46,7 +46,7 @@ class SentryService
      */
     public function setTenant(int $tenantId, ?string $tenantName = null): void
     {
-        \Nexus\Services\SentryService::setTenant($tenantId, $tenantName);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -54,6 +54,6 @@ class SentryService
      */
     public function setRequestContext(array $requestData): void
     {
-        \Nexus\Services\SentryService::setRequestContext($requestData);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

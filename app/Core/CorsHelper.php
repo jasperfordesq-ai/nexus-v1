@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * CORS header management with origin allowlisting.
- * Direct implementation replacing Nexus\Helpers\CorsHelper delegation.
  */
 class CorsHelper
 {

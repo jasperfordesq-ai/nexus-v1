@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * VolunteerReminderService � Laravel DI wrapper for legacy \Nexus\Services\VolunteerReminderService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class VolunteerReminderService
      */
     public function sendReminders(int $tenantId, int $opportunityId): int
     {
-        return \Nexus\Services\VolunteerReminderService::sendReminders($tenantId, $opportunityId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -30,7 +30,8 @@ class VolunteerReminderService
      */
     public function scheduleReminder(int $tenantId, int $opportunityId, string $datetime): bool
     {
-        return \Nexus\Services\VolunteerReminderService::scheduleReminder($tenantId, $opportunityId, $datetime);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class VolunteerReminderService
      */
     public function cancelReminder(int $tenantId, int $reminderId): bool
     {
-        return \Nexus\Services\VolunteerReminderService::cancelReminder($tenantId, $reminderId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,7 +48,8 @@ class VolunteerReminderService
      */
     public function getSettings(): array
     {
-        return \Nexus\Services\VolunteerReminderService::getSettings();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class VolunteerReminderService
      */
     public function updateSetting(string $type, array $data): bool
     {
-        return \Nexus\Services\VolunteerReminderService::updateSetting($type, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

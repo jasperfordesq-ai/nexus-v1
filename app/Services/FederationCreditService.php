@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationCreditService — Laravel DI wrapper for legacy \Nexus\Services\FederationCreditService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationCreditService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\FederationCreditService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationCreditService
      */
     public static function listAgreementsStatic(int $tenantId): array
     {
-        return \Nexus\Services\FederationCreditService::listAgreements($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class FederationCreditService
      */
     public function createAgreement(int $fromTenantId, int $toTenantId, float $exchangeRate = 1.0, ?float $maxMonthlyCredits = null, int $approvedBy = 0): array
     {
-        return \Nexus\Services\FederationCreditService::createAgreement($fromTenantId, $toTenantId, $exchangeRate, $maxMonthlyCredits, $approvedBy);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class FederationCreditService
      */
     public static function createAgreementStatic(int $fromTenantId, int $toTenantId, float $exchangeRate = 1.0, ?float $maxMonthlyCredits = null, int $approvedBy = 0): array
     {
-        return \Nexus\Services\FederationCreditService::createAgreement($fromTenantId, $toTenantId, $exchangeRate, $maxMonthlyCredits, $approvedBy);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class FederationCreditService
      */
     public function approveAgreement(int $agreementId, int $approvedBy): array
     {
-        return \Nexus\Services\FederationCreditService::approveAgreement($agreementId, $approvedBy);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -62,7 +66,8 @@ class FederationCreditService
      */
     public function updateAgreementStatus(int $agreementId, string $status): array
     {
-        return \Nexus\Services\FederationCreditService::updateAgreementStatus($agreementId, $status);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -70,6 +75,7 @@ class FederationCreditService
      */
     public function getAgreement(int $tenantA, int $tenantB): ?array
     {
-        return \Nexus\Services\FederationCreditService::getAgreement($tenantA, $tenantB);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

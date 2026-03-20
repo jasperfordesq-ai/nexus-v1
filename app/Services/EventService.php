@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * EventService — Laravel DI-based service for event operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\EventService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class EventService

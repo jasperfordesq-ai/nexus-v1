@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * IdeaMediaService — Laravel DI wrapper for legacy \Nexus\Services\IdeaMediaService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class IdeaMediaService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\IdeaMediaService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class IdeaMediaService
      */
     public function getMediaForIdea(int $ideaId): array
     {
-        return \Nexus\Services\IdeaMediaService::getMediaForIdea($ideaId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class IdeaMediaService
      */
     public function addMedia(int $ideaId, int $userId, array $data): ?int
     {
-        return \Nexus\Services\IdeaMediaService::addMedia($ideaId, $userId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,6 +48,7 @@ class IdeaMediaService
      */
     public function deleteMedia(int $mediaId, int $userId): bool
     {
-        return \Nexus\Services\IdeaMediaService::deleteMedia($mediaId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

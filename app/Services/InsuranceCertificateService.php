@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * InsuranceCertificateService — Laravel DI wrapper for legacy \Nexus\Services\InsuranceCertificateService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class InsuranceCertificateService
      */
     public function getUserCertificates(int $userId): array
     {
-        return \Nexus\Services\InsuranceCertificateService::getUserCertificates($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class InsuranceCertificateService
      */
     public function getById(int $id): ?array
     {
-        return \Nexus\Services\InsuranceCertificateService::getById($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class InsuranceCertificateService
      */
     public function getAll(array $filters = []): array
     {
-        return \Nexus\Services\InsuranceCertificateService::getAll($filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class InsuranceCertificateService
      */
     public function getStats(): array
     {
-        return \Nexus\Services\InsuranceCertificateService::getStats();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class InsuranceCertificateService
      */
     public function create(array $data): int
     {
-        return \Nexus\Services\InsuranceCertificateService::create($data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -62,7 +66,8 @@ class InsuranceCertificateService
      */
     public function update(int $id, array $data): bool
     {
-        return \Nexus\Services\InsuranceCertificateService::update($id, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -70,7 +75,8 @@ class InsuranceCertificateService
      */
     public function verify(int $id, int $adminId): bool
     {
-        return \Nexus\Services\InsuranceCertificateService::verify($id, $adminId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -78,7 +84,8 @@ class InsuranceCertificateService
      */
     public function reject(int $id, int $adminId, string $reason): bool
     {
-        return \Nexus\Services\InsuranceCertificateService::reject($id, $adminId, $reason);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -86,6 +93,7 @@ class InsuranceCertificateService
      */
     public function delete(int $id): bool
     {
-        return \Nexus\Services\InsuranceCertificateService::delete($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

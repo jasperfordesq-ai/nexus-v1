@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * OrgWalletService — Laravel DI-based service for organization wallet operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\OrgWalletService.
  * Manages organization time-credit balances and inter-org transfers.
  */
 class OrgWalletService

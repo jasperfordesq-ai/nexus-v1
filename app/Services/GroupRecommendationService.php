@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * GroupRecommendationService — Laravel DI-based service for group recommendations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\GroupRecommendationEngine.
  * Provides personalized group discovery using popularity and activity signals.
  */
 class GroupRecommendationService

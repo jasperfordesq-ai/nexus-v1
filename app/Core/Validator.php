@@ -8,7 +8,6 @@ namespace App\Core;
 
 /**
  * Input validation helpers.
- * Direct implementation replacing Nexus\Core\Validator delegation.
  *
  * NOTE: isIrishPhone() is intentionally NOT exposed here -- it is legacy only.
  * Project NEXUS is a global platform; use isPhone() for international E.164 format.

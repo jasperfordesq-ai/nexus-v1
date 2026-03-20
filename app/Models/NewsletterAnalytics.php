@@ -33,7 +33,6 @@ class NewsletterAnalytics extends Model
     /**
      * Record an email open.
      *
-     * Ported from legacy Nexus\Models\NewsletterAnalytics::recordOpen().
      */
     public static function recordOpen(
         int $newsletterId,
@@ -72,7 +71,6 @@ class NewsletterAnalytics extends Model
     /**
      * Record a link click.
      *
-     * Ported from legacy Nexus\Models\NewsletterAnalytics::recordClick().
      */
     public static function recordClick(
         int $newsletterId,

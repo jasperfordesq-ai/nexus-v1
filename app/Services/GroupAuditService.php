@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupAuditService — Laravel DI wrapper for legacy \Nexus\Services\GroupAuditService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupAuditService
      */
     public function log($action, $groupId = null, $userId = null, $details = [], $targetUserId = null)
     {
-        return \Nexus\Services\GroupAuditService::log($action, $groupId, $userId, $details, $targetUserId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupAuditService
      */
     public function logGroupCreated($groupId, $userId, $groupData = [])
     {
-        return \Nexus\Services\GroupAuditService::logGroupCreated($groupId, $userId, $groupData);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupAuditService
      */
     public function logGroupUpdated($groupId, $userId, $changes = [])
     {
-        return \Nexus\Services\GroupAuditService::logGroupUpdated($groupId, $userId, $changes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupAuditService
      */
     public function logGroupDeleted($groupId, $userId, $reason = '')
     {
-        return \Nexus\Services\GroupAuditService::logGroupDeleted($groupId, $userId, $reason);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupAuditService
      */
     public function logGroupFeatured($groupId, $userId, $featured = true)
     {
-        return \Nexus\Services\GroupAuditService::logGroupFeatured($groupId, $userId, $featured);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

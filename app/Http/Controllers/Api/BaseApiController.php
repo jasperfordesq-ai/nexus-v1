@@ -27,7 +27,6 @@ use App\Helpers\UrlHelper;
  * - v1 (legacy): { "success": true/false, "data": {...}, "error": "...", "code": "..." }
  * - v2 (current): { "data": {...} } or { "errors": [{code, message, field?}] }
  *
- * This is the Laravel equivalent of Nexus\Controllers\Api\BaseApiController.
  * Key difference: methods RETURN JsonResponse instead of echo+exit.
  *
  * @package App\Http\Controllers\Api

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * MatchNotificationService — Laravel DI wrapper for legacy \Nexus\Services\MatchNotificationService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class MatchNotificationService
      */
     public function onListingCreated(int $listingId, int $creatorUserId, array $listingData): int
     {
-        return \Nexus\Services\MatchNotificationService::onListingCreated($listingId, $creatorUserId, $listingData);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -30,6 +30,7 @@ class MatchNotificationService
      */
     public function cleanupOldRecords(): int
     {
-        return \Nexus\Services\MatchNotificationService::cleanupOldRecords();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupFeatureToggleService — Laravel DI wrapper for legacy \Nexus\Services\GroupFeatureToggleService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupFeatureToggleService
      */
     public function isEnabled($feature, $tenantId = null)
     {
-        return \Nexus\Services\GroupFeatureToggleService::isEnabled($feature, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupFeatureToggleService
      */
     public function enable($feature, $tenantId = null)
     {
-        return \Nexus\Services\GroupFeatureToggleService::enable($feature, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupFeatureToggleService
      */
     public function disable($feature, $tenantId = null)
     {
-        return \Nexus\Services\GroupFeatureToggleService::disable($feature, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupFeatureToggleService
      */
     public function getAllFeatures($tenantId = null)
     {
-        return \Nexus\Services\GroupFeatureToggleService::getAllFeatures($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupFeatureToggleService
      */
     public function bulkSet(array $features, $tenantId = null)
     {
-        return \Nexus\Services\GroupFeatureToggleService::bulkSet($features, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

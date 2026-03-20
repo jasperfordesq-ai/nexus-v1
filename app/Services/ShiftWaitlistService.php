@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * ShiftWaitlistService — Laravel DI-based service for shift waitlist operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ShiftWaitlistService.
  * Manages waitlist automation for volunteer shifts with tenant scoping.
  */
 class ShiftWaitlistService

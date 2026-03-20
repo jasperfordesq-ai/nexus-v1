@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * HoursReportService — Laravel DI wrapper for legacy \Nexus\Services\HoursReportService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class HoursReportService
      */
     public function getHoursByCategory(int $tenantId, array $dateRange = []): array
     {
-        return \Nexus\Services\HoursReportService::getHoursByCategory($tenantId, $dateRange);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class HoursReportService
      */
     public function getHoursByMember(int $tenantId, array $dateRange = [], string $sortBy = 'total', int $limit = 50, int $offset = 0): array
     {
-        return \Nexus\Services\HoursReportService::getHoursByMember($tenantId, $dateRange, $sortBy, $limit, $offset);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class HoursReportService
      */
     public function getHoursByPeriod(int $tenantId, array $dateRange = []): array
     {
-        return \Nexus\Services\HoursReportService::getHoursByPeriod($tenantId, $dateRange);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,6 +48,7 @@ class HoursReportService
      */
     public function getHoursSummary(int $tenantId, array $dateRange = []): array
     {
-        return \Nexus\Services\HoursReportService::getHoursSummary($tenantId, $dateRange);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * PerformanceMonitorService — Laravel DI wrapper for legacy \Nexus\Services\PerformanceMonitorService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class PerformanceMonitorService
      */
     public function isEnabled(): bool
     {
-        return \Nexus\Services\PerformanceMonitorService::isEnabled();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -30,7 +30,7 @@ class PerformanceMonitorService
      */
     public function startRequest(): void
     {
-        \Nexus\Services\PerformanceMonitorService::startRequest();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -38,7 +38,7 @@ class PerformanceMonitorService
      */
     public function endRequest(): void
     {
-        \Nexus\Services\PerformanceMonitorService::endRequest();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -46,7 +46,7 @@ class PerformanceMonitorService
      */
     public function trackQuery(string $sql, array $params, float $duration): void
     {
-        \Nexus\Services\PerformanceMonitorService::trackQuery($sql, $params, $duration);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -54,6 +54,6 @@ class PerformanceMonitorService
      */
     public function trackMetric(string $name, $value, array $context = []): void
     {
-        \Nexus\Services\PerformanceMonitorService::trackMetric($name, $value, $context);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

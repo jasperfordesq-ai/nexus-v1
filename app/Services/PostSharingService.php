@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * PostSharingService — Laravel DI wrapper for legacy \Nexus\Services\PostSharingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class PostSharingService
      */
     public function share(int $tenantId, int $postId, int $userId, ?string $comment = null): bool
     {
-        return \Nexus\Services\PostSharingService::share($tenantId, $postId, $userId, $comment);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -30,7 +30,8 @@ class PostSharingService
      */
     public function getShares(int $tenantId, int $postId): array
     {
-        return \Nexus\Services\PostSharingService::getShares($tenantId, $postId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,6 +39,7 @@ class PostSharingService
      */
     public function getShareCount(int $tenantId, int $postId): int
     {
-        return \Nexus\Services\PostSharingService::getShareCount($tenantId, $postId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 }

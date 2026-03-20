@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * ResourceCategoryService — Laravel DI wrapper for legacy \Nexus\Services\ResourceCategoryService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class ResourceCategoryService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\ResourceCategoryService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class ResourceCategoryService
      */
     public function getAll(bool $flat = false): array
     {
-        return \Nexus\Services\ResourceCategoryService::getAll($flat);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class ResourceCategoryService
      */
     public function getById(int $id): ?array
     {
-        return \Nexus\Services\ResourceCategoryService::getById($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class ResourceCategoryService
      */
     public function create(array $data): ?int
     {
-        return \Nexus\Services\ResourceCategoryService::create($data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class ResourceCategoryService
      */
     public function update(int $id, array $data): bool
     {
-        return \Nexus\Services\ResourceCategoryService::update($id, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

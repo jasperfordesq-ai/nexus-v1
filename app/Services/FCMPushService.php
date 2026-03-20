@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FCMPushService — Laravel DI wrapper for legacy \Nexus\Services\FCMPushService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FCMPushService
      */
     public function sendToUser(int $userId, string $title, string $body, array $data = []): array
     {
-        return \Nexus\Services\FCMPushService::sendToUser($userId, $title, $body, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FCMPushService
      */
     public function sendToUsers(array $userIds, string $title, string $body, array $data = []): array
     {
-        return \Nexus\Services\FCMPushService::sendToUsers($userIds, $title, $body, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class FCMPushService
      */
     public function isConfigured(): bool
     {
-        return \Nexus\Services\FCMPushService::isConfigured();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,7 +48,8 @@ class FCMPushService
      */
     public function registerDevice(int $userId, string $token, string $platform = 'android'): bool
     {
-        return \Nexus\Services\FCMPushService::registerDevice($userId, $token, $platform);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,6 +57,7 @@ class FCMPushService
      */
     public function unregisterDevice(string $token): bool
     {
-        return \Nexus\Services\FCMPushService::unregisterDevice($token);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

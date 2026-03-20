@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * VettingService — Laravel DI wrapper for legacy \Nexus\Services\VettingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class VettingService
      */
     public function getUserRecords(int $userId): array
     {
-        return \Nexus\Services\VettingService::getUserRecords($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class VettingService
      */
     public function getById(int $id): ?array
     {
-        return \Nexus\Services\VettingService::getById($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class VettingService
      */
     public function getAll(array $filters = []): array
     {
-        return \Nexus\Services\VettingService::getAll($filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class VettingService
      */
     public function getStats(): array
     {
-        return \Nexus\Services\VettingService::getStats();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class VettingService
      */
     public function create(array $data): int
     {
-        return \Nexus\Services\VettingService::create($data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -62,7 +66,8 @@ class VettingService
      */
     public function update(int $id, array $data): bool
     {
-        return \Nexus\Services\VettingService::update($id, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -70,7 +75,8 @@ class VettingService
      */
     public function verify(int $id, int $adminId): bool
     {
-        return \Nexus\Services\VettingService::verify($id, $adminId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -78,7 +84,8 @@ class VettingService
      */
     public function reject(int $id, int $adminId, string $reason): bool
     {
-        return \Nexus\Services\VettingService::reject($id, $adminId, $reason);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -86,7 +93,8 @@ class VettingService
      */
     public function delete(int $id): bool
     {
-        return \Nexus\Services\VettingService::delete($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -94,6 +102,7 @@ class VettingService
      */
     public function updateDocumentUrl(int $id, string $url): bool
     {
-        return \Nexus\Services\VettingService::updateDocumentUrl($id, $url);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

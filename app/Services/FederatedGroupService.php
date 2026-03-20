@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederatedGroupService — Laravel DI wrapper for legacy \Nexus\Services\FederatedGroupService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederatedGroupService
      */
     public function getPartnerGroups(int $tenantId, int $page = 1, int $perPage = 12, ?string $search = null, ?int $partnerTenantId = null): array
     {
-        return \Nexus\Services\FederatedGroupService::getPartnerGroups($tenantId, $page, $perPage, $search, $partnerTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederatedGroupService
      */
     public function getPartnerGroup(int $groupId, int $groupTenantId, int $userTenantId): ?array
     {
-        return \Nexus\Services\FederatedGroupService::getPartnerGroup($groupId, $groupTenantId, $userTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class FederatedGroupService
      */
     public function joinGroup(int $userId, int $userTenantId, int $groupId, int $groupTenantId): array
     {
-        return \Nexus\Services\FederatedGroupService::joinGroup($userId, $userTenantId, $groupId, $groupTenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class FederatedGroupService
      */
     public function leaveGroup(int $userId, int $userTenantId, int $groupId): array
     {
-        return \Nexus\Services\FederatedGroupService::leaveGroup($userId, $userTenantId, $groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class FederatedGroupService
      */
     public function isFederatedMember(int $userId, int $userTenantId, int $groupId): ?array
     {
-        return \Nexus\Services\FederatedGroupService::isFederatedMember($userId, $userTenantId, $groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

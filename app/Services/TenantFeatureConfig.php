@@ -9,7 +9,6 @@ namespace App\Services;
 /**
  * TenantFeatureConfig — Self-contained feature/module defaults and merging.
  *
- * No longer delegates to legacy \Nexus\Services\TenantFeatureConfig.
  */
 class TenantFeatureConfig
 {

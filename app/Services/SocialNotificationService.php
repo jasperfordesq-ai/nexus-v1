@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Log;
  * Handles platform and email notifications for social interactions
  * (likes, comments, shares) across all feed pages and profiles.
  *
- * Converted from legacy \Nexus\Services\SocialNotificationService to use
  * DB facade / Eloquent instead of legacy Database class.
  */
 class SocialNotificationService

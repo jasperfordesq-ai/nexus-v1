@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * CommunityProjectService — Laravel DI-based service for community project proposals.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\CommunityProjectService.
  * Manages community-proposed volunteering projects with tenant scoping.
  */
 class CommunityProjectService

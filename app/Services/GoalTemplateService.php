@@ -13,7 +13,6 @@ use App\Models\GoalTemplate;
  * GoalTemplateService — Eloquent-based service for goal templates.
  *
  * Replaces the legacy DI wrapper that delegated to
- * \Nexus\Services\GoalTemplateService.
  */
 class GoalTemplateService
 {

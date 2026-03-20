@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupPermissionManager — Laravel DI wrapper for legacy \Nexus\Services\GroupPermissionManager.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupPermissionManager
      */
     public function hasPermission($userId, $permission)
     {
-        return \Nexus\Services\GroupPermissionManager::hasPermission($userId, $permission);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupPermissionManager
      */
     public function hasGroupPermission($groupId, $userId, $permission)
     {
-        return \Nexus\Services\GroupPermissionManager::hasGroupPermission($groupId, $userId, $permission);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupPermissionManager
      */
     public function getUserGroupRole($groupId, $userId)
     {
-        return \Nexus\Services\GroupPermissionManager::getUserGroupRole($groupId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupPermissionManager
      */
     public function isGlobalAdmin($userId)
     {
-        return \Nexus\Services\GroupPermissionManager::isGlobalAdmin($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupPermissionManager
      */
     public function canCreateHub($userId)
     {
-        return \Nexus\Services\GroupPermissionManager::canCreateHub($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

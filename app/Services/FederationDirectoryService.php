@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationDirectoryService — Laravel DI wrapper for legacy \Nexus\Services\FederationDirectoryService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationDirectoryService
      */
     public function getDiscoverableTimebanks(int $currentTenantId, array $filters = []): array
     {
-        return \Nexus\Services\FederationDirectoryService::getDiscoverableTimebanks($currentTenantId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationDirectoryService
      */
     public function getAvailableRegions(): array
     {
-        return \Nexus\Services\FederationDirectoryService::getAvailableRegions();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class FederationDirectoryService
      */
     public function getAvailableCategories(): array
     {
-        return \Nexus\Services\FederationDirectoryService::getAvailableCategories();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class FederationDirectoryService
      */
     public function getTimebankProfile(int $tenantId): ?array
     {
-        return \Nexus\Services\FederationDirectoryService::getTimebankProfile($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class FederationDirectoryService
      */
     public function updateDirectoryProfile(int $tenantId, array $data): bool
     {
-        return \Nexus\Services\FederationDirectoryService::updateDirectoryProfile($tenantId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

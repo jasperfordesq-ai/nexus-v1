@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupEventService — Laravel DI wrapper for legacy \Nexus\Services\GroupEventService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupEventService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\GroupEventService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupEventService
      */
     public function listEvents(int $groupId, int $userId, array $filters = []): ?array
     {
-        return \Nexus\Services\GroupEventService::listEvents($groupId, $userId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupEventService
      */
     public function createEvent(int $groupId, int $userId, array $data): ?array
     {
-        return \Nexus\Services\GroupEventService::createEvent($groupId, $userId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupEventService
      */
     public function rsvp(int $groupId, int $eventId, int $userId, string $status): ?array
     {
-        return \Nexus\Services\GroupEventService::rsvp($groupId, $eventId, $userId, $status);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupEventService
      */
     public function deleteEvent(int $groupId, int $eventId, int $userId): bool
     {
-        return \Nexus\Services\GroupEventService::deleteEvent($groupId, $eventId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

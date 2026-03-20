@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * DigestService — Laravel DI wrapper for legacy \Nexus\Services\DigestService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,6 +21,7 @@ class DigestService
      */
     public function sendWeeklyDigests()
     {
-        return \Nexus\Services\DigestService::sendWeeklyDigests();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * ExchangeRatingService — Laravel DI wrapper for legacy \Nexus\Services\ExchangeRatingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class ExchangeRatingService
      */
     public function rate(int $tenantId, int $exchangeId, int $userId, int $rating, ?string $comment = null): bool
     {
-        return \Nexus\Services\ExchangeRatingService::rate($tenantId, $exchangeId, $userId, $rating, $comment);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -30,7 +30,8 @@ class ExchangeRatingService
      */
     public function getRatings(int $tenantId, int $exchangeId): array
     {
-        return \Nexus\Services\ExchangeRatingService::getRatings($tenantId, $exchangeId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,6 +39,7 @@ class ExchangeRatingService
      */
     public function getAverageRating(int $tenantId, int $userId): float
     {
-        return \Nexus\Services\ExchangeRatingService::getAverageRating($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0.0;
     }
 }

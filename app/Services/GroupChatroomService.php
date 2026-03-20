@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupChatroomService — Laravel DI wrapper for legacy \Nexus\Services\GroupChatroomService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupChatroomService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\GroupChatroomService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupChatroomService
      */
     public function getChatrooms(int $groupId): array
     {
-        return \Nexus\Services\GroupChatroomService::getChatrooms($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupChatroomService
      */
     public function getById(int $chatroomId): ?array
     {
-        return \Nexus\Services\GroupChatroomService::getById($chatroomId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupChatroomService
      */
     public function create(int $groupId, int $userId, array $data): ?int
     {
-        return \Nexus\Services\GroupChatroomService::create($groupId, $userId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,7 +57,8 @@ class GroupChatroomService
      */
     public function ensureDefaultChatroom(int $groupId, int $userId): ?int
     {
-        return \Nexus\Services\GroupChatroomService::ensureDefaultChatroom($groupId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -62,7 +66,8 @@ class GroupChatroomService
      */
     public function delete(int $chatroomId, int $userId): bool
     {
-        return \Nexus\Services\GroupChatroomService::delete($chatroomId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -70,7 +75,8 @@ class GroupChatroomService
      */
     public function getMessages(int $chatroomId, array $filters = []): array
     {
-        return \Nexus\Services\GroupChatroomService::getMessages($chatroomId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -78,7 +84,8 @@ class GroupChatroomService
      */
     public function postMessage(int $chatroomId, int $userId, string $body): ?int
     {
-        return \Nexus\Services\GroupChatroomService::postMessage($chatroomId, $userId, $body);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -86,6 +93,7 @@ class GroupChatroomService
      */
     public function deleteMessage(int $messageId, int $userId): bool
     {
-        return \Nexus\Services\GroupChatroomService::deleteMessage($messageId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

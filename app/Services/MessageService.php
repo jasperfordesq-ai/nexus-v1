@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * MessageService — Laravel DI-based service for messaging operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\MessageService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class MessageService

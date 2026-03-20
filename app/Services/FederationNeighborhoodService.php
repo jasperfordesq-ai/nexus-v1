@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * FederationNeighborhoodService — Laravel DI wrapper for legacy \Nexus\Services\FederationNeighborhoodService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class FederationNeighborhoodService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\FederationNeighborhoodService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class FederationNeighborhoodService
      */
     public static function listAllStatic(): array
     {
-        return \Nexus\Services\FederationNeighborhoodService::listAll();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class FederationNeighborhoodService
      */
     public function create(string $name, ?string $description = null, ?string $region = null, int $createdBy = 0): ?int
     {
-        return \Nexus\Services\FederationNeighborhoodService::create($name, $description, $region, $createdBy);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class FederationNeighborhoodService
      */
     public static function createStatic(string $name, ?string $description = null, ?string $region = null, int $createdBy = 0): ?int
     {
-        return \Nexus\Services\FederationNeighborhoodService::create($name, $description, $region, $createdBy);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,7 +57,8 @@ class FederationNeighborhoodService
      */
     public function update(int $id, array $data): bool
     {
-        return \Nexus\Services\FederationNeighborhoodService::update($id, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -62,7 +66,8 @@ class FederationNeighborhoodService
      */
     public function delete(int $id): bool
     {
-        return \Nexus\Services\FederationNeighborhoodService::delete($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -70,6 +75,7 @@ class FederationNeighborhoodService
      */
     public function getById(int $id): ?array
     {
-        return \Nexus\Services\FederationNeighborhoodService::getById($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

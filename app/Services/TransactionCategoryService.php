@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TransactionCategoryService — Laravel DI wrapper for legacy \Nexus\Services\TransactionCategoryService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TransactionCategoryService
      */
     public function getAll(int $tenantId): array
     {
-        return \Nexus\Services\TransactionCategoryService::getAll($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class TransactionCategoryService
      */
     public function create(int $tenantId, string $name, ?string $description = null): ?int
     {
-        return \Nexus\Services\TransactionCategoryService::create($tenantId, $name, $description);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class TransactionCategoryService
      */
     public function update(int $tenantId, int $categoryId, array $data): bool
     {
-        return \Nexus\Services\TransactionCategoryService::update($tenantId, $categoryId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -46,6 +48,7 @@ class TransactionCategoryService
      */
     public function delete(int $tenantId, int $categoryId): bool
     {
-        return \Nexus\Services\TransactionCategoryService::delete($tenantId, $categoryId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

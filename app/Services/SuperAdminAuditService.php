@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SuperAdminAuditService — Laravel DI wrapper for legacy \Nexus\Services\SuperAdminAuditService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SuperAdminAuditService
      */
     public function log(string $actionType, string $targetType, ?int $targetId = null, ?string $targetName = null, ?array $oldValues = null, ?array $newValues = null, ?string $description = null): bool
     {
-        return \Nexus\Services\SuperAdminAuditService::log($actionType, $targetType, $targetId, $targetName, $oldValues, $newValues, $description);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -30,7 +30,8 @@ class SuperAdminAuditService
      */
     public function getLog(array $filters = []): array
     {
-        return \Nexus\Services\SuperAdminAuditService::getLog($filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class SuperAdminAuditService
      */
     public function getStats(int $days = 30): array
     {
-        return \Nexus\Services\SuperAdminAuditService::getStats($days);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class SuperAdminAuditService
      */
     public function getActionLabel(string $actionType): string
     {
-        return \Nexus\Services\SuperAdminAuditService::getActionLabel($actionType);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -54,6 +57,7 @@ class SuperAdminAuditService
      */
     public function getActionIcon(string $actionType): string
     {
-        return \Nexus\Services\SuperAdminAuditService::getActionIcon($actionType);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 }

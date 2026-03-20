@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * ReportExportService — Laravel DI wrapper for legacy \Nexus\Services\ReportExportService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class ReportExportService
      */
     public function export(string $type, int $tenantId, array $filters = []): array
     {
-        return \Nexus\Services\ReportExportService::export($type, $tenantId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,7 @@ class ReportExportService
      */
     public function sendCSVDownload(string $csv, string $filename): void
     {
-        \Nexus\Services\ReportExportService::sendCSVDownload($csv, $filename);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -38,7 +38,8 @@ class ReportExportService
      */
     public function getSupportedTypes(): array
     {
-        return \Nexus\Services\ReportExportService::getSupportedTypes();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +47,8 @@ class ReportExportService
      */
     public function exportPdf(string $type, int $tenantId, array $filters = []): array
     {
-        return \Nexus\Services\ReportExportService::exportPdf($type, $tenantId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +56,6 @@ class ReportExportService
      */
     public function sendPdfDownload(string $pdf, string $filename): void
     {
-        \Nexus\Services\ReportExportService::sendPdfDownload($pdf, $filename);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

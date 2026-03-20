@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TenantSettingsService — Laravel DI wrapper for legacy \Nexus\Services\TenantSettingsService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TenantSettingsService
      */
     public function get(int $tenantId, string $key, $default = null)
     {
-        return \Nexus\Services\TenantSettingsService::get($tenantId, $key, $default);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class TenantSettingsService
      */
     public function getBool(int $tenantId, string $key, bool $default = false): bool
     {
-        return \Nexus\Services\TenantSettingsService::getBool($tenantId, $key, $default);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class TenantSettingsService
      */
     public function getAllGeneral(int $tenantId): array
     {
-        return \Nexus\Services\TenantSettingsService::getAllGeneral($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,7 @@ class TenantSettingsService
      */
     public function clearCache(): void
     {
-        \Nexus\Services\TenantSettingsService::clearCache();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -54,7 +56,8 @@ class TenantSettingsService
      */
     public function isRegistrationOpen(int $tenantId): bool
     {
-        return \Nexus\Services\TenantSettingsService::isRegistrationOpen($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -85,7 +88,8 @@ class TenantSettingsService
         // Ensure the user row has tenant_id set
         $user['tenant_id'] = $tenantId;
 
-        return \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -100,6 +104,7 @@ class TenantSettingsService
      */
     public function checkLoginGatesForUser(array $user): ?array
     {
-        return \Nexus\Services\TenantSettingsService::checkLoginGates($user);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

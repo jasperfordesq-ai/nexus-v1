@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * NewsletterTemplates — Laravel DI wrapper for legacy \Nexus\Services\NewsletterTemplates.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class NewsletterTemplates
      */
     public function getTemplates(): array
     {
-        return \Nexus\Services\NewsletterTemplates::getTemplates();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class NewsletterTemplates
      */
     public function getTemplate(string $templateId): array
     {
-        return \Nexus\Services\NewsletterTemplates::getTemplate($templateId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,6 +39,7 @@ class NewsletterTemplates
      */
     public function processTemplate(array $template, string $tenantName): array
     {
-        return \Nexus\Services\NewsletterTemplates::processTemplate($template, $tenantName);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

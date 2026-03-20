@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * EmailMonitorService — Laravel DI wrapper for legacy \Nexus\Services\EmailMonitorService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -31,7 +30,7 @@ class EmailMonitorService
     public static function recordEmailSendStatic(string $provider, bool $success, ?int $tenantId = null): void
     {
         try {
-            \Nexus\Services\EmailMonitorService::recordEmailSend($provider, $success, $tenantId);
+            \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
         } catch (\Throwable $e) {
             // Non-fatal — monitoring should never break sending
         }
@@ -42,7 +41,7 @@ class EmailMonitorService
      */
     public function recordTokenRefresh(bool $success, ?int $tenantId = null): void
     {
-        \Nexus\Services\EmailMonitorService::recordTokenRefresh($success, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -50,7 +49,7 @@ class EmailMonitorService
      */
     public function recordFallbackToSmtp(string $reason, ?int $tenantId = null): void
     {
-        \Nexus\Services\EmailMonitorService::recordFallbackToSmtp($reason, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -58,7 +57,7 @@ class EmailMonitorService
      */
     public function recordCircuitBreakerOpen(?int $tenantId = null): void
     {
-        \Nexus\Services\EmailMonitorService::recordCircuitBreakerOpen($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -66,7 +65,7 @@ class EmailMonitorService
      */
     public function recordRateLimitHit(?int $tenantId = null): void
     {
-        \Nexus\Services\EmailMonitorService::recordRateLimitHit($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 
     /**
@@ -74,6 +73,7 @@ class EmailMonitorService
      */
     public function getHealthSummary(?int $tenantId = null): array
     {
-        return \Nexus\Services\EmailMonitorService::getHealthSummary($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

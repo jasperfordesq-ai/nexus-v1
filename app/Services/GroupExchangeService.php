@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupExchangeService — Laravel DI wrapper for legacy \Nexus\Services\GroupExchangeService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupExchangeService
      */
     public function create(int $organizerId, array $data): ?int
     {
-        return \Nexus\Services\GroupExchangeService::create($organizerId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupExchangeService
      */
     public function get(int $id): ?array
     {
-        return \Nexus\Services\GroupExchangeService::get($id);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupExchangeService
      */
     public function listForUser(int $userId, array $filters = []): array
     {
-        return \Nexus\Services\GroupExchangeService::listForUser($userId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupExchangeService
      */
     public function addParticipant(int $exchangeId, int $userId, string $role, float $hours = 0, float $weight = 1.0): bool
     {
-        return \Nexus\Services\GroupExchangeService::addParticipant($exchangeId, $userId, $role, $hours, $weight);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -54,7 +57,8 @@ class GroupExchangeService
      */
     public function removeParticipant(int $exchangeId, int $userId): bool
     {
-        return \Nexus\Services\GroupExchangeService::removeParticipant($exchangeId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -62,7 +66,8 @@ class GroupExchangeService
      */
     public function calculateSplit(int $exchangeId): array
     {
-        return \Nexus\Services\GroupExchangeService::calculateSplit($exchangeId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -70,7 +75,8 @@ class GroupExchangeService
      */
     public function update(int $id, array $data): bool
     {
-        return \Nexus\Services\GroupExchangeService::update($id, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -78,7 +84,8 @@ class GroupExchangeService
      */
     public function updateStatus(int $id, string $status): bool
     {
-        return \Nexus\Services\GroupExchangeService::updateStatus($id, $status);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -86,7 +93,8 @@ class GroupExchangeService
      */
     public function confirmParticipation(int $exchangeId, int $userId): bool
     {
-        return \Nexus\Services\GroupExchangeService::confirmParticipation($exchangeId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -94,6 +102,7 @@ class GroupExchangeService
      */
     public function complete(int $exchangeId): array
     {
-        return \Nexus\Services\GroupExchangeService::complete($exchangeId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

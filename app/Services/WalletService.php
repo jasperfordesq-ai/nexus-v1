@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * WalletService — Laravel DI-based service for time credit wallet operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\WalletService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class WalletService

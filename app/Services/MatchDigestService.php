@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * MatchDigestService — Laravel DI wrapper for legacy \Nexus\Services\MatchDigestService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class MatchDigestService
      */
     public function generateDigest(int $userId): array
     {
-        return \Nexus\Services\MatchDigestService::generateDigest($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,6 +30,7 @@ class MatchDigestService
      */
     public function sendAllDigests(int $tenantId): array
     {
-        return \Nexus\Services\MatchDigestService::sendAllDigests($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

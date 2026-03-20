@@ -8,7 +8,6 @@ namespace App\Core;
 
 /**
  * Environment variable access using Laravel's env() helper.
- * Replaces legacy Nexus\Core\Env with direct implementation.
  */
 class Env
 {

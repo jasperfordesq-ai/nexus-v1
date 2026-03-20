@@ -11,7 +11,6 @@ use App\Services\FederationJwtService;
 
 /**
  * Federation API authentication and authorization middleware.
- * Direct implementation replacing Nexus\Middleware\FederationApiMiddleware delegation.
  *
  * Supports:
  * - API Key: Simple Bearer token (internal/trusted partners)

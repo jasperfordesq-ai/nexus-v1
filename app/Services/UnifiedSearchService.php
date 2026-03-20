@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * UnifiedSearchService — Laravel DI wrapper for legacy \Nexus\Services\UnifiedSearchService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class UnifiedSearchService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\UnifiedSearchService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class UnifiedSearchService
      */
     public function search(string $query, ?int $userId, array $filters = []): array
     {
-        return \Nexus\Services\UnifiedSearchService::search($query, $userId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,6 +39,7 @@ class UnifiedSearchService
      */
     public function getSuggestions(string $query, int $tenantId, int $limit = 5): array
     {
-        return \Nexus\Services\UnifiedSearchService::getSuggestions($query, $tenantId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

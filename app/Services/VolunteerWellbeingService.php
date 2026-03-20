@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * VolunteerWellbeingService — Laravel DI wrapper for legacy \Nexus\Services\VolunteerWellbeingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class VolunteerWellbeingService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\VolunteerWellbeingService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class VolunteerWellbeingService
      */
     public function detectBurnoutRisk(int $userId): array
     {
-        return \Nexus\Services\VolunteerWellbeingService::detectBurnoutRisk($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class VolunteerWellbeingService
      */
     public function runTenantAssessment(): array
     {
-        return \Nexus\Services\VolunteerWellbeingService::runTenantAssessment();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class VolunteerWellbeingService
      */
     public function getActiveAlerts(): array
     {
-        return \Nexus\Services\VolunteerWellbeingService::getActiveAlerts();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,6 +57,7 @@ class VolunteerWellbeingService
      */
     public function updateAlert(int $alertId, string $action, ?string $notes = null): bool
     {
-        return \Nexus\Services\VolunteerWellbeingService::updateAlert($alertId, $action, $notes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

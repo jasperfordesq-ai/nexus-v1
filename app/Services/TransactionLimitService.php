@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TransactionLimitService — Laravel DI wrapper for legacy \Nexus\Services\TransactionLimitService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TransactionLimitService
      */
     public function getLimit(int $tenantId, int $userId): ?float
     {
-        return \Nexus\Services\TransactionLimitService::getLimit($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class TransactionLimitService
      */
     public function setLimit(int $tenantId, int $userId, float $limit): bool
     {
-        return \Nexus\Services\TransactionLimitService::setLimit($tenantId, $userId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,6 +39,7 @@ class TransactionLimitService
      */
     public function checkLimit(int $tenantId, int $userId, float $amount): bool
     {
-        return \Nexus\Services\TransactionLimitService::checkLimit($tenantId, $userId, $amount);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

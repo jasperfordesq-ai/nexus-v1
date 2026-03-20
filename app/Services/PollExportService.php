@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
  * PollExportService — Eloquent-based service for poll export.
  *
  * Replaces the legacy DI wrapper that delegated to
- * \Nexus\Services\PollExportService.
  */
 class PollExportService
 {

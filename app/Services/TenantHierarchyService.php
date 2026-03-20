@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TenantHierarchyService — Laravel DI wrapper for legacy \Nexus\Services\TenantHierarchyService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TenantHierarchyService
      */
     public function createTenant(array $data, int $parentId): array
     {
-        return \Nexus\Services\TenantHierarchyService::createTenant($data, $parentId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class TenantHierarchyService
      */
     public function updateTenant(int $tenantId, array $data): array
     {
-        return \Nexus\Services\TenantHierarchyService::updateTenant($tenantId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class TenantHierarchyService
      */
     public function deleteTenant(int $tenantId, bool $hardDelete = false): array
     {
-        return \Nexus\Services\TenantHierarchyService::deleteTenant($tenantId, $hardDelete);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,7 +48,8 @@ class TenantHierarchyService
      */
     public function moveTenant(int $tenantId, int $newParentId): array
     {
-        return \Nexus\Services\TenantHierarchyService::moveTenant($tenantId, $newParentId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -54,7 +57,8 @@ class TenantHierarchyService
      */
     public function toggleSubtenantCapability(int $tenantId, bool $enable): array
     {
-        return \Nexus\Services\TenantHierarchyService::toggleSubtenantCapability($tenantId, $enable);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -62,7 +66,8 @@ class TenantHierarchyService
      */
     public function assignTenantSuperAdmin(int $userId, int $tenantId): array
     {
-        return \Nexus\Services\TenantHierarchyService::assignTenantSuperAdmin($userId, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -70,6 +75,7 @@ class TenantHierarchyService
      */
     public function revokeTenantSuperAdmin(int $userId): array
     {
-        return \Nexus\Services\TenantHierarchyService::revokeTenantSuperAdmin($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

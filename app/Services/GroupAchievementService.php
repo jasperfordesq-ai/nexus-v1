@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupAchievementService — Laravel DI wrapper for legacy \Nexus\Services\GroupAchievementService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupAchievementService
      */
     public function getGroupAchievements($groupId)
     {
-        return \Nexus\Services\GroupAchievementService::getGroupAchievements($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupAchievementService
      */
     public function calculateProgress($groupId, $targetType, $targetValue)
     {
-        return \Nexus\Services\GroupAchievementService::calculateProgress($groupId, $targetType, $targetValue);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupAchievementService
      */
     public function getEarnedAchievements($groupId)
     {
-        return \Nexus\Services\GroupAchievementService::getEarnedAchievements($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupAchievementService
      */
     public function checkAndAwardAchievements($groupId)
     {
-        return \Nexus\Services\GroupAchievementService::checkAndAwardAchievements($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupAchievementService
      */
     public function awardAchievement($groupId, $achievementKey, $achievement)
     {
-        return \Nexus\Services\GroupAchievementService::awardAchievement($groupId, $achievementKey, $achievement);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TeamTaskService — Laravel DI wrapper for legacy \Nexus\Services\TeamTaskService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TeamTaskService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\TeamTaskService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class TeamTaskService
      */
     public function getTasks(int $groupId, array $filters = []): array
     {
-        return \Nexus\Services\TeamTaskService::getTasks($groupId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class TeamTaskService
      */
     public function getById(int $taskId): ?array
     {
-        return \Nexus\Services\TeamTaskService::getById($taskId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class TeamTaskService
      */
     public function create(int $groupId, int $userId, array $data): ?int
     {
-        return \Nexus\Services\TeamTaskService::create($groupId, $userId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,7 +57,8 @@ class TeamTaskService
      */
     public function update(int $taskId, int $userId, array $data): bool
     {
-        return \Nexus\Services\TeamTaskService::update($taskId, $userId, $data);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -62,7 +66,8 @@ class TeamTaskService
      */
     public function delete(int $taskId, int $userId): bool
     {
-        return \Nexus\Services\TeamTaskService::delete($taskId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -70,6 +75,7 @@ class TeamTaskService
      */
     public function getStats(int $groupId): array
     {
-        return \Nexus\Services\TeamTaskService::getStats($groupId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

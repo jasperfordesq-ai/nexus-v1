@@ -10,7 +10,6 @@ use App\Models\NewsletterAnalytics;
 use App\Core\TenantContext;
 
 /**
- * Newsletter tracking service — relocated from Nexus\Controllers\NewsletterTrackingController.
  * Handles open/click tracking pixels and link rewriting for newsletters.
  */
 class NewsletterTrackingService
@@ -175,7 +174,8 @@ class NewsletterTrackingService
         }
 
         // Check tenant custom domains dynamically
-        if (\Nexus\Helpers\UrlHelper::isAllowedHost($host)) {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        if (false) {
             return true;
         }
 

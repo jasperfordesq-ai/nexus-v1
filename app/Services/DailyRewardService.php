@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * DailyRewardService � Laravel DI wrapper for legacy \Nexus\Services\DailyRewardService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class DailyRewardService
      */
     public function claim(int $tenantId, int $userId): ?array
     {
-        return \Nexus\Services\DailyRewardService::claim($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class DailyRewardService
      */
     public function canClaim(int $tenantId, int $userId): bool
     {
-        return \Nexus\Services\DailyRewardService::canClaim($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,7 +39,8 @@ class DailyRewardService
      */
     public function getStreak(int $tenantId, int $userId): int
     {
-        return \Nexus\Services\DailyRewardService::getStreak($tenantId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -46,7 +48,8 @@ class DailyRewardService
      */
     public function getRewardConfig(int $tenantId): array
     {
-        return \Nexus\Services\DailyRewardService::getRewardConfig($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -56,7 +59,8 @@ class DailyRewardService
      */
     public function checkAndAwardDailyReward(int $userId): ?array
     {
-        return \Nexus\Services\DailyRewardService::checkAndAwardDailyReward($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -66,7 +70,8 @@ class DailyRewardService
      */
     public function getTodayStatus(int $userId): array
     {
-        return \Nexus\Services\DailyRewardService::getTodayStatus($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -74,7 +79,8 @@ class DailyRewardService
      */
     public function getHistory(int $userId, int $limit = 30): array
     {
-        return \Nexus\Services\DailyRewardService::getHistory($userId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -82,6 +88,7 @@ class DailyRewardService
      */
     public function getTotalEarned(int $userId): int
     {
-        return \Nexus\Services\DailyRewardService::getTotalEarned($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 }

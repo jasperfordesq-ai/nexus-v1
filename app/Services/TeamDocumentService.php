@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * TeamDocumentService — Laravel DI wrapper for legacy \Nexus\Services\TeamDocumentService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class TeamDocumentService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\TeamDocumentService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class TeamDocumentService
      */
     public function getDocuments(int $groupId, array $filters = []): array
     {
-        return \Nexus\Services\TeamDocumentService::getDocuments($groupId, $filters);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class TeamDocumentService
      */
     public function upload(int $groupId, int $userId, array $fileData, ?string $title = null): ?int
     {
-        return \Nexus\Services\TeamDocumentService::upload($groupId, $userId, $fileData, $title);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,6 +48,7 @@ class TeamDocumentService
      */
     public function delete(int $documentId, int $userId): bool
     {
-        return \Nexus\Services\TeamDocumentService::delete($documentId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * HashtagService — Laravel DI wrapper for legacy \Nexus\Services\HashtagService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class HashtagService
      */
     public function getTrending(int $tenantId, int $limit = 10): array
     {
-        return \Nexus\Services\HashtagService::getTrending($tenantId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class HashtagService
      */
     public function getPostsByTag(int $tenantId, string $tag, int $limit = 20): array
     {
-        return \Nexus\Services\HashtagService::getPostsByTag($tenantId, $tag, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class HashtagService
      */
     public function extractTags(string $content): array
     {
-        return \Nexus\Services\HashtagService::extractTags($content);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,6 +48,6 @@ class HashtagService
      */
     public function syncTags(int $tenantId, int $postId, array $tags): void
     {
-        \Nexus\Services\HashtagService::syncTags($tenantId, $postId, $tags);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }

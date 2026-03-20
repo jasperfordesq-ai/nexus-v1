@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * SkillTaxonomyService — Laravel DI-based service for skill taxonomy.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\SkillTaxonomyService.
  * Manages hierarchical skill categories and user skill assignments.
  */
 class SkillTaxonomyService

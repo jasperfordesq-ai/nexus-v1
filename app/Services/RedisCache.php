@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * RedisCache — Laravel DI wrapper for legacy \Nexus\Services\RedisCache.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -25,7 +24,8 @@ class RedisCache
      */
     public function get(string $key, ?int $tenantId = null)
     {
-        return \Nexus\Services\RedisCache::get($key, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -33,7 +33,8 @@ class RedisCache
      */
     public function set(string $key, $value, int $ttl = self::DEFAULT_TTL, ?int $tenantId = null): bool
     {
-        return \Nexus\Services\RedisCache::set($key, $value, $ttl, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -41,7 +42,8 @@ class RedisCache
      */
     public function delete(string $key, ?int $tenantId = null): bool
     {
-        return \Nexus\Services\RedisCache::delete($key, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -49,7 +51,8 @@ class RedisCache
      */
     public function increment(string $key, int $ttl = self::DEFAULT_TTL, ?int $tenantId = null): int
     {
-        return \Nexus\Services\RedisCache::increment($key, $ttl, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -57,7 +60,8 @@ class RedisCache
      */
     public function has(string $key, ?int $tenantId = null): bool
     {
-        return \Nexus\Services\RedisCache::has($key, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -67,7 +71,8 @@ class RedisCache
      */
     public function clearTenant(?int $tenantId = null): int
     {
-        return \Nexus\Services\RedisCache::clearTenant($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0;
     }
 
     /**
@@ -75,6 +80,7 @@ class RedisCache
      */
     public function getStats(): array
     {
-        return \Nexus\Services\RedisCache::getStats();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

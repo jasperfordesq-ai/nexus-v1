@@ -8,7 +8,6 @@ namespace App\Core;
 
 /**
  * Email template renderer.
- * Direct implementation replacing Nexus\Core\EmailTemplate delegation.
  */
 class EmailTemplate
 {

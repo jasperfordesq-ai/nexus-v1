@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * HtmlSanitizer — Laravel DI wrapper for legacy \Nexus\Services\HtmlSanitizer.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class HtmlSanitizer
      */
     public function sanitize(string $html): string
     {
-        return \Nexus\Services\HtmlSanitizer::sanitize($html);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 
     /**
@@ -30,7 +30,8 @@ class HtmlSanitizer
      */
     public function containsHtml(string $content): bool
     {
-        return \Nexus\Services\HtmlSanitizer::containsHtml($content);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 
     /**
@@ -38,6 +39,7 @@ class HtmlSanitizer
      */
     public function toPlainText(string $html): string
     {
-        return \Nexus\Services\HtmlSanitizer::toPlainText($html);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 }

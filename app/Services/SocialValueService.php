@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * SocialValueService — Laravel DI wrapper for legacy \Nexus\Services\SocialValueService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class SocialValueService
      */
     public function calculateSROI(int $tenantId, array $dateRange = []): array
     {
-        return \Nexus\Services\SocialValueService::calculateSROI($tenantId, $dateRange);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class SocialValueService
      */
     public function getConfig(int $tenantId): array
     {
-        return \Nexus\Services\SocialValueService::getConfig($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,6 +39,7 @@ class SocialValueService
      */
     public function saveConfig(int $tenantId, array $config): bool
     {
-        return \Nexus\Services\SocialValueService::saveConfig($tenantId, $config);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return false;
     }
 }

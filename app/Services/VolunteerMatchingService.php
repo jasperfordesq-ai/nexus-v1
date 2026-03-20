@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * VolunteerMatchingService � Laravel DI wrapper for legacy \Nexus\Services\VolunteerMatchingService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class VolunteerMatchingService
      */
     public function findMatches(int $tenantId, int $opportunityId, int $limit = 10): array
     {
-        return \Nexus\Services\VolunteerMatchingService::findMatches($tenantId, $opportunityId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class VolunteerMatchingService
      */
     public function suggestOpportunities(int $tenantId, int $userId, int $limit = 10): array
     {
-        return \Nexus\Services\VolunteerMatchingService::suggestOpportunities($tenantId, $userId, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -38,7 +39,8 @@ class VolunteerMatchingService
      */
     public function getMatchScore(int $tenantId, int $opportunityId, int $userId): float
     {
-        return \Nexus\Services\VolunteerMatchingService::getMatchScore($tenantId, $opportunityId, $userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return 0.0;
     }
 
     /**
@@ -46,6 +48,7 @@ class VolunteerMatchingService
      */
     public function getRecommendedShifts(int $userId, array $options = []): array
     {
-        return \Nexus\Services\VolunteerMatchingService::getRecommendedShifts($userId, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 }

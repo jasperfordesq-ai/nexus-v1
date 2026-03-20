@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * IdeaTeamConversionService — Laravel DI wrapper for legacy \Nexus\Services\IdeaTeamConversionService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class IdeaTeamConversionService
      */
     public function getErrors(): array
     {
-        return \Nexus\Services\IdeaTeamConversionService::getErrors();
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -30,7 +30,8 @@ class IdeaTeamConversionService
      */
     public function convert(int $ideaId, int $userId, array $options = []): ?array
     {
-        return \Nexus\Services\IdeaTeamConversionService::convert($ideaId, $userId, $options);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class IdeaTeamConversionService
      */
     public function getLinksForChallenge(int $challengeId): array
     {
-        return \Nexus\Services\IdeaTeamConversionService::getLinksForChallenge($challengeId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return [];
     }
 
     /**
@@ -46,6 +48,7 @@ class IdeaTeamConversionService
      */
     public function getLinkForIdea(int $ideaId): ?array
     {
-        return \Nexus\Services\IdeaTeamConversionService::getLinkForIdea($ideaId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

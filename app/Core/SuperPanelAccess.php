@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * SuperPanelAccess Middleware - Gatekeeper for the Super Admin Panel.
- * Direct implementation replacing Nexus\Middleware\SuperPanelAccess delegation.
  *
  * ACCESS RULES:
  * - Master Tenant (id=1) + is_tenant_super_admin: GLOBAL access (sees all tenants)

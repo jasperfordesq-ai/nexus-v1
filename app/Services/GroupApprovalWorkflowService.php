@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * GroupApprovalWorkflowService — Laravel DI wrapper for legacy \Nexus\Services\GroupApprovalWorkflowService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class GroupApprovalWorkflowService
      */
     public function submitForApproval($groupId, $submittedBy, $notes = '')
     {
-        return \Nexus\Services\GroupApprovalWorkflowService::submitForApproval($groupId, $submittedBy, $notes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class GroupApprovalWorkflowService
      */
     public function approveGroup($requestId, $approvedBy, $notes = '')
     {
-        return \Nexus\Services\GroupApprovalWorkflowService::approveGroup($requestId, $approvedBy, $notes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class GroupApprovalWorkflowService
      */
     public function rejectGroup($requestId, $rejectedBy, $reason = '')
     {
-        return \Nexus\Services\GroupApprovalWorkflowService::rejectGroup($requestId, $rejectedBy, $reason);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class GroupApprovalWorkflowService
      */
     public function requestChanges($requestId, $reviewedBy, $changes = '')
     {
-        return \Nexus\Services\GroupApprovalWorkflowService::requestChanges($requestId, $reviewedBy, $changes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class GroupApprovalWorkflowService
      */
     public function resubmit($groupId, $userId, $notes = '')
     {
-        return \Nexus\Services\GroupApprovalWorkflowService::resubmit($groupId, $userId, $notes);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

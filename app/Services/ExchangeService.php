@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * ExchangeService — Laravel DI-based service for exchange workflow operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\ExchangeWorkflowService.
  * Manages the structured exchange lifecycle between members.
  */
 class ExchangeService

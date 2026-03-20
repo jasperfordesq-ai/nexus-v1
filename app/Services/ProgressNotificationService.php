@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * ProgressNotificationService — Laravel DI wrapper for legacy \Nexus\Services\ProgressNotificationService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class ProgressNotificationService
      */
     public function checkProgressNotifications($userId)
     {
-        return \Nexus\Services\ProgressNotificationService::checkProgressNotifications($userId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class ProgressNotificationService
      */
     public function getNearCompletionBadges($userId, $minPercent = 50, $limit = 5)
     {
-        return \Nexus\Services\ProgressNotificationService::getNearCompletionBadges($userId, $minPercent, $limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class ProgressNotificationService
      */
     public function getProgressNudge($userId, $badgeKey)
     {
-        return \Nexus\Services\ProgressNotificationService::getProgressNudge($userId, $badgeKey);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class ProgressNotificationService
      */
     public function batchCheckProgress($limit = 100)
     {
-        return \Nexus\Services\ProgressNotificationService::batchCheckProgress($limit);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class ProgressNotificationService
      */
     public function cleanupOldRecords($days = 30)
     {
-        return \Nexus\Services\ProgressNotificationService::cleanupOldRecords($days);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

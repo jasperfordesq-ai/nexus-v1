@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * MailchimpService — Laravel DI wrapper for legacy \Nexus\Services\MailchimpService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -26,6 +25,7 @@ class MailchimpService
      */
     public function __call(string $method, array $args): mixed
     {
-        return \Nexus\Services\MailchimpService::$method(...$args);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__ . '::' . $method);
+        return null;
     }
 }

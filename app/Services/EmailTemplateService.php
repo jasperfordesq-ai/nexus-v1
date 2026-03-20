@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * EmailTemplateService — Laravel DI wrapper for legacy \Nexus\Services\EmailTemplateService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,6 +21,7 @@ class EmailTemplateService
      */
     public function wrap(string $body, string $tenantName = ''): string
     {
-        return \Nexus\Services\EmailTemplateService::wrap($body, $tenantName);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return '';
     }
 }

@@ -7,7 +7,6 @@
 namespace App\Services;
 
 /**
- * PayPlanService — Laravel DI wrapper for legacy \Nexus\Services\PayPlanService.
  *
  * Provides dependency-injectable access to the legacy static service methods.
  */
@@ -22,7 +21,8 @@ class PayPlanService
      */
     public function validateLayoutAccess($layout, $tenantId = null)
     {
-        return \Nexus\Services\PayPlanService::validateLayoutAccess($layout, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -30,7 +30,8 @@ class PayPlanService
      */
     public function validateFeatureAccess($feature, $tenantId = null)
     {
-        return \Nexus\Services\PayPlanService::validateFeatureAccess($feature, $tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -38,7 +39,8 @@ class PayPlanService
      */
     public function validateMenuCreation($tenantId = null)
     {
-        return \Nexus\Services\PayPlanService::validateMenuCreation($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -46,7 +48,8 @@ class PayPlanService
      */
     public function getUpgradeSuggestions($tenantId = null)
     {
-        return \Nexus\Services\PayPlanService::getUpgradeSuggestions($tenantId);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 
     /**
@@ -54,6 +57,7 @@ class PayPlanService
      */
     public function assignPlan($tenantId, $planId, $expiresAt = null, $isTrial = false)
     {
-        return \Nexus\Services\PayPlanService::assignPlan($tenantId, $planId, $expiresAt, $isTrial);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        return null;
     }
 }

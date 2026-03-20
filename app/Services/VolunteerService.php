@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * VolunteerService — Laravel DI-based service for volunteering operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\VolunteerService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class VolunteerService

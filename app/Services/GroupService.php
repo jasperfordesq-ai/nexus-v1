@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 /**
  * GroupService — Laravel DI-based service for group operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\GroupService.
  * All queries are tenant-scoped automatically via the HasTenantScope trait.
  */
 class GroupService

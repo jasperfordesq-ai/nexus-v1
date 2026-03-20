@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 /**
  * EmailService — Laravel DI-based service for email operations.
  *
- * Eloquent/DI counterpart to the legacy static \Nexus\Services\EmailTemplateService.
  * Manages email sending, template configuration, and delivery settings.
  */
 class EmailService
