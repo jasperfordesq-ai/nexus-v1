@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Core;
 
 use Nexus\Tests\TestCase;
-use Nexus\Core\MenuManager;
+use App\Core\MenuManager;
 
 /**
  * MenuManager Tests

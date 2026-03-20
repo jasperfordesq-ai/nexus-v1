@@ -6,8 +6,7 @@
 
 namespace App\Services;
 
-use Nexus\Models\Newsletter;
-use Nexus\Models\NewsletterAnalytics;
+use App\Models\NewsletterAnalytics;
 use Nexus\Core\TenantContext;
 
 /**

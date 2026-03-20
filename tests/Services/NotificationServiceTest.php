@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\NotificationService;
+use App\Services\NotificationService;
 
 class NotificationServiceTest extends TestCase
 {

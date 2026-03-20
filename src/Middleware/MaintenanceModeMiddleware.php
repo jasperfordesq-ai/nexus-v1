@@ -7,8 +7,8 @@
 namespace Nexus\Middleware;
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\TokenService;
+use App\Core\TenantContext;
+use App\Services\TokenService;
 
 /**
  * MaintenanceModeMiddleware

@@ -10,11 +10,11 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\ShiftSwapService;
-use Nexus\Services\ShiftWaitlistService;
-use Nexus\Services\VolunteerCheckInService;
-use Nexus\Services\VolunteerService;
+use App\Core\TenantContext;
+use App\Services\ShiftSwapService;
+use App\Services\ShiftWaitlistService;
+use App\Services\VolunteerCheckInService;
+use App\Services\VolunteerService;
 
 /**
  * VolunteerFlowIntegrationTest

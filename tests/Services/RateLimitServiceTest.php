@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\RateLimitService;
+use App\Services\RateLimitService;
 
 class RateLimitServiceTest extends TestCase
 {

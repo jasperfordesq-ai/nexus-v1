@@ -10,8 +10,8 @@ namespace Nexus\Tests\Models;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\VolReview;
+use App\Core\TenantContext;
+use App\Models\VolReview;
 
 /**
  * VolReview Model Tests

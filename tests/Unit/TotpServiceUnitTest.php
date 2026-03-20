@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\TotpService;
+use App\Services\TotpService;
 
 /**
  * TotpService Unit Tests

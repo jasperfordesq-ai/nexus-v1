@@ -10,9 +10,9 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\FeedService;
-use Nexus\Services\FeedActivityService;
+use App\Core\TenantContext;
+use App\Services\FeedService;
+use App\Services\FeedActivityService;
 
 /**
  * FeedService Tests

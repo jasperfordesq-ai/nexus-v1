@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\NewsletterTemplates;
+use App\Services\NewsletterTemplates;
 
 class NewsletterTemplatesTest extends TestCase
 {

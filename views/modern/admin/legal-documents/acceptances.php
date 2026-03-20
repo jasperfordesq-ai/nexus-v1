@@ -3,7 +3,7 @@
  * Admin View Acceptance Records for a Version
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

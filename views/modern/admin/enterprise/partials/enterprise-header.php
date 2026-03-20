@@ -8,7 +8,7 @@
  * - Super Admin: Full access including Config/Secrets
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

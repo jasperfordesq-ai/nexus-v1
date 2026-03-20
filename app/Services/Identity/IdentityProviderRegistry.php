@@ -12,17 +12,14 @@ use Nexus\Services\Identity\IdentityProviderRegistry as LegacyRegistry;
  * IdentityProviderRegistry — Laravel DI wrapper for legacy registry.
  *
  * Delegates to \Nexus\Services\Identity\IdentityProviderRegistry.
+ * All methods are static to match the legacy API that tests expect.
  */
 class IdentityProviderRegistry
 {
-    public function __construct()
-    {
-    }
-
     /**
      * Register a provider instance.
      */
-    public function register(\Nexus\Services\Identity\IdentityVerificationProviderInterface $provider): void
+    public static function register(\Nexus\Services\Identity\IdentityVerificationProviderInterface $provider): void
     {
         if (!class_exists(LegacyRegistry::class)) {
             return;
@@ -35,7 +32,7 @@ class IdentityProviderRegistry
      *
      * @throws \InvalidArgumentException If provider not found
      */
-    public function get(string $slug): \Nexus\Services\Identity\IdentityVerificationProviderInterface
+    public static function get(string $slug): \Nexus\Services\Identity\IdentityVerificationProviderInterface
     {
         if (!class_exists(LegacyRegistry::class)) {
             throw new \RuntimeException('Legacy IdentityProviderRegistry is not available');
@@ -46,7 +43,7 @@ class IdentityProviderRegistry
     /**
      * Check if a provider is registered.
      */
-    public function has(string $slug): bool
+    public static function has(string $slug): bool
     {
         if (!class_exists(LegacyRegistry::class)) {
             return false;
@@ -59,7 +56,7 @@ class IdentityProviderRegistry
      *
      * @return array<string, \Nexus\Services\Identity\IdentityVerificationProviderInterface>
      */
-    public function all(): array
+    public static function all(): array
     {
         if (!class_exists(LegacyRegistry::class)) {
             return [];
@@ -72,7 +69,7 @@ class IdentityProviderRegistry
      *
      * @return array<int, array{slug: string, name: string, levels: string[]}>
      */
-    public function listForAdmin(): array
+    public static function listForAdmin(): array
     {
         if (!class_exists(LegacyRegistry::class)) {
             return [];
@@ -83,7 +80,7 @@ class IdentityProviderRegistry
     /**
      * Reset registry (for testing).
      */
-    public function reset(): void
+    public static function reset(): void
     {
         if (!class_exists(LegacyRegistry::class)) {
             return;

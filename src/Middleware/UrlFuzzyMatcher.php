@@ -7,6 +7,7 @@
 namespace Nexus\Middleware;
 
 use Nexus\Core\Database;
+use App\Core\TenantContext;
 
 /**
  * URL Fuzzy Matcher Middleware
@@ -83,7 +84,7 @@ class UrlFuzzyMatcher
     private static function findSimilarContent($url)
     {
         $db = Database::getConnection();
-        $tenantId = \Nexus\Core\TenantContext::getId();
+        $tenantId = TenantContext::getId();
 
         // Extract path segments and search terms
         $segments = array_filter(explode('/', trim($url, '/')));

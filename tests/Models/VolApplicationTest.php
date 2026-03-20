@@ -10,9 +10,9 @@ namespace Nexus\Tests\Models;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\VolApplication;
-use Nexus\Models\VolOpportunity;
+use App\Core\TenantContext;
+use App\Models\VolApplication;
+use App\Models\VolOpportunity;
 
 /**
  * VolApplication Model Tests

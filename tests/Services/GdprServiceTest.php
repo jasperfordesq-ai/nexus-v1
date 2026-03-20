@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use Nexus\Tests\TestCase;
-use Nexus\Services\Enterprise\GdprService;
+use App\Services\Enterprise\GdprService;
 use Nexus\Services\Enterprise\LoggerService;
 use Nexus\Services\Enterprise\MetricsService;
 

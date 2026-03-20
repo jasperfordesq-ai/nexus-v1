@@ -4,7 +4,7 @@
  * Path: views/modern/admin-legacy/groups/view.php
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $group = $group ?? null;

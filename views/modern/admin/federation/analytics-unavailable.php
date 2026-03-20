@@ -4,7 +4,7 @@
  * Shown when federation is not enabled or tenant is not whitelisted
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

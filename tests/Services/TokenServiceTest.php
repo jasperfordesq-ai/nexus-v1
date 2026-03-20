@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\TokenService;
+use App\Services\TokenService;
 
 class TokenServiceTest extends TestCase
 {

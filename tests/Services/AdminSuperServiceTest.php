@@ -10,10 +10,10 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\TenantVisibilityService;
-use Nexus\Services\TenantHierarchyService;
-use Nexus\Services\SuperAdminAuditService;
+use App\Core\TenantContext;
+use App\Services\TenantVisibilityService;
+use App\Services\TenantHierarchyService;
+use App\Services\SuperAdminAuditService;
 
 /**
  * Service-level tests for the Super Admin module

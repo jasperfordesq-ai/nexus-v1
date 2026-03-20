@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\LeaderboardService;
+use App\Services\LeaderboardService;
 
 class LeaderboardServiceTest extends TestCase
 {

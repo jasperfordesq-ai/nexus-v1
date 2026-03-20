@@ -7,10 +7,10 @@
 namespace Nexus\Tests\Models;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Models\Transaction;
-use Nexus\Models\User;
+use App\Models\Transaction;
+use App\Models\User;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 class TransactionTest extends TestCase
 {

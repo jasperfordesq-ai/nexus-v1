@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\ReviewService;
+use App\Services\ReviewService;
 
 class ReviewServiceTest extends TestCase
 {

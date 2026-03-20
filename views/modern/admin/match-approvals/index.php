@@ -5,8 +5,8 @@
  * Path: views/modern/admin-legacy/match-approvals/index.php
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 $adminPageTitle = 'Match Approvals';

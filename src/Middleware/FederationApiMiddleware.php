@@ -7,10 +7,10 @@
 namespace Nexus\Middleware;
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\FederationGateway;
-use Nexus\Services\FederationAuditService;
-use Nexus\Services\FederationJwtService;
+use App\Core\TenantContext;
+use App\Services\FederationGateway;
+use App\Services\FederationAuditService;
+use App\Services\FederationJwtService;
 
 /**
  * FederationApiMiddleware
@@ -600,7 +600,7 @@ class FederationApiMiddleware
             $keyId,
             $endpoint,
             $_SERVER['REQUEST_METHOD'],
-            \Nexus\Core\ClientIp::get(),
+            \App\Core\ClientIp::get(),
             substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255),
             $authMethod,
             $signatureValid

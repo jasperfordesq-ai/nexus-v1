@@ -6,7 +6,7 @@ $layout = 'default';
 <div class="nexus-container">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
         <h1>Manage News</h1>
-        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/create" class="nexus-btn-primary">
+        <a href="<?= \App\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/create" class="nexus-btn-primary">
             + Write Article
         </a>
     </div>
@@ -26,7 +26,7 @@ $layout = 'default';
                 <?php foreach ($posts as $post): ?>
                     <tr style="border-bottom: 1px solid #e5e7eb;">
                         <td style="padding: 15px;">
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/edit/<?= $post['id'] ?>" style="font-weight: 600; color: #111827; text-decoration: none;">
+                            <a href="<?= \App\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/edit/<?= $post['id'] ?>" style="font-weight: 600; color: #111827; text-decoration: none;">
                                 <?= htmlspecialchars($post['title']) ?>
                             </a>
                         </td>
@@ -44,9 +44,9 @@ $layout = 'default';
                             <?= date('M j, Y', strtotime($post['created_at'])) ?>
                         </td>
                         <td style="padding: 15px; text-align: right;">
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/edit/<?= $post['id'] ?>" class="nexus-btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">Edit</a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/builder/<?= $post['id'] ?>" class="nexus-btn-primary" style="padding: 6px 12px; font-size: 0.8rem; margin-left:5px;">Builder</a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog/<?= htmlspecialchars($post['slug']) ?>" target="_blank" class="nexus-link" style="margin-left: 10px; font-size: 0.8rem;">View</a>
+                            <a href="<?= \App\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/edit/<?= $post['id'] ?>" class="nexus-btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">Edit</a>
+                            <a href="<?= \App\Core\TenantContext::getBasePath() ?>/admin-legacy/blog/builder/<?= $post['id'] ?>" class="nexus-btn-primary" style="padding: 6px 12px; font-size: 0.8rem; margin-left:5px;">Builder</a>
+                            <a href="<?= \App\Core\TenantContext::getBasePath() ?>/blog/<?= htmlspecialchars($post['slug']) ?>" target="_blank" class="nexus-link" style="margin-left: 10px; font-size: 0.8rem;">View</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

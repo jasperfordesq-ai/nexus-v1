@@ -7,9 +7,9 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\MatchApprovalWorkflowService;
+use App\Services\MatchApprovalWorkflowService;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * MatchApprovalWorkflowServiceTest

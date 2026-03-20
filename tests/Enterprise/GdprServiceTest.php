@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Enterprise;
 
-use Nexus\Services\Enterprise\GdprService;
+use App\Services\Enterprise\GdprService;
 use Nexus\Tests\DatabaseTestCase;
 use PDO;
 

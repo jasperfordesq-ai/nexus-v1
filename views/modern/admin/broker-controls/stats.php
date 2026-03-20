@@ -4,7 +4,7 @@
  * Analytics and metrics for broker control features
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

@@ -5,7 +5,7 @@
  * STANDALONE admin interface - does NOT use main site header/footer
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Core\Database;
 
 $basePath = TenantContext::getBasePath();
@@ -243,7 +243,7 @@ require __DIR__ . '/partials/admin-header.php';
         <!-- ============================================ -->
         <div id="tab-shared" class="algo-tab-content active">
             <form action="<?= $basePath ?>/admin-legacy/algorithm-settings/save" method="POST">
-                <?= \Nexus\Core\Csrf::input() ?>
+                <?= \App\Core\Csrf::input() ?>
                 <input type="hidden" name="algorithm_type" value="shared">
 
                 <!-- Geospatial Settings -->
@@ -354,7 +354,7 @@ require __DIR__ . '/partials/admin-header.php';
         <!-- ============================================ -->
         <div id="tab-listings" class="algo-tab-content">
             <form action="<?= $basePath ?>/admin-legacy/algorithm-settings/save" method="POST">
-                <?= \Nexus\Core\Csrf::input() ?>
+                <?= \App\Core\Csrf::input() ?>
                 <input type="hidden" name="algorithm_type" value="listings">
 
                 <!-- Algorithm Overview Banner -->
@@ -631,7 +631,7 @@ require __DIR__ . '/partials/admin-header.php';
         <!-- ============================================ -->
         <div id="tab-members" class="algo-tab-content">
             <form action="<?= $basePath ?>/admin-legacy/algorithm-settings/save" method="POST">
-                <?= \Nexus\Core\Csrf::input() ?>
+                <?= \App\Core\Csrf::input() ?>
                 <input type="hidden" name="algorithm_type" value="members">
 
                 <!-- Algorithm Overview Banner -->

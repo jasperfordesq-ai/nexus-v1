@@ -5,7 +5,7 @@
  */
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 // Admin check
 if (($_SESSION['user_role'] ?? '') !== 'admin') {

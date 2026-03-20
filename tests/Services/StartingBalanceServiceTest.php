@@ -9,10 +9,10 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\StartingBalanceService;
-use Nexus\Services\TenantSettingsService;
+use App\Services\StartingBalanceService;
+use App\Services\TenantSettingsService;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * StartingBalanceService Tests

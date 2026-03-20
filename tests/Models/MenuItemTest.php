@@ -10,9 +10,9 @@ namespace Nexus\Tests\Models;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\Menu;
-use Nexus\Models\MenuItem;
+use App\Core\TenantContext;
+use App\Models\Menu;
+use App\Models\MenuItem;
 
 /**
  * MenuItem Model Tests

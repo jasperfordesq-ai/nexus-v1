@@ -4,7 +4,7 @@
  * Clean, functional page builder with Gold Standard design
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\PageBuilder\PageRenderer;
 use Nexus\PageBuilder\BlockRegistry;
 

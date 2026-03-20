@@ -7,12 +7,12 @@
 namespace Nexus\Tests\Models;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Models\OrgTransferRequest;
-use Nexus\Models\OrgMember;
-use Nexus\Models\OrgWallet;
-use Nexus\Models\User;
+use App\Models\OrgTransferRequest;
+use App\Models\OrgMember;
+use App\Models\OrgWallet;
+use App\Models\User;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 class OrgTransferRequestTest extends TestCase
 {

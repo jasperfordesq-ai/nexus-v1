@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Nexus\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\Identity\IdentityProviderRegistry;
+use App\Services\Identity\IdentityProviderRegistry;
 use Nexus\Services\Identity\MockIdentityProvider;
-use Nexus\Services\Identity\RegistrationPolicyService;
+use App\Services\Identity\RegistrationPolicyService;
 
 /**
  * Registration Policy Engine — Integration Tests

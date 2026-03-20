@@ -4,7 +4,7 @@
  * STANDALONE admin interface for creating new roles
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Core\Database;
 use Nexus\Services\Enterprise\PermissionService;
 

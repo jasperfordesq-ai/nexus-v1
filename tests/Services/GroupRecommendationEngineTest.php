@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\GroupRecommendationEngine;
+use App\Services\GroupRecommendationEngine;
 
 class GroupRecommendationEngineTest extends TestCase
 {

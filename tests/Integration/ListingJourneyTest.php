@@ -10,8 +10,8 @@ namespace Nexus\Tests\Integration;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\ListingService;
+use App\Core\TenantContext;
+use App\Services\ListingService;
 
 /**
  * Listing Journey Integration Test

@@ -6,7 +6,7 @@
  */
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

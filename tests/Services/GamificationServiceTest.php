@@ -7,9 +7,9 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\GamificationService;
+use App\Services\GamificationService;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 class GamificationServiceTest extends TestCase
 {

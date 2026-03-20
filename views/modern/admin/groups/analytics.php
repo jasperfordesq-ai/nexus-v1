@@ -4,7 +4,7 @@
  * Path: views/modern/admin-legacy/groups/analytics.php
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

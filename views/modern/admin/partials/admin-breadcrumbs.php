@@ -4,7 +4,7 @@
  * Automatically generates breadcrumbs from current URL and navigation config
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 // Load navigation config
 $adminNavigation = require __DIR__ . '/../../../../config/admin-navigation.php';

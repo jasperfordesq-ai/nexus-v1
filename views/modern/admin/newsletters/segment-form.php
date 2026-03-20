@@ -4,7 +4,7 @@
  * Holographic Glassmorphism Design
  */
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+$basePath = \App\Core\TenantContext::getBasePath();
 $isEdit = isset($segment);
 $action = $isEdit
     ? $basePath . "/admin-legacy/newsletters/segments/update/" . $segment['id']
@@ -76,7 +76,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <?php endif; ?>
 
     <form action="<?= $action ?>" method="POST" id="segment-form">
-        <?= \Nexus\Core\Csrf::input() ?>
+        <?= \App\Core\Csrf::input() ?>
 
         <!-- Basic Info Card -->
         <div class="glass-card">
@@ -189,7 +189,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <div class="modal" role="dialog" aria-modal="true"-actions">
             <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
             <form action="<?= $basePath ?>/admin-legacy/newsletters/segments/delete/<?= $segment['id'] ?>" method="POST" style="display: inline;">
-                <?= \Nexus\Core\Csrf::input() ?>
+                <?= \App\Core\Csrf::input() ?>
                 <button type="submit" class="btn-danger">
                     <i class="fa-solid fa-trash"></i> Delete Segment
                 </button>

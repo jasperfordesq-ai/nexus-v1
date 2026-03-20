@@ -7,10 +7,10 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\StreakService;
-use Nexus\Services\DailyRewardService;
-use Nexus\Services\GamificationService;
-use Nexus\Services\ChallengeService;
+use App\Services\StreakService;
+use App\Services\DailyRewardService;
+use App\Services\GamificationService;
+use App\Services\ChallengeService;
 
 /**
  * GamificationCronTest

@@ -6,7 +6,7 @@
 
 namespace Nexus\Middleware;
 
-use Nexus\Services\PerformanceMonitorService;
+use App\Services\PerformanceMonitorService;
 
 /**
  * Performance Monitoring Middleware

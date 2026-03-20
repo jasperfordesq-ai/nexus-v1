@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\WebAuthnChallengeStore;
+use App\Services\WebAuthnChallengeStore;
 
 /**
  * WebAuthnChallengeStore Tests

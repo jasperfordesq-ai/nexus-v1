@@ -4,7 +4,7 @@
  * Accessed via /admin-legacy/groups/view?id=X → Analytics Tab
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

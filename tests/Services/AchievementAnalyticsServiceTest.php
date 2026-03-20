@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\AchievementAnalyticsService;
+use App\Services\AchievementAnalyticsService;
 
 class AchievementAnalyticsServiceTest extends TestCase
 {

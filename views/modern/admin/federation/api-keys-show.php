@@ -4,8 +4,8 @@
  * Detailed view of a specific API key with usage stats and logs
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 

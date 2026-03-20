@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\AuditLogService;
-use Nexus\Core\TenantContext;
+use App\Services\AuditLogService;
+use App\Core\TenantContext;
 
 /**
  * AuditLogService Tests

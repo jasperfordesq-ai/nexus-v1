@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\TransactionExportService;
+use App\Services\TransactionExportService;
 
 class TransactionExportServiceTest extends TestCase
 {

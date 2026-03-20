@@ -4,7 +4,7 @@
  * Holographic Glassmorphism Dark Theme
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

@@ -10,9 +10,9 @@ namespace Nexus\Tests\Models;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\Event;
-use Nexus\Models\EventRsvp;
+use App\Core\TenantContext;
+use App\Models\Event;
+use App\Models\EventRsvp;
 
 /**
  * Event Model Tests

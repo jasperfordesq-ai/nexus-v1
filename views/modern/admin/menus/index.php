@@ -4,8 +4,8 @@
  * STANDALONE Admin Interface with Holographic Glassmorphism
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 
@@ -18,8 +18,8 @@ $adminPageIcon = 'fa-bars';
 require dirname(__DIR__) . '/partials/admin-header.php';
 
 // Check menu manager status
-$menuManagerConfig = \Nexus\Core\MenuManager::getConfig();
-$isEnabled = \Nexus\Core\MenuManager::isEnabled();
+$menuManagerConfig = \App\Core\MenuManager::getConfig();
+$isEnabled = \App\Core\MenuManager::isEnabled();
 ?>
 
 <?php if ($isEnabled && !empty($menuManagerConfig['show_warning'])): ?>

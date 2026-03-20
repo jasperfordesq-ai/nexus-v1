@@ -10,8 +10,8 @@ namespace Nexus\Tests\Models;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\GroupFeedback;
+use App\Core\TenantContext;
+use App\Models\GroupFeedback;
 
 /**
  * GroupFeedback Model Tests

@@ -4,7 +4,7 @@
  * Visual comparison matrix
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

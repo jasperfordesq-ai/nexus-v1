@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Core\ImageUploader;
+use App\Core\ImageUploader;
 
 /**
  * @covers \Nexus\Core\ImageUploader

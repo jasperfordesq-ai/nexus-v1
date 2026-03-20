@@ -10,8 +10,8 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\GroupExchangeService;
+use App\Core\TenantContext;
+use App\Services\GroupExchangeService;
 
 /**
  * GroupExchangeService Tests

@@ -4,8 +4,8 @@
  * View detailed information about a single exchange request
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 

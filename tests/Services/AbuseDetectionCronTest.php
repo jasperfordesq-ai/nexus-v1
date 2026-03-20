@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\AbuseDetectionService;
+use App\Services\AbuseDetectionService;
 
 /**
  * AbuseDetectionCronTest

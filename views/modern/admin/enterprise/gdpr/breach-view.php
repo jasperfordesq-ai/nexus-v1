@@ -4,7 +4,7 @@
  * Dark Mode Optimized Security Incident Detail
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 // Navigation context
 $currentSection = 'gdpr';

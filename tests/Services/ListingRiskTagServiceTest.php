@@ -7,9 +7,9 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\ListingRiskTagService;
+use App\Services\ListingRiskTagService;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * ListingRiskTagServiceTest

@@ -4,9 +4,9 @@
  * STANDALONE admin interface
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
-use Nexus\Core\Env;
+use App\Core\TenantContext;
+use App\Core\Csrf;
+use App\Core\Env;
 
 $basePath = TenantContext::getBasePath();
 

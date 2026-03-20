@@ -4,7 +4,7 @@
  * Intelligent featured groups management with geographic diversity
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

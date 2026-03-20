@@ -7,7 +7,7 @@
 namespace Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\FeedRankingService;
+use App\Services\FeedRankingService;
 
 /**
  * Comprehensive tests for FeedRankingService (14-signal EdgeRank pipeline).

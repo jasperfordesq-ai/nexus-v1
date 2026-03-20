@@ -7,13 +7,13 @@
 namespace Nexus\Tests\Services\AI;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\AI\AIServiceFactory;
+use App\Services\AI\AIServiceFactory;
 use Nexus\Services\AI\Contracts\AIProviderInterface;
 use Nexus\Services\AI\Providers\OpenAIProvider;
 use Nexus\Services\AI\Providers\AnthropicProvider;
 use Nexus\Services\AI\Providers\GeminiProvider;
 use Nexus\Services\AI\Providers\OllamaProvider;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * Unit tests for AIServiceFactory

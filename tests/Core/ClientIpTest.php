@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Core;
 
-use Nexus\Core\ClientIp;
+use App\Core\ClientIp;
 use Nexus\Tests\TestCase;
 
 /**

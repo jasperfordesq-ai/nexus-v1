@@ -10,9 +10,9 @@ namespace Nexus\Tests\Integration;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\WalletService;
-use Nexus\Services\ReviewService;
+use App\Core\TenantContext;
+use App\Services\WalletService;
+use App\Services\ReviewService;
 
 /**
  * Exchange Journey Integration Test

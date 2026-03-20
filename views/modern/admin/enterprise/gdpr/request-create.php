@@ -4,7 +4,7 @@
  * Admin-initiated GDPR request form
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

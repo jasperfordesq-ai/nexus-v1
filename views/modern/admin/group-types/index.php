@@ -5,7 +5,7 @@
  */
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Models\GroupType;
 
 // Admin check
@@ -23,7 +23,7 @@ $messageType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     // Validate CSRF token for all POST actions
-    if (!\Nexus\Core\Csrf::verify()) {
+    if (!\App\Core\Csrf::verify()) {
         $message = "Invalid request. Please refresh and try again.";
         $messageType = 'error';
     } else {
@@ -192,7 +192,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
                 <div class="type-status">
                     <form method="POST" style="display: inline;">
-                        <?= \Nexus\Core\Csrf::field() ?>
+                        <?= \App\Core\Csrf::field() ?>
                         <input type="hidden" name="action" value="toggle_active">
                         <input type="hidden" name="type_id" value="<?= $type['id'] ?>">
                         <button type="submit" class="status-toggle">
@@ -208,7 +208,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <i class="fa-solid fa-pen"></i>
                     </a>
                     <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this type? Groups will not be deleted, only uncategorized.');">
-                        <?= \Nexus\Core\Csrf::field() ?>
+                        <?= \App\Core\Csrf::field() ?>
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="type_id" value="<?= $type['id'] ?>">
                         <button type="submit" class="action-btn action-btn-danger" title="Delete">
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formData = new FormData();
                 formData.append('action', 'reorder');
                 formData.append('order', JSON.stringify(order));
-                formData.append('csrf_token', '<?= \Nexus\Core\Csrf::token() ?>');
+                formData.append('csrf_token', '<?= \App\Core\Csrf::token() ?>');
 
                 fetch(window.location.href, {
                     method: 'POST',

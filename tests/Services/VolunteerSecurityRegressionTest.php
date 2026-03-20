@@ -9,11 +9,11 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\ShiftGroupReservationService;
-use Nexus\Services\ShiftSwapService;
-use Nexus\Services\VolunteerCheckInService;
-use Nexus\Services\VolunteerService;
+use App\Core\TenantContext;
+use App\Services\ShiftGroupReservationService;
+use App\Services\ShiftSwapService;
+use App\Services\VolunteerCheckInService;
+use App\Services\VolunteerService;
 use Nexus\Tests\DatabaseTestCase;
 
 class VolunteerSecurityRegressionTest extends DatabaseTestCase

@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\StreakService;
+use App\Services\StreakService;
 
 class StreakServiceTest extends TestCase
 {

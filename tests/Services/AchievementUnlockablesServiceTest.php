@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\AchievementUnlockablesService;
+use App\Services\AchievementUnlockablesService;
 
 class AchievementUnlockablesServiceTest extends TestCase
 {

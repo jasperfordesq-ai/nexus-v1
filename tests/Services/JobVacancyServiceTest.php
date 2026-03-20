@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\JobVacancyService;
+use App\Core\TenantContext;
+use App\Services\JobVacancyService;
 use Nexus\Tests\DatabaseTestCase;
 
 /**

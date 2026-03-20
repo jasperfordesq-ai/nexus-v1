@@ -4,7 +4,7 @@
  * STANDALONE admin interface using admin-header.php and admin-footer.php
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 
@@ -466,7 +466,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <div class="mobile-warning-icon">💻</div>
             <h2>Desktop Recommended</h2>
             <p>The visual page builder works best on a desktop or laptop computer.</p>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages" class="btn-back">&larr; Back to Pages</a>
+            <a href="<?= App\Core\TenantContext::getBasePath() ?>/admin-legacy/pages" class="btn-back">&larr; Back to Pages</a>
             <button onclick="document.getElementById('mobile-warning').style.display='none'" class="btn-continue">Continue Anyway</button>
         </div>
     </div>
@@ -659,7 +659,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             updateToggleAllButton();
         });
 
-        const basePath = "<?= Nexus\Core\TenantContext::getBasePath() ?>";
+        const basePath = "<?= App\Core\TenantContext::getBasePath() ?>";
         const pageId = <?= (int)$page['id'] ?>;
         let hasUnsavedChanges = false;
         let isSaving = false;

@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\MatchLearningService;
+use App\Services\MatchLearningService;
 
 class MatchLearningServiceTest extends TestCase
 {

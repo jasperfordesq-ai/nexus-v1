@@ -7,10 +7,10 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\DeliverabilityTrackingService;
-use Nexus\Models\Deliverable;
-use Nexus\Models\DeliverableMilestone;
-use Nexus\Core\TenantContext;
+use App\Services\DeliverabilityTrackingService;
+use App\Models\Deliverable;
+use App\Models\DeliverableMilestone;
+use App\Core\TenantContext;
 use Nexus\Core\Database;
 
 /**

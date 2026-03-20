@@ -15,7 +15,7 @@ $medianScore = $analyticsData['median_score'] ?? 0;
 $tierDistribution = $analyticsData['tier_distribution'] ?? [];
 $categoryStats = $categoryStats ?? [];
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $adminPageTitle = 'Nexus Score Analytics';

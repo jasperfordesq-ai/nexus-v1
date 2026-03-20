@@ -5,7 +5,7 @@
  * Shows detailed information about a specific test run
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

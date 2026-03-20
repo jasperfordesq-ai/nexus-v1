@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Nexus\Tests\Services;
 
-use Nexus\Services\UnifiedSearchService;
-use Nexus\Core\TenantContext;
+use App\Services\UnifiedSearchService;
+use App\Core\TenantContext;
 use Nexus\Core\Database;
 use Nexus\Tests\DatabaseTestCase;
 

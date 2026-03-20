@@ -520,7 +520,7 @@ function executeImport() {
 
     const formData = new FormData();
     formData.append('filename', currentImportFile);
-    formData.append('csrf_token', '<?= \Nexus\Core\Csrf::generate() ?>');
+    formData.append('csrf_token', '<?= \App\Core\Csrf::generate() ?>');
 
     fetch('/admin-legacy/blog-restore/import', {
         method: 'POST',
@@ -630,7 +630,7 @@ function handleFileUpload(file) {
 
     const formData = new FormData();
     formData.append('sql_file', file);
-    formData.append('csrf_token', '<?= \Nexus\Core\Csrf::generate() ?>');
+    formData.append('csrf_token', '<?= \App\Core\Csrf::generate() ?>');
 
     fetch('/admin-legacy/blog-restore/upload', {
         method: 'POST',

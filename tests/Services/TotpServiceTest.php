@@ -10,9 +10,9 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\TotpService;
-use Nexus\Core\TotpEncryption;
+use App\Core\TenantContext;
+use App\Services\TotpService;
+use App\Core\TotpEncryption;
 
 /**
  * TotpService Tests

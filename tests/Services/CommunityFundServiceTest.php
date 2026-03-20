@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\CommunityFundService;
+use App\Services\CommunityFundService;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * CommunityFundService Tests

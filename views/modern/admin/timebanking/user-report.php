@@ -4,7 +4,7 @@
  * Holographic Glassmorphism Design
  */
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+$basePath = \App\Core\TenantContext::getBasePath();
 
 $userName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: 'User #' . $user['id'];
 
@@ -228,7 +228,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
             <button type="button" class="modal" role="dialog" aria-modal="true"-close" onclick="closeBalanceModal()">&times;</button>
         </div>
         <form action="<?= $basePath ?>/admin-legacy/timebanking/adjust-balance" method="POST">
-            <?= \Nexus\Core\Csrf::input() ?>
+            <?= \App\Core\Csrf::input() ?>
             <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
 
             <div class="modal" role="dialog" aria-modal="true"-body">

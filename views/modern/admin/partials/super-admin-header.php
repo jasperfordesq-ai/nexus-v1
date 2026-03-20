@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';

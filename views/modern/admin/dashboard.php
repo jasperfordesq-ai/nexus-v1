@@ -4,7 +4,7 @@
  * STANDALONE admin interface - does NOT use main site header/footer
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

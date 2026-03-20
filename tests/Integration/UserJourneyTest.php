@@ -10,9 +10,9 @@ namespace Nexus\Tests\Integration;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\User;
-use Nexus\Services\TokenService;
+use App\Core\TenantContext;
+use App\Models\User;
+use App\Services\TokenService;
 
 /**
  * User Journey Integration Test

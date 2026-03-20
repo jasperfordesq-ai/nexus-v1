@@ -7,9 +7,9 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\GeocodingService;
+use App\Services\GeocodingService;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * GeocodingServiceTest - Tests for the geocoding service

@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\SmartGroupMatchingService;
+use App\Services\SmartGroupMatchingService;
 
 class SmartGroupMatchingServiceTest extends TestCase
 {

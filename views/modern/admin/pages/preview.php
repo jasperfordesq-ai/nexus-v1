@@ -15,7 +15,7 @@ if (class_exists('Nexus\\Core\\HtmlSanitizer')) {
     $pageContent = HtmlSanitizer::sanitize($pageContent);
 }
 
-$basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContext::getBasePath() : '';
+$basePath = class_exists('\App\Core\TenantContext') ? \App\Core\TenantContext::getBasePath() : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">

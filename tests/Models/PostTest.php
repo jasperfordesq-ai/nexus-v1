@@ -10,8 +10,8 @@ namespace Nexus\Tests\Models;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\Post;
+use App\Core\TenantContext;
+use App\Models\Post;
 
 /**
  * Post Model Tests

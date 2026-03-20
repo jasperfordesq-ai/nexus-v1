@@ -10,7 +10,7 @@ namespace Nexus\Tests\Middleware;
 
 use Nexus\Tests\TestCase;
 use Nexus\Middleware\GroupFeatureMiddleware;
-use Nexus\Services\GroupFeatureToggleService;
+use App\Services\GroupFeatureToggleService;
 use ReflectionClass;
 
 /**

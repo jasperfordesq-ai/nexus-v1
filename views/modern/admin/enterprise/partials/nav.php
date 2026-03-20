@@ -8,7 +8,7 @@
  * Optional: $currentPage (e.g., 'requests', 'breaches', 'logs')
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $currentSection = $currentSection ?? 'dashboard';

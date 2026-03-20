@@ -4,9 +4,9 @@
  * STANDALONE admin interface - does NOT use main site header/footer
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Core\Database;
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 $tenantId = TenantContext::getId();

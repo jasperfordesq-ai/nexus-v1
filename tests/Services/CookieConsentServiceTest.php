@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\CookieConsentService;
+use App\Services\CookieConsentService;
 
 class CookieConsentServiceTest extends TestCase
 {

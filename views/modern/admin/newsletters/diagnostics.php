@@ -4,7 +4,7 @@
  * Holographic Glassmorphism Dark Theme
  */
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+$basePath = \App\Core\TenantContext::getBasePath();
 
 // Admin page configuration
 $adminPageTitle = 'Newsletter Diagnostics';
@@ -664,7 +664,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <p>Update newsletters with sent_at date to have 'sent' status</p>
                         </div>
                         <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
-                            <?= \Nexus\Core\Csrf::input() ?>
+                            <?= \App\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_sent_status">
                             <button type="submit" class="btn-fix">Run Fix</button>
                         </form>
@@ -677,7 +677,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <p>Set total_sent from total_recipients for sent newsletters</p>
                         </div>
                         <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
-                            <?= \Nexus\Core\Csrf::input() ?>
+                            <?= \App\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_total_sent">
                             <button type="submit" class="btn-fix">Run Fix</button>
                         </form>
@@ -690,7 +690,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <p>Set NULL tracking columns (opens, clicks) to 0</p>
                         </div>
                         <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
-                            <?= \Nexus\Core\Csrf::input() ?>
+                            <?= \App\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="init_tracking_columns">
                             <button type="submit" class="btn-fix">Run Fix</button>
                         </form>
@@ -703,7 +703,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <p>Create newsletter_opens and newsletter_clicks tables if missing</p>
                         </div>
                         <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
-                            <?= \Nexus\Core\Csrf::input() ?>
+                            <?= \App\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="create_tracking_tables">
                             <button type="submit" class="btn-create">Create Tables</button>
                         </form>
@@ -716,7 +716,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <p>Add total_opens, unique_opens, total_clicks, unique_clicks to newsletters table</p>
                         </div>
                         <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
-                            <?= \Nexus\Core\Csrf::input() ?>
+                            <?= \App\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="add_tracking_columns">
                             <button type="submit" class="btn-create">Add Columns</button>
                         </form>
@@ -738,7 +738,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                             <?php endif; ?>
                         </div>
                         <form method="POST" action="<?= $basePath ?>/admin-legacy/newsletters/repair" style="margin: 0;">
-                            <?= \Nexus\Core\Csrf::input() ?>
+                            <?= \App\Core\Csrf::input() ?>
                             <input type="hidden" name="fix" value="fix_stuck_sending">
                             <button type="submit" class="btn-fix" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">Fix Stuck</button>
                         </form>

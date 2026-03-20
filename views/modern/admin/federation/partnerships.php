@@ -4,8 +4,8 @@
  * Manage partnerships with other timebanks
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 
@@ -306,7 +306,7 @@ require __DIR__ . '/../partials/admin-header.php';
                 </td>
                 <td>
                     <?php
-                    $currentTenantId = \Nexus\Core\TenantContext::getId();
+                    $currentTenantId = \App\Core\TenantContext::getId();
                     $isIncoming = ($p['partner_tenant_id'] ?? 0) == $currentTenantId;
                     $isOutgoing = ($p['tenant_id'] ?? 0) == $currentTenantId;
                     ?>

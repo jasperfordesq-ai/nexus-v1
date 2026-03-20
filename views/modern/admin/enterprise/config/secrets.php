@@ -4,7 +4,7 @@
  * Dark Mode Optimized Vault & Secrets Interface
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

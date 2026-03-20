@@ -4,7 +4,7 @@
  * Side-by-side diff of two document versions
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

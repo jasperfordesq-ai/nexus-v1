@@ -4,7 +4,7 @@
  * STANDALONE admin interface for browsing all system permissions
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Core\Database;
 
 $adminPageTitle = 'Permissions Browser';

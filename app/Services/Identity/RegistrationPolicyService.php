@@ -12,6 +12,7 @@ use Nexus\Services\Identity\RegistrationPolicyService as LegacyService;
  * RegistrationPolicyService — Laravel DI wrapper for legacy service.
  *
  * Delegates to \Nexus\Services\Identity\RegistrationPolicyService.
+ * Methods are static to match the legacy API that tests and other callers expect.
  */
 class RegistrationPolicyService
 {
@@ -49,14 +50,10 @@ class RegistrationPolicyService
         'native_registration',
     ];
 
-    public function __construct()
-    {
-    }
-
     /**
      * Get the registration policy for a tenant.
      */
-    public function getPolicy(int $tenantId): ?array
+    public static function getPolicy(int $tenantId): ?array
     {
         if (!class_exists(LegacyService::class)) {
             return null;
@@ -67,7 +64,7 @@ class RegistrationPolicyService
     /**
      * Get the effective registration mode for a tenant.
      */
-    public function getEffectivePolicy(int $tenantId): array
+    public static function getEffectivePolicy(int $tenantId): array
     {
         if (!class_exists(LegacyService::class)) {
             return [];
@@ -80,7 +77,7 @@ class RegistrationPolicyService
      *
      * @throws \InvalidArgumentException On invalid input
      */
-    public function upsertPolicy(int $tenantId, array $data): array
+    public static function upsertPolicy(int $tenantId, array $data): array
     {
         if (!class_exists(LegacyService::class)) {
             return [];
@@ -91,7 +88,7 @@ class RegistrationPolicyService
     /**
      * Encrypt provider config JSON for storage at rest.
      */
-    public function encryptConfig(array $config): string
+    public static function encryptConfig(array $config): string
     {
         if (!class_exists(LegacyService::class)) {
             return '';
@@ -102,7 +99,7 @@ class RegistrationPolicyService
     /**
      * Decrypt provider config from storage.
      */
-    public function decryptConfig(string $encrypted): array
+    public static function decryptConfig(string $encrypted): array
     {
         if (!class_exists(LegacyService::class)) {
             return [];

@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\HashtagService;
-use Nexus\Core\TenantContext;
+use App\Services\HashtagService;
+use App\Core\TenantContext;
 
 /**
  * HashtagService Tests

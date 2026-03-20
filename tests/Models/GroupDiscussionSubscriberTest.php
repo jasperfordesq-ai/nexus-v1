@@ -10,9 +10,9 @@ namespace Nexus\Tests\Models;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Models\GroupDiscussion;
-use Nexus\Models\GroupDiscussionSubscriber;
+use App\Core\TenantContext;
+use App\Models\GroupDiscussion;
+use App\Models\GroupDiscussionSubscriber;
 
 /**
  * GroupDiscussionSubscriber Model Tests

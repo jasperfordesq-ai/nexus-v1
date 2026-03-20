@@ -4,8 +4,8 @@
  * STANDALONE admin interface with Holographic Glassmorphism
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 $csrfToken = Csrf::generate();

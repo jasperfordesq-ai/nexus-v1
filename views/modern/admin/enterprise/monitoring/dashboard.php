@@ -4,7 +4,7 @@
  * STANDALONE admin interface with Holographic Glassmorphism
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

@@ -10,7 +10,7 @@ namespace Nexus\Tests\Integration;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * Group Journey Integration Test

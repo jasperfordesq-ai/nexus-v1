@@ -4,7 +4,7 @@
  * STANDALONE admin interface for enterprise RBAC system
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Services\Enterprise\PermissionService;
 
 $basePath = TenantContext::getBasePath();

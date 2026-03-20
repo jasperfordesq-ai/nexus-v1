@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\NewsletterService;
+use App\Services\NewsletterService;
 
 /**
  * NewsletterCronTest

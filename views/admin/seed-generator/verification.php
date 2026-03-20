@@ -4,7 +4,7 @@
  * Proves generator can see database and is 100% safe
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $adminPageTitle = 'Seed Generator Verification';

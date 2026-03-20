@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 // Include shared navigation configuration
 require_once dirname(__DIR__, 3) . '/partials/admin/admin-navigation-config.php';

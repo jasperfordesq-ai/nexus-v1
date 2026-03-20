@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Core;
 
 use Nexus\Tests\TestCase;
-use Nexus\Core\Mailer;
+use App\Core\Mailer;
 
 /**
  * Mailer Tests

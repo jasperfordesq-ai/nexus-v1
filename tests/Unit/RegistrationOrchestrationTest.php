@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Nexus\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\Identity\RegistrationOrchestrationService;
-use Nexus\Services\Identity\RegistrationPolicyService;
-use Nexus\Services\Identity\IdentityVerificationSessionService;
+use App\Services\Identity\RegistrationOrchestrationService;
+use App\Services\Identity\RegistrationPolicyService;
+use App\Services\Identity\IdentityVerificationSessionService;
 use ReflectionClass;
 use ReflectionMethod;
 

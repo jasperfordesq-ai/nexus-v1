@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\SchemaService;
+use App\Services\SchemaService;
 
 class SchemaServiceTest extends TestCase
 {

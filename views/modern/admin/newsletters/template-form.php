@@ -4,7 +4,7 @@
  * Holographic Glassmorphism Design
  */
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+$basePath = \App\Core\TenantContext::getBasePath();
 $isEdit = !empty($template);
 
 // Admin header configuration
@@ -46,7 +46,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     </div>
 
     <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/<?= $isEdit ? 'update/' . $template['id'] : 'store' ?>" method="POST" id="templateForm">
-        <?= \Nexus\Core\Csrf::input() ?>
+        <?= \App\Core\Csrf::input() ?>
 
         <div class="form-grid">
             <!-- Main Content Column -->
@@ -308,7 +308,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <div class="modal" role="dialog" aria-modal="true"-actions">
             <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
             <form action="<?= $basePath ?>/admin-legacy/newsletters/templates/delete/<?= $template['id'] ?>" method="POST" style="display: inline;">
-                <?= \Nexus\Core\Csrf::input() ?>
+                <?= \App\Core\Csrf::input() ?>
                 <button type="submit" class="btn-danger">
                     <i class="fa-solid fa-trash"></i> Delete Template
                 </button>

@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\RankingService;
+use App\Services\RankingService;
 
 class RankingServiceTest extends TestCase
 {

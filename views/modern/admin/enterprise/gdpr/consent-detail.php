@@ -4,7 +4,7 @@
  * View consent type details and user consent records
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $adminPageTitle = 'Consent Details';

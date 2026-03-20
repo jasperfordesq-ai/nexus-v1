@@ -6,7 +6,7 @@
 
 namespace Nexus\Middleware;
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * TenantModuleMiddleware

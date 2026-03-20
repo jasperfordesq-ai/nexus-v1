@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Core;
 
 use Nexus\Tests\DatabaseTestCase;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * TenantContext Tests

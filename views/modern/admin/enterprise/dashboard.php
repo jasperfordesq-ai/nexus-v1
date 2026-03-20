@@ -5,7 +5,7 @@
  * Cyan/Teal Theme for Enterprise Module
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $isSuperAdmin = !empty($_SESSION['is_super_admin']);

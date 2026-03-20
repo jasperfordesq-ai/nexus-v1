@@ -4,7 +4,7 @@
  * Overview of document acceptance rates and compliance statistics
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

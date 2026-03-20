@@ -4,7 +4,7 @@
  * STANDALONE admin interface for editing existing roles
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Core\Database;
 use Nexus\Services\Enterprise\PermissionService;
 

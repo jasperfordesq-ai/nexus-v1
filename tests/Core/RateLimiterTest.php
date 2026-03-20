@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Core;
 
 use Nexus\Tests\DatabaseTestCase;
-use Nexus\Core\RateLimiter;
+use App\Core\RateLimiter;
 
 /**
  * RateLimiter Tests

@@ -4,8 +4,8 @@
  * Configure WebP conversion, quality settings, and auto-optimization
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 use Nexus\Admin\WebPConverter;
 
 $basePath = TenantContext::getBasePath();

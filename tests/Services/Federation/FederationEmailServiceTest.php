@@ -10,8 +10,8 @@ namespace Nexus\Tests\Services\Federation;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\FederationEmailService;
+use App\Core\TenantContext;
+use App\Services\FederationEmailService;
 
 /**
  * FederationEmailService Tests

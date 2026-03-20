@@ -4,7 +4,7 @@
  * Comprehensive dependency and environment validation
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

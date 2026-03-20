@@ -9,8 +9,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 

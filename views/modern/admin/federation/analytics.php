@@ -4,7 +4,7 @@
  * Gold Standard admin page for viewing federation activity metrics
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

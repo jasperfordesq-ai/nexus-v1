@@ -59,7 +59,7 @@
                 The visual page builder works best on a desktop or laptop computer.
                 The drag-and-drop interface requires a larger screen for the best experience.
             </p>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/news" style="display:inline-block; background:#6366f1; color:white; padding:12px 30px; border-radius:8px; text-decoration:none; font-weight:600;">
+            <a href="<?= App\Core\TenantContext::getBasePath() ?>/admin-legacy/news" style="display:inline-block; background:#6366f1; color:white; padding:12px 30px; border-radius:8px; text-decoration:none; font-weight:600;">
                 &larr; Back to News
             </a>
             <button onclick="document.getElementById('mobile-warning').style.display='none'" style="display:block; margin:20px auto 0; background:transparent; border:1px solid #555; color:#9ca3af; padding:10px 20px; border-radius:6px; cursor:pointer;">
@@ -82,7 +82,7 @@
         </div>
         <div class="panel__right">
             <div class="panel-top">
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/news" style="color:#ccc; text-decoration:none; margin-right:auto;">&larr; Back</a>
+                <a href="<?= App\Core\TenantContext::getBasePath() ?>/admin-legacy/news" style="color:#ccc; text-decoration:none; margin-right:auto;">&larr; Back</a>
                 <button class="btn-save" onclick="savePage()">Save Article</button>
             </div>
 
@@ -200,7 +200,7 @@
     </style>
 
     <script>
-        const basePath = "<?= Nexus\Core\TenantContext::getBasePath() ?>"; // Inject PHP Path into JS
+        const basePath = "<?= App\Core\TenantContext::getBasePath() ?>"; // Inject PHP Path into JS
 
         const editor = grapesjs.init({
             container: '#gjs',

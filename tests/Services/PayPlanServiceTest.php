@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\PayPlanService;
+use App\Services\PayPlanService;
 
 class PayPlanServiceTest extends TestCase
 {

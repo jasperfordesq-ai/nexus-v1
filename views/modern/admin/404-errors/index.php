@@ -4,7 +4,7 @@
  * Gold theme with polished interface
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 $pageTitle = '404 Error Tracking';

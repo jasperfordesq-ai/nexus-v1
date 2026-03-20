@@ -5,7 +5,7 @@
  * Admin UI for running and monitoring API tests
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

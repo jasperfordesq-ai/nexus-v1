@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Core;
 
 use Nexus\Tests\TestCase;
-use Nexus\Core\Csrf;
+use App\Core\Csrf;
 
 /**
  * CSRF Protection Tests

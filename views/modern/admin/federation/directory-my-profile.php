@@ -4,8 +4,8 @@
  * Gold Standard admin page for editing own timebank's directory listing
  */
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Csrf;
+use App\Core\TenantContext;
+use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
 

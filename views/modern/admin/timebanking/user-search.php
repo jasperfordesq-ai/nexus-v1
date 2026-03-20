@@ -4,7 +4,7 @@
  * Holographic Glassmorphism Design
  */
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+$basePath = \App\Core\TenantContext::getBasePath();
 
 // Admin header configuration
 $adminPageTitle = 'User Activity Report';

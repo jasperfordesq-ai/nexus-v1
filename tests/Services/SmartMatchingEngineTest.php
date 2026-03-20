@@ -7,9 +7,9 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\SmartMatchingEngine;
+use App\Services\SmartMatchingEngine;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * SmartMatchingEngineTest - Comprehensive tests for the matching algorithm

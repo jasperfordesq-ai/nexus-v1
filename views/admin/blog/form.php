@@ -2,7 +2,7 @@
 // Layout: Default (Admin)
 $layout = 'default';
 $isEdit = isset($post);
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+$basePath = \App\Core\TenantContext::getBasePath();
 $action = $isEdit ? $basePath . "/admin-legacy/blog/update/" . $post['id'] : $basePath . "/admin-legacy/blog/store";
 ?>
 
@@ -14,7 +14,7 @@ $action = $isEdit ? $basePath . "/admin-legacy/blog/update/" . $post['id'] : $ba
 
     <div class="nexus-card">
         <form action="<?= $action ?>" method="POST">
-            <?= \Nexus\Core\Csrf::input() ?>
+            <?= \App\Core\Csrf::input() ?>
 
             <!-- Title with AI -->
             <div style="margin-bottom: 20px;">

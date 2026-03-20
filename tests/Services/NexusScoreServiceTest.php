@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\NexusScoreService;
+use App\Services\NexusScoreService;
 
 class NexusScoreServiceTest extends TestCase
 {

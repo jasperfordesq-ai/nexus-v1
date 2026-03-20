@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\FCMPushService;
+use App\Services\FCMPushService;
 
 class FCMPushServiceTest extends TestCase
 {

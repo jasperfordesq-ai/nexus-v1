@@ -7,9 +7,9 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\DigestService;
-use Nexus\Services\NotificationDispatcher;
-use Nexus\Services\GroupService;
+use App\Services\DigestService;
+use App\Services\NotificationDispatcher;
+use App\Services\GroupService;
 
 /**
  * GroupDigestCronTest

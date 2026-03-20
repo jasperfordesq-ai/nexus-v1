@@ -6,7 +6,7 @@
 
 namespace Nexus\Middleware;
 
-use Nexus\Models\SeoRedirect;
+use App\Models\SeoRedirect;
 
 class RedirectMiddleware
 {

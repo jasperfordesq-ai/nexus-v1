@@ -59,7 +59,7 @@
         </div>
         <div class="panel__right">
             <div class="panel-top">
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin-legacy/pages" style="color:#ccc; text-decoration:none; margin-right:auto;">&larr; Back</a>
+                <a href="<?= App\Core\TenantContext::getBasePath() ?>/admin-legacy/pages" style="color:#ccc; text-decoration:none; margin-right:auto;">&larr; Back</a>
                 <button class="btn-save" onclick="savePage()">Save</button>
             </div>
 
@@ -283,7 +283,7 @@
     </style>
 
     <script>
-        const basePath = "<?= Nexus\Core\TenantContext::getBasePath() ?>"; // Inject PHP Path into JS
+        const basePath = "<?= App\Core\TenantContext::getBasePath() ?>"; // Inject PHP Path into JS
 
         const editor = grapesjs.init({
             container: '#gjs',

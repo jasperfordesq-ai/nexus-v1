@@ -10,8 +10,8 @@ namespace Nexus\Tests\Services;
 
 use Nexus\Tests\DatabaseTestCase;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\VolunteerWellbeingService;
+use App\Core\TenantContext;
+use App\Services\VolunteerWellbeingService;
 
 class VolunteerWellbeingServiceTest extends DatabaseTestCase
 {

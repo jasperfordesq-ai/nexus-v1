@@ -7,8 +7,8 @@
 namespace Nexus\Tests\Models;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Models\Deliverable;
-use Nexus\Core\TenantContext;
+use App\Models\Deliverable;
+use App\Core\TenantContext;
 use Nexus\Tests\DatabaseTestCase;
 
 class DeliverableTest extends DatabaseTestCase

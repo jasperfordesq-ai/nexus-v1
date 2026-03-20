@@ -5,7 +5,7 @@
  */
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 use Nexus\Models\GroupType;
 
 // Admin check
@@ -36,7 +36,7 @@ $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate CSRF token
-    if (!\Nexus\Core\Csrf::verify()) {
+    if (!\App\Core\Csrf::verify()) {
         $errors[] = "Invalid request. Please refresh and try again.";
     }
 
@@ -195,7 +195,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
     <!-- Main Form -->
     <div class="admin-form-main">
         <form method="POST" id="typeForm">
-            <?= \Nexus\Core\Csrf::field() ?>
+            <?= \App\Core\Csrf::field() ?>
             <!-- Basic Information -->
             <div class="admin-glass-card">
                 <div class="admin-card-header">

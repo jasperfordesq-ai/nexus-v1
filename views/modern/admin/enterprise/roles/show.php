@@ -4,7 +4,7 @@
  * Gold Standard v2.0 Admin Interface
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $adminPageTitle = 'Role Details';
 $adminPageSubtitle = 'Permissions & Access Control';

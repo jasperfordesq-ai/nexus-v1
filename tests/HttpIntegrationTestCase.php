@@ -11,7 +11,7 @@ namespace Nexus\Tests;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * HTTP Integration Test Case

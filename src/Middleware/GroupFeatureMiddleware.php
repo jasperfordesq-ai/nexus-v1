@@ -6,8 +6,8 @@
 
 namespace Nexus\Middleware;
 
-use Nexus\Services\GroupFeatureToggleService;
-use Nexus\Core\TenantContext;
+use App\Services\GroupFeatureToggleService;
+use App\Core\TenantContext;
 
 /**
  * GroupFeatureMiddleware

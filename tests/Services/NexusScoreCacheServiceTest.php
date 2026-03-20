@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\NexusScoreCacheService;
+use App\Services\NexusScoreCacheService;
 
 class NexusScoreCacheServiceTest extends TestCase
 {

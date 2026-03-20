@@ -4,7 +4,7 @@
  * Shows metrics on ML recommendation engine performance
  */
 
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
 

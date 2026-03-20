@@ -7,7 +7,7 @@
 namespace Nexus\Middleware;
 
 use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
+use App\Core\TenantContext;
 
 /**
  * SuperPanelAccess Middleware
@@ -185,7 +185,7 @@ class SuperPanelAccess
         }
 
         // Check god status via DB (session-free for JWT compatibility)
-        $isGod = !empty($access['user_id']) && \Nexus\Models\User::isGod($access['user_id']);
+        $isGod = !empty($access['user_id']) && \App\Models\User::isGod($access['user_id']);
 
         // Cannot manage own tenant (only view) - unless god
         if ($targetTenantId === $access['tenant_id']) {
@@ -306,7 +306,7 @@ class SuperPanelAccess
             $_SESSION['user_id'] ?? 'none',
             $_SESSION['tenant_id'] ?? 'none',
             $access['reason'],
-            \Nexus\Core\ClientIp::get()
+            \App\Core\ClientIp::get()
         ));
 
         if (self::isApiRequest()) {

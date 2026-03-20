@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Nexus\Tests\Middleware;
 
 use Nexus\Tests\TestCase;
-use Nexus\Core\ApiErrorCodes;
+use App\Core\ApiErrorCodes;
 use Nexus\Middleware\SuperPanelAccess;
 use ReflectionClass;
 use ReflectionMethod;

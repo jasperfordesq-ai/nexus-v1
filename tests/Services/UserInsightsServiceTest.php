@@ -7,7 +7,7 @@
 namespace Nexus\Tests\Services;
 
 use PHPUnit\Framework\TestCase;
-use Nexus\Services\UserInsightsService;
+use App\Services\UserInsightsService;
 
 class UserInsightsServiceTest extends TestCase
 {
