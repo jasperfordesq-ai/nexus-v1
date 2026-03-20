@@ -188,3 +188,6 @@ httpdocs/assets/css/admin-legacy-compat.css
 test
 tests/Services/test_*.txt
 Ctemp*
+
+# ─── Data exports (PII) ───────────────────────────────────────────────────────
+*.csv

@@ -6,159 +6,322 @@ Project NEXUS migrated from a custom PHP 8.2 framework to Laravel 12.54. The Rea
 
 ## Strategy: In-Place Incremental Migration
 
-**Not a strangler fig or parallel repo.** Work in-place on a long-lived `laravel-migration` branch. Convert file-by-file, merge incrementally, test against the same database.
+Work happened in-place on a long-lived `laravel-migration` branch, which was **merged to `main` on 2026-03-19** and deleted. The migration is now live in production.
 
-The key enabler: a **bridge layer** that let Laravel and the legacy framework coexist. Legacy routes fell through to the old router; converted routes used Laravel. Both shared the same DB connection.
-
----
-
-## Current Status (2026-03-19)
-
-**Phases 0-5 are complete.** Laravel is the sole HTTP handler. The legacy framework no longer boots for any request. Performance improved from 8.4s/req (bridge mode) to ~100ms/req (pure Laravel + JIT + OPCache).
-
-**What is genuinely Laravel (62% of services):**
-- Entry point, routing, middleware pipeline (100%)
-- 68 Eloquent models with automatic `HasTenantScope` (100%)
-- ~154 services with real Eloquent/DI implementations (wallet, listings, users, search, auth, notifications, reviews, events, admin dashboards, categories)
-- Events, broadcasting, queue dispatch
-- Auth (Sanctum tokens)
-
-**What is still legacy PHP wrapped by Laravel (28% of services):**
-- ~70 pure wrapper services that delegate to `src/Services/` static methods (matching, collaborative filtering, embeddings, federation messaging, achievement analytics, group recommendations)
-- These are algorithmic/integration-heavy — stable and rarely changed
-
-**What is partially migrated (10% of services):**
-- ~25 mixed services with some methods converted to Eloquent, some still delegating
-
-### Legacy Code Remaining
-
-| Category | Files | Lines | Status |
-|----------|-------|-------|--------|
-| `src/Services/` | 215 | ~100K | 62% genuinely migrated, 28% wrappers, 10% mixed |
-| `src/Core/` | ~25 | ~15K | `TenantContext` + `Database` still critical; `Router`, `View` unused but referenced |
-| `src/Helpers/` | 8 | ~3K | Still in use |
-| `src/Models/` | 2 | <1K | `User.php` used by `SuperPanelAccess`, `EmailSettings.php` used by `Mailer` |
-| `views/admin/` + `views/modern/admin/` | ~200 | -- | Legacy admin panels, intentionally NOT migrated |
-| `views/emails/` | ~25 | -- | Email templates, still in use |
-
-### Deleted (2026-03-19)
-
-| Category | Files | Lines | Why safe |
-|----------|-------|-------|----------|
-| `src/Controllers/` | 80 | ~45K | All 1,223 routes served by Laravel controllers. Two blocking controllers (`CronController`, `NewsletterTrackingController`) relocated to `app/Services/CronJobRunner.php` and `app/Services/NewsletterTrackingService.php` before deletion. |
-| `tests/Controllers/` | 142 | -- | Scaffold tests for deleted controllers (class_exists checks only) |
+The key enabler: a **bridge layer** that let Laravel and the legacy framework coexist. Legacy routes fell through to the old router; converted routes used Laravel. Both shared the same DB connection. The bridge has since been removed — Laravel is the sole HTTP handler.
 
 ---
 
-## Phases
+## Current Status (2026-03-20)
 
-### Phase 0 — Foundation (COMPLETE)
+**Phases 0–5 are complete and merged to `main`.** Laravel is the sole HTTP handler. The legacy framework no longer boots for any request. Performance improved from 8.4s/req (bridge mode) to ~100ms/req (pure Laravel + JIT + OPCache).
 
-Install Laravel alongside the existing app without breaking anything.
+### What is complete
 
-1. [x] `composer require laravel/framework:^12.54 laravel/sanctum:^4.3` (--ignore-platform-reqs for PHP 8.2 compat)
-2. [x] Created `bootstrap/app.php`, `config/` (laravel.php, database.php, cache.php, auth.php, sanctum.php), `artisan`
-3. [x] **Bridge in index.php**: Laravel handles request first; if 404, falls through to legacy `Router::dispatch()`
-4. [x] **Tenant middleware**: `App\Http\Middleware\ResolveTenant` delegates to existing `TenantContext::resolve()`
-5. [x] **TenantScope**: `App\Scopes\TenantScope` + `App\Models\Concerns\HasTenantScope` trait for Eloquent models
-6. [x] **Health check verified**: `/api/laravel/health` returns Laravel response, legacy routes unaffected
-7. [x] DB bridge: `Database::setLaravelConnection()` shares Laravel's PDO with legacy code
-8. [ ] ~~Add `tests/Laravel/` directory~~ (created but `TestCase` class has autoload issue — pre-existing)
+| Layer | Status | Details |
+|-------|--------|---------|
+| **Entry point & routing** | 100% | `httpdocs/index.php` is a 40-line Laravel entry point. 1,470 lines in `routes/api.php` |
+| **Middleware pipeline** | 100% | `ResolveTenant`, `SecurityHeaders`, CORS, auth — all native Laravel |
+| **Controllers** | 100% | 130 native Laravel controllers in `app/Http/Controllers/Api/` |
+| **Eloquent Models** | 100% | 116 models with `HasTenantScope` auto-scoping |
+| **Auth** | 100% | Sanctum tokens, WebAuthn, 2FA |
+| **Events & Broadcasting** | 100% | Laravel events dispatched; Pusher broadcasting |
+| **Native services** | 61% | 164 of 268 services are genuine Eloquent/DI implementations |
 
-**Files created:**
-- `bootstrap/app.php` — Laravel application bootstrap
-- `config/laravel.php`, `config/database.php`, `config/cache.php`, `config/auth.php`, `config/sanctum.php`
-- `app/Http/Middleware/ResolveTenant.php` — Tenant middleware (delegates to TenantContext)
-- `app/Scopes/TenantScope.php` — Eloquent global scope for tenant isolation
-- `app/Models/Concerns/HasTenantScope.php` — Trait to add TenantScope to models
-- `app/Providers/AppServiceProvider.php`, `routes/api.php`, `artisan`
+### What remains (Phase 6 — Legacy Cleanup)
 
-**Modified:**
-- `httpdocs/index.php` — Added Laravel bridge before legacy route loading
-- `composer.json` / `composer.lock` — Added laravel/framework + laravel/sanctum + 56 dependencies
-
-### Phase 1 — Route Migration (COMPLETE)
-
-**1,224 API routes** migrated to Laravel's routes/api.php. All 14 legacy route files commented out. Still in legacy: ~600 non-API routes (super-admin, admin-legacy views, cron, closures).
-
-Existing controllers still use `echo json_encode()` + `exit()` — Laravel routes call them directly. Controller conversion to return proper Laravel Response objects is a later phase.
-
-### Phase 2 — Models (COMPLETE — 68 models)
-
-All Eloquent models created with `HasTenantScope`. Tested against live database.
-
-### Phase 3 — Services (IN PROGRESS — 62% genuine)
-
-DI pattern established. **249 Laravel services** created (vs 215 legacy).
-
-| Status | Count | Description |
-|--------|-------|-------------|
-| **Genuine** | ~154 | Real Eloquent/DI implementations (wallet, listings, users, search, auth, etc.) |
-| **Wrappers** | ~70 | Delegate to legacy static services (matching, filtering, embeddings, federation) |
-| **Mixed** | ~25 | Partially converted — good candidates to finish next |
-
-### Phase 4 — Controllers (COMPLETE — 130 Laravel controllers)
-
-All API controllers converted. Legacy controllers deleted (2026-03-19).
-
-### Phase 5 — Activation (COMPLETE — 2026-03-18)
-
-Laravel is now the sole HTTP handler. The legacy bridge pattern (boot both frameworks, fall through on 404) has been replaced with a pure Laravel entry point.
-
-**What changed:**
-- `httpdocs/index.php` — rewritten from 550-line legacy boot to 40-line Laravel entry point
-- `bootstrap/app.php` — removed duplicate route loading (was loading 2,441 routes instead of 1,223)
-- `config/cors.php` — added `v2/*` to CORS paths (routes use `/v2/...` not `/api/...`)
-- `app/Http/Middleware/SecurityHeaders.php` — new middleware replacing inline headers from legacy index.php
-- `Dockerfile` — OPCache tuning (256MB, 30K files, JIT tracing with 100MB buffer, preloading)
-- `scripts/opcache-preload.php` — preloads Laravel framework + app classes into shared memory
-
-**Performance:** 8.4s/request (bridge) → ~100ms (pure Laravel + JIT + OPCache preload)
-
-**All 1,223 routes** served by Laravel across 126 controllers. Legacy PHP framework no longer boots for any request.
+| Item | Count | Effort | Risk |
+|------|-------|--------|------|
+| **Wrapper services** (`app/Services/`) | 104 | High | Medium |
+| **Legacy delegates** (`src/`) | 82 files | Low (delete after wrappers converted) | Low |
+| **Event Listener stubs** (`app/Listeners/`) | 5 | Medium | Medium |
+| **Migration consolidation** | 188 legacy SQL + 4 Laravel | Low | Low |
 
 ---
 
-## Phase 6 — Legacy Cleanup (NOT STARTED)
+## Phase 6 — Legacy Cleanup (IN PROGRESS)
 
-Remaining work to make this a fully Laravel application. Ordered by risk and value.
+### 6a. Convert 104 wrapper services — THE CORE REMAINING WORK
 
-### 6a. Finish mixed services (~25 services) — LOW RISK
-Services that are partially converted. Some methods use Eloquent, some delegate. Finish the conversion.
-- **Effort:** Small per service
-- **Risk:** Low — partial logic already works in Laravel
-- **Approach:** As you touch each service for bugs/features, finish the conversion
+**104 services** in `app/Services/` are pure DI wrappers that delegate every call to legacy `\Nexus\Services\*` static methods. They have no Eloquent logic — they exist only so Laravel controllers can inject them via DI.
 
-### 6b. Convert wrapper services (~70 services) — MEDIUM RISK
-Pure wrappers that just call legacy static methods. Convert to Eloquent/DI.
-- **Effort:** Medium — rewrite each with Eloquent
-- **Risk:** Medium — algorithmic code (matching, filtering, embeddings) with low test coverage
-- **Approach:** Incrementally, as you touch them. Do NOT bulk-rewrite without tests.
-- **Key services:** SmartMatchingEngine, CollaborativeFilteringService, EmbeddingService, FederatedMessageService, AchievementAnalyticsService, GroupRecommendationEngine
+**Pattern (every wrapper looks like this):**
+```php
+// app/Services/GroupAssignmentService.php
+namespace App\Services;
 
-### 6c. Remove dead framework classes — LOW RISK
-Classes in `src/Core/` that are no longer called but could not be deleted yet due to entanglement.
+class GroupAssignmentService
+{
+    public function __call(string $method, array $args): mixed
+    {
+        return \Nexus\Services\GroupAssignmentService::$method(...$args);
+    }
+}
+```
 
-| Class | Lines | Blocker |
-|-------|-------|---------|
-| `Router.php` | 9.4K | Used by `generate_openapi.php` |
-| `View.php` | 4.6K | Was referenced by deleted controllers — **may now be deletable** (needs verification) |
-| `MenuGenerator.php` | -- | Called directly by `MenuManager.php` lines 400-417 (no `class_exists` guard) |
-| `DefaultMenus.php` | 13K | Called by `MenuManager.php` with `class_exists` guard, but also calls `MenuGenerator` internally |
+Or with explicit method delegation:
+```php
+// app/Services/VolunteerMatchingService.php
+public function findMatches(int $tenantId, int $opportunityId, int $limit = 10): array
+{
+    return \Nexus\Services\VolunteerMatchingService::findMatches($tenantId, $opportunityId, $limit);
+}
+```
 
-**To unblock MenuGenerator/DefaultMenus deletion:** Rewrite `MenuManager.php` lines 400-417 to not delegate to `MenuGenerator`. Then both can go.
+**What "converting" means:** Rewrite each wrapper to use Eloquent models, `DB::` facades, and constructor DI — like the reference implementation `ListingService.php`:
+```php
+// app/Services/ListingService.php (REFERENCE — fully native)
+use App\Models\Listing;
+use Illuminate\Support\Facades\DB;
 
-### 6d. Migrate core framework classes — HIGH VALUE, HIGH RISK
-The two most critical legacy classes.
+class ListingService
+{
+    public function __construct(
+        private readonly Listing $listing,
+    ) {}
 
-| Class | Lines | Why it matters |
-|-------|-------|---------------|
-| `TenantContext` | 802 | 7 resolution strategies, called everywhere. Both `src/Core/` and `app/Core/` versions exist. |
-| `Database.php` | 9.4K | Raw PDO wrapper used by legacy services. Once wrapper services (6b) are gone, this has no callers. |
+    public function getActiveListings(array $filters = []): CursorPaginator
+    {
+        return $this->listing->where('status', 'active')
+            ->when($filters['category'] ?? null, fn ($q, $cat) => $q->where('category_id', $cat))
+            ->cursorPaginate(20);
+    }
+}
+```
 
-**Approach:** Do `Database.php` last — once all services use Eloquent/`DB::` facade, it becomes dead code. `TenantContext` can be rewritten as a proper Laravel singleton after that.
+#### Complete list of 104 wrapper services
 
-### 6e. Migrate legacy models — LOW EFFORT, BLOCKED
+Grouped by functional area to help prioritize:
+
+**Federation (14 services)** — Inter-community networking
+- `FederatedConnectionService.php`
+- `FederatedGroupService.php`
+- `FederatedMessageService.php`
+- `FederatedTransactionService.php`
+- `FederationActivityService.php`
+- `FederationCreditService.php`
+- `FederationDirectoryService.php`
+- `FederationEmailService.php`
+- `FederationExternalApiClient.php`
+- `FederationExternalPartnerService.php`
+- `FederationGateway.php`
+- `FederationJwtService.php`
+- `FederationNeighborhoodService.php`
+- `FederationRealtimeService.php`
+- `FederationUserService.php`
+
+**Groups (15 services)** — Community group management
+- `GroupAchievementService.php`
+- `GroupApprovalWorkflowService.php`
+- `GroupAssignmentService.php`
+- `GroupAuditService.php`
+- `GroupChatroomService.php`
+- `GroupConfigurationService.php`
+- `GroupEventService.php`
+- `GroupExchangeService.php`
+- `GroupFeatureToggleService.php`
+- `GroupFileService.php`
+- `GroupModerationService.php`
+- `GroupNotificationService.php`
+- `GroupPermissionManager.php`
+- `GroupPolicyRepository.php`
+- `GroupReportingService.php`
+- `OptimizedGroupQueries.php`
+
+**Matching & Recommendations (8 services)** — Algorithmic, low test coverage
+- `CrossModuleMatchingService.php`
+- `MatchApprovalWorkflowService.php`
+- `MatchDigestService.php`
+- `MatchLearningService.php`
+- `MatchingService.php`
+- `MatchNotificationService.php`
+- `PersonalizedSearchService.php`
+- `SmartGroupMatchingService.php`
+- `SmartGroupRankingService.php`
+- `SmartMatchingAnalyticsService.php`
+- `SmartSegmentSuggestionService.php`
+
+**Volunteering (5 services)**
+- `VolunteerCertificateService.php`
+- `VolunteerMatchingService.php`
+- `VolunteerReminderService.php`
+- `VolunteerWellbeingService.php`
+- `RecurringShiftService.php`
+
+**Email & Notifications (9 services)**
+- `DeliverabilityTrackingService.php`
+- `DigestService.php`
+- `EmailMonitorService.php`
+- `EmailTemplateBuilder.php`
+- `EmailTemplateService.php`
+- `FCMPushService.php`
+- `GamificationEmailService.php`
+- `NewsletterTemplates.php`
+- `OrgNotificationService.php`
+- `ProgressNotificationService.php`
+- `WebPushService.php`
+
+**Transactions & Wallet (6 services)**
+- `DailyRewardService.php`
+- `ExchangeRatingService.php`
+- `PayPlanService.php`
+- `StartingBalanceService.php`
+- `TransactionCategoryService.php`
+- `TransactionExportService.php`
+- `TransactionLimitService.php`
+
+**Admin & Infrastructure (12 services)**
+- `AdminListingsService.php`
+- `AdminSettingsService.php`
+- `GeocodingService.php`
+- `HtmlSanitizer.php`
+- `PerformanceMonitorService.php`
+- `PusherService.php`
+- `RankingService.php`
+- `RateLimitService.php`
+- `RedisCache.php`
+- `ReportExportService.php`
+- `SchemaService.php`
+- `SentryService.php`
+- `SuperAdminAuditService.php`
+- `TenantHierarchyService.php`
+- `TenantSettingsService.php`
+- `TenantVisibilityService.php`
+- `TwoFactorChallengeManager.php`
+
+**Other (remaining services)**
+- `BadgeService.php`
+- `BrokerService.php`
+- `CookieConsentService.php`
+- `GuardianConsentService.php`
+- `HashtagService.php`
+- `HoursReportService.php`
+- `IdeaMediaService.php`
+- `IdeaTeamConversionService.php`
+- `InsuranceCertificateService.php`
+- `MailchimpService.php`
+- `OrgWalletService.php`
+- `PostSharingService.php`
+- `PredictiveStaffingService.php`
+- `ReferralService.php`
+- `ResourceCategoryService.php`
+- `ResourceOrderService.php`
+- `SavedSearchService.php`
+- `SearchAnalyzerService.php`
+- `SearchLogService.php`
+- `SocialAuthService.php`
+- `SocialGamificationService.php`
+- `SocialValueService.php`
+- `TeamDocumentService.php`
+- `TeamTaskService.php`
+- `UnifiedSearchService.php`
+- `UploadService.php`
+- `VettingService.php`
+- `WebAuthnChallengeStore.php`
+- `WebhookDispatchService.php`
+
+**Approach:**
+- Do NOT bulk-rewrite. Convert incrementally as you touch each service for bugs or features.
+- **Add tests BEFORE converting** — many of these have no test coverage.
+- Use `ListingService.php` as the reference implementation.
+- 8 wrappers use `__call()` magic method forwarding (most dangerous — no IDE or static analysis support):
+  `UploadService`, `SocialAuthService`, `SmartGroupMatchingService`, `SearchAnalyzerService`, `PersonalizedSearchService`, `MailchimpService`, `GroupAssignmentService`, `FederationExternalApiClient`
+
+**Priority order:**
+1. The 8 `__call()` magic wrappers — highest risk, no type safety
+2. Services actively touched for bugs/features — convert as you go
+3. Federation services — complex but self-contained cluster
+4. Everything else — low urgency, stable code
+
+---
+
+### 6b. Implement 5 Event Listener stubs
+
+All 5 listeners in `app/Listeners/` are empty stubs with TODO comments. They were created during the migration but never implemented — the legacy code they're supposed to replace still runs via the wrapper services above.
+
+| Listener | Legacy code it replaces | TODOs |
+|----------|------------------------|-------|
+| **NotifyConnectionRequest** | `ConnectionService::sendConnectionNotification()`, `NotificationService::create()`, `PushNotificationService` | Create in-app notification, send push, send email if prefs allow |
+| **NotifyMessageReceived** | `MessageService::notifyRecipient()`, `NotificationService::create()`, `PushNotificationService`, `RealtimeService` | Create in-app notification, send push, send email if offline |
+| **SendWelcomeNotification** | `NotificationService::sendWelcomeNotification()`, `EmailService::sendWelcomeEmail()` | Send welcome email, create in-app notification, init gamification profile |
+| **UpdateFeedOnListingCreated** | `FeedService::createActivity()`, `SearchService::indexListing()` | Create feed activity, index in search, notify followers |
+| **UpdateWalletBalance** | `WalletService::processTransaction()`, `GamificationService::awardTransactionXp()` | Update sender/receiver balances, award XP, update leaderboard |
+
+**Approach:** These listeners should use the **native** `app/Services/` implementations (not the wrapper services). Convert the relevant wrapper services first, then implement the listeners.
+
+**Risk:** Medium — these are critical user-facing flows (notifications, wallet transactions). Test thoroughly.
+
+---
+
+### 6c. Delete 82 legacy `src/` delegate files
+
+All 82 remaining files in `src/` are thin backward-compatibility delegates that forward calls to `App\*` namespace classes. They exist because the 104 wrapper services in `app/Services/` call `\Nexus\Services\*` static methods.
+
+**Once the 104 wrapper services are converted to native Eloquent (6a), these files become dead code and can be deleted.**
+
+| Category | Files | Delegates to |
+|----------|-------|-------------|
+| `src/Core/` | 14 | `App\Core\*` (Auth, Database, TenantContext, Validator, etc.) |
+| `src/Admin/` | 1 | `App\Admin\WebPConverter` |
+| `src/Config/` | 4 | Static config files (no delegation) |
+| `src/Helpers/` | 8 | `App\Helpers\*` (CorsHelper, ImageHelper, TimeHelper, etc.) |
+| `src/I18n/` | 1 | `App\I18n\Translator` |
+| `src/Middleware/` | 8 | `App\Middleware\*` (FederationApi, Maintenance, SuperPanelAccess, etc.) |
+| `src/PageBuilder/` | 18 | `App\PageBuilder\*` (BlockRegistry, PageRenderer, 16 renderers) |
+| `src/Services/AI/` | 7 | `App\Services\AI\*` (AIServiceFactory, 5 providers, contracts) |
+| `src/Services/Enterprise/` | 5 | `App\Services\Enterprise\*` (Config, GDPR, Logger, Metrics, Permissions) |
+| `src/Services/Identity/` | 14 | `App\Services\Identity\*` (14 identity verification providers/services) |
+| `src/Services/TotpService.php` | 1 | `App\Services\TotpService` |
+| `src/helpers.php` | 1 | Static helper functions |
+
+**Approach:**
+1. After converting each group of wrapper services, grep for `\Nexus\` references across the entire codebase
+2. When a `src/` file has zero remaining callers, delete it
+3. The last files to go will be `src/Core/TenantContext.php` and `src/Core/Database.php` — these are called by nearly everything
+4. `src/Config/` files (4) are static config — may need to be moved to `config/` rather than deleted
+
+**Risk:** Low — these are verified delegates with no unique logic. Just need to confirm zero callers before each deletion.
+
+---
+
+### 6d. Consolidate database migrations
+
+Two parallel migration systems currently coexist:
+
+| System | Location | Files | Format | Runner |
+|--------|----------|-------|--------|--------|
+| **Legacy** | `migrations/` | 188 | Raw SQL (`.sql`) | `php scripts/safe_migrate.php` (local) or direct `mysql <` (production) |
+| **Laravel** | `database/migrations/` | 4 | PHP (Eloquent Schema Builder) | `php artisan migrate` |
+
+**Laravel migrations (4 files):**
+1. `2026_03_18_000000_baseline_schema.php` — Captures the entire existing schema as a baseline
+2. `2026_03_18_000001_create_personal_access_tokens_table.php` — Sanctum tokens
+3. `2026_03_18_000002_create_migration_registry.php` — Migration tracking
+4. `2026_03_18_000003_add_laravel_columns.php` — Additional columns needed by Laravel
+
+**Approach:**
+- All **new** schema changes should use Laravel migrations (`database/migrations/`)
+- The 188 legacy SQL files are historical — they've already been applied to production
+- Do NOT attempt to convert the 188 legacy files to Laravel format (no value, high risk)
+- Eventually, stop using `migrations/` for new work entirely
+- The baseline migration means `php artisan migrate` on a fresh database produces the correct schema
+
+**Risk:** Low — this is a process change, not a code change.
+
+---
+
+### 6e. Migrate core framework classes — HIGH VALUE, HIGH RISK
+
+The two most critical legacy classes, to be done **last**:
+
+| Class | Location | Lines | Why it matters |
+|-------|----------|-------|---------------|
+| `TenantContext` | `src/Core/TenantContext.php` → `app/Core/TenantContext.php` | 802 | 7 resolution strategies, called everywhere |
+| `Database.php` | `src/Core/Database.php` → `app/Core/Database.php` | 9.4K | Raw PDO wrapper used by wrapper services |
+
+**Approach:** Do `Database.php` last — once all 104 wrapper services use Eloquent/`DB::` facade, it becomes dead code. `TenantContext` can be rewritten as a proper Laravel singleton after that.
+
+### 6f. Migrate legacy models — LOW EFFORT, BLOCKED
 
 | Model | Blocker |
 |-------|---------|
@@ -167,10 +330,60 @@ The two most critical legacy classes.
 
 **Fix:** Move `isGod()` to `App\Models\User`, update `SuperPanelAccess`. Move `EmailSettings` logic to Eloquent model, update `Mailer`.
 
-### 6f. Admin panel modernisation (OPTIONAL) — LOW PRIORITY
+### 6g. Admin panel modernisation (OPTIONAL) — LOW PRIORITY
 - `views/admin/` + `views/modern/admin/` (~200 files) serve `/admin-legacy/` and `/super-admin/`
 - Could convert to Laravel Blade or React admin panel
 - **Not recommended now** — works fine, low traffic, admin-only
+
+---
+
+## Completed Phases (Historical)
+
+### Phase 0 — Foundation (COMPLETE)
+
+Install Laravel alongside the existing app without breaking anything.
+
+1. [x] `composer require laravel/framework:^12.54 laravel/sanctum:^4.3`
+2. [x] Created `bootstrap/app.php`, `config/`, `artisan`
+3. [x] Bridge in `index.php`: Laravel handles request first; if 404, falls through to legacy
+4. [x] Tenant middleware: `ResolveTenant` delegates to `TenantContext::resolve()`
+5. [x] `TenantScope` + `HasTenantScope` trait for Eloquent models
+6. [x] Health check verified: `/api/laravel/health`
+7. [x] DB bridge: `Database::setLaravelConnection()` shares Laravel's PDO with legacy code
+
+### Phase 1 — Route Migration (COMPLETE)
+
+**1,470 lines** in `routes/api.php`. All legacy route files retired.
+
+### Phase 2 — Models (COMPLETE — 116 models)
+
+All Eloquent models created with `HasTenantScope`. Tested against live database.
+
+### Phase 3 — Services (61% COMPLETE — 164/268 native)
+
+DI pattern established. **268 Laravel services** created.
+
+| Status | Count | % | Description |
+|--------|-------|---|-------------|
+| **Native** | 164 | 61% | Real Eloquent/DI implementations |
+| **Wrappers** | 104 | 39% | Delegate to legacy `\Nexus\*` static services |
+
+### Phase 4 — Controllers (COMPLETE — 130 Laravel controllers)
+
+All API controllers converted. Legacy controllers deleted (2026-03-19).
+
+### Phase 5 — Activation (COMPLETE — 2026-03-18)
+
+Laravel is the sole HTTP handler. The bridge has been removed.
+
+**Performance:** 8.4s/request (bridge) → ~100ms (pure Laravel + JIT + OPCache preload)
+
+### Deleted (2026-03-19)
+
+| Category | Files | Lines | Why safe |
+|----------|-------|-------|----------|
+| `src/Controllers/` | 80 | ~45K | All routes served by Laravel controllers |
+| `tests/Controllers/` | 142 | -- | Scaffold tests for deleted controllers |
 
 ---
 
@@ -182,16 +395,15 @@ The two most critical legacy classes.
 | Services | 1,283 | 95 pre-existing errors (DB access to `nexus_test`), 56% coverage gap |
 | Models | -- | Pre-existing DB access errors |
 | Laravel | 17 | `TestCase` autoload issue (pre-existing) |
-| Controllers | -- | **Deleted** (were scaffold tests for removed legacy controllers) |
 
-**Priority:** Fix `nexus_test` database access to unblock service tests before converting more services.
+**Priority:** Fix `nexus_test` database access to unblock service tests before converting more wrapper services.
 
 ---
 
 ## Critical Risks
 
 | Risk | Mitigation |
-|---|---|
+|------|------------|
 | API contract breakage (React breaks) | Response shape logging + snapshot tests |
 | Multi-tenant scope leak | `TenantScope` global scope is safer than manual scoping |
 | Wrapper service rewrite breaks logic | Add tests BEFORE converting untested services |
@@ -200,28 +412,17 @@ The two most critical legacy classes.
 
 ## What NOT to Migrate
 
-- Legacy PHP admin views (`views/admin/`, `views/modern/admin/`) — leave as-is (optional future work)
-- React frontend — untouched
+- Legacy PHP admin views (`views/admin/`, `views/modern/admin/`) — leave as-is
+- React frontend — untouched (already fully decoupled)
 - PHP i18n files (`lang/`) — only used by legacy admin
-- PageBuilder — low priority
+- PageBuilder — low priority, works fine
 
 ---
 
-## Production Impact & Parallel Development
-
-All migration work happens on a `laravel-migration` branch. `main` remains the stable production branch. Periodically merge `main` into `laravel-migration` to stay current.
-
-```bash
-git checkout laravel-migration
-git merge main
-```
-
-**NEVER merge `laravel-migration` into `main` without explicit user approval.**
-
 ## Verification
 
-After each phase:
-1. Run PHPUnit suites (Unit, Services, Models)
-2. Hit converted endpoints via React frontend
+After each service conversion:
+1. Run PHPUnit suites (Unit, Services)
+2. Hit affected endpoints via React frontend
 3. Verify tenant scoping with cross-tenant test queries
 4. Check Docker builds still work

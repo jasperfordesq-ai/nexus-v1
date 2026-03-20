@@ -97,17 +97,17 @@ The NGC folder (`C:\Users\{user}\AppData\Local\Microsoft\Ngc`) must exist — th
 
 ---
 
-## LARAVEL MIGRATION — BRANCH RULES (CRITICAL)
+## LARAVEL MIGRATION — STATUS
 
-A Laravel migration is in progress on the `laravel-migration` branch. **This work MUST NEVER be committed or merged to `main` until it is fully tested and approved by the user.**
+The Laravel migration has been **merged to `main`** (2026-03-19) and is live in production. The `laravel-migration` branch no longer exists.
 
-- **All Laravel migration work** happens exclusively on the `laravel-migration` branch
-- **NEVER merge `laravel-migration` into `main`** without explicit user approval
-- **NEVER commit Laravel migration changes to `main`** — not even "small" or "safe" ones
-- **`main` remains the stable production branch** — it must always be deployable
-- Regular feature work and bug fixes continue on `main` as normal
-- Periodically merge `main` into `laravel-migration` to keep the migration branch up to date
-- See [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) for full migration strategy and phases
+- **Phases 0–5 are complete**: Laravel 12.54 is the sole HTTP handler, routing, middleware, controllers, and auth
+- **164 of 268 services** are native Eloquent/DI implementations
+- **104 wrapper services** still delegate to legacy `\Nexus\*` static methods — convert incrementally as you touch them
+- **82 legacy `src/` files** remain as thin delegates — delete as their callers are converted
+- **5 Event Listener stubs** in `app/Listeners/` have TODO comments — implement after converting relevant wrapper services
+- All new schema changes use Laravel migrations in `database/migrations/`
+- See [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) for the full remaining work breakdown
 
 ---
 
