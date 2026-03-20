@@ -28,8 +28,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         })
             ->everyMinute()
             ->name('nexus:run-all')
-            ->withoutOverlapping(10)
-            ->runInBackground();
+            ->withoutOverlapping(10);
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).
