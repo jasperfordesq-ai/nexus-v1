@@ -51,17 +51,24 @@ MAINTENANCE_FILE="/var/www/html/.maintenance"
 PHP_CONTAINER="nexus-php-app"
 
 enable_maintenance_mode() {
-    log_step "=== Enabling Maintenance Mode ==="
+    log_step "=== Enabling Maintenance Mode (both layers) ==="
 
     if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+        # Layer 1: File-based gate
         docker exec "$PHP_CONTAINER" touch "$MAINTENANCE_FILE"
 
         if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
-            log_ok "Maintenance mode ON — all non-localhost traffic blocked"
+            log_ok "Layer 1: .maintenance file created"
         else
-            log_err "Failed to create .maintenance file"
+            log_err "Layer 1: Failed to create .maintenance file"
             exit 1
         fi
+
+        # Layer 2: Database — set all tenants to maintenance mode
+        _deploy_db_maintenance_set "true"
+
+        # Layer 3: Flush Redis bootstrap cache so frontend sees DB change immediately
+        _deploy_flush_bootstrap_cache
 
         # Verify HTTP 503
         sleep 1
@@ -79,9 +86,10 @@ enable_maintenance_mode() {
 }
 
 disable_maintenance_mode() {
-    log_step "=== Disabling Maintenance Mode ==="
+    log_step "=== Disabling Maintenance Mode (both layers) ==="
 
     if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+        # Layer 1: Remove file
         docker exec "$PHP_CONTAINER" rm -f "$MAINTENANCE_FILE"
 
         if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
@@ -89,12 +97,18 @@ disable_maintenance_mode() {
             docker exec "$PHP_CONTAINER" rm -f "$MAINTENANCE_FILE"
         fi
 
-        log_ok "Maintenance mode OFF — platform is live"
+        log_ok "Layer 1: .maintenance file removed"
+
+        # Layer 2: Database — clear maintenance mode for all tenants
+        _deploy_db_maintenance_set "false"
+
+        # Layer 3: Flush Redis bootstrap cache so frontend sees DB change immediately
+        _deploy_flush_bootstrap_cache
 
         # Verify HTTP 200
         sleep 1
         local HTTP_CODE
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/health.php 2>/dev/null || echo "000")
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
         if [ "$HTTP_CODE" = "200" ]; then
             log_ok "Verified: API returning HTTP 200"
         else
@@ -102,6 +116,58 @@ disable_maintenance_mode() {
         fi
     else
         log_warn "$PHP_CONTAINER not running — cannot disable maintenance mode"
+    fi
+}
+
+# Helper: set database maintenance_mode for all tenants during deploy
+_deploy_db_maintenance_set() {
+    local value="$1"
+    local DB_USER DB_PASS DB_NAME
+    DB_USER=$(grep "^DB_USER=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+    DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
+    DB_NAME=$(grep "^DB_NAME=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+    # Fallback: try DB_PASSWORD=
+    if [ -z "$DB_PASS" ]; then
+        DB_PASS=$(grep "^DB_PASSWORD=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "")
+    fi
+
+    if [ -z "$DB_PASS" ]; then
+        log_warn "Layer 2: No DB password — skipping database maintenance toggle"
+        return
+    fi
+
+    if docker ps --filter "name=nexus-php-db" --format "{{.Names}}" | grep -q "nexus-php-db"; then
+        docker exec nexus-php-db mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e \
+            "UPDATE tenant_settings SET setting_value = '$value' WHERE setting_key = 'general.maintenance_mode';" 2>/dev/null \
+            && log_ok "Layer 2: Database maintenance_mode = '$value'" \
+            || log_warn "Layer 2: Database update failed"
+    else
+        log_warn "Layer 2: nexus-php-db not running — skipping database maintenance toggle"
+    fi
+}
+
+# Helper: flush Redis bootstrap cache so frontend sees maintenance changes immediately
+_deploy_flush_bootstrap_cache() {
+    if docker ps --filter "name=nexus-php-redis" --format "{{.Names}}" | grep -q "nexus-php-redis"; then
+        local prefix
+        prefix=$(grep "^CACHE_PREFIX=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus_laravel")
+        local keys
+        keys=$(docker exec nexus-php-redis redis-cli --no-auth-warning KEYS "${prefix}:*tenant_bootstrap*" 2>/dev/null || echo "")
+        if [ -n "$keys" ]; then
+            for key in $keys; do
+                docker exec nexus-php-redis redis-cli --no-auth-warning DEL "$key" > /dev/null 2>&1
+            done
+        fi
+        # Also flush tenant_settings cache
+        keys=$(docker exec nexus-php-redis redis-cli --no-auth-warning KEYS "${prefix}:*tenant_settings*" 2>/dev/null || echo "")
+        if [ -n "$keys" ]; then
+            for key in $keys; do
+                docker exec nexus-php-redis redis-cli --no-auth-warning DEL "$key" > /dev/null 2>&1
+            done
+        fi
+        log_ok "Layer 3: Redis bootstrap/settings cache flushed"
+    else
+        log_warn "Layer 3: nexus-php-redis not running — skipping cache flush"
     fi
 }
 

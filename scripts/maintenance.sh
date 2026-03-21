@@ -7,16 +7,25 @@
 # This is the CANONICAL method for controlling maintenance mode on the entire
 # Project NEXUS platform across ALL tenants.
 #
-# How it works:
-#   Creates/removes a .maintenance file that is checked by index.php BEFORE
-#   any framework code loads. When present, ALL non-localhost requests receive
-#   HTTP 503 with a static maintenance page. This is the fastest, most reliable
-#   gate — no database, no Redis, no Laravel, no React involved.
+# THREE LAYERS are controlled simultaneously by this script:
 #
-# This method was established on 2026-03-21 after discovering that the
-# database-driven approach (tenant_settings) was unreliable because the
-# middleware was not registered. The file-based approach is now the canonical
-# method for global maintenance mode.
+#   Layer 1 (FILE-BASED):  .maintenance file in the PHP container
+#     - Checked by index.php BEFORE Laravel boots
+#     - Blocks ALL non-localhost HTTP requests with 503
+#     - Fastest gate — no database, no framework overhead
+#
+#   Layer 2 (DATABASE-BASED):  tenant_settings.general.maintenance_mode
+#     - Checked by Laravel CheckMaintenanceMode middleware
+#     - Checked by React TenantShell (shows MaintenancePage)
+#     - Per-tenant setting, but this script sets ALL tenants at once
+#
+#   Layer 3 (REDIS CACHE):  tenant_bootstrap cache keys
+#     - TenantBootstrapController caches settings for 10 minutes
+#     - React frontend reads maintenance_mode from cached bootstrap data
+#     - Must be flushed so frontend sees DB changes immediately
+#
+# ALL layers must agree, or users will still see maintenance mode even
+# after one layer is disabled. This script always toggles ALL THREE.
 #
 # DO NOT improvise alternative approaches. Use this script.
 # =============================================================================
@@ -26,7 +35,10 @@ set -e
 # --- Configuration ---
 DEPLOY_DIR="/opt/nexus-php"
 PHP_CONTAINER="nexus-php-app"
+DB_CONTAINER="nexus-php-db"
+REDIS_CONTAINER="nexus-php-redis"
 MAINTENANCE_FILE="/var/www/html/.maintenance"
+CACHE_PREFIX="nexus_laravel"
 
 # --- Colors ---
 RED='\033[0;31m'
@@ -43,47 +55,178 @@ log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_err()  { echo -e "${RED}[FAIL]${NC} $1"; }
 
 check_container() {
-    if ! docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
-        log_err "$PHP_CONTAINER container is not running"
+    local container="$1"
+    if ! docker ps --filter "name=$container" --format "{{.Names}}" | grep -q "$container"; then
+        log_err "$container container is not running"
         exit 1
+    fi
+}
+
+# Read DB credentials from .env
+get_db_creds() {
+    local env_file="$DEPLOY_DIR/.env"
+    if [ -f "$env_file" ]; then
+        DB_USER=$(grep "^DB_USER=" "$env_file" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+        DB_PASS=$(grep "^DB_PASS=" "$env_file" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
+        DB_NAME=$(grep "^DB_NAME=" "$env_file" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
+        # Fallback: try DB_PASSWORD= if DB_PASS= not found
+        if [ -z "$DB_PASS" ]; then
+            DB_PASS=$(grep "^DB_PASSWORD=" "$env_file" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "")
+        fi
+    else
+        DB_USER="nexus"
+        DB_PASS=""
+        DB_NAME="nexus"
+    fi
+}
+
+# Set database maintenance_mode for all tenants
+db_maintenance_set() {
+    local value="$1"  # "true" or "false"
+    get_db_creds
+
+    if [ -z "$DB_PASS" ]; then
+        log_warn "No DB password found in $DEPLOY_DIR/.env — skipping database layer"
+        return 1
+    fi
+
+    # Update existing rows
+    local updated
+    updated=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+        "UPDATE tenant_settings SET setting_value = '$value' WHERE setting_key = 'general.maintenance_mode'; SELECT ROW_COUNT();" 2>/dev/null)
+
+    # Insert for any tenants that don't have the setting yet
+    docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e \
+        "INSERT IGNORE INTO tenant_settings (tenant_id, setting_key, setting_value, setting_type)
+         SELECT t.id, 'general.maintenance_mode', '$value', 'boolean'
+         FROM tenants t WHERE t.is_active = 1
+         AND NOT EXISTS (
+             SELECT 1 FROM tenant_settings ts
+             WHERE ts.tenant_id = t.id AND ts.setting_key = 'general.maintenance_mode'
+         );" 2>/dev/null
+
+    log_ok "Layer 2: Database maintenance_mode = '$value' (${updated:-0} rows updated)"
+    return 0
+}
+
+# Flush Redis cache for tenant bootstrap data so frontend sees changes immediately
+flush_bootstrap_cache() {
+    if ! docker ps --filter "name=$REDIS_CONTAINER" --format "{{.Names}}" | grep -q "$REDIS_CONTAINER"; then
+        log_warn "Layer 3: $REDIS_CONTAINER not running — skipping cache flush"
+        return
+    fi
+
+    # Read cache prefix from .env (fallback to default)
+    local prefix="$CACHE_PREFIX"
+    local env_prefix
+    env_prefix=$(grep "^CACHE_PREFIX=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "")
+    if [ -n "$env_prefix" ]; then
+        prefix="$env_prefix"
+    fi
+
+    # Delete all tenant_bootstrap cache keys (format: nexus_laravel:t{id}:tenant_bootstrap)
+    local deleted=0
+    local keys
+    keys=$(docker exec "$REDIS_CONTAINER" redis-cli --no-auth-warning KEYS "${prefix}:*tenant_bootstrap*" 2>/dev/null || echo "")
+
+    if [ -n "$keys" ]; then
+        for key in $keys; do
+            docker exec "$REDIS_CONTAINER" redis-cli --no-auth-warning DEL "$key" > /dev/null 2>&1
+            deleted=$((deleted + 1))
+        done
+    fi
+
+    # Also flush tenant_settings cache keys (format: nexus_laravel:t{id}:tenant_settings)
+    keys=$(docker exec "$REDIS_CONTAINER" redis-cli --no-auth-warning KEYS "${prefix}:*tenant_settings*" 2>/dev/null || echo "")
+
+    if [ -n "$keys" ]; then
+        for key in $keys; do
+            docker exec "$REDIS_CONTAINER" redis-cli --no-auth-warning DEL "$key" > /dev/null 2>&1
+            deleted=$((deleted + 1))
+        done
+    fi
+
+    log_ok "Layer 3: Redis cache flushed ($deleted keys deleted)"
+}
+
+# Check how many tenants have maintenance_mode = 'true' in the database
+db_maintenance_status() {
+    get_db_creds
+    if [ -z "$DB_PASS" ]; then
+        log_warn "No DB password — cannot check database layer"
+        return
+    fi
+
+    local count
+    count=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+        "SELECT COUNT(*) FROM tenant_settings WHERE setting_key = 'general.maintenance_mode' AND setting_value = 'true';" 2>/dev/null || echo "?")
+
+    local total
+    total=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+        "SELECT COUNT(*) FROM tenant_settings WHERE setting_key = 'general.maintenance_mode';" 2>/dev/null || echo "?")
+
+    if [ "$count" = "0" ]; then
+        echo -e "    Database: ${GREEN}ALL tenants live${NC} (0/$total in maintenance)"
+    else
+        echo -e "    Database: ${RED}$count/$total tenants in maintenance mode${NC}"
+    fi
+}
+
+# Check Redis cache status
+redis_cache_status() {
+    if ! docker ps --filter "name=$REDIS_CONTAINER" --format "{{.Names}}" | grep -q "$REDIS_CONTAINER"; then
+        echo -e "    Redis:    ${YELLOW}container not running${NC}"
+        return
+    fi
+
+    local prefix="$CACHE_PREFIX"
+    local env_prefix
+    env_prefix=$(grep "^CACHE_PREFIX=" "$DEPLOY_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "")
+    if [ -n "$env_prefix" ]; then
+        prefix="$env_prefix"
+    fi
+
+    local cache_count
+    cache_count=$(docker exec "$REDIS_CONTAINER" redis-cli --no-auth-warning KEYS "${prefix}:*tenant_bootstrap*" 2>/dev/null | wc -l || echo "0")
+    cache_count=$(echo "$cache_count" | tr -d ' ')
+
+    if [ "$cache_count" = "0" ]; then
+        echo -e "    Redis:    ${GREEN}no cached bootstrap data${NC}"
+    else
+        echo -e "    Redis:    ${YELLOW}$cache_count tenant bootstrap keys cached${NC} (may serve stale maintenance_mode)"
     fi
 }
 
 maintenance_on() {
     echo -e "\n${BOLD}=== Enabling Global Maintenance Mode ===${NC}\n"
 
-    check_container
+    check_container "$PHP_CONTAINER"
+    check_container "$DB_CONTAINER"
 
-    # Create the .maintenance file (idempotent — touch is safe if file exists)
+    # --- Layer 1: File-based gate ---
     docker exec "$PHP_CONTAINER" touch "$MAINTENANCE_FILE"
-    log_ok "Maintenance file created: $MAINTENANCE_FILE"
-
-    # Verify it worked
     if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
-        log_ok "Verified: .maintenance file exists"
+        log_ok "Layer 1: .maintenance file created"
     else
-        log_err "Verification failed: .maintenance file NOT found"
+        log_err "Layer 1: Failed to create .maintenance file"
         exit 1
     fi
 
-    # Verify the API returns 503
+    # --- Layer 2: Database ---
+    db_maintenance_set "true" || log_warn "Layer 2: Database update failed — file-based gate still active"
+
+    # --- Layer 3: Flush Redis cache ---
+    flush_bootstrap_cache
+
+    # --- Verify ---
     sleep 1
     local HTTP_CODE
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/health.php 2>/dev/null || echo "000")
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
 
     if [ "$HTTP_CODE" = "503" ]; then
-        log_ok "Verified: API returning HTTP 503 (maintenance mode active)"
-    elif [ "$HTTP_CODE" = "200" ]; then
-        # health.php might not go through index.php — try a regular endpoint
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
-        if [ "$HTTP_CODE" = "503" ]; then
-            log_ok "Verified: API returning HTTP 503 (maintenance mode active)"
-        else
-            log_warn "API returned HTTP $HTTP_CODE — maintenance may not be fully active"
-            log_warn "Check that index.php contains the .maintenance file check"
-        fi
+        log_ok "Verified: HTTP 503 (maintenance active)"
     else
-        log_warn "Could not verify API response (HTTP $HTTP_CODE) — container may be starting up"
+        log_warn "HTTP $HTTP_CODE — maintenance may not be fully active yet"
     fi
 
     echo ""
@@ -95,40 +238,43 @@ maintenance_on() {
 maintenance_off() {
     echo -e "\n${BOLD}=== Disabling Global Maintenance Mode ===${NC}\n"
 
-    check_container
+    check_container "$PHP_CONTAINER"
+    check_container "$DB_CONTAINER"
 
-    # Remove the .maintenance file (idempotent — rm -f is safe if file doesn't exist)
+    # --- Layer 1: Remove file ---
     docker exec "$PHP_CONTAINER" rm -f "$MAINTENANCE_FILE"
-    log_ok "Maintenance file removed"
-
-    # Verify it's gone
     if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
-        log_err "Verification failed: .maintenance file STILL exists"
+        log_err "Layer 1: .maintenance file STILL exists"
         exit 1
     else
-        log_ok "Verified: .maintenance file removed"
+        log_ok "Layer 1: .maintenance file removed"
     fi
 
-    # Verify the API is responding normally
+    # --- Layer 2: Database ---
+    db_maintenance_set "false" || log_warn "Layer 2: Database update failed — check manually"
+
+    # --- Layer 3: Flush Redis cache ---
+    flush_bootstrap_cache
+
+    # --- Verify ---
     sleep 1
     local HTTP_CODE
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/health.php 2>/dev/null || echo "000")
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
 
     if [ "$HTTP_CODE" = "200" ]; then
-        log_ok "Verified: API returning HTTP 200 (platform is live)"
+        log_ok "Verified: HTTP 200 (platform is live)"
     elif [ "$HTTP_CODE" = "503" ]; then
-        log_warn "API still returning 503 — OPCache may be stale"
-        log_info "Restarting PHP container to clear OPCache..."
+        log_warn "Still returning 503 — restarting PHP container to clear OPCache..."
         docker restart "$PHP_CONTAINER" > /dev/null 2>&1
         sleep 3
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/health.php 2>/dev/null || echo "000")
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
         if [ "$HTTP_CODE" = "200" ]; then
-            log_ok "After restart: API returning HTTP 200 (platform is live)"
+            log_ok "After restart: HTTP 200 (platform is live)"
         else
-            log_warn "API returning HTTP $HTTP_CODE after restart — investigate manually"
+            log_warn "HTTP $HTTP_CODE after restart — investigate manually"
         fi
     else
-        log_warn "Could not verify API response (HTTP $HTTP_CODE)"
+        log_warn "HTTP $HTTP_CODE — container may be starting up"
     fi
 
     echo ""
@@ -139,28 +285,60 @@ maintenance_off() {
 maintenance_status() {
     echo -e "\n${BOLD}=== Maintenance Mode Status ===${NC}\n"
 
-    check_container
+    check_container "$PHP_CONTAINER"
+
+    # Layer 1: File check
+    if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
+        echo -e "    File:     ${RED}${BOLD}ON${NC} — .maintenance exists in container"
+    else
+        echo -e "    File:     ${GREEN}${BOLD}OFF${NC} — no .maintenance file"
+    fi
+
+    # Layer 2: Database check
+    db_maintenance_status
+
+    # Layer 3: Redis cache check
+    redis_cache_status
+
+    # HTTP verification
+    local HTTP_CODE
+    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
+    echo -e "    HTTP:     $HTTP_CODE"
+
+    # Overall status
+    echo ""
+    local file_on=false
+    local db_on=false
 
     if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
-        echo -e "    Status: ${RED}${BOLD}MAINTENANCE MODE IS ON${NC}"
-        echo -e "    File:   $MAINTENANCE_FILE exists in $PHP_CONTAINER"
-        echo ""
-        log_info "All non-localhost requests are being blocked with HTTP 503"
-        echo -e "    ${CYAN}To disable:${NC} sudo bash scripts/maintenance.sh off"
+        file_on=true
+    fi
+
+    get_db_creds
+    if [ -n "$DB_PASS" ]; then
+        local db_count
+        db_count=$(docker exec "$DB_CONTAINER" mysql -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -sN -e \
+            "SELECT COUNT(*) FROM tenant_settings WHERE setting_key = 'general.maintenance_mode' AND setting_value = 'true';" 2>/dev/null || echo "0")
+        if [ "$db_count" != "0" ]; then
+            db_on=true
+        fi
+    fi
+
+    if [ "$file_on" = "true" ] && [ "$db_on" = "true" ]; then
+        echo -e "    ${RED}${BOLD}MAINTENANCE MODE IS ON${NC} (both layers active)"
+    elif [ "$file_on" = "true" ]; then
+        echo -e "    ${RED}${BOLD}MAINTENANCE MODE IS ON${NC} (file gate active, DB says live)"
+        echo -e "    ${YELLOW}Layers are out of sync — run 'maintenance.sh on' or 'maintenance.sh off'${NC}"
+    elif [ "$db_on" = "true" ]; then
+        echo -e "    ${RED}${BOLD}PARTIALLY IN MAINTENANCE${NC} (file removed but DB still says maintenance!)"
+        echo -e "    ${YELLOW}⚠ Users will still see maintenance page! Run 'maintenance.sh off' to fix${NC}"
     else
-        echo -e "    Status: ${GREEN}${BOLD}PLATFORM IS LIVE${NC}"
-        echo -e "    File:   $MAINTENANCE_FILE does not exist"
-        echo ""
-        log_info "All requests are being served normally"
-        echo -e "    ${CYAN}To enable:${NC} sudo bash scripts/maintenance.sh on"
+        echo -e "    ${GREEN}${BOLD}PLATFORM IS LIVE${NC} (both layers off)"
     fi
 
     echo ""
-
-    # Also check HTTP response for verification
-    local HTTP_CODE
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
-    log_info "API HTTP response code: $HTTP_CODE"
+    echo -e "    ${CYAN}Enable:${NC}  sudo bash scripts/maintenance.sh on"
+    echo -e "    ${CYAN}Disable:${NC} sudo bash scripts/maintenance.sh off"
     echo ""
 }
 
@@ -179,9 +357,9 @@ case "${1:-}" in
         echo ""
         echo "Usage: sudo bash scripts/maintenance.sh [on|off|status]"
         echo ""
-        echo "  on      Enable global maintenance mode (all tenants, all users blocked)"
-        echo "  off     Disable global maintenance mode (platform goes live)"
-        echo "  status  Check current maintenance mode status"
+        echo "  on      Enable maintenance mode (file + database + cache flush)"
+        echo "  off     Disable maintenance mode (file + database + cache flush)"
+        echo "  status  Show all layers' status + detect out-of-sync state"
         echo ""
         exit 1
         ;;
