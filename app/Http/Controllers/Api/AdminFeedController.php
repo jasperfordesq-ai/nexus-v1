@@ -103,7 +103,7 @@ class AdminFeedController extends BaseApiController
         }
 
         if ($search) {
-            $conditions[] = '(fa.content LIKE ? OR u.name LIKE ?)';
+            $conditions[] = '(fa.content LIKE ? OR COALESCE(NULLIF(u.name, \'\'), CONCAT(u.first_name, \' \', u.last_name)) LIKE ?)';
             $searchPattern = '%' . $search . '%';
             $params[] = $searchPattern;
             $params[] = $searchPattern;
@@ -123,7 +123,8 @@ class AdminFeedController extends BaseApiController
             "SELECT fa.id as activity_id, fa.source_type, fa.source_id, fa.user_id,
                     fa.tenant_id, fa.title, fa.content, fa.image_url,
                     fa.is_hidden, fa.is_visible, fa.created_at,
-                    u.name as user_name, u.avatar_url as user_avatar,
+                    COALESCE(NULLIF(u.name, ''), CONCAT(u.first_name, ' ', u.last_name)) as user_name,
+                    u.avatar_url as user_avatar,
                     t.name as tenant_name,
                     (SELECT COUNT(*) FROM comments WHERE target_type = fa.source_type AND target_id = fa.source_id AND tenant_id = fa.tenant_id) as comments_count,
                     (SELECT COUNT(*) FROM likes WHERE target_type = fa.source_type AND target_id = fa.source_id AND tenant_id = fa.tenant_id) as likes_count
@@ -179,7 +180,8 @@ class AdminFeedController extends BaseApiController
             "SELECT fa.id as activity_id, fa.source_type, fa.source_id, fa.user_id,
                     fa.tenant_id, fa.title, fa.content, fa.image_url,
                     fa.is_hidden, fa.is_visible, fa.created_at,
-                    u.name as user_name, u.email as user_email, u.avatar_url as user_avatar,
+                    COALESCE(NULLIF(u.name, ''), CONCAT(u.first_name, ' ', u.last_name)) as user_name,
+                    u.email as user_email, u.avatar_url as user_avatar,
                     t.name as tenant_name
              FROM feed_activity fa
              LEFT JOIN users u ON fa.user_id = u.id
