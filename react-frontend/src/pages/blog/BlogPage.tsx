@@ -84,6 +84,13 @@ export function BlogPage() {
   const [isPaginated, setIsPaginated] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   // Load categories on mount
   useEffect(() => {
     const loadCategories = async () => {
@@ -102,6 +109,12 @@ export function BlogPage() {
   const cursorRef = useRef<string | undefined>();
 
   const loadPosts = useCallback(async (append = false) => {
+    if (!append) {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+    }
+
     try {
       if (append) {
         setIsLoadingMore(true);
@@ -120,6 +133,8 @@ export function BlogPage() {
         `/v2/blog?${params}`
       );
 
+      if (!append && abortRef.current?.signal.aborted) return;
+
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
 
@@ -133,16 +148,17 @@ export function BlogPage() {
         setHasMore(response.meta?.has_more ?? false);
         cursorRef.current = response.meta?.cursor ?? undefined;
       } else {
-        if (!append) setError(t('error_load_posts'));
+        if (!append) setError(tRef.current('error_load_posts'));
       }
     } catch (err) {
+      if (!append && abortRef.current?.signal.aborted) return;
       logError('Failed to load blog posts', err);
-      if (!append) setError(t('error_load_posts_retry'));
+      if (!append) setError(tRef.current('error_load_posts_retry'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [searchQuery, selectedCategory, t]);
+  }, [searchQuery, selectedCategory]);
 
   useEffect(() => {
     cursorRef.current = undefined;

@@ -9,7 +9,7 @@
  * Shows a list of saved searches with ability to re-run or delete them.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Spinner, Input, Tooltip } from '@heroui/react';
 import { Bookmark, Trash2, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -38,22 +38,39 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
   const [saveName, setSaveName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadSavedSearches = useCallback(async () => {
     if (!isAuthenticated) {
       setIsLoading(false);
       return;
     }
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const response = await api.get<SavedSearch[]>('/v2/search/saved');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setSavedSearches(response.data);
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load saved searches', error);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [isAuthenticated]);
 
@@ -79,11 +96,11 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
         setSavedSearches((prev) => [response.data!, ...prev]);
         setSaveName('');
         setShowSaveForm(false);
-        toast.success(t('toast_search_saved'));
+        toastRef.current.success(tRef.current('toast_search_saved'));
       }
     } catch (error) {
       logError('Failed to save search', error);
-      toast.error(t('toast_search_save_failed'));
+      toastRef.current.error(tRef.current('toast_search_save_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -93,10 +110,10 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
     try {
       await api.delete(`/v2/search/saved/${id}`);
       setSavedSearches((prev) => prev.filter((s) => s.id !== id));
-      toast.success(t('toast_search_deleted'));
+      toastRef.current.success(tRef.current('toast_search_deleted'));
     } catch (error) {
       logError('Failed to delete saved search', error);
-      toast.error(t('toast_search_delete_failed'));
+      toastRef.current.error(tRef.current('toast_search_delete_failed'));
     }
   };
 

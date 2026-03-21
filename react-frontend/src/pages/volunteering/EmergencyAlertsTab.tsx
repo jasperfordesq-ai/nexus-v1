@@ -7,7 +7,7 @@
  * EmergencyAlertsTab - View and respond to urgent shift-fill requests (V9)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
@@ -65,7 +65,20 @@ export function EmergencyAlertsTab() {
   const [error, setError] = useState<string | null>(null);
   const [respondingTo, setRespondingTo] = useState<number | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -74,19 +87,21 @@ export function EmergencyAlertsTab() {
         '/v2/volunteering/emergency-alerts'
       );
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const payload = response.data as { alerts?: EmergencyAlert[] } | EmergencyAlert[];
         setAlerts(Array.isArray(payload) ? payload : (payload.alerts ?? []));
       } else {
-        setError(t('emergency.error_load', 'Failed to load alerts'));
+        setError(tRef.current('emergency.error_load', 'Failed to load alerts'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load emergency alerts', err);
-      setError(t('emergency.error_load_generic', 'Unable to load alerts.'));
+      setError(tRef.current('emergency.error_load_generic', 'Unable to load alerts.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -97,14 +112,14 @@ export function EmergencyAlertsTab() {
       setRespondingTo(alertId);
       const result = await api.put(`/v2/volunteering/emergency-alerts/${alertId}`, { response });
       if (result.success) {
-        toast.success(response === 'accepted' ? t('emergency.alert_accepted', 'Alert accepted.') : t('emergency.alert_declined', 'Alert declined.'));
+        toastRef.current.success(response === 'accepted' ? tRef.current('emergency.alert_accepted', 'Alert accepted.') : tRef.current('emergency.alert_declined', 'Alert declined.'));
         load();
       } else {
-        toast.error(result.error || t('emergency.respond_error', 'Failed to respond to alert.'));
+        toastRef.current.error(result.error || tRef.current('emergency.respond_error', 'Failed to respond to alert.'));
       }
     } catch (err) {
       logError('Failed to respond to alert', err);
-      toast.error(t('emergency.respond_error_generic', 'Failed to respond to alert. Please try again.'));
+      toastRef.current.error(tRef.current('emergency.respond_error_generic', 'Failed to respond to alert. Please try again.'));
     } finally {
       setRespondingTo(null);
     }

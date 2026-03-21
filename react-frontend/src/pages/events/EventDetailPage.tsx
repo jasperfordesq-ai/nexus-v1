@@ -7,7 +7,7 @@
  * Event Detail Page - Single event view with enhanced RSVP, sharing, and organizer check-in
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -98,6 +98,15 @@ export function EventDetailPage() {
   const [seriesEvents, setSeriesEvents] = useState<Event[]>([]);
   const [isLoadingSeriesEvents, setIsLoadingSeriesEvents] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   /** Map backend rsvp_status to our 3-option model */
   function normalizeRsvpStatus(status: string | null | undefined): RsvpOption | null {
     if (!status) return null;
@@ -110,6 +119,10 @@ export function EventDetailPage() {
   const loadEvent = useCallback(async () => {
     if (!id) return;
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -118,22 +131,25 @@ export function EventDetailPage() {
         api.get<AttendeeWithCheckIn[]>(`/v2/events/${id}/attendees?per_page=50`).catch(() => ({ success: true, data: [] })),
       ]);
 
+      if (controller.signal.aborted) return;
+
       if (eventRes.success && eventRes.data) {
         setEvent(eventRes.data);
         setRsvpStatus(normalizeRsvpStatus(eventRes.data.rsvp_status));
       } else {
-        setError(t('detail.not_found_desc'));
+        setError(tRef.current('detail.not_found_desc'));
       }
       if (attendeesRes.success && attendeesRes.data) {
         setAttendees(attendeesRes.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load event', err);
-      setError(t('detail.unable_to_load'));
+      setError(tRef.current('detail.unable_to_load'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadEvent();
@@ -187,13 +203,13 @@ export function EventDetailPage() {
               interested_count: prevStatus === 'interested' ? Math.max(0, (prev.interested_count ?? 1) - 1) : prev.interested_count,
             };
           });
-          toast.success(t('toast.rsvp_removed'));
+          toastRef.current.success(tRef.current('toast.rsvp_removed'));
         } else {
-          toast.error(t('toast.rsvp_cancel_failed'));
+          toastRef.current.error(tRef.current('toast.rsvp_cancel_failed'));
         }
       } catch (err) {
         logError('Failed to cancel RSVP', err);
-        toast.error(t('toast.something_wrong'));
+        toastRef.current.error(tRef.current('toast.something_wrong'));
       } finally {
         setIsSubmitting(false);
       }
@@ -210,7 +226,7 @@ export function EventDetailPage() {
         if (rsvpData.status === 'waitlisted') {
           setIsWaitlisted(true);
           setWaitlistPosition(rsvpData.waitlist_position ?? null);
-          toast.info(rsvpData.message || t('toast.added_to_waitlist'));
+          toastRef.current.info(rsvpData.message || tRef.current('toast.added_to_waitlist'));
           return;
         }
 
@@ -244,17 +260,17 @@ export function EventDetailPage() {
         }
 
         const messages: Record<RsvpOption, string> = {
-          going: t('toast.rsvp_going'),
-          interested: t('toast.rsvp_interested'),
-          not_going: t('toast.rsvp_not_going'),
+          going: tRef.current('toast.rsvp_going'),
+          interested: tRef.current('toast.rsvp_interested'),
+          not_going: tRef.current('toast.rsvp_not_going'),
         };
-        toast.success(messages[newStatus]);
+        toastRef.current.success(messages[newStatus]);
       } else {
-        toast.error(t('toast.rsvp_failed'));
+        toastRef.current.error(tRef.current('toast.rsvp_failed'));
       }
     } catch (err) {
       logError('Failed to update RSVP', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -264,10 +280,10 @@ export function EventDetailPage() {
     const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
-      toast.success(t('toast.share_copied'));
+      toastRef.current.success(tRef.current('toast.share_copied'));
     } catch {
       // Fallback for older browsers
-      toast.error(t('toast.share_failed'));
+      toastRef.current.error(tRef.current('toast.share_failed'));
     }
   }
 
@@ -278,14 +294,14 @@ export function EventDetailPage() {
       setIsDeleting(true);
       const response = await api.delete(`/v2/events/${event.id}`);
       if (response.success) {
-        toast.success(t('toast.deleted'));
+        toastRef.current.success(tRef.current('toast.deleted'));
         navigate(tenantPath('/events'));
       } else {
-        toast.error(t('toast.delete_failed'));
+        toastRef.current.error(tRef.current('toast.delete_failed'));
       }
     } catch (err) {
       logError('Failed to delete event', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
@@ -303,13 +319,13 @@ export function EventDetailPage() {
         setAttendees((prev) =>
           prev.map((a) => a.id === attendeeId ? { ...a, checked_in: true } : a)
         );
-        toast.success(t('toast.checkin_success'));
+        toastRef.current.success(tRef.current('toast.checkin_success'));
       } else {
-        toast.error(t('toast.checkin_failed'));
+        toastRef.current.error(tRef.current('toast.checkin_failed'));
       }
     } catch (err) {
       logError('Failed to check in attendee', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setCheckingInUserId(null);
     }
@@ -323,14 +339,14 @@ export function EventDetailPage() {
       const response = await api.post(`/v2/events/${event.id}/cancel`, { reason: cancelReason });
       if (response.success) {
         setEvent((prev) => prev ? { ...prev, status: 'cancelled', cancellation_reason: cancelReason } : null);
-        toast.success(t('toast.event_cancelled'));
+        toastRef.current.success(tRef.current('toast.event_cancelled'));
         setShowCancelModal(false);
       } else {
-        toast.error(t('toast.cancel_failed'));
+        toastRef.current.error(tRef.current('toast.cancel_failed'));
       }
     } catch (err) {
       logError('Failed to cancel event', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsCancelling(false);
     }
@@ -345,13 +361,13 @@ export function EventDetailPage() {
       if (response.success && response.data) {
         setIsWaitlisted(true);
         setWaitlistPosition((response.data as { position?: number }).position ?? null);
-        toast.success(t('toast.added_to_waitlist'));
+        toastRef.current.success(tRef.current('toast.added_to_waitlist'));
       } else {
-        toast.error(t('toast.waitlist_join_failed'));
+        toastRef.current.error(tRef.current('toast.waitlist_join_failed'));
       }
     } catch (err) {
       logError('Failed to join waitlist', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
@@ -366,11 +382,11 @@ export function EventDetailPage() {
       if (response.success) {
         setIsWaitlisted(false);
         setWaitlistPosition(null);
-        toast.success(t('toast.removed_from_waitlist'));
+        toastRef.current.success(tRef.current('toast.removed_from_waitlist'));
       }
     } catch (err) {
       logError('Failed to leave waitlist', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }

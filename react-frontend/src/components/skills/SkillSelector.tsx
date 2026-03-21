@@ -10,7 +10,7 @@
  * Fetches skill categories from API and supports search.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Button,
   Input,
@@ -163,6 +163,15 @@ export function SkillSelector({
   const [proficiency, setProficiency] = useState<string>('intermediate');
   const [isAdding, setIsAdding] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Load categories on mount
   useEffect(() => {
     const loadCategories = async () => {
@@ -189,16 +198,24 @@ export function SkillSelector({
       return;
     }
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsSearching(true);
       const response = await api.get<SkillSearchResult[]>(`/v2/skills/search?q=${encodeURIComponent(query)}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setSearchResults(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to search skills', err);
     } finally {
-      setIsSearching(false);
+      if (!controller.signal.aborted) {
+        setIsSearching(false);
+      }
     }
   }, []);
 
@@ -216,18 +233,18 @@ export function SkillSelector({
       });
 
       if (response.success) {
-        toast.success(t('toasts.skill_added'));
+        toastRef.current.success(tRef.current('toasts.skill_added'));
         setSelectedSkill('');
         setSearchQuery('');
         setSearchResults([]);
         onSkillsChange();
         onClose();
       } else {
-        toast.error(response.error || t('toasts.skill_add_failed'));
+        toastRef.current.error(response.error || tRef.current('toasts.skill_add_failed'));
       }
     } catch (err) {
       logError('Failed to add skill', err);
-      toast.error(t('toasts.skill_add_failed'));
+      toastRef.current.error(tRef.current('toasts.skill_add_failed'));
     } finally {
       setIsAdding(false);
     }
@@ -238,14 +255,14 @@ export function SkillSelector({
     try {
       const response = await api.delete(`/v2/users/me/skills/${skillId}`);
       if (response.success) {
-        toast.success(t('toasts.skill_removed'));
+        toastRef.current.success(tRef.current('toasts.skill_removed'));
         onSkillsChange();
       } else {
-        toast.error(response.error || t('toasts.skill_remove_failed'));
+        toastRef.current.error(response.error || tRef.current('toasts.skill_remove_failed'));
       }
     } catch (err) {
       logError('Failed to remove skill', err);
-      toast.error(t('toasts.skill_remove_failed'));
+      toastRef.current.error(tRef.current('toasts.skill_remove_failed'));
     }
   };
 

@@ -18,7 +18,7 @@
  *   5. Opt-out footer link
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Chip, Avatar, Spinner } from '@heroui/react';
@@ -631,9 +631,22 @@ export default function FederationHubPage() {
 
   const isOptedIn = data.status?.enabled ?? false;
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // ─── Load federation data ───
 
   const loadData = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setIsLoading(true);
     setError(null);
 
@@ -641,8 +654,10 @@ export default function FederationHubPage() {
       // Fetch status first to determine if opted in
       const statusRes = await api.get<FederationStatus>('/v2/federation/status');
 
+      if (controller.signal.aborted) return;
+
       if (!statusRes.success || !statusRes.data) {
-        setError(statusRes.error || t('hub.error_load_status'));
+        setError(statusRes.error || tRef.current('hub.error_load_status'));
         setIsLoading(false);
         return;
       }
@@ -665,6 +680,8 @@ export default function FederationHubPage() {
           api.get<FederationPartner[]>('/v2/federation/partners'),
           api.get<FederationActivityItem[]>('/v2/federation/activity'),
         ]);
+
+        if (controller.signal.aborted) return;
 
         if (partnersRes.success && partnersRes.data) {
           const partnersData = Array.isArray(partnersRes.data)
@@ -692,12 +709,13 @@ export default function FederationHubPage() {
 
       setData(newData);
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('FederationHubPage: Failed to load data', err);
-      setError(t('hub.error_generic'));
+      setError(tRef.current('hub.error_generic'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -710,18 +728,18 @@ export default function FederationHubPage() {
     try {
       const res = await api.post<{ success: boolean }>('/v2/federation/opt-in');
       if (res.success) {
-        toast.success(t('hub.toast_enabled_title'), t('hub.toast_enabled_description'));
+        toastRef.current.success(tRef.current('hub.toast_enabled_title'), tRef.current('hub.toast_enabled_description'));
         await loadData();
       } else {
-        toast.error(t('hub.toast_enable_error_title'), res.error || t('hub.toast_enable_error_description'));
+        toastRef.current.error(tRef.current('hub.toast_enable_error_title'), res.error || tRef.current('hub.toast_enable_error_description'));
       }
     } catch (err) {
       logError('FederationHubPage: Opt-in failed', err);
-      toast.error(t('hub.toast_error'), t('hub.toast_enable_error_generic'));
+      toastRef.current.error(tRef.current('hub.toast_error'), tRef.current('hub.toast_enable_error_generic'));
     } finally {
       setIsOptingIn(false);
     }
-  }, [toast, loadData, t]);
+  }, [loadData]);
 
   // ─── Opt out ───
 
@@ -730,19 +748,19 @@ export default function FederationHubPage() {
     try {
       const res = await api.post<{ success: boolean }>('/v2/federation/opt-out');
       if (res.success) {
-        toast.info(t('hub.toast_disabled_title'), t('hub.toast_disabled_description'));
+        toastRef.current.info(tRef.current('hub.toast_disabled_title'), tRef.current('hub.toast_disabled_description'));
         setShowOptOutConfirm(false);
         await loadData();
       } else {
-        toast.error(t('hub.toast_disable_error_title'), res.error || t('hub.toast_disable_error_description'));
+        toastRef.current.error(tRef.current('hub.toast_disable_error_title'), res.error || tRef.current('hub.toast_disable_error_description'));
       }
     } catch (err) {
       logError('FederationHubPage: Opt-out failed', err);
-      toast.error(t('hub.toast_error'), t('hub.toast_disable_error_generic'));
+      toastRef.current.error(tRef.current('hub.toast_error'), tRef.current('hub.toast_disable_error_generic'));
     } finally {
       setIsOptingOut(false);
     }
-  }, [toast, loadData, t]);
+  }, [loadData]);
 
   // ─── Loading state ───
 

@@ -19,7 +19,7 @@
  * - Cursor-based pagination for ideas
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Button,
@@ -247,26 +247,44 @@ export function ChallengeDetailPage() {
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   usePageTitle(challenge?.title ?? t('page_title'));
 
   /* ───── Fetch challenge ───── */
   const fetchChallenge = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       const response = await api.get<Challenge>(`/v2/ideation-challenges/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setChallenge(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch challenge', err);
-      setError(t('challenges.load_error'));
+      setError(tRef.current('challenges.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   /* ───── Fetch ideas ───── */
+  const ideasAbortRef = useRef<AbortController | null>(null);
   const fetchIdeas = useCallback(async (sort: SortMode, loadMore = false) => {
+    ideasAbortRef.current?.abort();
+    const controller = new AbortController();
+    ideasAbortRef.current = controller;
     try {
       if (loadMore) {
         setIsLoadingMore(true);
@@ -282,6 +300,7 @@ export function ChallengeDetailPage() {
       }
 
       const response = await api.get<Idea[]>(`/v2/ideation-challenges/${id}/ideas?${params}`);
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
@@ -294,6 +313,7 @@ export function ChallengeDetailPage() {
         setHasMore(response.meta?.has_more ?? false);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch ideas', err);
     } finally {
       setIsLoadingIdeas(false);
@@ -390,11 +410,11 @@ export function ChallengeDetailPage() {
           return idea;
         }));
 
-        toast.success(result.voted ? t('toast.vote_added') : t('toast.vote_removed'));
+        toastRef.current.success(result.voted ? tRef.current('toast.vote_added') : tRef.current('toast.vote_removed'));
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setVotingIds(prev => {
         const next = new Set(prev);
@@ -430,7 +450,7 @@ export function ChallengeDetailPage() {
           }
         }
 
-        toast.success(t('toast.idea_submitted'));
+        toastRef.current.success(tRef.current('toast.idea_submitted'));
         onSubmitClose();
         setNewIdea({ title: '', description: '' });
         setNewIdeaMediaUrl('');
@@ -442,7 +462,7 @@ export function ChallengeDetailPage() {
         fetchChallenge();
       } catch (err) {
         logError('Failed to publish draft', err);
-        toast.error(t('toast.error_generic'));
+        toastRef.current.error(tRef.current('toast.error_generic'));
       } finally {
         setIsSubmitting(false);
       }
@@ -470,7 +490,7 @@ export function ChallengeDetailPage() {
         }
       }
 
-      toast.success(t('toast.idea_submitted'));
+      toastRef.current.success(tRef.current('toast.idea_submitted'));
       setNewIdea({ title: '', description: '' });
       setNewIdeaMediaUrl('');
       setNewIdeaMediaType('link');
@@ -483,7 +503,7 @@ export function ChallengeDetailPage() {
       fetchChallenge();
     } catch (err) {
       logError('Failed to submit idea', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsSubmitting(false);
     }
@@ -491,7 +511,7 @@ export function ChallengeDetailPage() {
 
   const handleSaveDraft = async () => {
     if (!newIdea.title.trim()) {
-      toast.error(t('validation.title_required'));
+      toastRef.current.error(tRef.current('validation.title_required'));
       return;
     }
 
@@ -512,13 +532,13 @@ export function ChallengeDetailPage() {
         });
       }
 
-      toast.success(t('ideas.draft_saved'));
+      toastRef.current.success(tRef.current('ideas.draft_saved'));
       setNewIdea({ title: '', description: '' });
       setEditingDraftId(null);
       fetchDrafts();
     } catch (err) {
       logError('Failed to save draft', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsSubmitting(false);
     }
@@ -527,11 +547,11 @@ export function ChallengeDetailPage() {
   const handleStatusChange = async (newStatus: string) => {
     try {
       await api.put(`/v2/ideation-challenges/${id}/status`, { status: newStatus });
-      toast.success(t('admin.status_updated'));
+      toastRef.current.success(tRef.current('admin.status_updated'));
       fetchChallenge();
     } catch (err) {
       logError('Failed to update status', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     }
   };
 
@@ -539,11 +559,11 @@ export function ChallengeDetailPage() {
     setIsDeleting(true);
     try {
       await api.delete(`/v2/ideation-challenges/${id}`);
-      toast.success(t('toast.challenge_deleted'));
+      toastRef.current.success(tRef.current('toast.challenge_deleted'));
       navigate(tenantPath('/ideation'));
     } catch (err) {
       logError('Failed to delete challenge', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsDeleting(false);
       onDeleteClose();
@@ -568,7 +588,7 @@ export function ChallengeDetailPage() {
       }
     } catch (err) {
       logError('Failed to toggle favorite', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsFavoriting(false);
     }
@@ -582,12 +602,12 @@ export function ChallengeDetailPage() {
       const response = await api.post<{ id: number }>(`/v2/ideation-challenges/${id}/duplicate`);
 
       if (response.success && response.data) {
-        toast.success(t('duplicate.success'));
+        toastRef.current.success(tRef.current('duplicate.success'));
         navigate(tenantPath(`/ideation/${response.data.id}/edit`));
       }
     } catch (err) {
       logError('Failed to duplicate challenge', err);
-      toast.error(t('duplicate.error'));
+      toastRef.current.error(tRef.current('duplicate.error'));
     } finally {
       setIsDuplicating(false);
     }
@@ -602,12 +622,12 @@ export function ChallengeDetailPage() {
         implementation_status: outcomeForm.implementation_status,
         impact_description: outcomeForm.impact_description.trim() || null,
       });
-      toast.success(t('toast.outcome_saved'));
+      toastRef.current.success(tRef.current('toast.outcome_saved'));
       onOutcomeClose();
       fetchOutcome();
     } catch (err) {
       logError('Failed to save outcome', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsSavingOutcome(false);
     }
@@ -621,12 +641,12 @@ export function ChallengeDetailPage() {
       await api.post(`/v2/ideation-campaigns/${selectedCampaignId}/challenges`, {
         challenge_id: parseInt(id!, 10),
       });
-      toast.success(t('campaigns.link_challenge'));
+      toastRef.current.success(tRef.current('campaigns.link_challenge'));
       onCampaignClose();
       fetchChallenge();
     } catch (err) {
       logError('Failed to link campaign', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsLinkingCampaign(false);
     }

@@ -7,7 +7,7 @@
  * GroupSignUpTab - View and manage group/team shift reservations (V3)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
@@ -94,7 +94,20 @@ export function GroupSignUpTab() {
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -103,19 +116,21 @@ export function GroupSignUpTab() {
         '/v2/volunteering/group-reservations'
       );
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
         setReservations(items);
       } else {
-        setError(t('group_signup.error_load', 'Failed to load group reservations.'));
+        setError(tRef.current('group_signup.error_load', 'Failed to load group reservations.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load group reservations', err);
-      setError(t('group_signup.error_load_generic', 'Unable to load group reservations. Please try again.'));
+      setError(tRef.current('group_signup.error_load_generic', 'Unable to load group reservations. Please try again.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -141,16 +156,16 @@ export function GroupSignUpTab() {
       );
 
       if (response.success) {
-        toast.success(t('group_signup.member_added', 'Member added to the group.'));
+        toastRef.current.success(tRef.current('group_signup.member_added', 'Member added to the group.'));
         onClose();
         setNewMemberEmail('');
         load();
       } else {
-        setAddError(t('group_signup.add_member_error', 'Failed to add member. They may already be in the group or the email is invalid.'));
+        setAddError(tRef.current('group_signup.add_member_error', 'Failed to add member. They may already be in the group or the email is invalid.'));
       }
     } catch (err) {
       logError('Failed to add member', err);
-      setAddError(t('group_signup.add_member_error_generic', 'Unable to add member. Please check the email and try again.'));
+      setAddError(tRef.current('group_signup.add_member_error_generic', 'Unable to add member. Please check the email and try again.'));
     } finally {
       setIsAdding(false);
     }

@@ -7,7 +7,7 @@
  * RecommendedShiftsTab - Skills-based shift recommendations (V4)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
@@ -59,7 +59,18 @@ export function RecommendedShiftsTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -68,19 +79,21 @@ export function RecommendedShiftsTab() {
         '/v2/volunteering/recommended-shifts?limit=10'
       );
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const payload = response.data as { shifts?: RecommendedShift[] } | RecommendedShift[];
         setShifts(Array.isArray(payload) ? payload : (payload.shifts ?? []));
       } else {
-        setError(t('recommendations.error_load', 'Failed to load recommendations'));
+        setError(tRef.current('recommendations.error_load', 'Failed to load recommendations'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load recommended shifts', err);
-      setError(t('recommendations.error_load_generic', 'Unable to load recommendations. Please try again.'));
+      setError(tRef.current('recommendations.error_load_generic', 'Unable to load recommendations. Please try again.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();

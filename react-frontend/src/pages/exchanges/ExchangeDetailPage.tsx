@@ -14,7 +14,7 @@
  * - Action buttons for exchange workflow
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -154,6 +154,15 @@ export function ExchangeDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Modal states
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -168,23 +177,29 @@ export function ExchangeDetailPage() {
   const loadExchange = useCallback(async () => {
     if (!id) return;
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<Exchange>(`/v2/exchanges/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setExchange(response.data);
         setConfirmHours(response.data.proposed_hours.toString());
       } else {
-        setError(t('detail.not_found'));
+        setError(tRef.current('detail.not_found'));
       }
     } catch (err) {
-      setError(t('detail.not_found'));
+      if (controller.signal.aborted) return;
+      setError(tRef.current('detail.not_found'));
       logError('Failed to load exchange', err);
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadExchange();
@@ -226,10 +241,10 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/accept`);
-      toast.success(t('toast.accepted'));
+      toastRef.current.success(tRef.current('toast.accepted'));
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.accept_failed'));
+      toastRef.current.error(tRef.current('toast.accept_failed'));
       logError('Failed to accept exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -242,11 +257,11 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/decline`, { reason: declineReason });
-      toast.success(t('toast.declined'));
+      toastRef.current.success(tRef.current('toast.declined'));
       setShowDeclineModal(false);
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.decline_failed'));
+      toastRef.current.error(tRef.current('toast.decline_failed'));
       logError('Failed to decline exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -259,10 +274,10 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/start`);
-      toast.success(t('toast.started'));
+      toastRef.current.success(tRef.current('toast.started'));
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.start_failed'));
+      toastRef.current.error(tRef.current('toast.start_failed'));
       logError('Failed to start exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -275,10 +290,10 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/complete`);
-      toast.success(t('toast.completed'));
+      toastRef.current.success(tRef.current('toast.completed'));
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.complete_failed'));
+      toastRef.current.error(tRef.current('toast.complete_failed'));
       logError('Failed to complete exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -290,23 +305,23 @@ export function ExchangeDetailPage() {
 
     const hours = parseFloat(confirmHours);
     if (isNaN(hours) || hours <= 0) {
-      toast.error(t('toast.invalid_hours'));
+      toastRef.current.error(tRef.current('toast.invalid_hours'));
       return;
     }
 
     if (hours > MAX_EXCHANGE_HOURS) {
-      toast.error(t('toast.max_hours', { max: MAX_EXCHANGE_HOURS }));
+      toastRef.current.error(tRef.current('toast.max_hours', { max: MAX_EXCHANGE_HOURS }));
       return;
     }
 
     try {
       setIsSubmitting(true);
       await api.post(`/v2/exchanges/${exchange.id}/confirm`, { hours });
-      toast.success(t('toast.hours_confirmed'));
+      toastRef.current.success(tRef.current('toast.hours_confirmed'));
       setShowConfirmModal(false);
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.confirm_failed'));
+      toastRef.current.error(tRef.current('toast.confirm_failed'));
       logError('Failed to confirm hours', err);
     } finally {
       setIsSubmitting(false);
@@ -319,11 +334,11 @@ export function ExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.delete(`/v2/exchanges/${exchange.id}`);
-      toast.success(t('toast.cancelled'));
+      toastRef.current.success(tRef.current('toast.cancelled'));
       setShowCancelModal(false);
       navigate(tenantPath('/exchanges'));
     } catch (err) {
-      toast.error(t('toast.cancel_failed'));
+      toastRef.current.error(tRef.current('toast.cancel_failed'));
       logError('Failed to cancel exchange', err);
     } finally {
       setIsSubmitting(false);

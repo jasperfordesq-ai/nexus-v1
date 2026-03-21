@@ -10,7 +10,7 @@
  * Admin can create new campaigns.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -74,21 +74,35 @@ export function CampaignsPage() {
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const fetchCampaigns = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<Campaign[]>('/v2/ideation-campaigns');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setCampaigns(Array.isArray(response.data) ? response.data : []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch campaigns', err);
-      setError(t('challenges.load_error'));
+      setError(tRef.current('challenges.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     fetchCampaigns();
@@ -119,14 +133,14 @@ export function CampaignsPage() {
       });
 
       if (response.success && response.data) {
-        toast.success(t('toast.campaign_created'));
+        toastRef.current.success(tRef.current('toast.campaign_created'));
         setNewCampaign({ name: '', description: '' });
         onClose();
         navigate(tenantPath(`/ideation/campaigns/${response.data.id}`));
       }
     } catch (err) {
       logError('Failed to create campaign', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsCreating(false);
     }

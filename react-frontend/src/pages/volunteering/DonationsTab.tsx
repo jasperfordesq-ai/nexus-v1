@@ -7,7 +7,7 @@
  * DonationsTab - Active giving days with progress and donation history
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -103,6 +103,15 @@ export function DonationsTab() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const toast = useToast();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [form, setForm] = useState<DonationForm>({
     giving_day_id: null,
     amount: '',
@@ -112,6 +121,10 @@ export function DonationsTab() {
   });
 
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -120,6 +133,8 @@ export function DonationsTab() {
         api.get<GivingDay[]>('/v2/volunteering/giving-days'),
         api.get<Donation[]>('/v2/volunteering/donations'),
       ]);
+
+      if (controller.signal.aborted) return;
 
       let days: GivingDay[] = [];
       if (daysRes.success && daysRes.data) {
@@ -137,12 +152,13 @@ export function DonationsTab() {
       const activeCampaigns = days.filter((d) => d.status === 'active').length;
       setStats({ total_raised: totalRaised, total_donors: totalDonors, active_campaigns: activeCampaigns });
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load donations data', err);
-      setError(t('donations.load_error', 'Unable to load donations data.'));
+      setError(tRef.current('donations.load_error', 'Unable to load donations data.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -161,7 +177,7 @@ export function DonationsTab() {
 
   const handleSubmit = async (onClose: () => void) => {
     if (!form.amount || parseFloat(form.amount) <= 0) {
-      toast.error(t('donations.invalid_amount', 'Please enter a valid amount.'));
+      toastRef.current.error(tRef.current('donations.invalid_amount', 'Please enter a valid amount.'));
       return;
     }
 
@@ -177,15 +193,15 @@ export function DonationsTab() {
       });
 
       if (response.success) {
-        toast.success(t('donations.submit_success', 'Donation recorded!'));
+        toastRef.current.success(tRef.current('donations.submit_success', 'Donation recorded!'));
         onClose();
         load();
       } else {
-        toast.error(response.error || t('donations.submit_error', 'Failed to record donation.'));
+        toastRef.current.error(response.error || tRef.current('donations.submit_error', 'Failed to record donation.'));
       }
     } catch (err) {
       logError('Failed to submit donation', err);
-      toast.error(t('donations.submit_error_retry', 'Failed to record donation. Please try again.'));
+      toastRef.current.error(tRef.current('donations.submit_error_retry', 'Failed to record donation. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

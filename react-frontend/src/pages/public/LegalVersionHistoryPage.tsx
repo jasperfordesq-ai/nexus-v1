@@ -20,7 +20,7 @@
  *   /acceptable-use/versions
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Chip, Spinner } from '@heroui/react';
@@ -121,6 +121,9 @@ export function LegalVersionHistoryPage() {
 
   usePageTitle(title ? `${title} - ${t('version_history.page_title')}` : t('version_history.page_title'));
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
   useEffect(() => {
     if (!docType) return;
     // Wait for tenant context so X-Tenant-ID header is available
@@ -181,6 +184,10 @@ export function LegalVersionHistoryPage() {
       return;
     }
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setDiffForVersionId(version.id);
     setDiffData(null);
     setLoadingDiff(true);
@@ -189,6 +196,7 @@ export function LegalVersionHistoryPage() {
       const res = await api.get<VersionComparison>(
         `/v2/legal/versions/compare?v1=${previousVersion.id}&v2=${version.id}`
       );
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setDiffData(res.data);
       }

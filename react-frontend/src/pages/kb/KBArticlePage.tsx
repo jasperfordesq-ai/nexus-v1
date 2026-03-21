@@ -16,7 +16,7 @@
  *      POST /api/v2/kb/{id}/feedback
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -89,27 +89,41 @@ export function KBArticlePage() {
   const [feedbackGiven, setFeedbackGiven] = useState<'helpful' | 'not_helpful' | null>(null);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   usePageTitle(article?.title || t('title'));
 
   const loadArticle = useCallback(async () => {
     if (!id) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setError(null);
       setFeedbackGiven(null);
       const response = await api.get<KBArticleFull>(`/v2/kb/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setArticle(response.data);
       } else {
-        setError(t('error.article_not_found'));
+        setError(tRef.current('error.article_not_found'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load KB article', err);
-      setError(t('error.article_load_retry'));
+      setError(tRef.current('error.article_load_retry'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadArticle();
@@ -126,7 +140,7 @@ export function KBArticlePage() {
 
       if (response.success) {
         setFeedbackGiven(isHelpful ? 'helpful' : 'not_helpful');
-        toast.success(t('feedback_thanks'));
+        toastRef.current.success(tRef.current('feedback_thanks'));
         // Update local counts
         setArticle((prev) => {
           if (!prev) return prev;
@@ -139,7 +153,7 @@ export function KBArticlePage() {
       }
     } catch (err) {
       logError('Failed to submit KB feedback', err);
-      toast.error(t('feedback_failed'));
+      toastRef.current.error(tRef.current('feedback_failed'));
     } finally {
       setIsSubmittingFeedback(false);
     }

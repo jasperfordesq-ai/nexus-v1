@@ -203,6 +203,15 @@ export function FederationMessagesPage() {
   // ── Refs ──
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // ── Derived data ──
   const threads = useMemo(
     () => buildThreads(allMessages, user?.id ?? 0),
@@ -227,24 +236,29 @@ export function FederationMessagesPage() {
 
   // ── Load messages ──
   const loadMessages = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setLoadError(false);
       const response = await api.get<FederatedMessage[]>('/v2/federation/messages');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setAllMessages(response.data);
       } else {
         setLoadError(true);
-        toast.error(t('messages.toast_error'), t('messages.load_error'));
+        toastRef.current.error(tRef.current('messages.toast_error'), tRef.current('messages.load_error'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federated messages', err);
       setLoadError(true);
-      toast.error(t('messages.toast_error'), t('messages.load_error_retry'));
+      toastRef.current.error(tRef.current('messages.toast_error'), tRef.current('messages.load_error_retry'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast, t]);
+  }, []);
 
   useEffect(() => {
     loadMessages();
@@ -361,22 +375,22 @@ export function FederationMessagesPage() {
       if (response.success && response.data) {
         setAllMessages((prev) => [...prev, response.data!]);
         setReplyText('');
-        toast.success(t('messages.toast_sent'), t('messages.toast_reply_delivered'));
+        toastRef.current.success(tRef.current('messages.toast_sent'), tRef.current('messages.toast_reply_delivered'));
 
         // Scroll to bottom
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
       } else {
-        toast.error(t('messages.toast_error'), response.error || t('messages.send_error'));
+        toastRef.current.error(tRef.current('messages.toast_error'), response.error || tRef.current('messages.send_error'));
       }
     } catch (err) {
       logError('Failed to send federated reply', err);
-      toast.error(t('messages.toast_error'), t('messages.send_error_retry'));
+      toastRef.current.error(tRef.current('messages.toast_error'), tRef.current('messages.send_error_retry'));
     } finally {
       setIsSending(false);
     }
-  }, [replyText, activeThread, isSending, toast, t]);
+  }, [replyText, activeThread, isSending]);
 
   // ── Recipient search (debounced) ──
   useEffect(() => {
@@ -427,7 +441,7 @@ export function FederationMessagesPage() {
 
       if (response.success && response.data) {
         setAllMessages((prev) => [...prev, response.data!]);
-        toast.success(t('messages.toast_sent'), t('messages.toast_compose_sent', { name: selectedRecipient.name || t('messages.the_recipient') }));
+        toastRef.current.success(tRef.current('messages.toast_sent'), tRef.current('messages.toast_compose_sent', { name: selectedRecipient.name || tRef.current('messages.the_recipient') }));
 
         // Close modal and reset
         setIsComposeOpen(false);
@@ -442,15 +456,15 @@ export function FederationMessagesPage() {
         setActiveThreadKey(key);
         setMobileShowThread(true);
       } else {
-        toast.error(t('messages.toast_error'), response.error || t('messages.send_error'));
+        toastRef.current.error(tRef.current('messages.toast_error'), response.error || tRef.current('messages.send_error'));
       }
     } catch (err) {
       logError('Failed to send federated message', err);
-      toast.error(t('messages.toast_error'), t('messages.send_error_retry'));
+      toastRef.current.error(tRef.current('messages.toast_error'), tRef.current('messages.send_error_retry'));
     } finally {
       setIsComposeSending(false);
     }
-  }, [selectedRecipient, composeSubject, composeBody, isComposeSending, toast, t]);
+  }, [selectedRecipient, composeSubject, composeBody, isComposeSending]);
 
   // ── Close compose and reset ──
   const closeCompose = useCallback(() => {

@@ -14,7 +14,7 @@
  * - Content type selection
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Input, Select, SelectItem, Chip } from '@heroui/react';
 import { Filter, X, Calendar, Tag, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -62,18 +62,31 @@ export function AdvancedSearchFilters({
   const [popularTags, setPopularTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   // Count active filters
   const activeFilterCount = Object.entries(filters).filter(
     ([key, value]) => value && value !== defaultFilters[key as keyof SearchFilters]
   ).length;
 
   const loadCategories = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const response = await api.get<Category[]>('/v2/categories');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setCategories(response.data);
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load categories', error);
     }
   }, []);

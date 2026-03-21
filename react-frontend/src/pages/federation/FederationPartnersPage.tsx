@@ -13,7 +13,7 @@
  * - Loading skeletons and error states
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -104,6 +104,13 @@ export function FederationPartnersPage() {
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const [partners, setPartners] = useState<FederationPartner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -111,24 +118,29 @@ export function FederationPartnersPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const loadPartners = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setLoadError(null);
 
       const response = await api.get<FederationPartner[]>('/v2/federation/partners');
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setPartners(response.data);
       } else {
         setPartners([]);
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federation partners', error);
-      setLoadError(t('partners.load_error'));
+      setLoadError(tRef.current('partners.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadPartners();

@@ -14,7 +14,7 @@
  * - Enhanced connection display with "Connected" chip and "Send Message" button
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Tabs, Tab, Chip, Skeleton } from '@heroui/react';
@@ -139,6 +139,15 @@ export function ProfilePage() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [gamification, setGamification] = useState<GamificationSummary | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Endorsement data keyed by skill name
   const [endorsements, setEndorsements] = useState<Record<string, { count: number; isEndorsed: boolean }>>({});
 
@@ -158,6 +167,10 @@ export function ProfilePage() {
 
   const loadProfile = useCallback(async () => {
     if (!profileId) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       setIsLoading(true);
@@ -183,6 +196,7 @@ export function ProfilePage() {
       }
 
       const results = await Promise.all(requests);
+      if (controller.signal.aborted) return;
       const connectionIdx = (isAuthenticated && currentUser && profileId !== currentUser.id.toString())
         ? (hasGamification ? 4 : 2)
         : -1;
@@ -245,7 +259,7 @@ export function ProfilePage() {
           });
         }
       } else {
-        setError(t('not_found'));
+        setError(tRef.current('not_found'));
         return;
       }
       if (listingsRes.success && listingsRes.data) {
@@ -283,12 +297,13 @@ export function ProfilePage() {
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load profile', err);
-      setError(t('load_error'));
+      setError(tRef.current('load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [profileId, isAuthenticated, currentUser, hasGamification, t]);
+  }, [profileId, isAuthenticated, currentUser, hasGamification]);
 
   useEffect(() => {
     loadProfile();
@@ -337,18 +352,18 @@ export function ProfilePage() {
         if (response.success) {
           setConnectionStatus('pending_sent');
           setConnectionId(response.data?.connection_id ?? null);
-          toast.success(t('toast.request_sent_title'), t('toast.request_sent'));
+          toastRef.current.success(tRef.current('toast.request_sent_title'), tRef.current('toast.request_sent'));
         } else {
-          toast.error(t('toast.failed'), response.error || t('toast.failed'));
+          toastRef.current.error(tRef.current('toast.failed'), response.error || tRef.current('toast.failed'));
         }
       } else if (connectionStatus === 'pending_received' && connectionId) {
         // Accept connection request
         const response = await api.post(`/v2/connections/${connectionId}/accept`);
         if (response.success) {
           setConnectionStatus('connected');
-          toast.success(t('toast.connected_title'), t('toast.connected'));
+          toastRef.current.success(tRef.current('toast.connected_title'), tRef.current('toast.connected'));
         } else {
-          toast.error(t('toast.failed'), response.error || t('toast.failed'));
+          toastRef.current.error(tRef.current('toast.failed'), response.error || tRef.current('toast.failed'));
         }
       } else if ((connectionStatus === 'pending_sent' || connectionStatus === 'connected') && connectionId) {
         // Cancel/Remove connection
@@ -356,18 +371,18 @@ export function ProfilePage() {
         if (response.success) {
           setConnectionStatus('none');
           setConnectionId(null);
-          toast.info(t('toast.removed_title'), t('toast.removed'));
+          toastRef.current.info(tRef.current('toast.removed_title'), tRef.current('toast.removed'));
         } else {
-          toast.error(t('toast.failed'), response.error || t('toast.failed'));
+          toastRef.current.error(tRef.current('toast.failed'), response.error || tRef.current('toast.failed'));
         }
       }
     } catch (error) {
       logError('Connection action failed', error);
-      toast.error(t('toast.failed'), t('toast.error'));
+      toastRef.current.error(tRef.current('toast.failed'), tRef.current('toast.error'));
     } finally {
       setIsConnecting(false);
     }
-  }, [profile?.id, connectionStatus, connectionId, toast, t]);
+  }, [profile?.id, connectionStatus, connectionId]);
 
   if (isLoading) {
     return <LoadingScreen message={t('loading')} />;

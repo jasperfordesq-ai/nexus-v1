@@ -15,7 +15,7 @@
  * Route: /group-exchanges/create
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -109,6 +109,12 @@ export function CreateGroupExchangePage() {
   const { user } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(1);
@@ -324,18 +330,18 @@ export function CreateGroupExchangePage() {
 
       if (response.success && response.data) {
         const newId = response.data?.id;
-        toast.success(t('toast.created'), t('toast.created_desc'));
+        toastRef.current.success(tRef.current('toast.created'), tRef.current('toast.created_desc'));
         navigate(tenantPath(`/group-exchanges/${newId}`));
       } else {
-        toast.error(t('toast.create_failed'), response.error || t('toast.error_occurred'));
+        toastRef.current.error(tRef.current('toast.create_failed'), response.error || tRef.current('toast.error_occurred'));
       }
     } catch (err) {
       logError('Failed to create group exchange', err);
-      toast.error(t('toast.create_failed'), t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.create_failed'), tRef.current('toast.something_wrong'));
     } finally {
       setIsSubmitting(false);
     }
-  }, [title, description, splitType, totalHours, participants, toast, navigate, tenantPath, t]);
+  }, [title, description, splitType, totalHours, participants, navigate, tenantPath]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Animation

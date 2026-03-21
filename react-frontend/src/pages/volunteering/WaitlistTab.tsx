@@ -7,7 +7,7 @@
  * WaitlistTab - View and manage shift waitlist positions (V1)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -71,7 +71,20 @@ export function WaitlistTab() {
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [leaveTarget, setLeaveTarget] = useState<number | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -80,19 +93,24 @@ export function WaitlistTab() {
         '/v2/volunteering/my-waitlists'
       );
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
         setEntries(items);
       } else {
-        setError(t('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
+        setError(tRef.current('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load waitlists', err);
-      setError(t('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
+      setError(tRef.current('waitlist.load_error', 'Unable to load your waitlist entries. Please try again.'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -106,13 +124,13 @@ export function WaitlistTab() {
       const response = await api.delete(`/v2/volunteering/shifts/${leaveTarget}/waitlist`);
       if (response.success) {
         setEntries((prev) => prev.filter((e) => e.shift.id !== leaveTarget));
-        toast.success(t('waitlist.leave_success', 'You have left the waitlist.'));
+        toastRef.current.success(tRef.current('waitlist.leave_success', 'You have left the waitlist.'));
       } else {
-        toast.error(t('waitlist.leave_failed', 'Failed to leave waitlist.'));
+        toastRef.current.error(tRef.current('waitlist.leave_failed', 'Failed to leave waitlist.'));
       }
     } catch (err) {
       logError('Failed to leave waitlist', err);
-      toast.error(t('waitlist.leave_failed', 'Failed to leave waitlist.'));
+      toastRef.current.error(tRef.current('waitlist.leave_failed', 'Failed to leave waitlist.'));
     } finally {
       setRemovingId(null);
       setLeaveTarget(null);

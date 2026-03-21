@@ -12,7 +12,7 @@
  * - GET /api/v2/volunteering/reviews/organization/{id}
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -117,8 +117,20 @@ export function OrganisationDetailPage() {
 
   usePageTitle(organisation?.name ?? t('organisation_detail.page_title'));
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const loadData = useCallback(async () => {
     if (!id) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -130,10 +142,12 @@ export function OrganisationDetailPage() {
         api.get<{ reviews: Review[] }>(`/v2/volunteering/reviews/organization/${id}`),
       ]);
 
+      if (controller.signal.aborted) return;
+
       if (orgRes.success && orgRes.data) {
         setOrganisation(orgRes.data as OrganisationDetail);
       } else {
-        setError(t('organisation_detail.not_found'));
+        setError(tRef.current('organisation_detail.not_found'));
         return;
       }
 
@@ -146,12 +160,13 @@ export function OrganisationDetailPage() {
         setReviews(reviewsData.reviews ?? []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load organisation', err);
-      setError(t('organisation_detail.error_load_retry'));
+      setError(tRef.current('organisation_detail.error_load_retry'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadData();

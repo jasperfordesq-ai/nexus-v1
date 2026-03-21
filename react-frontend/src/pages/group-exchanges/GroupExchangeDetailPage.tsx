@@ -20,7 +20,7 @@
  * Route: /group-exchanges/:id
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -156,6 +156,15 @@ export function GroupExchangeDetailPage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [exchange, setExchange] = useState<GroupExchangeDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -177,24 +186,29 @@ export function GroupExchangeDetailPage() {
 
   const loadExchange = useCallback(async () => {
     if (!id) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<GroupExchangeDetail>(`/v2/group-exchanges/${id}`);
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setExchange(response.data);
       } else {
-        setError(t('detail.not_found'));
+        setError(tRef.current('detail.not_found'));
       }
     } catch (err) {
-      setError(t('detail.not_found'));
+      if (controller.signal.aborted) return;
+      setError(tRef.current('detail.not_found'));
       logError('Failed to load group exchange', err);
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadExchange();
@@ -239,10 +253,10 @@ export function GroupExchangeDetailPage() {
         await api.put(`/v2/group-exchanges/${exchange.id}`, {});
       }
 
-      toast.success(t('toast.exchange_updated'));
+      toastRef.current.success(tRef.current('toast.exchange_updated'));
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.update_failed'));
+      toastRef.current.error(tRef.current('toast.update_failed'));
       logError('Failed to update exchange status', err);
     } finally {
       setIsSubmitting(false);
@@ -255,10 +269,10 @@ export function GroupExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.post(`/v2/group-exchanges/${exchange.id}/confirm`);
-      toast.success(t('toast.hours_confirmed'));
+      toastRef.current.success(tRef.current('toast.hours_confirmed'));
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.confirm_failed'));
+      toastRef.current.error(tRef.current('toast.confirm_failed'));
       logError('Failed to confirm participation', err);
     } finally {
       setIsSubmitting(false);
@@ -275,13 +289,13 @@ export function GroupExchangeDetailPage() {
       );
 
       if (response.success) {
-        toast.success(t('toast.exchange_completed'), t('toast.exchange_completed_desc'));
+        toastRef.current.success(tRef.current('toast.exchange_completed'), tRef.current('toast.exchange_completed_desc'));
         loadExchange();
       } else {
-        toast.error(t('toast.complete_failed'), response.error || t('toast.error_occurred'));
+        toastRef.current.error(tRef.current('toast.complete_failed'), response.error || tRef.current('toast.error_occurred'));
       }
     } catch (err) {
-      toast.error(t('toast.complete_failed'));
+      toastRef.current.error(tRef.current('toast.complete_failed'));
       logError('Failed to complete group exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -294,11 +308,11 @@ export function GroupExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.delete(`/v2/group-exchanges/${exchange.id}`);
-      toast.success(t('toast.exchange_cancelled'));
+      toastRef.current.success(tRef.current('toast.exchange_cancelled'));
       setShowCancelModal(false);
       navigate(tenantPath('/group-exchanges'));
     } catch (err) {
-      toast.error(t('toast.cancel_failed'));
+      toastRef.current.error(tRef.current('toast.cancel_failed'));
       logError('Failed to cancel group exchange', err);
     } finally {
       setIsSubmitting(false);
@@ -343,11 +357,11 @@ export function GroupExchangeDetailPage() {
         user_id: userId,
         role: addRole,
       });
-      toast.success(t('toast.participant_added'));
+      toastRef.current.success(tRef.current('toast.participant_added'));
       setSearchResults((prev) => prev.filter((r) => r.id !== userId));
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.add_participant_failed'));
+      toastRef.current.error(tRef.current('toast.add_participant_failed'));
       logError('Failed to add participant', err);
     } finally {
       setIsSubmitting(false);
@@ -360,10 +374,10 @@ export function GroupExchangeDetailPage() {
     try {
       setIsSubmitting(true);
       await api.delete(`/v2/group-exchanges/${exchange.id}/participants/${userId}`);
-      toast.success(t('toast.participant_removed'));
+      toastRef.current.success(tRef.current('toast.participant_removed'));
       loadExchange();
     } catch (err) {
-      toast.error(t('toast.remove_participant_failed'));
+      toastRef.current.error(tRef.current('toast.remove_participant_failed'));
       logError('Failed to remove participant', err);
     } finally {
       setIsSubmitting(false);

@@ -8,7 +8,7 @@
  * Route: /federation/connections
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -64,18 +64,33 @@ export function FederationConnectionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadConnections = useCallback(async (tab: TabKey) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const response = await api.get<FederationConnection[]>(
         `/v2/federation/connections?status=${tab}`
       );
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setConnections(response.data);
       } else {
         setConnections([]);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federation connections', err);
       setConnections([]);
     } finally {
@@ -104,18 +119,18 @@ export function FederationConnectionsPage() {
       }
       if (response.success) {
         const msgs: Record<string, string> = {
-          accept: t('connections.accepted_success', 'Connection accepted!'),
-          reject: t('connections.rejected_success', 'Connection request declined'),
-          remove: t('connections.removed_success', 'Connection removed'),
+          accept: tRef.current('connections.accepted_success', 'Connection accepted!'),
+          reject: tRef.current('connections.rejected_success', 'Connection request declined'),
+          remove: tRef.current('connections.removed_success', 'Connection removed'),
         };
-        toast.success(msgs[action]);
+        toastRef.current.success(msgs[action]);
         loadConnections(activeTab);
       } else {
-        toast.error(response.error || t('connections.action_failed', 'Action failed'));
+        toastRef.current.error(response.error || tRef.current('connections.action_failed', 'Action failed'));
       }
     } catch (err) {
       logError(`Failed to ${action} connection`, err);
-      toast.error(t('connections.action_failed', 'Action failed'));
+      toastRef.current.error(tRef.current('connections.action_failed', 'Action failed'));
     } finally {
       setActionLoading(null);
     }

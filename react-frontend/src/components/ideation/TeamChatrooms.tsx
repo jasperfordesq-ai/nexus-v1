@@ -96,12 +96,26 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const [isDeletingChannel, setIsDeletingChannel] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const isAdmin = isGroupAdmin || (user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role));
 
   const fetchChatrooms = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const response = await api.get<Chatroom[]>(`/v2/groups/${groupId}/chatrooms`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const rooms = Array.isArray(response.data) ? response.data : [];
         setChatrooms(rooms);
@@ -110,9 +124,12 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch chatrooms', err);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [groupId, activeChatroomId]);
 
@@ -152,12 +169,12 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
       await api.post(`/v2/group-chatrooms/${activeChatroomId}/messages`, {
         body: newMessage.trim(),
       });
-      toast.success(t('toast.message_posted'));
+      toastRef.current.success(tRef.current('toast.message_posted'));
       setNewMessage('');
       fetchMessages(activeChatroomId);
     } catch (err) {
       logError('Failed to send message', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsSending(false);
     }
@@ -169,7 +186,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
       setMessages(prev => prev.filter(m => m.id !== messageId));
     } catch (err) {
       logError('Failed to delete message', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     }
   };
 
@@ -182,7 +199,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
         name: newChannelName.trim(),
       });
       if (response.success && response.data) {
-        toast.success(t('toast.chatroom_created'));
+        toastRef.current.success(tRef.current('toast.chatroom_created'));
         setNewChannelName('');
         onCreateClose();
         fetchChatrooms();
@@ -190,7 +207,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
       }
     } catch (err) {
       logError('Failed to create channel', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsCreatingChannel(false);
     }
@@ -202,14 +219,14 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
     setIsDeletingChannel(true);
     try {
       await api.delete(`/v2/group-chatrooms/${activeChatroomId}`);
-      toast.success(t('toast.chatroom_deleted'));
+      toastRef.current.success(tRef.current('toast.chatroom_deleted'));
       onDeleteClose();
       setActiveChatroomId(null);
       setMessages([]);
       fetchChatrooms();
     } catch (err) {
       logError('Failed to delete channel', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsDeletingChannel(false);
     }

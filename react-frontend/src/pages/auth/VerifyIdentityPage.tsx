@@ -77,6 +77,10 @@ export function VerifyIdentityPage() {
   const [isStarting, setIsStarting] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Stable refs for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
       clearInterval(pollRef.current);
@@ -126,9 +130,9 @@ export function VerifyIdentityPage() {
       }
     } catch {
       setPageState('error');
-      setErrorMessage(t('verify_identity.fetch_error', { defaultValue: 'Unable to check verification status. Please try again.' }));
+      setErrorMessage(tRef.current('verify_identity.fetch_error', { defaultValue: 'Unable to check verification status. Please try again.' }));
     }
-  }, [navigate, tenantPath, t, stopPolling]);
+  }, [navigate, tenantPath, stopPolling]);
 
   const startPolling = useCallback(() => {
     stopPolling();
@@ -162,7 +166,7 @@ export function VerifyIdentityPage() {
         }
       }
     } catch {
-      setErrorMessage(t('verify_identity.start_error', { defaultValue: 'Unable to start verification. Please try again later.' }));
+      setErrorMessage(tRef.current('verify_identity.start_error', { defaultValue: 'Unable to start verification. Please try again later.' }));
     } finally {
       setIsStarting(false);
     }

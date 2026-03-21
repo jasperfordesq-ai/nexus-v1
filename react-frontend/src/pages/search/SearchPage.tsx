@@ -7,7 +7,7 @@
  * Search Page - Global search across content
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Input, Tabs, Tab, Avatar, Skeleton } from '@heroui/react';
@@ -118,6 +118,15 @@ export function SearchPage() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>({ ...defaultFilters });
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const performSearch = useCallback(async (searchQuery: string, filters?: AdvancedFilters) => {
     if (!searchQuery.trim()) {
       setResults({ listings: [], users: [], events: [], groups: [] });
@@ -125,6 +134,10 @@ export function SearchPage() {
       setSearchError(null);
       return;
     }
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       setIsLoading(true);
@@ -145,17 +158,19 @@ export function SearchPage() {
       if (f.location) params.set('location', f.location);
 
       const response = await api.get<RawSearchItem[]>(`/v2/search?${params}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setResults(groupSearchItems(response.data));
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Search failed', error);
-      setSearchError(t('error_message'));
-      toast.error(t('toast.search_failed'));
+      setSearchError(tRef.current('error_message'));
+      toastRef.current.error(tRef.current('toast.search_failed'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast, advancedFilters, t]);
+  }, [advancedFilters]);
 
   useEffect(() => {
     const urlQuery = searchParams.get('q');

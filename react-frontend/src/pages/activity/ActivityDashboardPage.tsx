@@ -16,7 +16,7 @@
  * API: GET /api/v2/users/me/activity/dashboard
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Spinner } from '@heroui/react';
@@ -202,23 +202,36 @@ export function ActivityDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const loadDashboard = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<DashboardData>('/v2/users/me/activity/dashboard');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setDashboard(response.data);
       } else {
-        setError(t('error_load_failed'));
+        setError(tRef.current('error_load_failed'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load activity dashboard', err);
-      setError(t('error_load_failed_detail'));
+      setError(tRef.current('error_load_failed_detail'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     void loadDashboard();

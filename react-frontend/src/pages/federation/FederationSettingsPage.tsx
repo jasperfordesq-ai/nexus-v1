@@ -12,7 +12,7 @@
  * Route: /federation/settings
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -90,6 +90,15 @@ export function FederationSettingsPage() {
   const toast = useToast();
   const { tenantPath } = useTenant();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -108,6 +117,9 @@ export function FederationSettingsPage() {
   // ───────────────────────────────────────────────────────────────────────────
 
   const loadSettings = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setLoadError(null);
@@ -116,6 +128,7 @@ export function FederationSettingsPage() {
         enabled: boolean;
       }>('/v2/federation/settings');
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const s = response.data.settings;
         const formData: SettingsFormData = {
@@ -134,15 +147,16 @@ export function FederationSettingsPage() {
         setOriginalSettings(formData);
         setFederationOptedIn(response.data.enabled ?? s.federation_optin ?? false);
       } else {
-        setLoadError(t('settings.load_error'));
+        setLoadError(tRef.current('settings.load_error'));
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federation settings', error);
-      setLoadError(t('settings.load_error_retry'));
+      setLoadError(tRef.current('settings.load_error_retry'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadSettings();
@@ -161,20 +175,20 @@ export function FederationSettingsPage() {
       const response = await api.post(endpoint);
       if (response.success) {
         setFederationOptedIn(!federationOptedIn);
-        toast.success(
-          t('settings.federation_toggled_title', { action }),
-          t('settings.federation_toggled_description', { action })
+        toastRef.current.success(
+          tRef.current('settings.federation_toggled_title', { action }),
+          tRef.current('settings.federation_toggled_description', { action })
         );
       } else {
-        toast.error(t('settings.action_failed'), response.error || t('settings.toggle_error', { action: federationOptedIn ? t('settings.disable') : t('settings.enable') }));
+        toastRef.current.error(tRef.current('settings.action_failed'), response.error || tRef.current('settings.toggle_error', { action: federationOptedIn ? tRef.current('settings.disable') : tRef.current('settings.enable') }));
       }
     } catch (error) {
       logError(`Failed to toggle federation`, error);
-      toast.error(t('settings.action_failed'), t('settings.toggle_error', { action: federationOptedIn ? t('settings.disable') : t('settings.enable') }));
+      toastRef.current.error(tRef.current('settings.action_failed'), tRef.current('settings.toggle_error', { action: federationOptedIn ? tRef.current('settings.disable') : tRef.current('settings.enable') }));
     } finally {
       setIsTogglingStatus(false);
     }
-  }, [federationOptedIn, toast, t]);
+  }, [federationOptedIn]);
 
   const handleSave = useCallback(async () => {
     try {
@@ -182,17 +196,17 @@ export function FederationSettingsPage() {
       const response = await api.put('/v2/federation/settings', settings);
       if (response.success) {
         setOriginalSettings({ ...settings });
-        toast.success(t('settings.save_success_title'), t('settings.save_success_description'));
+        toastRef.current.success(tRef.current('settings.save_success_title'), tRef.current('settings.save_success_description'));
       } else {
-        toast.error(t('settings.save_failed_title'), response.error || t('settings.save_failed_description'));
+        toastRef.current.error(tRef.current('settings.save_failed_title'), response.error || tRef.current('settings.save_failed_description'));
       }
     } catch (error) {
       logError('Failed to save federation settings', error);
-      toast.error(t('settings.save_failed_title'), t('settings.save_failed_retry'));
+      toastRef.current.error(tRef.current('settings.save_failed_title'), tRef.current('settings.save_failed_retry'));
     } finally {
       setIsSaving(false);
     }
-  }, [settings, toast, t]);
+  }, [settings]);
 
   const updateSetting = useCallback(<K extends keyof SettingsFormData>(key: K, value: SettingsFormData[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));

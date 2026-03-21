@@ -11,7 +11,7 @@
  * - List of closed/archived challenges with their outcomes
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -75,21 +75,33 @@ export function OutcomesDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const fetchDashboard = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<OutcomeDashboard>('/v2/ideation-outcomes/dashboard');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setDashboard(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch outcomes dashboard', err);
-      setError(t('challenges.load_error'));
+      setError(tRef.current('challenges.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     fetchDashboard();

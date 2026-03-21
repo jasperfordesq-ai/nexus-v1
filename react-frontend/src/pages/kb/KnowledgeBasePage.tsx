@@ -13,7 +13,7 @@
  *      GET /api/v2/kb/search?q=...
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -74,43 +74,63 @@ export function KnowledgeBasePage() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<KBArticle[] | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   // Load top-level articles
   const loadArticles = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<KBArticle[]>('/v2/kb');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setArticles(Array.isArray(response.data) ? response.data : []);
       } else {
-        setError(t('error.load_articles'));
+        setError(tRef.current('error.load_articles'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load KB articles', err);
-      setError(t('error.load_retry'));
+      setError(tRef.current('error.load_retry'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadArticles();
   }, [loadArticles]);
 
   // Search
+  const searchAbortRef = useRef<AbortController | null>(null);
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults(null);
       return;
     }
 
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+
     try {
       setIsSearching(true);
       const response = await api.get<KBArticle[]>(`/v2/kb/search?q=${encodeURIComponent(query.trim())}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setSearchResults(Array.isArray(response.data) ? response.data : []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to search KB', err);
     } finally {
       setIsSearching(false);

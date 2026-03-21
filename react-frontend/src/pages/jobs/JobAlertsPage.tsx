@@ -12,7 +12,7 @@
  * - Pause/resume and delete alerts
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -80,6 +80,15 @@ export function JobAlertsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Create form state
   const [keywords, setKeywords] = useState('');
   const [categories, setCategories] = useState('');
@@ -91,20 +100,25 @@ export function JobAlertsPage() {
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   const loadAlerts = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     setIsLoading(true);
     setError(null);
     try {
       const response = await api.get<JobAlert[]>('/v2/jobs/alerts');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setAlerts(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load job alerts', err);
-      setError(t('alerts.load_error', 'Failed to load alerts. Please try again.'));
+      setError(tRef.current('alerts.load_error', 'Failed to load alerts. Please try again.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadAlerts();
@@ -123,16 +137,16 @@ export function JobAlertsPage() {
 
       const response = await api.post('/v2/jobs/alerts', payload);
       if (response.success) {
-        toast.success(t('alerts.create_success'));
+        toastRef.current.success(tRef.current('alerts.create_success'));
         createModal.onClose();
         resetForm();
         loadAlerts();
       } else {
-        toast.error(t('alerts.create_error'));
+        toastRef.current.error(tRef.current('alerts.create_error'));
       }
     } catch (err) {
       logError('Failed to create alert', err);
-      toast.error(t('alerts.create_error'));
+      toastRef.current.error(tRef.current('alerts.create_error'));
     } finally {
       setIsCreating(false);
     }
@@ -143,11 +157,11 @@ export function JobAlertsPage() {
 
     try {
       await api.delete(`/v2/jobs/alerts/${deleteTarget}`);
-      toast.success(t('alerts.delete_success'));
+      toastRef.current.success(tRef.current('alerts.delete_success'));
       setAlerts((prev) => prev.filter((a) => a.id !== deleteTarget));
     } catch (err) {
       logError('Failed to delete alert', err);
-      toast.error(t('alerts.delete_error'));
+      toastRef.current.error(tRef.current('alerts.delete_error'));
     } finally {
       setDeleteTarget(null);
     }
@@ -157,15 +171,15 @@ export function JobAlertsPage() {
     try {
       if (isActive) {
         await api.put(`/v2/jobs/alerts/${alertId}/unsubscribe`, {});
-        toast.success(t('alerts.unsubscribe_success'));
+        toastRef.current.success(tRef.current('alerts.unsubscribe_success'));
       } else {
         await api.put(`/v2/jobs/alerts/${alertId}/resubscribe`, {});
-        toast.success(t('alerts.resubscribe_success'));
+        toastRef.current.success(tRef.current('alerts.resubscribe_success'));
       }
       loadAlerts();
     } catch (err) {
       logError('Failed to toggle alert', err);
-      toast.error(t('alerts.toggle_error'));
+      toastRef.current.error(tRef.current('alerts.toggle_error'));
     }
   };
 

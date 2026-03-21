@@ -20,7 +20,7 @@
  * - Empty state
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -137,6 +137,15 @@ export function IdeationPage() {
 
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
@@ -176,6 +185,9 @@ export function IdeationPage() {
   }, []);
 
   const fetchChallenges = useCallback(async (tab: FilterTab, loadMore = false, categoryFilter?: string, searchTerm?: string, tagFilter?: string[]) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       if (loadMore) {
         setIsLoadingMore(true);
@@ -210,6 +222,7 @@ export function IdeationPage() {
       }
 
       const response = await api.get<Challenge[]>(`/v2/ideation-challenges?${params}`);
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
@@ -221,20 +234,21 @@ export function IdeationPage() {
         setHasMore(response.meta?.has_more ?? false);
         setCursor(response.meta?.cursor ?? undefined);
       } else {
-        if (!loadMore) setError(t('challenges.load_error'));
+        if (!loadMore) setError(tRef.current('challenges.load_error'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch challenges', err);
       if (!loadMore) {
-        setError(t('challenges.load_error'));
+        setError(tRef.current('challenges.load_error'));
       } else {
-        toast.error(t('challenges.load_error'));
+        toastRef.current.error(tRef.current('challenges.load_error'));
       }
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [cursor, t, toast]);
+  }, [cursor]);
 
   useEffect(() => {
     setCursor(undefined);
@@ -281,7 +295,7 @@ export function IdeationPage() {
       }
     } catch (err) {
       logError('Failed to toggle favorite', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setFavoritingIds(prev => {
         const next = new Set(prev);

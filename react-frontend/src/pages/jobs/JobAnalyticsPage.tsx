@@ -13,7 +13,7 @@
  * - Average time to apply, time to fill
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@heroui/react';
 import {
@@ -70,24 +70,36 @@ export function JobAnalyticsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const loadAnalytics = useCallback(async () => {
     if (!id) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     setIsLoading(true);
     setError(null);
     try {
       const response = await api.get<AnalyticsData>(`/v2/jobs/${id}/analytics`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setAnalytics(response.data);
       } else {
-        setError(response.error || t('analytics.load_error', 'Failed to load analytics'));
+        setError(response.error || tRef.current('analytics.load_error', 'Failed to load analytics'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load job analytics', err);
-      setError(t('analytics.load_error', 'Failed to load analytics'));
+      setError(tRef.current('analytics.load_error', 'Failed to load analytics'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadAnalytics();

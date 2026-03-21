@@ -15,7 +15,7 @@
  * - Cursor-based pagination for comments
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -143,26 +143,44 @@ export function IdeaDetailPage() {
   const isAdmin = user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role);
   const isOwner = user?.id === idea?.user_id;
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   usePageTitle(idea?.title ?? t('idea_detail.page_title'));
 
   /* ───── Fetch idea ───── */
   const fetchIdea = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       const response = await api.get<Idea>(`/v2/ideation-ideas/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setIdea(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch idea', err);
-      setError(t('ideas.load_error'));
+      setError(tRef.current('ideas.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   /* ───── Fetch comments ───── */
+  const commentsAbortRef = useRef<AbortController | null>(null);
   const fetchComments = useCallback(async (loadMore = false) => {
+    commentsAbortRef.current?.abort();
+    const controller = new AbortController();
+    commentsAbortRef.current = controller;
     try {
       if (loadMore) {
         setIsLoadingMoreComments(true);
@@ -177,6 +195,7 @@ export function IdeaDetailPage() {
       }
 
       const response = await api.get<Comment[]>(`/v2/ideation-ideas/${id}/comments?${params}`);
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
@@ -189,6 +208,7 @@ export function IdeaDetailPage() {
         setHasMoreComments(response.meta?.has_more ?? false);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch comments', err);
     } finally {
       setIsLoadingComments(false);
@@ -230,11 +250,11 @@ export function IdeaDetailPage() {
           votes_count: result.votes_count,
         } : prev);
 
-        toast.success(result.voted ? t('toast.vote_added') : t('toast.vote_removed'));
+        toastRef.current.success(result.voted ? tRef.current('toast.vote_added') : tRef.current('toast.vote_removed'));
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsVoting(false);
     }
@@ -249,7 +269,7 @@ export function IdeaDetailPage() {
         body: newComment.trim(),
       });
 
-      toast.success(t('toast.comment_added'));
+      toastRef.current.success(tRef.current('toast.comment_added'));
       setNewComment('');
 
       // Refresh comments
@@ -258,7 +278,7 @@ export function IdeaDetailPage() {
       fetchIdea();
     } catch (err) {
       logError('Failed to post comment', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsPostingComment(false);
     }
@@ -268,14 +288,14 @@ export function IdeaDetailPage() {
     setDeletingCommentId(commentId);
     try {
       await api.delete(`/v2/ideation-comments/${commentId}`);
-      toast.success(t('toast.comment_deleted'));
+      toastRef.current.success(tRef.current('toast.comment_deleted'));
 
       setComments(prev => prev.filter(c => c.id !== commentId));
       // Update count on idea
       setIdea(prev => prev ? { ...prev, comments_count: Math.max(0, prev.comments_count - 1) } : prev);
     } catch (err) {
       logError('Failed to delete comment', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setDeletingCommentId(null);
     }
@@ -284,11 +304,11 @@ export function IdeaDetailPage() {
   const handleIdeaStatusChange = async (newStatus: string) => {
     try {
       await api.put(`/v2/ideation-ideas/${id}/status`, { status: newStatus });
-      toast.success(t('admin.idea_status_updated'));
+      toastRef.current.success(tRef.current('admin.idea_status_updated'));
       fetchIdea();
     } catch (err) {
       logError('Failed to update idea status', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     }
   };
 
@@ -296,11 +316,11 @@ export function IdeaDetailPage() {
     setIsDeletingIdea(true);
     try {
       await api.delete(`/v2/ideation-ideas/${id}`);
-      toast.success(t('toast.idea_deleted'));
+      toastRef.current.success(tRef.current('toast.idea_deleted'));
       navigate(tenantPath(`/ideation/${challengeId ?? idea?.challenge_id}`));
     } catch (err) {
       logError('Failed to delete idea', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsDeletingIdea(false);
       onDeleteClose();
@@ -317,13 +337,13 @@ export function IdeaDetailPage() {
       });
 
       if (response.data) {
-        toast.success(t('convert_to_group.success'));
+        toastRef.current.success(tRef.current('convert_to_group.success'));
         setIsConvertOpen(false);
         navigate(tenantPath(`/groups/${response.data.id}`));
       }
     } catch (err) {
       logError('Failed to convert idea to group', err);
-      toast.error(t('convert_to_group.error'));
+      toastRef.current.error(tRef.current('convert_to_group.error'));
     } finally {
       setIsConverting(false);
     }

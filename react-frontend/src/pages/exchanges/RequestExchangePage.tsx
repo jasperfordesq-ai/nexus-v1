@@ -7,7 +7,7 @@
  * Request Exchange Page - Create a new exchange request for a listing
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Input, Textarea } from '@heroui/react';
@@ -49,8 +49,21 @@ export function RequestExchangePage() {
   const [prepTime, setPrepTime] = useState('');
   const [message, setMessage] = useState('');
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadData = useCallback(async () => {
     if (!id) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       setIsLoading(true);
@@ -62,6 +75,8 @@ export function RequestExchangePage() {
         api.get<ExchangeConfig>('/v2/exchanges/config'),
       ]);
 
+      if (controller.signal.aborted) return;
+
       if (listingResponse.success && listingResponse.data) {
         setListing(listingResponse.data);
         // Pre-fill hours with listing estimate
@@ -70,22 +85,23 @@ export function RequestExchangePage() {
           setProposedHours(estimatedHours.toString());
         }
       } else {
-        setError(t('request.listing_not_found'));
+        setError(tRef.current('request.listing_not_found'));
       }
 
       if (configResponse.success && configResponse.data) {
         setConfig(configResponse.data);
         if (!configResponse.data?.exchange_workflow_enabled) {
-          setError(t('request.workflow_not_enabled'));
+          setError(tRef.current('request.workflow_not_enabled'));
         }
       }
     } catch (err) {
-      setError(t('request.load_failed'));
+      if (controller.signal.aborted) return;
+      setError(tRef.current('request.load_failed'));
       logError('Failed to load listing', err);
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadData();
@@ -98,12 +114,12 @@ export function RequestExchangePage() {
 
     const hours = parseFloat(proposedHours);
     if (isNaN(hours) || hours <= 0) {
-      toast.error(t('toast.invalid_hours'));
+      toastRef.current.error(tRef.current('toast.invalid_hours'));
       return;
     }
 
     if (hours > MAX_EXCHANGE_HOURS) {
-      toast.error(t('toast.max_hours', { max: MAX_EXCHANGE_HOURS }));
+      toastRef.current.error(tRef.current('toast.max_hours', { max: MAX_EXCHANGE_HOURS }));
       return;
     }
 
@@ -118,11 +134,11 @@ export function RequestExchangePage() {
       });
 
       if (response.success && response.data) {
-        toast.success(t('toast.request_sent'));
+        toastRef.current.success(tRef.current('toast.request_sent'));
         navigate(tenantPath(`/exchanges/${response.data.id}`));
       }
     } catch (err) {
-      toast.error(t('toast.request_failed'));
+      toastRef.current.error(tRef.current('toast.request_failed'));
       logError('Failed to create exchange request', err);
     } finally {
       setIsSubmitting(false);

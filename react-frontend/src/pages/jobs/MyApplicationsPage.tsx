@@ -390,6 +390,15 @@ export function MyApplicationsPage() {
   const [error, setError] = useState<string | null>(null);
   const cursorRef = useRef<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [withdrawTarget, setWithdrawTarget] = useState<JobApplication | null>(null);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
@@ -410,6 +419,10 @@ export function MyApplicationsPage() {
 
   const loadApplications = useCallback(
     async (append = false) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       if (append) {
         setIsLoadingMore(true);
       } else {
@@ -425,6 +438,7 @@ export function MyApplicationsPage() {
         if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
         const res = await api.get<ApplicationsResponse>(`/v2/jobs/my-applications?${params.toString()}`);
+        if (controller.signal.aborted) return;
 
         if (res.success && res.data && 'items' in res.data) {
           const data = res.data as ApplicationsResponse;
@@ -432,21 +446,22 @@ export function MyApplicationsPage() {
           setHasMore(data.has_more);
           setApplications((prev) => (append ? [...prev, ...data.items] : data.items));
         } else {
-          const msg = (res as { error?: string }).error ?? t('my_applications.load_error', 'Failed to load applications');
+          const msg = (res as { error?: string }).error ?? tRef.current('my_applications.load_error', 'Failed to load applications');
           if (!append) setError(msg);
-          toast.error(msg);
+          toastRef.current.error(msg);
         }
       } catch (err) {
+        if (controller.signal.aborted) return;
         logError('MyApplicationsPage', err);
-        const msg = t('something_wrong', 'Something went wrong. Please try again.');
+        const msg = tRef.current('something_wrong', 'Something went wrong. Please try again.');
         if (!append) setError(msg);
-        toast.error(msg);
+        toastRef.current.error(msg);
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
       }
     },
-    [activeTab, toast, t],
+    [activeTab],
   );
 
   useEffect(() => {
@@ -467,7 +482,7 @@ export function MyApplicationsPage() {
     try {
       const res = await api.put(`/v2/jobs/applications/${withdrawTarget.id}`, { status: 'withdrawn' });
       if (res.success) {
-        toast.success(t('application_withdrawn'));
+        toastRef.current.success(tRef.current('application_withdrawn'));
         closeWithdraw();
         // Refresh the list
         cursorRef.current = null;
@@ -475,15 +490,15 @@ export function MyApplicationsPage() {
         setApplications([]);
         loadApplications();
       } else {
-        toast.error((res as { error?: string }).error ?? t('my_applications.withdraw_error', 'Failed to withdraw application.'));
+        toastRef.current.error((res as { error?: string }).error ?? tRef.current('my_applications.withdraw_error', 'Failed to withdraw application.'));
       }
     } catch (err) {
       logError('MyApplicationsPage.confirmWithdraw', err);
-      toast.error(t('something_wrong'));
+      toastRef.current.error(tRef.current('something_wrong'));
     } finally {
       setIsWithdrawing(false);
     }
-  }, [withdrawTarget, toast, closeWithdraw, loadApplications, t]);
+  }, [withdrawTarget, closeWithdraw, loadApplications]);
 
   return (
     <div className='max-w-3xl mx-auto px-4 py-8'>

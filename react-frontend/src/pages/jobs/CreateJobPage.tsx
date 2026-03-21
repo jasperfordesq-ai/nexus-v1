@@ -10,7 +10,7 @@
  * Uses HeroUI form components with validation.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Button,
@@ -88,6 +88,12 @@ export function CreateJobPage() {
   const isEditing = Boolean(id);
   usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
 
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [form, setForm] = useState<JobFormData>(INITIAL_FORM);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,12 +139,12 @@ export function CreateJobPage() {
             salary_negotiable: Boolean(v.salary_negotiable),
           });
         } else {
-          toast.error(t('detail.not_found'));
+          toastRef.current.error(tRef.current('detail.not_found'));
           navigate(tenantPath('/jobs'));
         }
       } catch (err) {
         logError('Failed to load vacancy for editing', err);
-        toast.error(t('detail.unable_to_load'));
+        toastRef.current.error(tRef.current('detail.unable_to_load'));
         navigate(tenantPath('/jobs'));
       } finally {
         setIsLoading(false);
@@ -146,7 +152,7 @@ export function CreateJobPage() {
     };
 
     loadVacancy();
-  }, [id, isEditing, navigate, tenantPath, toast, t]);
+  }, [id, isEditing, navigate, tenantPath]);
 
   const updateField = useCallback(<K extends keyof JobFormData>(field: K, value: JobFormData[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -220,7 +226,7 @@ export function CreateJobPage() {
       }
 
       if (response.success) {
-        toast.success(isEditing ? t('form.update_success') : t('form.create_success'));
+        toastRef.current.success(isEditing ? tRef.current('form.update_success') : tRef.current('form.create_success'));
         const newId = isEditing ? id : (response.data as Record<string, unknown>)?.id;
         if (newId) {
           navigate(tenantPath(`/jobs/${newId}`));
@@ -228,11 +234,11 @@ export function CreateJobPage() {
           navigate(tenantPath('/jobs'));
         }
       } else {
-        toast.error(response.error || (isEditing ? t('form.update_error') : t('form.create_error')));
+        toastRef.current.error(response.error || (isEditing ? tRef.current('form.update_error') : tRef.current('form.create_error')));
       }
     } catch (err) {
       logError('Failed to save vacancy', err);
-      toast.error(isEditing ? t('form.update_error') : t('form.create_error'));
+      toastRef.current.error(isEditing ? tRef.current('form.update_error') : tRef.current('form.create_error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -574,7 +580,7 @@ export function CreateJobPage() {
                     payload.salary_negotiable = form.salary_negotiable;
                     const response = await api.post('/v2/jobs', payload);
                     if (response.success) {
-                      toast.success(t('form.draft_saved', 'Draft saved'));
+                      toastRef.current.success(tRef.current('form.draft_saved', 'Draft saved'));
                       const newId = (response.data as Record<string, unknown>)?.id;
                       if (newId) {
                         navigate(tenantPath(`/jobs/${newId}`));
@@ -582,11 +588,11 @@ export function CreateJobPage() {
                         navigate(tenantPath('/jobs'));
                       }
                     } else {
-                      toast.error(response.error || t('form.create_error'));
+                      toastRef.current.error(response.error || tRef.current('form.create_error'));
                     }
                   } catch (err) {
                     logError('Failed to save draft', err);
-                    toast.error(t('form.create_error'));
+                    toastRef.current.error(tRef.current('form.create_error'));
                   } finally {
                     setIsSubmitting(false);
                   }

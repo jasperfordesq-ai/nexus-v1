@@ -10,7 +10,7 @@
  * Admin can edit campaign, link/unlink challenges.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Button,
@@ -97,6 +97,15 @@ export function CampaignDetailPage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -115,10 +124,14 @@ export function CampaignDetailPage() {
   usePageTitle(campaign?.title ?? t('campaigns.page_title'));
 
   const fetchCampaign = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<Campaign>(`/v2/ideation-campaigns/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setCampaign(response.data);
         setEditForm({
@@ -127,12 +140,13 @@ export function CampaignDetailPage() {
         });
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch campaign', err);
-      setError(t('challenges.load_error'));
+      setError(tRef.current('challenges.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     fetchCampaign();
@@ -147,12 +161,12 @@ export function CampaignDetailPage() {
         title: editForm.name.trim(),
         description: editForm.description.trim() || null,
       });
-      toast.success(t('toast.campaign_updated'));
+      toastRef.current.success(tRef.current('toast.campaign_updated'));
       onEditClose();
       fetchCampaign();
     } catch (err) {
       logError('Failed to update campaign', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsSaving(false);
     }
@@ -162,11 +176,11 @@ export function CampaignDetailPage() {
     setIsDeleting(true);
     try {
       await api.delete(`/v2/ideation-campaigns/${id}`);
-      toast.success(t('toast.campaign_deleted'));
+      toastRef.current.success(tRef.current('toast.campaign_deleted'));
       navigate(tenantPath('/ideation/campaigns'));
     } catch (err) {
       logError('Failed to delete campaign', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsDeleting(false);
       onDeleteClose();
@@ -178,12 +192,12 @@ export function CampaignDetailPage() {
   const handleUnlinkChallenge = async (challengeId: number) => {
     try {
       await api.delete(`/v2/ideation-campaigns/${id}/challenges/${challengeId}`);
-      toast.success(t('campaigns.unlink_challenge'));
+      toastRef.current.success(tRef.current('campaigns.unlink_challenge'));
       setUnlinkTargetId(null);
       fetchCampaign();
     } catch (err) {
       logError('Failed to unlink challenge', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
       setUnlinkTargetId(null);
     }
   };

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Chip, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, useDisclosure } from '@heroui/react';
 import { ShieldCheck, GraduationCap, AlertTriangle, Plus, RefreshCw, FileWarning, Calendar } from 'lucide-react';
@@ -40,36 +40,50 @@ export function SafeguardingTab() {
   const [incidentForm, setIncidentForm] = useState({ title: '', description: '', severity: 'low', category: '' });
   const [isSubmittingIncident, setIsSubmittingIncident] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true); setError(null);
       const [tRes, iRes] = await Promise.all([api.get<Training[]>('/v2/volunteering/training'), api.get<Incident[]>('/v2/volunteering/incidents')]);
+      if (controller.signal.aborted) return;
       if (tRes.success && tRes.data) setTrainings(tRes.data as Training[]);
       if (iRes.success && iRes.data) setIncidents(iRes.data as Incident[]);
-    } catch (err) { logError('Failed to load safeguarding data', err); setError(t('safeguarding.load_error', 'Unable to load safeguarding data.')); }
+    } catch (err) { if (controller.signal.aborted) return; logError('Failed to load safeguarding data', err); setError(tRef.current('safeguarding.load_error', 'Unable to load safeguarding data.')); }
     finally { setIsLoading(false); }
-  }, [t]);
+  }, []);
   useEffect(() => { load(); }, [load]);
 
   const handleSubmitTraining = async () => {
-    if (!trainingForm.training_name.trim() || !trainingForm.completed_at) { toast.error(t('safeguarding.fill_required', 'Please fill in all required fields.')); return; }
+    if (!trainingForm.training_name.trim() || !trainingForm.completed_at) { toastRef.current.error(tRef.current('safeguarding.fill_required', 'Please fill in all required fields.')); return; }
     try {
       setIsSubmittingTraining(true);
       const res = await api.post('/v2/volunteering/training', { training_type: trainingForm.training_type, training_name: trainingForm.training_name.trim(), provider: trainingForm.provider.trim() || null, completed_at: trainingForm.completed_at, expires_at: trainingForm.expires_at || null });
-      if (res.success) { trainingModal.onClose(); setTrainingForm({ training_type: 'children_first', training_name: '', provider: '', completed_at: '', expires_at: '' }); toast.success(t('safeguarding.training_added', 'Training record submitted.')); load(); }
-      else { toast.error(t('safeguarding.training_failed', 'Failed to submit training record.')); }
-    } catch (err) { logError('Failed to submit training record', err); toast.error(t('safeguarding.training_failed', 'Failed to submit training record.')); }
+      if (res.success) { trainingModal.onClose(); setTrainingForm({ training_type: 'children_first', training_name: '', provider: '', completed_at: '', expires_at: '' }); toastRef.current.success(tRef.current('safeguarding.training_added', 'Training record submitted.')); load(); }
+      else { toastRef.current.error(tRef.current('safeguarding.training_failed', 'Failed to submit training record.')); }
+    } catch (err) { logError('Failed to submit training record', err); toastRef.current.error(tRef.current('safeguarding.training_failed', 'Failed to submit training record.')); }
     finally { setIsSubmittingTraining(false); }
   };
 
   const handleSubmitIncident = async () => {
-    if (!incidentForm.title.trim() || !incidentForm.description.trim()) { toast.error(t('safeguarding.fill_required', 'Please fill in all required fields.')); return; }
+    if (!incidentForm.title.trim() || !incidentForm.description.trim()) { toastRef.current.error(tRef.current('safeguarding.fill_required', 'Please fill in all required fields.')); return; }
     try {
       setIsSubmittingIncident(true);
       const res = await api.post('/v2/volunteering/incidents', { title: incidentForm.title.trim(), description: incidentForm.description.trim(), severity: incidentForm.severity, category: incidentForm.category.trim() || undefined });
-      if (res.success) { incidentModal.onClose(); setIncidentForm({ title: '', description: '', severity: 'low', category: '' }); toast.success(t('safeguarding.incident_reported', 'Incident reported.')); load(); }
-      else { toast.error(t('safeguarding.incident_failed', 'Failed to report incident.')); }
-    } catch (err) { logError('Failed to report incident', err); toast.error(t('safeguarding.incident_failed', 'Failed to report incident.')); }
+      if (res.success) { incidentModal.onClose(); setIncidentForm({ title: '', description: '', severity: 'low', category: '' }); toastRef.current.success(tRef.current('safeguarding.incident_reported', 'Incident reported.')); load(); }
+      else { toastRef.current.error(tRef.current('safeguarding.incident_failed', 'Failed to report incident.')); }
+    } catch (err) { logError('Failed to report incident', err); toastRef.current.error(tRef.current('safeguarding.incident_failed', 'Failed to report incident.')); }
     finally { setIsSubmittingIncident(false); }
   };
 

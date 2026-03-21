@@ -68,6 +68,15 @@ export function MessagesPage() {
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox');
   const archivedLoadedRef = useRef(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Broker messaging restriction state
   const [messagingRestricted, setMessagingRestricted] = useState(false);
 
@@ -84,22 +93,28 @@ export function MessagesPage() {
 
   // Memoize loadConversations to use in effects and handlers
   const loadConversations = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<Conversation[]>('/v2/messages');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setConversations(response.data);
       } else {
-        setError(t('load_failed'));
+        setError(tRef.current('load_failed'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load conversations', err);
-      setError(t('load_failed'));
+      setError(tRef.current('load_failed'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   /**
    * Handle incoming new message from Pusher
@@ -222,25 +237,32 @@ export function MessagesPage() {
   }, [toUserId, listingId, conversations.length, startNewConversation]);
 
   // Debounced user search
+  const searchAbortRef = useRef<AbortController | null>(null);
   const searchUsers = useCallback(async (query: string) => {
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+
     try {
       setIsSearchingUsers(true);
       setUserSearchError(null);
       const response = await api.get<User[]>(`/v2/users?q=${encodeURIComponent(query)}&limit=10`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         // Filter out current user from results
         const filtered = response.data.filter(u => u.id !== currentUser?.id);
         setUserSearchResults(filtered);
       } else {
-        setUserSearchError(t('search_members_failed'));
+        setUserSearchError(tRef.current('search_members_failed'));
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to search users', error);
-      setUserSearchError(t('search_members_failed'));
+      setUserSearchError(tRef.current('search_members_failed'));
     } finally {
       setIsSearchingUsers(false);
     }
-  }, [t, currentUser?.id]);
+  }, [currentUser?.id]);
 
   useEffect(() => {
     if (!userSearchQuery.trim()) {
@@ -255,14 +277,21 @@ export function MessagesPage() {
     return () => clearTimeout(timer);
   }, [userSearchQuery, searchUsers]);
 
+  const archivedAbortRef = useRef<AbortController | null>(null);
   const loadArchivedConversations = useCallback(async () => {
+    archivedAbortRef.current?.abort();
+    const controller = new AbortController();
+    archivedAbortRef.current = controller;
+
     try {
       setIsLoadingArchived(true);
       const response = await api.get<Conversation[]>('/v2/messages?archived=true');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setArchivedConversations(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load archived conversations', err);
     } finally {
       setIsLoadingArchived(false);
@@ -278,11 +307,11 @@ export function MessagesPage() {
         setArchivedConversations((prev) => prev.filter((c) => c.id !== conversationId));
         // Reload main inbox to show restored conversation
         loadConversations();
-        toast.success(t('conversation_restored'), t('conversation_restored_desc'));
+        toastRef.current.success(tRef.current('conversation_restored'), tRef.current('conversation_restored_desc'));
       }
     } catch (error) {
       logError('Failed to restore conversation', error);
-      toast.error(t('error_title'), t('restore_failed'));
+      toastRef.current.error(tRef.current('error_title'), tRef.current('restore_failed'));
     }
   }
 

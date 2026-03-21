@@ -14,7 +14,7 @@
  * 5. CTA section
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/react';
@@ -148,13 +148,22 @@ export function AboutPage() {
   const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState<PlatformStats | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
   const loadStats = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const response = await api.get<PlatformStats>('/v2/platform/stats');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setStats(response.data);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load platform stats on about page', err);
     }
   }, []);

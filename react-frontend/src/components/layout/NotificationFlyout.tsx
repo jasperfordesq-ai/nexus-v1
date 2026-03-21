@@ -59,6 +59,10 @@ export function NotificationFlyout() {
   const [isLoading, setIsLoading] = useState(false);
   const fetchIdRef = useRef(0);
 
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   // Always re-fetch when popover opens — ensures sync with page deletions/reads
   const fetchNotifications = useCallback(async () => {
     const fetchId = ++fetchIdRef.current;

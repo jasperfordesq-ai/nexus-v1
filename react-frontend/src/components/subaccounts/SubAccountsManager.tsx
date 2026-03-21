@@ -12,7 +12,7 @@
  * API: GET/POST /api/v2/users/me/sub-accounts
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Button,
   Input,
@@ -86,21 +86,38 @@ export function SubAccountsManager() {
   const [addName, setAddName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadSubAccounts = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<SubAccount[]>('/v2/users/me/sub-accounts');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setSubAccounts(response.data);
       } else {
         setError('Failed to load linked accounts');
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load sub-accounts', err);
       setError('Failed to load linked accounts');
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
@@ -111,7 +128,7 @@ export function SubAccountsManager() {
   // Add sub-account
   const handleAdd = async () => {
     if (!addEmail.trim()) {
-      toast.error(t('toasts.subaccount_enter_email'));
+      toastRef.current.error(tRef.current('toasts.subaccount_enter_email'));
       return;
     }
 
@@ -123,17 +140,17 @@ export function SubAccountsManager() {
       });
 
       if (response.success) {
-        toast.success(t('toasts.subaccount_request_sent'));
+        toastRef.current.success(tRef.current('toasts.subaccount_request_sent'));
         setAddEmail('');
         setAddName('');
         onClose();
         loadSubAccounts();
       } else {
-        toast.error(response.error || 'Failed to add linked account');
+        toastRef.current.error(response.error || 'Failed to add linked account');
       }
     } catch (err) {
       logError('Failed to add sub-account', err);
-      toast.error(t('toasts.subaccount_send_failed'));
+      toastRef.current.error(tRef.current('toasts.subaccount_send_failed'));
     } finally {
       setIsAdding(false);
     }
@@ -155,11 +172,11 @@ export function SubAccountsManager() {
           )
         );
       } else {
-        toast.error(response.error || t('toasts.subaccount_permission_failed'));
+        toastRef.current.error(response.error || tRef.current('toasts.subaccount_permission_failed'));
       }
     } catch (err) {
       logError('Failed to update permission', err);
-      toast.error(t('toasts.subaccount_permission_failed'));
+      toastRef.current.error(tRef.current('toasts.subaccount_permission_failed'));
     }
   };
 
@@ -168,14 +185,14 @@ export function SubAccountsManager() {
     try {
       const response = await api.delete(`/v2/users/me/sub-accounts/${accountId}`);
       if (response.success) {
-        toast.success(t('toasts.subaccount_removed'));
+        toastRef.current.success(tRef.current('toasts.subaccount_removed'));
         setSubAccounts((prev) => prev.filter((sa) => sa.id !== accountId));
       } else {
-        toast.error(response.error || 'Failed to remove');
+        toastRef.current.error(response.error || 'Failed to remove');
       }
     } catch (err) {
       logError('Failed to remove sub-account', err);
-      toast.error(t('toasts.subaccount_remove_failed'));
+      toastRef.current.error(tRef.current('toasts.subaccount_remove_failed'));
     }
   };
 
@@ -184,14 +201,14 @@ export function SubAccountsManager() {
     try {
       const response = await api.put(`/v2/users/me/sub-accounts/${accountId}/approve`);
       if (response.success) {
-        toast.success(t('toasts.subaccount_approved'));
+        toastRef.current.success(tRef.current('toasts.subaccount_approved'));
         loadSubAccounts();
       } else {
-        toast.error(response.error || 'Failed to approve');
+        toastRef.current.error(response.error || 'Failed to approve');
       }
     } catch (err) {
       logError('Failed to approve sub-account', err);
-      toast.error(t('toasts.subaccount_approve_failed'));
+      toastRef.current.error(tRef.current('toasts.subaccount_approve_failed'));
     }
   };
 

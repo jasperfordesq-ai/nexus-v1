@@ -13,7 +13,7 @@
  * - Task stats summary
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Button,
   Input,
@@ -117,9 +117,22 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
   });
   const [isCreating, setIsCreating] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const isAdmin = isGroupAdmin || (user?.role && ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'].includes(user.role));
 
   const fetchTasks = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const params = new URLSearchParams();
@@ -127,13 +140,17 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
         params.set('status', statusFilter);
       }
       const response = await api.get<Task[]>(`/v2/groups/${groupId}/tasks?${params}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setTasks(Array.isArray(response.data) ? response.data : []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to fetch tasks', err);
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [groupId, statusFilter]);
 
@@ -166,7 +183,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
         assigned_to: taskForm.assigned_to ? parseInt(taskForm.assigned_to, 10) : null,
         due_date: taskForm.due_date || null,
       });
-      toast.success(t('toast.task_created'));
+      toastRef.current.success(tRef.current('toast.task_created'));
       setTaskForm({
         title: '',
         description: '',
@@ -180,7 +197,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
       fetchStats();
     } catch (err) {
       logError('Failed to create task', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsCreating(false);
     }
@@ -189,24 +206,24 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
   const handleUpdateStatus = async (taskId: number, newStatus: string) => {
     try {
       await api.put(`/v2/team-tasks/${taskId}`, { status: newStatus });
-      toast.success(t('toast.task_updated'));
+      toastRef.current.success(tRef.current('toast.task_updated'));
       fetchTasks();
       fetchStats();
     } catch (err) {
       logError('Failed to update task', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     }
   };
 
   const handleDeleteTask = async (taskId: number) => {
     try {
       await api.delete(`/v2/team-tasks/${taskId}`);
-      toast.success(t('toast.task_deleted'));
+      toastRef.current.success(tRef.current('toast.task_deleted'));
       setTasks(prev => prev.filter(t => t.id !== taskId));
       fetchStats();
     } catch (err) {
       logError('Failed to delete task', err);
-      toast.error(t('toast.error_generic'));
+      toastRef.current.error(tRef.current('toast.error_generic'));
     }
   };
 

@@ -10,7 +10,7 @@
  * (read-only) and in settings (editable).
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, Spinner, Tooltip } from '@heroui/react';
 import { Calendar, Save, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -69,11 +69,24 @@ export function AvailabilityGrid({
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Build key for slot map
   const slotKey = (day: number, time: string) => `${day}-${time}`;
 
   // Load availability
   const loadAvailability = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -83,6 +96,8 @@ export function AvailabilityGrid({
         : '/v2/users/me/availability';
 
       const response = await api.get<AvailabilityData>(endpoint);
+
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const newSlots = new Map<string, boolean>();
@@ -102,10 +117,13 @@ export function AvailabilityGrid({
         setSlots(newSlots);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load availability', err);
       setError('Failed to load availability');
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [userId]);
 
@@ -168,14 +186,14 @@ export function AvailabilityGrid({
       });
 
       if (response.success) {
-        toast.success(t('toasts.availability_saved'));
+        toastRef.current.success(tRef.current('toasts.availability_saved'));
         setIsDirty(false);
       } else {
-        toast.error(response.error || t('toasts.availability_save_failed'));
+        toastRef.current.error(response.error || tRef.current('toasts.availability_save_failed'));
       }
     } catch (err) {
       logError('Failed to save availability', err);
-      toast.error(t('toasts.availability_save_failed'));
+      toastRef.current.error(tRef.current('toasts.availability_save_failed'));
     } finally {
       setIsSaving(false);
     }

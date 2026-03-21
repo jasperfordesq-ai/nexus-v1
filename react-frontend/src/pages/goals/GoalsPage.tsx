@@ -167,6 +167,16 @@ export function GoalsPage() {
   usePageTitle(t('goals.page_title'));
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
+
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -218,6 +228,12 @@ export function GoalsPage() {
   const [checkinGoal, setCheckinGoal] = useState<Goal | null>(null);
 
   const loadGoals = useCallback(async (append = false) => {
+    if (!append) {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+    }
+    const controller = abortRef.current;
     try {
       if (!append) {
         setIsLoading(true);
@@ -236,6 +252,7 @@ export function GoalsPage() {
 
       const response = await api.get<Goal[]>(endpoint);
 
+      if (controller?.signal.aborted) return;
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
 
@@ -249,15 +266,16 @@ export function GoalsPage() {
         cursorRef.current = newCursor;
         setCursor(newCursor);
       } else {
-        if (!append) setError(t('goals.load_error', 'Failed to load goals. Please try again.'));
+        if (!append) setError(tRef.current('goals.load_error', 'Failed to load goals. Please try again.'));
       }
     } catch (err) {
+      if (controller?.signal.aborted) return;
       logError('Failed to load goals', err);
-      if (!append) setError(t('goals.load_error', 'Failed to load goals. Please try again.'));
+      if (!append) setError(tRef.current('goals.load_error', 'Failed to load goals. Please try again.'));
     } finally {
       setIsLoading(false);
     }
-  }, [tab, t]);
+  }, [tab]);
 
   useEffect(() => {
     cursorRef.current = undefined;
@@ -281,12 +299,12 @@ export function GoalsPage() {
       if (response.success) {
         onClose();
         setNewGoal({ title: '', description: '', target_value: 100, deadline: '', is_public: false });
-        toast.success(t('goals.toast.created'));
+        toastRef.current.success(tRef.current('goals.toast.created'));
         loadGoals();
       }
     } catch (err) {
       logError('Failed to create goal', err);
-      toast.error(t('goals.toast.create_failed'));
+      toastRef.current.error(tRef.current('goals.toast.create_failed'));
     } finally {
       setIsCreating(false);
     }
@@ -296,12 +314,12 @@ export function GoalsPage() {
     try {
       const response = await api.post(`/v2/goals/${goalId}/progress`, { increment });
       if (response.success) {
-        toast.success(t('goals.toast.progress_updated'));
+        toastRef.current.success(tRef.current('goals.toast.progress_updated'));
         loadGoals();
       }
     } catch (err) {
       logError('Failed to update progress', err);
-      toast.error(t('goals.toast.progress_failed'));
+      toastRef.current.error(tRef.current('goals.toast.progress_failed'));
     }
   };
 
@@ -334,12 +352,12 @@ export function GoalsPage() {
       if (response.success) {
         onEditClose();
         setEditGoal(null);
-        toast.success(t('goals.toast.updated'));
+        toastRef.current.success(tRef.current('goals.toast.updated'));
         loadGoals();
       }
     } catch (err) {
       logError('Failed to update goal', err);
-      toast.error(t('goals.toast.update_failed'));
+      toastRef.current.error(tRef.current('goals.toast.update_failed'));
     } finally {
       setIsSavingEdit(false);
     }
@@ -362,11 +380,11 @@ export function GoalsPage() {
         onDeleteClose();
         setGoals((prev) => prev.filter((g) => g.id !== deleteGoal.id));
         setDeleteGoal(null);
-        toast.success(t('goals.toast.deleted'));
+        toastRef.current.success(tRef.current('goals.toast.deleted'));
       }
     } catch (err) {
       logError('Failed to delete goal', err);
-      toast.error(t('goals.toast.delete_failed'));
+      toastRef.current.error(tRef.current('goals.toast.delete_failed'));
     } finally {
       setIsDeleting(false);
     }
@@ -387,13 +405,13 @@ export function GoalsPage() {
               : g
           )
         );
-        toast.success(t('goals.toast.completed'));
+        toastRef.current.success(tRef.current('goals.toast.completed'));
         // Clear celebration after animation
         setTimeout(() => setCelebratingId(null), 2000);
       }
     } catch (err) {
       logError('Failed to complete goal', err);
-      toast.error(t('goals.toast.complete_failed'));
+      toastRef.current.error(tRef.current('goals.toast.complete_failed'));
     }
   };
 
@@ -403,7 +421,7 @@ export function GoalsPage() {
       const response = await api.post(`/v2/goals/${goal.id}/buddy`, {});
 
       if (response.success) {
-        toast.success(t('goals.toast.buddy_joined'));
+        toastRef.current.success(tRef.current('goals.toast.buddy_joined'));
         // Update local state
         setGoals((prev) =>
           prev.map((g) =>
@@ -415,7 +433,7 @@ export function GoalsPage() {
       }
     } catch (err) {
       logError('Failed to become buddy', err);
-      toast.error(t('goals.toast.buddy_failed'));
+      toastRef.current.error(tRef.current('goals.toast.buddy_failed'));
     }
   };
 

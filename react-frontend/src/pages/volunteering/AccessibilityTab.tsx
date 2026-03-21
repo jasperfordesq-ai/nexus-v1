@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -80,23 +80,38 @@ export function AccessibilityTab() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<AccessibilityNeed[]>('/v2/volunteering/accessibility-needs');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setNeeds(response.data as AccessibilityNeed[]);
       } else {
-        setError(t('accessibility.load_error', 'Unable to load accessibility needs.'));
+        setError(tRef.current('accessibility.load_error', 'Unable to load accessibility needs.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load accessibility needs', err);
-      setError(t('accessibility.load_error', 'Unable to load accessibility needs.'));
+      setError(tRef.current('accessibility.load_error', 'Unable to load accessibility needs.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => { load(); }, [load]);
 
@@ -105,14 +120,14 @@ export function AccessibilityTab() {
       setIsSaving(true);
       const response = await api.put('/v2/volunteering/accessibility-needs', { needs });
       if (response.success) {
-        toast.success(t('accessibility.saved', 'Accessibility needs saved successfully.'));
+        toastRef.current.success(tRef.current('accessibility.saved', 'Accessibility needs saved successfully.'));
         load();
       } else {
-        toast.error(t('accessibility.save_error', 'Failed to save changes.'));
+        toastRef.current.error(tRef.current('accessibility.save_error', 'Failed to save changes.'));
       }
     } catch (err) {
       logError('Failed to save accessibility needs', err);
-      toast.error(t('accessibility.save_error', 'Failed to save changes.'));
+      toastRef.current.error(tRef.current('accessibility.save_error', 'Failed to save changes.'));
     } finally {
       setIsSaving(false);
     }

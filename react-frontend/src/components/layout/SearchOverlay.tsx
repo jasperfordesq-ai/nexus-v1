@@ -11,7 +11,7 @@
  * Just works.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -51,6 +51,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const { tenantPath, hasFeature } = useTenant();
   const { isAuthenticated } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
 
   // ─── State ─────────────────────────────────────────────────────────────
   const [query, setQuery] = useState('');

@@ -7,7 +7,7 @@
  * Listing Detail Page - View single listing
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -63,6 +63,15 @@ export function ListingDetailPage() {
   const [isRenewing, setIsRenewing] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Social fields from API response (set after listing loads)
   const [socialInit, setSocialInit] = useState<{ liked: boolean; likes: number; comments: number }>({ liked: false, likes: 0, comments: 0 });
 
@@ -81,6 +90,7 @@ export function ListingDetailPage() {
   const loadExchangeConfig = useCallback(async () => {
     try {
       const response = await api.get<ExchangeConfig>('/v2/exchanges/config');
+      if (abortRef.current?.signal.aborted) return;
       if (response.success && response.data) {
         setExchangeConfig(response.data);
       }
@@ -93,6 +103,7 @@ export function ListingDetailPage() {
     if (!id || !isAuthenticated) return;
     try {
       const response = await api.get<{ id: number; status: string; role: string; proposed_hours: number } | null>(`/v2/exchanges/check?listing_id=${id}`);
+      if (abortRef.current?.signal.aborted) return;
       if (response.success && response.data) {
         setActiveExchange(response.data);
       }
@@ -104,10 +115,15 @@ export function ListingDetailPage() {
   const loadListing = useCallback(async () => {
     if (!id) return;
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<Listing>(`/v2/listings/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setListing(response.data);
         setIsSaved(response.data.is_favorited ?? false);
@@ -119,15 +135,16 @@ export function ListingDetailPage() {
           comments: data.comments_count ?? 0,
         });
       } else {
-        setError(t('not_found_error'));
+        setError(tRef.current('not_found_error'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load listing', err);
-      setError(t('not_found_error'));
+      setError(tRef.current('not_found_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadListing();
@@ -141,11 +158,11 @@ export function ListingDetailPage() {
     try {
       setIsDeleting(true);
       await api.delete(`/v2/listings/${listing.id}`);
-      toast.success(t('delete_success_title'));
+      toastRef.current.success(tRef.current('delete_success_title'));
       navigate(tenantPath('/listings'), { replace: true });
     } catch (err) {
       logError('Failed to delete listing', err);
-      toast.error(t('delete_error_title'), t('error_retry'));
+      toastRef.current.error(tRef.current('delete_error_title'), tRef.current('error_retry'));
     } finally {
       setIsDeleting(false);
     }
@@ -159,10 +176,10 @@ export function ListingDetailPage() {
     try {
       if (wasAlreadySaved) {
         await api.delete(`/v2/listings/${id}/save`);
-        toast.info(t('unsave_title'));
+        toastRef.current.info(tRef.current('unsave_title'));
       } else {
         await api.post(`/v2/listings/${id}/save`, {});
-        toast.success(t('save_success_title'), t('save_success_subtitle'));
+        toastRef.current.success(tRef.current('save_success_title'), tRef.current('save_success_subtitle'));
       }
     } catch (err) {
       logError('Failed to save listing', err);
@@ -178,12 +195,12 @@ export function ListingDetailPage() {
     try {
       const response = await api.post<{ renewed: boolean; new_expires_at: string }>(`/v2/listings/${listing.id}/renew`, {});
       if (response.success) {
-        toast.success(t('renew_success'));
+        toastRef.current.success(tRef.current('renew_success'));
         loadListing(); // Reload to get updated data
       }
     } catch (err) {
       logError('Failed to renew listing', err);
-      toast.error(t('renew_error'));
+      toastRef.current.error(tRef.current('renew_error'));
     } finally {
       setIsRenewing(false);
     }

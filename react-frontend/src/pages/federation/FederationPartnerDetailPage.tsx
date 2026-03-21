@@ -10,7 +10,7 @@
  * Route: /federation/partners/:id
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -91,6 +91,13 @@ export function FederationPartnerDetailPage() {
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const [partner, setPartner] = useState<FederationPartner | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,27 +106,32 @@ export function FederationPartnerDetailPage() {
 
   const loadPartner = useCallback(async () => {
     if (!id) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<FederationPartner[]>('/v2/federation/partners');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const found = response.data.find((p) => String(p.id) === id);
         if (found) {
           setPartner(found);
         } else {
-          setError(t('partner_detail.not_found_error'));
+          setError(tRef.current('partner_detail.not_found_error'));
         }
       } else {
-        setError(t('partner_detail.load_communities_error'));
+        setError(tRef.current('partner_detail.load_communities_error'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federation partner', err);
-      setError(t('partner_detail.load_error'));
+      setError(tRef.current('partner_detail.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadPartner();

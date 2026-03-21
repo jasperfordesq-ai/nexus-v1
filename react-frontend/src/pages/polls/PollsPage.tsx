@@ -15,7 +15,7 @@
  * - Delete confirmation modal (owner / admin)
  */
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -355,6 +355,15 @@ export function PollsPage() {
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   /* ── State ── */
   const [polls, setPolls] = useState<Poll[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -409,6 +418,13 @@ export function PollsPage() {
 
   /* ── Data loading ── */
   const loadPolls = useCallback(async (append = false) => {
+    if (!append) {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+    }
+    const controller = abortRef.current!;
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -436,6 +452,7 @@ export function PollsPage() {
 
       const response = await api.get<Poll[]>(`/v2/polls?${params}`);
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
         if (append) {
@@ -446,20 +463,21 @@ export function PollsPage() {
         setHasMore(response.meta?.has_more ?? items.length >= ITEMS_PER_PAGE);
         setCursor(response.meta?.cursor ?? undefined);
       } else {
-        if (!append) setError(t('errors.load_failed'));
+        if (!append) setError(tRef.current('errors.load_failed'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load polls', err);
       if (!append) {
-        setError(t('errors.load_failed'));
+        setError(tRef.current('errors.load_failed'));
       } else {
-        toast.error(t('errors.load_more_failed'));
+        toastRef.current.error(tRef.current('errors.load_more_failed'));
       }
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [tab, cursor, selectedCategory, t, toast]);
+  }, [tab, cursor, selectedCategory]);
 
   // Reload when tab or category changes
   useEffect(() => {
@@ -508,11 +526,11 @@ export function PollsPage() {
 
   const handleCreate = async () => {
     if (!newQuestion.trim()) {
-      toast.error(t('errors.question_required'));
+      toastRef.current.error(tRef.current('errors.question_required'));
       return;
     }
     if (validOptions.length < 2) {
-      toast.error(t('errors.min_options'));
+      toastRef.current.error(tRef.current('errors.min_options'));
       return;
     }
 
@@ -539,7 +557,7 @@ export function PollsPage() {
       if (response.success) {
         resetCreateForm();
         setShowCreate(false);
-        toast.success(t('toast.created'));
+        toastRef.current.success(tRef.current('toast.created'));
         // If we're on the "open" or "mine" tab, reload to show the new poll
         if (tab === 'open' || tab === 'mine') {
           setCursor(undefined);
@@ -548,11 +566,11 @@ export function PollsPage() {
           setTab('open');
         }
       } else {
-        toast.error(t('toast.create_failed'));
+        toastRef.current.error(tRef.current('toast.create_failed'));
       }
     } catch (err) {
       logError('Failed to create poll', err);
-      toast.error(t('toast.create_failed'));
+      toastRef.current.error(tRef.current('toast.create_failed'));
     } finally {
       setIsCreating(false);
     }
@@ -593,18 +611,18 @@ export function PollsPage() {
     try {
       const response = await api.post(`/v2/polls/${pollId}/vote`, { option_id: optionId });
       if (response.success) {
-        toast.success(t('toast.voted'));
+        toastRef.current.success(tRef.current('toast.voted'));
       } else {
         // Revert on failure
         loadPolls();
-        toast.error(t('toast.vote_failed'));
+        toastRef.current.error(tRef.current('toast.vote_failed'));
       }
     } catch (err) {
       logError('Failed to vote', err);
       loadPolls();
-      toast.error(t('toast.vote_failed'));
+      toastRef.current.error(tRef.current('toast.vote_failed'));
     }
-  }, [t, toast, loadPolls]);
+  }, [loadPolls]);
 
   /* ── Delete ── */
   const openDeleteModal = (poll: Poll) => {
@@ -622,15 +640,15 @@ export function PollsPage() {
       if (response.success) {
         onDeleteClose();
         setDeletingPoll(null);
-        toast.success(t('toast.deleted'));
+        toastRef.current.success(tRef.current('toast.deleted'));
         // Remove from local state
         setPolls((prev) => prev.filter((p) => p.id !== deletingPoll.id));
       } else {
-        toast.error(t('toast.delete_failed'));
+        toastRef.current.error(tRef.current('toast.delete_failed'));
       }
     } catch (err) {
       logError('Failed to delete poll', err);
-      toast.error(t('toast.delete_failed'));
+      toastRef.current.error(tRef.current('toast.delete_failed'));
     } finally {
       setIsDeleting(false);
     }
@@ -653,7 +671,7 @@ export function PollsPage() {
       }
     } catch (err) {
       logError('Failed to load ranked results', err);
-      toast.error(t('toast.vote_failed'));
+      toastRef.current.error(tRef.current('toast.vote_failed'));
     } finally {
       setIsLoadingRanked(false);
     }
@@ -668,15 +686,15 @@ export function PollsPage() {
       });
 
       if (response.success) {
-        toast.success(t('toast.voted'));
+        toastRef.current.success(tRef.current('toast.voted'));
         onRankedClose();
         loadPolls();
       } else {
-        toast.error(t('toast.vote_failed'));
+        toastRef.current.error(tRef.current('toast.vote_failed'));
       }
     } catch (err) {
       logError('Failed to submit ranked vote', err);
-      toast.error(t('toast.vote_failed'));
+      toastRef.current.error(tRef.current('toast.vote_failed'));
     } finally {
       setIsSubmittingRank(false);
     }
@@ -720,13 +738,13 @@ export function PollsPage() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        toast.success(t('toast.csv_exported'));
+        toastRef.current.success(tRef.current('toast.csv_exported'));
       } else {
-        toast.error(t('toast.export_failed'));
+        toastRef.current.error(tRef.current('toast.export_failed'));
       }
     } catch (err) {
       logError('Failed to export poll', err);
-      toast.error(t('toast.export_failed'));
+      toastRef.current.error(tRef.current('toast.export_failed'));
     }
   };
 

@@ -7,7 +7,7 @@
  * CertificatesTab - Generate and view volunteer impact certificates
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button, Chip } from '@heroui/react';
@@ -49,9 +49,22 @@ export function CertificatesTab() {
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { success: toastSuccess, error: toastError } = useToast();
+  const toast = useToast();
+
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -60,19 +73,21 @@ export function CertificatesTab() {
         '/v2/volunteering/certificates'
       );
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const payload = response.data as { certificates?: Certificate[] } | Certificate[];
         setCertificates(Array.isArray(payload) ? payload : (payload.certificates ?? []));
       } else {
-        setError(t('certificates.error_load', 'Failed to load certificates'));
+        setError(tRef.current('certificates.error_load', 'Failed to load certificates'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load certificates', err);
-      setError(t('certificates.error_load_generic', 'Unable to load certificates.'));
+      setError(tRef.current('certificates.error_load_generic', 'Unable to load certificates.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -85,17 +100,17 @@ export function CertificatesTab() {
       const response = await api.post('/v2/volunteering/certificates', {});
 
       if (response.success) {
-        toastSuccess(t('certificates.generated_success', 'Certificate generated!'));
+        toastRef.current.success(tRef.current('certificates.generated_success', 'Certificate generated!'));
         load();
       } else {
-        toastError(
+        toastRef.current.error(
           response.error ||
-          t('certificates.no_verified_hours', 'No verified volunteer hours found. Hours must be approved before generating a certificate.')
+          tRef.current('certificates.no_verified_hours', 'No verified volunteer hours found. Hours must be approved before generating a certificate.')
         );
       }
     } catch (err) {
       logError('Failed to generate certificate', err);
-      toastError(t('certificates.generated_error', 'Failed to generate certificate. Please try again.'));
+      toastRef.current.error(tRef.current('certificates.generated_error', 'Failed to generate certificate. Please try again.'));
     } finally {
       setIsGenerating(false);
     }

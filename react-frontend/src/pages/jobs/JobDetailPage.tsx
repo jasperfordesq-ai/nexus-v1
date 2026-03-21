@@ -21,7 +21,7 @@
  * - Edit/delete for owner
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -233,27 +233,41 @@ export function JobDetailPage() {
 
   usePageTitle(vacancy?.title ?? t('detail.loading'));
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const isOwner = vacancy && user && vacancy.user_id === user.id;
 
   const loadVacancy = useCallback(async () => {
     if (!id) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<JobVacancy>(`/v2/jobs/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setVacancy(response.data);
         setIsSaved(response.data.is_saved ?? false);
       } else {
-        setError(t('detail.not_found'));
+        setError(tRef.current('detail.not_found'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load job vacancy', err);
-      setError(t('detail.unable_to_load'));
+      setError(tRef.current('detail.unable_to_load'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadVacancy();
@@ -304,16 +318,16 @@ export function JobDetailPage() {
         message: applyMessage || null,
       });
       if (response.success) {
-        toast.success(t('apply.success'));
+        toastRef.current.success(tRef.current('apply.success'));
         applyModal.onClose();
         setApplyMessage('');
         loadVacancy();
       } else {
-        toast.error(response.error || t('apply.error'));
+        toastRef.current.error(response.error || tRef.current('apply.error'));
       }
     } catch (err) {
       logError('Failed to apply for job', err);
-      toast.error(t('apply.error'));
+      toastRef.current.error(tRef.current('apply.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -324,15 +338,15 @@ export function JobDetailPage() {
     try {
       const response = await api.delete(`/v2/jobs/${id}`);
       if (response.success) {
-        toast.success(t('detail.deleted'));
+        toastRef.current.success(tRef.current('detail.deleted'));
         deleteModal.onClose();
         navigate(tenantPath('/jobs'));
       } else {
-        toast.error(t('detail.delete_error'));
+        toastRef.current.error(tRef.current('detail.delete_error'));
       }
     } catch (err) {
       logError('Failed to delete vacancy', err);
-      toast.error(t('detail.delete_error'));
+      toastRef.current.error(tRef.current('detail.delete_error'));
     }
   };
 
@@ -345,18 +359,18 @@ export function JobDetailPage() {
         const response = await api.delete(`/v2/jobs/${id}/save`);
         if (response.success) {
           setIsSaved(false);
-          toast.success(t('saved.unsave_success'));
+          toastRef.current.success(tRef.current('saved.unsave_success'));
         }
       } else {
         const response = await api.post(`/v2/jobs/${id}/save`, {});
         if (response.success) {
           setIsSaved(true);
-          toast.success(t('saved.save_success'));
+          toastRef.current.success(tRef.current('saved.save_success'));
         }
       }
     } catch (err) {
       logError('Failed to toggle save', err);
-      toast.error(t('saved.save_error'));
+      toastRef.current.error(tRef.current('saved.save_error'));
     } finally {
       setIsSaving(false);
     }
@@ -367,14 +381,14 @@ export function JobDetailPage() {
     try {
       const response = await api.put(`/v2/jobs/applications/${applicationId}`, { status });
       if (response.success) {
-        toast.success(t('detail.status_updated'));
+        toastRef.current.success(tRef.current('detail.status_updated'));
         loadApplications();
       } else {
-        toast.error(t('detail.status_update_error'));
+        toastRef.current.error(tRef.current('detail.status_update_error'));
       }
     } catch (err) {
       logError('Failed to update application status', err);
-      toast.error(t('detail.status_update_error'));
+      toastRef.current.error(tRef.current('detail.status_update_error'));
     }
   };
 
@@ -402,15 +416,15 @@ export function JobDetailPage() {
     try {
       const response = await api.post(`/v2/jobs/${id}/renew`, { days: renewDays });
       if (response.success) {
-        toast.success(t('renew.success'));
+        toastRef.current.success(tRef.current('renew.success'));
         renewModal.onClose();
         loadVacancy();
       } else {
-        toast.error(t('renew.error'));
+        toastRef.current.error(tRef.current('renew.error'));
       }
     } catch (err) {
       logError('Failed to renew job', err);
-      toast.error(t('renew.error'));
+      toastRef.current.error(tRef.current('renew.error'));
     } finally {
       setIsRenewing(false);
     }
@@ -685,14 +699,14 @@ export function JobDetailPage() {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'closed' });
                     if (res.success) {
-                      toast.success(t('vacancy_closed', 'Vacancy closed'));
+                      toastRef.current.success(tRef.current('vacancy_closed', 'Vacancy closed'));
                       loadVacancy();
                     } else {
-                      toast.error(t('detail.status_update_error'));
+                      toastRef.current.error(tRef.current('detail.status_update_error'));
                     }
                   } catch (err) {
                     logError('Failed to close vacancy', err);
-                    toast.error(t('detail.status_update_error'));
+                    toastRef.current.error(tRef.current('detail.status_update_error'));
                   }
                 }}>
                   {t('detail.close_vacancy', 'Close Vacancy')}
@@ -703,14 +717,14 @@ export function JobDetailPage() {
                   try {
                     const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'open' });
                     if (res.success) {
-                      toast.success(t('vacancy_reopened', 'Vacancy reopened'));
+                      toastRef.current.success(tRef.current('vacancy_reopened', 'Vacancy reopened'));
                       loadVacancy();
                     } else {
-                      toast.error(t('detail.status_update_error'));
+                      toastRef.current.error(tRef.current('detail.status_update_error'));
                     }
                   } catch (err) {
                     logError('Failed to reopen vacancy', err);
-                    toast.error(t('detail.status_update_error'));
+                    toastRef.current.error(tRef.current('detail.status_update_error'));
                   }
                 }}>
                   {t('detail.reopen_vacancy', 'Reopen')}

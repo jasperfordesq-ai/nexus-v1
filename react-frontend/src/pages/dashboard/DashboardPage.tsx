@@ -11,7 +11,7 @@
  * Grid: 1 col → 2 col (md) → 4 col (lg) with intelligent card spanning
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -135,7 +135,17 @@ export function DashboardPage() {
   const [groupsLoading, setGroupsLoading] = useState(true);
   const [eventsLoading, setEventsLoading] = useState(true);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const loadDashboardData = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setError(null); setIsLoading(true); setActivityLoading(true);
       setSuggestedLoading(true); setGroupsLoading(true); setEventsLoading(true);
@@ -156,6 +166,8 @@ export function DashboardPage() {
 
       const allPromises = [...coreRequests, ...optionalRequests.map((r) => r.promise)];
       const results = await Promise.allSettled(allPromises);
+
+      if (controller.signal.aborted) return;
 
       const walletRes = results[0].status === 'fulfilled' ? results[0].value : null;
       const listingsRes = results[1].status === 'fulfilled' ? results[1].value : null;
@@ -198,13 +210,14 @@ export function DashboardPage() {
         myGroups: groupsData, upcomingEvents: eventsData, myEndorsements: endorsementsData,
       });
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load dashboard data', err);
-      setError(t('unable_to_load'));
+      setError(tRef.current('unable_to_load'));
     } finally {
       setIsLoading(false); setActivityLoading(false); setSuggestedLoading(false);
       setGroupsLoading(false); setEventsLoading(false);
     }
-  }, [hasGamification, hasFeedModule, hasListingsModule, hasGroups, hasEvents, user?.id, t]);
+  }, [hasGamification, hasFeedModule, hasListingsModule, hasGroups, hasEvents, user?.id]);
 
   useEffect(() => { loadDashboardData(); }, [loadDashboardData]);
 

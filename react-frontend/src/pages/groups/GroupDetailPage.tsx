@@ -134,6 +134,15 @@ export function GroupDetailPage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   // Core state
   const [group, setGroup] = useState<GroupDetails | null>(null);
   const [activeTab, setActiveTab] = useState('feed');
@@ -217,26 +226,31 @@ export function GroupDetailPage() {
 
   const loadGroup = useCallback(async () => {
     if (!id) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<GroupDetails>(`/v2/groups/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setGroup(response.data);
         if (response.data.sub_groups && response.data.sub_groups.length > 0) {
           setActiveTab('subgroups');
         }
       } else {
-        setError(t('detail.not_found_desc'));
+        setError(tRef.current('detail.not_found_desc'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load group', err);
-      setError(t('detail.error_load_failed'));
+      setError(tRef.current('detail.error_load_failed'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadGroup();
@@ -276,14 +290,14 @@ export function GroupDetailPage() {
     } catch (err) {
       logError('Failed to load group feed', err);
       if (!append) {
-        toast.error(t('toast.feed_load_failed', 'Failed to load feed'));
+        toastRef.current.error(tRef.current('toast.feed_load_failed', 'Failed to load feed'));
       }
     } finally {
       setFeedLoading(false);
       setFeedLoadingMore(false);
       setFeedLoaded(true);
     }
-  }, [id, toast, t]);
+  }, [id]);
 
   useEffect(() => {
     if (activeTab === 'feed' && !feedLoaded && group && isMember(group)) {
@@ -321,10 +335,10 @@ export function GroupDetailPage() {
     try {
       await api.post(`/v2/feed/posts/${postId}/hide`);
       setFeedItems((prev) => prev.filter((fi) => !(fi.id === postId && fi.type === 'post')));
-      toast.success(t('toast.post_hidden', 'Post hidden'));
+      toastRef.current.success(tRef.current('toast.post_hidden', 'Post hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
-      toast.error(t('toast.hide_failed', 'Failed to hide post'));
+      toastRef.current.error(tRef.current('toast.hide_failed', 'Failed to hide post'));
     }
   };
 
@@ -335,10 +349,10 @@ export function GroupDetailPage() {
         const author = fi.author ?? (fi as unknown as Record<string, unknown>).user as FeedItem['author'];
         return !author || author.id !== userId;
       }));
-      toast.success(t('toast.user_muted', 'User muted'));
+      toastRef.current.success(tRef.current('toast.user_muted', 'User muted'));
     } catch (err) {
       logError('Failed to mute user', err);
-      toast.error(t('toast.mute_failed', 'Failed to mute user'));
+      toastRef.current.error(tRef.current('toast.mute_failed', 'Failed to mute user'));
     }
   };
 
@@ -350,7 +364,7 @@ export function GroupDetailPage() {
 
   const handleFeedReport = async () => {
     if (!reportPostId || !reportReason.trim()) {
-      toast.error(t('toast.provide_reason', 'Please provide a reason'));
+      toastRef.current.error(tRef.current('toast.provide_reason', 'Please provide a reason'));
       return;
     }
     try {
@@ -359,10 +373,10 @@ export function GroupDetailPage() {
       onReportClose();
       setReportPostId(null);
       setReportReason('');
-      toast.success(t('toast.reported', 'Post reported'));
+      toastRef.current.success(tRef.current('toast.reported', 'Post reported'));
     } catch (err) {
       logError('Failed to report post', err);
-      toast.error(t('toast.report_failed', 'Failed to report post'));
+      toastRef.current.error(tRef.current('toast.report_failed', 'Failed to report post'));
     } finally {
       setIsReporting(false);
     }
@@ -372,10 +386,10 @@ export function GroupDetailPage() {
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
       setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success(t('toast.deleted', 'Post deleted'));
+      toastRef.current.success(tRef.current('toast.deleted', 'Post deleted'));
     } catch (err) {
       logError('Failed to delete post', err);
-      toast.error(t('toast.delete_failed', 'Failed to delete post'));
+      toastRef.current.error(tRef.current('toast.delete_failed', 'Failed to delete post'));
     }
   };
 
@@ -393,7 +407,7 @@ export function GroupDetailPage() {
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toast.error(t('toast.vote_failed', 'Failed to vote'));
+      toastRef.current.error(tRef.current('toast.vote_failed', 'Failed to vote'));
     }
   };
 
@@ -428,13 +442,13 @@ export function GroupDetailPage() {
     } catch (err) {
       logError('Failed to load discussions', err);
       if (!append) {
-        toast.error(t('toast.discussions_load_failed'));
+        toastRef.current.error(tRef.current('toast.discussions_load_failed'));
       }
     } finally {
       setDiscussionsLoading(false);
       setDiscussionsLoaded(true);
     }
-  }, [id, discussionsCursor, discussionsLoading, toast, t]);
+  }, [id, discussionsCursor, discussionsLoading]);
 
   // Load discussions when tab changes to discussion
   useEffect(() => {
@@ -542,13 +556,13 @@ export function GroupDetailPage() {
           member_count: memberCount + 1,
           members_count: memberCount + 1,
         } : null);
-        toast.success(t('toast.joined'));
+        toastRef.current.success(tRef.current('toast.joined'));
       } else {
-        toast.error(t('toast.join_failed'));
+        toastRef.current.error(tRef.current('toast.join_failed'));
       }
     } catch (err) {
       logError('Failed to join group', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsJoining(false);
     }
@@ -569,13 +583,13 @@ export function GroupDetailPage() {
           member_count: memberCount - 1,
           members_count: memberCount - 1,
         } : null);
-        toast.success(t('toast.left'));
+        toastRef.current.success(tRef.current('toast.left'));
       } else {
-        toast.error(t('toast.leave_failed'));
+        toastRef.current.error(tRef.current('toast.leave_failed'));
       }
     } catch (err) {
       logError('Failed to leave group', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setIsJoining(false);
       setShowLeaveConfirm(false);
@@ -602,13 +616,13 @@ export function GroupDetailPage() {
         setNewDiscussionTitle('');
         setNewDiscussionContent('');
         setShowNewDiscussion(false);
-        toast.success(t('toast.discussion_created'));
+        toastRef.current.success(tRef.current('toast.discussion_created'));
       } else {
-        toast.error(response.error || t('toast.discussion_failed'));
+        toastRef.current.error(response.error || tRef.current('toast.discussion_failed'));
       }
     } catch (err) {
       logError('Failed to create discussion', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setCreatingDiscussion(false);
     }
@@ -639,12 +653,12 @@ export function GroupDetailPage() {
         const { discussion: disc, messages } = response.data;
         setExpandedDiscussion({ ...disc, messages });
       } else {
-        toast.error(t('toast.discussion_load_failed'));
+        toastRef.current.error(tRef.current('toast.discussion_load_failed'));
         setExpandedDiscussionId(null);
       }
     } catch (err) {
       logError('Failed to load discussion', err);
-      toast.error(t('toast.discussion_load_failed'));
+      toastRef.current.error(tRef.current('toast.discussion_load_failed'));
       setExpandedDiscussionId(null);
     } finally {
       setExpandedLoading(false);
@@ -678,13 +692,13 @@ export function GroupDetailPage() {
           )
         );
         setReplyContent('');
-        toast.success(t('toast.reply_sent'));
+        toastRef.current.success(tRef.current('toast.reply_sent'));
       } else {
-        toast.error(response.error || t('toast.reply_failed'));
+        toastRef.current.error(response.error || tRef.current('toast.reply_failed'));
       }
     } catch (err) {
       logError('Failed to send reply', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setSendingReply(false);
     }
@@ -719,12 +733,12 @@ export function GroupDetailPage() {
           ...prev,
           ...(type === 'avatar' ? { image_url: url } : { cover_image_url: url }),
         } : null);
-        toast.success(type === 'avatar' ? t('toast.image_avatar_updated') : t('toast.image_cover_updated'));
+        toastRef.current.success(type === 'avatar' ? tRef.current('toast.image_avatar_updated') : tRef.current('toast.image_cover_updated'));
       } else {
-        toast.error(response.error || t('toast.image_upload_failed'));
+        toastRef.current.error(response.error || tRef.current('toast.image_upload_failed'));
       }
     } catch {
-      toast.error(t('toast.image_upload_failed'));
+      toastRef.current.error(tRef.current('toast.image_upload_failed'));
     } finally {
       setUploadingImage(false);
       e.target.value = '';
@@ -751,13 +765,13 @@ export function GroupDetailPage() {
           ...(settingsLocation.trim() ? { location: settingsLocation.trim() } : {}),
         } : null);
         setShowSettingsModal(false);
-        toast.success(t('toast.settings_updated'));
+        toastRef.current.success(tRef.current('toast.settings_updated'));
       } else {
-        toast.error(response.error || t('toast.settings_failed'));
+        toastRef.current.error(response.error || tRef.current('toast.settings_failed'));
       }
     } catch (err) {
       logError('Failed to update group settings', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setSavingSettings(false);
     }
@@ -774,14 +788,14 @@ export function GroupDetailPage() {
       setDeletingGroup(true);
       const response = await api.delete(`/v2/groups/${id}`);
       if (response.success) {
-        toast.success(t('toast.deleted'));
+        toastRef.current.success(tRef.current('toast.deleted'));
         navigate(tenantPath('/groups'));
       } else {
-        toast.error(response.error || t('toast.delete_failed'));
+        toastRef.current.error(response.error || tRef.current('toast.delete_failed'));
       }
     } catch (err) {
       logError('Failed to delete group', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setDeletingGroup(false);
       setShowDeleteModal(false);
@@ -800,7 +814,7 @@ export function GroupDetailPage() {
       const response = await api.post(`/v2/groups/${id}/requests/${userId}`, { action });
       if (response.success) {
         setJoinRequests((prev) => prev.filter((r) => r.user_id !== userId));
-        toast.success(action === 'accept' ? t('toast.request_accepted') : t('toast.request_rejected'));
+        toastRef.current.success(action === 'accept' ? tRef.current('toast.request_accepted') : tRef.current('toast.request_rejected'));
         if (action === 'accept') {
           setGroup((prev) => prev ? {
             ...prev,
@@ -812,11 +826,11 @@ export function GroupDetailPage() {
           }
         }
       } else {
-        toast.error(response.error || t('toast.request_failed', { action }));
+        toastRef.current.error(response.error || tRef.current('toast.request_failed', { action }));
       }
     } catch (err) {
       logError(`Failed to ${action} join request`, err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setProcessingRequest(null);
     }
@@ -836,13 +850,13 @@ export function GroupDetailPage() {
         setMembers((prev) =>
           prev.map((m) => (m.id === userId ? { ...m, role: newRole } : m))
         );
-        toast.success(t('toast.role_updated', { role: newRole }));
+        toastRef.current.success(tRef.current('toast.role_updated', { role: newRole }));
       } else {
-        toast.error(response.error || t('toast.role_update_failed'));
+        toastRef.current.error(response.error || tRef.current('toast.role_update_failed'));
       }
     } catch (err) {
       logError('Failed to update member role', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setUpdatingMember(null);
     }
@@ -865,13 +879,13 @@ export function GroupDetailPage() {
           member_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
           members_count: Math.max(0, (prev.member_count ?? prev.members_count ?? 0) - 1),
         } : null);
-        toast.success(t('toast.member_removed'));
+        toastRef.current.success(tRef.current('toast.member_removed'));
       } else {
-        toast.error(response.error || t('toast.member_remove_failed'));
+        toastRef.current.error(response.error || tRef.current('toast.member_remove_failed'));
       }
     } catch (err) {
       logError('Failed to remove member', err);
-      toast.error(t('toast.something_wrong'));
+      toastRef.current.error(tRef.current('toast.something_wrong'));
     } finally {
       setUpdatingMember(null);
     }

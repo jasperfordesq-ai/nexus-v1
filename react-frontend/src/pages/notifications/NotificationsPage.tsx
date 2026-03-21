@@ -7,7 +7,7 @@
  * Notifications Page - User notifications center
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Skeleton } from '@heroui/react';
@@ -48,23 +48,38 @@ export function NotificationsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<NotificationFilter>('all');
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadNotifications = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setLoadError(null);
       const response = await api.get<Notification[]>('/v2/notifications?per_page=50');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setNotifications(response.data);
       } else {
-        setLoadError(t('error_load'));
+        setLoadError(tRef.current('error_load'));
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load notifications', error);
-      setLoadError(t('error_load'));
+      setLoadError(tRef.current('error_load'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     loadNotifications();
@@ -79,7 +94,7 @@ export function NotificationsPage() {
       );
     } catch (error) {
       logError('Failed to mark as read', error);
-      toast.error(t('toast.mark_read_failed'));
+      toastRef.current.error(tRef.current('toast.mark_read_failed'));
     }
   }
 
@@ -90,10 +105,10 @@ export function NotificationsPage() {
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
       );
-      toast.success(t('toast.all_read'));
+      toastRef.current.success(tRef.current('toast.all_read'));
     } catch (error) {
       logError('Failed to mark all as read', error);
-      toast.error(t('toast.mark_all_failed'));
+      toastRef.current.error(tRef.current('toast.mark_all_failed'));
     }
   }
 
@@ -108,7 +123,7 @@ export function NotificationsPage() {
       }
     } catch (error) {
       logError('Failed to delete notification', error);
-      toast.error(t('toast.delete_failed'));
+      toastRef.current.error(tRef.current('toast.delete_failed'));
     }
   }
 

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Avatar, Button, Chip, Spinner } from '@heroui/react';
 import { Clock, CheckCircle, XCircle, Building2, ChevronDown } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
@@ -58,7 +58,20 @@ export function HoursReviewTab() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [actionInFlight, setActionInFlight] = useState<Set<number>>(new Set());
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadEntries = useCallback(async (append = false) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       if (append) {
         setIsLoadingMore(true);
@@ -74,6 +87,7 @@ export function HoursReviewTab() {
         `/v2/volunteering/hours/pending-review?${params}`,
       );
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const { items, cursor: nextCursor, has_more } = response.data;
         if (append) {
@@ -85,9 +99,10 @@ export function HoursReviewTab() {
         setHasMore(has_more);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load pending hours', err);
       if (!append) {
-        toast.error(t('hours_load_failed'));
+        toastRef.current.error(tRef.current('hours_load_failed'));
       }
     } finally {
       setIsLoading(false);
@@ -116,7 +131,7 @@ export function HoursReviewTab() {
       const response = await api.put(`/v2/volunteering/hours/${entryId}/verify`, { action });
 
       if (response.success) {
-        toast.success(action === 'approve' ? 'Hours approved.' : 'Hours declined.');
+        toastRef.current.success(action === 'approve' ? 'Hours approved.' : 'Hours declined.');
         setTimeout(() => {
           setEntries((prev) => prev.filter((e) => e.id !== entryId));
         }, 800);
@@ -124,14 +139,14 @@ export function HoursReviewTab() {
         setEntries((prev) =>
           prev.map((e) => (e.id === entryId ? { ...e, status: 'pending' } : e)),
         );
-        toast.error(response.error ?? 'Action failed. Please try again.');
+        toastRef.current.error(response.error ?? 'Action failed. Please try again.');
       }
     } catch (err) {
       logError('Failed to verify hours', err);
       setEntries((prev) =>
         prev.map((e) => (e.id === entryId ? { ...e, status: 'pending' } : e)),
       );
-      toast.error(t('something_wrong'));
+      toastRef.current.error(tRef.current('something_wrong'));
     } finally {
       setActionInFlight((prev) => {
         const next = new Set(prev);

@@ -7,7 +7,7 @@
  * Achievements Page - Badge showcase, challenges, collections, XP shop, daily rewards
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -149,14 +149,29 @@ function DailyRewardWidget() {
   const [isClaiming, setIsClaiming] = useState(false);
   const [justClaimed, setJustClaimed] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadStatus = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const res = await api.get<DailyRewardStatus>('/v2/gamification/daily-reward');
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setStatus(res.data as unknown as DailyRewardStatus);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load daily reward status', err);
     } finally {
       setIsLoading(false);
@@ -173,7 +188,7 @@ function DailyRewardWidget() {
       const res = await api.post<{ xp_earned: number; new_streak: number }>('/v2/gamification/daily-reward');
       if (res.success) {
         setJustClaimed(true);
-        toast.success(t('achievements.daily_reward.claimed_title'), t('achievements.daily_reward.claimed_message', { xp: status?.reward_xp ?? 0 }));
+        toastRef.current.success(tRef.current('achievements.daily_reward.claimed_title'), tRef.current('achievements.daily_reward.claimed_message', { xp: status?.reward_xp ?? 0 }));
         // Update status
         setStatus((prev) =>
           prev
@@ -187,11 +202,11 @@ function DailyRewardWidget() {
         // Reset animation after 2s
         setTimeout(() => setJustClaimed(false), 2000);
       } else {
-        toast.error(t('achievements.daily_reward.claim_failed'), res.error ?? t('achievements.daily_reward.claim_failed_desc'));
+        toastRef.current.error(tRef.current('achievements.daily_reward.claim_failed'), res.error ?? tRef.current('achievements.daily_reward.claim_failed_desc'));
       }
     } catch (err) {
       logError('Failed to claim daily reward', err);
-      toast.error(t('achievements.daily_reward.claim_failed'), t('achievements.daily_reward.claim_error'));
+      toastRef.current.error(tRef.current('achievements.daily_reward.claim_failed'), tRef.current('achievements.daily_reward.claim_error'));
     } finally {
       setIsClaiming(false);
     }
@@ -337,20 +352,35 @@ function ChallengesTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [claimingId, setClaimingId] = useState<number | null>(null);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadChallenges = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const res = await api.get<Challenge[]>('/v2/gamification/challenges');
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setChallenges(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load challenges', err);
-      toast.error(t('achievements.challenges.load_failed'), t('achievements.challenges.load_failed_desc'));
+      toastRef.current.error(tRef.current('achievements.challenges.load_failed'), tRef.current('achievements.challenges.load_failed_desc'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast, t]);
+  }, []);
 
   useEffect(() => {
     loadChallenges();
@@ -361,16 +391,16 @@ function ChallengesTab() {
       setClaimingId(challengeId);
       const res = await api.post('/v2/gamification/challenges/' + challengeId + '/claim');
       if (res.success) {
-        toast.success(t('achievements.challenges.reward_claimed'), t('achievements.challenges.reward_claimed_desc'));
+        toastRef.current.success(tRef.current('achievements.challenges.reward_claimed'), tRef.current('achievements.challenges.reward_claimed_desc'));
         setChallenges((prev) =>
           prev.map((c) => (c.id === challengeId ? { ...c, status: 'claimed' as const } : c))
         );
       } else {
-        toast.error(t('achievements.challenges.claim_failed'), res.error ?? t('achievements.challenges.claim_failed_desc'));
+        toastRef.current.error(tRef.current('achievements.challenges.claim_failed'), res.error ?? tRef.current('achievements.challenges.claim_failed_desc'));
       }
     } catch (err) {
       logError('Failed to claim challenge reward', err);
-      toast.error(t('achievements.challenges.claim_failed'), t('achievements.challenges.claim_error'));
+      toastRef.current.error(tRef.current('achievements.challenges.claim_failed'), tRef.current('achievements.challenges.claim_error'));
     } finally {
       setClaimingId(null);
     }
@@ -555,20 +585,35 @@ function CollectionsTab() {
   const [collections, setCollections] = useState<BadgeCollection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadCollections = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const res = await api.get<BadgeCollection[]>('/v2/gamification/collections');
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setCollections(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load collections', err);
-      toast.error(t('achievements.collections.load_failed'), t('achievements.collections.load_failed_desc'));
+      toastRef.current.error(tRef.current('achievements.collections.load_failed'), tRef.current('achievements.collections.load_failed_desc'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast, t]);
+  }, []);
 
   useEffect(() => {
     loadCollections();
@@ -707,24 +752,39 @@ function XpShopTab({ userXp }: { userXp: number }) {
   const [purchasingId, setPurchasingId] = useState<number | null>(null);
   const [currentXp, setCurrentXp] = useState(userXp);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   useEffect(() => {
     setCurrentXp(userXp);
   }, [userXp]);
 
   const loadShop = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       const res = await api.get<ShopItem[]>('/v2/gamification/shop');
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setItems(Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load shop', err);
-      toast.error(t('achievements.shop.load_failed'), t('achievements.shop.load_failed_desc'));
+      toastRef.current.error(tRef.current('achievements.shop.load_failed'), tRef.current('achievements.shop.load_failed_desc'));
     } finally {
       setIsLoading(false);
     }
-  }, [toast, t]);
+  }, []);
 
   useEffect(() => {
     loadShop();
@@ -732,7 +792,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
 
   const purchaseItem = async (item: ShopItem) => {
     if (currentXp < item.cost_xp) {
-      toast.warning(t('achievements.shop.not_enough_xp'), t('achievements.shop.not_enough_xp_desc', { xp: item.cost_xp - currentXp }));
+      toastRef.current.warning(tRef.current('achievements.shop.not_enough_xp'), tRef.current('achievements.shop.not_enough_xp_desc', { xp: item.cost_xp - currentXp }));
       return;
     }
 
@@ -740,17 +800,17 @@ function XpShopTab({ userXp }: { userXp: number }) {
       setPurchasingId(item.id);
       const res = await api.post('/v2/gamification/shop/purchase', { item_id: item.id });
       if (res.success) {
-        toast.success(t('achievements.shop.purchase_complete'), t('achievements.shop.purchase_complete_desc', { name: item.name }));
+        toastRef.current.success(tRef.current('achievements.shop.purchase_complete'), tRef.current('achievements.shop.purchase_complete_desc', { name: item.name }));
         setItems((prev) =>
           prev.map((i) => (i.id === item.id ? { ...i, owned: true } : i))
         );
         setCurrentXp((prev) => prev - item.cost_xp);
       } else {
-        toast.error(t('achievements.shop.purchase_failed'), res.error ?? t('achievements.shop.purchase_failed_desc'));
+        toastRef.current.error(tRef.current('achievements.shop.purchase_failed'), res.error ?? tRef.current('achievements.shop.purchase_failed_desc'));
       }
     } catch (err) {
       logError('Failed to purchase shop item', err);
-      toast.error(t('achievements.shop.purchase_failed'), t('achievements.shop.purchase_error'));
+      toastRef.current.error(tRef.current('achievements.shop.purchase_failed'), tRef.current('achievements.shop.purchase_error'));
     } finally {
       setPurchasingId(null);
     }
@@ -1055,7 +1115,20 @@ export function AchievementsPage() {
   const [isShowcaseOpen, setIsShowcaseOpen] = useState(false);
   const [isSavingShowcase, setIsSavingShowcase] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadData = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -1065,6 +1138,8 @@ export function AchievementsPage() {
         api.get<GamificationProfile>('/v2/gamification/profile'),
         api.get<{ data: BadgeEntry[]; meta: { total: number; available_types: string[] } }>('/v2/gamification/badges'),
       ]);
+
+      if (controller.signal.aborted) return;
 
       if (profileRes.success && profileRes.data) {
         const profileData = profileRes.data as unknown as GamificationProfile;
@@ -1076,6 +1151,7 @@ export function AchievementsPage() {
         setAvailableTypes((badgesRes.meta?.available_types as string[]) ?? []);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load achievements', err);
       setError('Failed to load achievements. Please try again.');
     } finally {
@@ -1092,7 +1168,7 @@ export function AchievementsPage() {
       setIsSavingShowcase(true);
       const res = await api.put('/v2/gamification/showcase', { badge_keys: badgeKeys });
       if (res.success) {
-        toast.success(t('achievements.showcase.updated'), t('achievements.showcase.updated_desc'));
+        toastRef.current.success(tRef.current('achievements.showcase.updated'), tRef.current('achievements.showcase.updated_desc'));
         // Update badge showcase state
         setBadges((prev) =>
           prev.map((b) => ({
@@ -1102,11 +1178,11 @@ export function AchievementsPage() {
         );
         setIsShowcaseOpen(false);
       } else {
-        toast.error(t('achievements.showcase.save_failed'), res.error ?? t('achievements.showcase.save_failed_desc'));
+        toastRef.current.error(tRef.current('achievements.showcase.save_failed'), res.error ?? tRef.current('achievements.showcase.save_failed_desc'));
       }
     } catch (err) {
       logError('Failed to save showcase', err);
-      toast.error(t('achievements.showcase.save_failed'), t('achievements.showcase.save_error'));
+      toastRef.current.error(tRef.current('achievements.showcase.save_failed'), tRef.current('achievements.showcase.save_error'));
     } finally {
       setIsSavingShowcase(false);
     }

@@ -12,7 +12,7 @@
  * Uses V2 API: POST /api/v2/comments/{id}/reactions
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -127,8 +127,22 @@ export function BlogPostPage() {
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
+  // AbortController refs to cancel stale requests
+  const abortPostRef = useRef<AbortController | null>(null);
+  const abortCommentsRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadPost = useCallback(async () => {
     if (!slug) return;
+
+    abortPostRef.current?.abort();
+    const controller = new AbortController();
+    abortPostRef.current = controller;
 
     try {
       setIsLoading(true);
@@ -136,25 +150,34 @@ export function BlogPostPage() {
 
       const response = await api.get<BlogPostDetail>(`/v2/blog/${slug}`);
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         setPost(response.data);
       } else {
-        setError(t('post.not_found'));
+        setError(tRef.current('post.not_found'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load blog post', err);
-      setError(t('post.error_load'));
+      setError(tRef.current('post.error_load'));
     } finally {
       setIsLoading(false);
     }
-  }, [slug, t]);
+  }, [slug]);
 
   const loadComments = useCallback(async (postId: number) => {
+    abortCommentsRef.current?.abort();
+    const controller = new AbortController();
+    abortCommentsRef.current = controller;
+
     try {
       setIsLoadingComments(true);
       const response = await api.get<{ comments: BlogComment[] }>(
         `/v2/comments?target_type=blog_post&target_id=${postId}`
       );
+
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const loaded = response.data.comments ?? [];
@@ -165,6 +188,7 @@ export function BlogPostPage() {
         setCommentCount(countAll(loaded));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load comments', err);
     } finally {
       setIsLoadingComments(false);
@@ -212,13 +236,13 @@ export function BlogPostPage() {
         setComments((prev) => [optimisticComment, ...prev]);
         setCommentCount((prev) => prev + 1);
         setNewComment('');
-        toast.success(t('post.comment_posted'));
+        toastRef.current.success(tRef.current('post.comment_posted'));
         // Reload to get server data
         loadComments(post.id);
       }
     } catch (err) {
       logError('Failed to submit comment', err);
-      toast.error(t('post.comment_failed'));
+      toastRef.current.error(tRef.current('post.comment_failed'));
     } finally {
       setIsSubmittingComment(false);
     }

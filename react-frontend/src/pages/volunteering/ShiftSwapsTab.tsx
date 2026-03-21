@@ -7,7 +7,7 @@
  * ShiftSwapsTab - View and manage shift swap requests (V2)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -78,7 +78,20 @@ export function ShiftSwapsTab() {
   const [rejectTarget, setRejectTarget] = useState<number | null>(null);
   const [view, setView] = useState<'all' | 'sent' | 'received'>('all');
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -87,6 +100,7 @@ export function ShiftSwapsTab() {
         '/v2/volunteering/swaps'
       );
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         // Backend returns {swaps: [...]} wrapper
         const raw = response.data as Record<string, unknown>;
@@ -95,15 +109,16 @@ export function ShiftSwapsTab() {
           : [];
         setSwaps(items);
       } else {
-        setError(t('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
+        setError(tRef.current('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load shift swaps', err);
-      setError(t('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
+      setError(tRef.current('swaps.load_error', 'Unable to load shift swap requests. Please try again.'));
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -118,11 +133,11 @@ export function ShiftSwapsTab() {
           prev.map((s) => (s.id === swapId ? { ...s, status: 'accepted' as const } : s))
         );
       } else {
-        toast.error(t('swaps.accept_failed', 'Failed to accept swap request.'));
+        toastRef.current.error(tRef.current('swaps.accept_failed', 'Failed to accept swap request.'));
       }
     } catch (err) {
       logError('Failed to accept shift swap', err);
-      toast.error(t('swaps.accept_failed', 'Failed to accept swap request.'));
+      toastRef.current.error(tRef.current('swaps.accept_failed', 'Failed to accept swap request.'));
     } finally {
       setActioningId(null);
     }
@@ -139,11 +154,11 @@ export function ShiftSwapsTab() {
           prev.map((s) => (s.id === rejectTarget ? { ...s, status: 'rejected' as const } : s))
         );
       } else {
-        toast.error(t('swaps.reject_failed', 'Failed to reject swap request.'));
+        toastRef.current.error(tRef.current('swaps.reject_failed', 'Failed to reject swap request.'));
       }
     } catch (err) {
       logError('Failed to reject shift swap', err);
-      toast.error(t('swaps.reject_failed', 'Failed to reject swap request.'));
+      toastRef.current.error(tRef.current('swaps.reject_failed', 'Failed to reject swap request.'));
     } finally {
       setActioningId(null);
       setRejectTarget(null);

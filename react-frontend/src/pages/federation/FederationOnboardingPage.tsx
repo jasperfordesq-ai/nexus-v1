@@ -15,7 +15,7 @@
  * Route: /federation/onboarding
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -104,6 +104,15 @@ export function FederationOnboardingPage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [currentStep, setCurrentStep] = useState(1);
   const [settings, setSettings] = useState<OnboardingSettings>(DEFAULT_SETTINGS);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -113,13 +122,18 @@ export function FederationOnboardingPage() {
   const [partnersLoading, setPartnersLoading] = useState(false);
 
   const loadPartners = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setPartnersLoading(true);
       const response = await api.get<FederationPartner[]>('/v2/federation/partners');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setPartners(Array.isArray(response.data) ? response.data : []);
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federation partners', error);
     } finally {
       setPartnersLoading(false);
@@ -152,19 +166,19 @@ export function FederationOnboardingPage() {
       // Single atomic request: opt in + save settings together
       const response = await api.post('/v2/federation/setup', settings);
       if (!response.success) {
-        toast.error(t('onboarding.toast_setup_failed'), response.error || t('onboarding.toast_enable_error'));
+        toastRef.current.error(tRef.current('onboarding.toast_setup_failed'), response.error || tRef.current('onboarding.toast_enable_error'));
         return;
       }
 
-      toast.success(t('onboarding.toast_enabled'), t('onboarding.toast_welcome'));
+      toastRef.current.success(tRef.current('onboarding.toast_enabled'), tRef.current('onboarding.toast_welcome'));
       navigate(tenantPath('/federation'));
     } catch (error) {
       logError('Failed to complete federation onboarding', error);
-      toast.error(t('onboarding.toast_setup_failed'), t('onboarding.toast_generic_error'));
+      toastRef.current.error(tRef.current('onboarding.toast_setup_failed'), tRef.current('onboarding.toast_generic_error'));
     } finally {
       setIsSubmitting(false);
     }
-  }, [settings, toast, navigate, tenantPath, t]);
+  }, [settings, navigate, tenantPath]);
 
   const handleSkip = useCallback(() => {
     navigate(tenantPath('/federation'));

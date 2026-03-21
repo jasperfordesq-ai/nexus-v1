@@ -10,7 +10,7 @@
  * suggested rest days, and a mood check-in form.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -125,25 +125,43 @@ export function WellbeingTab() {
   const [checkinNote, setCheckinNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
 
       const response = await api.get<WellbeingData>('/v2/volunteering/wellbeing');
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         setData(response.data as WellbeingData);
       } else {
-        setError(t('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
+        setError(tRef.current('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load wellbeing data', err);
-      setError(t('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
+      setError(tRef.current('wellbeing.load_error', 'Unable to load wellbeing data. Please try again.'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     load();
@@ -164,11 +182,11 @@ export function WellbeingTab() {
         setCheckinNote('');
         load();
       } else {
-        toast.error(t('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
+        toastRef.current.error(tRef.current('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
       }
     } catch (err) {
       logError('Failed to submit wellbeing check-in', err);
-      toast.error(t('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
+      toastRef.current.error(tRef.current('wellbeing.checkin_failed', 'Failed to submit check-in. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

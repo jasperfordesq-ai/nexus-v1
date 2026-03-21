@@ -10,7 +10,7 @@
  * Route: /federation/members/:id
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -61,6 +61,16 @@ export function FederationMemberProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   const toast = useToast();
+
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const [connectionStatus, setConnectionStatus] = useState<string>('none');
   const [connectLoading, setConnectLoading] = useState(false);
 
@@ -78,24 +88,31 @@ export function FederationMemberProfilePage() {
     }
   }, [id, member]);
 
+
+
   const loadMember = useCallback(async () => {
     if (!id) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<FederatedMember>(`/v2/federation/members/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setMember(response.data);
       } else {
-        setError(t('member_profile.not_found_error'));
+        setError(tRef.current('member_profile.not_found_error'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federated member profile', err);
-      setError(t('member_profile.load_error'));
+      setError(tRef.current('member_profile.load_error'));
     } finally {
       setIsLoading(false);
     }
-  }, [id, t]);
+  }, [id]);
 
   useEffect(() => {
     loadMember();
@@ -114,14 +131,14 @@ export function FederationMemberProfilePage() {
         receiver_tenant_id: member.timebank.id,
       });
       if (response.success) {
-        toast.success(t('member_profile.connect_sent', 'Connection request sent!'));
+        toastRef.current.success(tRef.current('member_profile.connect_sent', 'Connection request sent!'));
         loadConnectionStatus();
       } else {
-        toast.error(response.error || t('member_profile.connect_failed', 'Failed to send request'));
+        toastRef.current.error(response.error || tRef.current('member_profile.connect_failed', 'Failed to send request'));
       }
     } catch (err) {
       logError('Failed to send connection request', err);
-      toast.error(t('member_profile.connect_failed', 'Failed to send request'));
+      toastRef.current.error(tRef.current('member_profile.connect_failed', 'Failed to send request'));
     } finally {
       setConnectLoading(false);
     }

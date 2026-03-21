@@ -7,7 +7,7 @@
  * Leaderboard Page - Community rankings with type selector and seasons
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Avatar, Select, SelectItem, Chip, Progress, Skeleton } from '@heroui/react';
@@ -101,11 +101,25 @@ function SeasonCard() {
   const [allSeasons, setAllSeasons] = useState<Season[]>([]);
   const [loadingAllSeasons, setLoadingAllSeasons] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadCurrentSeason = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setSeasonError(false);
       const res = await api.get<CurrentSeason>('/v2/gamification/seasons/current');
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         setSeason(res.data as unknown as CurrentSeason);
       } else if (!res.success) {
@@ -113,6 +127,7 @@ function SeasonCard() {
         setSeasonError(true);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load current season', err);
       setSeasonError(true);
     } finally {
@@ -138,7 +153,7 @@ function SeasonCard() {
       setShowAllSeasons(true);
     } catch (err) {
       logError('Failed to load all seasons', err);
-      toast.error(t('leaderboard.season.load_failed'), t('leaderboard.season.load_failed_desc'));
+      toastRef.current.error(tRef.current('leaderboard.season.load_failed'), tRef.current('leaderboard.season.load_failed_desc'));
     } finally {
       setLoadingAllSeasons(false);
     }
@@ -344,7 +359,18 @@ export function LeaderboardPage() {
   const [period, setPeriod] = useState<LeaderboardPeriod>('all');
   const [type, setType] = useState<LeaderboardType>('xp');
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable ref for t
+  const tRef = useRef(t);
+  tRef.current = t;
+
   const loadLeaderboard = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -358,21 +384,23 @@ export function LeaderboardPage() {
         `/v2/gamification/leaderboard?${params}`
       );
 
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setEntries(Array.isArray(response.data) ? response.data : []);
         setMeta((response.meta as unknown as LeaderboardMeta) ?? null);
       } else {
         setError(response.code === 'SESSION_EXPIRED'
-          ? t('leaderboard.session_expired', 'Your session has expired. Please log in again.')
-          : t('leaderboard.load_error', 'Failed to load leaderboard.'));
+          ? tRef.current('leaderboard.session_expired', 'Your session has expired. Please log in again.')
+          : tRef.current('leaderboard.load_error', 'Failed to load leaderboard.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load leaderboard', err);
       setError('Failed to load leaderboard. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [period, type, t]);
+  }, [period, type]);
 
   useEffect(() => {
     loadLeaderboard();

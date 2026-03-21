@@ -7,7 +7,7 @@
  * Skills Browse Page - Explore skill categories, skills, and skilled members
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Chip, Spinner, Avatar } from '@heroui/react';
@@ -123,22 +123,31 @@ export function SkillsBrowsePage() {
   const [skillMembers, setSkillMembers] = useState<SkillMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
 
+  // AbortController ref to cancel stale requests
+  const abortRef = useRef<AbortController | null>(null);
+
   // ── Load categories ──────────────────────────────────────────────────────
   useEffect(() => {
     loadCategories();
   }, []);
 
   const loadCategories = async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<SkillCategory[]>('/v2/skills/categories');
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setCategories(response.data);
       } else {
         setError('Failed to load skill categories');
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load skill categories', err);
       setError('Failed to load skill categories. Please try again.');
     } finally {
