@@ -300,12 +300,15 @@ export function ListingDetailPage() {
 
         {/* Listing Image */}
         {listing.image_url && (
-          <div className="mb-6 -mx-6 sm:-mx-8 -mt-2">
+          <div className="mb-6 overflow-hidden rounded-xl">
             <img
               src={resolveAssetUrl(listing.image_url)}
               alt={listing.title}
-              className="w-full h-48 sm:h-64 object-cover"
+              className="w-full max-h-[28rem] object-cover"
               loading="lazy"
+              width={800}
+              height={448}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           </div>
         )}
