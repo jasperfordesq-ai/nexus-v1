@@ -22,13 +22,13 @@ $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Services\BrokerMessageVisibilityService;
 
 echo "[" . date('Y-m-d H:i:s') . "] Starting broker message copy cleanup\n";
 
 // Process all tenants
-$tenants = Database::query("SELECT id, name, slug FROM tenants WHERE id > 0")->fetchAll();
+$tenants = array_map(fn($r) => (array) $r, DB::select("SELECT id, name, slug FROM tenants WHERE id > 0"));
 
 $totalDeleted = 0;
 

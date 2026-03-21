@@ -6,7 +6,7 @@
 
 namespace App\Middleware;
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 /**
@@ -81,7 +81,7 @@ class SuperPanelAccess
         }
 
         // Get user + their tenant info
-        $user = Database::query("
+        $rows = DB::select("
             SELECT
                 u.id as user_id,
                 u.tenant_id,
@@ -96,7 +96,8 @@ class SuperPanelAccess
             FROM users u
             JOIN tenants t ON u.tenant_id = t.id
             WHERE u.id = ?
-        ", [$effectiveUserId])->fetch(\PDO::FETCH_ASSOC);
+        ", [$effectiveUserId]);
+        $user = !empty($rows) ? (array) $rows[0] : null;
 
         if (!$user) {
             self::$currentAccess['reason'] = 'User not found';
@@ -157,10 +158,11 @@ class SuperPanelAccess
         }
 
         // Regional: check if target is in their subtree
-        $target = Database::query(
+        $rows = DB::select(
             "SELECT path FROM tenants WHERE id = ?",
             [$targetTenantId]
-        )->fetch(\PDO::FETCH_ASSOC);
+        );
+        $target = !empty($rows) ? (array) $rows[0] : null;
 
         if (!$target) {
             return false;
@@ -221,10 +223,11 @@ class SuperPanelAccess
         }
 
         // Get parent tenant info
-        $parent = Database::query("
+        $rows = DB::select("
             SELECT id, name, path, depth, allows_subtenants, max_depth
             FROM tenants WHERE id = ?
-        ", [$parentTenantId])->fetch(\PDO::FETCH_ASSOC);
+        ", [$parentTenantId]);
+        $parent = !empty($rows) ? (array) $rows[0] : null;
 
         if (!$parent) {
             return ['allowed' => false, 'reason' => 'Parent tenant not found'];

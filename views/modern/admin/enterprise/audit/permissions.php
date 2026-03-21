@@ -5,7 +5,7 @@
  */
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Services\Enterprise\PermissionService;
 
 $adminPageTitle = 'Permission Audit Log';
@@ -15,7 +15,7 @@ $adminPageIcon = 'fa-clipboard-list';
 require dirname(__DIR__, 2) . '/partials/admin-header.php';
 
 $permService = new PermissionService();
-$db = Database::getInstance();
+$db = DB::connection()->getPdo();
 $currentUserId = $_SESSION['user_id'] ?? 0;
 
 // Check permission

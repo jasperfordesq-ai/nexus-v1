@@ -6,7 +6,7 @@
 
 use App\Core\TenantContext;
 use App\Core\Csrf;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 
 $basePath = TenantContext::getBasePath();
 $tenantId = TenantContext::getId();
@@ -679,10 +679,10 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     </label>
                     <select name="user_ids[]" class="form-select" multiple required>
                         <?php
-                        $users = Database::query(
+                        $users = array_map(fn($r) => (array) $r, DB::select(
                             "SELECT id, first_name, last_name, email FROM users WHERE tenant_id = ? ORDER BY first_name, last_name",
                             [$tenantId]
-                        )->fetchAll();
+                        ));
                         foreach ($users as $user):
                         ?>
                         <option value="<?= $user['id'] ?>">

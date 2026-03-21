@@ -130,13 +130,12 @@ class UrlHelper
 
         // Dynamic check: tenant custom domains from DB
         try {
-            $db = \App\Core\Database::getConnection();
-            $stmt = $db->prepare(
-                "SELECT 1 FROM tenants WHERE (domain = ? OR domain = ?) AND is_active = 1 LIMIT 1"
-            );
             $stripped = preg_replace('/^www\./', '', $host);
-            $stmt->execute([$host, $stripped]);
-            if ($stmt->fetch()) {
+            $result = \Illuminate\Support\Facades\DB::select(
+                "SELECT 1 FROM tenants WHERE (domain = ? OR domain = ?) AND is_active = 1 LIMIT 1",
+                [$host, $stripped]
+            );
+            if (!empty($result)) {
                 return true;
             }
         } catch (\Throwable $e) {

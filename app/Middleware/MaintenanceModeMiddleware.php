@@ -6,7 +6,7 @@
 
 namespace App\Middleware;
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\TokenService;
 
@@ -58,13 +58,14 @@ class MaintenanceModeMiddleware
         }
 
         try {
-            $setting = Database::query(
+            $rows = DB::select(
                 "SELECT setting_value FROM tenant_settings
                  WHERE tenant_id = ? AND setting_key = 'general.maintenance_mode'",
                 [$tenantId]
-            )->fetch();
+            );
+            $setting = $rows[0] ?? null;
 
-            $maintenanceMode = $setting && ($setting['setting_value'] === 'true' || $setting['setting_value'] === '1');
+            $maintenanceMode = $setting && ($setting->setting_value === 'true' || $setting->setting_value === '1');
 
             if (!$maintenanceMode) {
                 return; // Not in maintenance mode
@@ -100,16 +101,17 @@ class MaintenanceModeMiddleware
                     $userId = $payload['user_id'];
                     $tenantId = $payload['tenant_id'] ?? null;
 
-                    $user = Database::query(
+                    $rows = DB::select(
                         "SELECT role, is_super_admin, is_tenant_super_admin
                          FROM users WHERE id = ?" . ($tenantId ? " AND tenant_id = ?" : ""),
                         $tenantId ? [$userId, $tenantId] : [$userId]
-                    )->fetch();
+                    );
+                    $user = $rows[0] ?? null;
 
                     if ($user) {
-                        return in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin'])
-                            || !empty($user['is_super_admin'])
-                            || !empty($user['is_tenant_super_admin']);
+                        return in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin'])
+                            || !empty($user->is_super_admin)
+                            || !empty($user->is_tenant_super_admin);
                     }
                 }
             } catch (\Exception $e) {
@@ -122,16 +124,17 @@ class MaintenanceModeMiddleware
             $userId = $_SESSION['user_id'];
             $tenantId = TenantContext::getId();
 
-            $user = Database::query(
+            $rows = DB::select(
                 "SELECT role, is_super_admin, is_tenant_super_admin
                  FROM users WHERE id = ? AND tenant_id = ?",
                 [$userId, $tenantId]
-            )->fetch();
+            );
+            $user = $rows[0] ?? null;
 
             if ($user) {
-                return in_array($user['role'] ?? '', ['admin', 'tenant_admin', 'super_admin'])
-                    || !empty($user['is_super_admin'])
-                    || !empty($user['is_tenant_super_admin']);
+                return in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin'])
+                    || !empty($user->is_super_admin)
+                    || !empty($user->is_tenant_super_admin);
             }
         }
 

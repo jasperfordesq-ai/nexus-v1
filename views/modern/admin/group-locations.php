@@ -4,7 +4,7 @@
  * STANDALONE admin interface
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 // Admin check
@@ -87,13 +87,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $updated = 0;
         $errors = 0;
 
-        $groups = Database::query(
+        $groups = array_map(fn($r) => (array) $r, DB::select(
             "SELECT g.id, g.name, g.location, g.parent_id, p.name as parent_name, p.location as parent_location
              FROM `groups` g
              LEFT JOIN `groups` p ON g.parent_id = p.id
              WHERE g.tenant_id = ? AND (g.location IS NULL OR g.location = '')",
             [$tenantId]
-        )->fetchAll();
+        ));
 
         foreach ($groups as $group) {
             $newLocation = null;
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             if ($newLocation) {
                 try {
-                    Database::query("UPDATE `groups` SET location = ? WHERE id = ?", [$newLocation, $group['id']]);
+                    DB::update("UPDATE `groups` SET location = ? WHERE id = ?", [$newLocation, $group['id']]);
                     $updated++;
                 } catch (Exception $e) {
                     $errors++;
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
     elseif ($_POST['action'] === 'update_single' && isset($_POST['group_id'], $_POST['location'])) {
         try {
-            Database::query(
+            DB::update(
                 "UPDATE `groups` SET location = ? WHERE id = ? AND tenant_id = ?",
                 [$_POST['location'], $_POST['group_id'], $tenantId]
             );
@@ -147,7 +147,7 @@ $sql = "SELECT g.id, g.name, g.location, g.parent_id, p.name as parent_name, p.l
         WHERE g.tenant_id = ?
         ORDER BY g.parent_id, g.name";
 
-$groups = Database::query($sql, [$tenantId])->fetchAll();
+$groups = array_map(fn($r) => (array) $r, DB::select($sql, [$tenantId]));
 
 // Analyze groups
 $withLocation = [];

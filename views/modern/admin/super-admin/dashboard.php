@@ -5,22 +5,22 @@
  * Path: views/modern/admin/super-admin/dashboard.php
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Core\Env;
 
 $basePath = TenantContext::getBasePath();
 
 // Fetch all tenants
-$tenants = Database::query("SELECT * FROM tenants ORDER BY created_at DESC")->fetchAll();
+$tenants = array_map(fn($r) => (array) $r, DB::select("SELECT * FROM tenants ORDER BY created_at DESC"));
 
 // Queue Stats
-$qPending = Database::query("SELECT COUNT(*) FROM notification_queue WHERE status='pending'")->fetchColumn();
-$qFailed = Database::query("SELECT COUNT(*) FROM notification_queue WHERE status='failed'")->fetchColumn();
-$qProcessed = Database::query("SELECT COUNT(*) FROM notification_queue WHERE status='sent'")->fetchColumn();
+$qPending = DB::select("SELECT COUNT(*) as c FROM notification_queue WHERE status='pending'")[0]->c;
+$qFailed = DB::select("SELECT COUNT(*) as c FROM notification_queue WHERE status='failed'")[0]->c;
+$qProcessed = DB::select("SELECT COUNT(*) as c FROM notification_queue WHERE status='sent'")[0]->c;
 
 // Total users across all tenants
-$totalUsers = Database::query("SELECT COUNT(*) FROM users")->fetchColumn();
+$totalUsers = DB::select("SELECT COUNT(*) as c FROM users")[0]->c;
 
 // Cron key
 $cronKey = Env::get('CRON_KEY') ?? 'Not Set';

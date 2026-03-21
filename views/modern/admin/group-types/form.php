@@ -4,7 +4,7 @@
  * STANDALONE admin interface
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Models\GroupType;
 

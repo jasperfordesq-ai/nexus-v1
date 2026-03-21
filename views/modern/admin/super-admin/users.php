@@ -5,7 +5,7 @@
  * Path: views/modern/admin/super-admin/users.php
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();

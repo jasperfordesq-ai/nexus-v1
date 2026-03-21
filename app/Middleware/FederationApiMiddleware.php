@@ -6,7 +6,7 @@
 
 namespace App\Middleware;
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\FederationGateway;
 use App\Services\FederationAuditService;
@@ -293,9 +293,7 @@ class FederationApiMiddleware
      */
     private static function getPartnerByPlatformId(string $platformId): ?array
     {
-        $db = Database::getInstance();
-
-        $stmt = $db->prepare("
+        $rows = DB::select("
             SELECT
                 fak.id,
                 fak.tenant_id,
@@ -314,21 +312,20 @@ class FederationApiMiddleware
             WHERE fak.platform_id = ?
             AND fak.status = 'active'
             AND (fak.expires_at IS NULL OR fak.expires_at > NOW())
-        ");
-        $stmt->execute([$platformId]);
-        $partner = $stmt->fetch(\PDO::FETCH_ASSOC);
+        ", [$platformId]);
+
+        $partner = !empty($rows) ? (array) $rows[0] : null;
 
         if ($partner) {
             // Update last used timestamp
-            $updateStmt = $db->prepare("
+            DB::update("
                 UPDATE federation_api_keys
                 SET last_used_at = NOW(), request_count = request_count + 1
                 WHERE id = ?
-            ");
-            $updateStmt->execute([$partner['id']]);
+            ", [$partner['id']]);
         }
 
-        return $partner ?: null;
+        return $partner;
     }
 
     /**
@@ -442,12 +439,10 @@ class FederationApiMiddleware
      */
     private static function validateApiKey(string $apiKey): ?array
     {
-        $db = Database::getInstance();
-
         // Hash the API key for lookup (we store hashed keys)
         $hashedKey = hash('sha256', $apiKey);
 
-        $stmt = $db->prepare("
+        $rows = DB::select("
             SELECT
                 fak.id,
                 fak.tenant_id,
@@ -463,21 +458,20 @@ class FederationApiMiddleware
             WHERE fak.key_hash = ?
             AND fak.status = 'active'
             AND (fak.expires_at IS NULL OR fak.expires_at > NOW())
-        ");
-        $stmt->execute([$hashedKey]);
-        $partner = $stmt->fetch(\PDO::FETCH_ASSOC);
+        ", [$hashedKey]);
+
+        $partner = !empty($rows) ? (array) $rows[0] : null;
 
         if ($partner) {
             // Update last used timestamp
-            $updateStmt = $db->prepare("
+            DB::update("
                 UPDATE federation_api_keys
                 SET last_used_at = NOW(), request_count = request_count + 1
                 WHERE id = ?
-            ");
-            $updateStmt->execute([$partner['id']]);
+            ", [$partner['id']]);
         }
 
-        return $partner ?: null;
+        return $partner;
     }
 
     /**
@@ -495,22 +489,21 @@ class FederationApiMiddleware
      */
     private static function checkRateLimit(int $keyId): bool
     {
-        $db = Database::getInstance();
         $currentHour = date('Y-m-d H:00:00');
 
         try {
             // Get rate limit config and current usage
             // Uses new columns (hourly_request_count, rate_limit_hour) for sliding window
-            $stmt = $db->prepare("
+            $rows = DB::select("
                 SELECT
                     rate_limit,
                     COALESCE(hourly_request_count, 0) as hourly_request_count,
                     rate_limit_hour
                 FROM federation_api_keys
                 WHERE id = ?
-            ");
-            $stmt->execute([$keyId]);
-            $config = $stmt->fetch(\PDO::FETCH_ASSOC);
+            ", [$keyId]);
+
+            $config = !empty($rows) ? (array) $rows[0] : null;
 
             if (!$config) {
                 return false;
@@ -523,34 +516,32 @@ class FederationApiMiddleware
             // Check if we're in a new hour - reset counter if so
             if ($storedHour !== $currentHour) {
                 // New hour, reset the counter to 1 (this request)
-                $updateStmt = $db->prepare("
+                DB::update("
                     UPDATE federation_api_keys
                     SET hourly_request_count = 1,
                         rate_limit_hour = ?
                     WHERE id = ?
-                ");
-                $updateStmt->execute([$currentHour, $keyId]);
+                ", [$currentHour, $keyId]);
                 $requestCount = 1;
             } else {
                 // Same hour, increment counter
-                $updateStmt = $db->prepare("
+                DB::update("
                     UPDATE federation_api_keys
                     SET hourly_request_count = hourly_request_count + 1
                     WHERE id = ?
-                ");
-                $updateStmt->execute([$keyId]);
+                ", [$keyId]);
                 $requestCount++;
             }
         } catch (\PDOException $e) {
             // Fallback for pre-migration schemas: use simple request_count
             // This allows the system to work before migration is applied
-            $stmt = $db->prepare("
+            $rows = DB::select("
                 SELECT rate_limit, request_count
                 FROM federation_api_keys
                 WHERE id = ?
-            ");
-            $stmt->execute([$keyId]);
-            $config = $stmt->fetch(\PDO::FETCH_ASSOC);
+            ", [$keyId]);
+
+            $config = !empty($rows) ? (array) $rows[0] : null;
 
             if (!$config) {
                 return false;
@@ -589,14 +580,11 @@ class FederationApiMiddleware
      */
     private static function logApiAccess(int $keyId, string $endpoint, string $authMethod = 'api_key', ?bool $signatureValid = null): void
     {
-        $db = Database::getInstance();
-
-        $stmt = $db->prepare("
+        DB::insert("
             INSERT INTO federation_api_logs
             (api_key_id, endpoint, method, ip_address, user_agent, auth_method, signature_valid, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
-        ");
-        $stmt->execute([
+        ", [
             $keyId,
             $endpoint,
             $_SERVER['REQUEST_METHOD'],

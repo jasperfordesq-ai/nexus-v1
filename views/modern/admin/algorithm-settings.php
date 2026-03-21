@@ -6,13 +6,13 @@
  */
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 
 $basePath = TenantContext::getBasePath();
 $tenantId = TenantContext::getId();
 
 // Get current algorithm settings from tenant config
-$db = Database::getInstance();
+$db = DB::connection()->getPdo();
 $tenantStmt = $db->prepare("SELECT configuration FROM tenants WHERE id = ?");
 $tenantStmt->execute([$tenantId]);
 $tenantRow = $tenantStmt->fetch();

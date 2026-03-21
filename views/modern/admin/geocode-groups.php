@@ -3,14 +3,14 @@
  * Geocode Groups - Admin Interface
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 $tenantId = TenantContext::getId();
 $basePath = TenantContext::getBasePath();
 
 // Get total count needing geocoding
-$totalCount = Database::query("
+$totalCount = DB::select("
     SELECT COUNT(*) as total
     FROM `groups`
     WHERE tenant_id = ?
@@ -19,7 +19,7 @@ $totalCount = Database::query("
     AND (latitude IS NULL OR longitude IS NULL)
     AND location IS NOT NULL
     AND location != ''
-", [$tenantId])->fetch()['total'];
+", [$tenantId])[0]->total;
 
 // Admin header configuration
 $adminPageTitle = 'Geocode Groups';

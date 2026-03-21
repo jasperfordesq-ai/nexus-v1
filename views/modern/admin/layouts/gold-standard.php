@@ -6,7 +6,7 @@
  */
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';

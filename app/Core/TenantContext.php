@@ -41,12 +41,7 @@ class TenantContext
      */
     private static function getPdo(): \PDO
     {
-        try {
-            return DB::connection()->getPdo();
-        } catch (\Throwable $e) {
-            // Fallback for contexts where Laravel hasn't fully booted
-            return \App\Core\Database::getConnection();
-        }
+        return DB::connection()->getPdo();
     }
 
     /**

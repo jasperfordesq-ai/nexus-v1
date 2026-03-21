@@ -33,7 +33,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\RedisCache;
 
@@ -69,7 +69,7 @@ $typeFilter = $opts['type'] ?? null; // null = both
 $tenantIds = [];
 
 if (isset($opts['all-tenants'])) {
-    $rows      = Database::query("SELECT id FROM tenants WHERE is_active = 1 ORDER BY id")->fetchAll(\PDO::FETCH_ASSOC);
+    $rows      = array_map(fn($r) => (array) $r, DB::select("SELECT id FROM tenants WHERE is_active = 1 ORDER BY id"));
     $tenantIds = array_column($rows, 'id');
 } elseif (isset($opts['tenant'])) {
     $tenantIds = [(int)$opts['tenant']];
@@ -139,13 +139,13 @@ function processListingRecommendations(int $tenantId, bool $dryRun, bool $rubixA
 {
     // Load active listings
     try {
-        $listings = Database::query(
+        $listings = array_map(fn($r) => (array) $r, DB::select(
             "SELECT l.id, l.description, l.location, l.view_count, l.save_count
              FROM listings l
              WHERE l.tenant_id = ? AND l.status = 'active'
              ORDER BY l.id",
             [$tenantId]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        ));
     } catch (\Throwable $e) {
         fwrite(STDERR, "  listings query failed for tenant {$tenantId}: " . $e->getMessage() . "\n");
         return [0, 1];
@@ -210,10 +210,10 @@ function processListingRecommendations(int $tenantId, bool $dryRun, bool $rubixA
     if ($dryRun) {
         // Load member count for reporting
         try {
-            $memberCount = (int)Database::query(
-                "SELECT COUNT(*) FROM users WHERE tenant_id = ? AND status = 'active'",
+            $memberCount = (int)DB::select(
+                "SELECT COUNT(*) as c FROM users WHERE tenant_id = ? AND status = 'active'",
                 [$tenantId]
-            )->fetchColumn();
+            )[0]->c;
         } catch (\Throwable $e) {
             $memberCount = 0;
         }
@@ -223,13 +223,13 @@ function processListingRecommendations(int $tenantId, bool $dryRun, bool $rubixA
 
     // Load active members
     try {
-        $members = Database::query(
+        $members = array_map(fn($r) => (array) $r, DB::select(
             "SELECT u.id, u.skills
              FROM users u
              WHERE u.tenant_id = ? AND u.status = 'active'
              ORDER BY u.id",
             [$tenantId]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        ));
     } catch (\Throwable $e) {
         fwrite(STDERR, "  members query failed for tenant {$tenantId}: " . $e->getMessage() . "\n");
         return [0, 1];
@@ -287,7 +287,7 @@ function processListingRecommendations(int $tenantId, bool $dryRun, bool $rubixA
 function processMemberRecommendations(int $tenantId, bool $dryRun, bool $rubixAvailable): array
 {
     try {
-        $rows = Database::query(
+        $rows = array_map(fn($r) => (array) $r, DB::select(
             "SELECT u.id, u.skills, u.bio,
                     COALESCE((SELECT SUM(t.amount) FROM transactions t
                               WHERE t.giver_id = u.id AND t.tenant_id = ? AND t.status = 'completed'), 0) AS hours_given,
@@ -301,7 +301,7 @@ function processMemberRecommendations(int $tenantId, bool $dryRun, bool $rubixAv
              WHERE u.tenant_id = ? AND u.status = 'active'
              GROUP BY u.id",
             [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        ));
     } catch (\Throwable $e) {
         fwrite(STDERR, "  member query failed for tenant {$tenantId}: " . $e->getMessage() . "\n");
         return [0, 1];

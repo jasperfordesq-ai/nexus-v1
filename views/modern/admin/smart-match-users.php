@@ -3,20 +3,20 @@
  * Smart Match Users to Groups - Admin Interface
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 $tenantId = TenantContext::getId();
 $basePath = TenantContext::getBasePath();
 
 // Get total count needing matching
-$totalCount = Database::query("
+$totalCount = DB::select("
     SELECT COUNT(*) as total
     FROM users u
     WHERE u.tenant_id = ?
     AND u.status = 'active'
     AND (u.location IS NOT NULL OR (u.latitude IS NOT NULL AND u.longitude IS NOT NULL))
-", [$tenantId])->fetch()['total'];
+", [$tenantId])[0]->total;
 
 // Admin header configuration
 $adminPageTitle = 'Smart Match Users';

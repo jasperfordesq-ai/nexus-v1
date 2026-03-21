@@ -34,7 +34,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\SearchService;
 
@@ -76,9 +76,9 @@ if ($typeFilter !== null && !in_array($typeFilter, ['listing', 'user'], true)) {
 $tenantIds = [];
 
 if (isset($opts['all-tenants'])) {
-    $rows = Database::query(
+    $rows = array_map(fn($r) => (array) $r, DB::select(
         "SELECT id FROM tenants WHERE is_active = 1 ORDER BY id"
-    )->fetchAll(\PDO::FETCH_ASSOC);
+    ));
     $tenantIds = array_column($rows, 'id');
 } elseif (isset($opts['tenant'])) {
     $tenantIds = [(int)$opts['tenant']];
@@ -157,7 +157,7 @@ exit($totalErrors > 0 ? 1 : 0);
  */
 function syncListings(int $tenantId, bool $dryRun): array
 {
-    $rows = Database::query(
+    $rows = array_map(fn($r) => (array) $r, DB::select(
         "SELECT l.id, l.tenant_id, l.title, l.description, l.location, l.status,
                 CONCAT(u.first_name, ' ', u.last_name) as author_name
          FROM listings l
@@ -165,7 +165,7 @@ function syncListings(int $tenantId, bool $dryRun): array
          WHERE l.tenant_id = ? AND l.status = 'active'
          ORDER BY l.id",
         [$tenantId]
-    )->fetchAll(\PDO::FETCH_ASSOC);
+    ));
 
     $total = count($rows);
 
@@ -211,13 +211,13 @@ function syncListings(int $tenantId, bool $dryRun): array
  */
 function syncUsers(int $tenantId, bool $dryRun): array
 {
-    $rows = Database::query(
+    $rows = array_map(fn($r) => (array) $r, DB::select(
         "SELECT id, tenant_id, first_name, last_name, bio, skills, location, status
          FROM users
          WHERE tenant_id = ? AND status = 'active'
          ORDER BY id",
         [$tenantId]
-    )->fetchAll(\PDO::FETCH_ASSOC);
+    ));
 
     $total = count($rows);
 

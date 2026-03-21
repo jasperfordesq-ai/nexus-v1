@@ -3,7 +3,7 @@
  * Smart Match Monitoring Dashboard - Admin Interface
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 $tenantId = TenantContext::getId();
@@ -23,22 +23,22 @@ $stats = [
 
 try {
     // Total active users
-    $stats['total_users'] = Database::query("
+    $stats['total_users'] = DB::select("
         SELECT COUNT(*) as c FROM users WHERE tenant_id = ? AND status = 'active'
-    ", [$tenantId])->fetch()['c'] ?? 0;
+    ", [$tenantId])[0]->c ?? 0;
 
     // Users in hub groups
-    $stats['users_in_groups'] = Database::query("
+    $stats['users_in_groups'] = DB::select("
         SELECT COUNT(DISTINCT gm.user_id) as c
         FROM group_members gm
         JOIN `groups` g ON g.id = gm.group_id
         WHERE g.tenant_id = ? AND g.type_id = 26
-    ", [$tenantId])->fetch()['c'] ?? 0;
+    ", [$tenantId])[0]->c ?? 0;
 
     $stats['users_without_groups'] = $stats['total_users'] - $stats['users_in_groups'];
 
     // Average groups per user
-    $avgResult = Database::query("
+    $avgResult = DB::select("
         SELECT AVG(group_count) as avg_groups
         FROM (
             SELECT COUNT(*) as group_count
@@ -47,20 +47,20 @@ try {
             WHERE g.tenant_id = ? AND g.type_id = 26
             GROUP BY gm.user_id
         ) as counts
-    ", [$tenantId])->fetch();
-    $stats['avg_groups_per_user'] = round($avgResult['avg_groups'] ?? 0, 1);
+    ", [$tenantId])[0] ?? null;
+    $stats['avg_groups_per_user'] = round($avgResult->avg_groups ?? 0, 1);
 
     // Hub groups stats
-    $stats['total_hub_groups'] = Database::query("
+    $stats['total_hub_groups'] = DB::select("
         SELECT COUNT(*) as c FROM `groups` WHERE tenant_id = ? AND type_id = 26
-    ", [$tenantId])->fetch()['c'] ?? 0;
+    ", [$tenantId])[0]->c ?? 0;
 
-    $stats['groups_with_members'] = Database::query("
+    $stats['groups_with_members'] = DB::select("
         SELECT COUNT(DISTINCT g.id) as c
         FROM `groups` g
         JOIN group_members gm ON gm.group_id = g.id
         WHERE g.tenant_id = ? AND g.type_id = 26
-    ", [$tenantId])->fetch()['c'] ?? 0;
+    ", [$tenantId])[0]->c ?? 0;
 
     $stats['groups_without_members'] = $stats['total_hub_groups'] - $stats['groups_with_members'];
 
@@ -71,7 +71,7 @@ try {
 // Get distribution data
 $distribution = [];
 try {
-    $distResult = Database::query("
+    $distResult = DB::select("
         SELECT
             g.name as group_name,
             COUNT(gm.user_id) as member_count
@@ -81,8 +81,8 @@ try {
         GROUP BY g.id, g.name
         ORDER BY member_count DESC
         LIMIT 20
-    ", [$tenantId])->fetchAll();
-    $distribution = $distResult;
+    ", [$tenantId]);
+    $distribution = array_map(fn($r) => (array) $r, $distResult);
 } catch (Exception $e) {
     // Handle errors
 }

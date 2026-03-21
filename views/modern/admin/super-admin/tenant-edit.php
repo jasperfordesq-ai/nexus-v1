@@ -5,7 +5,7 @@
  * Path: views/modern/admin/super-admin/tenant-edit.php
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
 $basePath = TenantContext::getBasePath();
@@ -21,7 +21,7 @@ $feats = json_decode($tenant['features'] ?? '[]', true);
 $config = json_decode($tenant['configuration'] ?? '[]', true);
 
 // Fetch admins for this tenant
-$admins = Database::query("SELECT * FROM users WHERE tenant_id = ? AND role = 'admin'", [$tenant['id']])->fetchAll();
+$admins = array_map(fn($r) => (array) $r, DB::select("SELECT * FROM users WHERE tenant_id = ? AND role = 'admin'", [$tenant['id']]));
 
 // Module definitions
 $modules = [

@@ -29,7 +29,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\EmbeddingService;
 
@@ -62,7 +62,7 @@ $typeFilter = $opts['type'] ?? null; // null = both
 $tenantIds = [];
 
 if (isset($opts['all-tenants'])) {
-    $rows = Database::query("SELECT id FROM tenants WHERE status = 'active' ORDER BY id")->fetchAll();
+    $rows = array_map(fn($r) => (array) $r, DB::select("SELECT id FROM tenants WHERE status = 'active' ORDER BY id"));
     $tenantIds = array_column($rows, 'id');
 } elseif (isset($opts['tenant'])) {
     $tenantIds = [(int)$opts['tenant']];
@@ -181,23 +181,23 @@ function processType(int $tenantId, string $type, int $batchSize, bool $dryRun):
 function loadRows(int $tenantId, string $type): array
 {
     if ($type === 'listing') {
-        return Database::query(
+        return array_map(fn($r) => (array) $r, DB::select(
             "SELECT l.id, l.title, l.description, l.location, l.skills
              FROM listings l
              WHERE l.tenant_id = ? AND l.status = 'active'
              ORDER BY l.id",
             [$tenantId]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        ));
     }
 
     if ($type === 'user') {
-        return Database::query(
+        return array_map(fn($r) => (array) $r, DB::select(
             "SELECT u.id, u.first_name, u.last_name, u.bio, u.skills
              FROM users u
              WHERE u.tenant_id = ? AND u.status = 'active'
              ORDER BY u.id",
             [$tenantId]
-        )->fetchAll(\PDO::FETCH_ASSOC);
+        ));
     }
 
     return [];

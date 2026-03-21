@@ -24,7 +24,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 // Initialize database connection
 try {
-    \App\Core\Database::getConnection();
+    \Illuminate\Support\Facades\DB::connection()->getPdo();
 } catch (\Exception $e) {
     echo "[" . date('Y-m-d H:i:s') . "] ERROR: Database connection failed: " . $e->getMessage() . "\n";
     exit(1);

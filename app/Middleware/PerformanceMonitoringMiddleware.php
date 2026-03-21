@@ -56,16 +56,18 @@ class PerformanceMonitoringMiddleware
     private static function addPerformanceHeaders(): void
     {
         // Get database query stats if profiling is enabled
-        if (class_exists('\App\Core\Database')) {
-            $stats = \App\Core\Database::getQueryStats();
+        // Uses Laravel's query log when DB profiling is active
+        $queryLog = \Illuminate\Support\Facades\DB::getQueryLog();
+        if (!empty($queryLog)) {
+            $totalQueries = count($queryLog);
+            $totalTime = array_sum(array_column($queryLog, 'time'));
+            $slowest = !empty($queryLog) ? max(array_column($queryLog, 'time')) : 0;
 
-            if (!empty($stats)) {
-                header('X-Query-Count: ' . ($stats['total_queries'] ?? 0));
-                header('X-Query-Time: ' . ($stats['total_duration'] ?? '0ms'));
+            header('X-Query-Count: ' . $totalQueries);
+            header('X-Query-Time: ' . round($totalTime, 2) . 'ms');
 
-                if (isset($stats['slowest_query'])) {
-                    header('X-Slowest-Query: ' . $stats['slowest_query']['duration']);
-                }
+            if ($slowest > 0) {
+                header('X-Slowest-Query: ' . round($slowest, 2) . 'ms');
             }
         }
 

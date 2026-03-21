@@ -27,7 +27,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\BrokerControlConfigService;
 
@@ -51,7 +51,7 @@ if ($tenantFilter) {
     $tenantQuery .= " AND id = ?";
     $tenantParams[] = $tenantFilter;
 }
-$tenants = Database::query($tenantQuery, $tenantParams)->fetchAll();
+$tenants = array_map(fn($r) => (array) $r, DB::select($tenantQuery, $tenantParams));
 
 $totalCopied = 0;
 $totalSkipped = 0;
@@ -77,13 +77,13 @@ foreach ($tenants as $tenant) {
     echo ", new_member_days=" . ($messagingConfig['new_member_monitoring_days'] ?? 30) . "\n";
 
     // Get all messages for this tenant, ordered by date
-    $messages = Database::query(
+    $messages = array_map(fn($r) => (array) $r, DB::select(
         "SELECT m.id, m.sender_id, m.receiver_id, m.body, m.listing_id, m.created_at
          FROM messages m
          WHERE m.tenant_id = ?
          ORDER BY m.created_at ASC",
         [$tenantId]
-    )->fetchAll();
+    ));
 
     echo "  Total messages: " . count($messages) . "\n";
 
@@ -100,21 +100,21 @@ foreach ($tenants as $tenant) {
 
     // Get existing broker copies to avoid duplicates
     $existingCopies = [];
-    $existing = Database::query(
+    $existing = array_map(fn($r) => (array) $r, DB::select(
         "SELECT original_message_id FROM broker_message_copies WHERE tenant_id = ?",
         [$tenantId]
-    )->fetchAll();
+    ));
     foreach ($existing as $e) {
         $existingCopies[$e['original_message_id']] = true;
     }
 
     // Get existing first contacts
     $existingFirstContacts = [];
-    $existingFC = Database::query(
+    $existingFC = array_map(fn($r) => (array) $r, DB::select(
         "SELECT CONCAT(LEAST(user1_id, user2_id), '-', GREATEST(user1_id, user2_id)) as pair_key
          FROM user_first_contacts WHERE tenant_id = ?",
         [$tenantId]
-    )->fetchAll();
+    ));
     foreach ($existingFC as $fc) {
         $existingFirstContacts[$fc['pair_key']] = true;
         $contactPairs[$fc['pair_key']] = true;
@@ -122,22 +122,22 @@ foreach ($tenants as $tenant) {
 
     // Get users under monitoring
     $monitoredUsers = [];
-    $monitored = Database::query(
+    $monitored = array_map(fn($r) => (array) $r, DB::select(
         "SELECT user_id FROM user_messaging_restrictions
          WHERE tenant_id = ? AND under_monitoring = 1",
         [$tenantId]
-    )->fetchAll();
+    ));
     foreach ($monitored as $mu) {
         $monitoredUsers[$mu['user_id']] = true;
     }
 
     // Get high-risk listings
     $highRiskListings = [];
-    $riskTags = Database::query(
+    $riskTags = array_map(fn($r) => (array) $r, DB::select(
         "SELECT listing_id FROM listing_risk_tags
          WHERE tenant_id = ? AND risk_level IN ('high', 'critical')",
         [$tenantId]
-    )->fetchAll();
+    ));
     foreach ($riskTags as $rt) {
         $highRiskListings[$rt['listing_id']] = true;
     }
@@ -147,10 +147,10 @@ foreach ($tenants as $tenant) {
 
     // Get user join dates for new member check
     $userJoinDates = [];
-    $users = Database::query(
+    $users = array_map(fn($r) => (array) $r, DB::select(
         "SELECT id, created_at FROM users WHERE tenant_id = ?",
         [$tenantId]
-    )->fetchAll();
+    ));
     foreach ($users as $u) {
         $userJoinDates[$u['id']] = strtotime($u['created_at']);
     }
@@ -186,7 +186,7 @@ foreach ($tenants as $tenant) {
 
                 // Record first contact
                 if (!isset($existingFirstContacts[$pairKey]) && !$dryRun) {
-                    Database::query(
+                    DB::statement(
                         "INSERT IGNORE INTO user_first_contacts
                          (tenant_id, user1_id, user2_id, first_message_id, first_contact_at)
                          VALUES (?, ?, ?, ?, ?)",
@@ -227,7 +227,7 @@ foreach ($tenants as $tenant) {
             if ($dryRun) {
                 echo "  [DRY RUN] Would copy msg #{$msg['id']} (sender={$senderId}, receiver={$receiverId}, reason={$copyReason})\n";
             } else {
-                Database::query(
+                DB::statement(
                     "INSERT INTO broker_message_copies
                      (tenant_id, original_message_id, conversation_key, sender_id, receiver_id, message_body, sent_at, copy_reason, created_at)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",

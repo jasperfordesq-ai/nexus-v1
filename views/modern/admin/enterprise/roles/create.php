@@ -5,11 +5,11 @@
  */
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Services\Enterprise\PermissionService;
 
 $basePath = TenantContext::getBasePath();
-$db = Database::getInstance();
+$db = DB::connection()->getPdo();
 $permService = new PermissionService();
 
 // Admin header configuration

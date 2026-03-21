@@ -8,7 +8,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,14 +52,15 @@ class CheckMaintenanceMode
         }
 
         try {
-            $setting = Database::query(
+            $rows = DB::select(
                 "SELECT setting_value FROM tenant_settings
                  WHERE tenant_id = ? AND setting_key = 'general.maintenance_mode'",
                 [$tenantId]
-            )->fetch();
+            );
+            $setting = $rows[0] ?? null;
 
             $isMaintenanceMode = $setting
-                && ($setting['setting_value'] === 'true' || $setting['setting_value'] === '1');
+                && ($setting->setting_value === 'true' || $setting->setting_value === '1');
 
             if (!$isMaintenanceMode) {
                 return $next($request);
@@ -99,16 +100,17 @@ class CheckMaintenanceMode
             try {
                 $payload = \App\Services\TokenService::validateToken($token);
                 if ($payload && isset($payload['user_id'])) {
-                    $row = Database::query(
+                    $rows = DB::select(
                         "SELECT role, is_super_admin, is_tenant_super_admin
                          FROM users WHERE id = ? AND tenant_id = ?",
                         [$payload['user_id'], $tenantId]
-                    )->fetch();
+                    );
+                    $row = $rows[0] ?? null;
 
                     if ($row) {
-                        return in_array($row['role'] ?? '', ['admin', 'tenant_admin', 'super_admin'])
-                            || !empty($row['is_super_admin'])
-                            || !empty($row['is_tenant_super_admin']);
+                        return in_array($row->role ?? '', ['admin', 'tenant_admin', 'super_admin'])
+                            || !empty($row->is_super_admin)
+                            || !empty($row->is_tenant_super_admin);
                     }
                 }
             } catch (\Throwable $e) {

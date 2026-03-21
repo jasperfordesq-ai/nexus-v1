@@ -5,7 +5,7 @@
  */
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\Csrf;
 
 $basePath = TenantContext::getBasePath();
@@ -20,7 +20,7 @@ $adminPageIcon = 'fa-hands-helping';
 require dirname(__DIR__) . '/partials/admin-header.php';
 
 // Get stats
-$db = Database::getInstance();
+$db = DB::connection()->getPdo();
 
 // Total organizations
 $totalOrgs = $db->prepare("SELECT COUNT(*) FROM vol_organizations WHERE tenant_id = ?");

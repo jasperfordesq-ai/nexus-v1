@@ -201,19 +201,12 @@ class CorsHelper
         // Query all active tenant custom domains
         $origins = [];
         try {
-            if (!class_exists('\App\Core\Database', false)) {
-                // Database class not loaded yet (called before autoloader)
-                self::$tenantDomainOrigins = $origins;
-                return $origins;
-            }
-            $db = \App\Core\Database::getConnection();
-            $stmt = $db->query(
+            $rows = \Illuminate\Support\Facades\DB::select(
                 "SELECT domain FROM tenants WHERE domain IS NOT NULL AND domain != '' AND is_active = 1"
             );
-            $rows = $stmt->fetchAll(\PDO::FETCH_COLUMN);
 
-            foreach ($rows as $domain) {
-                $domain = trim($domain);
+            foreach ($rows as $row) {
+                $domain = trim($row->domain);
                 if (empty($domain)) continue;
                 // Add both with and without www
                 $origins[] = 'https://' . $domain;

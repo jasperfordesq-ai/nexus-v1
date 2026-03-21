@@ -13,7 +13,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\NotificationDispatcher;
 
@@ -25,7 +25,7 @@ if ($reviewId <= 0) {
 }
 
 // Fetch the review with user details
-$stmt = Database::query(
+$rows = DB::select(
     "SELECT r.*,
             reviewer.name as reviewer_name, reviewer.first_name as reviewer_first_name,
             receiver.name as receiver_name, receiver.email as receiver_email, receiver.tenant_id as receiver_tenant_id
@@ -35,7 +35,7 @@ $stmt = Database::query(
      WHERE r.id = ?",
     [$reviewId]
 );
-$review = $stmt->fetch();
+$review = !empty($rows) ? (array) $rows[0] : null;
 
 if (!$review) {
     echo "Review #{$reviewId} not found.\n";

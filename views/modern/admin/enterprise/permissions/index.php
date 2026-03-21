@@ -5,7 +5,7 @@
  */
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 
 $adminPageTitle = 'Permissions Browser';
 $adminPageSubtitle = 'Enterprise Access Control';
@@ -14,7 +14,7 @@ $adminPageIcon = 'fa-key';
 require dirname(__DIR__, 2) . '/partials/admin-header.php';
 
 $basePath = TenantContext::getBasePath();
-$db = Database::getInstance();
+$db = DB::connection()->getPdo();
 
 // Get filter parameters
 $filterCategory = $_GET['category'] ?? null;

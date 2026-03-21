@@ -31,7 +31,7 @@ $userRoles = $permService->getUserRoles($userId);
 $allRoles = $permService->getAllRoles();
 
 // Get user's effective permissions (grouped by category)
-$db = App\Core\Database::getInstance();
+$db = \Illuminate\Support\Facades\DB::connection()->getPdo();
 $stmt = $db->prepare("
     SELECT DISTINCT p.id, p.name, p.display_name, p.category, p.description, p.is_dangerous,
            'role' as source, GROUP_CONCAT(r.display_name SEPARATOR ', ') as source_name

@@ -1739,10 +1739,10 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
             <?php
             $unreadNotifications = 0;
             try {
-                $unreadNotifications = \App\Core\Database::query(
+                $unreadNotifications = \Illuminate\Support\Facades\DB::select(
                     "SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0 AND deleted_at IS NULL",
                     [$_SESSION['user_id'] ?? 0]
-                )->fetch()['c'] ?? 0;
+                )[0]->c ?? 0;
             } catch (\Exception $e) { /* Table may not exist */ }
             ?>
             <a href="<?= htmlspecialchars($notifUrl) ?>" class="admin-notif-bell" title="Notifications" target="_blank" rel="noopener">

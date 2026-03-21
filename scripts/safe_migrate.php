@@ -21,7 +21,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 
 // ─── Color output helpers ─────────────────────────────────────────────────────
 function success($msg) { echo "\033[32m✓ {$msg}\033[0m\n"; }
@@ -184,7 +184,7 @@ function runMigration(string $migrationPath, bool $dryRun, bool $skipBackup, boo
     }
 
     try {
-        $pdo = Database::getInstance();
+        $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->exec($migrationContent);
         success("Executed: {$name}");
@@ -272,7 +272,7 @@ if ($dryRun) {
 
 // ─── MODE: --pending ──────────────────────────────────────────────────────────
 if ($modePending) {
-    $pdo = Database::getInstance();
+    $pdo = DB::connection()->getPdo();
     $pending = getPendingMigrations($pdo);
 
     if (empty($pending)) {
@@ -291,7 +291,7 @@ if ($modePending) {
 
 // ─── MODE: --mark-applied ─────────────────────────────────────────────────────
 if ($modeMark) {
-    $pdo = Database::getInstance();
+    $pdo = DB::connection()->getPdo();
 
     if ($markAll) {
         $files = getAllMigrationFiles();
@@ -317,7 +317,7 @@ if ($modeMark) {
 
 // ─── MODE: --run-pending ──────────────────────────────────────────────────────
 if ($modeRun) {
-    $pdo = Database::getInstance();
+    $pdo = DB::connection()->getPdo();
     $pending = getPendingMigrations($pdo);
 
     if (empty($pending)) {

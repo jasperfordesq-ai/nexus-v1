@@ -22,15 +22,15 @@ $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Core\TenantContext;
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Services\ListingExpiryReminderService;
 
 echo "[" . date('Y-m-d H:i:s') . "] Starting listing expiry reminder processing\n";
 
 // Process all active tenants
-$tenants = Database::query(
+$tenants = array_map(fn($r) => (array) $r, DB::select(
     "SELECT id, name, slug FROM tenants WHERE id > 0 AND (is_active = 1 OR is_active IS NULL)"
-)->fetchAll();
+));
 
 $totalSent = 0;
 $totalErrors = 0;

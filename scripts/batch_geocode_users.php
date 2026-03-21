@@ -18,7 +18,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\GeocodingService;
 
@@ -36,7 +36,7 @@ echo "\n";
 
 // Fetch active tenants
 $whereClause = $onlyTenantId ? "WHERE is_active = 1 AND id = {$onlyTenantId}" : "WHERE is_active = 1";
-$tenants = Database::query("SELECT id, name FROM tenants {$whereClause} ORDER BY id")->fetchAll(\PDO::FETCH_ASSOC);
+$tenants = array_map(fn($r) => (array) $r, DB::select("SELECT id, name FROM tenants {$whereClause} ORDER BY id"));
 
 if (empty($tenants)) {
     echo "No active tenants found.\n";

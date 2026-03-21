@@ -6,7 +6,7 @@
 
 namespace App\Services;
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\Mailer;
 use App\Core\Env;
 use App\Core\TenantContext;
@@ -77,7 +77,7 @@ class CronJobRunner
     private function ensureLogsTable(): void
     {
         try {
-            Database::query("
+            DB::statement("
                 CREATE TABLE IF NOT EXISTS cron_logs (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     job_id VARCHAR(100) NOT NULL,
@@ -138,7 +138,7 @@ class CronJobRunner
         $duration = microtime(true) - $this->jobStartTime;
 
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, ?, ?, ?, NULL, NULL)",
                 [
                     $this->currentJobId,
@@ -163,7 +163,7 @@ class CronJobRunner
     {
         $duration = microtime(true) - $startTime;
         try {
-            Database::query(
+            DB::insert(
                 "INSERT INTO cron_logs (job_id, status, output, duration_seconds, executed_by, tenant_id) VALUES (?, ?, ?, ?, NULL, NULL)",
                 [$jobId, $status, substr($output, 0, 65000), round($duration, 2)]
             );
@@ -247,7 +247,7 @@ class CronJobRunner
                 WHERE frequency = ? AND status = 'pending'
                 GROUP BY user_id";
 
-        $users = Database::query($sql, [$frequency])->fetchAll();
+        $users = array_map(fn($r) => (array) $r, DB::select($sql, [$frequency]));
 
         if (empty($users)) {
             echo "No pending notifications for $frequency digest.\n";
@@ -274,7 +274,7 @@ class CronJobRunner
             $itemsSql = "SELECT * FROM notification_queue
                          WHERE user_id = ? AND frequency = ? AND status = 'pending'
                          ORDER BY created_at ASC";
-            $items = Database::query($itemsSql, [$userId, $frequency])->fetchAll();
+            $items = array_map(fn($r) => (array) $r, DB::select($itemsSql, [$userId, $frequency]));
 
             // Generate Email Body
             $subject = "Your $frequency Digest from Project NEXUS";
@@ -290,7 +290,7 @@ class CronJobRunner
                 if (!empty($ids)) {
                     $inQuery = implode(',', array_fill(0, count($ids), '?'));
                     $updateSql = "UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id IN ($inQuery)";
-                    Database::query($updateSql, $ids);
+                    DB::update($updateSql, $ids);
                     echo " - Queue updated (Marked as sent).\n";
                 }
             } else {
@@ -323,7 +323,7 @@ class CronJobRunner
                     ORDER BY q.created_at ASC
                     LIMIT 50";
 
-            $items = Database::query($sql)->fetchAll();
+            $items = array_map(fn($r) => (array) $r, DB::select($sql));
 
             if (empty($items)) {
                 echo "No pending instant notifications.\n";
@@ -388,7 +388,7 @@ class CronJobRunner
                     }
 
                     if ($mailer->send($item['email'], $subject, $body)) {
-                        Database::query("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
+                        DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
                         echo "OK.\n";
                     } else {
                         echo "FAILED.\n";
@@ -529,7 +529,7 @@ class CronJobRunner
 
             // Find newsletters that are currently sending
             $sql = "SELECT DISTINCT newsletter_id FROM newsletter_queue WHERE status = 'pending' LIMIT 10";
-            $pending = Database::query($sql)->fetchAll();
+            $pending = array_map(fn($r) => (array) $r, DB::select($sql));
 
             foreach ($pending as $row) {
                 $newsletter = \App\Models\Newsletter::findById($row['newsletter_id']);
@@ -606,7 +606,7 @@ class CronJobRunner
         // 1. Clean expired password reset tokens (check column exists first)
         try {
             $sql = "UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)";
-            Database::query($sql);
+            DB::update($sql);
             $tasks[] = "Cleaned expired password reset tokens";
         } catch (\Exception $e) {
             // Column may not exist in this schema version
@@ -616,7 +616,7 @@ class CronJobRunner
         // 2. Clean old notification queue items (older than 30 days, already sent)
         try {
             $sql = "DELETE FROM notification_queue WHERE status = 'sent' AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
-            Database::query($sql);
+            DB::delete($sql);
             $tasks[] = "Cleaned old notification queue entries";
         } catch (\Exception $e) {
             $tasks[] = "Notification queue: " . $e->getMessage();
@@ -625,7 +625,7 @@ class CronJobRunner
         // 3. Clean expired newsletter suppression entries
         try {
             $sql = "DELETE FROM newsletter_suppression_list WHERE expires_at IS NOT NULL AND expires_at < NOW()";
-            Database::query($sql);
+            DB::delete($sql);
             $tasks[] = "Cleaned expired suppression list entries";
         } catch (\Exception $e) {
             // Table may not exist
@@ -637,7 +637,7 @@ class CronJobRunner
         /*
         try {
             $sql = "DELETE FROM newsletter_link_clicks WHERE clicked_at < DATE_SUB(NOW(), INTERVAL 90 DAY)";
-            Database::query($sql);
+            DB::delete($sql);
             $tasks[] = "Cleaned old newsletter click tracking data";
         } catch (\Exception $e) {
             // Table may not exist
@@ -649,7 +649,7 @@ class CronJobRunner
         /*
         try {
             $sql = "DELETE FROM api_logs WHERE created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)";
-            Database::query($sql);
+            DB::delete($sql);
             $tasks[] = "Cleaned old API logs";
         } catch (\Exception $e) {
             // Table may not exist
@@ -961,7 +961,7 @@ class CronJobRunner
                 ORDER BY q.created_at ASC
                 LIMIT 50";
 
-        $items = Database::query($sql)->fetchAll();
+        $items = array_map(fn($r) => (array) $r, DB::select($sql));
 
         if (empty($items)) {
             echo "   No pending instant notifications.\n";
@@ -988,7 +988,7 @@ class CronJobRunner
             $body = $item['email_body'] ?? nl2br($item['content_snippet']);
 
             if ($mailer->send($item['email'], $subject, $body)) {
-                Database::query("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
+                DB::update("UPDATE notification_queue SET status = 'sent', sent_at = NOW() WHERE id = ?", [$item['id']]);
                 $sent++;
             }
         }
@@ -1001,7 +1001,7 @@ class CronJobRunner
     private function processNewsletterQueueInternal()
     {
         $sql = "SELECT DISTINCT newsletter_id FROM newsletter_queue WHERE status = 'pending' LIMIT 5";
-        $pending = Database::query($sql)->fetchAll();
+        $pending = array_map(fn($r) => (array) $r, DB::select($sql));
 
         if (empty($pending)) {
             echo "   No pending newsletter queues.\n";
@@ -1046,26 +1046,26 @@ class CronJobRunner
     private function cleanupInternal()
     {
         try {
-            Database::query("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            DB::update("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
             echo "   Cleaned expired reset tokens.\n";
         } catch (\Exception $e) {
         }
 
         try {
-            Database::query("DELETE FROM notification_queue WHERE status = 'sent' AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
+            DB::delete("DELETE FROM notification_queue WHERE status = 'sent' AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
             echo "   Cleaned old notification queue.\n";
         } catch (\Exception $e) {
         }
 
         try {
-            Database::query("DELETE FROM newsletter_suppression_list WHERE expires_at IS NOT NULL AND expires_at < NOW()");
+            DB::delete("DELETE FROM newsletter_suppression_list WHERE expires_at IS NOT NULL AND expires_at < NOW()");
             echo "   Cleaned expired suppressions.\n";
         } catch (\Exception $e) {
         }
 
         // Clean old match cache entries (older than 24 hours)
         try {
-            Database::query("DELETE FROM match_cache WHERE expires_at < NOW()");
+            DB::delete("DELETE FROM match_cache WHERE expires_at < NOW()");
             echo "   Cleaned expired match cache.\n";
         } catch (\Exception $e) {
         }
@@ -1085,7 +1085,7 @@ class CronJobRunner
                     AND fus.email_notifications = 1
                     AND u.email IS NOT NULL";
 
-            $users = Database::query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+            $users = array_map(fn($r) => (array) $r, DB::select($sql));
 
             if (empty($users)) {
                 echo "   No users eligible for federation digest.\n";
@@ -1176,7 +1176,7 @@ class CronJobRunner
                 )";
 
         try {
-            $users = Database::query($sql, [$frequency, $frequency])->fetchAll();
+            $users = array_map(fn($r) => (array) $r, DB::select($sql, [$frequency, $frequency]));
         } catch (\Exception $e) {
             echo "Error fetching users: " . $e->getMessage() . "\n";
             echo "Match preferences table may not exist yet. Run the migration.\n";
@@ -1261,7 +1261,7 @@ class CronJobRunner
                     )
                     LIMIT 50";
 
-            $newListings = Database::query($sql)->fetchAll();
+            $newListings = array_map(fn($r) => (array) $r, DB::select($sql));
 
             if (empty($newListings)) {
                 echo "No new listings to process.\n";
@@ -1292,11 +1292,11 @@ class CronJobRunner
                              AND l.user_id != ?
                              LIMIT 20";
 
-                $potentialUsers = Database::query($matchSql, [
+                $potentialUsers = array_map(fn($r) => (array) $r, DB::select($matchSql, [
                     $listing['category_id'],
                     $oppositeType,
                     $listing['user_id']
-                ])->fetchAll();
+                ]));
 
                 foreach ($potentialUsers as $user) {
                     // Calculate actual match score
@@ -1308,10 +1308,10 @@ class CronJobRunner
                     }
 
                     // Get user's listings to calculate proper match score
-                    $userListings = Database::query(
+                    $userListings = array_map(fn($r) => (array) $r, DB::select(
                         "SELECT * FROM listings WHERE user_id = ? AND status = 'active'",
                         [$user['user_id']]
-                    )->fetchAll();
+                    ));
 
                     if (empty($userListings)) continue;
 
@@ -1337,7 +1337,7 @@ class CronJobRunner
 
                         // Record that we notified about this listing
                         try {
-                            Database::query(
+                            DB::insert(
                                 "INSERT INTO match_history (user_id, listing_id, action, match_score, created_at) VALUES (?, ?, 'notified', ?, NOW())",
                                 [$user['user_id'], $listing['id'], $matchResult['score']]
                             );
@@ -1437,7 +1437,7 @@ class CronJobRunner
                     AND fus.email_notifications = 1
                     AND u.email IS NOT NULL";
 
-            $users = Database::query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+            $users = array_map(fn($r) => (array) $r, DB::select($sql));
 
             if (empty($users)) {
                 echo "No users eligible for federation weekly digest.\n";
@@ -1491,7 +1491,7 @@ class CronJobRunner
      */
     private function forEachTenant(callable $callback): void
     {
-        $tenants = Database::query("SELECT id, slug FROM tenants WHERE is_active = 1")->fetchAll(\PDO::FETCH_ASSOC);
+        $tenants = array_map(fn($r) => (array) $r, DB::select("SELECT id, slug FROM tenants WHERE is_active = 1"));
         foreach ($tenants as $tenant) {
             try {
                 TenantContext::setById($tenant['id']);
@@ -1508,14 +1508,14 @@ class CronJobRunner
     private function cleanSessionsAndTokensInternal(): void
     {
         try {
-            Database::query("DELETE FROM sessions WHERE last_activity < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            DB::delete("DELETE FROM sessions WHERE last_activity < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
             echo "   Cleaned old sessions.\n";
         } catch (\Exception $e) {
             echo "   Sessions: skipped (" . $e->getMessage() . ")\n";
         }
 
         try {
-            Database::query("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            DB::update("UPDATE users SET reset_token = NULL WHERE reset_token IS NOT NULL AND created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
             echo "   Cleaned expired reset tokens.\n";
         } catch (\Exception $e) {
             echo "   Reset tokens: skipped.\n";
@@ -1595,7 +1595,7 @@ class CronJobRunner
                         WHERE l.tenant_id = ? AND l.status = 'active'
                         AND l.created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
                         LIMIT 50";
-                $newListings = Database::query($sql, [$tenantId])->fetchAll();
+                $newListings = array_map(fn($r) => (array) $r, DB::select($sql, [$tenantId]));
 
                 foreach ($newListings as $listing) {
                     $oppositeType = $listing['type'] === 'offer' ? 'request' : 'offer';
@@ -1604,9 +1604,9 @@ class CronJobRunner
                                  WHERE l2.category_id = ? AND l2.type = ? AND l2.status = 'active'
                                  AND l2.user_id != ? AND l2.tenant_id = ?
                                  LIMIT 20";
-                    $potentialMatches = Database::query($matchSql, [
+                    $potentialMatches = array_map(fn($r) => (array) $r, DB::select($matchSql, [
                         $listing['category_id'], $oppositeType, $listing['user_id'], $tenantId
-                    ])->fetchAll();
+                    ]));
 
                     foreach ($potentialMatches as $match) {
                         try {
@@ -1677,18 +1677,18 @@ class CronJobRunner
             $this->forEachTenant(function ($tenantId, $slug) {
                 if (!TenantContext::hasFeature('gamification')) return;
 
-                $expired = Database::query(
+                $expiredCount = DB::update(
                     "UPDATE challenges SET is_active = 0 WHERE tenant_id = ? AND end_date < CURDATE() AND is_active = 1",
                     [$tenantId]
                 );
 
-                Database::query(
+                DB::update(
                     "UPDATE friend_challenges SET status = 'expired' WHERE tenant_id = ? AND end_date < CURDATE() AND status IN ('pending', 'active')",
                     [$tenantId]
                 );
 
-                if ($expired->rowCount() > 0) {
-                    echo "   [$slug] Expired {$expired->rowCount()} challenges.\n";
+                if ($expiredCount > 0) {
+                    echo "   [$slug] Expired {$expiredCount} challenges.\n";
                 }
             });
             echo "   Challenge check complete.\n";
@@ -1706,7 +1706,7 @@ class CronJobRunner
             $this->forEachTenant(function ($tenantId, $slug) {
                 if (!TenantContext::hasFeature('gamification')) return;
 
-                Database::query(
+                DB::insert(
                     "INSERT IGNORE INTO weekly_rank_snapshots (tenant_id, user_id, rank_position, xp, snapshot_date)
                      SELECT ?, id, @rank := @rank + 1, xp, CURDATE()
                      FROM users, (SELECT @rank := 0) r
@@ -1716,18 +1716,18 @@ class CronJobRunner
                 );
 
                 // Finalize ended seasons
-                $endedSeasons = Database::query(
+                $endedSeasons = array_map(fn($r) => (array) $r, DB::select(
                     "SELECT id FROM leaderboard_seasons WHERE tenant_id = ? AND end_date < CURDATE() AND is_finalized = 0",
                     [$tenantId]
-                )->fetchAll();
+                ));
 
                 foreach ($endedSeasons as $season) {
-                    $topUsers = Database::query(
+                    $topUsers = array_map(fn($r) => (array) $r, DB::select(
                         "SELECT user_id, rank_position FROM weekly_rank_snapshots
                          WHERE tenant_id = ? AND snapshot_date = (SELECT end_date FROM leaderboard_seasons WHERE id = ?)
                          ORDER BY rank_position ASC LIMIT 10",
                         [$tenantId, $season['id']]
-                    )->fetchAll();
+                    ));
 
                     $rewards = [1 => 500, 2 => 300, 3 => 200, 4 => 100, 5 => 100];
                     foreach ($topUsers as $user) {
@@ -1735,7 +1735,7 @@ class CronJobRunner
                         GamificationService::awardXP($user['user_id'], $xp, 'season_reward', "Season #{$season['id']} rank #{$user['rank_position']}");
                     }
 
-                    Database::query("UPDATE leaderboard_seasons SET is_finalized = 1 WHERE id = ?", [$season['id']]);
+                    DB::update("UPDATE leaderboard_seasons SET is_finalized = 1 WHERE id = ?", [$season['id']]);
                     echo "   [$slug] Finalized season {$season['id']}.\n";
                 }
             });
@@ -1756,10 +1756,10 @@ class CronJobRunner
                 if (!TenantContext::hasFeature('gamification')) return;
 
                 foreach ($milestones as $days) {
-                    $users = Database::query(
+                    $users = array_map(fn($r) => (array) $r, DB::select(
                         "SELECT id FROM users WHERE tenant_id = ? AND login_streak = ?",
                         [$tenantId, $days]
-                    )->fetchAll();
+                    ));
 
                     foreach ($users as $user) {
                         GamificationService::awardBadge($user['id'], "streak_{$days}");
@@ -1786,20 +1786,20 @@ class CronJobRunner
                 if (!TenantContext::hasFeature('gamification')) return;
 
                 // Reset streaks for inactive users
-                $result = Database::query(
+                $resetCount = DB::update(
                     "UPDATE users SET login_streak = 0
                      WHERE tenant_id = ? AND COALESCE(last_login_at, created_at) < DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND login_streak > 0",
                     [$tenantId]
                 );
-                echo "   [$slug] Reset {$result->rowCount()} streaks.\n";
+                echo "   [$slug] Reset {$resetCount} streaks.\n";
 
                 // Award daily bonuses
-                $activeUsers = Database::query(
+                $activeUsers = array_map(fn($r) => (array) $r, DB::select(
                     "SELECT id FROM users
                      WHERE tenant_id = ? AND DATE(COALESCE(last_login_at, created_at)) = CURDATE()
                      AND id NOT IN (SELECT user_id FROM daily_rewards WHERE tenant_id = ? AND reward_date = CURDATE())",
                     [$tenantId, $tenantId]
-                )->fetchAll();
+                ));
 
                 $bonuses = 0;
                 foreach ($activeUsers as $user) {
@@ -1813,20 +1813,20 @@ class CronJobRunner
                 echo "   [$slug] Awarded $bonuses daily bonuses.\n";
 
                 // Badge checks for recently active users
-                $users = Database::query(
+                $users = array_map(fn($r) => (array) $r, DB::select(
                     "SELECT id FROM users
                      WHERE tenant_id = ? AND is_approved = 1
                      AND COALESCE(last_login_at, created_at) > DATE_SUB(NOW(), INTERVAL 24 HOUR)
                      LIMIT 200",
                     [$tenantId]
-                )->fetchAll();
+                ));
 
                 $badges = 0;
                 foreach ($users as $user) {
                     try {
-                        $before = Database::query("SELECT COUNT(*) as c FROM user_badges WHERE user_id = ?", [$user['id']])->fetch()['c'];
+                        $before = DB::selectOne("SELECT COUNT(*) as c FROM user_badges WHERE user_id = ?", [$user['id']])->c;
                         GamificationService::runAllBadgeChecks($user['id']);
-                        $after = Database::query("SELECT COUNT(*) as c FROM user_badges WHERE user_id = ?", [$user['id']])->fetch()['c'];
+                        $after = DB::selectOne("SELECT COUNT(*) as c FROM user_badges WHERE user_id = ?", [$user['id']])->c;
                         $badges += ($after - $before);
                     } catch (\Throwable $e) {
                         // Continue
@@ -1854,10 +1854,11 @@ class CronJobRunner
                 if ($newAlerts > 0 || $reviewing > 0) {
                     echo "   [$slug] $newAlerts new alerts, $reviewing under review.\n";
 
-                    $critical = Database::query(
-                        "SELECT COUNT(*) FROM abuse_alerts WHERE tenant_id = ? AND status = 'new' AND severity IN ('critical', 'high')",
+                    $criticalRow = DB::selectOne(
+                        "SELECT COUNT(*) as cnt FROM abuse_alerts WHERE tenant_id = ? AND status = 'new' AND severity IN ('critical', 'high')",
                         [$tenantId]
-                    )->fetchColumn();
+                    );
+                    $critical = $criticalRow->cnt ?? 0;
 
                     if ($critical > 0) {
                         echo "   [$slug] *** $critical CRITICAL/HIGH severity alerts! ***\n";
@@ -1916,7 +1917,7 @@ class CronJobRunner
                         )
                         LIMIT 100";
 
-                $users = Database::query($sql, [$tenantId, $frequency, $frequency])->fetchAll();
+                $users = array_map(fn($r) => (array) $r, DB::select($sql, [$tenantId, $frequency, $frequency]));
 
                 foreach ($users as $user) {
                     try {
@@ -1945,19 +1946,19 @@ class CronJobRunner
     {
         try {
             $this->forEachTenant(function ($tenantId, $slug) {
-                $archived = Database::query(
+                $archivedCount = DB::delete(
                     "DELETE FROM abuse_alerts WHERE tenant_id = ? AND status IN ('resolved', 'dismissed') AND resolved_at < DATE_SUB(NOW(), INTERVAL 90 DAY)",
                     [$tenantId]
                 );
 
-                $autoDismissed = Database::query(
+                $autoDismissedCount = DB::update(
                     "UPDATE abuse_alerts SET status = 'dismissed', resolved_at = NOW(), resolution_notes = 'Auto-dismissed (aged out)'
                      WHERE tenant_id = ? AND status = 'new' AND severity = 'low' AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)",
                     [$tenantId]
                 );
 
-                if ($archived->rowCount() > 0 || $autoDismissed->rowCount() > 0) {
-                    echo "   [$slug] Archived {$archived->rowCount()}, auto-dismissed {$autoDismissed->rowCount()}.\n";
+                if ($archivedCount > 0 || $autoDismissedCount > 0) {
+                    echo "   [$slug] Archived {$archivedCount}, auto-dismissed {$autoDismissedCount}.\n";
                 }
             });
             echo "   Abuse cleanup complete.\n";
@@ -1975,9 +1976,9 @@ class CronJobRunner
             $this->forEachTenant(function ($tenantId, $slug) {
                 if (!TenantContext::hasFeature('gamification')) return;
 
-                Database::query("DELETE FROM xp_notifications WHERE tenant_id = ? AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)", [$tenantId]);
-                Database::query("DELETE FROM campaign_awards WHERE awarded_at < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
-                Database::query("DELETE FROM achievement_analytics WHERE tenant_id = ? AND date < DATE_SUB(CURDATE(), INTERVAL 2 YEAR)", [$tenantId]);
+                DB::delete("DELETE FROM xp_notifications WHERE tenant_id = ? AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)", [$tenantId]);
+                DB::delete("DELETE FROM campaign_awards WHERE awarded_at < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
+                DB::delete("DELETE FROM achievement_analytics WHERE tenant_id = ? AND date < DATE_SUB(CURDATE(), INTERVAL 2 YEAR)", [$tenantId]);
             });
             echo "   Gamification cleanup complete.\n";
         } catch (\Throwable $e) {

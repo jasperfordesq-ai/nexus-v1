@@ -157,10 +157,10 @@ require __DIR__ . '/../partials/header.php';
                                 </td>
                                 <td>
                                     <?php
-                                    $childUsers = \App\Core\Database::query(
-                                        "SELECT COUNT(*) FROM users WHERE tenant_id = ?",
+                                    $childUsers = \Illuminate\Support\Facades\DB::select(
+                                        "SELECT COUNT(*) as c FROM users WHERE tenant_id = ?",
                                         [$child['id']]
-                                    )->fetchColumn();
+                                    )[0]->c;
                                     echo number_format($childUsers);
                                     ?>
                                 </td>

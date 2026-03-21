@@ -6,7 +6,7 @@
 
 namespace App\Middleware;
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 
 /**
  * URL Fuzzy Matcher Middleware
@@ -82,7 +82,6 @@ class UrlFuzzyMatcher
      */
     private static function findSimilarContent($url)
     {
-        $db = Database::getConnection();
         $tenantId = \App\Core\TenantContext::getId();
 
         // Extract path segments and search terms
@@ -98,59 +97,51 @@ class UrlFuzzyMatcher
         try {
             // Check help articles
             if (count($segments) > 0 && $segments[0] === 'help') {
-                $stmt = $db->prepare("
+                $searchTerm = '%' . $lastSegment . '%';
+                $rows = DB::select("
                     SELECT slug FROM help_articles
                     WHERE (slug LIKE ? OR title LIKE ?) AND tenant_id = ?
                     LIMIT 1
-                ");
-                $searchTerm = '%' . $lastSegment . '%';
-                $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
-                $result = $stmt->fetch();
+                ", [$searchTerm, $searchTerm, $tenantId]);
 
-                if ($result) {
-                    return '/help/' . $result['slug'];
+                if (!empty($rows)) {
+                    return '/help/' . $rows[0]->slug;
                 }
             }
 
             // Check blog posts
             if (count($segments) > 0 && ($segments[0] === 'blog' || $segments[0] === 'news')) {
-                $stmt = $db->prepare("
+                $searchTerm = '%' . $lastSegment . '%';
+                $rows = DB::select("
                     SELECT slug FROM posts
                     WHERE (slug LIKE ? OR title LIKE ?) AND tenant_id = ?
                     LIMIT 1
-                ");
-                $searchTerm = '%' . $lastSegment . '%';
-                $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
-                $result = $stmt->fetch();
+                ", [$searchTerm, $searchTerm, $tenantId]);
 
-                if ($result) {
-                    return '/news/' . $result['slug'];
+                if (!empty($rows)) {
+                    return '/news/' . $rows[0]->slug;
                 }
             }
 
             // Check listings (by ID if it looks like a number, otherwise by title)
             if (count($segments) > 0 && $segments[0] === 'listings') {
                 if (is_numeric($lastSegment)) {
-                    $stmt = $db->prepare("SELECT id FROM listings WHERE id = ? AND tenant_id = ? LIMIT 1");
-                    $stmt->execute([$lastSegment, $tenantId]);
-                    $result = $stmt->fetch();
+                    $rows = DB::select("SELECT id FROM listings WHERE id = ? AND tenant_id = ? LIMIT 1", [$lastSegment, $tenantId]);
 
-                    if ($result) {
-                        return '/listings/' . $result['id'];
+                    if (!empty($rows)) {
+                        return '/listings/' . $rows[0]->id;
                     }
                 } else {
                     // Try to find by title
-                    $stmt = $db->prepare("
+                    $searchTerm = '%' . str_replace('-', ' ', $lastSegment) . '%';
+                    $rows = DB::select("
                         SELECT id FROM listings
                         WHERE (title LIKE ? OR description LIKE ?) AND tenant_id = ?
                         LIMIT 1
-                    ");
-                    $searchTerm = '%' . str_replace('-', ' ', $lastSegment) . '%';
-                    $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
-                    $result = $stmt->fetch();
+                    ", [$searchTerm, $searchTerm, $tenantId]);
 
-                    if ($result) {
-                        return '/listings/' . $result['id'];
+                    if (!empty($rows)) {
+                        return '/listings/' . $rows[0]->id;
                     }
                 }
             }
@@ -158,26 +149,22 @@ class UrlFuzzyMatcher
             // Check groups
             if (count($segments) > 0 && $segments[0] === 'groups') {
                 if (is_numeric($lastSegment)) {
-                    $stmt = $db->prepare("SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? LIMIT 1");
-                    $stmt->execute([$lastSegment, $tenantId]);
-                    $result = $stmt->fetch();
+                    $rows = DB::select("SELECT id FROM `groups` WHERE id = ? AND tenant_id = ? LIMIT 1", [$lastSegment, $tenantId]);
 
-                    if ($result) {
-                        return '/groups/' . $result['id'];
+                    if (!empty($rows)) {
+                        return '/groups/' . $rows[0]->id;
                     }
                 } else {
                     // Try to find by name
-                    $stmt = $db->prepare("
+                    $searchTerm = '%' . str_replace('-', ' ', $lastSegment) . '%';
+                    $rows = DB::select("
                         SELECT id FROM `groups`
                         WHERE (name LIKE ? OR description LIKE ?) AND tenant_id = ?
                         LIMIT 1
-                    ");
-                    $searchTerm = '%' . str_replace('-', ' ', $lastSegment) . '%';
-                    $stmt->execute([$searchTerm, $searchTerm, $tenantId]);
-                    $result = $stmt->fetch();
+                    ", [$searchTerm, $searchTerm, $tenantId]);
 
-                    if ($result) {
-                        return '/groups/' . $result['id'];
+                    if (!empty($rows)) {
+                        return '/groups/' . $rows[0]->id;
                     }
                 }
             }

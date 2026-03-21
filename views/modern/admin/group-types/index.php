@@ -4,7 +4,7 @@
  * STANDALONE Admin Interface with Holographic Glassmorphism
  */
 
-use App\Core\Database;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Models\GroupType;
 
