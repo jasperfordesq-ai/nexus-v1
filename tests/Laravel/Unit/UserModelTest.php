@@ -14,7 +14,7 @@ use App\Models\User;
 use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Laravel\TestCase;
 
 /**
@@ -24,7 +24,7 @@ use Tests\Laravel\TestCase;
  */
 class UserModelTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     // ------------------------------------------------------------------
     //  Tenant Scope

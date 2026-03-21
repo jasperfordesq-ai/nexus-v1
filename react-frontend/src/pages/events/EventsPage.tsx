@@ -83,6 +83,11 @@ export function EventsPage() {
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -145,34 +150,39 @@ export function EventsPage() {
         setHasMore(response.meta?.has_more ?? (response.data?.length ?? 0) >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
-          setError(t('unable_to_load'));
+          setError(tRef.current('unable_to_load'));
         }
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load events', err);
       if (!append) {
-        setError(t('unable_to_load'));
+        setError(tRef.current('unable_to_load'));
       } else {
-        toast.error(t('error_load_more'));
+        toastRef.current.error(tRef.current('error_load_more'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [debouncedQuery, filter, selectedCategory, t, toast]);
+  }, [debouncedQuery, filter, selectedCategory]);
+
+  const loadEventsRef = useRef(loadEvents);
+  loadEventsRef.current = loadEvents;
 
   useEffect(() => {
     nextCursorRef.current = null;
     setNextCursor(null);
     setHasMore(true);
-    loadEvents();
+    loadEventsRef.current(false);
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
-  }, [debouncedQuery, filter, selectedCategory, loadEvents]);
+  }, [debouncedQuery, filter, selectedCategory]);
 
   // Update URL params
   useEffect(() => {
@@ -195,19 +205,6 @@ export function EventsPage() {
     groups[key].push(event);
     return groups;
   }, {} as Record<string, Event[]>);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6">
@@ -406,12 +403,7 @@ export function EventsPage() {
               emptyMessage={t('no_location')}
             />
           ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-8"
-            >
+            <div className="space-y-8">
               {Object.entries(groupedEvents).map(([month, monthEvents]) => (
                 <section key={month} aria-label={t('events_in_month', 'Events in {{month}}', { month })}>
                   <h2 className="text-lg font-semibold text-theme-secondary mb-4 flex items-center gap-2">
@@ -420,7 +412,12 @@ export function EventsPage() {
                   </h2>
                   <div className="space-y-4">
                     {monthEvents.map((event) => (
-                      <motion.div key={event.id} variants={itemVariants}>
+                      <motion.div
+                        key={event.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
                         <EventCard event={event} />
                       </motion.div>
                     ))}
@@ -441,7 +438,7 @@ export function EventsPage() {
                   </Button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
         </>
       )}

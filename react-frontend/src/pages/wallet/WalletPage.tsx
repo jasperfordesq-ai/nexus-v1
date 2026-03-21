@@ -7,7 +7,7 @@
  * Wallet Page - Time credit balance and transactions
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Tabs, Tab, Skeleton } from '@heroui/react';
@@ -53,12 +53,21 @@ export function WalletPage() {
   const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
   const toast = useToast();
 
+  const abortRef = useRef<AbortController | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
   // Check for ?to=userId URL param to auto-open transfer modal
   const [savedRecipientId, setSavedRecipientId] = useState<number | null>(
     searchParams.get('to') ? parseInt(searchParams.get('to')!, 10) : null
   );
 
   const loadWalletData = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -68,12 +77,14 @@ export function WalletPage() {
         api.get<Transaction[]>('/v2/wallet/transactions?per_page=50'),
       ]);
 
+      if (controller.signal.aborted) return;
+
       if (balanceRes.success && balanceRes.data) {
         setBalance(balanceRes.data);
       } else {
         setError(balanceRes.code === 'SESSION_EXPIRED'
-          ? t('error.session_expired', 'Your session has expired. Please log in again.')
-          : t('error.load_balance'));
+          ? tRef.current('error.session_expired', 'Your session has expired. Please log in again.')
+          : tRef.current('error.load_balance'));
         return;
       }
       if (transactionsRes.success && transactionsRes.data) {
@@ -82,16 +93,25 @@ export function WalletPage() {
         setHasMoreTransactions(transactionsRes.meta?.has_more ?? transactionsRes.data.length >= 50);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load wallet data', err);
-      setError(t('error.load_wallet'));
+      setError(tRef.current('error.load_wallet'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [t]);
+  }, []);
+
+  const loadWalletDataRef = useRef(loadWalletData);
+  loadWalletDataRef.current = loadWalletData;
 
   useEffect(() => {
-    loadWalletData();
-  }, [loadWalletData]);
+    loadWalletDataRef.current();
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
 
   // Auto-open transfer modal when ?to=userId is present and data is loaded
   useEffect(() => {
@@ -121,11 +141,11 @@ export function WalletPage() {
       }
     } catch (err) {
       logError('Failed to load more transactions', err);
-      toast.error(t('toast.load_error'));
+      toastRef.current.error(tRef.current('toast.load_error'));
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, hasMoreTransactions, txCursor, toast, t]);
+  }, [isLoadingMore, hasMoreTransactions, txCursor]);
 
   // Handle successful transfer
   function handleTransferComplete(transaction: Transaction) {
@@ -218,19 +238,6 @@ export function WalletPage() {
     toast.success(t('toast.exported'), t('toast.exported_desc'));
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
   return (
     <>
     <PageMeta
@@ -238,14 +245,9 @@ export function WalletPage() {
       description={t("subtitle")}
       noIndex
     />
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="max-w-4xl mx-auto space-y-6"
-    >
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <motion.div variants={itemVariants}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
           <Wallet className="w-7 h-7 text-amber-400" />
           {t('title')}
@@ -255,7 +257,7 @@ export function WalletPage() {
 
       {/* Error State */}
       {error && (
-        <motion.div variants={itemVariants}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           <GlassCard className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
@@ -273,7 +275,7 @@ export function WalletPage() {
 
       {/* Balance Card */}
       {!error && (
-      <motion.div variants={itemVariants}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <GlassCard className="p-8 text-center relative overflow-hidden">
           {/* Background decoration */}
           <div className="absolute inset-0 opacity-10">
@@ -332,7 +334,7 @@ export function WalletPage() {
 
       {/* Community Fund */}
       {!error && (
-      <motion.div variants={itemVariants}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <CommunityFundCard
           compact
           onDonateClick={() => setIsDonateModalOpen(true)}
@@ -342,7 +344,7 @@ export function WalletPage() {
 
       {/* Stats Grid */}
       {!error && (
-      <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <StatCard
           icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.earned')}
@@ -369,7 +371,7 @@ export function WalletPage() {
 
       {/* Transactions */}
       {!error && (
-      <motion.div variants={itemVariants}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <GlassCard className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
@@ -469,7 +471,7 @@ export function WalletPage() {
         currentBalance={balance?.balance ?? 0}
         onDonationComplete={() => loadWalletData()}
       />
-    </motion.div>
+    </div>
     </>
   );
 }

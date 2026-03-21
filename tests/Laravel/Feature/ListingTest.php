@@ -8,7 +8,7 @@ namespace Tests\Laravel\Feature;
 
 use App\Models\Listing;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -20,7 +20,7 @@ use Tests\Laravel\TestCase;
  */
 class ListingTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * Create and authenticate a test user via Sanctum.

@@ -230,6 +230,12 @@ export function ResourcesPage() {
 
   // Upload modal state
   const uploadModal = useDisclosure();
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
+  const abortRef = useRef<AbortController | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadTitle, setUploadTitle] = useState('');
   const [uploadDescription, setUploadDescription] = useState('');
@@ -266,6 +272,10 @@ export function ResourcesPage() {
   }, []);
 
   const loadResources = useCallback(async (append = false) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       if (append) {
         setIsLoadingMore(true);
@@ -284,6 +294,8 @@ export function ResourcesPage() {
         `/v2/resources?${params}`
       );
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
 
@@ -295,21 +307,30 @@ export function ResourcesPage() {
         setHasMore(response.meta?.has_more ?? false);
         setCursor(response.meta?.cursor ?? undefined);
       } else {
-        if (!append) setError(t('resources.error_load'));
+        if (!append) setError(tRef.current('resources.error_load'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load resources', err);
-      if (!append) setError(t('resources.error_load_retry'));
+      if (!append) setError(tRef.current('resources.error_load_retry'));
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [cursor, searchQuery, selectedCategory, t]);
+  }, [cursor, searchQuery, selectedCategory]);
+
+  const loadResourcesRef = useRef(loadResources);
+  loadResourcesRef.current = loadResources;
 
   useEffect(() => {
     setCursor(undefined);
-    loadResources();
-  }, [searchQuery, selectedCategory, loadResources]);
+    loadResourcesRef.current();
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [searchQuery, selectedCategory]);
 
   // ─── Upload Handlers ────────────────────────────────────────────────
 
@@ -486,16 +507,6 @@ export function ResourcesPage() {
     green: 'bg-emerald-500/10 text-emerald-500',
     red: 'bg-rose-500/10 text-rose-500',
     yellow: 'bg-amber-500/10 text-amber-500',
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   const inputClassNames = {
@@ -684,14 +695,14 @@ export function ResourcesPage() {
               }
             />
           ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-3"
-            >
+            <div className="space-y-3">
               {resources.map((resource) => (
-                <motion.div key={resource.id} variants={itemVariants}>
+                <motion.div
+                  key={resource.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <GlassCard className="p-4 hover:bg-theme-hover/30 transition-colors">
                     <div className="flex items-center gap-4">
                       {/* R3 - Reorder controls (admin only) */}
@@ -816,7 +827,7 @@ export function ResourcesPage() {
                   </Button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
         </>
       )}

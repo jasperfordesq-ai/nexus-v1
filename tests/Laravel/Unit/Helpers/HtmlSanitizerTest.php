@@ -1,0 +1,249 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace Tests\Laravel\Unit\Helpers;
+
+use App\Helpers\HtmlSanitizer;
+use PHPUnit\Framework\TestCase;
+
+class HtmlSanitizerTest extends TestCase
+{
+    // -------------------------------------------------------
+    // sanitize()
+    // -------------------------------------------------------
+
+    public function test_sanitize_returns_empty_for_empty_input(): void
+    {
+        $this->assertSame('', HtmlSanitizer::sanitize(''));
+    }
+
+    public function test_sanitize_preserves_allowed_tags(): void
+    {
+        $html = '<p>Hello <strong>World</strong></p>';
+        $result = HtmlSanitizer::sanitize($html);
+        $this->assertStringContainsString('<p>', $result);
+        $this->assertStringContainsString('<strong>', $result);
+    }
+
+    public function test_sanitize_strips_script_tags(): void
+    {
+        $html = '<p>Hello</p><script>alert("xss")</script>';
+        $result = HtmlSanitizer::sanitize($html);
+        $this->assertStringNotContainsString('<script>', $result);
+        $this->assertStringNotContainsString('alert', $result);
+    }
+
+    public function test_sanitize_removes_event_handlers(): void
+    {
+        $html = '<p onclick="alert(1)">Click me</p>';
+        $result = HtmlSanitizer::sanitize($html);
+        $this->assertStringNotContainsString('onclick', $result);
+    }
+
+    public function test_sanitize_removes_style_attributes(): void
+    {
+        $html = '<p style="color:red">Styled</p>';
+        $result = HtmlSanitizer::sanitize($html);
+        $this->assertStringNotContainsString('style=', $result);
+    }
+
+    public function test_sanitize_blocks_javascript_urls(): void
+    {
+        $html = '<a href="javascript:alert(1)">Click</a>';
+        $result = HtmlSanitizer::sanitize($html);
+        $this->assertStringNotContainsString('javascript:', $result);
+    }
+
+    public function test_sanitize_allows_http_urls(): void
+    {
+        $html = '<a href="https://example.com">Link</a>';
+        $result = HtmlSanitizer::sanitize($html);
+        $this->assertStringContainsString('https://example.com', $result);
+    }
+
+    public function test_sanitize_adds_rel_noopener_to_links(): void
+    {
+        $html = '<a href="https://example.com">Link</a>';
+        $result = HtmlSanitizer::sanitize($html);
+        $this->assertStringContainsString('rel="noopener noreferrer"', $result);
+    }
+
+    public function test_sanitize_strips_img_when_disabled(): void
+    {
+        $html = '<p>Text</p><img src="/image.jpg" alt="test">';
+        $result = HtmlSanitizer::sanitize($html, false);
+        $this->assertStringNotContainsString('<img', $result);
+    }
+
+    public function test_sanitize_allows_img_by_default(): void
+    {
+        $html = '<img src="/image.jpg" alt="test">';
+        $result = HtmlSanitizer::sanitize($html, true);
+        $this->assertStringContainsString('<img', $result);
+    }
+
+    // -------------------------------------------------------
+    // stripAll()
+    // -------------------------------------------------------
+
+    public function test_stripAll_removes_all_html(): void
+    {
+        $html = '<p>Hello <strong>World</strong></p>';
+        $result = HtmlSanitizer::stripAll($html);
+        $this->assertStringNotContainsString('<', $result);
+        $this->assertStringContainsString('Hello World', $result);
+    }
+
+    public function test_stripAll_encodes_special_chars(): void
+    {
+        $result = HtmlSanitizer::stripAll('Test & "quotes"');
+        $this->assertStringContainsString('&amp;', $result);
+        $this->assertStringContainsString('&quot;', $result);
+    }
+
+    // -------------------------------------------------------
+    // sanitizeCms()
+    // -------------------------------------------------------
+
+    public function test_sanitizeCms_returns_empty_for_empty_input(): void
+    {
+        $this->assertSame('', HtmlSanitizer::sanitizeCms(''));
+    }
+
+    public function test_sanitizeCms_removes_null_bytes(): void
+    {
+        $html = "<p>Hello\0World</p>";
+        $result = HtmlSanitizer::sanitizeCms($html);
+        $this->assertStringNotContainsString("\0", $result);
+    }
+
+    public function test_sanitizeCms_strips_disallowed_tags(): void
+    {
+        $html = '<p>Good</p><iframe src="evil.com"></iframe>';
+        $result = HtmlSanitizer::sanitizeCms($html);
+        $this->assertStringNotContainsString('<iframe', $result);
+    }
+
+    public function test_sanitizeCms_with_styles_allowed_preserves_safe_css(): void
+    {
+        $html = '<p style="color: red; font-size: 16px;">Styled</p>';
+        $result = HtmlSanitizer::sanitizeCms($html, true);
+        $this->assertStringContainsString('color: red', $result);
+        $this->assertStringContainsString('font-size: 16px', $result);
+    }
+
+    public function test_sanitizeCms_strips_dangerous_css_expressions(): void
+    {
+        $html = '<p style="background: expression(alert(1));">Test</p>';
+        $result = HtmlSanitizer::sanitizeCms($html, true);
+        $this->assertStringNotContainsString('expression', $result);
+    }
+
+    // -------------------------------------------------------
+    // sanitizeStyle()
+    // -------------------------------------------------------
+
+    public function test_sanitizeStyle_keeps_safe_properties(): void
+    {
+        $result = HtmlSanitizer::sanitizeStyle('color: red; font-size: 14px;');
+        $this->assertStringContainsString('color: red', $result);
+        $this->assertStringContainsString('font-size: 14px', $result);
+    }
+
+    public function test_sanitizeStyle_strips_expression(): void
+    {
+        $result = HtmlSanitizer::sanitizeStyle('background: expression(alert(1));');
+        $this->assertStringNotContainsString('expression', $result);
+    }
+
+    public function test_sanitizeStyle_strips_moz_binding(): void
+    {
+        $result = HtmlSanitizer::sanitizeStyle('-moz-binding: url("evil.xml");');
+        $this->assertStringNotContainsString('-moz-binding', $result);
+    }
+
+    public function test_sanitizeStyle_strips_behavior(): void
+    {
+        $result = HtmlSanitizer::sanitizeStyle('behavior: url("evil.htc");');
+        $this->assertStringNotContainsString('behavior', $result);
+    }
+
+    public function test_sanitizeStyle_strips_javascript_url(): void
+    {
+        $result = HtmlSanitizer::sanitizeStyle('background: url(javascript:alert(1));');
+        $this->assertStringNotContainsString('javascript:', $result);
+    }
+
+    public function test_sanitizeStyle_rejects_unsafe_properties(): void
+    {
+        $result = HtmlSanitizer::sanitizeStyle('position: absolute; z-index: 9999;');
+        // position and z-index are not in the safe list
+        $this->assertStringNotContainsString('position', $result);
+        $this->assertStringNotContainsString('z-index', $result);
+    }
+
+    // -------------------------------------------------------
+    // stripTags()
+    // -------------------------------------------------------
+
+    public function test_stripTags_removes_script_content(): void
+    {
+        $html = '<p>Before</p><script>alert(1);</script><p>After</p>';
+        $result = HtmlSanitizer::stripTags($html);
+        $this->assertStringNotContainsString('alert', $result);
+        $this->assertStringContainsString('Before', $result);
+        $this->assertStringContainsString('After', $result);
+    }
+
+    public function test_stripTags_removes_style_content(): void
+    {
+        $html = '<style>.evil { display: none; }</style><p>Content</p>';
+        $result = HtmlSanitizer::stripTags($html);
+        $this->assertStringNotContainsString('.evil', $result);
+        $this->assertStringContainsString('Content', $result);
+    }
+
+    public function test_stripTags_normalizes_whitespace(): void
+    {
+        $html = "<p>Hello   \n\n  World</p>";
+        $result = HtmlSanitizer::stripTags($html);
+        $this->assertSame('Hello World', $result);
+    }
+
+    // -------------------------------------------------------
+    // excerpt()
+    // -------------------------------------------------------
+
+    public function test_excerpt_returns_full_text_when_short(): void
+    {
+        $html = '<p>Short text</p>';
+        $result = HtmlSanitizer::excerpt($html, 160);
+        $this->assertSame('Short text', $result);
+    }
+
+    public function test_excerpt_truncates_long_text(): void
+    {
+        $html = '<p>' . str_repeat('word ', 100) . '</p>';
+        $result = HtmlSanitizer::excerpt($html, 50);
+        $this->assertStringEndsWith('...', $result);
+        $this->assertLessThanOrEqual(53, strlen($result)); // 50 + "..."
+    }
+
+    public function test_excerpt_cuts_at_word_boundary(): void
+    {
+        $text = 'The quick brown fox jumps over the lazy dog and continues running';
+        $result = HtmlSanitizer::excerpt($text, 30);
+        // Should end with "..." and not cut mid-word
+        $this->assertStringEndsWith('...', $result);
+    }
+
+    public function test_excerpt_strips_html_before_truncating(): void
+    {
+        $html = '<p><strong>Bold</strong> and <em>italic</em> text here</p>';
+        $result = HtmlSanitizer::excerpt($html, 160);
+        $this->assertStringNotContainsString('<', $result);
+    }
+}

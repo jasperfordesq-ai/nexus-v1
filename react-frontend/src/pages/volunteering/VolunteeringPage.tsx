@@ -398,6 +398,9 @@ function OpportunitiesTab() {
   const [hasMore, setHasMore] = useState(false);
   const [, setCursor] = useState<string | undefined>();
   const cursorRef = useRef<string | undefined>(undefined);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const abortOpportunitiesRef = useRef<AbortController | null>(null);
 
   // Apply modal
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -406,6 +409,10 @@ function OpportunitiesTab() {
   const [isApplying, setIsApplying] = useState(false);
 
   const loadOpportunities = useCallback(async (append = false) => {
+    abortOpportunitiesRef.current?.abort();
+    const controller = new AbortController();
+    abortOpportunitiesRef.current = controller;
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -421,6 +428,8 @@ function OpportunitiesTab() {
         `/v2/volunteering/opportunities?${params}`
       );
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
 
@@ -434,21 +443,28 @@ function OpportunitiesTab() {
         cursorRef.current = newCursor;
         setCursor(newCursor);
       } else {
-        if (!append) setError(t('volunteering.error_load_opportunities'));
+        if (!append) setError(tRef.current('volunteering.error_load_opportunities'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load opportunities', err);
-      if (!append) setError(t('volunteering.error_load_opportunities_retry'));
+      if (!append) setError(tRef.current('volunteering.error_load_opportunities_retry'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [searchQuery, t]);
+  }, [searchQuery]);
+
+  const loadOpportunitiesRef = useRef(loadOpportunities);
+  loadOpportunitiesRef.current = loadOpportunities;
 
   useEffect(() => {
     cursorRef.current = undefined;
     setCursor(undefined);
-    loadOpportunities();
-  }, [searchQuery, loadOpportunities]);
+    loadOpportunitiesRef.current();
+    return () => { abortOpportunitiesRef.current?.abort(); };
+  }, [searchQuery]);
 
   const handleApply = async () => {
     if (!selectedOpportunity) return;
@@ -480,16 +496,6 @@ function OpportunitiesTab() {
     setSelectedOpportunity(opp);
     setApplyMessage('');
     onOpen();
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -546,14 +552,9 @@ function OpportunitiesTab() {
               description={searchQuery ? t('volunteering.try_different_search') : t('volunteering.no_opportunities_available')}
             />
           ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-4"
-            >
+            <div className="space-y-4">
               {opportunities.map((opp) => (
-                <motion.div key={opp.id} variants={itemVariants}>
+                <motion.div key={opp.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                   <OpportunityCard
                     opportunity={opp}
                     onApply={isAuthenticated && !opp.has_applied ? () => openApplyModal(opp) : undefined}
@@ -572,7 +573,7 @@ function OpportunitiesTab() {
                   </Button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
         </>
       )}
@@ -745,8 +746,15 @@ function ApplicationsTab() {
   const [hasMore, setHasMore] = useState(false);
   const [, setCursor] = useState<string | undefined>();
   const cursorRef = useRef<string | undefined>(undefined);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const abortApplicationsRef = useRef<AbortController | null>(null);
 
   const loadApplications = useCallback(async (append = false) => {
+    abortApplicationsRef.current?.abort();
+    const controller = new AbortController();
+    abortApplicationsRef.current = controller;
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -762,6 +770,8 @@ function ApplicationsTab() {
         `/v2/volunteering/applications?${params}`
       );
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
 
@@ -775,21 +785,28 @@ function ApplicationsTab() {
         cursorRef.current = newCursor;
         setCursor(newCursor);
       } else {
-        if (!append) setError(t('volunteering.error_load_applications'));
+        if (!append) setError(tRef.current('volunteering.error_load_applications'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load applications', err);
-      if (!append) setError(t('volunteering.error_load_applications_retry'));
+      if (!append) setError(tRef.current('volunteering.error_load_applications_retry'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [statusFilter, t]);
+  }, [statusFilter]);
+
+  const loadApplicationsRef = useRef(loadApplications);
+  loadApplicationsRef.current = loadApplications;
 
   useEffect(() => {
     cursorRef.current = undefined;
     setCursor(undefined);
-    loadApplications();
-  }, [statusFilter, loadApplications]);
+    loadApplicationsRef.current();
+    return () => { abortApplicationsRef.current?.abort(); };
+  }, [statusFilter]);
 
   const handleWithdraw = async (applicationId: number) => {
     try {
@@ -820,16 +837,6 @@ function ApplicationsTab() {
       case 'declined': return <XCircle className="w-3 h-3" />;
       default: return <Hourglass className="w-3 h-3" />;
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -884,14 +891,9 @@ function ApplicationsTab() {
               description={statusFilter ? t('volunteering.no_status_applications', { status: statusFilter }) : t('volunteering.no_applications_yet')}
             />
           ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-4"
-            >
+            <div className="space-y-4">
               {applications.map((app) => (
-                <motion.div key={app.id} variants={itemVariants}>
+                <motion.div key={app.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                   <GlassCard className="p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
@@ -967,7 +969,7 @@ function ApplicationsTab() {
                   </Button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
         </>
       )}

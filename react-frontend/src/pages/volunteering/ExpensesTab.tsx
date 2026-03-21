@@ -7,7 +7,7 @@
  * ExpensesTab - View and submit volunteer expense claims
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -93,31 +93,46 @@ export function ExpensesTab() {
   const [formAmount, setFormAmount] = useState('');
   const [formCurrency, setFormCurrency] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const tRef = useRef(t);
+  tRef.current = t;
+  const abortRef = useRef<AbortController | null>(null);
 
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<{ items: Expense[]; cursor?: string; has_more: boolean }>(
         '/v2/volunteering/expenses'
       );
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         const data = response.data;
         setItems(Array.isArray(data.items) ? data.items : []);
       } else {
-        setError(t('expenses.load_error', 'Unable to load expenses. Please try again.'));
+        setError(tRef.current('expenses.load_error', 'Unable to load expenses. Please try again.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load expenses', err);
-      setError(t('expenses.load_error', 'Unable to load expenses. Please try again.'));
+      setError(tRef.current('expenses.load_error', 'Unable to load expenses. Please try again.'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [t]);
+  }, []);
+
+  const loadRef = useRef(load);
+  loadRef.current = load;
 
   useEffect(() => {
-    load();
-  }, [load]);
+    loadRef.current();
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const stats = useMemo(() => {
     const sum = (filter?: (e: Expense) => boolean) =>
@@ -165,15 +180,6 @@ export function ExpensesTab() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   const fmt = (val: number) =>
@@ -248,9 +254,9 @@ export function ExpensesTab() {
 
       {/* Expense List */}
       {!error && !isLoading && items.length > 0 && (
-        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-3">
+        <div className="space-y-3">
           {items.map((expense) => (
-            <motion.div key={expense.id} variants={itemVariants}>
+            <motion.div key={expense.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               <GlassCard className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -280,7 +286,7 @@ export function ExpensesTab() {
               </GlassCard>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       )}
 
       {/* Submit Modal */}

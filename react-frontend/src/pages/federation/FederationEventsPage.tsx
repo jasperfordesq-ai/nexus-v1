@@ -81,6 +81,13 @@ export function FederationEventsPage() {
   );
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loadEventsRef = useRef<(append?: boolean) => Promise<void>>(null as any);
 
   // ── Debounce search ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -113,6 +120,10 @@ export function FederationEventsPage() {
   // ── Load events ──────────────────────────────────────────────────────────
   const loadEvents = useCallback(
     async (append = false) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       try {
         if (!append) {
           setIsLoading(true);
@@ -132,6 +143,8 @@ export function FederationEventsPage() {
           `/v2/federation/events?${params}`
         );
 
+        if (controller.signal.aborted) return;
+
         if (response.success && response.data) {
           if (append) {
             setEvents((prev) => [...prev, ...response.data!]);
@@ -146,26 +159,34 @@ export function FederationEventsPage() {
           setHasMore(false);
         }
       } catch (error) {
+        if (controller.signal.aborted) return;
         logError('Failed to load federated events', error);
         if (!append) {
-          setLoadError(t('events.load_error'));
+          setLoadError(tRef.current('events.load_error'));
         } else {
-          toast.error(t('events.load_more_error'));
+          toastRef.current.error(tRef.current('events.load_more_error'));
         }
       } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+          setIsLoadingMore(false);
+        }
       }
     },
-    [debouncedQuery, selectedPartner, upcomingOnly, cursor, toast, t]
+    [debouncedQuery, selectedPartner, upcomingOnly, cursor]
   );
+  loadEventsRef.current = loadEvents;
 
   // Reload on filter change
   useEffect(() => {
     setCursor(null);
     setHasMore(false);
-    loadEvents(false);
-  }, [debouncedQuery, selectedPartner, upcomingOnly]); // eslint-disable-line react-hooks/exhaustive-deps
+    loadEventsRef.current(false);
+
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [debouncedQuery, selectedPartner, upcomingOnly]);
 
   // Sync URL params
   useEffect(() => {
@@ -181,19 +202,6 @@ export function FederationEventsPage() {
       loadEvents(true);
     }
   }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6">
@@ -323,18 +331,18 @@ export function FederationEventsPage() {
       {/* Events List */}
       {!isLoading && !loadError && events.length > 0 && (
         <>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             {events.map((event) => (
-              <motion.div key={`${event.timebank.id}-${event.id}`} variants={itemVariants}>
+              <motion.div
+                key={`${event.timebank.id}-${event.id}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <FederatedEventCard event={event} />
               </motion.div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Load More */}
           {hasMore && (

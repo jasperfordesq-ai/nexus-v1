@@ -94,6 +94,13 @@ export function FederationListingsPage() {
   );
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loadListingsRef = useRef<(append?: boolean) => Promise<void>>(null as any);
 
   // ── Debounce search ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -126,6 +133,10 @@ export function FederationListingsPage() {
   // ── Load listings ────────────────────────────────────────────────────────
   const loadListings = useCallback(
     async (append = false) => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       try {
         if (!append) {
           setIsLoading(true);
@@ -145,6 +156,8 @@ export function FederationListingsPage() {
           `/v2/federation/listings?${params}`
         );
 
+        if (controller.signal.aborted) return;
+
         if (response.success && response.data) {
           if (append) {
             setListings((prev) => [...prev, ...response.data!]);
@@ -159,26 +172,34 @@ export function FederationListingsPage() {
           setHasMore(false);
         }
       } catch (error) {
+        if (controller.signal.aborted) return;
         logError('Failed to load federated listings', error);
         if (!append) {
-          setLoadError(t('listings.load_error'));
+          setLoadError(tRef.current('listings.load_error'));
         } else {
-          toast.error(t('listings.load_more_error'));
+          toastRef.current.error(tRef.current('listings.load_more_error'));
         }
       } finally {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+          setIsLoadingMore(false);
+        }
       }
     },
-    [debouncedQuery, selectedType, selectedPartner, cursor, toast, t]
+    [debouncedQuery, selectedType, selectedPartner, cursor]
   );
+  loadListingsRef.current = loadListings;
 
   // Reload on filter change
   useEffect(() => {
     setCursor(null);
     setHasMore(false);
-    loadListings(false);
-  }, [debouncedQuery, selectedType, selectedPartner]); // eslint-disable-line react-hooks/exhaustive-deps
+    loadListingsRef.current(false);
+
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [debouncedQuery, selectedType, selectedPartner]);
 
   // Sync URL params
   useEffect(() => {
@@ -194,19 +215,6 @@ export function FederationListingsPage() {
       loadListings(true);
     }
   }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6">
@@ -340,14 +348,14 @@ export function FederationListingsPage() {
       {/* Listings Grid */}
       {!isLoading && !loadError && listings.length > 0 && (
         <>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {listings.map((listing) => (
-              <motion.div key={`${listing.timebank.id}-${listing.id}`} variants={itemVariants}>
+              <motion.div
+                key={`${listing.timebank.id}-${listing.id}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <FederatedListingCard
                   listing={listing}
                   onViewDetails={() => {
@@ -357,7 +365,7 @@ export function FederationListingsPage() {
                 />
               </motion.div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Load More */}
           {hasMore && (

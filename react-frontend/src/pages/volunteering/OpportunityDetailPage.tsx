@@ -11,7 +11,7 @@
  *      POST /api/v2/volunteering/opportunities/{id}/apply
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -156,8 +156,17 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
   const [actionLoading, setActionLoading] = useState<Record<number, boolean>>({});
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+  const abortApplicationsRef = useRef<AbortController | null>(null);
 
   const loadApplications = useCallback(async (filter: AppStatusFilter, nextCursor: string | null = null) => {
+    abortApplicationsRef.current?.abort();
+    const controller = new AbortController();
+    abortApplicationsRef.current = controller;
+
     try {
       if (nextCursor) setIsLoadingMore(true);
       else setIsLoading(true);
@@ -170,28 +179,37 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
         `/v2/volunteering/opportunities/${opportunityId}/applications?${params}`
       );
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         const { items, cursor: newCursor, has_more } = response.data;
         setApplications((prev) => nextCursor ? [...prev, ...items] : items);
         setCursor(newCursor);
         setHasMore(has_more);
       } else {
-        toast.error(response.error || t('applications.load_failed', 'Failed to load applications.'));
+        toastRef.current.error(response.error || tRef.current('applications.load_failed', 'Failed to load applications.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load applications', err);
-      toast.error(t('applications.load_failed', 'Failed to load applications.'));
+      toastRef.current.error(tRef.current('applications.load_failed', 'Failed to load applications.'));
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [opportunityId, toast, t]);
+  }, [opportunityId]);
+
+  const loadApplicationsRef = useRef(loadApplications);
+  loadApplicationsRef.current = loadApplications;
 
   useEffect(() => {
     setApplications([]);
     setCursor(null);
-    loadApplications(statusFilter);
-  }, [statusFilter, loadApplications]);
+    loadApplicationsRef.current(statusFilter);
+    return () => { abortApplicationsRef.current?.abort(); };
+  }, [statusFilter]);
 
   async function handleAction(applicationId: number, action: 'approve' | 'decline') {
     setActionLoading((prev) => ({ ...prev, [applicationId]: true }));
@@ -461,29 +479,44 @@ export function OpportunityDetailPage() {
   const [applyMessage, setApplyMessage] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [selectedShiftId, setSelectedShiftId] = useState<number | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const abortLoadRef = useRef<AbortController | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
+    abortLoadRef.current?.abort();
+    const controller = new AbortController();
+    abortLoadRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const response = await api.get<OpportunityDetail>(`/v2/volunteering/opportunities/${id}`);
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setOpportunity(response.data);
       } else {
-        setError(t('opportunity.not_found', 'Opportunity not found.'));
+        setError(tRef.current('opportunity.not_found', 'Opportunity not found.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load opportunity', err);
-      setError(t('opportunity.load_error', 'Unable to load this opportunity. Please try again.'));
+      setError(tRef.current('opportunity.load_error', 'Unable to load this opportunity. Please try again.'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [id, t]);
+  }, [id]);
+
+  const loadRef = useRef(load);
+  loadRef.current = load;
 
   useEffect(() => {
-    load();
-  }, [load]);
+    loadRef.current();
+    return () => { abortLoadRef.current?.abort(); };
+  }, [id]);
 
   async function handleApply() {
     if (!id) return;

@@ -66,7 +66,21 @@ export function ListingsPage() {
   // Track in-flight save requests to prevent double-clicks
   const [savingIds, setSavingIds] = useState<Set<number>>(new Set());
 
+  // Stable refs for values used in loadListings but that should NOT trigger re-creation
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+  const tRef = useRef(t);
+  tRef.current = t;
+
+  // AbortController ref to cancel stale requests (prevents StrictMode double-fire race condition)
+  const abortRef = useRef<AbortController | null>(null);
+
   const loadListings = useCallback(async (reset = false) => {
+    // Cancel any in-flight request to prevent stale responses overwriting fresh data
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       if (reset) {
@@ -82,6 +96,9 @@ export function ListingsPage() {
       params.set('per_page', '20');
 
       const response = await api.get<Listing[]>(`/v2/listings?${params}`);
+
+      // If this request was aborted while awaiting, discard the result
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         if (reset) {
@@ -100,42 +117,47 @@ export function ListingsPage() {
         setHasMore(false);
       }
     } catch (error) {
+      if (controller.signal.aborted) return;
       logError('Failed to load listings', error);
-      if (reset && listings.length === 0) {
-        setLoadError(t('load_error'));
+      if (reset) {
+        setLoadError(tRef.current('load_error'));
       } else {
-        toast.error(t('load_more_error'));
+        toastRef.current.error(tRef.current('load_more_error'));
       }
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [searchQuery, selectedType, selectedCategory, listings.length, t, toast]);
+  }, [searchQuery, selectedType, selectedCategory]);
 
-  const loadCategories = useCallback(async () => {
-    try {
-      const response = await api.get<Category[]>('/v2/categories?type=listing');
+  // Keep a ref so effects always call the latest version without depending on it
+  const loadListingsRef = useRef(loadListings);
+  loadListingsRef.current = loadListings;
+
+  // Load categories once on mount
+  useEffect(() => {
+    api.get<Category[]>('/v2/categories?type=listing').then((response) => {
       if (response.success && response.data) {
         setCategories(response.data);
       }
-    } catch (error) {
-      logError('Failed to load categories', error);
-    }
+    }).catch((error) => logError('Failed to load categories', error));
   }, []);
 
+  // Load listings when filters change — separate from URL sync to avoid reset loops
   useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
+    loadListingsRef.current(true);
+    return () => { abortRef.current?.abort(); };
+  }, [searchQuery, selectedType, selectedCategory]);
 
+  // Sync URL params with filter state (harmless if it re-runs)
   useEffect(() => {
-    loadListings(true);
-
-    // Update URL params
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
     if (selectedType !== 'all') params.set('type', selectedType);
     if (selectedCategory) params.set('category', selectedCategory);
     setSearchParams(params, { replace: true });
-  }, [searchQuery, selectedType, selectedCategory, loadListings, setSearchParams]);
+  }, [searchQuery, selectedType, selectedCategory, setSearchParams]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -178,19 +200,6 @@ export function ListingsPage() {
       });
     }
   }, [savingIds, t, toast]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <>
@@ -383,14 +392,16 @@ export function ListingsPage() {
               emptyMessage={t('map_empty')}
             />
           ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
+            <div
               className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
             >
               {listings.map((listing) => (
-                <motion.div key={listing.id} variants={itemVariants}>
+                <motion.div
+                  key={listing.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <ListingCard
                     listing={listing}
                     viewMode={viewMode}
@@ -399,7 +410,7 @@ export function ListingsPage() {
                   />
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
           )}
 
           {/* Load More */}

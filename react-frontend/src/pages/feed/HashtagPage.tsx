@@ -70,9 +70,16 @@ export function HashtagPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [postCount, setPostCount] = useState(0);
   const cursorRef = useRef<string | undefined>();
+  const abortRef = useRef<AbortController | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const loadPosts = useCallback(async (append = false) => {
     if (!tag) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       if (append) {
@@ -87,6 +94,7 @@ export function HashtagPage() {
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
       const response = await api.get<FeedItem[]>(`/v2/feed/hashtags/${encodeURIComponent(tag)}?${params}`);
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const feedItems = Array.isArray(response.data) ? response.data : [];
@@ -101,21 +109,28 @@ export function HashtagPage() {
           setPostCount(response.meta.total_items);
         }
       } else {
-        if (!append) setError(t('hashtag.load_failed'));
+        if (!append) setError(tRef.current('hashtag.load_failed'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load hashtag posts', err);
-      if (!append) setError(t('hashtag.load_failed'));
+      if (!append) setError(tRef.current('hashtag.load_failed'));
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [tag, t]);
+  }, [tag]);
+
+  const loadPostsRef = useRef(loadPosts);
+  loadPostsRef.current = loadPosts;
 
   useEffect(() => {
     cursorRef.current = undefined;
-    loadPosts();
-  }, [loadPosts]);
+    loadPostsRef.current(true);
+    return () => { abortRef.current?.abort(); };
+  }, [tag]);
 
   // Feed interactions
   const handleToggleLike = async (item: FeedItem) => {
@@ -173,16 +188,6 @@ export function HashtagPage() {
         );
       }
     } catch { /* ignore */ }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -247,10 +252,10 @@ export function HashtagPage() {
               description={t('hashtag.no_posts_desc', { tag })}
             />
           ) : (
-            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
+            <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {items.map((item) => (
-                  <motion.div key={`${item.type}-${item.id}`} variants={itemVariants} layout>
+                  <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} layout>
                     <FeedCard
                       item={item}
                       onToggleLike={() => handleToggleLike(item)}
@@ -279,7 +284,7 @@ export function HashtagPage() {
                   </Button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
         </>
       )}

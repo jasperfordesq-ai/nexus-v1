@@ -112,6 +112,12 @@ export function GroupExchangesPage() {
   const [selectedTab, setSelectedTab] = useState(searchParams.get('status') || 'all');
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const exchangesLengthRef = useRef(0);
+  exchangesLengthRef.current = exchanges.length;
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   // Load group exchanges
   const loadExchanges = useCallback(async (append = false) => {
@@ -128,7 +134,7 @@ export function GroupExchangesPage() {
         setIsLoadingMore(true);
       }
 
-      const offset = append ? exchanges.length : 0;
+      const offset = append ? exchangesLengthRef.current : 0;
       const statusFilter = selectedTab !== 'all' ? `&status=${selectedTab}` : '';
       const url = `/v2/group-exchanges?limit=${ITEMS_PER_PAGE}&offset=${offset}${statusFilter}`;
 
@@ -148,24 +154,30 @@ export function GroupExchangesPage() {
         setHasMore(more);
       } else {
         if (!append) {
-          setError(t('error_load_failed'));
+          setError(tRef.current('error_load_failed'));
         } else {
-          toast.error(t('toast.load_more_failed'));
+          toastRef.current.error(tRef.current('toast.load_more_failed'));
         }
       }
     } catch (err) {
+      if (abortControllerRef.current?.signal.aborted) return;
       if (err instanceof Error && err.name === 'AbortError') return;
       logError('Failed to load group exchanges', err);
       if (!append) {
-        setError(t('error_load_failed'));
+        setError(tRef.current('error_load_failed'));
       } else {
-        toast.error(t('toast.load_more_failed'));
+        toastRef.current.error(tRef.current('toast.load_more_failed'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!abortControllerRef.current?.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [selectedTab, exchanges.length, toast, t]);
+  }, [selectedTab]);
+
+  const loadExchangesRef = useRef(loadExchanges);
+  loadExchangesRef.current = loadExchanges;
 
   const loadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
@@ -174,13 +186,13 @@ export function GroupExchangesPage() {
 
   // Reload on tab change
   useEffect(() => {
-    loadExchanges();
+    loadExchangesRef.current();
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
-  }, [selectedTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedTab]);
 
   function handleTabChange(key: string | number) {
     setSelectedTab(key.toString());

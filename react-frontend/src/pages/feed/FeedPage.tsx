@@ -139,6 +139,19 @@ export function FeedPage() {
   // Use a ref for cursor to avoid infinite re-render loop
   const cursorRef = useRef<string | undefined>();
 
+  // AbortController ref to cancel stale feed requests (race condition prevention)
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
+  // Stable ref for loadFeed — avoids including it in useEffect deps which causes reset loops
+  const loadFeedRef = useRef<(append?: boolean) => Promise<void>>(null!);
+
+
   // Load friends for StoriesBar
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -156,6 +169,11 @@ export function FeedPage() {
   }, [isAuthenticated]);
 
   const loadFeed = useCallback(async (append = false) => {
+    // Abort any in-flight request to prevent stale race conditions
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       if (append) {
         setIsLoadingMore(true);
@@ -176,6 +194,8 @@ export function FeedPage() {
         `/v2/feed?${params}`
       );
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         const feedItems = Array.isArray(response.data) ? response.data : [];
 
@@ -189,19 +209,24 @@ export function FeedPage() {
       } else {
         if (!append) {
           setError(response.code === 'SESSION_EXPIRED'
-            ? t('session_expired', 'Your session has expired. Please log in again.')
-            : t('error_load'));
+            ? tRef.current('session_expired', 'Your session has expired. Please log in again.')
+            : tRef.current('error_load'));
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load feed', err);
-      if (!append) setError(t('error_load_retry'));
+      if (!append) setError(tRef.current('error_load_retry'));
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- t excluded intentionally (stable after namespace load)
   }, [filter, feedMode, subFilter]);
+
+  // Keep loadFeedRef in sync with latest loadFeed
+  loadFeedRef.current = loadFeed;
 
   // Track previous filter to detect filter changes and auto-reset subFilter
   const prevFilterRef = useRef(filter);
@@ -215,8 +240,10 @@ export function FeedPage() {
     }
     cursorRef.current = undefined;
     setPendingPostCount(0);
-    loadFeed();
-  }, [filter, feedMode, subFilter, loadFeed]);
+    loadFeedRef.current();
+    return () => { abortRef.current?.abort(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- uses loadFeedRef to avoid reset loops
+  }, [filter, feedMode, subFilter]);
 
   /* ───────── Real-time feed subscription ───────── */
 
@@ -302,24 +329,24 @@ export function FeedPage() {
     try {
       await api.post(`/v2/feed/posts/${item.id}/hide`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success(t('toast.post_hidden'));
+      toastRef.current.success(tRef.current('toast.post_hidden'));
     } catch (err) {
       logError('Failed to hide post', err);
-      toast.error(t('toast.hide_failed'));
+      toastRef.current.error(tRef.current('toast.hide_failed'));
     }
-  }, [toast, t]);
+  }, []);
 
   const handleMuteUser = useCallback(async (item: FeedItem) => {
     const userId = getAuthor(item).id;
     try {
       await api.post(`/v2/feed/users/${userId}/mute`);
       setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
-      toast.success(t('toast.user_muted'));
+      toastRef.current.success(tRef.current('toast.user_muted'));
     } catch (err) {
       logError('Failed to mute user', err);
-      toast.error(t('toast.mute_failed'));
+      toastRef.current.error(tRef.current('toast.mute_failed'));
     }
-  }, [toast, t]);
+  }, []);
 
   const openReportModal = useCallback((item: FeedItem) => {
     setReportPostId(item.id);
@@ -329,7 +356,7 @@ export function FeedPage() {
 
   const handleReport = async () => {
     if (!reportPostId || !reportReason.trim()) {
-      toast.error(t('toast.provide_reason'));
+      toastRef.current.error(tRef.current('toast.provide_reason'));
       return;
     }
 
@@ -341,10 +368,10 @@ export function FeedPage() {
       onReportClose();
       setReportPostId(null);
       setReportReason('');
-      toast.success(t('toast.reported'));
+      toastRef.current.success(tRef.current('toast.reported'));
     } catch (err) {
       logError('Failed to report post', err);
-      toast.error(t('toast.report_failed'));
+      toastRef.current.error(tRef.current('toast.report_failed'));
     } finally {
       setIsReporting(false);
     }
@@ -354,24 +381,24 @@ export function FeedPage() {
     try {
       await api.post(`/v2/feed/posts/${item.id}/delete`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success(t('toast.deleted'));
+      toastRef.current.success(tRef.current('toast.deleted'));
     } catch (err) {
       logError('Failed to delete post', err);
-      toast.error(t('toast.delete_failed'));
+      toastRef.current.error(tRef.current('toast.delete_failed'));
     }
-  }, [toast, t]);
+  }, []);
 
   const handleAdminDeletePost = useCallback(async (item: FeedItem) => {
     try {
       const sourceType = item.type || 'post';
       await api.delete(`/v2/admin/feed/posts/${item.id}?type=${encodeURIComponent(sourceType)}`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toast.success(t('toast.deleted'));
+      toastRef.current.success(tRef.current('toast.deleted'));
     } catch (err) {
       logError('Failed to admin-delete post', err);
-      toast.error(t('toast.delete_failed'));
+      toastRef.current.error(tRef.current('toast.delete_failed'));
     }
-  }, [toast, t]);
+  }, []);
 
   /* ───────── Poll Voting ───────── */
 
@@ -392,9 +419,9 @@ export function FeedPage() {
       }
     } catch (err) {
       logError('Failed to vote', err);
-      toast.error(t('toast.vote_failed'));
+      toastRef.current.error(tRef.current('toast.vote_failed'));
     }
-  }, [toast, t]);
+  }, []);
 
   /* ───────── New-posts banner dismiss ───────── */
 
@@ -417,15 +444,6 @@ export function FeedPage() {
     { key: 'discussions', label: t('filter.discussions', 'Discussions') },
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <>
@@ -618,10 +636,10 @@ export function FeedPage() {
               )}
             </GlassCard>
           ) : (
-            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
+            <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {items.map((item) => (
-                  <motion.div key={`${item.type}-${item.id}`} variants={itemVariants} layout>
+                  <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} layout>
                     <FeedCard
                       item={item}
                       onToggleLike={handleToggleLike}
@@ -652,7 +670,7 @@ export function FeedPage() {
                   </Button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
         </>
       )}

@@ -9,7 +9,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Button, Avatar, Chip, Tabs, Tab } from '@heroui/react';
 import {
   ArrowRightLeft,
@@ -52,6 +51,12 @@ export function ExchangesPage() {
   // Refs for race condition prevention
   const abortControllerRef = useRef<AbortController | null>(null);
   const configLoadedRef = useRef(false);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loadExchangesRef = useRef<(append?: boolean) => Promise<void>>(null as any);
 
   // Load config once on mount
   const loadConfig = useCallback(async () => {
@@ -71,10 +76,9 @@ export function ExchangesPage() {
   // Load exchanges with abort controller for race condition prevention
   const loadExchanges = useCallback(async (append = false) => {
     // Cancel previous request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    abortControllerRef.current = new AbortController();
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
       if (!append) {
@@ -90,9 +94,7 @@ export function ExchangesPage() {
         : `?limit=${ITEMS_PER_PAGE}&offset=${offset}`;
 
       const response = await api.get<Exchange[]>(`/v2/exchanges${queryString}`);
-
-      // Check if request was aborted
-      if (abortControllerRef.current?.signal.aborted) return;
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         if (append) {
@@ -103,32 +105,34 @@ export function ExchangesPage() {
         setHasMore(response.meta?.has_more ?? (response.data?.length ?? 0) >= ITEMS_PER_PAGE);
       } else {
         if (!append) {
-          setError(t('error.load_failed'));
+          setError(tRef.current('error.load_failed'));
         } else {
-          toast.error(t('toast.load_more_failed'));
+          toastRef.current.error(tRef.current('toast.load_more_failed'));
         }
       }
     } catch (err) {
-      // Ignore abort errors
-      if (err instanceof Error && err.name === 'AbortError') return;
+      if (controller.signal.aborted) return;
 
       logError('Failed to load exchanges', err);
       if (!append) {
-        setError(t('error.load_failed'));
+        setError(tRef.current('error.load_failed'));
       } else {
-        toast.error(t('toast.load_more_failed'));
+        toastRef.current.error(tRef.current('toast.load_more_failed'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [selectedTab, exchanges.length, toast, t]);
+  }, [selectedTab, exchanges.length]);
+  loadExchangesRef.current = loadExchanges;
 
   // Load more exchanges
   const loadMoreExchanges = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
-    loadExchanges(true);
-  }, [isLoadingMore, hasMore, loadExchanges]);
+    loadExchangesRef.current(true);
+  }, [isLoadingMore, hasMore]);
 
   // Load config on mount
   useEffect(() => {
@@ -137,14 +141,14 @@ export function ExchangesPage() {
 
   // Load exchanges on tab change
   useEffect(() => {
-    loadExchanges();
+    loadExchangesRef.current();
     // Cleanup on unmount
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
-  }, [selectedTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedTab]);
 
   function handleTabChange(key: string | number) {
     setSelectedTab(key.toString());
@@ -176,9 +180,7 @@ export function ExchangesPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="space-y-6"
     >
       {/* Header */}
@@ -376,7 +378,7 @@ export function ExchangesPage() {
           )}
         </>
       )}
-    </motion.div>
+    </div>
   );
 }
 

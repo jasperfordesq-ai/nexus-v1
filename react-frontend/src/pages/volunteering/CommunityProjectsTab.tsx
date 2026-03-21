@@ -7,7 +7,7 @@
  * CommunityProjectsTab - Browse and propose community volunteer projects
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -92,13 +92,22 @@ export function CommunityProjectsTab() {
     target_volunteers: '',
     proposed_date: '',
   });
+  const tRef = useRef(t);
+  tRef.current = t;
+  const abortRef = useRef<AbortController | null>(null);
+
   const load = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setIsLoading(true);
       setError(null);
       const res = await api.get<{ items: Project[]; cursor?: string; has_more: boolean }>(
         '/v2/volunteering/community-projects',
       );
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         const raw = res.data as Record<string, unknown>;
         const items = Array.isArray(raw.items)
@@ -108,18 +117,26 @@ export function CommunityProjectsTab() {
             : [];
         setProjects(items);
       } else {
-        setError(t('community_projects.load_error', 'Unable to load community projects.'));
+        setError(tRef.current('community_projects.load_error', 'Unable to load community projects.'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load community projects', err);
-      setError(t('community_projects.load_error', 'Unable to load community projects.'));
+      setError(tRef.current('community_projects.load_error', 'Unable to load community projects.'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
-  }, [t]);
+  }, []);
+
+  const loadRef = useRef(load);
+  loadRef.current = load;
+
   useEffect(() => {
-    load();
-  }, [load]);
+    loadRef.current();
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const toggleSupport = async (project: Project) => {
     try {
@@ -183,14 +200,6 @@ export function CommunityProjectsTab() {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-  };
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -245,14 +254,9 @@ export function CommunityProjectsTab() {
 
       {/* Project Grid */}
       {!error && !isLoading && projects.length > 0 && (
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {projects.map((project) => (
-            <motion.div key={project.id} variants={itemVariants}>
+            <motion.div key={project.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               <GlassCard className="p-5 flex flex-col h-full">
                 {/* Title + Status */}
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -321,7 +325,7 @@ export function CommunityProjectsTab() {
               </GlassCard>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       )}
 
       {/* Propose Modal */}

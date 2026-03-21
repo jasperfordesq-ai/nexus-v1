@@ -7,7 +7,7 @@
 namespace Tests\Laravel\Feature;
 
 use App\Models\Tenant;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
@@ -19,7 +19,7 @@ use Tests\Laravel\TestCase;
  */
 class TenantBootstrapTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * Seed a minimal tenant row for bootstrap tests.

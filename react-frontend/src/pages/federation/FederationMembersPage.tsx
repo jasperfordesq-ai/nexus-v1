@@ -110,6 +110,13 @@ export function FederationMembersPage() {
 
   // Debounce ref
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loadMembersRef = useRef<(append?: boolean) => Promise<void>>(null as any);
 
   // Debounce search input
   useEffect(() => {
@@ -149,6 +156,10 @@ export function FederationMembersPage() {
   const loadMembers = useCallback(async (append = false) => {
     if (!federationEnabled) return;
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -172,6 +183,8 @@ export function FederationMembersPage() {
         `/v2/federation/members?${params}`
       );
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         if (append) {
           setMembers((prev) => [...prev, ...response.data!]);
@@ -186,30 +199,38 @@ export function FederationMembersPage() {
         }
       } else {
         if (!append) {
-          setError(t('members.load_error'));
+          setError(tRef.current('members.load_error'));
         } else {
-          toast.error(t('members.load_more_error'));
+          toastRef.current.error(tRef.current('members.load_more_error'));
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load federated members', err);
       if (!append) {
-        setError(t('members.load_error'));
+        setError(tRef.current('members.load_error'));
       } else {
-        toast.error(t('members.load_more_error'));
+        toastRef.current.error(tRef.current('members.load_more_error'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, skillsFilter, cursor, toast, t]);
+  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, skillsFilter, cursor]);
+  loadMembersRef.current = loadMembers;
 
   // Load on mount and when filters change
   useEffect(() => {
     setCursor(undefined);
     setHasMore(true);
-    loadMembers();
-  }, [debouncedQuery, selectedPartner, serviceReach, skillsFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+    loadMembersRef.current();
+
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [debouncedQuery, selectedPartner, serviceReach, skillsFilter]);
 
   // Load more handler
   const handleLoadMore = useCallback(() => {
@@ -227,20 +248,6 @@ export function FederationMembersPage() {
       tenantPath(`/federation/messages?compose=true&to_user=${member.id}&to_tenant=${member.timebank.id}`)
     );
   }, [navigate, tenantPath]);
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.06 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 12, scale: 0.97 },
-    visible: { opacity: 1, y: 0, scale: 1 },
-  };
 
   // Don't render if federation is disabled (redirect in progress)
   if (!federationEnabled) {
@@ -411,14 +418,14 @@ export function FederationMembersPage() {
       {/* Members Grid */}
       {!isLoading && !error && members.length > 0 && (
         <>
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {members.map((member) => (
-              <motion.div key={member.id} variants={itemVariants}>
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <FederatedMemberCard
                   member={member}
                   isAuthenticated={isAuthenticated}
@@ -427,7 +434,7 @@ export function FederationMembersPage() {
                 />
               </motion.div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Load More */}
           {hasMore && (

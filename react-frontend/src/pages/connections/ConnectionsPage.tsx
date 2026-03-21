@@ -12,7 +12,7 @@
  * Uses POST /api/v2/connections/request to send a request.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -369,7 +369,14 @@ export default function ConnectionsPage() {
   const { tenantPath } = useTenant();
   const { success: toastSuccess, error: toastError, info: toastInfo } = useToast();
 
+  const abortRef = useRef<AbortController | null>(null);
+  const toastErrorRef = useRef(toastError);
+  toastErrorRef.current = toastError;
+  const tRef = useRef(t);
+  tRef.current = t;
   type TabKey = 'accepted' | 'pending_received' | 'pending_sent';
+  const fetchConnectionsRef = useRef<(status: TabKey, cursor?: string | null) => Promise<void>>(null!);
+
   const [activeTab, setActiveTab] = useState<TabKey>('accepted');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -408,6 +415,10 @@ export default function ConnectionsPage() {
   };
 
   const fetchConnections = useCallback(async (status: TabKey, cursor?: string | null) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     const isInitial = !cursor;
     if (isInitial) {
       setLoading(prev => ({ ...prev, [status]: true }));
@@ -420,6 +431,7 @@ export default function ConnectionsPage() {
       if (cursor) url += `&cursor=${cursor}`;
 
       const response = await api.get<Connection[]>(url);
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const items = Array.isArray(response.data) ? response.data : [];
@@ -431,23 +443,28 @@ export default function ConnectionsPage() {
         setHasMore(prev => ({ ...prev, [status]: hasMoreItems }));
       }
     } catch {
-      toastError(t('toast_load_failed'));
+      if (controller.signal.aborted) return;
+      toastErrorRef.current(tRef.current('toast_load_failed'));
     } finally {
-      if (isInitial) {
-        setLoading(prev => ({ ...prev, [status]: false }));
-      } else {
-        setLoadingMore(false);
+      if (!controller.signal.aborted) {
+        if (isInitial) {
+          setLoading(prev => ({ ...prev, [status]: false }));
+        } else {
+          setLoadingMore(false);
+        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toastError, t]);
+  }, []);
+  fetchConnectionsRef.current = fetchConnections;
 
   // Load all three tabs on mount
   useEffect(() => {
-    void fetchConnections('accepted');
-    void fetchConnections('pending_received');
-    void fetchConnections('pending_sent');
-  }, [fetchConnections]);
+    void fetchConnectionsRef.current('accepted');
+    void fetchConnectionsRef.current('pending_received');
+    void fetchConnectionsRef.current('pending_sent');
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const markActing = (id: number, acting: boolean) => {
     setActingIds(prev => {

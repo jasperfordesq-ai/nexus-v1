@@ -7,7 +7,7 @@
 namespace Tests\Laravel\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
@@ -20,7 +20,7 @@ use Tests\Laravel\TestCase;
  */
 class AuthTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * Test that the login endpoint returns a token for valid credentials.

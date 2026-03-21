@@ -48,23 +48,43 @@ abstract class TestCase extends BaseTestCase
      *
      * Sets tenant_id=2 (hour-timebank) so that all tenant-scoped
      * queries and model operations work correctly during tests.
+     *
+     * For unit tests that don't need the database, the DB insert is
+     * wrapped in a try-catch so tests can still set the TenantContext
+     * without requiring a live DB connection.
      */
     protected function setUpTenantContext(): void
     {
         // Seed the test tenant if it doesn't exist (RefreshDatabase creates empty tables)
-        DB::table('tenants')->insertOrIgnore([
-            'id' => $this->testTenantId,
-            'name' => 'Hour Timebank',
-            'slug' => $this->testTenantSlug,
-            'domain' => null,
-            'is_active' => true,
-            'depth' => 0,
-            'allows_subtenants' => false,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        try {
+            DB::table('tenants')->insertOrIgnore([
+                'id' => $this->testTenantId,
+                'name' => 'Hour Timebank',
+                'slug' => $this->testTenantSlug,
+                'domain' => null,
+                'is_active' => true,
+                'depth' => 0,
+                'allows_subtenants' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        TenantContext::setById($this->testTenantId);
+            TenantContext::setById($this->testTenantId);
+        } catch (\Exception $e) {
+            // DB not available — unit tests that don't need DB can still proceed.
+            // Use reflection to set the private static $tenant property directly.
+            $ref = new \ReflectionClass(TenantContext::class);
+            $prop = $ref->getProperty('tenant');
+            $prop->setAccessible(true);
+            $prop->setValue(null, [
+                'id' => $this->testTenantId,
+                'name' => 'Hour Timebank',
+                'slug' => $this->testTenantSlug,
+                'domain' => null,
+                'is_active' => true,
+                'features' => '{}',
+            ]);
+        }
     }
 
     /**

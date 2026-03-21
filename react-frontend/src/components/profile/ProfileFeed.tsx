@@ -26,16 +26,6 @@ interface ProfileFeedProps {
   isOwnProfile?: boolean;
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
-};
-
 function FeedSkeleton() {
   return (
     <GlassCard className="p-5">
@@ -68,8 +58,15 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const cursorRef = useRef<string | undefined>();
+  const abortRef = useRef<AbortController | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const loadFeed = useCallback(async (cursor?: string) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const isInitial = !cursor;
       if (isInitial) {
@@ -87,6 +84,8 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
 
       const response = await api.get<FeedItem[]>(`/v2/feed?${params.toString()}`);
 
+      if (controller.signal.aborted) return;
+
       if (response.success && response.data) {
         const feedItems = Array.isArray(response.data) ? response.data : [];
         if (isInitial) {
@@ -98,19 +97,28 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
         setHasMore(response.meta?.has_more ?? false);
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load profile feed', err);
-      if (!cursor) setError(t('feed_error', 'Failed to load activity'));
+      if (!cursor) setError(tRef.current('feed_error', 'Failed to load activity'));
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [userId, t]);
+  }, [userId]);
+
+  const loadFeedRef = useRef(loadFeed);
+  loadFeedRef.current = loadFeed;
 
   useEffect(() => {
     cursorRef.current = undefined;
     setItems([]);
-    loadFeed();
-  }, [userId, loadFeed]);
+    loadFeedRef.current();
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [userId]);
 
   // --- Feed action handlers (matching FeedPage patterns) ---
 
@@ -233,10 +241,10 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
   }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
+    <div className="space-y-4">
       <AnimatePresence mode="popLayout">
         {items.map((item) => (
-          <motion.div key={`${item.type}-${item.id}`} variants={itemVariants} layout>
+          <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} layout>
             <FeedCard
               item={item}
               onToggleLike={() => void handleToggleLike(item)}
@@ -265,6 +273,6 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
           </Button>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
