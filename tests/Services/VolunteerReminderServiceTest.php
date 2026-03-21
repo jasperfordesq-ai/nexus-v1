@@ -16,76 +16,11 @@ use App\Services\VolunteerReminderService;
 /**
  * VolunteerReminderService Tests
  *
- * Tests reminder settings CRUD and dispatcher return types for all reminder categories.
+ * Tests reminder sending, settings retrieval, and settings update.
  */
 class VolunteerReminderServiceTest extends DatabaseTestCase
 {
     private const TENANT_ID = 2;
-
-    private static int $testUserId = 0;
-
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-        TenantContext::setById(self::TENANT_ID);
-
-        $ts = time();
-
-        // Create test user
-        Database::query(
-            'INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 0, 1, NOW())',
-            [
-                self::TENANT_ID,
-                "volreminder-test-{$ts}@example.test",
-                "volreminder-test-{$ts}",
-                'Reminder',
-                'Tester',
-                'Reminder Tester',
-            ]
-        );
-        self::$testUserId = (int) Database::getInstance()->lastInsertId();
-
-        // Insert a reminder setting row for testing getSettings / updateSetting
-        try {
-            Database::query(
-                "INSERT INTO vol_reminder_settings
-                    (tenant_id, reminder_type, is_enabled, hours_before, hours_after,
-                     days_inactive, days_before_expiry, email_enabled, push_enabled,
-                     message_template, updated_at)
-                 VALUES (?, 'pre_shift', 1, 24, NULL, NULL, NULL, 1, 1, 'Test reminder template', NOW())
-                 ON DUPLICATE KEY UPDATE
-                     is_enabled = VALUES(is_enabled),
-                     message_template = VALUES(message_template),
-                     updated_at = NOW()",
-                [self::TENANT_ID]
-            );
-        } catch (\Exception $e) {
-            // Table may not exist — tests will skip via requireTables
-        }
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        // Cleanup test data
-        try {
-            if (self::$testUserId > 0) {
-                Database::query(
-                    'DELETE FROM vol_reminder_settings WHERE tenant_id = ? AND message_template LIKE ?',
-                    [self::TENANT_ID, '%Test reminder%']
-                );
-                Database::query(
-                    'DELETE FROM vol_reminders_sent WHERE tenant_id = ? AND user_id = ?',
-                    [self::TENANT_ID, self::$testUserId]
-                );
-                Database::query('DELETE FROM users WHERE id = ?', [self::$testUserId]);
-            }
-        } catch (\Exception $e) {
-            // Best-effort cleanup
-        }
-
-        parent::tearDownAfterClass();
-    }
 
     protected function setUp(): void
     {
@@ -94,214 +29,261 @@ class VolunteerReminderServiceTest extends DatabaseTestCase
     }
 
     // ==========================================
-    // Class & method existence
+    // sendReminders
     // ==========================================
 
-    public function testClassExists(): void
+    public function testSendRemindersReturnsZeroWhenNoSettingExists(): void
     {
-        $this->assertTrue(class_exists(VolunteerReminderService::class));
+        $this->requireTables(['vol_reminder_settings', 'vol_shifts', 'vol_shift_signups', 'vol_reminders_sent']);
+
+        // Ensure no pre_shift setting is enabled
+        Database::query(
+            "DELETE FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = 'pre_shift'",
+            [self::TENANT_ID]
+        );
+
+        $result = VolunteerReminderService::sendReminders(self::TENANT_ID, 999999);
+
+        $this->assertSame(0, $result);
     }
 
-    public function testGetSettingsMethodIsStatic(): void
+    public function testSendRemindersReturnsZeroWhenNoShiftsInWindow(): void
     {
-        $ref = new \ReflectionMethod(VolunteerReminderService::class, 'getSettings');
-        $this->assertTrue($ref->isStatic());
+        $this->requireTables(['vol_reminder_settings', 'vol_shifts', 'vol_shift_signups', 'vol_reminders_sent', 'vol_opportunities', 'vol_organizations']);
+
+        // Create a pre_shift setting
+        Database::query(
+            "DELETE FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = 'pre_shift'",
+            [self::TENANT_ID]
+        );
+        Database::query(
+            "INSERT INTO vol_reminder_settings (tenant_id, reminder_type, enabled, hours_before, push_enabled, email_enabled, sms_enabled, created_at, updated_at)
+             VALUES (?, 'pre_shift', 1, 24, 1, 1, 0, NOW(), NOW())",
+            [self::TENANT_ID]
+        );
+
+        $ownerId = $this->createUser('rem-owner');
+        $oppId = $this->createOpportunity($ownerId);
+
+        $result = VolunteerReminderService::sendReminders(self::TENANT_ID, $oppId);
+
+        $this->assertSame(0, $result);
     }
 
-    public function testUpdateSettingMethodIsStatic(): void
+    public function testSendRemindersSendsToConfirmedVolunteers(): void
     {
-        $ref = new \ReflectionMethod(VolunteerReminderService::class, 'updateSetting');
-        $this->assertTrue($ref->isStatic());
+        $this->requireTables(['vol_reminder_settings', 'vol_shifts', 'vol_shift_signups', 'vol_reminders_sent', 'vol_opportunities', 'vol_organizations']);
+
+        // Create a pre_shift setting with 48-hour window
+        Database::query(
+            "DELETE FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = 'pre_shift'",
+            [self::TENANT_ID]
+        );
+        Database::query(
+            "INSERT INTO vol_reminder_settings (tenant_id, reminder_type, enabled, hours_before, push_enabled, email_enabled, sms_enabled, created_at, updated_at)
+             VALUES (?, 'pre_shift', 1, 48, 1, 1, 0, NOW(), NOW())",
+            [self::TENANT_ID]
+        );
+
+        $ownerId = $this->createUser('rem-send-owner');
+        $volunteerId = $this->createUser('rem-volunteer');
+        $oppId = $this->createOpportunity($ownerId);
+
+        // Create a shift starting in 12 hours (within 48-hour window)
+        Database::query(
+            'INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity, created_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 12 HOUR), DATE_ADD(NOW(), INTERVAL 14 HOUR), 5, NOW())',
+            [self::TENANT_ID, $oppId]
+        );
+        $shiftId = (int) Database::getInstance()->lastInsertId();
+
+        // Confirm the volunteer for this shift
+        Database::query(
+            "INSERT INTO vol_shift_signups (tenant_id, shift_id, user_id, status, created_at) VALUES (?, ?, ?, 'confirmed', NOW())",
+            [self::TENANT_ID, $shiftId, $volunteerId]
+        );
+
+        $result = VolunteerReminderService::sendReminders(self::TENANT_ID, $oppId);
+
+        $this->assertGreaterThanOrEqual(1, $result);
     }
 
-    public function testSendPreShiftRemindersMethodIsStatic(): void
+    public function testSendRemindersDoesNotDuplicate(): void
     {
-        $ref = new \ReflectionMethod(VolunteerReminderService::class, 'sendPreShiftReminders');
-        $this->assertTrue($ref->isStatic());
-    }
+        $this->requireTables(['vol_reminder_settings', 'vol_shifts', 'vol_shift_signups', 'vol_reminders_sent', 'vol_opportunities', 'vol_organizations']);
 
-    public function testNudgeLapsedVolunteersMethodIsStatic(): void
-    {
-        $ref = new \ReflectionMethod(VolunteerReminderService::class, 'nudgeLapsedVolunteers');
-        $this->assertTrue($ref->isStatic());
+        Database::query(
+            "DELETE FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = 'pre_shift'",
+            [self::TENANT_ID]
+        );
+        Database::query(
+            "INSERT INTO vol_reminder_settings (tenant_id, reminder_type, enabled, hours_before, push_enabled, email_enabled, sms_enabled, created_at, updated_at)
+             VALUES (?, 'pre_shift', 1, 48, 1, 0, 0, NOW(), NOW())",
+            [self::TENANT_ID]
+        );
+
+        $ownerId = $this->createUser('rem-nodup-owner');
+        $volunteerId = $this->createUser('rem-nodup-vol');
+        $oppId = $this->createOpportunity($ownerId);
+
+        Database::query(
+            'INSERT INTO vol_shifts (tenant_id, opportunity_id, start_time, end_time, capacity, created_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 6 HOUR), DATE_ADD(NOW(), INTERVAL 8 HOUR), 5, NOW())',
+            [self::TENANT_ID, $oppId]
+        );
+        $shiftId = (int) Database::getInstance()->lastInsertId();
+
+        Database::query(
+            "INSERT INTO vol_shift_signups (tenant_id, shift_id, user_id, status, created_at) VALUES (?, ?, ?, 'confirmed', NOW())",
+            [self::TENANT_ID, $shiftId, $volunteerId]
+        );
+
+        $first = VolunteerReminderService::sendReminders(self::TENANT_ID, $oppId);
+        $second = VolunteerReminderService::sendReminders(self::TENANT_ID, $oppId);
+
+        $this->assertGreaterThanOrEqual(1, $first);
+        $this->assertSame(0, $second);
     }
 
     // ==========================================
     // getSettings
     // ==========================================
 
-    public function testGetSettingsReturnsArray(): void
+    public function testGetSettingsReturnsAllFiveReminderTypes(): void
     {
         $this->requireTables(['vol_reminder_settings']);
-
-        $result = VolunteerReminderService::getSettings();
-        $this->assertIsArray($result);
-    }
-
-    public function testGetSettingsContainsPreShiftAfterSetup(): void
-    {
-        $this->requireTables(['vol_reminder_settings']);
-
-        $result = VolunteerReminderService::getSettings();
-        $this->assertIsArray($result);
-
-        // The setUpBeforeClass inserted a pre_shift row
-        if (isset($result['pre_shift'])) {
-            $this->assertArrayHasKey('reminder_type', $result['pre_shift']);
-            $this->assertSame('pre_shift', $result['pre_shift']['reminder_type']);
-        } else {
-            // Row may have been rolled back; still valid that getSettings returns array
-            $this->assertIsArray($result);
-        }
-    }
-
-    // ==========================================
-    // updateSetting — valid types
-    // ==========================================
-
-    public function testUpdateSettingWithValidTypeReturnsBool(): void
-    {
-        $this->requireTables(['vol_reminder_settings']);
-
-        $result = VolunteerReminderService::updateSetting('post_shift_feedback', [
-            'is_enabled'       => 1,
-            'hours_after'      => 4,
-            'email_enabled'    => 1,
-            'push_enabled'     => 1,
-            'message_template' => 'Test reminder feedback template',
-        ]);
-
-        $this->assertIsBool($result);
-        $this->assertTrue($result);
-    }
-
-    public function testUpdateSettingPersistsData(): void
-    {
-        $this->requireTables(['vol_reminder_settings']);
-
-        $updated = VolunteerReminderService::updateSetting('lapsed_volunteer', [
-            'is_enabled'       => 1,
-            'days_inactive'    => 45,
-            'email_enabled'    => 1,
-            'push_enabled'     => 0,
-            'message_template' => 'Test reminder lapsed template',
-        ]);
-        $this->assertTrue($updated);
 
         $settings = VolunteerReminderService::getSettings();
-        $this->assertArrayHasKey('lapsed_volunteer', $settings);
-        $this->assertEquals(45, (int) $settings['lapsed_volunteer']['days_inactive']);
-        $this->assertEquals(0, (int) $settings['lapsed_volunteer']['push_enabled']);
-    }
 
-    // ==========================================
-    // updateSetting — invalid type
-    // ==========================================
-
-    public function testUpdateSettingWithInvalidTypeThrowsOrReturnsFalse(): void
-    {
-        $this->requireTables(['vol_reminder_settings']);
-
-        // The service does not validate reminder_type against a whitelist,
-        // so an unknown type will be inserted. We verify the method still returns bool.
-        $result = VolunteerReminderService::updateSetting('totally_invalid_type', [
-            'is_enabled'    => 0,
-            'email_enabled' => 0,
-            'push_enabled'  => 0,
-        ]);
-
-        $this->assertIsBool($result);
-
-        // Cleanup the invalid row if it was inserted
-        try {
-            Database::query(
-                'DELETE FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = ?',
-                [self::TENANT_ID, 'totally_invalid_type']
-            );
-        } catch (\Exception $e) {
-            // ignore
-        }
-    }
-
-    // ==========================================
-    // Reminder dispatchers — return int
-    // ==========================================
-
-    public function testSendPreShiftRemindersReturnsInt(): void
-    {
-        $this->requireTables(['vol_reminder_settings', 'vol_shifts', 'vol_reminders_sent']);
-
-        $result = VolunteerReminderService::sendPreShiftReminders();
-        $this->assertIsInt($result);
-        $this->assertGreaterThanOrEqual(0, $result);
-    }
-
-    public function testSendPostShiftFeedbackReturnsInt(): void
-    {
-        $this->requireTables(['vol_reminder_settings', 'vol_shifts', 'vol_reminders_sent']);
-
-        $result = VolunteerReminderService::sendPostShiftFeedback();
-        $this->assertIsInt($result);
-        $this->assertGreaterThanOrEqual(0, $result);
-    }
-
-    public function testNudgeLapsedVolunteersReturnsInt(): void
-    {
-        $this->requireTables(['vol_reminder_settings', 'vol_reminders_sent']);
-
-        $result = VolunteerReminderService::nudgeLapsedVolunteers();
-        $this->assertIsInt($result);
-        $this->assertGreaterThanOrEqual(0, $result);
-    }
-
-    public function testSendCredentialExpiryWarningsReturnsInt(): void
-    {
-        $this->requireTables(['vol_reminder_settings', 'vol_credentials', 'vol_reminders_sent']);
-
-        $result = VolunteerReminderService::sendCredentialExpiryWarnings();
-        $this->assertIsInt($result);
-        $this->assertGreaterThanOrEqual(0, $result);
-    }
-
-    public function testSendTrainingExpiryWarningsReturnsInt(): void
-    {
-        $this->requireTables(['vol_reminder_settings', 'vol_safeguarding_training', 'vol_reminders_sent']);
-
-        $result = VolunteerReminderService::sendTrainingExpiryWarnings();
-        $this->assertIsInt($result);
-        $this->assertGreaterThanOrEqual(0, $result);
-    }
-
-    // ==========================================
-    // getSettings reflects updateSetting changes
-    // ==========================================
-
-    public function testGetSettingsReturnsDataAfterUpdateSetting(): void
-    {
-        $this->requireTables(['vol_reminder_settings']);
-
-        $updated = VolunteerReminderService::updateSetting('credential_expiry', [
-            'is_enabled'        => 1,
-            'days_before_expiry' => 14,
-            'email_enabled'     => 1,
-            'push_enabled'      => 1,
-            'email_template'  => 'Test reminder credential expiry template',
-        ]);
-        $this->assertTrue($updated);
-
-        $settings = VolunteerReminderService::getSettings();
         $this->assertIsArray($settings);
-        $this->assertArrayHasKey('credential_expiry', $settings);
-        $this->assertEquals(14, (int) $settings['credential_expiry']['days_before_expiry']);
-        $this->assertSame(
-            'Test reminder credential expiry template',
-            $settings['credential_expiry']['email_template']
+        $this->assertCount(5, $settings);
+
+        $types = array_column($settings, 'reminder_type');
+        $this->assertContains('pre_shift', $types);
+        $this->assertContains('post_shift_feedback', $types);
+        $this->assertContains('lapsed_volunteer', $types);
+        $this->assertContains('credential_expiry', $types);
+        $this->assertContains('training_expiry', $types);
+    }
+
+    public function testGetSettingsReturnsDefaultsWhenNoRowsExist(): void
+    {
+        $this->requireTables(['vol_reminder_settings']);
+
+        Database::query(
+            'DELETE FROM vol_reminder_settings WHERE tenant_id = ?',
+            [self::TENANT_ID]
         );
+
+        $settings = VolunteerReminderService::getSettings();
+
+        $this->assertCount(5, $settings);
+        foreach ($settings as $setting) {
+            $this->assertNull($setting['id']);
+            $this->assertTrue($setting['enabled']);
+        }
+    }
+
+    // ==========================================
+    // updateSetting
+    // ==========================================
+
+    public function testUpdateSettingReturnsFalseForInvalidType(): void
+    {
+        $result = VolunteerReminderService::updateSetting('invalid_type', []);
+
+        $this->assertFalse($result);
+    }
+
+    public function testUpdateSettingCreatesNewRow(): void
+    {
+        $this->requireTables(['vol_reminder_settings']);
+
+        Database::query(
+            "DELETE FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = 'lapsed_volunteer'",
+            [self::TENANT_ID]
+        );
+
+        $result = VolunteerReminderService::updateSetting('lapsed_volunteer', [
+            'enabled' => true,
+            'days_inactive' => 45,
+            'push_enabled' => true,
+            'email_enabled' => false,
+        ]);
+
+        $this->assertTrue($result);
+
+        $row = Database::query(
+            "SELECT * FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = 'lapsed_volunteer'",
+            [self::TENANT_ID]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        $this->assertNotFalse($row);
+        $this->assertEquals(45, (int) $row['days_inactive']);
+    }
+
+    public function testUpdateSettingUpdatesExistingRow(): void
+    {
+        $this->requireTables(['vol_reminder_settings']);
+
+        VolunteerReminderService::updateSetting('pre_shift', ['hours_before' => 24]);
+
+        $result = VolunteerReminderService::updateSetting('pre_shift', ['hours_before' => 12]);
+
+        $this->assertTrue($result);
+
+        $row = Database::query(
+            "SELECT hours_before FROM vol_reminder_settings WHERE tenant_id = ? AND reminder_type = 'pre_shift'",
+            [self::TENANT_ID]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        $this->assertNotFalse($row);
+        $this->assertEquals(12, (int) $row['hours_before']);
+    }
+
+    public function testUpdateSettingAcceptsAllValidTypes(): void
+    {
+        $this->requireTables(['vol_reminder_settings']);
+
+        $validTypes = ['pre_shift', 'post_shift_feedback', 'lapsed_volunteer', 'credential_expiry', 'training_expiry'];
+        foreach ($validTypes as $type) {
+            $result = VolunteerReminderService::updateSetting($type, ['enabled' => true]);
+            $this->assertTrue($result, "updateSetting should accept type: {$type}");
+        }
     }
 
     // ==========================================
     // Helpers
     // ==========================================
+
+    private function createUser(string $prefix): int
+    {
+        $uniq = $prefix . '-' . str_replace('.', '', (string) microtime(true)) . '-' . random_int(1000, 9999);
+        Database::query(
+            'INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, is_approved, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())',
+            [self::TENANT_ID, $uniq . '@example.test', $uniq, 'Test', 'User', 'Test User', 0]
+        );
+        return (int) Database::getInstance()->lastInsertId();
+    }
+
+    private function createOpportunity(int $ownerId): int
+    {
+        $orgId = $this->createOrganization($ownerId);
+        $uniq = 'opp-' . str_replace('.', '', (string) microtime(true)) . '-' . random_int(1000, 9999);
+        Database::query(
+            "INSERT INTO vol_opportunities (tenant_id, organization_id, created_by, title, description, location, status, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, 'open', 1, NOW())",
+            [self::TENANT_ID, $orgId, $ownerId, $uniq, 'Test opportunity', 'Remote']
+        );
+        return (int) Database::getInstance()->lastInsertId();
+    }
+
+    private function createOrganization(int $ownerId): int
+    {
+        $uniq = 'org-' . str_replace('.', '', (string) microtime(true)) . '-' . random_int(1000, 9999);
+        Database::query(
+            'INSERT INTO vol_organizations (tenant_id, user_id, name, description, contact_email, status, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())',
+            [self::TENANT_ID, $ownerId, $uniq, 'Test org', $uniq . '@example.test', 'approved']
+        );
+        return (int) Database::getInstance()->lastInsertId();
+    }
 
     /** @param string[] $tables */
     private function requireTables(array $tables): void

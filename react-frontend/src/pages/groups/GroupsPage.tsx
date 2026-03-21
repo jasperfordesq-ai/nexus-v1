@@ -130,7 +130,7 @@ export function GroupsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, filter, cursor, user?.id]);
+  }, [debouncedQuery, filter, cursor, user?.id, t, toast]);
 
   // Load groups when filter or debounced query changes; reset cursor for a fresh page-1 fetch
   useEffect(() => {

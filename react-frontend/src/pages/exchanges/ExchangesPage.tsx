@@ -122,7 +122,7 @@ export function ExchangesPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [selectedTab, exchanges.length, toast]);
+  }, [selectedTab, exchanges.length, toast, t]);
 
   // Load more exchanges
   const loadMoreExchanges = useCallback(() => {

@@ -157,7 +157,7 @@ export function FederationEventsPage() {
         setIsLoadingMore(false);
       }
     },
-    [debouncedQuery, selectedPartner, upcomingOnly, cursor, toast]
+    [debouncedQuery, selectedPartner, upcomingOnly, cursor, toast, t]
   );
 
   // Reload on filter change

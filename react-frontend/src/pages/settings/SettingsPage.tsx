@@ -376,7 +376,7 @@ export function SettingsPage() {
     } finally {
       setSessionsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (user) {
@@ -463,7 +463,7 @@ export function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [profileData, refreshUser, toast]);
+  }, [profileData, refreshUser, toast, t]);
 
   const saveNotifications = useCallback(async () => {
     try {
@@ -488,7 +488,7 @@ export function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [notifications, matchDigestFrequency, notifyHotMatches, notifyMutualMatches, toast]);
+  }, [notifications, matchDigestFrequency, notifyHotMatches, notifyMutualMatches, toast, t]);
 
   const savePrivacy = useCallback(async () => {
     try {
@@ -512,7 +512,7 @@ export function SettingsPage() {
     } finally {
       setIsSavingPrivacy(false);
     }
-  }, [privacy, toast]);
+  }, [privacy, toast, t]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Auth Handlers

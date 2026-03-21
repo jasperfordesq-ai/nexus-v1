@@ -51,11 +51,7 @@ export function HashtagsDiscoveryPage() {
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    loadTrending();
-  }, []);
-
-  const loadTrending = async () => {
+  const loadTrending = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -71,7 +67,11 @@ export function HashtagsDiscoveryPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    loadTrending();
+  }, [loadTrending]);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);

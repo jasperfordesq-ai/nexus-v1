@@ -123,7 +123,7 @@ export function OrganisationsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [cursor, debouncedQuery]);
+  }, [cursor, debouncedQuery, t]);
 
   // Reset on search change
   useEffect(() => {

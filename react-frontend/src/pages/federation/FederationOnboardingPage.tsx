@@ -112,13 +112,6 @@ export function FederationOnboardingPage() {
   const [partners, setPartners] = useState<FederationPartner[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(false);
 
-  // Load partners when reaching step 4
-  useEffect(() => {
-    if (currentStep === 4) {
-      loadPartners();
-    }
-  }, [currentStep]);
-
   const loadPartners = useCallback(async () => {
     try {
       setPartnersLoading(true);
@@ -132,6 +125,13 @@ export function FederationOnboardingPage() {
       setPartnersLoading(false);
     }
   }, []);
+
+  // Load partners when reaching step 4
+  useEffect(() => {
+    if (currentStep === 4) {
+      loadPartners();
+    }
+  }, [currentStep, loadPartners]);
 
   const updateSetting = useCallback(<K extends keyof OnboardingSettings>(key: K, value: OnboardingSettings[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));

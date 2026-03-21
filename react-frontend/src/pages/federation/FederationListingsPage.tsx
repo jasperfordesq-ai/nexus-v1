@@ -170,7 +170,7 @@ export function FederationListingsPage() {
         setIsLoadingMore(false);
       }
     },
-    [debouncedQuery, selectedType, selectedPartner, cursor, toast]
+    [debouncedQuery, selectedType, selectedPartner, cursor, toast, t]
   );
 
   // Reload on filter change

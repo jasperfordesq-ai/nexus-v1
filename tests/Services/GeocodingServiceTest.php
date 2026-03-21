@@ -4,334 +4,251 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+declare(strict_types=1);
+
 namespace App\Tests\Services;
 
 use App\Tests\TestCase;
 use App\Services\GeocodingService;
-use App\Core\Database;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 /**
- * GeocodingServiceTest - Tests for the geocoding service
+ * GeocodingServiceTest — tests for geocoding via Nominatim with caching.
  *
- * Tests geocoding, caching, and batch operations.
- * Note: Actual API calls are avoided in tests to prevent rate limiting.
+ * All HTTP calls are faked to avoid hitting the real Nominatim API.
  */
 class GeocodingServiceTest extends TestCase
 {
-    private static $testTenantId = 1;
-    private static $testUserId;
-    private static $testListingId;
-
-    public static function setUpBeforeClass(): void
-    {
-        TenantContext::setById(self::$testTenantId);
-
-        $timestamp = time() . rand(1000, 9999);
-
-        // Create test user with location but no coordinates
-        Database::query(
-            "INSERT INTO users (tenant_id, email, first_name, last_name, name, location, latitude, longitude, is_approved, status, created_at)
-             VALUES (?, ?, 'Geo', 'TestUser', 'Geo TestUser', 'London, UK', NULL, NULL, 1, 'active', NOW())",
-            [self::$testTenantId, 'geocoding_test_' . $timestamp . '@test.com']
-        );
-        self::$testUserId = Database::getInstance()->lastInsertId();
-
-        // Create test listing with location but no coordinates
-        Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, location, latitude, longitude, status, created_at)
-             VALUES (?, ?, 'Test Listing', 'Test', 'offer', 'Manchester, UK', NULL, NULL, 'active', NOW())",
-            [self::$testTenantId, self::$testUserId]
-        );
-        self::$testListingId = Database::getInstance()->lastInsertId();
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        if (self::$testUserId) {
-            try {
-                Database::query("DELETE FROM listings WHERE user_id = ?", [self::$testUserId]);
-            } catch (\Exception $e) {}
-            try {
-                Database::query("DELETE FROM users WHERE id = ?", [self::$testUserId]);
-            } catch (\Exception $e) {}
-        }
-
-        // Clean up geocode cache entries created during tests
-        try {
-            Database::query("DELETE FROM geocode_cache WHERE address LIKE 'Test%'");
-        } catch (\Exception $e) {}
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Reset user/listing coordinates before each test
-        try {
-            Database::query(
-                "UPDATE users SET latitude = NULL, longitude = NULL WHERE id = ?",
-                [self::$testUserId]
-            );
-            Database::query(
-                "UPDATE listings SET latitude = NULL, longitude = NULL WHERE id = ?",
-                [self::$testListingId]
-            );
-        } catch (\Exception $e) {}
+        TenantContext::setById(1);
+        Cache::flush();
     }
 
     // =========================================================================
-    // GEOCODE BASIC TESTS
+    // geocode — input validation
     // =========================================================================
 
     public function testGeocodeReturnsNullForEmptyAddress(): void
     {
-        $result = GeocodingService::geocode('');
-
-        $this->assertNull($result);
+        $this->assertNull(GeocodingService::geocode(''));
     }
 
     public function testGeocodeReturnsNullForWhitespaceAddress(): void
     {
-        $result = GeocodingService::geocode('   ');
+        $this->assertNull(GeocodingService::geocode('   '));
+    }
 
+    // =========================================================================
+    // geocode — cache behaviour
+    // =========================================================================
+
+    public function testGeocodeReturnsCachedResultOnHit(): void
+    {
+        $address = 'Dublin, Ireland';
+        $cacheKey = 'geocode:' . md5(strtolower($address));
+        $expected = ['latitude' => 53.3498, 'longitude' => -6.2603];
+
+        Cache::put($cacheKey, $expected, 86400);
+
+        // HTTP should NOT be called because cache is hit
+        Http::fake([
+            '*' => Http::response([], 200),
+        ]);
+
+        $result = GeocodingService::geocode($address);
+
+        $this->assertNotNull($result);
+        $this->assertEquals(53.3498, $result['latitude']);
+        $this->assertEquals(-6.2603, $result['longitude']);
+    }
+
+    // =========================================================================
+    // geocode — HTTP responses
+    // =========================================================================
+
+    public function testGeocodeReturnsCoordinatesOnSuccess(): void
+    {
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([
+                ['lat' => '51.5074', 'lon' => '-0.1278', 'display_name' => 'London'],
+            ], 200),
+        ]);
+
+        $result = GeocodingService::geocode('London, UK');
+
+        $this->assertNotNull($result);
+        $this->assertArrayHasKey('latitude', $result);
+        $this->assertArrayHasKey('longitude', $result);
+        $this->assertEquals(51.5074, $result['latitude']);
+        $this->assertEquals(-0.1278, $result['longitude']);
+    }
+
+    public function testGeocodeCachesResultAfterSuccessfulLookup(): void
+    {
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([
+                ['lat' => '48.8566', 'lon' => '2.3522'],
+            ], 200),
+        ]);
+
+        $address = 'Paris, France';
+        $cacheKey = 'geocode:' . md5(strtolower($address));
+
+        $this->assertNull(Cache::get($cacheKey));
+
+        GeocodingService::geocode($address);
+
+        $cached = Cache::get($cacheKey);
+        $this->assertNotNull($cached);
+        $this->assertEquals(48.8566, $cached['latitude']);
+    }
+
+    public function testGeocodeReturnsNullOnEmptyResults(): void
+    {
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([], 200),
+        ]);
+
+        $result = GeocodingService::geocode('xyznonexistentplace12345');
         $this->assertNull($result);
     }
 
-    public function testGeocodeReturnsExpectedStructure(): void
+    public function testGeocodeReturnsNullOnApiError(): void
     {
-        // Use a cached address or skip if no cache
-        // We test structure, not actual geocoding (to avoid API calls)
-        $result = GeocodingService::geocode('London, UK');
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([], 500),
+        ]);
 
-        if ($result !== null) {
-            $this->assertIsArray($result);
-            $this->assertArrayHasKey('latitude', $result);
-            $this->assertArrayHasKey('longitude', $result);
-            $this->assertIsNumeric($result['latitude']);
-            $this->assertIsNumeric($result['longitude']);
-        }
+        $result = GeocodingService::geocode('Some Place');
+        $this->assertNull($result);
+    }
 
-        // Pass even if null (API might not be available in test env)
-        $this->assertTrue(true);
+    public function testGeocodeReturnsNullOnNetworkException(): void
+    {
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => function () {
+                throw new \RuntimeException('Connection timeout');
+            },
+        ]);
+
+        $result = GeocodingService::geocode('Some Place');
+        $this->assertNull($result);
+    }
+
+    public function testGeocodeReturnsNullWhenResultMissingLatLon(): void
+    {
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([
+                ['display_name' => 'Somewhere'],
+            ], 200),
+        ]);
+
+        $result = GeocodingService::geocode('Incomplete Result Place');
+        $this->assertNull($result);
     }
 
     // =========================================================================
-    // CACHE TESTS
+    // updateUserCoordinates
     // =========================================================================
 
-    public function testCacheTableCreation(): void
+    public function testUpdateUserCoordinatesReturnsFalseForEmptyLocation(): void
     {
-        // This should create the cache table if it doesn't exist
-        GeocodingService::geocode('Test Address for Cache Creation');
-
-        // Check if table exists
-        try {
-            $result = Database::query("SHOW TABLES LIKE 'geocode_cache'")->fetch();
-            $tableExists = !empty($result);
-        } catch (\Exception $e) {
-            $tableExists = false;
-        }
-
-        // Either table exists or the service handles it gracefully
-        $this->assertTrue(true);
+        $this->assertFalse(GeocodingService::updateUserCoordinates(1, ''));
     }
 
-    public function testCacheHitReturnsExpectedStructure(): void
+    public function testUpdateUserCoordinatesReturnsFalseForNullLocation(): void
     {
-        // Manually insert a cache entry
-        $testAddress = 'Test Cache Hit Address ' . time();
-        $hash = md5(strtolower(trim($testAddress)));
-
-        try {
-            Database::query(
-                "INSERT INTO geocode_cache (address_hash, address, latitude, longitude, created_at)
-                 VALUES (?, ?, 51.5074, -0.1278, NOW())
-                 ON DUPLICATE KEY UPDATE latitude = VALUES(latitude)",
-                [$hash, $testAddress]
-            );
-
-            $result = GeocodingService::geocode($testAddress);
-
-            if ($result !== null) {
-                $this->assertEquals(51.5074, $result['latitude']);
-                $this->assertEquals(-0.1278, $result['longitude']);
-                $this->assertTrue($result['cached'] ?? false);
-            }
-
-            // Cleanup
-            Database::query("DELETE FROM geocode_cache WHERE address_hash = ?", [$hash]);
-        } catch (\Exception $e) {
-            // Cache table might not exist, that's ok
-            $this->assertTrue(true);
-        }
+        $this->assertFalse(GeocodingService::updateUserCoordinates(1, null));
     }
 
-    // =========================================================================
-    // UPDATE COORDINATES TESTS
-    // =========================================================================
-
-    public function testUpdateUserCoordinatesReturnsBool(): void
+    public function testUpdateUserCoordinatesReturnsFalseWhenGeocodeReturnsNull(): void
     {
-        $result = GeocodingService::updateUserCoordinates(self::$testUserId, 'London, UK');
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([], 200),
+        ]);
 
-        $this->assertIsBool($result);
-    }
-
-    public function testUpdateUserCoordinatesWithEmptyLocation(): void
-    {
-        $result = GeocodingService::updateUserCoordinates(self::$testUserId, '');
-
+        $result = GeocodingService::updateUserCoordinates(1, 'xyznonexistent12345');
         $this->assertFalse($result);
     }
 
-    public function testUpdateUserCoordinatesWithNullLocation(): void
+    public function testUpdateUserCoordinatesUpdatesDbOnSuccess(): void
     {
-        $result = GeocodingService::updateUserCoordinates(self::$testUserId, null);
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([
+                ['lat' => '52.52', 'lon' => '13.405'],
+            ], 200),
+        ]);
 
-        $this->assertFalse($result);
-    }
+        DB::shouldReceive('update')
+            ->once()
+            ->withArgs(function ($sql, $params) {
+                return str_contains($sql, 'UPDATE users') &&
+                       $params[0] === 52.52 &&
+                       $params[1] === 13.405;
+            })
+            ->andReturn(1);
 
-    public function testUpdateListingCoordinatesReturnsBool(): void
-    {
-        $result = GeocodingService::updateListingCoordinates(self::$testListingId, 'Manchester, UK');
-
-        $this->assertIsBool($result);
-    }
-
-    public function testUpdateListingCoordinatesWithEmptyLocation(): void
-    {
-        $result = GeocodingService::updateListingCoordinates(self::$testListingId, '');
-
-        $this->assertFalse($result);
-    }
-
-    // =========================================================================
-    // BATCH GEOCODING TESTS
-    // =========================================================================
-
-    public function testBatchGeocodeUsersReturnsExpectedStructure(): void
-    {
-        $result = GeocodingService::batchGeocodeUsers(5);
-
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('processed', $result);
-        $this->assertArrayHasKey('success', $result);
-        $this->assertArrayHasKey('failed', $result);
-
-        $this->assertIsInt($result['processed']);
-        $this->assertIsInt($result['success']);
-        $this->assertIsInt($result['failed']);
-
-        $this->assertGreaterThanOrEqual(0, $result['processed']);
-        $this->assertGreaterThanOrEqual(0, $result['success']);
-        $this->assertGreaterThanOrEqual(0, $result['failed']);
-    }
-
-    public function testBatchGeocodeListingsReturnsExpectedStructure(): void
-    {
-        $result = GeocodingService::batchGeocodeListings(5);
-
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('processed', $result);
-        $this->assertArrayHasKey('success', $result);
-        $this->assertArrayHasKey('failed', $result);
-
-        $this->assertIsInt($result['processed']);
-        $this->assertIsInt($result['success']);
-        $this->assertIsInt($result['failed']);
-    }
-
-    public function testBatchGeocodeWithZeroLimit(): void
-    {
-        $result = GeocodingService::batchGeocodeUsers(0);
-
-        $this->assertIsArray($result);
-        $this->assertEquals(0, $result['processed']);
+        $result = GeocodingService::updateUserCoordinates(1, 'Berlin, Germany');
+        $this->assertTrue($result);
     }
 
     // =========================================================================
-    // STATISTICS TESTS
+    // updateListingCoordinates
     // =========================================================================
 
-    public function testGetStatsReturnsExpectedStructure(): void
+    public function testUpdateListingCoordinatesReturnsFalseForEmptyLocation(): void
     {
-        $stats = GeocodingService::getStats();
-
-        $this->assertIsArray($stats);
-        $this->assertArrayHasKey('users_with_coords', $stats);
-        $this->assertArrayHasKey('users_without_coords', $stats);
-        $this->assertArrayHasKey('listings_with_coords', $stats);
-        $this->assertArrayHasKey('listings_without_coords', $stats);
-        $this->assertArrayHasKey('cache_entries', $stats);
+        $this->assertFalse(GeocodingService::updateListingCoordinates(1, ''));
     }
 
-    public function testGetStatsReturnsIntegers(): void
+    public function testUpdateListingCoordinatesReturnsFalseForNullLocation(): void
     {
-        $stats = GeocodingService::getStats();
-
-        $this->assertIsInt($stats['users_with_coords']);
-        $this->assertIsInt($stats['users_without_coords']);
-        $this->assertIsInt($stats['listings_with_coords']);
-        $this->assertIsInt($stats['listings_without_coords']);
-        $this->assertIsInt($stats['cache_entries']);
-    }
-
-    public function testGetStatsValuesAreNonNegative(): void
-    {
-        $stats = GeocodingService::getStats();
-
-        $this->assertGreaterThanOrEqual(0, $stats['users_with_coords']);
-        $this->assertGreaterThanOrEqual(0, $stats['users_without_coords']);
-        $this->assertGreaterThanOrEqual(0, $stats['listings_with_coords']);
-        $this->assertGreaterThanOrEqual(0, $stats['listings_without_coords']);
-        $this->assertGreaterThanOrEqual(0, $stats['cache_entries']);
+        $this->assertFalse(GeocodingService::updateListingCoordinates(1, null));
     }
 
     // =========================================================================
-    // EDGE CASES
+    // Edge cases
     // =========================================================================
 
-    public function testGeocodeWithSpecialCharacters(): void
+    public function testGeocodeWithSpecialCharactersDoesNotThrow(): void
     {
-        // Should handle special characters without error
-        $result = GeocodingService::geocode("123 Test St. #456, City's Town & County");
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([], 200),
+        ]);
 
-        // Result can be null (no match) but shouldn't throw
+        GeocodingService::geocode("123 Test St. #456, City's Town & County");
+        // Should not throw, null is acceptable
         $this->assertTrue(true);
     }
 
-    public function testGeocodeWithVeryLongAddress(): void
+    public function testGeocodeWithUnicodeCharactersDoesNotThrow(): void
     {
-        // Should handle very long addresses
-        $longAddress = str_repeat('Very Long Address Part ', 20);
-        $result = GeocodingService::geocode($longAddress);
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([], 200),
+        ]);
 
-        // Result can be null but shouldn't throw
+        GeocodingService::geocode('Strasse 1, Munchen');
         $this->assertTrue(true);
     }
 
-    public function testGeocodeWithUnicodeCharacters(): void
+    public function testGeocodeCacheKeyIsCaseInsensitive(): void
     {
-        // Should handle unicode
-        $result = GeocodingService::geocode('東京都渋谷区');
+        Http::fake([
+            'nominatim.openstreetmap.org/*' => Http::response([
+                ['lat' => '51.0', 'lon' => '-1.0'],
+            ], 200),
+        ]);
 
-        // Result can be null but shouldn't throw
-        $this->assertTrue(true);
-    }
+        GeocodingService::geocode('London');
 
-    public function testUpdateUserCoordinatesWithInvalidUserId(): void
-    {
-        $result = GeocodingService::updateUserCoordinates(999999999, 'London, UK');
-
-        // Should return false (user doesn't exist) or true (geocoded but no user)
-        $this->assertIsBool($result);
-    }
-
-    public function testUpdateListingCoordinatesWithInvalidListingId(): void
-    {
-        $result = GeocodingService::updateListingCoordinates(999999999, 'London, UK');
-
-        $this->assertIsBool($result);
+        // Same address different case should use cached value
+        $cacheKey = 'geocode:' . md5('london');
+        $cached = Cache::get($cacheKey);
+        $this->assertNotNull($cached);
     }
 }

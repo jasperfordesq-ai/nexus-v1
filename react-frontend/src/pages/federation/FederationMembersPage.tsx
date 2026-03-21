@@ -89,7 +89,7 @@ export function FederationMembersPage() {
       toast.warning(t('members.federation_not_enabled'));
       navigate(tenantPath('/federation'), { replace: true });
     }
-  }, [federationEnabled, navigate, toast]);
+  }, [federationEnabled, navigate, toast, t, tenantPath]);
 
   // Data state
   const [members, setMembers] = useState<FederatedMember[]>([]);
@@ -202,7 +202,7 @@ export function FederationMembersPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, skillsFilter, cursor, toast]);
+  }, [federationEnabled, debouncedQuery, selectedPartner, serviceReach, skillsFilter, cursor, toast, t]);
 
   // Load on mount and when filters change
   useEffect(() => {
@@ -220,7 +220,7 @@ export function FederationMembersPage() {
   // Navigation handlers
   const handleViewProfile = useCallback((member: FederatedMember) => {
     navigate(tenantPath(`/federation/members/${member.id}`));
-  }, [navigate]);
+  }, [navigate, tenantPath]);
 
   const handleSendMessage = useCallback((member: FederatedMember) => {
     navigate(

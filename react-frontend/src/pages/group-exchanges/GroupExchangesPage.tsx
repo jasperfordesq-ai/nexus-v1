@@ -165,7 +165,7 @@ export function GroupExchangesPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [selectedTab, exchanges.length, toast]);
+  }, [selectedTab, exchanges.length, toast, t]);
 
   const loadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) return;

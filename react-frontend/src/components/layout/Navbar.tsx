@@ -225,11 +225,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   // Helper to filter items by feature/module gates
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const gateFilter = (item: any) => {
+  const gateFilter = useCallback((item: any) => {
     if ('feature' in item && item.feature && !hasFeature(item.feature as Parameters<typeof hasFeature>[0])) return false;
     if ('module' in item && item.module && !hasModule(item.module as Parameters<typeof hasModule>[0])) return false;
     return true;
-  };
+  }, [hasFeature, hasModule]);
 
   // ─── Collapsed primary nav items → overflow into MegaMenu ────────────────
   const overflowNavItems = useMemo(() => {
@@ -283,7 +283,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         { label: t('nav.ai_chat', 'AI Assistant'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
       ].filter(gateFilter),
     },
-  ], [t, tenantPath, hasFeature, hasModule, overflowNavItems]);
+  ], [t, tenantPath, overflowNavItems, gateFilter]);
 
   // ─── Right column sections ───────────────────────────────────────────────
   const rightSections = useMemo(() => [
@@ -331,7 +331,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         { label: t('nav.federation_settings'), desc: t('nav_desc.federation_settings'), href: tenantPath('/federation/settings'), icon: Settings },
       ],
     }] : []),
-  ], [t, tenantPath, isHourTimebank, hasFeature, tenant?.menu_pages?.about]);
+  ], [t, tenantPath, isHourTimebank, hasFeature, tenant?.menu_pages?.about, gateFilter]);
 
   const timebankingPaths = useMemo(() => timebankingItems.map(i => i.href), [timebankingItems]);
   const communityPaths = useMemo(() => communityItems.map(i => i.href), [communityItems]);

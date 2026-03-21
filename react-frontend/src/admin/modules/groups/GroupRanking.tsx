@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Switch } from '@heroui/react';
 import { RefreshCw, Star } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -18,11 +18,7 @@ export default function GroupRanking() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
-    loadGroups();
-  }, []);
-
-  const loadGroups = async () => {
+  const loadGroups = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminGroups.getFeaturedGroups();
@@ -32,7 +28,11 @@ export default function GroupRanking() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [error]);
+
+  useEffect(() => {
+    loadGroups();
+  }, [loadGroups]);
 
   const handleUpdateRankings = async () => {
     try {

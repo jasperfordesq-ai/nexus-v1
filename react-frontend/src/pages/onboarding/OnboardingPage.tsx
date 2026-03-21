@@ -177,7 +177,7 @@ export function OnboardingPage() {
     } finally {
       setCategoriesLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   // ── Navigation ─────────────────────────────────────────────────────────────
 
@@ -232,7 +232,7 @@ export function OnboardingPage() {
         fileInputRef.current.value = '';
       }
     }
-  }, [toast, refreshUser]);
+  }, [toast, refreshUser, t]);
 
   const handleAvatarUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -288,7 +288,7 @@ export function OnboardingPage() {
     } finally {
       setIsSavingProfile(false);
     }
-  }, [bio, user?.avatar_url, toast, refreshUser, goNextAnimated]);
+  }, [bio, user?.avatar_url, toast, refreshUser, goNextAnimated, t]);
 
   // ── Save interests + proceed handler (Step 3) ──────────────────────────
 
@@ -394,7 +394,7 @@ export function OnboardingPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [skillOffers, skillNeeds, toast, navigate, tenantPath, refreshUser, goToStep]);
+  }, [skillOffers, skillNeeds, toast, navigate, tenantPath, refreshUser, goToStep, selectedInterests, t]);
 
   // ── Skip handler (skips interests/skills — photo+bio already done) ──────
 
@@ -427,7 +427,7 @@ export function OnboardingPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [navigate, tenantPath, refreshUser, toast, goToStep]);
+  }, [navigate, tenantPath, refreshUser, toast, goToStep, t]);
 
   // ── Animation variants ─────────────────────────────────────────────────
 

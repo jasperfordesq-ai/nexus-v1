@@ -92,7 +92,7 @@ export function WaitlistTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();

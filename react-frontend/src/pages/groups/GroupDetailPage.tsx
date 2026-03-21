@@ -236,7 +236,7 @@ export function GroupDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadGroup();
@@ -434,7 +434,7 @@ export function GroupDetailPage() {
       setDiscussionsLoading(false);
       setDiscussionsLoaded(true);
     }
-  }, [id, discussionsCursor, discussionsLoading, toast]);
+  }, [id, discussionsCursor, discussionsLoading, toast, t]);
 
   // Load discussions when tab changes to discussion
   useEffect(() => {

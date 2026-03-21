@@ -253,7 +253,79 @@ export function ConversationPage() {
         clearTimeout(typingTimeoutRef.current);
       }
     };
-  }, [targetId, pusher]);
+  }, [targetId, pusher, id]);
+
+  const loadUserForNewConversation = useCallback(async (userIdToLoad: number) => {
+    try {
+      const response = await api.get<User>(`/v2/users/${userIdToLoad}`);
+      if (response.success && response.data) {
+        const userData = response.data;
+        // Create a mock conversation with the user
+        setConversation({
+          meta: {
+            id: userIdToLoad,
+            other_user: {
+              id: userData.id,
+              name: userData.name || `${userData.first_name || ''} ${userData.last_name || ''}`.trim(),
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              avatar_url: userData.avatar_url,
+              avatar: userData.avatar,
+              tagline: userData.tagline,
+            },
+          },
+          messages: [],
+        });
+        setIsNewConversation(true);
+      } else {
+        // User not found - go back to messages
+        navigate(tenantPath('/messages'));
+      }
+    } catch (error) {
+      logError('Failed to load user for new conversation', error);
+      navigate(tenantPath('/messages'));
+    }
+  }, [navigate, tenantPath]);
+
+  /**
+   * Poll for new messages using cursor-based pagination
+   * Only fetches messages newer than the last known message
+   */
+  const pollForNewMessages = useCallback(async () => {
+    // Only poll for existing conversations (not new ones started via user ID)
+    if (!id || isNewConversationRoute || !lastMessageIdRef.current) return;
+
+    try {
+      // Use the last message ID as cursor to get only newer messages
+      const cursor = btoa(String(lastMessageIdRef.current));
+      const response = await api.get<Message[]>(`/v2/messages/${id}?direction=newer&cursor=${cursor}`);
+
+      if (response.success && response.data && response.data.length > 0) {
+        const newMessages = response.data;
+
+        // Update the last message ID
+        lastMessageIdRef.current = newMessages[newMessages.length - 1].id;
+
+        // Append new messages to the conversation
+        setConversation((prev) => {
+          if (!prev) return null;
+
+          // Filter out any duplicates (by ID)
+          const existingIds = new Set(prev.messages.map((m) => m.id));
+          const uniqueNewMessages = newMessages.filter((m) => !existingIds.has(m.id));
+
+          if (uniqueNewMessages.length === 0) return prev;
+
+          return {
+            ...prev,
+            messages: [...prev.messages, ...uniqueNewMessages],
+          };
+        });
+      }
+    } catch {
+      // Silent fail for polling - don't spam console
+    }
+  }, [id, isNewConversationRoute]);
 
   // Memoize loadConversation
   const loadConversation = useCallback(async () => {
@@ -317,7 +389,7 @@ export function ConversationPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [targetId, isNewConversationRoute]);
+  }, [targetId, isNewConversationRoute, loadUserForNewConversation]);
 
   // Cleanup ref for unmount guard
   useEffect(() => {
@@ -358,7 +430,7 @@ export function ConversationPage() {
         ),
       };
     });
-  }, [conversation?.messages?.length, id, isNewConversationRoute, user?.id]);
+  }, [conversation?.messages?.length, id, isNewConversationRoute, user?.id, conversation?.messages]);
 
   // Fetch messaging restriction status (broker monitoring)
   const refreshRestrictionStatus = useCallback(() => {
@@ -402,7 +474,7 @@ export function ConversationPage() {
         pollingIntervalRef.current = null;
       }
     };
-  }, [targetId, isNewConversation, pusher?.isConnected, isDocumentVisible]);
+  }, [targetId, isNewConversation, pusher?.isConnected, isDocumentVisible, pollForNewMessages]);
 
   // Scroll to bottom when messages change (only for new messages, not history)
   useEffect(() => {
@@ -437,78 +509,6 @@ export function ConversationPage() {
 
     fetchListing();
   }, [listingId]);
-
-  async function loadUserForNewConversation(userIdToLoad: number) {
-    try {
-      const response = await api.get<User>(`/v2/users/${userIdToLoad}`);
-      if (response.success && response.data) {
-        const userData = response.data;
-        // Create a mock conversation with the user
-        setConversation({
-          meta: {
-            id: userIdToLoad,
-            other_user: {
-              id: userData.id,
-              name: userData.name || `${userData.first_name || ''} ${userData.last_name || ''}`.trim(),
-              first_name: userData.first_name,
-              last_name: userData.last_name,
-              avatar_url: userData.avatar_url,
-              avatar: userData.avatar,
-              tagline: userData.tagline,
-            },
-          },
-          messages: [],
-        });
-        setIsNewConversation(true);
-      } else {
-        // User not found - go back to messages
-        navigate(tenantPath('/messages'));
-      }
-    } catch (error) {
-      logError('Failed to load user for new conversation', error);
-      navigate(tenantPath('/messages'));
-    }
-  }
-
-  /**
-   * Poll for new messages using cursor-based pagination
-   * Only fetches messages newer than the last known message
-   */
-  async function pollForNewMessages() {
-    // Only poll for existing conversations (not new ones started via user ID)
-    if (!id || isNewConversationRoute || !lastMessageIdRef.current) return;
-
-    try {
-      // Use the last message ID as cursor to get only newer messages
-      const cursor = btoa(String(lastMessageIdRef.current));
-      const response = await api.get<Message[]>(`/v2/messages/${id}?direction=newer&cursor=${cursor}`);
-
-      if (response.success && response.data && response.data.length > 0) {
-        const newMessages = response.data;
-
-        // Update the last message ID
-        lastMessageIdRef.current = newMessages[newMessages.length - 1].id;
-
-        // Append new messages to the conversation
-        setConversation((prev) => {
-          if (!prev) return null;
-
-          // Filter out any duplicates (by ID)
-          const existingIds = new Set(prev.messages.map((m) => m.id));
-          const uniqueNewMessages = newMessages.filter((m) => !existingIds.has(m.id));
-
-          if (uniqueNewMessages.length === 0) return prev;
-
-          return {
-            ...prev,
-            messages: [...prev.messages, ...uniqueNewMessages],
-          };
-        });
-      }
-    } catch {
-      // Silent fail for polling - don't spam console
-    }
-  }
 
   /**
    * Load older messages when user scrolls to top
@@ -628,7 +628,7 @@ export function ConversationPage() {
       // Revoke any remaining blob URLs
       attachmentPreviews.forEach((a) => { if (a.preview) URL.revokeObjectURL(a.preview); });
     };
-  }, []);
+  }, [attachmentPreviews]);
 
   /**
    * Start voice recording

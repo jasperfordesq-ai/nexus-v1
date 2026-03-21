@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import {
   Card,
   Table,
@@ -46,11 +46,7 @@ export default function GroupTypes() {
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
   const { isOpen: isPoliciesOpen, onOpen: onPoliciesOpen, onClose: onPoliciesClose } = useDisclosure();
 
-  useEffect(() => {
-    loadTypes();
-  }, []);
-
-  const loadTypes = async () => {
+  const loadTypes = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminGroups.getGroupTypes();
@@ -60,7 +56,11 @@ export default function GroupTypes() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [error]);
+
+  useEffect(() => {
+    loadTypes();
+  }, [loadTypes]);
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {

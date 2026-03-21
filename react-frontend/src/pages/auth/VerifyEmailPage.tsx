@@ -75,7 +75,7 @@ export function VerifyEmailPage() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, t]);
 
   async function handleResendVerification() {
     if (!isAuthenticated) return;

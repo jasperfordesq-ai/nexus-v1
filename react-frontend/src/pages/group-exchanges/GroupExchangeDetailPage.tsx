@@ -194,7 +194,7 @@ export function GroupExchangeDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadExchange();

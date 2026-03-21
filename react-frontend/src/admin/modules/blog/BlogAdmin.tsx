@@ -63,7 +63,7 @@ export function BlogAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search]);
+  }, [page, status, search, toast]);
 
   useEffect(() => {
     loadItems();

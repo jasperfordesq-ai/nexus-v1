@@ -142,7 +142,7 @@ export function BlogPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, t]);
 
   useEffect(() => {
     cursorRef.current = undefined;

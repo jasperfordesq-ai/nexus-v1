@@ -151,7 +151,7 @@ export function OrganisationDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadData();

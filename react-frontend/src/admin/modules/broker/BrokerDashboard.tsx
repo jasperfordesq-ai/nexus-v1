@@ -114,7 +114,7 @@ export function BrokerDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadDashboard();

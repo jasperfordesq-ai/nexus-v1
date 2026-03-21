@@ -52,7 +52,7 @@ export function MatchingDiagnostic() {
       })
       .catch(() => toast.error('Failed to load engine status'))
       .finally(() => setLoadingEngine(false));
-  }, []);
+  }, [toast]);
 
   const handleDiagnoseUser = async () => {
     if (!userId) return;

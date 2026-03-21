@@ -276,7 +276,8 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
     } finally {
       setLoading(false);
     }
-  }, [page, search, refreshKey]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshKey intentionally triggers reload
+  }, [page, search, refreshKey, toast]);
 
   useEffect(() => {
     loadGrants();

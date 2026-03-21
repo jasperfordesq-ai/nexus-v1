@@ -87,7 +87,7 @@ export function JobAnalyticsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadAnalytics();

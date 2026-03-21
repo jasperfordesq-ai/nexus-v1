@@ -442,7 +442,7 @@ function OpportunitiesTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, t]);
 
   useEffect(() => {
     cursorRef.current = undefined;
@@ -783,7 +783,7 @@ function ApplicationsTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, t]);
 
   useEffect(() => {
     cursorRef.current = undefined;
@@ -1020,7 +1020,7 @@ function HoursTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadSummary();

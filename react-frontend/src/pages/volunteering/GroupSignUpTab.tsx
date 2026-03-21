@@ -115,7 +115,7 @@ export function GroupSignUpTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();

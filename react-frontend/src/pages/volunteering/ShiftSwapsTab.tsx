@@ -103,7 +103,7 @@ export function ShiftSwapsTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardBody,
@@ -51,11 +51,7 @@ export default function LegalDocComplianceDashboard() {
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [exportingDocId, setExportingDocId] = useState<number | null>(null);
 
-  useEffect(() => {
-    loadStats();
-  }, []);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminLegalDocs.getComplianceStats();
@@ -70,7 +66,11 @@ export default function LegalDocComplianceDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [error]);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   const loadAcceptances = async (docId: number, versionId: number) => {
     try {

@@ -335,7 +335,7 @@ export function CreateGroupExchangePage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [title, description, splitType, totalHours, participants, toast, navigate, tenantPath]);
+  }, [title, description, splitType, totalHours, participants, toast, navigate, tenantPath, t]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Animation

@@ -128,7 +128,7 @@ export function FederationPartnersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadPartners();

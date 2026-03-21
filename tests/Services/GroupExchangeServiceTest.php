@@ -8,286 +8,416 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Tests\DatabaseTestCase;
-use App\Core\Database;
-use App\Core\TenantContext;
+use App\Tests\TestCase;
 use App\Services\GroupExchangeService;
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
 
 /**
- * GroupExchangeService Tests
- *
- * Tests multi-participant group exchanges with split types,
- * participant confirmation, and transaction creation.
+ * GroupExchangeServiceTest — tests for group exchange CRUD, participants, and split calculation.
  */
-class GroupExchangeServiceTest extends DatabaseTestCase
+class GroupExchangeServiceTest extends TestCase
 {
-    protected static ?int $testTenantId = null;
-    protected static ?int $testUserId = null;
-    protected static ?int $testUser2Id = null;
-    protected static ?int $testExchangeId = null;
+    private GroupExchangeService $service;
 
-    public static function setUpBeforeClass(): void
+    protected function setUp(): void
     {
-        parent::setUpBeforeClass();
-
-        self::$testTenantId = 2;
-        TenantContext::setById(self::$testTenantId);
-
-        self::createTestData();
+        parent::setUp();
+        $this->service = new GroupExchangeService();
+        TenantContext::setById(1);
     }
 
-    protected static function createTestData(): void
-    {
-        $ts = time();
-
-        // Create test users
-        Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
-            [self::$testTenantId, "grpex1_{$ts}@test.com", "grpex1_{$ts}", 'GroupEx', 'One', 'GroupEx One', 100]
-        );
-        self::$testUserId = (int)Database::getInstance()->lastInsertId();
-
-        Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, balance, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
-            [self::$testTenantId, "grpex2_{$ts}@test.com", "grpex2_{$ts}", 'GroupEx', 'Two', 'GroupEx Two', 50]
-        );
-        self::$testUser2Id = (int)Database::getInstance()->lastInsertId();
-
-        // Create test group exchange
-        self::$testExchangeId = GroupExchangeService::create(self::$testUserId, [
-            'title' => "Test Group Exchange {$ts}",
-            'description' => 'Test group exchange for testing',
-            'split_type' => 'equal',
-            'total_hours' => 10.0
-        ]);
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        if (self::$testExchangeId) {
-            try {
-                Database::query("DELETE FROM group_exchange_participants WHERE group_exchange_id = ?", [self::$testExchangeId]);
-                Database::query("DELETE FROM group_exchanges WHERE id = ?", [self::$testExchangeId]);
-            } catch (\Exception $e) {}
-        }
-        if (self::$testUserId && self::$testUser2Id) {
-            try {
-                Database::query("DELETE FROM users WHERE id IN (?, ?)", [self::$testUserId, self::$testUser2Id]);
-            } catch (\Exception $e) {}
-        }
-
-        parent::tearDownAfterClass();
-    }
-
-    // ==========================================
-    // Create Tests
-    // ==========================================
+    // =========================================================================
+    // create
+    // =========================================================================
 
     public function testCreateReturnsExchangeId(): void
     {
-        $this->assertNotNull(self::$testExchangeId);
-        $this->assertIsInt(self::$testExchangeId);
-    }
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('insertGetId')->once()->andReturn(42);
 
-    public function testCreateSetsDefaultStatus(): void
-    {
-        $exchange = GroupExchangeService::get(self::$testExchangeId);
-        $this->assertNotNull($exchange);
-        $this->assertEquals('draft', $exchange['status']);
-    }
-
-    // ==========================================
-    // Get Tests
-    // ==========================================
-
-    public function testGetReturnsValidStructure(): void
-    {
-        $exchange = GroupExchangeService::get(self::$testExchangeId);
-
-        $this->assertNotNull($exchange);
-        $this->assertArrayHasKey('id', $exchange);
-        $this->assertArrayHasKey('title', $exchange);
-        $this->assertArrayHasKey('organizer_id', $exchange);
-        $this->assertArrayHasKey('split_type', $exchange);
-        $this->assertArrayHasKey('participants', $exchange);
-    }
-
-    public function testGetReturnsNullForInvalidId(): void
-    {
-        $exchange = GroupExchangeService::get(999999);
-        $this->assertNull($exchange);
-    }
-
-    public function testGetIncludesParticipants(): void
-    {
-        $exchange = GroupExchangeService::get(self::$testExchangeId);
-        $this->assertIsArray($exchange['participants']);
-    }
-
-    // ==========================================
-    // Participant Tests
-    // ==========================================
-
-    public function testAddParticipantReturnsTrue(): void
-    {
-        $result = GroupExchangeService::addParticipant(
-            self::$testExchangeId,
-            self::$testUserId,
-            'provider',
-            5.0
-        );
-        $this->assertTrue($result);
-
-        // Cleanup
-        GroupExchangeService::removeParticipant(self::$testExchangeId, self::$testUserId);
-    }
-
-    public function testRemoveParticipantReturnsTrue(): void
-    {
-        // First add a participant
-        GroupExchangeService::addParticipant(self::$testExchangeId, self::$testUserId, 'provider');
-
-        $result = GroupExchangeService::removeParticipant(self::$testExchangeId, self::$testUserId);
-        $this->assertTrue($result);
-    }
-
-    public function testConfirmParticipationReturnsTrue(): void
-    {
-        // Add participant first
-        GroupExchangeService::addParticipant(self::$testExchangeId, self::$testUserId, 'provider');
-
-        $result = GroupExchangeService::confirmParticipation(self::$testExchangeId, self::$testUserId);
-        $this->assertTrue($result);
-
-        // Cleanup
-        GroupExchangeService::removeParticipant(self::$testExchangeId, self::$testUserId);
-    }
-
-    // ==========================================
-    // List Tests
-    // ==========================================
-
-    public function testListForUserReturnsValidStructure(): void
-    {
-        $result = GroupExchangeService::listForUser(self::$testUserId);
-
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('items', $result);
-        $this->assertArrayHasKey('has_more', $result);
-    }
-
-    public function testListForUserIncludesOrganizerExchanges(): void
-    {
-        $result = GroupExchangeService::listForUser(self::$testUserId);
-
-        // Should include the exchange we created
-        $ids = array_column($result['items'], 'id');
-        $this->assertContains(self::$testExchangeId, $ids);
-    }
-
-    public function testListForUserRespectsStatusFilter(): void
-    {
-        $result = GroupExchangeService::listForUser(self::$testUserId, ['status' => 'draft']);
-        $this->assertIsArray($result);
-
-        foreach ($result['items'] as $item) {
-            $this->assertEquals('draft', $item['status']);
-        }
-    }
-
-    // ==========================================
-    // Status Update Tests
-    // ==========================================
-
-    public function testUpdateStatusChangesStatus(): void
-    {
-        $result = GroupExchangeService::updateStatus(self::$testExchangeId, 'active');
-        $this->assertTrue($result);
-
-        $exchange = GroupExchangeService::get(self::$testExchangeId);
-        $this->assertEquals('active', $exchange['status']);
-
-        // Reset
-        GroupExchangeService::updateStatus(self::$testExchangeId, 'draft');
-    }
-
-    // ==========================================
-    // Split Calculation Tests
-    // ==========================================
-
-    public function testCalculateSplitReturnsArray(): void
-    {
-        // Add participants
-        GroupExchangeService::addParticipant(self::$testExchangeId, self::$testUserId, 'provider', 5.0);
-        GroupExchangeService::addParticipant(self::$testExchangeId, self::$testUser2Id, 'receiver', 5.0);
-
-        $splits = GroupExchangeService::calculateSplit(self::$testExchangeId);
-        $this->assertIsArray($splits);
-
-        // Cleanup
-        GroupExchangeService::removeParticipant(self::$testExchangeId, self::$testUserId);
-        GroupExchangeService::removeParticipant(self::$testExchangeId, self::$testUser2Id);
-    }
-
-    public function testCalculateSplitHandlesEqualSplit(): void
-    {
-        // Set up equal split
-        Database::query("UPDATE group_exchanges SET split_type = 'equal', total_hours = 10 WHERE id = ?", [self::$testExchangeId]);
-
-        GroupExchangeService::addParticipant(self::$testExchangeId, self::$testUserId, 'provider');
-        GroupExchangeService::addParticipant(self::$testExchangeId, self::$testUser2Id, 'receiver');
-
-        $splits = GroupExchangeService::calculateSplit(self::$testExchangeId);
-        $this->assertNotEmpty($splits);
-
-        // Cleanup
-        GroupExchangeService::removeParticipant(self::$testExchangeId, self::$testUserId);
-        GroupExchangeService::removeParticipant(self::$testExchangeId, self::$testUser2Id);
-    }
-
-    // ==========================================
-    // Update Tests
-    // ==========================================
-
-    public function testUpdateChangesFields(): void
-    {
-        $result = GroupExchangeService::update(self::$testExchangeId, [
-            'title' => 'Updated Title'
+        $result = $this->service->create(1, [
+            'title' => 'Test Exchange',
+            'description' => 'A test',
+            'split_type' => 'equal',
+            'total_hours' => 10.0,
         ]);
-        $this->assertTrue($result);
 
-        $exchange = GroupExchangeService::get(self::$testExchangeId);
-        $this->assertEquals('Updated Title', $exchange['title']);
+        $this->assertEquals(42, $result);
     }
 
-    public function testUpdateIgnoresInvalidFields(): void
+    public function testCreateSetsDefaultStatusToDraft(): void
     {
-        $result = GroupExchangeService::update(self::$testExchangeId, [
-            'invalid_field' => 'value'
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('insertGetId')
+            ->once()
+            ->withArgs(function ($data) {
+                return $data['status'] === 'draft';
+            })
+            ->andReturn(1);
+
+        $this->service->create(1, ['title' => 'Test']);
+    }
+
+    // =========================================================================
+    // get
+    // =========================================================================
+
+    public function testGetReturnsNullForNonExistent(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn(null);
+
+        $result = $this->service->get(999);
+        $this->assertNull($result);
+    }
+
+    public function testGetReturnsStructuredArrayWithParticipants(): void
+    {
+        $exchange = (object) [
+            'id' => 1,
+            'tenant_id' => 1,
+            'title' => 'Test',
+            'description' => 'Desc',
+            'organizer_id' => 10,
+            'listing_id' => null,
+            'status' => 'draft',
+            'split_type' => 'equal',
+            'total_hours' => 10.0,
+            'broker_id' => null,
+            'broker_notes' => null,
+            'completed_at' => null,
+            'created_at' => '2026-01-01',
+            'updated_at' => '2026-01-01',
+        ];
+
+        $participants = collect([
+            (object) [
+                'participant_id' => 1,
+                'user_id' => 10,
+                'role' => 'provider',
+                'hours' => 5.0,
+                'weight' => 1.0,
+                'confirmed' => 0,
+                'confirmed_at' => null,
+                'notes' => null,
+                'created_at' => '2026-01-01',
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'avatar_url' => null,
+            ],
         ]);
-        // Should return false since no valid fields
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($exchange);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('join')->once()->andReturnSelf();
+        DB::shouldReceive('where')->once()->andReturnSelf();
+        DB::shouldReceive('select')->once()->andReturnSelf();
+        DB::shouldReceive('get')->once()->andReturn($participants);
+
+        $result = $this->service->get(1);
+
+        $this->assertNotNull($result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('title', $result);
+        $this->assertArrayHasKey('participants', $result);
+        $this->assertCount(1, $result['participants']);
+        $this->assertEquals('John Doe', $result['participants'][0]['name']);
+    }
+
+    // =========================================================================
+    // addParticipant
+    // =========================================================================
+
+    public function testAddParticipantReturnsTrueOnSuccess(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->times(3)->andReturnSelf();
+        DB::shouldReceive('exists')->once()->andReturn(false);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('insert')->once()->andReturn(true);
+
+        $result = $this->service->addParticipant(1, 10, 'provider', 5.0);
+        $this->assertTrue($result);
+    }
+
+    public function testAddParticipantReturnsFalseIfAlreadyExists(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->times(3)->andReturnSelf();
+        DB::shouldReceive('exists')->once()->andReturn(true);
+
+        $result = $this->service->addParticipant(1, 10, 'provider');
         $this->assertFalse($result);
     }
 
-    // ==========================================
-    // Complete Tests
-    // ==========================================
+    // =========================================================================
+    // removeParticipant
+    // =========================================================================
 
-    public function testCompleteRequiresPendingConfirmationStatus(): void
+    public function testRemoveParticipantReturnsTrueWhenDeleted(): void
     {
-        $result = GroupExchangeService::complete(self::$testExchangeId);
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('delete')->once()->andReturn(1);
 
-        $this->assertFalse($result['success']);
-        $this->assertArrayHasKey('error', $result);
+        $this->assertTrue($this->service->removeParticipant(1, 10));
     }
 
-    public function testCompleteReturnsErrorForInvalidId(): void
+    public function testRemoveParticipantReturnsFalseWhenNotFound(): void
     {
-        $result = GroupExchangeService::complete(999999);
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('delete')->once()->andReturn(0);
 
+        $this->assertFalse($this->service->removeParticipant(1, 999));
+    }
+
+    // =========================================================================
+    // calculateSplit — equal
+    // =========================================================================
+
+    public function testCalculateSplitReturnsEmptyForNonExistentExchange(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn(null);
+
+        $result = $this->service->calculateSplit(999);
+        $this->assertEmpty($result);
+    }
+
+    public function testCalculateSplitEqualDistributesEvenly(): void
+    {
+        $exchange = (object) [
+            'id' => 1,
+            'total_hours' => 10.0,
+            'split_type' => 'equal',
+        ];
+
+        $participants = collect([
+            (object) ['user_id' => 10, 'role' => 'provider', 'hours' => 0, 'weight' => 1.0],
+            (object) ['user_id' => 20, 'role' => 'provider', 'hours' => 0, 'weight' => 1.0],
+        ]);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($exchange);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->once()->andReturnSelf();
+        DB::shouldReceive('get')->once()->andReturn($participants);
+
+        $result = $this->service->calculateSplit(1);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals(5.0, $result[0]['hours']);
+        $this->assertEquals(5.0, $result[1]['hours']);
+    }
+
+    // =========================================================================
+    // calculateSplit — custom
+    // =========================================================================
+
+    public function testCalculateSplitCustomUsesPresetHours(): void
+    {
+        $exchange = (object) [
+            'id' => 1,
+            'total_hours' => 10.0,
+            'split_type' => 'custom',
+        ];
+
+        $participants = collect([
+            (object) ['user_id' => 10, 'role' => 'provider', 'hours' => 7.0, 'weight' => 1.0],
+            (object) ['user_id' => 20, 'role' => 'receiver', 'hours' => 3.0, 'weight' => 1.0],
+        ]);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($exchange);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->once()->andReturnSelf();
+        DB::shouldReceive('get')->once()->andReturn($participants);
+
+        $result = $this->service->calculateSplit(1);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals(7.0, $result[0]['hours']);
+        $this->assertEquals(3.0, $result[1]['hours']);
+    }
+
+    // =========================================================================
+    // calculateSplit — weighted
+    // =========================================================================
+
+    public function testCalculateSplitWeightedDistributesByWeight(): void
+    {
+        $exchange = (object) [
+            'id' => 1,
+            'total_hours' => 12.0,
+            'split_type' => 'weighted',
+        ];
+
+        // Two providers with weights 1 and 2 (total weight 3)
+        $participants = collect([
+            (object) ['user_id' => 10, 'role' => 'provider', 'hours' => 0, 'weight' => 1.0],
+            (object) ['user_id' => 20, 'role' => 'provider', 'hours' => 0, 'weight' => 2.0],
+        ]);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($exchange);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->once()->andReturnSelf();
+        DB::shouldReceive('get')->once()->andReturn($participants);
+
+        $result = $this->service->calculateSplit(1);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals(4.0, $result[0]['hours']); // weight 1/3 * 12 = 4
+        $this->assertEquals(8.0, $result[1]['hours']); // weight 2/3 * 12 = 8
+    }
+
+    // =========================================================================
+    // update
+    // =========================================================================
+
+    public function testUpdateReturnsTrueWhenNoChanges(): void
+    {
+        $result = $this->service->update(1, []);
+        $this->assertTrue($result);
+    }
+
+    public function testUpdateFiltersDisallowedFields(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('update')
+            ->once()
+            ->withArgs(function ($data) {
+                return isset($data['title']) && !isset($data['hacker_field']);
+            })
+            ->andReturn(1);
+
+        $this->service->update(1, ['title' => 'New', 'hacker_field' => 'evil']);
+    }
+
+    // =========================================================================
+    // updateStatus
+    // =========================================================================
+
+    public function testUpdateStatusSetsCompletedAtWhenCompleted(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('update')
+            ->once()
+            ->withArgs(function ($data) {
+                return $data['status'] === 'completed' && isset($data['completed_at']);
+            })
+            ->andReturn(1);
+
+        $this->assertTrue($this->service->updateStatus(1, 'completed'));
+    }
+
+    public function testUpdateStatusDoesNotSetCompletedAtForOtherStatuses(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('update')
+            ->once()
+            ->withArgs(function ($data) {
+                return $data['status'] === 'active' && !isset($data['completed_at']);
+            })
+            ->andReturn(1);
+
+        $this->assertTrue($this->service->updateStatus(1, 'active'));
+    }
+
+    // =========================================================================
+    // confirmParticipation
+    // =========================================================================
+
+    public function testConfirmParticipationReturnsTrueWhenUpdated(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->times(3)->andReturnSelf();
+        DB::shouldReceive('update')->once()->andReturn(1);
+
+        $this->assertTrue($this->service->confirmParticipation(1, 10));
+    }
+
+    public function testConfirmParticipationReturnsFalseWhenAlreadyConfirmed(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->times(3)->andReturnSelf();
+        DB::shouldReceive('update')->once()->andReturn(0);
+
+        $this->assertFalse($this->service->confirmParticipation(1, 10));
+    }
+
+    // =========================================================================
+    // complete
+    // =========================================================================
+
+    public function testCompleteReturnsErrorForNonExistentExchange(): void
+    {
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn(null);
+
+        $result = $this->service->complete(999);
         $this->assertFalse($result['success']);
         $this->assertEquals('Exchange not found', $result['error']);
+    }
+
+    public function testCompleteReturnsErrorIfAlreadyCompleted(): void
+    {
+        $exchange = (object) ['id' => 1, 'status' => 'completed'];
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($exchange);
+
+        $result = $this->service->complete(1);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('already completed', $result['error']);
+    }
+
+    public function testCompleteReturnsErrorIfCancelled(): void
+    {
+        $exchange = (object) ['id' => 1, 'status' => 'cancelled'];
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($exchange);
+
+        $result = $this->service->complete(1);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('cancelled', $result['error']);
+    }
+
+    public function testCompleteReturnsErrorIfUnconfirmedParticipants(): void
+    {
+        $exchange = (object) ['id' => 1, 'status' => 'active'];
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn($exchange);
+
+        DB::shouldReceive('table')->once()->andReturnSelf();
+        DB::shouldReceive('where')->twice()->andReturnSelf();
+        DB::shouldReceive('count')->once()->andReturn(2);
+
+        $result = $this->service->complete(1);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Not all participants', $result['error']);
     }
 }

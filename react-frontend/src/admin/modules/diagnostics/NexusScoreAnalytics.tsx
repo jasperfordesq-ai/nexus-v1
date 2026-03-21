@@ -45,7 +45,7 @@ export function NexusScoreAnalytics() {
       })
       .catch(() => toast.error('Failed to load Nexus Score analytics'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

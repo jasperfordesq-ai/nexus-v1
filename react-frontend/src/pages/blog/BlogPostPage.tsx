@@ -147,7 +147,7 @@ export function BlogPostPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [slug]);
+  }, [slug, t]);
 
   const loadComments = useCallback(async (postId: number) => {
     try {

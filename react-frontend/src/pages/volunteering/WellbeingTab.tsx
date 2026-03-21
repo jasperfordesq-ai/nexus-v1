@@ -143,7 +143,7 @@ export function WellbeingTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();

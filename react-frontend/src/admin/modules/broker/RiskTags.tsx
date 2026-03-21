@@ -113,7 +113,7 @@ export function RiskTagsPage() {
     } finally {
       setLoading(false);
     }
-  }, [riskLevel]);
+  }, [riskLevel, toast]);
 
   useEffect(() => {
     loadItems();

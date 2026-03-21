@@ -80,7 +80,7 @@ export function RecommendedShiftsTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();

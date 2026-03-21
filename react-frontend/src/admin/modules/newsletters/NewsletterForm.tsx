@@ -193,7 +193,7 @@ export function NewsletterForm() {
         setLoading(false);
       })();
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, toast]);
 
   // Fetch recipient count when targeting changes
   const fetchRecipientCount = useCallback(async () => {

@@ -53,7 +53,7 @@ export function Subscriptions() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     fetchData();

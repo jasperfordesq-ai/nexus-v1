@@ -87,7 +87,7 @@ export function WalletPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadWalletData();
@@ -125,7 +125,7 @@ export function WalletPage() {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, hasMoreTransactions, txCursor, toast]);
+  }, [isLoadingMore, hasMoreTransactions, txCursor, toast, t]);
 
   // Handle successful transfer
   function handleTransferComplete(transaction: Transaction) {

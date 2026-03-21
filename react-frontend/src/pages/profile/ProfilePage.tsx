@@ -288,7 +288,7 @@ export function ProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [profileId, isAuthenticated, currentUser, hasGamification]);
+  }, [profileId, isAuthenticated, currentUser, hasGamification, t]);
 
   useEffect(() => {
     loadProfile();
@@ -367,7 +367,7 @@ export function ProfilePage() {
     } finally {
       setIsConnecting(false);
     }
-  }, [profile?.id, connectionStatus, connectionId, toast]);
+  }, [profile?.id, connectionStatus, connectionId, toast, t]);
 
   if (isLoading) {
     return <LoadingScreen message={t('loading')} />;

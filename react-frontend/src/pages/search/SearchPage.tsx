@@ -155,7 +155,7 @@ export function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast, advancedFilters]);
+  }, [toast, advancedFilters, t]);
 
   useEffect(() => {
     const urlQuery = searchParams.get('q');

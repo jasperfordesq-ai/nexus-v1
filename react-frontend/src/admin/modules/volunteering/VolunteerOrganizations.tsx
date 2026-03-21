@@ -50,7 +50,7 @@ export function VolunteerOrganizations() {
       setItems([]);
     }
     setLoading(false);
-  }, []);
+  }, [toast]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

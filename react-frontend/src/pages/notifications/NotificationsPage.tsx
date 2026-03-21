@@ -7,7 +7,7 @@
  * Notifications Page - User notifications center
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button, Skeleton } from '@heroui/react';
@@ -48,11 +48,7 @@ export function NotificationsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<NotificationFilter>('all');
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
-  async function loadNotifications() {
+  const loadNotifications = useCallback(async () => {
     try {
       setIsLoading(true);
       setLoadError(null);
@@ -68,7 +64,11 @@ export function NotificationsPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [t]);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
 
   async function markAsRead(id: number) {
     try {

@@ -39,7 +39,7 @@ export function GroupAnalytics() {
       }
     };
     load();
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

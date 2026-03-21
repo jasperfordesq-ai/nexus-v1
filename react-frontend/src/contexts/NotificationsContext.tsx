@@ -379,7 +379,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         pollingRef.current = null;
       }
     };
-  }, [isAuthenticated, user?.id, refreshCounts, handleNewNotification]);
+  }, [isAuthenticated, user?.id, refreshCounts, handleNewNotification, toast, user?.tenant_id]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Context Value

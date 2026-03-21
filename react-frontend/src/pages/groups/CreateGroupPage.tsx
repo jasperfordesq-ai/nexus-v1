@@ -106,7 +106,7 @@ export function CreateGroupPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     if (isEditing) {

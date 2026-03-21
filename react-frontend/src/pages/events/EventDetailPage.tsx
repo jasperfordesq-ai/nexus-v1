@@ -133,7 +133,7 @@ export function EventDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadEvent();
@@ -166,7 +166,7 @@ export function EventDetailPage() {
 
     fetchSeriesEvents();
     return () => { cancelled = true; };
-  }, [event?.series?.id, event?.id]);
+  }, [event]);
 
   async function handleRsvp(newStatus: RsvpOption) {
     if (!event || !isAuthenticated) return;

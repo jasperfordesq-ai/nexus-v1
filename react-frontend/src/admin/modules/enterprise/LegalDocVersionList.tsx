@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -72,11 +72,7 @@ export default function LegalDocVersionList() {
 
   const documentId = parseInt(id || '0', 10);
 
-  useEffect(() => {
-    loadVersions();
-  }, [documentId]);
-
-  const loadVersions = async () => {
+  const loadVersions = useCallback(async () => {
     if (!documentId) return;
 
     try {
@@ -93,7 +89,11 @@ export default function LegalDocVersionList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [documentId, error]);
+
+  useEffect(() => {
+    loadVersions();
+  }, [loadVersions]);
 
   const handlePublish = async () => {
     if (!selectedVersion) return;

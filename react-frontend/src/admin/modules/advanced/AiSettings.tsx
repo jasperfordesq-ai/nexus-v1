@@ -45,7 +45,7 @@ export function AiSettings() {
       })
       .catch(() => toast.error('Failed to load AI settings'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [toast]);
 
   const handleSave = async () => {
     setSaving(true);

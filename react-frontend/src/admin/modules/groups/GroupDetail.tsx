@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -39,14 +39,7 @@ export default function GroupDetail() {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '', location: '' });
 
-  useEffect(() => {
-    if (id) {
-      loadGroup();
-      loadMembers();
-    }
-  }, [id]);
-
-  const loadGroup = async () => {
+  const loadGroup = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminGroups.getGroup(Number(id));
@@ -64,9 +57,9 @@ export default function GroupDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, error]);
 
-  const loadMembers = async () => {
+  const loadMembers = useCallback(async () => {
     try {
       const response = await adminGroups.getMembers(Number(id), { limit: 50 });
       if (response.success && response.data) {
@@ -75,7 +68,14 @@ export default function GroupDetail() {
     } catch {
       error('Failed to load members');
     }
-  };
+  }, [id, error]);
+
+  useEffect(() => {
+    if (id) {
+      loadGroup();
+      loadMembers();
+    }
+  }, [id, loadGroup, loadMembers]);
 
   const handleSave = async () => {
     try {

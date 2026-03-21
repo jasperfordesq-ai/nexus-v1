@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ModalHeader,
   ModalBody,
@@ -36,11 +36,7 @@ export default function LegalDocVersionComparison({
   const [comparison, setComparison] = useState<VersionComparison | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadComparison();
-  }, [documentId, version1Id, version2Id]);
-
-  const loadComparison = async () => {
+  const loadComparison = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminLegalDocs.compareVersions(documentId, version1Id, version2Id);
@@ -55,7 +51,11 @@ export default function LegalDocVersionComparison({
     } finally {
       setLoading(false);
     }
-  };
+  }, [documentId, version1Id, version2Id, error]);
+
+  useEffect(() => {
+    loadComparison();
+  }, [loadComparison]);
 
   return (
     <>

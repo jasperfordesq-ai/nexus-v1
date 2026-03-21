@@ -47,7 +47,7 @@ export function SmartMatchUsers() {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, toast]);
 
   useEffect(() => {
     fetchData();

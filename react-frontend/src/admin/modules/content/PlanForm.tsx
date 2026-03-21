@@ -77,7 +77,7 @@ export function PlanForm() {
         .catch(() => toast.error('Failed to load plan'))
         .finally(() => setLoading(false));
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, toast]);
 
   const handleChange = (field: keyof PlanFormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

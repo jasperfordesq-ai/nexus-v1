@@ -77,6 +77,13 @@ export function VerifyIdentityPage() {
   const [isStarting, setIsStarting] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  }, []);
+
   const fetchStatus = useCallback(async () => {
     try {
       const response = await api.get<VerificationStatus>('/v2/auth/verification-status');
@@ -121,14 +128,7 @@ export function VerifyIdentityPage() {
       setPageState('error');
       setErrorMessage(t('verify_identity.fetch_error', { defaultValue: 'Unable to check verification status. Please try again.' }));
     }
-  }, [navigate, tenantPath, t]);
-
-  const stopPolling = useCallback(() => {
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
-  }, []);
+  }, [navigate, tenantPath, t, stopPolling]);
 
   const startPolling = useCallback(() => {
     stopPolling();

@@ -47,7 +47,7 @@ export function GroupModeration() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadItems();

@@ -304,7 +304,7 @@ export function ResourcesPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [cursor, searchQuery, selectedCategory]);
+  }, [cursor, searchQuery, selectedCategory, t]);
 
   useEffect(() => {
     setCursor(undefined);

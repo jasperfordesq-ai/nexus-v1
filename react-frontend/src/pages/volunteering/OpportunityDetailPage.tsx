@@ -185,7 +185,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [opportunityId, toast]);
+  }, [opportunityId, toast, t]);
 
   useEffect(() => {
     setApplications([]);
@@ -479,7 +479,7 @@ export function OpportunityDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     load();

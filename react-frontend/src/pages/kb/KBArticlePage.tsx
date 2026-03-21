@@ -109,7 +109,7 @@ export function KBArticlePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadArticle();

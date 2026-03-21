@@ -68,7 +68,7 @@ export function MessageReview() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter]);
+  }, [page, filter, toast]);
 
   useEffect(() => {
     loadItems();

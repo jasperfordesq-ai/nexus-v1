@@ -73,7 +73,7 @@ export function FederationMemberProfilePage() {
       if (response.success && response.data) {
         setConnectionStatus(response.data.status);
       }
-    } catch (err) {
+    } catch {
       // Non-critical - just means we can't show status
     }
   }, [id, member]);
@@ -95,7 +95,7 @@ export function FederationMemberProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadMember();

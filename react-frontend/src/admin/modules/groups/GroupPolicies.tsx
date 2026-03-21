@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Modal,
   ModalContent,
@@ -38,13 +38,7 @@ export default function GroupPolicies({ isOpen, onClose, typeId, typeName }: Gro
   const [policies, setPolicies] = useState<GroupPolicy[]>([]);
   const [sections, setSections] = useState<PolicySection[]>([]);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadPolicies();
-    }
-  }, [isOpen, typeId]);
-
-  const loadPolicies = async () => {
+  const loadPolicies = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminGroups.getPolicies(typeId);
@@ -56,7 +50,13 @@ export default function GroupPolicies({ isOpen, onClose, typeId, typeName }: Gro
     } finally {
       setLoading(false);
     }
-  };
+  }, [typeId, error]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadPolicies();
+    }
+  }, [isOpen, loadPolicies]);
 
   const organizePolicies = (data: GroupPolicy[]) => {
     const categoryMap = new Map<string, GroupPolicy[]>();

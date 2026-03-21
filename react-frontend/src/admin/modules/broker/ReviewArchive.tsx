@@ -50,7 +50,7 @@ export function ReviewArchive() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, search]);
+  }, [page, filter, search, toast]);
 
   useEffect(() => {
     loadItems();

@@ -58,7 +58,7 @@ export function DeliverablesList() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     fetchData();

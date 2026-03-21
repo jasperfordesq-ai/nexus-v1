@@ -142,7 +142,7 @@ export function CredentialVerificationTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();

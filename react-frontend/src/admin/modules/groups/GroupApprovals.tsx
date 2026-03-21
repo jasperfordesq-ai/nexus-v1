@@ -49,7 +49,7 @@ export function GroupApprovals() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadItems();

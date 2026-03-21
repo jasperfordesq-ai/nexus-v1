@@ -86,7 +86,7 @@ export function EmergencyAlertsTab() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();

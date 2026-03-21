@@ -109,7 +109,7 @@ export function ListingsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedType, selectedCategory]);
+  }, [searchQuery, selectedType, selectedCategory, listings.length, t, toast]);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -135,7 +135,7 @@ export function ListingsPage() {
     if (selectedType !== 'all') params.set('type', selectedType);
     if (selectedCategory) params.set('category', selectedCategory);
     setSearchParams(params, { replace: true });
-  }, [searchQuery, selectedType, selectedCategory]);
+  }, [searchQuery, selectedType, selectedCategory, loadListings, setSearchParams]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -177,7 +177,7 @@ export function ListingsPage() {
         return next;
       });
     }
-  }, [savingIds, t]);
+  }, [savingIds, t, toast]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

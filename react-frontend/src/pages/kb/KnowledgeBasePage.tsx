@@ -91,7 +91,7 @@ export function KnowledgeBasePage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadArticles();

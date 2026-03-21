@@ -200,7 +200,7 @@ export function Subscribers() {
       toast.error('Failed to add subscriber');
     }
     setAddLoading(false);
-  }, [addForm, loadData, statusFilter, searchQuery]);
+  }, [addForm, loadData, statusFilter, searchQuery, toast]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Remove subscriber
@@ -222,7 +222,7 @@ export function Subscribers() {
       toast.error('Failed to remove subscriber');
     }
     setRemoveLoading(false);
-  }, [removeTarget, loadData]);
+  }, [removeTarget, loadData, toast]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Import CSV
@@ -268,7 +268,7 @@ export function Subscribers() {
       setImportRows(rows);
     };
     reader.readAsText(file);
-  }, []);
+  }, [toast]);
 
   const handleImport = useCallback(async () => {
     if (importRows.length === 0) return;
@@ -289,7 +289,7 @@ export function Subscribers() {
       toast.error('Failed to import subscribers');
     }
     setImportLoading(false);
-  }, [importRows, loadData, statusFilter, searchQuery]);
+  }, [importRows, loadData, statusFilter, searchQuery, toast]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Export CSV
@@ -324,7 +324,7 @@ export function Subscribers() {
       toast.error('Failed to export subscribers');
     }
     setExportLoading(false);
-  }, []);
+  }, [toast]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Sync members
@@ -345,7 +345,7 @@ export function Subscribers() {
       toast.error('Failed to sync members');
     }
     setSyncLoading(false);
-  }, [loadData, statusFilter, searchQuery]);
+  }, [loadData, statusFilter, searchQuery, toast]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Helpers
@@ -359,7 +359,7 @@ export function Subscribers() {
     if (!subscribeUrl) return;
     navigator.clipboard.writeText(subscribeUrl);
     toast.success('Subscribe link copied to clipboard');
-  }, [subscribeUrl]);
+  }, [subscribeUrl, toast]);
 
   const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
     switch (status) {

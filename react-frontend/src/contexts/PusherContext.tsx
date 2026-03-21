@@ -168,7 +168,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
     pusherRef.current = pusher;
 
     // Subscribe to user's personal channel (must match backend PusherService::getUserChannel format)
-    const tenantId = user.tenant_id || tokenManager.getTenantId();
+    const tenantId = user?.tenant_id || tokenManager.getTenantId();
     if (!tenantId) {
       logError('Cannot subscribe to Pusher: no tenant_id available');
       return;
@@ -197,6 +197,8 @@ export function PusherProvider({ children }: PusherProviderProps) {
     // Do NOT call unsubscribe() before disconnect() — it queues an async send
     // that fires after disconnect starts closing the socket, causing
     // "WebSocket is already in CLOSING or CLOSED state" warnings.
+    // Copy ref values into local variables for the cleanup function
+    const currentConversationChannels = conversationChannelsRef.current;
     return () => {
       if (userChannelRef.current) {
         userChannelRef.current.unbind_all();
@@ -204,15 +206,15 @@ export function PusherProvider({ children }: PusherProviderProps) {
       if (feedChannelRef.current) {
         feedChannelRef.current.unbind_all();
       }
-      conversationChannelsRef.current.forEach((ch) => ch.unbind_all());
+      currentConversationChannels.forEach((ch) => ch.unbind_all());
       pusher.disconnect();
       pusherRef.current = null;
       userChannelRef.current = null;
       feedChannelRef.current = null;
-      conversationChannelsRef.current.clear();
+      currentConversationChannels.clear();
       setIsConnected(false);
     };
-  }, [isAuthenticated, user?.id, config]);
+  }, [isAuthenticated, user?.id, config, user?.tenant_id]);
 
   /**
    * Subscribe to a conversation channel for real-time messages and typing
@@ -226,7 +228,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
       : `${otherUserId}-${user.id}`;
 
     // Must match backend PusherService::getChatChannel format (tenant-scoped)
-    const tenantId = user.tenant_id || tokenManager.getTenantId();
+    const tenantId = user?.tenant_id || tokenManager.getTenantId();
     const channelName = `private-tenant.${tenantId}.chat.${chatId}`;
 
     // Already subscribed?
@@ -245,7 +247,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
     });
 
     conversationChannelsRef.current.set(channelName, channel);
-  }, [user?.id]);
+  }, [user?.id, user?.tenant_id]);
 
   /**
    * Unsubscribe from a conversation channel
@@ -258,7 +260,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
       : `${otherUserId}-${user.id}`;
 
     // Must match backend PusherService::getChatChannel format (tenant-scoped)
-    const tenantId = user.tenant_id || tokenManager.getTenantId();
+    const tenantId = user?.tenant_id || tokenManager.getTenantId();
     const channelName = `private-tenant.${tenantId}.chat.${chatId}`;
 
     const channel = conversationChannelsRef.current.get(channelName);
@@ -273,7 +275,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
       }
       conversationChannelsRef.current.delete(channelName);
     }
-  }, [user?.id]);
+  }, [user?.id, user?.tenant_id]);
 
   /**
    * Register a callback for new messages

@@ -244,7 +244,7 @@ export function FederationMessagesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     loadMessages();
@@ -294,7 +294,7 @@ export function FederationMessagesPage() {
       newParams.delete('to_tenant');
       setSearchParams(newParams, { replace: true });
     }
-  }, []); // Only run on mount
+  }, [searchParams, setSearchParams]); // Only run on mount
 
   // ── Mark thread as read ──
   const markThreadRead = useCallback(
@@ -376,7 +376,7 @@ export function FederationMessagesPage() {
     } finally {
       setIsSending(false);
     }
-  }, [replyText, activeThread, isSending, toast]);
+  }, [replyText, activeThread, isSending, toast, t]);
 
   // ── Recipient search (debounced) ──
   useEffect(() => {
@@ -450,7 +450,7 @@ export function FederationMessagesPage() {
     } finally {
       setIsComposeSending(false);
     }
-  }, [selectedRecipient, composeSubject, composeBody, isComposeSending, toast]);
+  }, [selectedRecipient, composeSubject, composeBody, isComposeSending, toast, t]);
 
   // ── Close compose and reset ──
   const closeCompose = useCallback(() => {

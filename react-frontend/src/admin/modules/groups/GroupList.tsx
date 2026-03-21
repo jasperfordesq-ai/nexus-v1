@@ -75,7 +75,7 @@ export function GroupList() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search]);
+  }, [page, status, search, toast]);
 
   useEffect(() => {
     loadItems();

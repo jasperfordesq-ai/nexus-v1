@@ -372,7 +372,7 @@ export function LeaderboardPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [period, type]);
+  }, [period, type, t]);
 
   useEffect(() => {
     loadLeaderboard();

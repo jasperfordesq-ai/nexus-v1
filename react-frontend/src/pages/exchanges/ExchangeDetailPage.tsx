@@ -184,7 +184,7 @@ export function ExchangeDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadExchange();
@@ -206,7 +206,7 @@ export function ExchangeDetailPage() {
       }
     }
     loadRatings();
-  }, [exchange?.status, id]);
+  }, [exchange, id]);
 
   const isRequester = exchange?.requester_id === user?.id;
   const isProvider = exchange?.provider_id === user?.id;

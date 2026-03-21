@@ -9,7 +9,7 @@
  * Parity: PHP BrokerControlsController::configuration()
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardBody, Button, Input, Switch, Divider, Spinner } from '@heroui/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -59,11 +59,7 @@ export default function BrokerConfiguration() {
     insurance_expiry_warning_days: 30,
   });
 
-  useEffect(() => {
-    loadConfig();
-  }, []);
-
-  async function loadConfig() {
+  const loadConfig = useCallback(async () => {
     setLoading(true);
     try {
       const res = await adminBroker.getConfiguration();
@@ -75,7 +71,11 @@ export default function BrokerConfiguration() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [toast]);
+
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig]);
 
   async function handleSave() {
     setSaving(true);

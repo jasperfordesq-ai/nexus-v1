@@ -58,7 +58,7 @@ export function PagesAdmin() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     fetchData();

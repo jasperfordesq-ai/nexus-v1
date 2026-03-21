@@ -107,7 +107,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       toast.error(t('announcements.load_failed', 'Failed to load announcements'));
     }
     setLoading(false);
-  }, [groupId, toast]);
+  }, [groupId, toast, t]);
 
   useEffect(() => { loadAnnouncements(); }, [loadAnnouncements]);
 
@@ -134,7 +134,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       toast.error(t('announcements.create_failed', 'Failed to create announcement'));
     }
     setCreating(false);
-  }, [groupId, title, content, isPinned, toast, onClose, loadAnnouncements]);
+  }, [groupId, title, content, isPinned, toast, onClose, loadAnnouncements, t]);
 
   // ─── Toggle pin ───
   const handleTogglePin = useCallback(async (announcement: Announcement) => {
@@ -156,7 +156,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       logError('GroupAnnouncementsTab.togglePin', err);
       toast.error(t('announcements.update_failed', 'Failed to update announcement'));
     }
-  }, [groupId, toast]);
+  }, [groupId, toast, t]);
 
   // ─── Delete ───
   const handleDelete = useCallback(async () => {
@@ -172,7 +172,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
       toast.error(t('announcements.delete_failed', 'Failed to delete announcement'));
     }
     setDeleting(false);
-  }, [groupId, deleteTarget, toast]);
+  }, [groupId, deleteTarget, toast, t]);
 
   // ─── Render ───
   return (

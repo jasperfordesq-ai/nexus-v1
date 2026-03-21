@@ -159,7 +159,6 @@ export function NewsletterAnalytics() {
   }, [loadData]);
 
   const totals = data?.totals ?? null;
-  const monthly = data?.monthly_breakdown ?? [];
   const topPerformers = data?.top_performers ?? [];
 
   // Derived avg rates from totals (more accurate than column average)
@@ -179,14 +178,16 @@ export function NewsletterAnalytics() {
 
   // Monthly chart data with computed rates
   const chartData = useMemo(
-    () =>
-      monthly.map((m) => ({
+    () => {
+      const monthly = data?.monthly_breakdown ?? [];
+      return monthly.map((m) => ({
         ...m,
         label: formatMonth(m.month),
         openRate: m.sent > 0 ? Math.round((m.opens / m.sent) * 1000) / 10 : 0,
         clickRate: m.sent > 0 ? Math.round((m.clicks / m.sent) * 1000) / 10 : 0,
-      })),
-    [monthly],
+      }));
+    },
+    [data],
   );
 
   const hasData = (data?.total_newsletters ?? 0) > 0;

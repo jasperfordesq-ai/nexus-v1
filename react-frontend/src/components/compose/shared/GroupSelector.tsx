@@ -52,7 +52,7 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
 
     loadGroups();
     return () => { cancelled = true; };
-  }, [user?.id]);
+  }, [user?.id, user]);
 
   if (groups.length === 0 && !isLoading) return null;
 

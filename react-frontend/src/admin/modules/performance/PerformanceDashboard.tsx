@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Tabs, Tab, Chip, Spinner } from '@heroui/react';
 import { Activity, Database, Zap, AlertTriangle, Clock, MemoryStick } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -50,11 +50,7 @@ export default function PerformanceDashboard() {
   const [hours, setHours] = useState(24);
   const [selectedTab, setSelectedTab] = useState('requests');
 
-  useEffect(() => {
-    loadSummary();
-  }, [hours]);
-
-  const loadSummary = async () => {
+  const loadSummary = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get<PerformanceSummary>(`/v2/metrics/summary?hours=${hours}`);
@@ -66,7 +62,11 @@ export default function PerformanceDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [hours]);
+
+  useEffect(() => {
+    loadSummary();
+  }, [hours, loadSummary]);
 
   const formatDuration = (ms: number) => {
     if (ms < 1000) return `${Math.round(ms)}ms`;

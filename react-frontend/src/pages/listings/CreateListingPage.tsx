@@ -79,52 +79,52 @@ export function CreateListingPage() {
   }, [imagePreview]);
 
   useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await api.get<Category[]>('/v2/categories?type=listing');
+        if (response.success && response.data) {
+          setCategories(response.data);
+        }
+      } catch (error) {
+        logError('Failed to load categories', error);
+      }
+    }
+
+    async function loadListing() {
+      if (!id) return;
+
+      try {
+        setIsLoading(true);
+        const response = await api.get<Listing>(`/v2/listings/${id}`);
+        if (response.success && response.data) {
+          const listing = response.data;
+          setFormData({
+            title: listing.title,
+            description: listing.description,
+            type: listing.type,
+            category_id: listing.category_id?.toString() || '',
+            hours_estimate: (listing.hours_estimate ?? listing.estimated_hours ?? 1).toString(),
+            location: listing.location || '',
+            latitude: listing.latitude ?? undefined,
+            longitude: listing.longitude ?? undefined,
+          });
+          if (listing.image_url) {
+            setExistingImageUrl(listing.image_url);
+          }
+        }
+      } catch (error) {
+        logError('Failed to load listing', error);
+        toast.error(t('form.load_error', 'Failed to load listing'));
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
     loadCategories();
     if (isEditing) {
       loadListing();
     }
-  }, [id]);
-
-  async function loadCategories() {
-    try {
-      const response = await api.get<Category[]>('/v2/categories?type=listing');
-      if (response.success && response.data) {
-        setCategories(response.data);
-      }
-    } catch (error) {
-      logError('Failed to load categories', error);
-    }
-  }
-
-  async function loadListing() {
-    if (!id) return;
-
-    try {
-      setIsLoading(true);
-      const response = await api.get<Listing>(`/v2/listings/${id}`);
-      if (response.success && response.data) {
-        const listing = response.data;
-        setFormData({
-          title: listing.title,
-          description: listing.description,
-          type: listing.type,
-          category_id: listing.category_id?.toString() || '',
-          hours_estimate: (listing.hours_estimate ?? listing.estimated_hours ?? 1).toString(),
-          location: listing.location || '',
-          latitude: listing.latitude ?? undefined,
-          longitude: listing.longitude ?? undefined,
-        });
-        if (listing.image_url) {
-          setExistingImageUrl(listing.image_url);
-        }
-      }
-    } catch (error) {
-      logError('Failed to load listing', error);
-      toast.error(t('form.load_error', 'Failed to load listing'));
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  }, [id, isEditing, t, toast]);
 
   function validateForm(): boolean {
     const newErrors: Partial<Record<keyof FormData, string>> = {};

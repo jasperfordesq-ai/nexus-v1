@@ -40,7 +40,7 @@ export function DeliverabilityAnalytics() {
       })
       .catch(() => toast.error('Failed to load analytics'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

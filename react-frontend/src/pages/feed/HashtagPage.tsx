@@ -110,7 +110,7 @@ export function HashtagPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [tag]);
+  }, [tag, t]);
 
   useEffect(() => {
     cursorRef.current = undefined;

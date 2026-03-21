@@ -119,7 +119,7 @@ export function FederationPartnerDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     loadPartner();

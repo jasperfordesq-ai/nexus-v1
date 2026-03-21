@@ -697,7 +697,7 @@ export default function FederationHubPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadData();
@@ -721,7 +721,7 @@ export default function FederationHubPage() {
     } finally {
       setIsOptingIn(false);
     }
-  }, [toast, loadData]);
+  }, [toast, loadData, t]);
 
   // ─── Opt out ───
 
@@ -742,7 +742,7 @@ export default function FederationHubPage() {
     } finally {
       setIsOptingOut(false);
     }
-  }, [toast, loadData]);
+  }, [toast, loadData, t]);
 
   // ─── Loading state ───
 

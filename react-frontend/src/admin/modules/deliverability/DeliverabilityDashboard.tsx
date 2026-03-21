@@ -47,7 +47,7 @@ export function DeliverabilityDashboard() {
       })
       .catch(() => toast.error('Failed to load dashboard data'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

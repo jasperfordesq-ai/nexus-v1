@@ -58,7 +58,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2.30"
+        }
     },
     "suggest": {
         "ext-redis": "For Redis caching support",

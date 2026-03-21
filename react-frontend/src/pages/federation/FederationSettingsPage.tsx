@@ -142,7 +142,7 @@ export function FederationSettingsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadSettings();
@@ -174,7 +174,7 @@ export function FederationSettingsPage() {
     } finally {
       setIsTogglingStatus(false);
     }
-  }, [federationOptedIn, toast]);
+  }, [federationOptedIn, toast, t]);
 
   const handleSave = useCallback(async () => {
     try {
@@ -192,7 +192,7 @@ export function FederationSettingsPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [settings, toast]);
+  }, [settings, toast, t]);
 
   const updateSetting = useCallback(<K extends keyof SettingsFormData>(key: K, value: SettingsFormData[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));

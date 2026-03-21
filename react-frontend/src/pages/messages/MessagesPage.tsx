@@ -222,6 +222,26 @@ export function MessagesPage() {
   }, [toUserId, listingId, conversations.length, startNewConversation]);
 
   // Debounced user search
+  const searchUsers = useCallback(async (query: string) => {
+    try {
+      setIsSearchingUsers(true);
+      setUserSearchError(null);
+      const response = await api.get<User[]>(`/v2/users?q=${encodeURIComponent(query)}&limit=10`);
+      if (response.success && response.data) {
+        // Filter out current user from results
+        const filtered = response.data.filter(u => u.id !== currentUser?.id);
+        setUserSearchResults(filtered);
+      } else {
+        setUserSearchError(t('search_members_failed'));
+      }
+    } catch (error) {
+      logError('Failed to search users', error);
+      setUserSearchError(t('search_members_failed'));
+    } finally {
+      setIsSearchingUsers(false);
+    }
+  }, [t, currentUser?.id]);
+
   useEffect(() => {
     if (!userSearchQuery.trim()) {
       setUserSearchResults([]);
@@ -233,7 +253,7 @@ export function MessagesPage() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [userSearchQuery]);
+  }, [userSearchQuery, searchUsers]);
 
   const loadArchivedConversations = useCallback(async () => {
     try {
@@ -272,26 +292,6 @@ export function MessagesPage() {
       loadArchivedConversations();
     }
   }, [activeTab, loadArchivedConversations]);
-
-  async function searchUsers(query: string) {
-    try {
-      setIsSearchingUsers(true);
-      setUserSearchError(null);
-      const response = await api.get<User[]>(`/v2/users?q=${encodeURIComponent(query)}&limit=10`);
-      if (response.success && response.data) {
-        // Filter out current user from results
-        const filtered = response.data.filter(u => u.id !== currentUser?.id);
-        setUserSearchResults(filtered);
-      } else {
-        setUserSearchError(t('search_members_failed'));
-      }
-    } catch (error) {
-      logError('Failed to search users', error);
-      setUserSearchError(t('search_members_failed'));
-    } finally {
-      setIsSearchingUsers(false);
-    }
-  }
 
   function handleSelectUser(user: User) {
     // Check if we already have a conversation with this user

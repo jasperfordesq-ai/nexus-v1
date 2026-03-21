@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from '@heroui/react';
 import { TrendingUp, Users, Target } from 'lucide-react';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -18,11 +18,7 @@ export default function GroupRecommendations() {
   const [stats, setStats] = useState({ total: 0, avg_score: 0, join_rate: 0 });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await adminGroups.getRecommendationData({ limit: 50 });
@@ -34,7 +30,11 @@ export default function GroupRecommendations() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [error]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   return (
     <div className="p-6 space-y-6">
