@@ -7,18 +7,28 @@
 namespace App\Core;
 
 /**
- * Environment variable access using Laravel's env() helper.
+ * Environment variable access — thin wrapper around Laravel's env() helper.
+ *
+ * Kept for backward compatibility with legacy code that calls Env::get().
+ * New code should use Laravel's env() or config() directly.
  */
 class Env
 {
     /**
      * Load environment variables from a .env file.
      *
-     * In a full Laravel context this is handled by Dotenv automatically.
-     * This method provides backwards compatibility for legacy code paths.
+     * In Laravel, Dotenv handles this automatically during bootstrap.
+     * This method is a no-op when Laravel is booted; it only does manual
+     * loading as a fallback for standalone scripts.
      */
     public static function load(string $path): void
     {
+        // If Laravel is booted, Dotenv already loaded .env — nothing to do.
+        if (function_exists('app') && app()->bound('config')) {
+            return;
+        }
+
+        // Fallback for standalone scripts outside Laravel
         if (!file_exists($path)) {
             return;
         }
@@ -50,8 +60,8 @@ class Env
     /**
      * Get an environment variable value.
      *
-     * Uses Laravel's env() helper when available, then falls back to
-     * checking $_ENV, $_SERVER, and getenv().
+     * Delegates to Laravel's env() helper which handles caching and
+     * type casting. Falls back to raw lookups only if Laravel is not booted.
      *
      * @param string $key     Environment variable name
      * @param mixed  $default Default value if not found
@@ -59,30 +69,12 @@ class Env
      */
     public static function get($key, $default = null)
     {
-        // Use Laravel's env() helper if available (it handles caching, type casting, etc.)
+        // Laravel's env() is the canonical source
         if (function_exists('env')) {
-            $value = env($key);
-            if ($value !== null) {
-                return $value;
-            }
+            return env($key, $default);
         }
 
-        // Check $_ENV (most reliable across platforms)
-        if (isset($_ENV[$key])) {
-            return $_ENV[$key];
-        }
-
-        // Check $_SERVER (often populated by web servers)
-        if (isset($_SERVER[$key])) {
-            return $_SERVER[$key];
-        }
-
-        // Check getenv() (system environment variables)
-        $value = getenv($key);
-        if ($value !== false) {
-            return $value;
-        }
-
-        return $default;
+        // Fallback chain for non-Laravel context (standalone scripts)
+        return $_ENV[$key] ?? $_SERVER[$key] ?? (($v = getenv($key)) !== false ? $v : $default);
     }
 }

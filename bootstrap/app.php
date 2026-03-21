@@ -97,16 +97,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })
     ->create();
 
-// DB Bridge: Share Laravel's PDO connection with the legacy Database class.
-// This ensures both frameworks use the same connection pool and transaction state.
-$app->booted(function () use ($app) {
-    try {
-        $pdo = $app->make('db')->connection()->getPdo();
-        \App\Core\Database::setLaravelConnection($pdo);
-    } catch (\Throwable $e) {
-        // If Laravel DB isn't configured yet, legacy Database creates its own connection
-        error_log('[Laravel Bridge] DB bridge skipped: ' . $e->getMessage());
-    }
-});
+// NOTE: App\Core\Database now delegates directly to DB::connection()->getPdo()
+// so no explicit bridge setup is needed.
 
 return $app;

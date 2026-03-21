@@ -6,98 +6,65 @@
 
 namespace App\Core;
 
+use Illuminate\Support\Facades\DB;
 use PDO;
 use PDOException;
 
 /**
- * Database singleton — provides raw PDO access with query profiling,
- * slow-query logging, and Laravel PDO bridge support.
+ * Database — thin wrapper around Laravel's DB facade.
  *
- * Prefer Eloquent or DB:: facade for new code. This class exists for
- * backward compatibility with legacy code that calls Database::query().
+ * All production code should use Eloquent or DB:: directly. This class
+ * exists solely for backward compatibility with tests, migrations, and
+ * legacy scripts that call Database::query().
+ *
+ * Internally delegates to Laravel's PDO connection — no separate
+ * connection is created.
  */
 class Database
 {
-    private static $instance = null;
-    private $pdo;
-
     /** Query performance tracking */
-    private static $queryLog = [];
-    private static $slowQueryThreshold = 0.1; // 100ms in seconds
-    private static $enableProfiling = null;
+    private static array $queryLog = [];
+    private static float $slowQueryThreshold = 0.1; // 100ms in seconds
+    private static ?bool $enableProfiling = null;
 
     /**
-     * Laravel DB bridge — when set, getInstance() returns Laravel's PDO
-     * instead of creating a separate connection.
+     * Get the PDO instance from Laravel's database connection.
      */
-    private static ?PDO $laravelPdo = null;
-
-    private function __construct()
+    public static function getInstance(): PDO
     {
-        // Prefer Laravel's PDO if the application has booted
-        try {
-            if (function_exists('app') && app()->bound('db')) {
-                $this->pdo = \Illuminate\Support\Facades\DB::connection()->getPdo();
-                return;
-            }
-        } catch (\Throwable $e) {
-            // Laravel not available, fall back to manual connection
-        }
-
-        $config = require __DIR__ . '/../../src/Config/config.php';
-        $dbConfig = $config['db'];
-
-        try {
-            if ($dbConfig['type'] === 'sqlite') {
-                $this->pdo = new PDO('sqlite:' . $dbConfig['file']);
-            } elseif ($dbConfig['type'] === 'pgsql' || $dbConfig['type'] === 'postgresql') {
-                $port = $dbConfig['port'] ?? 5432;
-                $dsn = "pgsql:host={$dbConfig['host']};port={$port};dbname={$dbConfig['name']}";
-                $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass']);
-            } else {
-                $port = $dbConfig['port'] ?? 3306;
-                $dsn = "mysql:host={$dbConfig['host']};port={$port};dbname={$dbConfig['name']};charset=utf8mb4";
-                $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass']);
-            }
-
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        } catch (PDOException $e) {
-            error_log('Database Connection Failed: ' . $e->getMessage());
-            throw new \RuntimeException('Database connection failed: ' . $e->getMessage());
-        }
+        return DB::connection()->getPdo();
     }
 
     /**
-     * Set Laravel's PDO connection for the DB bridge.
+     * Alias for getInstance().
      */
-    public static function setLaravelConnection(PDO $pdo): void
-    {
-        self::$laravelPdo = $pdo;
-    }
-
-    public static function getInstance()
-    {
-        if (self::$laravelPdo !== null) {
-            return self::$laravelPdo;
-        }
-
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance->pdo;
-    }
-
-    public static function getConnection()
+    public static function getConnection(): PDO
     {
         return self::getInstance();
     }
 
+    /**
+     * Set Laravel's PDO connection for the DB bridge.
+     *
+     * @deprecated No longer needed — getInstance() pulls from DB:: directly.
+     */
+    public static function setLaravelConnection(PDO $pdo): void
+    {
+        // No-op: kept for backward compatibility with bootstrap/app.php
+    }
+
+    /**
+     * Execute a prepared statement and return the PDOStatement.
+     *
+     * @param string $sql    SQL query with ? placeholders
+     * @param array  $params Bind parameters
+     * @return \PDOStatement
+     */
     public static function query($sql, $params = [])
     {
         if (self::$enableProfiling === null) {
-            self::$enableProfiling = getenv('DEBUG') === 'true' || getenv('DB_PROFILING') === 'true';
+            self::$enableProfiling = config('app.debug', false)
+                || config('database.profiling', false);
         }
 
         $start = microtime(true);
@@ -121,15 +88,11 @@ class Database
                 }
             }
 
-            $stmt = self::getInstance()->prepare($sql);
+            $pdo = self::getInstance();
+            $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
 
             $duration = microtime(true) - $start;
-
-            // Track with performance monitor if available
-            if (class_exists(\App\Services\PerformanceMonitorService::class)) {
-                \App\Services\PerformanceMonitorService::trackQueryStatic($sql, $params, $duration);
-            }
 
             if ($duration > self::$slowQueryThreshold) {
                 self::logSlowQuery($sql, $params, $duration);
@@ -152,7 +115,7 @@ class Database
         }
     }
 
-    private static function logSlowQuery($sql, $params, $duration)
+    private static function logSlowQuery($sql, $params, $duration): void
     {
         $milliseconds = round($duration * 1000, 2);
 
@@ -174,7 +137,7 @@ class Database
         error_log($message);
     }
 
-    public static function getQueryStats()
+    public static function getQueryStats(): array
     {
         if (empty(self::$queryLog)) {
             return [
@@ -213,37 +176,37 @@ class Database
         ];
     }
 
-    public static function resetQueryLog()
+    public static function resetQueryLog(): void
     {
         self::$queryLog = [];
     }
 
-    public static function setSlowQueryThreshold($seconds)
+    public static function setSlowQueryThreshold($seconds): void
     {
         self::$slowQueryThreshold = (float) $seconds;
     }
 
-    public static function setProfilingEnabled($enabled)
+    public static function setProfilingEnabled($enabled): void
     {
         self::$enableProfiling = (bool) $enabled;
     }
 
-    public static function lastInsertId()
+    public static function lastInsertId(): string
     {
         return self::getInstance()->lastInsertId();
     }
 
-    public static function beginTransaction()
+    public static function beginTransaction(): bool
     {
         return self::getInstance()->beginTransaction();
     }
 
-    public static function commit()
+    public static function commit(): bool
     {
         return self::getInstance()->commit();
     }
 
-    public static function rollback()
+    public static function rollback(): bool
     {
         return self::getInstance()->rollBack();
     }

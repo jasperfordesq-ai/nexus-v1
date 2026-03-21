@@ -35,13 +35,16 @@ class TenantContext
     private static $headerTenantId = null;
 
     /**
-     * Get a PDO connection — uses Laravel DB facade when available,
+     * Query a single tenant row and return as associative array (or false/null).
      *
-     * @return \PDO
+     * @param string $column Column to match
+     * @param mixed  $value  Value to match
+     * @return array|null Associative array of tenant data, or null if not found
      */
-    private static function getPdo(): \PDO
+    private static function fetchTenant(string $column, $value): ?array
     {
-        return DB::connection()->getPdo();
+        $row = DB::table('tenants')->where($column, $value)->first();
+        return $row ? (array) $row : null;
     }
 
     /**
@@ -56,10 +59,7 @@ class TenantContext
             // Strip www. prefix for consistent matching
             $host = preg_replace('/^www\./', '', $host);
 
-            $db = self::getPdo();
-            $stmt = $db->prepare("SELECT * FROM tenants WHERE domain = ?");
-            $stmt->execute([$host]);
-            $domainTenant = $stmt->fetch();
+            $domainTenant = self::fetchTenant('domain', $host);
 
             if ($domainTenant && $domainTenant['id'] != 1) {
                 // Check if tenant is active
@@ -101,10 +101,7 @@ class TenantContext
             }
 
             // Validate the tenant ID exists
-            $db = self::getPdo();
-            $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
-            $stmt->execute([$headerTenantId]);
-            $headerTenant = $stmt->fetch();
+            $headerTenant = self::fetchTenant('id', $headerTenantId);
 
             if (!$headerTenant) {
                 self::respondWithInvalidTenantError($headerTenantId);
@@ -127,10 +124,7 @@ class TenantContext
         // Same security model as X-Tenant-ID: token tenant must match unless superadmin.
         $headerSlug = $_SERVER['HTTP_X_TENANT_SLUG'] ?? null;
         if ($headerSlug !== null && $headerSlug !== '') {
-            $db = self::getPdo();
-            $stmt = $db->prepare("SELECT * FROM tenants WHERE slug = ?");
-            $stmt->execute([trim($headerSlug)]);
-            $slugTenant = $stmt->fetch();
+            $slugTenant = self::fetchTenant('slug', trim($headerSlug));
 
             if ($slugTenant) {
                 $slugTenantId = (int)$slugTenant['id'];
@@ -166,10 +160,7 @@ class TenantContext
             // Only use token tenant if this looks like an API request without other resolution
             $requestUri = $_SERVER['REQUEST_URI'] ?? '';
             if (strpos($requestUri, '/api/') !== false) {
-                $db = self::getPdo();
-                $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
-                $stmt->execute([$tokenTenantId]);
-                $tokenTenant = $stmt->fetch();
+                $tokenTenant = self::fetchTenant('id', $tokenTenantId);
 
                 if ($tokenTenant) {
                     if (empty($tokenTenant['is_active'])) {
@@ -264,10 +255,7 @@ class TenantContext
         ];
 
         if (!empty($firstSegment) && !in_array($firstSegment, $reserved)) {
-            $db = self::getPdo();
-            $stmt = $db->prepare("SELECT * FROM tenants WHERE slug = ?");
-            $stmt->execute([$firstSegment]);
-            $tenant = $stmt->fetch();
+            $tenant = self::fetchTenant('slug', $firstSegment);
 
             if ($tenant) {
                 // Check if tenant is active
@@ -302,10 +290,7 @@ class TenantContext
         // 4. For reserved routes (admin, dashboard, etc.), use session tenant if available
         // This ensures admin areas use the logged-in user's tenant, not Master
         if (in_array($firstSegment, $reserved) && !empty($_SESSION['tenant_id'])) {
-            $db = self::getPdo();
-            $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
-            $stmt->execute([$_SESSION['tenant_id']]);
-            $sessionTenant = $stmt->fetch();
+            $sessionTenant = self::fetchTenant('id', $_SESSION['tenant_id']);
             if ($sessionTenant) {
                 // Check if tenant is active (except for super-admin routes)
                 if (empty($sessionTenant['is_active']) && $firstSegment !== 'super-admin') {
@@ -324,9 +309,7 @@ class TenantContext
         // 5. Fallback: Master Tenant (ID 1)
         // This handles Root (/), Restricted Routes (/login, /about), and Master Domain usage.
         try {
-            $db = self::getPdo();
-            $stmt = $db->query("SELECT * FROM tenants WHERE id = 1");
-            $master = $stmt->fetch();
+            $master = self::fetchTenant('id', 1);
             if ($master) {
                 self::$tenant = $master;
                 self::$basePath = '';
@@ -366,10 +349,7 @@ class TenantContext
      */
     public static function setById($tenantId): bool
     {
-        $db = self::getPdo();
-        $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
-        $stmt->execute([$tenantId]);
-        $tenant = $stmt->fetch();
+        $tenant = self::fetchTenant('id', $tenantId);
 
         if ($tenant) {
             self::$tenant = $tenant;
@@ -733,18 +713,17 @@ class TenantContext
                 $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
                 if ($payload && $userId) {
                     // Look up user to check super admin status
-                    $db = self::getPdo();
-                    $stmt = $db->prepare("SELECT is_super_admin, is_tenant_super_admin, role FROM users WHERE id = ?");
-                    $stmt->execute([$userId]);
-                    $user = $stmt->fetch();
+                    $userRow = DB::table('users')
+                        ->where('id', $userId)
+                        ->first(['is_super_admin', 'is_tenant_super_admin', 'role']);
 
-                    if ($user) {
+                    if ($userRow) {
                         // SECURITY: Only actual super admins can access cross-tenant data.
                         // Regular admins (role=admin, role=tenant_admin) must NOT be allowed
                         // to spoof X-Tenant-ID headers to access other tenants' data.
-                        return !empty($user['is_super_admin'])
-                            || !empty($user['is_tenant_super_admin'])
-                            || ($user['role'] ?? '') === 'super_admin';
+                        return !empty($userRow->is_super_admin)
+                            || !empty($userRow->is_tenant_super_admin)
+                            || ($userRow->role ?? '') === 'super_admin';
                     }
                 }
             }
