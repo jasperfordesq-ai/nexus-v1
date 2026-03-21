@@ -139,8 +139,10 @@ export function FeedPage() {
   // Use a ref for cursor to avoid infinite re-render loop
   const cursorRef = useRef<string | undefined>();
 
-  // AbortController ref to cancel stale feed requests (race condition prevention)
+  // Separate AbortControllers: initial/filter loads vs load-more appends
+  // This prevents a fresh load from aborting an in-flight append (or vice versa)
   const abortRef = useRef<AbortController | null>(null);
+  const appendAbortRef = useRef<AbortController | null>(null);
 
   // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
@@ -169,15 +171,18 @@ export function FeedPage() {
   }, [isAuthenticated]);
 
   const loadFeed = useCallback(async (append = false) => {
-    // Abort any in-flight request to prevent stale race conditions
-    abortRef.current?.abort();
+    // Use separate abort controllers so fresh loads don't cancel appends
+    const ref = append ? appendAbortRef : abortRef;
+    ref.current?.abort();
     const controller = new AbortController();
-    abortRef.current = controller;
+    ref.current = controller;
 
     try {
       if (append) {
         setIsLoadingMore(true);
       } else {
+        // Fresh load — also cancel any in-flight append to avoid stale data
+        appendAbortRef.current?.abort();
         setIsLoading(true);
         setError(null);
       }
@@ -200,7 +205,12 @@ export function FeedPage() {
         const feedItems = Array.isArray(response.data) ? response.data : [];
 
         if (append) {
-          setItems((prev) => [...prev, ...feedItems]);
+          // Deduplicate: prevent double-rendering if API returns overlapping items
+          setItems((prev) => {
+            const existingKeys = new Set(prev.map((p) => `${p.type}-${p.id}`));
+            const newItems = feedItems.filter((fi) => !existingKeys.has(`${fi.type}-${fi.id}`));
+            return [...prev, ...newItems];
+          });
         } else {
           setItems(feedItems);
         }
@@ -219,8 +229,11 @@ export function FeedPage() {
       if (!append) setError(tRef.current('error_load_retry'));
     } finally {
       if (!controller.signal.aborted) {
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        if (append) {
+          setIsLoadingMore(false);
+        } else {
+          setIsLoading(false);
+        }
       }
     }
   }, [filter, feedMode, subFilter]);
@@ -241,7 +254,7 @@ export function FeedPage() {
     cursorRef.current = undefined;
     setPendingPostCount(0);
     loadFeedRef.current();
-    return () => { abortRef.current?.abort(); };
+    return () => { abortRef.current?.abort(); appendAbortRef.current?.abort(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- uses loadFeedRef to avoid reset loops
   }, [filter, feedMode, subFilter]);
 
@@ -637,9 +650,9 @@ export function FeedPage() {
             </GlassCard>
           ) : (
             <div className="space-y-4">
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence initial={false}>
                 {items.map((item) => (
-                  <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} layout>
+                  <motion.div key={`${item.type}-${item.id}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }} transition={{ duration: 0.25 }}>
                     <FeedCard
                       item={item}
                       onToggleLike={handleToggleLike}
