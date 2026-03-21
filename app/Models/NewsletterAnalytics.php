@@ -7,12 +7,13 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class NewsletterAnalytics extends Model
 {
-    use HasTenantScope;
+    use HasFactory, HasTenantScope;
 
     protected $table = 'newsletter_engagement_patterns';
 

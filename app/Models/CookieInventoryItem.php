@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CookieInventoryItem extends Model
 {
+    use HasFactory;
+
     protected $table = 'cookie_inventory';
 
     protected $fillable = [

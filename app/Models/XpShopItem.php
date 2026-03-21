@@ -7,11 +7,12 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class XpShopItem extends Model
 {
-    use HasTenantScope;
+    use HasFactory, HasTenantScope;
 
     protected $table = 'xp_shop_items';
 

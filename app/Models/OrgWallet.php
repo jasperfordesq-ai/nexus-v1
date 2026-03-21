@@ -7,11 +7,12 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class OrgWallet extends Model
 {
-    use HasTenantScope;
+    use HasFactory, HasTenantScope;
 
     protected $table = 'org_wallets';
 

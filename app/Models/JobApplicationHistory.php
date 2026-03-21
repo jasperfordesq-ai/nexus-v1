@@ -6,11 +6,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class JobApplicationHistory extends Model
 {
+    use HasFactory;
+
     protected $table = 'job_application_history';
 
     public $timestamps = false;

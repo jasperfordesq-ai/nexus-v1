@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ use App\Core\TenantContext;
 
 class Gamification extends Model
 {
-    use HasTenantScope;
+    use HasFactory, HasTenantScope;
 
     // Legacy Gamification model is a utility class that updates users.points
     // There is no dedicated gamification table — XP is tracked on the users table

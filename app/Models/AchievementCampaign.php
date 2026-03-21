@@ -7,11 +7,12 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AchievementCampaign extends Model
 {
-    use HasTenantScope;
+    use HasFactory, HasTenantScope;
 
     protected $table = 'achievement_campaigns';
 

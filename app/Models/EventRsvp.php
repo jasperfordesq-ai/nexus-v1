@@ -7,6 +7,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ use App\Core\TenantContext;
 
 class EventRsvp extends Model
 {
-    use HasTenantScope;
+    use HasFactory, HasTenantScope;
 
     protected $table = 'event_rsvps';
 

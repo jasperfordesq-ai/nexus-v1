@@ -7,13 +7,14 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasTenantScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
 class ActivityLog extends Model
 {
-    use HasTenantScope;
+    use HasFactory, HasTenantScope;
     protected $table = 'activity_log';
 
     protected $fillable = [
