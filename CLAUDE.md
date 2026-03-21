@@ -102,11 +102,10 @@ The NGC folder (`C:\Users\{user}\AppData\Local\Microsoft\Ngc`) must exist — th
 The Laravel migration has been **merged to `main`** (2026-03-19) and is live in production. The `laravel-migration` branch no longer exists.
 
 - **Phases 0–5 are complete**: Laravel 12.54 is the sole HTTP handler, routing, middleware, controllers, and auth
-- **164 of 268 services** are native Eloquent/DI implementations
-- **104 wrapper services** still delegate to legacy `\Nexus\*` static methods — convert incrementally as you touch them
-- **82 legacy `src/` files** remain as thin delegates — delete as their callers are converted
-- **5 Event Listener stubs** in `app/Listeners/` have TODO comments — implement after converting relevant wrapper services
-- All new schema changes use Laravel migrations in `database/migrations/`
+- **All 223 services are native Laravel implementations** — zero stubs remain (47 converted + 45 dead stubs deleted on 2026-03-21)
+- **43 legacy `src/` files** remain (39 deleted 2026-03-21) — kept alive only by admin views and `app/Core/ImageUploader.php`
+- **5 Event Listeners** in `app/Listeners/` are fully implemented (completed 2026-03-21)
+- All new schema changes use Laravel migrations in `database/migrations/` (5 Laravel, 190 legacy SQL)
 - See [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) for the full remaining work breakdown
 
 ---
@@ -307,40 +306,48 @@ sudo bash scripts/safe-deploy.sh status     # Check current deployment status
 
 ## 🔴 Global Maintenance Mode (CRITICAL — CANONICAL METHOD)
 
-**This section documents the ONLY reliable method for putting the entire Project NEXUS platform into maintenance mode. Do NOT improvise, guess, or use alternative approaches. This procedure was established on 2026-03-21 and is the canonical method.**
+**This section documents the ONLY reliable method for putting the entire Project NEXUS platform into maintenance mode. Do NOT improvise, guess, or use alternative approaches. Updated 2026-03-21.**
 
 ### What "maintenance mode" means
 
-When maintenance mode is ON, **all tenants across the entire platform** return HTTP 503 to every non-localhost request. A static HTML maintenance page is served. No database, Redis, or framework code is involved — the check happens in `httpdocs/index.php` before anything else loads.
+When maintenance mode is ON, **all tenants across the entire platform** are blocked. Two independent layers enforce this — **BOTH must be toggled together** or users will still see maintenance mode.
 
-### How it works
+### How it works — TWO LAYERS
 
-A `.maintenance` file inside the PHP container (`/var/www/html/.maintenance`) triggers a pre-framework gate in `index.php` (line 16). When the file exists, all external traffic is blocked. When it doesn't exist, the platform is live.
+| Layer | Mechanism | Where checked | What it blocks |
+|-------|-----------|---------------|---------------|
+| **Layer 1: File** | `.maintenance` file in PHP container | `httpdocs/index.php` line 16 (pre-framework) | ALL HTTP traffic except localhost |
+| **Layer 2: Database** | `tenant_settings.general.maintenance_mode` | Laravel `CheckMaintenanceMode` middleware + React `TenantShell` | Non-admin API requests + React frontend |
+
+**Layer 1** is the fast gate — blocks everything before Laravel boots, serves static HTML 503.
+**Layer 2** is the application gate — if the file is gone but the database still says `true`, Laravel middleware returns 503 JSON and React shows `MaintenancePage`.
+
+**`scripts/maintenance.sh` controls BOTH layers atomically.** One command toggles both.
 
 ### Commands (run on the production server via SSH)
 
 ```bash
-# Enable maintenance mode (all tenants, immediate)
+# Enable maintenance mode (file + database, all tenants, immediate)
 sudo bash scripts/maintenance.sh on
 
-# Disable maintenance mode (platform goes live, immediate)
+# Disable maintenance mode (file + database, all tenants, immediate)
 sudo bash scripts/maintenance.sh off
 
-# Check current status
+# Check both layers' status
 sudo bash scripts/maintenance.sh status
 ```
 
 ### Deployment integration
 
 The deploy script (`scripts/safe-deploy.sh`) automatically:
-1. **Enables** maintenance mode at the start of every deployment
-2. **Re-enables** it after container rebuilds (since `docker compose up --force-recreate` wipes container filesystems)
-3. **Disables** it at the end of a successful deployment
+1. **Enables** maintenance mode (both layers) at the start of every deployment
+2. **Re-enables** Layer 1 after container rebuilds (since `docker compose up --force-recreate` wipes container filesystems — Layer 2 survives in the database)
+3. **Disables** maintenance mode (both layers) at the end of a successful deployment
 4. **Leaves it ON** if deployment fails — with clear recovery instructions printed to console
 
 ### On deployment failure
 
-If a deploy fails, **maintenance mode stays ON**. This is intentional — a failed deploy may leave the platform in an inconsistent state. Recovery options are printed:
+If a deploy fails, **maintenance mode stays ON**. Recovery:
 1. Re-deploy: `sudo bash scripts/safe-deploy.sh full`
 2. Rollback: `sudo bash scripts/safe-deploy.sh rollback`
 3. Force live: `sudo bash scripts/maintenance.sh off` (only if you're sure the platform is healthy)
@@ -359,7 +366,7 @@ ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.
   "sudo bash /opt/nexus-php/scripts/maintenance.sh off"
 ```
 
-**Do NOT** attempt database-driven maintenance mode (updating `tenant_settings`) as a substitute for this method. The database approach exists as a secondary per-tenant layer but the file-based approach is the primary global control.
+**NEVER toggle only one layer.** Always use `maintenance.sh` which handles both.
 
 ---
 

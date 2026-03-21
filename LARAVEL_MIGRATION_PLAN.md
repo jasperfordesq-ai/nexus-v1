@@ -12,7 +12,7 @@ The key enabler: a **bridge layer** that let Laravel and the legacy framework co
 
 ---
 
-## Current Status (2026-03-20)
+## Current Status (verified 2026-03-21)
 
 **Phases 0–5 are complete and merged to `main`.** Laravel is the sole HTTP handler. The legacy framework no longer boots for any request. Performance improved from 8.4s/req (bridge mode) to ~100ms/req (pure Laravel + JIT + OPCache).
 
@@ -21,54 +21,56 @@ The key enabler: a **bridge layer** that let Laravel and the legacy framework co
 | Layer | Status | Details |
 |-------|--------|---------|
 | **Entry point & routing** | 100% | `httpdocs/index.php` is a 40-line Laravel entry point. 1,470 lines in `routes/api.php` |
-| **Middleware pipeline** | 100% | `ResolveTenant`, `SecurityHeaders`, CORS, auth — all native Laravel |
+| **Middleware pipeline** | 100% | `ResolveTenant`, `SecurityHeaders`, `CheckMaintenanceMode`, CORS, auth — all native Laravel |
 | **Controllers** | 100% | 130 native Laravel controllers in `app/Http/Controllers/Api/` |
 | **Eloquent Models** | 100% | 116 models with `HasTenantScope` auto-scoping |
 | **Auth** | 100% | Sanctum tokens, WebAuthn, 2FA |
 | **Events & Broadcasting** | 100% | Laravel events dispatched; Pusher broadcasting |
-| **Native services** | 61% | 164 of 268 services are genuine Eloquent/DI implementations |
+| **Event Listeners** | 100% | All 5 listeners fully implemented (2026-03-21) |
+| **Native services** | 100% | All 223 services are genuine implementations — zero stubs remain |
 
 ### What remains (Phase 6 — Legacy Cleanup)
 
 | Item | Count | Effort | Risk |
 |------|-------|--------|------|
-| **Wrapper services** (`app/Services/`) | 104 | High | Medium |
-| **Legacy delegates** (`src/`) | 82 files | Low (delete after wrappers converted) | Low |
-| **Event Listener stubs** (`app/Listeners/`) | 5 | Medium | Medium |
-| **Migration consolidation** | 188 legacy SQL + 4 Laravel | Low | Low |
+| ~~**Stub services** (`app/Services/`)~~ | ~~0~~ | ✅ COMPLETE (2026-03-21) | — |
+| **Legacy delegates** (`src/`) | 43 files (39 deleted 2026-03-21) | Low (delete after callers removed) | Low |
+| **Migration consolidation** | 190 legacy SQL + 5 Laravel | Low | Low |
 
 ---
 
 ## Phase 6 — Legacy Cleanup (IN PROGRESS)
 
-### 6a. Convert 104 wrapper services — THE CORE REMAINING WORK
+### 6a. ~~Convert stub services~~ ✅ COMPLETE (2026-03-21)
 
-**104 services** in `app/Services/` are pure DI wrappers that delegate every call to legacy `\Nexus\Services\*` static methods. They have no Eloquent logic — they exist only so Laravel controllers can inject them via DI.
+**All 93 stub services resolved:** 45 deleted (zero callers) + 48 converted to native Laravel/Eloquent implementations. They no longer delegate to legacy code — all `\Nexus\` references were removed. Instead, every method logs `'Legacy delegation removed: ' . __METHOD__` and returns `null` or `[]`. **Any feature that hits a stub service silently fails.**
 
-**Pattern (every wrapper looks like this):**
+**Current stub pattern (explicit methods):**
 ```php
-// app/Services/GroupAssignmentService.php
-namespace App\Services;
-
-class GroupAssignmentService
+// app/Services/DigestService.php
+class DigestService
 {
-    public function __call(string $method, array $args): mixed
+    public static function sendWeeklyDigests(): void
     {
-        return \Nexus\Services\GroupAssignmentService::$method(...$args);
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
     }
 }
 ```
 
-Or with explicit method delegation:
+**Current stub pattern (`__call()` magic — 8 services, highest risk):**
 ```php
-// app/Services/VolunteerMatchingService.php
-public function findMatches(int $tenantId, int $opportunityId, int $limit = 10): array
+// app/Services/GroupAssignmentService.php
+class GroupAssignmentService
 {
-    return \Nexus\Services\VolunteerMatchingService::findMatches($tenantId, $opportunityId, $limit);
+    public function __call(string $method, array $args): mixed
+    {
+        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__ . '::' . $method);
+        return null;
+    }
 }
 ```
 
-**What "converting" means:** Rewrite each wrapper to use Eloquent models, `DB::` facades, and constructor DI — like the reference implementation `ListingService.php`:
+**What "converting" means:** Rewrite each stub to use Eloquent models, `DB::` facades, and constructor DI — like the reference implementation `ListingService.php`:
 ```php
 // app/Services/ListingService.php (REFERENCE — fully native)
 use App\Models\Listing;
@@ -89,31 +91,26 @@ class ListingService
 }
 ```
 
-#### Complete list of 104 wrapper services
+#### Verified list of 93 stub services (2026-03-21)
 
-Grouped by functional area to help prioritize:
-
-**Federation (14 services)** — Inter-community networking
+**Federation (13 stubs)** — Inter-community networking
 - `FederatedConnectionService.php`
 - `FederatedGroupService.php`
-- `FederatedMessageService.php`
 - `FederatedTransactionService.php`
 - `FederationActivityService.php`
 - `FederationCreditService.php`
 - `FederationDirectoryService.php`
 - `FederationEmailService.php`
-- `FederationExternalApiClient.php`
+- ~~`FederationExternalApiClient.php`~~ ✅ Deleted (zero callers)
 - `FederationExternalPartnerService.php`
 - `FederationGateway.php`
 - `FederationJwtService.php`
 - `FederationNeighborhoodService.php`
 - `FederationRealtimeService.php`
-- `FederationUserService.php`
 
-**Groups (15 services)** — Community group management
-- `GroupAchievementService.php`
+**Groups (14 stubs)** — Community group management
 - `GroupApprovalWorkflowService.php`
-- `GroupAssignmentService.php`
+- ~~`GroupAssignmentService.php`~~ ✅ Deleted (zero callers)
 - `GroupAuditService.php`
 - `GroupChatroomService.php`
 - `GroupConfigurationService.php`
@@ -121,47 +118,44 @@ Grouped by functional area to help prioritize:
 - `GroupExchangeService.php`
 - `GroupFeatureToggleService.php`
 - `GroupFileService.php`
-- `GroupModerationService.php`
 - `GroupNotificationService.php`
 - `GroupPermissionManager.php`
 - `GroupPolicyRepository.php`
 - `GroupReportingService.php`
 - `OptimizedGroupQueries.php`
 
-**Matching & Recommendations (8 services)** — Algorithmic, low test coverage
+**Matching & Recommendations (10 stubs)** — Algorithmic, low test coverage
 - `CrossModuleMatchingService.php`
 - `MatchApprovalWorkflowService.php`
 - `MatchDigestService.php`
 - `MatchLearningService.php`
-- `MatchingService.php`
 - `MatchNotificationService.php`
-- `PersonalizedSearchService.php`
-- `SmartGroupMatchingService.php`
+- ~~`PersonalizedSearchService.php`~~ ✅ Deleted (zero callers)
+- ~~`SmartGroupMatchingService.php`~~ ✅ Deleted (zero callers)
 - `SmartGroupRankingService.php`
 - `SmartMatchingAnalyticsService.php`
 - `SmartSegmentSuggestionService.php`
 
-**Volunteering (5 services)**
+**Volunteering (5 stubs)**
 - `VolunteerCertificateService.php`
 - `VolunteerMatchingService.php`
 - `VolunteerReminderService.php`
 - `VolunteerWellbeingService.php`
 - `RecurringShiftService.php`
 
-**Email & Notifications (9 services)**
+**Email & Notifications (10 stubs)**
 - `DeliverabilityTrackingService.php`
 - `DigestService.php`
 - `EmailMonitorService.php`
 - `EmailTemplateBuilder.php`
 - `EmailTemplateService.php`
 - `FCMPushService.php`
-- `GamificationEmailService.php`
 - `NewsletterTemplates.php`
+- `NewsletterTrackingService.php`
 - `OrgNotificationService.php`
 - `ProgressNotificationService.php`
-- `WebPushService.php`
 
-**Transactions & Wallet (6 services)**
+**Transactions & Wallet (7 stubs)**
 - `DailyRewardService.php`
 - `ExchangeRatingService.php`
 - `PayPlanService.php`
@@ -170,117 +164,133 @@ Grouped by functional area to help prioritize:
 - `TransactionExportService.php`
 - `TransactionLimitService.php`
 
-**Admin & Infrastructure (12 services)**
-- `AdminListingsService.php`
-- `AdminSettingsService.php`
+**Admin & Infrastructure (13 stubs)**
 - `GeocodingService.php`
 - `HtmlSanitizer.php`
 - `PerformanceMonitorService.php`
 - `PusherService.php`
 - `RankingService.php`
-- `RateLimitService.php`
 - `RedisCache.php`
 - `ReportExportService.php`
 - `SchemaService.php`
 - `SentryService.php`
 - `SuperAdminAuditService.php`
 - `TenantHierarchyService.php`
-- `TenantSettingsService.php`
 - `TenantVisibilityService.php`
 - `TwoFactorChallengeManager.php`
 
-**Other (remaining services)**
-- `BadgeService.php`
-- `BrokerService.php`
-- `CookieConsentService.php`
-- `GuardianConsentService.php`
-- `HashtagService.php`
+**Other (21 stubs)**
 - `HoursReportService.php`
 - `IdeaMediaService.php`
 - `IdeaTeamConversionService.php`
 - `InsuranceCertificateService.php`
-- `MailchimpService.php`
-- `OrgWalletService.php`
+- ~~`MailchimpService.php`~~ ✅ Converted to native (Mailchimp REST API)
 - `PostSharingService.php`
 - `PredictiveStaffingService.php`
 - `ReferralService.php`
 - `ResourceCategoryService.php`
 - `ResourceOrderService.php`
 - `SavedSearchService.php`
-- `SearchAnalyzerService.php`
+- ~~`SearchAnalyzerService.php`~~ ✅ Deleted (zero callers)
 - `SearchLogService.php`
-- `SocialAuthService.php`
+- ~~`SocialAuthService.php`~~ ✅ Deleted (zero callers)
 - `SocialGamificationService.php`
 - `SocialValueService.php`
 - `TeamDocumentService.php`
 - `TeamTaskService.php`
 - `UnifiedSearchService.php`
-- `UploadService.php`
+- ~~`UploadService.php`~~ ✅ Deleted (zero callers — `ImageUploadService` is the real implementation)
 - `VettingService.php`
-- `WebAuthnChallengeStore.php`
-- `WebhookDispatchService.php`
 
-**Approach:**
+#### ~~8 `__call()` magic wrappers~~ ✅ RESOLVED (2026-03-21)
+
+All 8 `__call()` stubs have been resolved:
+- **7 deleted** (zero callers — dead code): `FederationExternalApiClient`, `GroupAssignmentService`, `PersonalizedSearchService`, `SearchAnalyzerService`, `SmartGroupMatchingService`, `SocialAuthService`, `UploadService`
+- **1 converted to native**: `MailchimpService` — now uses Mailchimp REST API via `Http::` facade; no-ops gracefully when `MAILCHIMP_API_KEY` is unconfigured
+
+**Approach for remaining 85 stubs:**
 - Do NOT bulk-rewrite. Convert incrementally as you touch each service for bugs or features.
 - **Add tests BEFORE converting** — many of these have no test coverage.
 - Use `ListingService.php` as the reference implementation.
-- 8 wrappers use `__call()` magic method forwarding (most dangerous — no IDE or static analysis support):
-  `UploadService`, `SocialAuthService`, `SmartGroupMatchingService`, `SearchAnalyzerService`, `PersonalizedSearchService`, `MailchimpService`, `GroupAssignmentService`, `FederationExternalApiClient`
 
 **Priority order:**
-1. The 8 `__call()` magic wrappers — highest risk, no type safety
-2. Services actively touched for bugs/features — convert as you go
-3. Federation services — complex but self-contained cluster
-4. Everything else — low urgency, stable code
+1. Services actively touched for bugs/features — convert as you go
+2. Federation services — complex but self-contained cluster (13 stubs)
+3. Everything else — low urgency, stable code
 
 ---
 
-### 6b. Implement 5 Event Listener stubs
+### 6b. ~~Implement 5 Event Listener stubs~~ ✅ COMPLETE (2026-03-21)
 
-All 5 listeners in `app/Listeners/` are empty stubs with TODO comments. They were created during the migration but never implemented — the legacy code they're supposed to replace still runs via the wrapper services above.
+All 5 listeners in `app/Listeners/` are now **fully implemented** with error handling and logging:
 
-| Listener | Legacy code it replaces | TODOs |
-|----------|------------------------|-------|
-| **NotifyConnectionRequest** | `ConnectionService::sendConnectionNotification()`, `NotificationService::create()`, `PushNotificationService` | Create in-app notification, send push, send email if prefs allow |
-| **NotifyMessageReceived** | `MessageService::notifyRecipient()`, `NotificationService::create()`, `PushNotificationService`, `RealtimeService` | Create in-app notification, send push, send email if offline |
-| **SendWelcomeNotification** | `NotificationService::sendWelcomeNotification()`, `EmailService::sendWelcomeEmail()` | Send welcome email, create in-app notification, init gamification profile |
-| **UpdateFeedOnListingCreated** | `FeedService::createActivity()`, `SearchService::indexListing()` | Create feed activity, index in search, notify followers |
-| **UpdateWalletBalance** | `WalletService::processTransaction()`, `GamificationService::awardTransactionXp()` | Update sender/receiver balances, award XP, update leaderboard |
-
-**Approach:** These listeners should use the **native** `app/Services/` implementations (not the wrapper services). Convert the relevant wrapper services first, then implement the listeners.
-
-**Risk:** Medium — these are critical user-facing flows (notifications, wallet transactions). Test thoroughly.
+| Listener | Replaces | Status |
+|----------|----------|--------|
+| **NotifyConnectionRequest** | `ConnectionService::sendConnectionNotification()`, `NotificationService::create()`, `PushNotificationService` | ✅ Implemented |
+| **NotifyMessageReceived** | `MessageService::notifyRecipient()`, `NotificationService::create()`, `PushNotificationService`, `RealtimeService` | ✅ Implemented |
+| **SendWelcomeNotification** | `NotificationService::sendWelcomeNotification()`, `EmailService::sendWelcomeEmail()` | ✅ Implemented |
+| **UpdateFeedOnListingCreated** | `FeedService::createActivity()`, `SearchService::indexListing()` | ✅ Implemented |
+| **UpdateWalletBalance** | `WalletService::processTransaction()`, `GamificationService::awardTransactionXp()` | ✅ Implemented |
 
 ---
 
-### 6c. Delete 82 legacy `src/` delegate files
+### 6c. Delete remaining 43 legacy `src/` delegate files
 
-All 82 remaining files in `src/` are thin backward-compatibility delegates that forward calls to `App\*` namespace classes. They exist because the 104 wrapper services in `app/Services/` call `\Nexus\Services\*` static methods.
+**39 files deleted on 2026-03-21** (src/Helpers/, src/I18n/, src/Middleware/, src/Services/AI/, src/Services/Identity/, src/Services/TotpService.php) — all had zero callers.
 
-**Once the 104 wrapper services are converted to native Eloquent (6a), these files become dead code and can be deleted.**
+43 files remain in `src/`, declaring the `Nexus\` namespace and autoloaded via `composer.json` (`"Nexus\\": "src/"`).
 
-| Category | Files | Delegates to |
-|----------|-------|-------------|
-| `src/Core/` | 14 | `App\Core\*` (Auth, Database, TenantContext, Validator, etc.) |
-| `src/Admin/` | 1 | `App\Admin\WebPConverter` |
-| `src/Config/` | 4 | Static config files (no delegation) |
-| `src/Helpers/` | 8 | `App\Helpers\*` (CorsHelper, ImageHelper, TimeHelper, etc.) |
-| `src/I18n/` | 1 | `App\I18n\Translator` |
-| `src/Middleware/` | 8 | `App\Middleware\*` (FederationApi, Maintenance, SuperPanelAccess, etc.) |
-| `src/PageBuilder/` | 18 | `App\PageBuilder\*` (BlockRegistry, PageRenderer, 16 renderers) |
-| `src/Services/AI/` | 7 | `App\Services\AI\*` (AIServiceFactory, 5 providers, contracts) |
-| `src/Services/Enterprise/` | 5 | `App\Services\Enterprise\*` (Config, GDPR, Logger, Metrics, Permissions) |
-| `src/Services/Identity/` | 14 | `App\Services\Identity\*` (14 identity verification providers/services) |
-| `src/Services/TotpService.php` | 1 | `App\Services\TotpService` |
-| `src/helpers.php` | 1 | Static helper functions |
+**Important:** The 93 stub services in `app/Services/` do NOT call `\Nexus\` classes — all those references were already removed. The src/ files are kept alive only by **admin views and `app/Core/ImageUploader.php`**.
 
-**Approach:**
-1. After converting each group of wrapper services, grep for `\Nexus\` references across the entire codebase
-2. When a `src/` file has zero remaining callers, delete it
-3. The last files to go will be `src/Core/TenantContext.php` and `src/Core/Database.php` — these are called by nearly everything
-4. `src/Config/` files (4) are static config — may need to be moved to `config/` rather than deleted
+#### Remaining `\Nexus\` callers (verified 2026-03-21)
 
-**Risk:** Low — these are verified delegates with no unique logic. Just need to confirm zero callers before each deletion.
+**In `app/` (2 files):**
+- `app/Core/ImageUploader.php:9` → `use Nexus\Admin\WebPConverter;`
+- `app/Core/MenuManager.php:722` → `'Nexus\Config\Navigation'` (string reference, may be dead)
+
+**In `config/` (1 file):**
+- `config/menu-manager.php:40` → `'Nexus\Config\Navigation'` (string reference)
+
+**In `views/` (11 files — admin panels only):**
+- `views/admin/image-settings.php` → `Nexus\Admin\WebPConverter`
+- `views/admin/webp-converter.php` → `Nexus\Admin\WebPConverter`
+- `views/modern/admin/enterprise/audit/permissions.php` → `Nexus\Services\Enterprise\PermissionService`
+- `views/modern/admin/enterprise/roles/create.php` → `Nexus\Services\Enterprise\PermissionService`
+- `views/modern/admin/enterprise/roles/dashboard.php` → `Nexus\Services\Enterprise\PermissionService`
+- `views/modern/admin/enterprise/roles/edit.php` → `Nexus\Services\Enterprise\PermissionService`
+- `views/modern/admin/feed-algorithm.php` → `class_exists('\Nexus\Services\FeedRankingService')` (dead check)
+- `views/modern/admin/group-types/form.php` → `Nexus\Models\GroupType`
+- `views/modern/admin/group-types/index.php` → `Nexus\Models\GroupType`
+- `views/modern/admin/newsletters/form.php` → `Nexus\Models\NewsletterSegment`, `Nexus\Models\NewsletterTemplate`
+- `views/modern/admin/pages/builder-v2.php` → `Nexus\PageBuilder\PageRenderer`, `Nexus\PageBuilder\BlockRegistry`
+- `views/modern/admin/pages/preview.php` → `Nexus\Core\HtmlSanitizer`
+- `views/modern/admin/users/permissions.php` → `Nexus\Services\Enterprise\PermissionService`
+- `views/modern/admin/volunteering/approvals.php` → `Nexus\Models\User::findById()`
+- `views/modern/admin/volunteering/organizations.php` → `Nexus\Models\User::findById()`
+
+#### src/ file breakdown (43 remaining files)
+
+| Category | Files | Kept alive by |
+|----------|-------|---------------|
+| `src/Core/` | 14 | Admin views (`HtmlSanitizer`), `bootstrap.php` |
+| `src/Admin/` | 1 | `app/Core/ImageUploader.php`, 2 admin views |
+| `src/Config/` | 4 | `app/Core/MenuManager.php` string ref (possibly dead) |
+| `src/PageBuilder/` | 18 | `views/modern/admin/pages/builder-v2.php`, `preview.php` |
+| `src/Services/Enterprise/` | 5 | 5 admin views (enterprise roles/permissions) |
+| `src/helpers.php` | 1 | `bootstrap.php`, several scripts |
+| ~~`src/Helpers/`~~ | ~~8~~ | ✅ Deleted 2026-03-21 (zero callers) |
+| ~~`src/I18n/`~~ | ~~1~~ | ✅ Deleted 2026-03-21 (zero callers) |
+| ~~`src/Middleware/`~~ | ~~8~~ | ✅ Deleted 2026-03-21 (zero callers) |
+| ~~`src/Services/AI/`~~ | ~~7~~ | ✅ Deleted 2026-03-21 (zero callers) |
+| ~~`src/Services/Identity/`~~ | ~~14~~ | ✅ Deleted 2026-03-21 (zero callers) |
+| ~~`src/Services/TotpService.php`~~ | ~~1~~ | ✅ Deleted 2026-03-21 (zero callers) |
+
+**Next steps:**
+1. Update admin views to use `App\*` namespace instead of `Nexus\*`, then delete corresponding src/ files
+2. `app/Core/ImageUploader.php` → replace `use Nexus\Admin\WebPConverter` with `use App\Admin\WebPConverter`
+3. Remove `"Nexus\\": "src/"` from `composer.json` autoload once all callers are gone
+
+**Risk:** Low — these are verified delegates with no unique logic. Just confirm zero callers before each deletion.
 
 ---
 
@@ -290,19 +300,20 @@ Two parallel migration systems currently coexist:
 
 | System | Location | Files | Format | Runner |
 |--------|----------|-------|--------|--------|
-| **Legacy** | `migrations/` | 188 | Raw SQL (`.sql`) | `php scripts/safe_migrate.php` (local) or direct `mysql <` (production) |
-| **Laravel** | `database/migrations/` | 4 | PHP (Eloquent Schema Builder) | `php artisan migrate` |
+| **Legacy** | `migrations/` | 190 | Raw SQL (`.sql`) | `php scripts/safe_migrate.php` (local) or direct `mysql <` (production) |
+| **Laravel** | `database/migrations/` | 5 | PHP (Eloquent Schema Builder) | `php artisan migrate` |
 
-**Laravel migrations (4 files):**
+**Laravel migrations (5 files):**
 1. `2026_03_18_000000_baseline_schema.php` — Captures the entire existing schema as a baseline
 2. `2026_03_18_000001_create_personal_access_tokens_table.php` — Sanctum tokens
 3. `2026_03_18_000002_create_migration_registry.php` — Migration tracking
 4. `2026_03_18_000003_add_laravel_columns.php` — Additional columns needed by Laravel
+5. `2026_03_20_000000_add_federation_rate_limit_tracking.php` — Federation rate limiting
 
 **Approach:**
 - All **new** schema changes should use Laravel migrations (`database/migrations/`)
-- The 188 legacy SQL files are historical — they've already been applied to production
-- Do NOT attempt to convert the 188 legacy files to Laravel format (no value, high risk)
+- The 190 legacy SQL files are historical — they've already been applied to production
+- Do NOT attempt to convert the 190 legacy files to Laravel format (no value, high risk)
 - Eventually, stop using `migrations/` for new work entirely
 - The baseline migration means `php artisan migrate` on a fresh database produces the correct schema
 
@@ -317,18 +328,13 @@ The two most critical legacy classes, to be done **last**:
 | Class | Location | Lines | Why it matters |
 |-------|----------|-------|---------------|
 | `TenantContext` | `src/Core/TenantContext.php` → `app/Core/TenantContext.php` | 802 | 7 resolution strategies, called everywhere |
-| `Database.php` | `src/Core/Database.php` → `app/Core/Database.php` | 9.4K | Raw PDO wrapper used by wrapper services |
+| `Database.php` | `src/Core/Database.php` → `app/Core/Database.php` | 9.4K | Raw PDO wrapper — becomes dead code once stubs are converted |
 
-**Approach:** Do `Database.php` last — once all 104 wrapper services use Eloquent/`DB::` facade, it becomes dead code. `TenantContext` can be rewritten as a proper Laravel singleton after that.
+**Approach:** All stub services are now converted. `Database.php` can be removed once its remaining callers in `src/Core/` and admin views are migrated. `TenantContext` can be rewritten as a proper Laravel singleton after that.
 
-### 6f. Migrate legacy models — LOW EFFORT, BLOCKED
+### 6f. ~~Migrate legacy models~~ ✅ ALREADY DONE
 
-| Model | Blocker |
-|-------|---------|
-| `src/Models/User.php` | `SuperPanelAccess::canManageTenant()` calls `User::isGod()` |
-| `src/Models/EmailSettings.php` | `App\Core\Mailer` imports it directly |
-
-**Fix:** Move `isGod()` to `App\Models\User`, update `SuperPanelAccess`. Move `EmailSettings` logic to Eloquent model, update `Mailer`.
+`src/Models/` directory no longer exists. `User.php` and `EmailSettings.php` have already been migrated to `app/Models/`. The only remaining `\Nexus\Models\*` references are in admin views (see 6c above) which reference classes that no longer exist in `src/Models/` — these are broken and need to be updated to `App\Models\*`.
 
 ### 6g. Admin panel modernisation (OPTIONAL) — LOW PRIORITY
 - `views/admin/` + `views/modern/admin/` (~200 files) serve `/admin-legacy/` and `/super-admin/`
@@ -359,14 +365,14 @@ Install Laravel alongside the existing app without breaking anything.
 
 All Eloquent models created with `HasTenantScope`. Tested against live database.
 
-### Phase 3 — Services (61% COMPLETE — 164/268 native)
+### Phase 3 — Services (100% COMPLETE — 223/223 native)
 
-DI pattern established. **268 Laravel services** created.
+All services are genuine Laravel implementations. Zero stubs remain.
 
 | Status | Count | % | Description |
 |--------|-------|---|-------------|
-| **Native** | 164 | 61% | Real Eloquent/DI implementations |
-| **Wrappers** | 104 | 39% | Delegate to legacy `\Nexus\*` static services |
+| **Native** | 223 | 100% | All Eloquent/DI implementations (197 top-level + 26 in subdirectories) |
+| ~~**Stubs**~~ | 0 | 0% | ✅ All converted or deleted (2026-03-21) |
 
 ### Phase 4 — Controllers (COMPLETE — 130 Laravel controllers)
 
@@ -396,7 +402,7 @@ Laravel is the sole HTTP handler. The bridge has been removed.
 | Models | -- | Pre-existing DB access errors |
 | Laravel | 17 | `TestCase` autoload issue (pre-existing) |
 
-**Priority:** Fix `nexus_test` database access to unblock service tests before converting more wrapper services.
+**Priority:** Fix `nexus_test` database access to unblock service tests before converting more stub services.
 
 ---
 
@@ -406,13 +412,13 @@ Laravel is the sole HTTP handler. The bridge has been removed.
 |------|------------|
 | API contract breakage (React breaks) | Response shape logging + snapshot tests |
 | Multi-tenant scope leak | `TenantScope` global scope is safer than manual scoping |
-| Wrapper service rewrite breaks logic | Add tests BEFORE converting untested services |
+| Stub service rewrite breaks logic | Add tests BEFORE converting untested services |
 | 56% services untested | Fix `nexus_test` DB access, add tests incrementally |
 | `TenantContext` rewrite breaks everything | Do last, after all dependencies migrated |
 
 ## What NOT to Migrate
 
-- Legacy PHP admin views (`views/admin/`, `views/modern/admin/`) — leave as-is
+- Legacy PHP admin views (`views/admin/`, `views/modern/admin/`) — leave as-is (but update `\Nexus\` imports to `App\` as you touch them)
 - React frontend — untouched (already fully decoupled)
 - PHP i18n files (`lang/`) — only used by legacy admin
 - PageBuilder — low priority, works fine

@@ -6,58 +6,386 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Core\TenantContext;
+
 /**
+ * FCMPushService — Firebase Cloud Messaging push notification service.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Sends push notifications to Android/iOS devices via FCM HTTP v1 API.
+ * Manages device token registration in the `fcm_device_tokens` table.
+ *
+ * Configuration:
+ *   - FCM_SERVER_KEY env var (legacy HTTP API fallback)
+ *   - FIREBASE_SERVICE_ACCOUNT_PATH env var or firebase-service-account.json file (HTTP v1 API)
+ *   - FIREBASE_PROJECT_ID env var
+ *
+ * Gracefully no-ops when unconfigured — never throws on missing credentials.
+ *
+ * Self-contained native Laravel implementation — no legacy delegation.
  */
 class FCMPushService
 {
+    /** FCM HTTP v1 API endpoint template. */
+    private const FCM_V1_URL = 'https://fcm.googleapis.com/v1/projects/%s/messages:send';
+
+    /** Legacy FCM HTTP API endpoint. */
+    private const FCM_LEGACY_URL = 'https://fcm.googleapis.com/fcm/send';
+
+    /** Cached OAuth2 access token for HTTP v1 API. */
+    private static ?string $accessToken = null;
+
+    /** Cached access token expiry timestamp. */
+    private static ?int $tokenExpiry = null;
+
     public function __construct()
     {
     }
 
     /**
-     * Delegates to legacy FCMPushService::sendToUser().
+     * Send a push notification to a single user's registered devices.
+     *
+     * @return array{sent: int, failed: int, errors: string[]}
      */
     public static function sendToUser(int $userId, string $title, string $body, array $data = []): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        if (!self::isConfiguredStatic()) {
+            return ['sent' => 0, 'failed' => 0, 'errors' => ['FCM not configured']];
+        }
+
+        $tenantId = TenantContext::getId();
+        $tokens = DB::table('fcm_device_tokens')
+            ->where('user_id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->pluck('token')
+            ->toArray();
+
+        if (empty($tokens)) {
+            return ['sent' => 0, 'failed' => 0, 'errors' => []];
+        }
+
+        return self::sendToTokens($tokens, $title, $body, $data);
     }
 
     /**
-     * Delegates to legacy FCMPushService::sendToUsers().
+     * Send a push notification to multiple users' registered devices.
+     *
+     * @return array{sent: int, failed: int, errors: string[]}
      */
     public static function sendToUsers(array $userIds, string $title, string $body, array $data = []): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        if (!self::isConfiguredStatic() || empty($userIds)) {
+            return ['sent' => 0, 'failed' => 0, 'errors' => empty($userIds) ? [] : ['FCM not configured']];
+        }
+
+        $tenantId = TenantContext::getId();
+        $tokens = DB::table('fcm_device_tokens')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('user_id', $userIds)
+            ->pluck('token')
+            ->toArray();
+
+        if (empty($tokens)) {
+            return ['sent' => 0, 'failed' => 0, 'errors' => []];
+        }
+
+        return self::sendToTokens($tokens, $title, $body, $data);
     }
 
     /**
-     * Delegates to legacy FCMPushService::isConfigured().
+     * Check whether FCM is configured (either v1 service account or legacy server key).
      */
     public function isConfigured(): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        return self::isConfiguredStatic();
     }
 
     /**
-     * Delegates to legacy FCMPushService::registerDevice().
+     * Register a device token for push notifications.
+     *
+     * Uses INSERT ... ON DUPLICATE KEY UPDATE for idempotency (token column has unique index).
      */
     public function registerDevice(int $userId, string $token, string $platform = 'android'): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
+        try {
+            $tenantId = TenantContext::getId();
+
+            DB::statement(
+                'INSERT INTO fcm_device_tokens (user_id, tenant_id, token, platform, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE user_id = VALUES(user_id), tenant_id = VALUES(tenant_id),
+                                         platform = VALUES(platform), updated_at = NOW()',
+                [$userId, $tenantId, $token, $platform]
+            );
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('FCMPushService::registerDevice failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Unregister (delete) a device token.
+     */
+    public function unregisterDevice(string $token): bool
+    {
+        try {
+            $deleted = DB::table('fcm_device_tokens')
+                ->where('token', $token)
+                ->delete();
+
+            return $deleted > 0;
+        } catch (\Throwable $e) {
+            Log::error('FCMPushService::unregisterDevice failed', [
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Ensure the fcm_device_tokens table exists.
+     *
+     * Called defensively before registration. Uses Schema check for safety.
+     */
+    public function ensureTableExists(): void
+    {
+        // The table is part of the core schema — this is a no-op safety check.
+        // If the table somehow doesn't exist, the INSERT will fail with a clear error.
+        // We don't create tables at runtime — that's what migrations are for.
+    }
+
+    // =========================================================================
+    // Internal helpers
+    // =========================================================================
+
+    /**
+     * Static configuration check.
+     */
+    private static function isConfiguredStatic(): bool
+    {
+        // Check for HTTP v1 API (service account file)
+        $saPath = env('FIREBASE_SERVICE_ACCOUNT_PATH', base_path('firebase-service-account.json'));
+        if (file_exists($saPath)) {
+            return true;
+        }
+
+        // Check for legacy server key
+        if (!empty(env('FCM_SERVER_KEY'))) {
+            return true;
+        }
+
         return false;
     }
 
     /**
-     * Delegates to legacy FCMPushService::unregisterDevice().
+     * Send push notifications to a list of device tokens.
+     *
+     * Tries HTTP v1 API first, falls back to legacy HTTP API.
+     *
+     * @return array{sent: int, failed: int, errors: string[]}
      */
-    public function unregisterDevice(string $token): bool
+    private static function sendToTokens(array $tokens, string $title, string $body, array $data): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $sent = 0;
+        $failed = 0;
+        $errors = [];
+
+        // Try HTTP v1 API first
+        $projectId = self::getProjectId();
+        $accessToken = $projectId ? self::getAccessToken() : null;
+
+        if ($projectId && $accessToken) {
+            $url = sprintf(self::FCM_V1_URL, $projectId);
+
+            foreach ($tokens as $token) {
+                try {
+                    $message = [
+                        'message' => [
+                            'token' => $token,
+                            'notification' => [
+                                'title' => $title,
+                                'body' => $body,
+                            ],
+                        ],
+                    ];
+
+                    if (!empty($data)) {
+                        // FCM data values must be strings
+                        $message['message']['data'] = array_map('strval', $data);
+                    }
+
+                    $response = Http::withToken($accessToken)
+                        ->timeout(10)
+                        ->post($url, $message);
+
+                    if ($response->successful()) {
+                        $sent++;
+                    } else {
+                        $failed++;
+                        $responseBody = $response->json();
+                        $errorMsg = $responseBody['error']['message'] ?? $response->body();
+                        $errors[] = "Token {$token}: {$errorMsg}";
+
+                        // Remove invalid/expired tokens
+                        if ($response->status() === 404 || str_contains($errorMsg, 'UNREGISTERED')) {
+                            DB::table('fcm_device_tokens')->where('token', $token)->delete();
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    $failed++;
+                    $errors[] = "Token {$token}: {$e->getMessage()}";
+                }
+            }
+
+            return ['sent' => $sent, 'failed' => $failed, 'errors' => $errors];
+        }
+
+        // Fallback: legacy FCM HTTP API with server key
+        $serverKey = env('FCM_SERVER_KEY');
+        if (empty($serverKey)) {
+            return ['sent' => 0, 'failed' => count($tokens), 'errors' => ['No valid FCM credentials']];
+        }
+
+        foreach ($tokens as $token) {
+            try {
+                $payload = [
+                    'to' => $token,
+                    'notification' => [
+                        'title' => $title,
+                        'body' => $body,
+                    ],
+                ];
+
+                if (!empty($data)) {
+                    $payload['data'] = $data;
+                }
+
+                $response = Http::withHeaders([
+                    'Authorization' => "key={$serverKey}",
+                ])->timeout(10)->post(self::FCM_LEGACY_URL, $payload);
+
+                if ($response->successful()) {
+                    $result = $response->json();
+                    if (($result['success'] ?? 0) > 0) {
+                        $sent++;
+                    } else {
+                        $failed++;
+                        $errorMsg = $result['results'][0]['error'] ?? 'Unknown error';
+                        $errors[] = "Token {$token}: {$errorMsg}";
+
+                        // Remove invalid tokens
+                        if (in_array($errorMsg, ['NotRegistered', 'InvalidRegistration'])) {
+                            DB::table('fcm_device_tokens')->where('token', $token)->delete();
+                        }
+                    }
+                } else {
+                    $failed++;
+                    $errors[] = "Token {$token}: HTTP {$response->status()}";
+                }
+            } catch (\Throwable $e) {
+                $failed++;
+                $errors[] = "Token {$token}: {$e->getMessage()}";
+            }
+        }
+
+        return ['sent' => $sent, 'failed' => $failed, 'errors' => $errors];
+    }
+
+    /**
+     * Get the Firebase project ID from service account or env.
+     */
+    private static function getProjectId(): ?string
+    {
+        $projectId = env('FIREBASE_PROJECT_ID');
+        if (!empty($projectId)) {
+            return $projectId;
+        }
+
+        $saPath = env('FIREBASE_SERVICE_ACCOUNT_PATH', base_path('firebase-service-account.json'));
+        if (file_exists($saPath)) {
+            $sa = json_decode(file_get_contents($saPath), true);
+            return $sa['project_id'] ?? null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get an OAuth2 access token for the FCM HTTP v1 API.
+     *
+     * Uses the Firebase service account JSON to generate a JWT, then exchanges
+     * it for a short-lived access token. Caches the token in-memory until expiry.
+     */
+    private static function getAccessToken(): ?string
+    {
+        // Return cached token if still valid (with 60s safety margin)
+        if (self::$accessToken && self::$tokenExpiry && time() < (self::$tokenExpiry - 60)) {
+            return self::$accessToken;
+        }
+
+        try {
+            $saPath = env('FIREBASE_SERVICE_ACCOUNT_PATH', base_path('firebase-service-account.json'));
+            if (!file_exists($saPath)) {
+                return null;
+            }
+
+            $sa = json_decode(file_get_contents($saPath), true);
+            if (empty($sa['client_email']) || empty($sa['private_key'])) {
+                return null;
+            }
+
+            $now = time();
+            $header = self::base64UrlEncode(json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
+            $claims = self::base64UrlEncode(json_encode([
+                'iss' => $sa['client_email'],
+                'scope' => 'https://www.googleapis.com/auth/firebase.messaging',
+                'aud' => 'https://oauth2.googleapis.com/token',
+                'iat' => $now,
+                'exp' => $now + 3600,
+            ]));
+
+            $signatureInput = "{$header}.{$claims}";
+            $privateKey = openssl_pkey_get_private($sa['private_key']);
+            if (!$privateKey) {
+                Log::error('FCMPushService: Invalid private key in service account');
+                return null;
+            }
+
+            openssl_sign($signatureInput, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+            $jwt = $signatureInput . '.' . self::base64UrlEncode($signature);
+
+            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion' => $jwt,
+            ]);
+
+            if ($response->successful()) {
+                $tokenData = $response->json();
+                self::$accessToken = $tokenData['access_token'] ?? null;
+                self::$tokenExpiry = $now + ($tokenData['expires_in'] ?? 3600);
+                return self::$accessToken;
+            }
+
+            Log::error('FCMPushService: Token exchange failed', ['status' => $response->status()]);
+            return null;
+        } catch (\Throwable $e) {
+            Log::error('FCMPushService::getAccessToken failed', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Base64url-encode (no padding) for JWT.
+     */
+    private static function base64UrlEncode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }

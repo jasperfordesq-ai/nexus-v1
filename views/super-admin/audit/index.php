@@ -5,7 +5,7 @@
  * Track all hierarchy changes made through the Super Admin Panel.
  */
 
-use Nexus\Services\SuperAdminAuditService;
+use App\Services\SuperAdminAuditService;
 
 $pageTitle = $pageTitle ?? 'Audit Log';
 require __DIR__ . '/../partials/header.php';

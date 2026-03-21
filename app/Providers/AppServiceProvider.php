@@ -94,15 +94,12 @@ use App\Services\SeoService;
 use App\Services\LeaderboardService;
 use App\Services\LeaderboardSeasonService;
 use App\Services\OnboardingService;
-use App\Services\RankingService;
 use App\Services\StreakService;
 use App\Services\NexusScoreService;
 use App\Services\NexusScoreCacheService;
 use App\Services\RateLimitService;
-use App\Services\ReferralService;
 use App\Services\FeedActivityService;
 use App\Services\FeedRankingService;
-use App\Services\PostSharingService;
 use App\Services\HashtagService;
 use App\Services\ExchangeRatingService;
 use App\Services\ExchangeWorkflowService;
@@ -110,7 +107,6 @@ use App\Services\CreditDonationService;
 use App\Services\StartingBalanceService;
 use App\Services\TransactionCategoryService;
 use App\Services\TransactionExportService;
-use App\Services\TransactionLimitService;
 use App\Services\ListingAnalyticsService;
 use App\Services\ListingModerationService;
 use App\Services\ListingFeaturedService;
@@ -142,26 +138,18 @@ use App\Services\CommunityProjectService;
 use App\Services\ContextualMessageService;
 use App\Services\CookieInventoryService;
 use App\Services\CrossModuleMatchingService;
-use App\Services\DeliverabilityTrackingService;
-use App\Services\DigestService;
 use App\Services\EmailMonitorService;
-use App\Services\EmailTemplateBuilder;
-use App\Services\EmailTemplateService;
 use App\Services\EmbeddingService;
 use App\Services\FCMPushService;
 use App\Services\FederatedConnectionService;
-use App\Services\FederatedGroupService;
 use App\Services\FederatedMessageService;
-use App\Services\FederatedTransactionService;
 use App\Services\FederationActivityService;
 use App\Services\FederationAuditService;
 use App\Services\FederationCreditService;
 use App\Services\FederationDirectoryService;
 use App\Services\FederationEmailService;
-use App\Services\FederationExternalApiClient;
-use App\Services\FederationExternalPartnerService;
+
 use App\Services\FederationFeatureService;
-use App\Services\FederationGateway;
 use App\Services\FederationJwtService;
 use App\Services\FederationNeighborhoodService;
 use App\Services\FederationPartnershipService;
@@ -177,21 +165,13 @@ use App\Services\GoalReminderService;
 use App\Services\GoalTemplateService;
 use App\Services\GroupAchievementService;
 use App\Services\GroupAnnouncementService;
-use App\Services\GroupApprovalWorkflowService;
-use App\Services\GroupAssignmentService;
-use App\Services\GroupAuditService;
+
 use App\Services\GroupChatroomService;
-use App\Services\GroupConfigurationService;
-use App\Services\GroupEventService;
 use App\Services\GroupExchangeService;
-use App\Services\GroupFeatureToggleService;
-use App\Services\GroupFileService;
 use App\Services\GroupModerationService;
 use App\Services\GroupNotificationService;
-use App\Services\GroupPermissionManager;
 use App\Services\GroupPolicyRepository;
 use App\Services\GroupRecommendationEngine;
-use App\Services\GroupReportingService;
 use App\Services\GuardianConsentService;
 use App\Services\HoursReportService;
 use App\Services\HtmlSanitizer;
@@ -207,45 +187,29 @@ use App\Services\ListingRiskTagService;
 use App\Services\ListingSkillTagService;
 use App\Services\MailchimpService;
 use App\Services\MatchApprovalWorkflowService;
-use App\Services\MatchDigestService;
 use App\Services\MatchLearningService;
-use App\Services\MatchNotificationService;
 use App\Services\MatchingService;
 use App\Services\MemberReportService;
 use App\Services\MemberVerificationBadgeService;
-use App\Services\NewsletterTemplates;
 use App\Services\NotificationDispatcher;
-use App\Services\OptimizedGroupQueries;
-use App\Services\OrgNotificationService;
-use App\Services\PayPlanService;
-use App\Services\PerformanceMonitorService;
-use App\Services\PersonalizedSearchService;
+
 use App\Services\PollExportService;
 use App\Services\PollRankingService;
-use App\Services\PredictiveStaffingService;
-use App\Services\ProgressNotificationService;
 use App\Services\PusherService;
 use App\Services\RecurringShiftService;
 use App\Services\RedisCache;
 use App\Services\ReportExportService;
-use App\Services\ResourceCategoryService;
-use App\Services\ResourceOrderService;
 use App\Services\SafeguardingService;
-use App\Services\SavedSearchService;
-use App\Services\SchemaService;
-use App\Services\SearchAnalyzerService;
+
 use App\Services\SearchLogService;
-use App\Services\SentryService;
 use App\Services\ShiftGroupReservationService;
 use App\Services\ShiftSwapService;
 use App\Services\ShiftWaitlistService;
-use App\Services\SmartGroupMatchingService;
+
 use App\Services\SmartGroupRankingService;
 use App\Services\SmartMatchingAnalyticsService;
 use App\Services\SmartMatchingEngine;
-use App\Services\SmartSegmentSuggestionService;
-use App\Services\SocialAuthService;
-use App\Services\SocialGamificationService;
+
 use App\Services\SocialNotificationService;
 use App\Services\SocialValueService;
 use App\Services\SuperAdminAuditService;
@@ -257,8 +221,7 @@ use App\Services\TenantSettingsService;
 use App\Services\TenantVisibilityService;
 use App\Services\TotpService;
 use App\Services\TwoFactorChallengeManager;
-use App\Services\UnifiedSearchService;
-use App\Services\UploadService;
+
 use App\Services\UserInsightsService;
 use App\Services\VettingService;
 use App\Services\VolunteerCertificateService;
@@ -543,10 +506,6 @@ class AppServiceProvider extends ServiceProvider
             return new OnboardingService();
         });
 
-        $this->app->singleton(RankingService::class, function ($app) {
-            return new RankingService();
-        });
-
         $this->app->singleton(StreakService::class, function ($app) {
             return new StreakService();
         });
@@ -563,20 +522,12 @@ class AppServiceProvider extends ServiceProvider
             return new RateLimitService();
         });
 
-        $this->app->singleton(ReferralService::class, function ($app) {
-            return new ReferralService();
-        });
-
         $this->app->singleton(FeedActivityService::class, function ($app) {
             return new FeedActivityService();
         });
 
         $this->app->singleton(FeedRankingService::class, function ($app) {
             return new FeedRankingService();
-        });
-
-        $this->app->singleton(PostSharingService::class, function ($app) {
-            return new PostSharingService();
         });
 
         $this->app->singleton(HashtagService::class, function ($app) {
@@ -605,10 +556,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(TransactionExportService::class, function ($app) {
             return new TransactionExportService();
-        });
-
-        $this->app->singleton(TransactionLimitService::class, function ($app) {
-            return new TransactionLimitService();
         });
 
         $this->app->singleton(ListingAnalyticsService::class, function ($app) {
@@ -734,27 +681,14 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(CrossModuleMatchingService::class, function ($app) {
-            return new CrossModuleMatchingService();
-        });
-
-        $this->app->singleton(DeliverabilityTrackingService::class, function ($app) {
-            return new DeliverabilityTrackingService();
-        });
-
-        $this->app->singleton(DigestService::class, function ($app) {
-            return new DigestService();
+            return new CrossModuleMatchingService(
+                $app->make(SmartMatchingEngine::class),
+                $app->make(MatchLearningService::class),
+            );
         });
 
         $this->app->singleton(EmailMonitorService::class, function ($app) {
             return new EmailMonitorService();
-        });
-
-        $this->app->singleton(EmailTemplateBuilder::class, function ($app) {
-            return new EmailTemplateBuilder();
-        });
-
-        $this->app->singleton(EmailTemplateService::class, function ($app) {
-            return new EmailTemplateService();
         });
 
         $this->app->singleton(EmbeddingService::class, function ($app) {
@@ -769,16 +703,8 @@ class AppServiceProvider extends ServiceProvider
             return new FederatedConnectionService();
         });
 
-        $this->app->singleton(FederatedGroupService::class, function ($app) {
-            return new FederatedGroupService();
-        });
-
         $this->app->singleton(FederatedMessageService::class, function ($app) {
             return new FederatedMessageService();
-        });
-
-        $this->app->singleton(FederatedTransactionService::class, function ($app) {
-            return new FederatedTransactionService();
         });
 
         $this->app->singleton(FederationActivityService::class, function ($app) {
@@ -801,20 +727,8 @@ class AppServiceProvider extends ServiceProvider
             return new FederationEmailService();
         });
 
-        $this->app->singleton(FederationExternalApiClient::class, function ($app) {
-            return new FederationExternalApiClient();
-        });
-
-        $this->app->singleton(FederationExternalPartnerService::class, function ($app) {
-            return new FederationExternalPartnerService();
-        });
-
         $this->app->singleton(FederationFeatureService::class, function ($app) {
             return new FederationFeatureService();
-        });
-
-        $this->app->singleton(FederationGateway::class, function ($app) {
-            return new FederationGateway();
         });
 
         $this->app->singleton(FederationJwtService::class, function ($app) {
@@ -877,40 +791,12 @@ class AppServiceProvider extends ServiceProvider
             return new GroupAnnouncementService();
         });
 
-        $this->app->singleton(GroupApprovalWorkflowService::class, function ($app) {
-            return new GroupApprovalWorkflowService();
-        });
-
-        $this->app->singleton(GroupAssignmentService::class, function ($app) {
-            return new GroupAssignmentService();
-        });
-
-        $this->app->singleton(GroupAuditService::class, function ($app) {
-            return new GroupAuditService();
-        });
-
         $this->app->singleton(GroupChatroomService::class, function ($app) {
             return new GroupChatroomService();
         });
 
-        $this->app->singleton(GroupConfigurationService::class, function ($app) {
-            return new GroupConfigurationService();
-        });
-
-        $this->app->singleton(GroupEventService::class, function ($app) {
-            return new GroupEventService();
-        });
-
         $this->app->singleton(GroupExchangeService::class, function ($app) {
             return new GroupExchangeService();
-        });
-
-        $this->app->singleton(GroupFeatureToggleService::class, function ($app) {
-            return new GroupFeatureToggleService();
-        });
-
-        $this->app->singleton(GroupFileService::class, function ($app) {
-            return new GroupFileService();
         });
 
         $this->app->singleton(GroupModerationService::class, function ($app) {
@@ -921,20 +807,12 @@ class AppServiceProvider extends ServiceProvider
             return new GroupNotificationService();
         });
 
-        $this->app->singleton(GroupPermissionManager::class, function ($app) {
-            return new GroupPermissionManager();
-        });
-
         $this->app->singleton(GroupPolicyRepository::class, function ($app) {
             return new GroupPolicyRepository();
         });
 
         $this->app->singleton(GroupRecommendationEngine::class, function ($app) {
             return new GroupRecommendationEngine();
-        });
-
-        $this->app->singleton(GroupReportingService::class, function ($app) {
-            return new GroupReportingService();
         });
 
         $this->app->singleton(GuardianConsentService::class, function ($app) {
@@ -997,16 +875,8 @@ class AppServiceProvider extends ServiceProvider
             return new MatchApprovalWorkflowService();
         });
 
-        $this->app->singleton(MatchDigestService::class, function ($app) {
-            return new MatchDigestService();
-        });
-
         $this->app->singleton(MatchLearningService::class, function ($app) {
             return new MatchLearningService();
-        });
-
-        $this->app->singleton(MatchNotificationService::class, function ($app) {
-            return new MatchNotificationService();
         });
 
         $this->app->singleton(MatchingService::class, function ($app) {
@@ -1021,32 +891,8 @@ class AppServiceProvider extends ServiceProvider
             return new MemberVerificationBadgeService();
         });
 
-        $this->app->singleton(NewsletterTemplates::class, function ($app) {
-            return new NewsletterTemplates();
-        });
-
         $this->app->singleton(NotificationDispatcher::class, function ($app) {
             return new NotificationDispatcher();
-        });
-
-        $this->app->singleton(OptimizedGroupQueries::class, function ($app) {
-            return new OptimizedGroupQueries();
-        });
-
-        $this->app->singleton(OrgNotificationService::class, function ($app) {
-            return new OrgNotificationService();
-        });
-
-        $this->app->singleton(PayPlanService::class, function ($app) {
-            return new PayPlanService();
-        });
-
-        $this->app->singleton(PerformanceMonitorService::class, function ($app) {
-            return new PerformanceMonitorService();
-        });
-
-        $this->app->singleton(PersonalizedSearchService::class, function ($app) {
-            return new PersonalizedSearchService();
         });
 
         $this->app->singleton(PollExportService::class, function ($app) {
@@ -1055,14 +901,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(PollRankingService::class, function ($app) {
             return new PollRankingService();
-        });
-
-        $this->app->singleton(PredictiveStaffingService::class, function ($app) {
-            return new PredictiveStaffingService();
-        });
-
-        $this->app->singleton(ProgressNotificationService::class, function ($app) {
-            return new ProgressNotificationService();
         });
 
         $this->app->singleton(PusherService::class, function ($app) {
@@ -1081,36 +919,12 @@ class AppServiceProvider extends ServiceProvider
             return new ReportExportService();
         });
 
-        $this->app->singleton(ResourceCategoryService::class, function ($app) {
-            return new ResourceCategoryService();
-        });
-
-        $this->app->singleton(ResourceOrderService::class, function ($app) {
-            return new ResourceOrderService();
-        });
-
         $this->app->singleton(SafeguardingService::class, function ($app) {
             return new SafeguardingService();
         });
 
-        $this->app->singleton(SavedSearchService::class, function ($app) {
-            return new SavedSearchService();
-        });
-
-        $this->app->singleton(SchemaService::class, function ($app) {
-            return new SchemaService();
-        });
-
-        $this->app->singleton(SearchAnalyzerService::class, function ($app) {
-            return new SearchAnalyzerService();
-        });
-
         $this->app->singleton(SearchLogService::class, function ($app) {
             return new SearchLogService();
-        });
-
-        $this->app->singleton(SentryService::class, function ($app) {
-            return new SentryService();
         });
 
         $this->app->singleton(ShiftGroupReservationService::class, function ($app) {
@@ -1125,10 +939,6 @@ class AppServiceProvider extends ServiceProvider
             return new ShiftWaitlistService();
         });
 
-        $this->app->singleton(SmartGroupMatchingService::class, function ($app) {
-            return new SmartGroupMatchingService();
-        });
-
         $this->app->singleton(SmartGroupRankingService::class, function ($app) {
             return new SmartGroupRankingService();
         });
@@ -1139,18 +949,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(SmartMatchingEngine::class, function ($app) {
             return new SmartMatchingEngine();
-        });
-
-        $this->app->singleton(SmartSegmentSuggestionService::class, function ($app) {
-            return new SmartSegmentSuggestionService();
-        });
-
-        $this->app->singleton(SocialAuthService::class, function ($app) {
-            return new SocialAuthService();
-        });
-
-        $this->app->singleton(SocialGamificationService::class, function ($app) {
-            return new SocialGamificationService();
         });
 
         $this->app->singleton(SocialNotificationService::class, function ($app) {
@@ -1195,14 +993,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(TwoFactorChallengeManager::class, function ($app) {
             return new TwoFactorChallengeManager();
-        });
-
-        $this->app->singleton(UnifiedSearchService::class, function ($app) {
-            return new UnifiedSearchService();
-        });
-
-        $this->app->singleton(UploadService::class, function ($app) {
-            return new UploadService();
         });
 
         $this->app->singleton(UserInsightsService::class, function ($app) {

@@ -6,41 +6,115 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
+ * FederationNeighborhoodService — Manages federation neighborhoods (geographic groupings of tenants).
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Neighborhoods allow admins to organize tenants into regional clusters
+ * for easier federation discovery and management.
  */
 class FederationNeighborhoodService
 {
+    /** @var array<string> */
+    private array $errors = [];
+
     public function __construct()
     {
     }
 
     /**
-     * Delegates to legacy FederationNeighborhoodService::getErrors().
+     * Get accumulated errors from the last operation.
      */
     public function getErrors(): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        return $this->errors;
     }
 
     /**
-     * Static proxy: list all neighborhoods.
+     * Static proxy: list all neighborhoods with their tenant counts.
      */
     public static function listAllStatic(): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        try {
+            $rows = DB::select(
+                "SELECT fn.id, fn.name, fn.description, fn.region, fn.created_by, fn.created_at, fn.updated_at,
+                        (SELECT COUNT(*) FROM federation_neighborhood_tenants fnt WHERE fnt.neighborhood_id = fn.id) as tenant_count,
+                        CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as created_by_name
+                 FROM federation_neighborhoods fn
+                 LEFT JOIN users u ON fn.created_by = u.id
+                 ORDER BY fn.name ASC"
+            );
+
+            return array_map(function ($row) {
+                // Get member tenants
+                $tenants = DB::select(
+                    "SELECT fnt.tenant_id, t.name, t.slug
+                     FROM federation_neighborhood_tenants fnt
+                     JOIN tenants t ON t.id = fnt.tenant_id
+                     WHERE fnt.neighborhood_id = ?
+                     ORDER BY t.name ASC",
+                    [$row->id]
+                );
+
+                return [
+                    'id' => (int) $row->id,
+                    'name' => $row->name,
+                    'description' => $row->description,
+                    'region' => $row->region,
+                    'tenant_count' => (int) $row->tenant_count,
+                    'created_by' => $row->created_by ? (int) $row->created_by : null,
+                    'created_by_name' => $row->created_by_name ? trim($row->created_by_name) : null,
+                    'tenants' => array_map(fn($t) => [
+                        'tenant_id' => (int) $t->tenant_id,
+                        'name' => $t->name,
+                        'slug' => $t->slug,
+                    ], $tenants),
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at,
+                ];
+            }, $rows);
+        } catch (\Exception $e) {
+            Log::error('[FederationNeighborhood] listAllStatic failed', ['error' => $e->getMessage()]);
+            return [];
+        }
     }
 
     /**
-     * Delegates to legacy FederationNeighborhoodService::create().
+     * Create a new neighborhood (instance method).
      */
     public function create(string $name, ?string $description = null, ?string $region = null, int $createdBy = 0): ?int
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        $this->errors = [];
+
+        $name = trim($name);
+        if (empty($name)) {
+            $this->errors[] = 'Name is required';
+            return null;
+        }
+
+        try {
+            DB::insert(
+                "INSERT INTO federation_neighborhoods (name, description, region, created_by, created_at)
+                 VALUES (?, ?, ?, ?, NOW())",
+                [$name, $description, $region, $createdBy ?: null]
+            );
+
+            $id = (int) DB::getPdo()->lastInsertId();
+
+            Log::info('[FederationNeighborhood] Created', [
+                'id' => $id,
+                'name' => $name,
+                'created_by' => $createdBy,
+            ]);
+
+            return $id;
+        } catch (\Exception $e) {
+            Log::error('[FederationNeighborhood] create failed', ['error' => $e->getMessage()]);
+            $this->errors[] = 'Failed to create neighborhood';
+            return null;
+        }
     }
 
     /**
@@ -48,34 +122,137 @@ class FederationNeighborhoodService
      */
     public static function createStatic(string $name, ?string $description = null, ?string $region = null, int $createdBy = 0): ?int
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        $instance = new self();
+        return $instance->create($name, $description, $region, $createdBy);
     }
 
     /**
-     * Delegates to legacy FederationNeighborhoodService::update().
+     * Update a neighborhood.
      */
     public function update(int $id, array $data): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $this->errors = [];
+
+        $updates = [];
+        $params = [];
+
+        if (array_key_exists('name', $data)) {
+            $name = trim($data['name']);
+            if (empty($name)) {
+                $this->errors[] = 'Name cannot be empty';
+                return false;
+            }
+            $updates[] = 'name = ?';
+            $params[] = $name;
+        }
+
+        if (array_key_exists('description', $data)) {
+            $updates[] = 'description = ?';
+            $params[] = $data['description'];
+        }
+
+        if (array_key_exists('region', $data)) {
+            $updates[] = 'region = ?';
+            $params[] = $data['region'];
+        }
+
+        if (empty($updates)) {
+            return true;
+        }
+
+        try {
+            $params[] = $id;
+            $updated = DB::update(
+                "UPDATE federation_neighborhoods SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = ?",
+                $params
+            );
+
+            if ($updated === 0) {
+                $this->errors[] = 'Neighborhood not found';
+                return false;
+            }
+
+            Log::info('[FederationNeighborhood] Updated', ['id' => $id]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('[FederationNeighborhood] update failed', ['error' => $e->getMessage()]);
+            $this->errors[] = 'Failed to update neighborhood';
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy FederationNeighborhoodService::delete().
+     * Delete a neighborhood and its tenant associations.
      */
     public function delete(int $id): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $this->errors = [];
+
+        try {
+            // Delete tenant associations first
+            DB::delete("DELETE FROM federation_neighborhood_tenants WHERE neighborhood_id = ?", [$id]);
+
+            $deleted = DB::delete("DELETE FROM federation_neighborhoods WHERE id = ?", [$id]);
+
+            if ($deleted === 0) {
+                $this->errors[] = 'Neighborhood not found';
+                return false;
+            }
+
+            Log::info('[FederationNeighborhood] Deleted', ['id' => $id]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('[FederationNeighborhood] delete failed', ['error' => $e->getMessage()]);
+            $this->errors[] = 'Failed to delete neighborhood';
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy FederationNeighborhoodService::getById().
+     * Get a neighborhood by ID.
      */
     public function getById(int $id): ?array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        try {
+            $row = DB::selectOne(
+                "SELECT fn.*, CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) as created_by_name
+                 FROM federation_neighborhoods fn
+                 LEFT JOIN users u ON fn.created_by = u.id
+                 WHERE fn.id = ?",
+                [$id]
+            );
+
+            if (!$row) {
+                return null;
+            }
+
+            $tenants = DB::select(
+                "SELECT fnt.tenant_id, t.name, t.slug
+                 FROM federation_neighborhood_tenants fnt
+                 JOIN tenants t ON t.id = fnt.tenant_id
+                 WHERE fnt.neighborhood_id = ?
+                 ORDER BY t.name ASC",
+                [$id]
+            );
+
+            return [
+                'id' => (int) $row->id,
+                'name' => $row->name,
+                'description' => $row->description,
+                'region' => $row->region,
+                'created_by' => $row->created_by ? (int) $row->created_by : null,
+                'created_by_name' => $row->created_by_name ? trim($row->created_by_name) : null,
+                'tenants' => array_map(fn($t) => [
+                    'tenant_id' => (int) $t->tenant_id,
+                    'name' => $t->name,
+                    'slug' => $t->slug,
+                ], $tenants),
+                'created_at' => $row->created_at,
+                'updated_at' => $row->updated_at,
+            ];
+        } catch (\Exception $e) {
+            Log::error('[FederationNeighborhood] getById failed', ['error' => $e->getMessage()]);
+            return null;
+        }
     }
 }

@@ -6,94 +6,254 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+
 /**
+ * InsuranceCertificateService — Native Eloquent/DB implementation for insurance certificate management.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Handles CRUD, verification, rejection for insurance certificates.
+ * Used by both AdminInsuranceCertificateController and UserInsuranceController.
  */
 class InsuranceCertificateService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * Delegates to legacy InsuranceCertificateService::getUserCertificates().
+     * Get all certificates for a specific user (tenant-scoped).
      */
     public function getUserCertificates(int $userId): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        $tenantId = TenantContext::getId();
+
+        return DB::table('insurance_certificates')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::getById().
+     * Get a single certificate by ID (tenant-scoped).
      */
     public function getById(int $id): ?array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        $tenantId = TenantContext::getId();
+
+        $record = DB::table('insurance_certificates')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        return $record ? (array) $record : null;
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::getAll().
+     * Get all certificates with filters and pagination (admin).
+     *
+     * @return array{data: array, pagination: array{total: int, page: int, per_page: int}}
      */
     public function getAll(array $filters = []): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        $tenantId = TenantContext::getId();
+        $page = max(1, (int) ($filters['page'] ?? 1));
+        $perPage = max(1, min(100, (int) ($filters['per_page'] ?? 25)));
+
+        $query = DB::table('insurance_certificates')
+            ->where('insurance_certificates.tenant_id', $tenantId);
+
+        if (!empty($filters['status'])) {
+            $query->where('insurance_certificates.status', $filters['status']);
+        }
+
+        if (!empty($filters['insurance_type'])) {
+            $query->where('insurance_certificates.insurance_type', $filters['insurance_type']);
+        }
+
+        if (!empty($filters['search'])) {
+            $search = '%' . $filters['search'] . '%';
+            $query->where(function ($q) use ($search) {
+                $q->where('insurance_certificates.provider_name', 'LIKE', $search)
+                  ->orWhere('insurance_certificates.policy_number', 'LIKE', $search);
+            });
+        }
+
+        if (!empty($filters['expiring_soon'])) {
+            $query->where('insurance_certificates.expiry_date', '<=', now()->addDays(30)->toDateString())
+                  ->where('insurance_certificates.expiry_date', '>=', now()->toDateString())
+                  ->where('insurance_certificates.status', '!=', 'expired');
+        }
+
+        if (!empty($filters['expired'])) {
+            $query->where(function ($q) {
+                $q->where('insurance_certificates.expiry_date', '<', now()->toDateString())
+                  ->orWhere('insurance_certificates.status', 'expired');
+            });
+        }
+
+        $total = $query->count();
+
+        $data = $query->orderByDesc('insurance_certificates.created_at')
+            ->offset(($page - 1) * $perPage)
+            ->limit($perPage)
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->toArray();
+
+        return [
+            'data' => $data,
+            'pagination' => [
+                'total' => $total,
+                'page' => $page,
+                'per_page' => $perPage,
+            ],
+        ];
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::getStats().
+     * Get aggregate stats for insurance certificates (admin dashboard).
      */
     public function getStats(): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        $tenantId = TenantContext::getId();
+
+        $counts = DB::table('insurance_certificates')
+            ->where('tenant_id', $tenantId)
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = 'submitted' THEN 1 ELSE 0 END) as submitted,
+                SUM(CASE WHEN status = 'verified' THEN 1 ELSE 0 END) as verified,
+                SUM(CASE WHEN status = 'expired' THEN 1 ELSE 0 END) as expired,
+                SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
+                SUM(CASE WHEN status = 'revoked' THEN 1 ELSE 0 END) as revoked,
+                SUM(CASE WHEN expiry_date IS NOT NULL AND expiry_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) AND expiry_date >= CURDATE() AND status NOT IN ('expired','rejected','revoked') THEN 1 ELSE 0 END) as expiring_soon
+            ")
+            ->first();
+
+        return [
+            'total' => (int) ($counts->total ?? 0),
+            'pending' => (int) ($counts->pending ?? 0),
+            'submitted' => (int) ($counts->submitted ?? 0),
+            'verified' => (int) ($counts->verified ?? 0),
+            'expired' => (int) ($counts->expired ?? 0),
+            'rejected' => (int) ($counts->rejected ?? 0),
+            'revoked' => (int) ($counts->revoked ?? 0),
+            'expiring_soon' => (int) ($counts->expiring_soon ?? 0),
+        ];
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::create().
+     * Create a new insurance certificate record.
      */
     public function create(array $data): int
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0;
+        $tenantId = TenantContext::getId();
+
+        $id = DB::table('insurance_certificates')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => (int) $data['user_id'],
+            'insurance_type' => $data['insurance_type'] ?? 'public_liability',
+            'provider_name' => $data['provider_name'] ?? null,
+            'policy_number' => $data['policy_number'] ?? null,
+            'coverage_amount' => isset($data['coverage_amount']) ? (float) $data['coverage_amount'] : null,
+            'start_date' => $data['start_date'] ?? null,
+            'expiry_date' => $data['expiry_date'] ?? null,
+            'certificate_file_path' => $data['certificate_file_path'] ?? null,
+            'status' => $data['status'] ?? 'pending',
+            'notes' => $data['notes'] ?? null,
+            'created_at' => now(),
+        ]);
+
+        return (int) $id;
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::update().
+     * Update an existing insurance certificate.
      */
     public function update(int $id, array $data): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $tenantId = TenantContext::getId();
+
+        $data['updated_at'] = now();
+
+        $affected = DB::table('insurance_certificates')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update($data);
+
+        return $affected > 0;
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::verify().
+     * Verify an insurance certificate (admin action).
      */
     public function verify(int $id, int $adminId): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $tenantId = TenantContext::getId();
+        $now = now();
+
+        $affected = DB::table('insurance_certificates')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update([
+                'status' => 'verified',
+                'verified_by' => $adminId,
+                'verified_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+        return $affected > 0;
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::reject().
+     * Reject an insurance certificate (admin action).
      */
     public function reject(int $id, int $adminId, string $reason): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $tenantId = TenantContext::getId();
+        $now = now();
+
+        $affected = DB::table('insurance_certificates')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->update([
+                'status' => 'rejected',
+                'verified_by' => $adminId,
+                'verified_at' => $now,
+                'notes' => $reason,
+                'updated_at' => $now,
+            ]);
+
+        return $affected > 0;
     }
 
     /**
-     * Delegates to legacy InsuranceCertificateService::delete().
+     * Delete an insurance certificate.
      */
     public function delete(int $id): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $tenantId = TenantContext::getId();
+
+        // Delete the physical file if it exists
+        $record = DB::table('insurance_certificates')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (!$record) {
+            return false;
+        }
+
+        if (!empty($record->certificate_file_path) && file_exists($record->certificate_file_path)) {
+            @unlink($record->certificate_file_path);
+        }
+
+        DB::table('insurance_certificates')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        return true;
     }
 }

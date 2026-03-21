@@ -1,14 +1,20 @@
 <?php
-// Copyright � 2024�2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+
 /**
+ * VolunteerReminderService — manages reminder settings and sends shift/credential
+ * reminders to volunteers.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Backed by `vol_reminder_settings` and `vol_reminders_sent` tables.
+ * All queries are tenant-scoped via TenantContext.
  */
 class VolunteerReminderService
 {
@@ -17,47 +23,313 @@ class VolunteerReminderService
     }
 
     /**
-     * Delegates to legacy VolunteerReminderService::sendReminders().
+     * Send reminders for an opportunity's upcoming shifts.
+     *
+     * Finds confirmed volunteers for shifts belonging to the given opportunity
+     * that are within the configured pre-shift reminder window, and records
+     * the reminder as sent.
+     *
+     * @return int  Number of reminders sent
      */
     public static function sendReminders(int $tenantId, int $opportunityId): int
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0;
+        // Get the pre_shift reminder setting for this tenant
+        $setting = DB::table('vol_reminder_settings')
+            ->where('tenant_id', $tenantId)
+            ->where('reminder_type', 'pre_shift')
+            ->where('enabled', true)
+            ->first();
+
+        if (!$setting) {
+            return 0;
+        }
+
+        $hoursBefore = (int) ($setting->hours_before ?? 24);
+
+        // Find shifts for this opportunity that start within the reminder window
+        $shifts = DB::table('vol_shifts')
+            ->where('opportunity_id', $opportunityId)
+            ->where('tenant_id', $tenantId)
+            ->where('start_time', '>', now())
+            ->where('start_time', '<=', now()->addHours($hoursBefore))
+            ->get();
+
+        if ($shifts->isEmpty()) {
+            return 0;
+        }
+
+        $sentCount = 0;
+
+        foreach ($shifts as $shift) {
+            // Get confirmed volunteers for this shift
+            $signups = DB::table('vol_shift_signups')
+                ->where('shift_id', $shift->id)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'confirmed')
+                ->pluck('user_id')
+                ->all();
+
+            foreach ($signups as $userId) {
+                // Check if reminder was already sent for this shift+user combination
+                $alreadySent = DB::table('vol_reminders_sent')
+                    ->where('tenant_id', $tenantId)
+                    ->where('user_id', $userId)
+                    ->where('reminder_type', 'pre_shift')
+                    ->where('reference_id', $shift->id)
+                    ->exists();
+
+                if ($alreadySent) {
+                    continue;
+                }
+
+                // Record the reminder as sent
+                try {
+                    // Determine which channels are enabled
+                    $channels = [];
+                    if ($setting->push_enabled ?? true) {
+                        $channels[] = 'push';
+                    }
+                    if ($setting->email_enabled ?? true) {
+                        $channels[] = 'email';
+                    }
+                    if ($setting->sms_enabled ?? false) {
+                        $channels[] = 'sms';
+                    }
+
+                    if (empty($channels)) {
+                        $channels = ['push']; // default fallback
+                    }
+
+                    foreach ($channels as $channel) {
+                        DB::table('vol_reminders_sent')->insert([
+                            'tenant_id' => $tenantId,
+                            'user_id' => $userId,
+                            'reminder_type' => 'pre_shift',
+                            'reference_id' => (int) $shift->id,
+                            'channel' => $channel,
+                            'sent_at' => now(),
+                        ]);
+                    }
+
+                    $sentCount++;
+                } catch (\Throwable $e) {
+                    error_log("VolunteerReminderService::sendReminders error for user {$userId}: " . $e->getMessage());
+                }
+            }
+        }
+
+        return $sentCount;
     }
 
     /**
-     * Delegates to legacy VolunteerReminderService::scheduleReminder().
+     * Schedule a reminder for a specific opportunity at a given datetime.
+     *
+     * Records a pre_shift reminder entry with the specified send time.
+     * Actual delivery is handled by a scheduled job that polls vol_reminders_sent.
+     *
+     * @return bool  True if scheduled successfully
      */
     public static function scheduleReminder(int $tenantId, int $opportunityId, string $datetime): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        try {
+            $sendAt = new \DateTime($datetime);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        // Verify the opportunity exists in this tenant
+        $opp = DB::table('vol_opportunities as opp')
+            ->join('vol_organizations as org', 'opp.organization_id', '=', 'org.id')
+            ->where('opp.id', $opportunityId)
+            ->where('org.tenant_id', $tenantId)
+            ->first();
+
+        if (!$opp) {
+            return false;
+        }
+
+        try {
+            // Record a scheduled reminder entry (reference_id = opportunity_id)
+            DB::table('vol_reminders_sent')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => 0, // 0 = broadcast to all volunteers for this opportunity
+                'reminder_type' => 'pre_shift',
+                'reference_id' => $opportunityId,
+                'channel' => 'push',
+                'sent_at' => $sendAt->format('Y-m-d H:i:s'),
+            ]);
+
+            return true;
+        } catch (\Throwable $e) {
+            error_log("VolunteerReminderService::scheduleReminder error: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy VolunteerReminderService::cancelReminder().
+     * Cancel a scheduled reminder by its ID.
+     *
+     * @return bool  True if the reminder was found and deleted
      */
     public static function cancelReminder(int $tenantId, int $reminderId): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        try {
+            $deleted = DB::table('vol_reminders_sent')
+                ->where('id', $reminderId)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+
+            return $deleted > 0;
+        } catch (\Throwable $e) {
+            error_log("VolunteerReminderService::cancelReminder error: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * Delegates to legacy VolunteerReminderService::getSettings().
+     * Get all reminder settings for the current tenant.
+     *
+     * Returns one row per reminder_type, or synthesises defaults for types
+     * that have no row yet.
+     *
+     * @return array  Keyed list of reminder settings
      */
     public static function getSettings(): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        $tenantId = TenantContext::getId();
+
+        $rows = DB::table('vol_reminder_settings')
+            ->where('tenant_id', $tenantId)
+            ->get()
+            ->keyBy('reminder_type');
+
+        $defaults = [
+            'pre_shift' => [
+                'hours_before' => 24,
+                'hours_after' => null,
+                'days_inactive' => null,
+                'days_before_expiry' => null,
+            ],
+            'post_shift_feedback' => [
+                'hours_before' => null,
+                'hours_after' => 2,
+                'days_inactive' => null,
+                'days_before_expiry' => null,
+            ],
+            'lapsed_volunteer' => [
+                'hours_before' => null,
+                'hours_after' => null,
+                'days_inactive' => 30,
+                'days_before_expiry' => null,
+            ],
+            'credential_expiry' => [
+                'hours_before' => null,
+                'hours_after' => null,
+                'days_inactive' => null,
+                'days_before_expiry' => 14,
+            ],
+            'training_expiry' => [
+                'hours_before' => null,
+                'hours_after' => null,
+                'days_inactive' => null,
+                'days_before_expiry' => 14,
+            ],
+        ];
+
+        $settings = [];
+
+        foreach ($defaults as $type => $typeDefaults) {
+            $row = $rows->get($type);
+
+            if ($row) {
+                $settings[] = [
+                    'id' => (int) $row->id,
+                    'reminder_type' => $row->reminder_type,
+                    'enabled' => (bool) $row->enabled,
+                    'hours_before' => $row->hours_before !== null ? (int) $row->hours_before : null,
+                    'hours_after' => $row->hours_after !== null ? (int) $row->hours_after : null,
+                    'days_inactive' => $row->days_inactive !== null ? (int) $row->days_inactive : null,
+                    'days_before_expiry' => $row->days_before_expiry !== null ? (int) $row->days_before_expiry : null,
+                    'email_template' => $row->email_template,
+                    'push_enabled' => (bool) $row->push_enabled,
+                    'email_enabled' => (bool) $row->email_enabled,
+                    'sms_enabled' => (bool) $row->sms_enabled,
+                    'updated_at' => $row->updated_at,
+                ];
+            } else {
+                // Synthesise a default entry (not yet persisted)
+                $settings[] = [
+                    'id' => null,
+                    'reminder_type' => $type,
+                    'enabled' => true,
+                    'hours_before' => $typeDefaults['hours_before'],
+                    'hours_after' => $typeDefaults['hours_after'],
+                    'days_inactive' => $typeDefaults['days_inactive'],
+                    'days_before_expiry' => $typeDefaults['days_before_expiry'],
+                    'email_template' => null,
+                    'push_enabled' => true,
+                    'email_enabled' => true,
+                    'sms_enabled' => false,
+                    'updated_at' => null,
+                ];
+            }
+        }
+
+        return $settings;
     }
 
     /**
-     * Delegates to legacy VolunteerReminderService::updateSetting().
+     * Create or update a reminder setting for the current tenant.
+     *
+     * Uses UPSERT on (tenant_id, reminder_type).
+     *
+     * @param string $type  One of: pre_shift, post_shift_feedback, lapsed_volunteer, credential_expiry, training_expiry
+     * @param array  $data  Setting fields to update
+     * @return bool  True on success
      */
     public static function updateSetting(string $type, array $data): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $tenantId = TenantContext::getId();
+
+        $allowedTypes = ['pre_shift', 'post_shift_feedback', 'lapsed_volunteer', 'credential_expiry', 'training_expiry'];
+        if (!in_array($type, $allowedTypes, true)) {
+            return false;
+        }
+
+        $values = [
+            'tenant_id' => $tenantId,
+            'reminder_type' => $type,
+            'enabled' => isset($data['enabled']) ? (bool) $data['enabled'] : true,
+            'hours_before' => isset($data['hours_before']) ? (int) $data['hours_before'] : null,
+            'hours_after' => isset($data['hours_after']) ? (int) $data['hours_after'] : null,
+            'days_inactive' => isset($data['days_inactive']) ? (int) $data['days_inactive'] : null,
+            'days_before_expiry' => isset($data['days_before_expiry']) ? (int) $data['days_before_expiry'] : null,
+            'email_template' => isset($data['email_template']) ? trim((string) $data['email_template']) : null,
+            'push_enabled' => isset($data['push_enabled']) ? (bool) $data['push_enabled'] : true,
+            'email_enabled' => isset($data['email_enabled']) ? (bool) $data['email_enabled'] : true,
+            'sms_enabled' => isset($data['sms_enabled']) ? (bool) $data['sms_enabled'] : false,
+            'updated_at' => now(),
+        ];
+
+        try {
+            $existing = DB::table('vol_reminder_settings')
+                ->where('tenant_id', $tenantId)
+                ->where('reminder_type', $type)
+                ->first();
+
+            if ($existing) {
+                DB::table('vol_reminder_settings')
+                    ->where('id', $existing->id)
+                    ->update($values);
+            } else {
+                $values['created_at'] = now();
+                DB::table('vol_reminder_settings')->insert($values);
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            error_log("VolunteerReminderService::updateSetting error: " . $e->getMessage());
+            return false;
+        }
     }
 }

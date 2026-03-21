@@ -1,45 +1,152 @@
 <?php
-// Copyright � 2024�2026 Jasper Ford
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
+ * ExchangeRatingService — native DB query builder implementation.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Handles post-completion satisfaction ratings for exchange requests.
+ * Both parties (requester and provider) can leave a 1–5 star rating
+ * with an optional comment. Each user can only rate an exchange once.
  */
 class ExchangeRatingService
 {
-    public function __construct()
+    /**
+     * Submit a rating for a completed exchange.
+     *
+     * @param int         $exchangeId Exchange request ID.
+     * @param int         $userId     The user submitting the rating (rater).
+     * @param int         $rating     1–5 star rating.
+     * @param string|null $comment    Optional review comment.
+     * @return array{success: bool, error?: string}
+     */
+    public function submitRating(int $exchangeId, int $userId, int $rating, ?string $comment = null): array
     {
+        $tenantId = TenantContext::getId();
+
+        // Validate rating range
+        if ($rating < 1 || $rating > 5) {
+            return ['success' => false, 'error' => 'Rating must be between 1 and 5'];
+        }
+
+        // Fetch the exchange to verify it exists, is completed, and determine roles
+        $exchange = DB::selectOne(
+            "SELECT id, requester_id, provider_id, status
+             FROM exchange_requests
+             WHERE id = ? AND tenant_id = ?",
+            [$exchangeId, $tenantId]
+        );
+
+        if (!$exchange) {
+            return ['success' => false, 'error' => 'Exchange not found'];
+        }
+
+        if ($exchange->status !== 'completed') {
+            return ['success' => false, 'error' => 'Exchange must be completed before rating'];
+        }
+
+        // Determine the rater's role and the rated user
+        $requesterId = (int) $exchange->requester_id;
+        $providerId = (int) $exchange->provider_id;
+
+        if ($userId === $requesterId) {
+            $role = 'requester';
+            $ratedId = $providerId;
+        } elseif ($userId === $providerId) {
+            $role = 'provider';
+            $ratedId = $requesterId;
+        } else {
+            return ['success' => false, 'error' => 'You are not a participant in this exchange'];
+        }
+
+        // Check if already rated (unique constraint: exchange_id + rater_id)
+        $existing = DB::selectOne(
+            "SELECT id FROM exchange_ratings WHERE exchange_id = ? AND rater_id = ?",
+            [$exchangeId, $userId]
+        );
+
+        if ($existing) {
+            return ['success' => false, 'error' => 'You have already rated this exchange'];
+        }
+
+        try {
+            DB::insert(
+                "INSERT INTO exchange_ratings (tenant_id, exchange_id, rater_id, rated_id, rating, comment, role, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$tenantId, $exchangeId, $userId, $ratedId, $rating, $comment, $role]
+            );
+
+            return ['success' => true];
+        } catch (\Throwable $e) {
+            Log::error('[ExchangeRatingService] submitRating failed: ' . $e->getMessage());
+            return ['success' => false, 'error' => 'Failed to submit rating'];
+        }
     }
 
     /**
-     * Delegates to legacy ExchangeRatingService::rate().
+     * Get all ratings for a specific exchange.
+     *
+     * @return array<int, array>
      */
-    public function rate(int $tenantId, int $exchangeId, int $userId, int $rating, ?string $comment = null): bool
+    public function getRatingsForExchange(int $exchangeId): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return false;
+        $tenantId = TenantContext::getId();
+
+        $rows = DB::select(
+            "SELECT er.id, er.exchange_id, er.rater_id, er.rated_id, er.rating, er.comment, er.role, er.created_at,
+                    u.first_name AS rater_first_name, u.last_name AS rater_last_name, u.username AS rater_username
+             FROM exchange_ratings er
+             LEFT JOIN users u ON u.id = er.rater_id
+             WHERE er.exchange_id = ? AND er.tenant_id = ?
+             ORDER BY er.created_at ASC",
+            [$exchangeId, $tenantId]
+        );
+
+        return array_map(fn ($row) => (array) $row, $rows);
     }
 
     /**
-     * Delegates to legacy ExchangeRatingService::getRatings().
+     * Check whether a user has already rated a specific exchange.
      */
-    public function getRatings(int $tenantId, int $exchangeId): array
+    public function hasRated(int $exchangeId, int $userId): bool
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        $tenantId = TenantContext::getId();
+
+        $row = DB::selectOne(
+            "SELECT id FROM exchange_ratings WHERE exchange_id = ? AND rater_id = ? AND tenant_id = ?",
+            [$exchangeId, $userId, $tenantId]
+        );
+
+        return $row !== null;
     }
 
     /**
-     * Delegates to legacy ExchangeRatingService::getAverageRating().
+     * Get a user's aggregate rating data (average rating received across all exchanges).
+     *
+     * @return array{average: float, count: int}
      */
-    public function getAverageRating(int $tenantId, int $userId): float
+    public function getUserRating(int $userId): array
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return 0.0;
+        $tenantId = TenantContext::getId();
+
+        $row = DB::selectOne(
+            "SELECT AVG(rating) AS average, COUNT(*) AS count
+             FROM exchange_ratings
+             WHERE rated_id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+
+        return [
+            'average' => $row && $row->average !== null ? round((float) $row->average, 2) : 0.0,
+            'count' => $row ? (int) $row->count : 0,
+        ];
     }
 }

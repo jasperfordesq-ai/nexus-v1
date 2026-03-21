@@ -1,45 +1,170 @@
 <?php
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 namespace App\Services;
 
+use App\Core\TenantContext;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 /**
+ * TransactionExportService â€” native DB query builder implementation.
  *
- * Provides dependency-injectable access to the legacy static service methods.
+ * Generates personal transaction statements in CSV format for download.
+ * Supports date-range and type filters.
  */
 class TransactionExportService
 {
-    public function __construct()
+    /**
+     * Export a personal transaction statement as CSV.
+     *
+     * @param int   $userId  The user requesting the statement.
+     * @param array $filters Optional filters: startDate, endDate, type.
+     * @return array{success: bool, csv?: string, filename?: string, message?: string}
+     */
+    public function exportPersonalStatementCSV(int $userId, array $filters = []): array
     {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $query = "SELECT t.id, t.amount, t.description, t.status, t.transaction_type, t.created_at,
+                             t.sender_id, t.receiver_id,
+                             s.first_name AS sender_first, s.last_name AS sender_last,
+                             r.first_name AS receiver_first, r.last_name AS receiver_last
+                      FROM transactions t
+                      LEFT JOIN users s ON s.id = t.sender_id
+                      LEFT JOIN users r ON r.id = t.receiver_id
+                      WHERE t.tenant_id = ?
+                        AND (
+                            (t.sender_id = ? AND t.deleted_for_sender = 0)
+                            OR (t.receiver_id = ? AND t.deleted_for_receiver = 0)
+                        )";
+
+            $params = [$tenantId, $userId, $userId];
+
+            // Apply date filters
+            if (!empty($filters['startDate'])) {
+                $query .= " AND t.created_at >= ?";
+                $params[] = $filters['startDate'] . ' 00:00:00';
+            }
+
+            if (!empty($filters['endDate'])) {
+                $query .= " AND t.created_at <= ?";
+                $params[] = $filters['endDate'] . ' 23:59:59';
+            }
+
+            // Apply type filter
+            if (!empty($filters['type'])) {
+                $query .= " AND t.transaction_type = ?";
+                $params[] = $filters['type'];
+            }
+
+            $query .= " ORDER BY t.created_at DESC";
+
+            $rows = DB::select($query, $params);
+
+            // Build CSV content
+            $csv = $this->buildCSV($rows, $userId);
+
+            // Generate filename
+            $dateRange = '';
+            if (!empty($filters['startDate']) || !empty($filters['endDate'])) {
+                $start = $filters['startDate'] ?? 'start';
+                $end = $filters['endDate'] ?? 'now';
+                $dateRange = "_{$start}_to_{$end}";
+            }
+
+            $filename = "statement_{$userId}{$dateRange}_" . date('Ymd_His') . '.csv';
+
+            return [
+                'success' => true,
+                'csv' => $csv,
+                'filename' => $filename,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('[TransactionExportService] exportPersonalStatementCSV failed: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Failed to generate statement. Please try again.',
+            ];
+        }
     }
 
     /**
-     * Delegates to legacy TransactionExportService::exportCsv().
+     * Send CSV content as a downloadable file response and exit.
+     *
+     * @param string $csv      CSV content string.
+     * @param string $filename Download filename.
      */
-    public function exportCsv(int $tenantId, array $filters = []): string
+    public function sendCSVDownload(string $csv, string $filename): void
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return '';
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($csv));
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo $csv;
+        exit;
     }
 
     /**
-     * Delegates to legacy TransactionExportService::exportPdf().
+     * Build CSV string from transaction rows.
+     *
+     * @param array $rows   Transaction rows from DB.
+     * @param int   $userId The user's ID (to determine debit/credit direction).
+     * @return string CSV content with UTF-8 BOM for Excel compatibility.
      */
-    public function exportPdf(int $tenantId, array $filters = []): string
+    private function buildCSV(array $rows, int $userId): string
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return '';
+        // UTF-8 BOM for Excel compatibility
+        $output = "\xEF\xBB\xBF";
+
+        // Header row
+        $headers = ['Date', 'Type', 'Description', 'Other Party', 'Debit', 'Credit', 'Status'];
+        $output .= implode(',', $headers) . "\r\n";
+
+        foreach ($rows as $row) {
+            $isSender = ((int) $row->sender_id === $userId);
+
+            $otherParty = $isSender
+                ? trim(($row->receiver_first ?? '') . ' ' . ($row->receiver_last ?? ''))
+                : trim(($row->sender_first ?? '') . ' ' . ($row->sender_last ?? ''));
+
+            // System transactions (starting_balance, admin_grant) may not have an other party
+            if (trim($otherParty) === '') {
+                $otherParty = 'System';
+            }
+
+            $debit = $isSender ? number_format((float) $row->amount, 2) : '';
+            $credit = !$isSender ? number_format((float) $row->amount, 2) : '';
+
+            $date = date('Y-m-d H:i', strtotime($row->created_at));
+            $type = ucfirst(str_replace('_', ' ', $row->transaction_type ?? 'transfer'));
+            $description = $this->escapeCSV($row->description ?? '');
+            $otherParty = $this->escapeCSV($otherParty);
+            $status = ucfirst($row->status ?? 'completed');
+
+            $output .= implode(',', [$date, $type, $description, $otherParty, $debit, $credit, $status]) . "\r\n";
+        }
+
+        return $output;
     }
 
     /**
-     * Delegates to legacy TransactionExportService::getExportHistory().
+     * Escape a value for CSV (double-quote if it contains commas, quotes, or newlines).
      */
-    public function getExportHistory(int $tenantId): array
+    private function escapeCSV(string $value): string
     {
-        \Illuminate\Support\Facades\Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return [];
+        if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
+            return '"' . str_replace('"', '""', $value) . '"';
+        }
+
+        return $value;
     }
 }

@@ -6,12 +6,14 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
- * FederationJwtService — JWT token management for federation API.
+ * FederationJwtService — JWT token management for federation API authentication.
  *
- * Handles JWT generation, validation, and encoding for cross-platform federation.
+ * Handles JWT generation, validation, and OAuth2 client_credentials flow
+ * for cross-platform federation using HMAC-SHA256 signing.
  */
 class FederationJwtService
 {
@@ -35,8 +37,49 @@ class FederationJwtService
      */
     public static function generateToken(string $platformId, string $userId, int $tenantId, array $scopes = [], int $lifetime = self::DEFAULT_TOKEN_LIFETIME): ?array
     {
-        Log::warning('Legacy delegation removed: ' . __METHOD__);
-        return null;
+        $secret = self::getSigningSecret();
+        if (!$secret) {
+            Log::error('[FederationJwt] No signing secret configured');
+            return null;
+        }
+
+        $lifetime = min(max($lifetime, 60), self::MAX_TOKEN_LIFETIME);
+
+        $now = time();
+        $payload = [
+            'iss' => config('app.url', 'project-nexus'),
+            'sub' => $userId,
+            'aud' => $platformId,
+            'iat' => $now,
+            'exp' => $now + $lifetime,
+            'nbf' => $now,
+            'jti' => bin2hex(random_bytes(16)),
+            'tenant_id' => $tenantId,
+            'scopes' => $scopes,
+        ];
+
+        $header = ['typ' => 'JWT', 'alg' => 'HS256'];
+
+        $headerB64 = self::base64UrlEncode(json_encode($header));
+        $payloadB64 = self::base64UrlEncode(json_encode($payload));
+        $signature = hash_hmac('sha256', "{$headerB64}.{$payloadB64}", $secret, true);
+        $signatureB64 = self::base64UrlEncode($signature);
+
+        $token = "{$headerB64}.{$payloadB64}.{$signatureB64}";
+
+        Log::info('[FederationJwt] Token generated', [
+            'platform' => $platformId,
+            'user' => $userId,
+            'tenant' => $tenantId,
+            'expires_in' => $lifetime,
+        ]);
+
+        return [
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => $lifetime,
+            'scope' => implode(' ', $scopes),
+        ];
     }
 
     /**
@@ -90,9 +133,33 @@ class FederationJwtService
             return null;
         }
 
-        // In a full implementation, we would verify the signature here
-        // For now, return null because we can't verify without the secret
-        return null;
+        // Check not-before
+        if (isset($payload['nbf']) && (int) $payload['nbf'] > time()) {
+            return null;
+        }
+
+        // Verify HMAC signature
+        $secret = self::getSigningSecret();
+        if (!$secret) {
+            Log::error('[FederationJwt] Cannot verify token: no signing secret');
+            return null;
+        }
+
+        if ($alg === 'HS256') {
+            $expectedSignature = hash_hmac('sha256', "{$headerB64}.{$payloadB64}", $secret, true);
+            $expectedSignatureB64 = self::base64UrlEncode($expectedSignature);
+
+            if (!hash_equals($expectedSignatureB64, $signatureB64)) {
+                Log::warning('[FederationJwt] Token signature mismatch');
+                return null;
+            }
+        } else {
+            // RS256 not implemented yet — reject
+            Log::warning('[FederationJwt] RS256 validation not implemented');
+            return null;
+        }
+
+        return $payload;
     }
 
     /**
@@ -104,13 +171,14 @@ class FederationJwtService
     }
 
     /**
-     * Handle an OAuth2-style token request.
+     * Handle an OAuth2-style client_credentials token request.
      *
      * @return array Token response or error
      */
     public static function handleTokenRequest(): array
     {
-        $grantType = $_POST['grant_type'] ?? '';
+        $request = request();
+        $grantType = $request->input('grant_type', $request->request->get('grant_type', ''));
 
         if ($grantType !== 'client_credentials') {
             return [
@@ -119,9 +187,9 @@ class FederationJwtService
             ];
         }
 
-        // Check for client authentication
-        $clientId = $_SERVER['PHP_AUTH_USER'] ?? '';
-        $clientSecret = $_SERVER['PHP_AUTH_PW'] ?? '';
+        // Check for client authentication (Basic Auth or POST body)
+        $clientId = $request->getUser() ?: $request->input('client_id', '');
+        $clientSecret = $request->getPassword() ?: $request->input('client_secret', '');
 
         if (empty($clientId) || empty($clientSecret)) {
             return [
@@ -130,20 +198,75 @@ class FederationJwtService
             ];
         }
 
-        // Validate client credentials against federation platforms
-        // This is a stub - full implementation would check the database
-        Log::warning('Legacy delegation removed: FederationJwtService::handleTokenRequest');
+        try {
+            // Validate client credentials against federation API keys
+            $apiKey = DB::selectOne(
+                "SELECT fak.id, fak.tenant_id, fak.name, fak.permissions, fak.status, fak.expires_at
+                 FROM federation_api_keys fak
+                 WHERE fak.key_prefix = ? AND fak.key_hash = ? AND fak.status = 'active'",
+                [substr($clientId, 0, 8), hash('sha256', $clientSecret)]
+            );
 
-        return [
-            'error' => 'invalid_client',
-            'error_description' => 'Unknown client.',
-        ];
+            if (!$apiKey) {
+                return [
+                    'error' => 'invalid_client',
+                    'error_description' => 'Unknown client or invalid credentials.',
+                ];
+            }
+
+            // Check expiry
+            if ($apiKey->expires_at && strtotime($apiKey->expires_at) < time()) {
+                return [
+                    'error' => 'invalid_client',
+                    'error_description' => 'API key has expired.',
+                ];
+            }
+
+            // Parse scopes
+            $scopes = [];
+            if (!empty($apiKey->permissions)) {
+                $scopes = json_decode($apiKey->permissions, true) ?: [];
+            }
+
+            $requestedScope = $request->input('scope', '');
+            if (!empty($requestedScope)) {
+                $requestedScopes = explode(' ', $requestedScope);
+                $scopes = array_intersect($requestedScopes, $scopes) ?: $scopes;
+            }
+
+            // Generate token
+            $tokenData = self::generateToken(
+                $clientId,
+                'api_key_' . $apiKey->id,
+                (int) $apiKey->tenant_id,
+                $scopes
+            );
+
+            if (!$tokenData) {
+                return [
+                    'error' => 'server_error',
+                    'error_description' => 'Failed to generate token.',
+                ];
+            }
+
+            // Update last_used_at
+            DB::update(
+                "UPDATE federation_api_keys SET last_used_at = NOW() WHERE id = ?",
+                [$apiKey->id]
+            );
+
+            return $tokenData;
+        } catch (\Exception $e) {
+            Log::error('[FederationJwt] handleTokenRequest failed', ['error' => $e->getMessage()]);
+            return [
+                'error' => 'server_error',
+                'error_description' => 'Internal server error.',
+            ];
+        }
     }
 
     /**
      * Get supported algorithms.
-     *
-     * @return array
      */
     public static function getSupportedAlgorithms(): array
     {
@@ -152,8 +275,6 @@ class FederationJwtService
 
     /**
      * Get default token lifetime.
-     *
-     * @return int
      */
     public static function getDefaultTokenLifetime(): int
     {
@@ -162,12 +283,27 @@ class FederationJwtService
 
     /**
      * Get maximum token lifetime.
-     *
-     * @return int
      */
     public static function getMaxTokenLifetime(): int
     {
         return self::MAX_TOKEN_LIFETIME;
+    }
+
+    /**
+     * Get the signing secret from configuration.
+     */
+    private static function getSigningSecret(): ?string
+    {
+        // Use a dedicated federation secret, falling back to APP_KEY
+        $secret = config('federation.jwt_secret', config('app.key'));
+        if (empty($secret)) {
+            return null;
+        }
+        // Laravel APP_KEY is prefixed with "base64:" — decode it
+        if (str_starts_with($secret, 'base64:')) {
+            $secret = base64_decode(substr($secret, 7));
+        }
+        return $secret;
     }
 
     /**

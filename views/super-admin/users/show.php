@@ -171,7 +171,7 @@ require __DIR__ . '/../partials/header.php';
                             <select name="new_tenant_id" class="super-form-select" style="flex: 1;" required>
                                 <option value="">-- Select Tenant --</option>
                                 <?php
-                                $tenants = \Nexus\Services\TenantVisibilityService::getTenantList();
+                                $tenants = \App\Services\TenantVisibilityService::getTenantList();
                                 foreach ($tenants as $t):
                                     if ($t['id'] != $tenant['id']):
                                 ?>
