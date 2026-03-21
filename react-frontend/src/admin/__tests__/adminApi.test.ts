@@ -644,7 +644,7 @@ describe('adminApi', () => {
 
     it('hideFeedPost calls POST', async () => {
       await adminModeration.hideFeedPost(5);
-      expect(mockPost).toHaveBeenCalledWith('/v2/admin/feed/posts/5/hide');
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/feed/posts/5/hide', { type: 'post' });
     });
 
     it('resolveReport calls POST', async () => {

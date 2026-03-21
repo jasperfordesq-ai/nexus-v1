@@ -115,21 +115,21 @@ describe('ExchangesPage', () => {
 
   it('renders page title and description', () => {
     render(<ExchangesPage />);
-    expect(screen.getByText('My Exchanges')).toBeInTheDocument();
-    expect(screen.getByText('Track your service exchange requests and confirmations')).toBeInTheDocument();
+    expect(screen.getByText('title')).toBeInTheDocument();
+    expect(screen.getByText('subtitle')).toBeInTheDocument();
   });
 
   it('shows Browse Listings button', () => {
     render(<ExchangesPage />);
-    expect(screen.getByText('Browse Listings')).toBeInTheDocument();
+    expect(screen.getByText('browse_listings')).toBeInTheDocument();
   });
 
   it('renders status filter tabs', () => {
     render(<ExchangesPage />);
-    expect(screen.getByText('Active')).toBeInTheDocument();
-    expect(screen.getByText('Needs Confirmation')).toBeInTheDocument();
-    expect(screen.getByText('Completed')).toBeInTheDocument();
-    expect(screen.getByText('All')).toBeInTheDocument();
+    expect(screen.getByText('tabs.active')).toBeInTheDocument();
+    expect(screen.getByText('tabs.needs_confirmation')).toBeInTheDocument();
+    expect(screen.getByText('tabs.completed')).toBeInTheDocument();
+    expect(screen.getByText('tabs.all')).toBeInTheDocument();
   });
 
   it('shows loading skeletons initially', () => {
@@ -146,7 +146,7 @@ describe('ExchangesPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
-    expect(screen.getByText('No Exchanges Found')).toBeInTheDocument();
+    expect(screen.getByText('empty.title')).toBeInTheDocument();
   });
 
   it('displays exchanges when loaded', async () => {
@@ -177,7 +177,7 @@ describe('ExchangesPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Gardening Help')).toBeInTheDocument();
     });
-    expect(screen.getByText(/Provider User/)).toBeInTheDocument();
+    expect(screen.getByText('card.with_party')).toBeInTheDocument();
   });
 
   it('shows role indicator for requester', async () => {
@@ -205,7 +205,7 @@ describe('ExchangesPage', () => {
     render(<ExchangesPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('You requested')).toBeInTheDocument();
+      expect(screen.getByText('card.you_requested')).toBeInTheDocument();
     });
   });
 
@@ -234,7 +234,7 @@ describe('ExchangesPage', () => {
     render(<ExchangesPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('3 hours')).toBeInTheDocument();
+      expect(screen.getByText('hours_count')).toBeInTheDocument();
     });
   });
 });
