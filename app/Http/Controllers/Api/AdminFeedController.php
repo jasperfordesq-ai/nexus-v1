@@ -56,6 +56,9 @@ class AdminFeedController extends BaseApiController
     /**
      * GET /api/v2/admin/feed
      *
+     * Queries feed_activity (the unified feed table) so admins see ALL feed
+     * items — posts, listings, events, polls, goals, jobs, challenges, etc.
+     *
      * Query params: page, limit, type, user_id, search, is_hidden
      */
     public function index(): JsonResponse
@@ -77,30 +80,30 @@ class AdminFeedController extends BaseApiController
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
         if ($effectiveTenantId !== null) {
-            $conditions[] = 'fp.tenant_id = ?';
+            $conditions[] = 'fa.tenant_id = ?';
             $params[] = $effectiveTenantId;
         }
 
         if ($type) {
-            $conditions[] = 'fp.type = ?';
+            $conditions[] = 'fa.source_type = ?';
             $params[] = $type;
         }
 
         if ($userId) {
-            $conditions[] = 'fp.user_id = ?';
+            $conditions[] = 'fa.user_id = ?';
             $params[] = $userId;
         }
 
         if ($isHidden !== null) {
             if (filter_var($isHidden, FILTER_VALIDATE_BOOLEAN)) {
-                $conditions[] = 'fp.is_hidden = 1';
+                $conditions[] = 'fa.is_hidden = 1';
             } else {
-                $conditions[] = 'fp.is_hidden = 0';
+                $conditions[] = 'fa.is_hidden = 0';
             }
         }
 
         if ($search) {
-            $conditions[] = '(fp.content LIKE ? OR u.name LIKE ?)';
+            $conditions[] = '(fa.content LIKE ? OR u.name LIKE ?)';
             $searchPattern = '%' . $search . '%';
             $params[] = $searchPattern;
             $params[] = $searchPattern;
@@ -110,188 +113,212 @@ class AdminFeedController extends BaseApiController
 
         $total = (int) DB::selectOne(
             "SELECT COUNT(*) as total
-             FROM feed_posts fp
-             LEFT JOIN users u ON fp.user_id = u.id
+             FROM feed_activity fa
+             LEFT JOIN users u ON fa.user_id = u.id
              WHERE {$where}",
             $params
         )->total;
 
-        $posts = DB::select(
-            "SELECT fp.*,
+        $rows = DB::select(
+            "SELECT fa.id as activity_id, fa.source_type, fa.source_id, fa.user_id,
+                    fa.tenant_id, fa.title, fa.content, fa.image_url,
+                    fa.is_hidden, fa.is_visible, fa.created_at,
                     u.name as user_name, u.avatar_url as user_avatar,
                     t.name as tenant_name,
-                    (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND target_id = fp.id) as comments_count
-             FROM feed_posts fp
-             LEFT JOIN users u ON fp.user_id = u.id
-             LEFT JOIN tenants t ON fp.tenant_id = t.id
+                    (SELECT COUNT(*) FROM comments WHERE target_type = fa.source_type AND target_id = fa.source_id AND tenant_id = fa.tenant_id) as comments_count,
+                    (SELECT COUNT(*) FROM likes WHERE target_type = fa.source_type AND target_id = fa.source_id AND tenant_id = fa.tenant_id) as likes_count
+             FROM feed_activity fa
+             LEFT JOIN users u ON fa.user_id = u.id
+             LEFT JOIN tenants t ON fa.tenant_id = t.id
              WHERE {$where}
-             ORDER BY fp.created_at DESC
+             ORDER BY fa.created_at DESC
              LIMIT ? OFFSET ?",
             array_merge($params, [$limit, $offset])
         );
 
-        $formatted = array_map(function ($post) {
+        $formatted = array_map(function ($row) {
             return [
-                'id' => (int) $post->id,
-                'user_id' => (int) $post->user_id,
-                'tenant_id' => (int) $post->tenant_id,
-                'tenant_name' => $post->tenant_name ?? 'Unknown',
-                'user_name' => $post->user_name ?? 'Unknown',
-                'user_avatar' => $post->user_avatar,
-                'type' => $post->type ?? 'post',
-                'content' => $post->content,
-                'image_url' => $post->image ?? null,
-                'likes_count' => (int) ($post->likes_count ?? 0),
-                'comments_count' => (int) ($post->comments_count ?? 0),
-                'visibility' => $post->visibility ?? 'public',
-                'is_hidden' => (bool) ($post->is_hidden ?? false),
-                'created_at' => $post->created_at,
+                'id' => (int) $row->source_id,
+                'activity_id' => (int) $row->activity_id,
+                'user_id' => (int) $row->user_id,
+                'tenant_id' => (int) $row->tenant_id,
+                'tenant_name' => $row->tenant_name ?? 'Unknown',
+                'user_name' => $row->user_name ?? 'Unknown',
+                'user_avatar' => $row->user_avatar,
+                'type' => $row->source_type ?? 'post',
+                'content' => $row->content,
+                'image_url' => $row->image_url ?? null,
+                'likes_count' => (int) ($row->likes_count ?? 0),
+                'comments_count' => (int) ($row->comments_count ?? 0),
+                'is_hidden' => (bool) ($row->is_hidden ?? false),
+                'created_at' => $row->created_at,
             ];
-        }, $posts);
+        }, $rows);
 
         return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
     }
 
     /**
      * GET /api/v2/admin/feed/{id}
+     *
+     * Accepts query param ?type=<source_type> to look up non-post items.
+     * Defaults to 'post' for backwards compatibility.
      */
     public function show(int $id): JsonResponse
     {
         $this->requireAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
+        $sourceType = $this->query('type', 'post');
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
-        $tenantWhere = $effectiveTenantId !== null ? 'fp.tenant_id = ?' : '1=1';
+        $tenantWhere = $effectiveTenantId !== null ? 'fa.tenant_id = ?' : '1=1';
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
-        $post = DB::selectOne(
-            "SELECT fp.*,
+        $row = DB::selectOne(
+            "SELECT fa.id as activity_id, fa.source_type, fa.source_id, fa.user_id,
+                    fa.tenant_id, fa.title, fa.content, fa.image_url,
+                    fa.is_hidden, fa.is_visible, fa.created_at,
                     u.name as user_name, u.email as user_email, u.avatar_url as user_avatar,
                     t.name as tenant_name
-             FROM feed_posts fp
-             LEFT JOIN users u ON fp.user_id = u.id
-             LEFT JOIN tenants t ON fp.tenant_id = t.id
-             WHERE fp.id = ? AND {$tenantWhere}",
-            array_merge([$id], $tenantParams)
+             FROM feed_activity fa
+             LEFT JOIN users u ON fa.user_id = u.id
+             LEFT JOIN tenants t ON fa.tenant_id = t.id
+             WHERE fa.source_id = ? AND fa.source_type = ? AND {$tenantWhere}",
+            array_merge([$id, $sourceType], $tenantParams)
         );
 
-        if (!$post) {
+        if (!$row) {
             return $this->respondWithError('NOT_FOUND', 'Post not found', null, 404);
         }
 
-        $postTenantId = (int) $post->tenant_id;
+        $rowTenantId = (int) $row->tenant_id;
         $recentComments = DB::select(
             "SELECT c.*, u.name as user_name
              FROM comments c
              LEFT JOIN users u ON c.user_id = u.id
-             WHERE c.target_type = 'post' AND c.target_id = ? AND c.tenant_id = ?
+             WHERE c.target_type = ? AND c.target_id = ? AND c.tenant_id = ?
              ORDER BY c.created_at DESC
              LIMIT 10",
-            [$id, $postTenantId]
+            [$row->source_type, $id, $rowTenantId]
         );
 
         return $this->respondWithData([
-            'id' => (int) $post->id,
-            'user_id' => (int) $post->user_id,
-            'tenant_id' => (int) $post->tenant_id,
-            'tenant_name' => $post->tenant_name ?? 'Unknown',
-            'user_name' => $post->user_name ?? 'Unknown',
-            'user_email' => $post->user_email,
-            'user_avatar' => $post->user_avatar,
-            'type' => $post->type ?? 'post',
-            'content' => $post->content,
-            'image_url' => $post->image ?? null,
-            'likes_count' => (int) ($post->likes_count ?? 0),
-            'visibility' => $post->visibility ?? 'public',
-            'is_hidden' => (bool) ($post->is_hidden ?? false),
-            'created_at' => $post->created_at,
+            'id' => (int) $row->source_id,
+            'activity_id' => (int) $row->activity_id,
+            'user_id' => (int) $row->user_id,
+            'tenant_id' => (int) $row->tenant_id,
+            'tenant_name' => $row->tenant_name ?? 'Unknown',
+            'user_name' => $row->user_name ?? 'Unknown',
+            'user_email' => $row->user_email,
+            'user_avatar' => $row->user_avatar,
+            'type' => $row->source_type ?? 'post',
+            'content' => $row->content,
+            'image_url' => $row->image_url ?? null,
+            'is_hidden' => (bool) ($row->is_hidden ?? false),
+            'created_at' => $row->created_at,
             'recent_comments' => $recentComments,
         ]);
     }
 
     /**
      * POST /api/v2/admin/feed/{id}/hide
+     *
+     * Accepts JSON body { "type": "listing" } to hide non-post items.
+     * Defaults to 'post' for backwards compatibility.
      */
     public function hide(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
+        $sourceType = $this->getJsonInput()['type'] ?? $this->query('type', 'post');
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
         $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
-        $post = DB::selectOne(
-            "SELECT id, user_id, tenant_id FROM feed_posts WHERE id = ? AND {$tenantWhere}",
-            array_merge([$id], $tenantParams)
+        $row = DB::selectOne(
+            "SELECT id, tenant_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND {$tenantWhere}",
+            array_merge([$sourceType, $id], $tenantParams)
         );
 
-        if (!$post) {
-            return $this->respondWithError('NOT_FOUND', 'Post not found', null, 404);
+        if (!$row) {
+            return $this->respondWithError('NOT_FOUND', 'Feed item not found', null, 404);
         }
 
-        $postTenantId = (int) $post->tenant_id;
+        $itemTenantId = (int) $row->tenant_id;
 
-        // Global admin hide — set is_hidden on the post itself (hides from all users)
+        // Hide from feed_activity (hides from main feed for all users)
         DB::update(
-            "UPDATE feed_posts SET is_hidden = 1 WHERE id = ? AND tenant_id = ?",
-            [$id, $postTenantId]
+            "UPDATE feed_activity SET is_hidden = 1, is_visible = 0 WHERE source_type = ? AND source_id = ? AND tenant_id = ?",
+            [$sourceType, $id, $itemTenantId]
         );
 
-        // Also hide from feed_activity so it doesn't appear in the main feed
-        DB::update(
-            "UPDATE feed_activity SET is_hidden = 1, is_visible = 0 WHERE source_type = 'post' AND source_id = ? AND tenant_id = ?",
-            [$id, $postTenantId]
-        );
+        // If the source is a post, also set is_hidden on the feed_posts row
+        if ($sourceType === 'post') {
+            DB::update(
+                "UPDATE feed_posts SET is_hidden = 1 WHERE id = ? AND tenant_id = ?",
+                [$id, $itemTenantId]
+            );
+        }
 
         ActivityLog::log(
             $adminId,
-            'hide_feed_post',
-            "Hidden feed post #{$id}" . ($superAdmin ? " (tenant {$postTenantId})" : '')
+            'hide_feed_item',
+            "Hidden feed {$sourceType} #{$id}" . ($superAdmin ? " (tenant {$itemTenantId})" : '')
         );
 
-        return $this->respondWithData(['success' => true, 'message' => 'Post hidden']);
+        return $this->respondWithData(['success' => true, 'message' => 'Item hidden']);
     }
 
     /**
      * DELETE /api/v2/admin/feed/{id}
+     *
+     * Accepts query param ?type=<source_type> to delete non-post items.
+     * Defaults to 'post' for backwards compatibility.
      */
     public function destroy(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
+        $sourceType = $this->query('type', 'post');
 
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
         $tenantWhere = $effectiveTenantId !== null ? 'tenant_id = ?' : '1=1';
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
-        $post = DB::selectOne(
-            "SELECT id, tenant_id FROM feed_posts WHERE id = ? AND {$tenantWhere}",
-            array_merge([$id], $tenantParams)
+        $row = DB::selectOne(
+            "SELECT id, tenant_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND {$tenantWhere}",
+            array_merge([$sourceType, $id], $tenantParams)
         );
 
-        if (!$post) {
-            return $this->respondWithError('NOT_FOUND', 'Post not found', null, 404);
+        if (!$row) {
+            return $this->respondWithError('NOT_FOUND', 'Feed item not found', null, 404);
         }
 
-        $postTenantId = (int) $post->tenant_id;
+        $itemTenantId = (int) $row->tenant_id;
 
-        DB::delete("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$id, $postTenantId]);
-        DB::delete("DELETE FROM feed_hidden WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$id, $postTenantId]);
-        DB::delete("DELETE FROM feed_activity WHERE source_type = 'post' AND source_id = ? AND tenant_id = ?", [$id, $postTenantId]);
-        DB::delete("DELETE FROM likes WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$id, $postTenantId]);
-        DB::delete("DELETE FROM comments WHERE target_type = 'post' AND target_id = ? AND tenant_id = ?", [$id, $postTenantId]);
+        // Remove from feed_activity
+        DB::delete("DELETE FROM feed_activity WHERE source_type = ? AND source_id = ? AND tenant_id = ?", [$sourceType, $id, $itemTenantId]);
+        // Remove related engagement data
+        DB::delete("DELETE FROM feed_hidden WHERE target_type = ? AND target_id = ? AND tenant_id = ?", [$sourceType, $id, $itemTenantId]);
+        DB::delete("DELETE FROM likes WHERE target_type = ? AND target_id = ? AND tenant_id = ?", [$sourceType, $id, $itemTenantId]);
+        DB::delete("DELETE FROM comments WHERE target_type = ? AND target_id = ? AND tenant_id = ?", [$sourceType, $id, $itemTenantId]);
+
+        // If the source is a post, also delete the feed_posts row
+        if ($sourceType === 'post') {
+            DB::delete("DELETE FROM feed_posts WHERE id = ? AND tenant_id = ?", [$id, $itemTenantId]);
+        }
 
         ActivityLog::log(
             $adminId,
-            'delete_feed_post',
-            "Deleted feed post #{$id}" . ($superAdmin ? " (tenant {$postTenantId})" : '')
+            'delete_feed_item',
+            "Deleted feed {$sourceType} #{$id}" . ($superAdmin ? " (tenant {$itemTenantId})" : '')
         );
 
-        return $this->respondWithData(['success' => true, 'message' => 'Post deleted']);
+        return $this->respondWithData(['success' => true, 'message' => 'Item deleted']);
     }
 
     /**
@@ -309,19 +336,19 @@ class AdminFeedController extends BaseApiController
             $stats = DB::selectOne(
                 "SELECT
                     COUNT(*) as total,
-                    SUM(fp.is_hidden) as hidden,
-                    (SELECT COUNT(*) FROM comments WHERE target_type = 'post' AND tenant_id = ?) as total_comments
-                 FROM feed_posts fp
-                 WHERE fp.tenant_id = ?",
+                    SUM(fa.is_hidden) as hidden,
+                    (SELECT COUNT(*) FROM comments WHERE tenant_id = ?) as total_comments
+                 FROM feed_activity fa
+                 WHERE fa.tenant_id = ?",
                 [$effectiveTenantId, $effectiveTenantId]
             );
         } else {
             $stats = DB::selectOne(
                 "SELECT
                     COUNT(*) as total,
-                    SUM(fp.is_hidden) as hidden,
-                    (SELECT COUNT(*) FROM comments WHERE target_type = 'post') as total_comments
-                 FROM feed_posts fp"
+                    SUM(fa.is_hidden) as hidden,
+                    (SELECT COUNT(*) FROM comments) as total_comments
+                 FROM feed_activity fa"
             );
         }
 

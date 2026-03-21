@@ -1462,11 +1462,11 @@ export const adminModeration = {
   getFeedPost: (id: number) =>
     api.get<AdminFeedPost>(`/v2/admin/feed/posts/${id}`),
 
-  hideFeedPost: (id: number) =>
-    api.post<{ success: boolean }>(`/v2/admin/feed/posts/${id}/hide`),
+  hideFeedPost: (id: number, type = 'post') =>
+    api.post<{ success: boolean }>(`/v2/admin/feed/posts/${id}/hide`, { type }),
 
-  deleteFeedPost: (id: number) =>
-    api.delete<{ success: boolean }>(`/v2/admin/feed/posts/${id}`),
+  deleteFeedPost: (id: number, type = 'post') =>
+    api.delete<{ success: boolean }>(`/v2/admin/feed/posts/${id}?type=${encodeURIComponent(type)}`),
 
   getFeedStats: () =>
     api.get<ModerationStats>('/v2/admin/feed/stats'),

@@ -75,9 +75,13 @@ export interface FeedCardProps {
   onReportPost: (item: FeedItem) => void;
   /** Called with the feed item when the user deletes their own post. */
   onDeletePost: (item: FeedItem) => void;
+  /** Called with the feed item when an admin deletes any post. */
+  onAdminDeletePost?: (item: FeedItem) => void;
   onVotePoll: (pollId: number, optionId: number) => void;
   isAuthenticated: boolean;
   currentUserId?: number;
+  /** Whether the current user is an admin (shows admin delete on all posts). */
+  isAdmin?: boolean;
 }
 
 /* ───────────────────────── Type Badge Config ───────────────────────── */
@@ -244,9 +248,11 @@ const FeedCard = React.memo(function FeedCard({
   onMuteUser,
   onReportPost,
   onDeletePost,
+  onAdminDeletePost,
   onVotePoll,
   isAuthenticated,
   currentUserId,
+  isAdmin,
 }: FeedCardProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
@@ -468,6 +474,17 @@ const FeedCard = React.memo(function FeedCard({
                     >
                       {t('card.report_post')}
                     </DropdownItem>
+                    {isAdmin && onAdminDeletePost && (
+                      <DropdownItem
+                        key="admin-delete"
+                        startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
+                        className="text-danger"
+                        color="danger"
+                        onPress={() => onAdminDeletePost(item)}
+                      >
+                        {t('card.admin_delete', 'Delete (Admin)')}
+                      </DropdownItem>
+                    )}
                   </>
                 )}
               </DropdownMenu>

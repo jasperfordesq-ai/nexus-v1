@@ -109,6 +109,7 @@ export function FeedPage() {
   const pusher = usePusherOptional();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -356,6 +357,18 @@ export function FeedPage() {
       toast.success(t('toast.deleted'));
     } catch (err) {
       logError('Failed to delete post', err);
+      toast.error(t('toast.delete_failed'));
+    }
+  }, [toast, t]);
+
+  const handleAdminDeletePost = useCallback(async (item: FeedItem) => {
+    try {
+      const sourceType = item.type || 'post';
+      await api.delete(`/v2/admin/feed/posts/${item.id}?type=${encodeURIComponent(sourceType)}`);
+      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+      toast.success(t('toast.deleted'));
+    } catch (err) {
+      logError('Failed to admin-delete post', err);
       toast.error(t('toast.delete_failed'));
     }
   }, [toast, t]);
@@ -616,9 +629,11 @@ export function FeedPage() {
                       onMuteUser={handleMuteUser}
                       onReportPost={openReportModal}
                       onDeletePost={handleDeletePost}
+                      onAdminDeletePost={isAdmin ? handleAdminDeletePost : undefined}
                       onVotePoll={handleVotePoll}
                       isAuthenticated={isAuthenticated}
                       currentUserId={user?.id}
+                      isAdmin={isAdmin}
                     />
                   </motion.div>
                 ))}

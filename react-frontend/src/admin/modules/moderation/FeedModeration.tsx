@@ -37,6 +37,13 @@ const POST_TYPES = [
   { label: 'Poll', value: 'poll' },
   { label: 'Event', value: 'event' },
   { label: 'Listing', value: 'listing' },
+  { label: 'Goal', value: 'goal' },
+  { label: 'Review', value: 'review' },
+  { label: 'Job', value: 'job' },
+  { label: 'Challenge', value: 'challenge' },
+  { label: 'Volunteer', value: 'volunteer' },
+  { label: 'Blog', value: 'blog' },
+  { label: 'Discussion', value: 'discussion' },
 ];
 
 export default function FeedModeration() {
@@ -117,9 +124,10 @@ export default function FeedModeration() {
 
     setActionLoading(true);
     try {
+      const postType = confirmAction.post.type || 'post';
       const response = confirmAction.type === 'hide'
-        ? await adminModeration.hideFeedPost(confirmAction.post.id)
-        : await adminModeration.deleteFeedPost(confirmAction.post.id);
+        ? await adminModeration.hideFeedPost(confirmAction.post.id, postType)
+        : await adminModeration.deleteFeedPost(confirmAction.post.id, postType);
 
       if (response.success) {
         toast.success(
