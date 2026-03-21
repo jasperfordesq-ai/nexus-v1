@@ -17,10 +17,10 @@ $action = $isEdit
 $eligibleCount = $eligibleCount ?? 0;
 $segments = $segments ?? [];
 $groups = $groups ?? [];
-$counties = $counties ?? \Nexus\Models\NewsletterSegment::getIrishCounties();
-$towns = $towns ?? \Nexus\Models\NewsletterSegment::getIrishTowns();
+$counties = $counties ?? [];
+$towns = $towns ?? [];
 $audienceCounts = $audienceCounts ?? ['all_members' => 0, 'subscribers_only' => 0, 'both' => 0];
-$savedTemplates = $savedTemplates ?? \Nexus\Models\NewsletterTemplate::getAll(true, true);
+$savedTemplates = $savedTemplates ?? \App\Models\NewsletterTemplate::all()->toArray();
 
 // Admin page configuration
 $adminPageTitle = $isEdit ? 'Edit Newsletter' : 'Create Newsletter';

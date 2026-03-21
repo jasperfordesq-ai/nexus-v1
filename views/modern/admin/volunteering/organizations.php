@@ -68,7 +68,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </thead>
                 <tbody>
                     <?php foreach ($orgs as $org):
-                        $owner = \Nexus\Models\User::findById($org['user_id']);
+                        $owner = \App\Models\User::findById($org['user_id']);
                     ?>
                     <tr>
                         <td class="hide-mobile">

@@ -5,8 +5,8 @@
  */
 
 use App\Core\TenantContext;
-use Nexus\PageBuilder\PageRenderer;
-use Nexus\PageBuilder\BlockRegistry;
+use App\PageBuilder\PageRenderer;
+use App\PageBuilder\BlockRegistry;
 
 $basePath = TenantContext::getBasePath();
 $pageId = (int)($page['id'] ?? 0);

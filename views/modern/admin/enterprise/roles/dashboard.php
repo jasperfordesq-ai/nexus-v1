@@ -5,7 +5,7 @@
  */
 
 use App\Core\TenantContext;
-use Nexus\Services\Enterprise\PermissionService;
+use App\Services\Enterprise\PermissionService;
 
 $basePath = TenantContext::getBasePath();
 $permService = new PermissionService();

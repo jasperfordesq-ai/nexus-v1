@@ -6,7 +6,7 @@
 
 namespace App\Core;
 
-use Nexus\Admin\WebPConverter;
+use App\Admin\WebPConverter;
 
 /**
  * Image upload handler with resizing, cropping, and WebP conversion.

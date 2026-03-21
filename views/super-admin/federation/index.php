@@ -307,7 +307,7 @@ require __DIR__ . '/../partials/header.php';
 
 <!-- Federation Activity Analytics -->
 <?php
-$auditStats = $auditStats ?? \Nexus\Services\FederationAuditService::getStats(30);
+$auditStats = $auditStats ?? \App\Services\FederationAuditService::getStats(30);
 ?>
 <div class="super-card" style="margin-top: 1.5rem;">
     <div class="super-card-header">

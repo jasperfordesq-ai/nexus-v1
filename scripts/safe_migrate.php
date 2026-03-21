@@ -17,9 +17,11 @@
  *                     Use with --file=X or --all
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use Nexus\Core\Database;
+use App\Core\Database;
 
 // ─── Color output helpers ─────────────────────────────────────────────────────
 function success($msg) { echo "\033[32m✓ {$msg}\033[0m\n"; }

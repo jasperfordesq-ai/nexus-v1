@@ -23,11 +23,13 @@
  *   --dry-run     Show what would be copied without actually copying
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\BrokerControlConfigService;
+use App\Core\Database;
+use App\Core\TenantContext;
+use App\Services\BrokerControlConfigService;
 
 // Parse CLI arguments
 $dryRun = in_array('--dry-run', $argv ?? []);

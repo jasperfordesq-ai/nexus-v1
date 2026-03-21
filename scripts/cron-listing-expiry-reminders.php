@@ -17,11 +17,13 @@
  *   0 9 * * * docker exec nexus-php-app php /var/www/html/scripts/cron-listing-expiry-reminders.php >> /var/log/nexus-listing-expiry.log 2>&1
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Database;
-use Nexus\Services\ListingExpiryReminderService;
+use App\Core\TenantContext;
+use App\Core\Database;
+use App\Services\ListingExpiryReminderService;
 
 echo "[" . date('Y-m-d H:i:s') . "] Starting listing expiry reminder processing\n";
 
@@ -60,7 +62,7 @@ if ($cleaned > 0) {
 
 // Also clean up old match notification records
 try {
-    $matchCleaned = \Nexus\Services\MatchNotificationService::cleanupOldRecords();
+    $matchCleaned = \App\Services\MatchNotificationService::cleanupOldRecords();
     if ($matchCleaned > 0) {
         echo "  Cleaned up {$matchCleaned} old match notification records\n";
     }

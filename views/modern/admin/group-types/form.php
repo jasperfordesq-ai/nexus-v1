@@ -6,7 +6,7 @@
 
 use App\Core\Database;
 use App\Core\TenantContext;
-use Nexus\Models\GroupType;
+use App\Models\GroupType;
 
 // Admin check
 if (($_SESSION['user_role'] ?? '') !== 'admin') {

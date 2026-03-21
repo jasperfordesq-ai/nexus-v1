@@ -5,7 +5,7 @@
  */
 
 use App\Core\TenantContext;
-use Nexus\Services\AdminBadgeCountService;
+use App\Services\AdminBadgeCountService;
 
 // Load navigation config
 $adminNavigation = require __DIR__ . '/../../../config/admin-navigation.php';
@@ -33,7 +33,7 @@ $currentPathClean = strtok($currentPath, '?');
 // Check federation condition
 $isFederationEnabled = false;
 try {
-    $isFederationEnabled = \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
+    $isFederationEnabled = \App\Services\FederationFeatureService::isTenantFederationEnabled();
 } catch (\Exception $e) {
     // Service not available
 }

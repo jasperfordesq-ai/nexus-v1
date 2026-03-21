@@ -9,11 +9,13 @@
  * Usage: php scripts/send-review-email.php <review_id>
  */
 
-require_once __DIR__ . '/../httpdocs/index.php';
+require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-use Nexus\Services\NotificationDispatcher;
+use App\Core\Database;
+use App\Core\TenantContext;
+use App\Services\NotificationDispatcher;
 
 $reviewId = (int)($argv[1] ?? 0);
 

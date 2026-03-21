@@ -719,7 +719,7 @@ class MenuManager
     {
         $configFile = __DIR__ . '/../../config/menu-manager.php';
         $config = file_exists($configFile) ? require $configFile : [];
-        $navClass = $config['original_nav_config'] ?? 'Nexus\Config\Navigation';
+        $navClass = $config['original_nav_config'] ?? 'App\Config\Navigation';
 
         if (!class_exists($navClass)) {
             $defaultMenu = self::getDefaultMenu($location, TenantContext::getBasePath());

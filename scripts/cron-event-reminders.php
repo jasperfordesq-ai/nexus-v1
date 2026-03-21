@@ -18,11 +18,13 @@
  *   0,15,30,45 * * * * docker exec nexus-php-app php /var/www/html/scripts/cron-event-reminders.php
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use Nexus\Core\TenantContext;
-use Nexus\Core\Database;
-use Nexus\Services\EventReminderService;
+use App\Core\TenantContext;
+use App\Core\Database;
+use App\Services\EventReminderService;
 
 echo "[" . date('Y-m-d H:i:s') . "] Starting event reminder processing\n";
 

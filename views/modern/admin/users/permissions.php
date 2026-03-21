@@ -5,7 +5,7 @@
  */
 
 use App\Core\TenantContext;
-use Nexus\Services\Enterprise\PermissionService;
+use App\Services\Enterprise\PermissionService;
 
 $adminPageTitle = 'User Permissions';
 $adminPageSubtitle = 'Access Control';

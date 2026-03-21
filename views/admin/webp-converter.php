@@ -6,7 +6,7 @@
 
 use App\Core\TenantContext;
 use App\Core\Csrf;
-use Nexus\Admin\WebPConverter;
+use App\Admin\WebPConverter;
 
 $basePath = TenantContext::getBasePath();
 

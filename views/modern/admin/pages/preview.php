@@ -5,13 +5,13 @@
  * Path: views/modern/admin-legacy/pages/preview.php
  */
 
-use Nexus\Core\HtmlSanitizer;
+use App\Helpers\HtmlSanitizer;
 
 $pageTitle = $page['title'] ?? 'Page Preview';
 $pageContent = $page['content'] ?? '';
 
 // Sanitize content
-if (class_exists('Nexus\\Core\\HtmlSanitizer')) {
+if (class_exists('App\\Helpers\\HtmlSanitizer')) {
     $pageContent = HtmlSanitizer::sanitize($pageContent);
 }
 

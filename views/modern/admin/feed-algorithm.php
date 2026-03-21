@@ -69,7 +69,7 @@ $defaults = [
 $settings = array_merge($defaults, $feedAlgo);
 
 // Check if algorithm service exists
-$algorithmActive = class_exists('\Nexus\Services\FeedRankingService');
+$algorithmActive = class_exists('\App\Services\FeedRankingService');
 
 // Count enabled modules
 $enabledModules = array_sum([

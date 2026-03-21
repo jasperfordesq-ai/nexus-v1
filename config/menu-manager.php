@@ -37,7 +37,7 @@ return [
      * Original navigation configuration
      * Falls back to this when menu manager is disabled
      */
-    'original_nav_config' => 'Nexus\Config\Navigation',
+    'original_nav_config' => 'App\Config\Navigation',
 
     /**
      * Cache settings for menus

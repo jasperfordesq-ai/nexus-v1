@@ -270,7 +270,7 @@ function filterAdminModules(array $modules): array
         }
 
         if ($module['condition'] === 'federation') {
-            return \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
+            return \App\Services\FederationFeatureService::isTenantFederationEnabled();
         }
 
         return true;

@@ -6,7 +6,7 @@
 
 use App\Core\TenantContext;
 use App\Core\Database;
-use Nexus\Services\Enterprise\PermissionService;
+use App\Services\Enterprise\PermissionService;
 
 $basePath = TenantContext::getBasePath();
 $db = Database::getInstance();

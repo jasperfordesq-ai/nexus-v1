@@ -11,9 +11,11 @@
  * Run after the feed_activity migration: php scripts/backfill_feed_activity.php
  */
 
-require_once __DIR__ . '/../httpdocs/bootstrap.php';
+require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use Nexus\Core\Database;
+use App\Core\Database;
 
 $db = Database::getConnection();
 
