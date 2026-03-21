@@ -148,12 +148,13 @@ function processType(int $tenantId, string $type, int $batchSize, bool $dryRun):
     foreach ($batches as $batchIndex => $batch) {
         foreach ($batch as $row) {
             try {
+                $embeddingSvc = app(EmbeddingService::class);
                 if ($type === 'listing') {
                     $row['tenant_id'] = $tenantId;
-                    EmbeddingService::generateForListing($row);
+                    $embeddingSvc->generateForListing($row);
                 } else {
                     $row['tenant_id'] = $tenantId;
-                    EmbeddingService::generateForUser($row);
+                    $embeddingSvc->generateForUser($row);
                 }
                 $processed++;
             } catch (\Throwable $e) {

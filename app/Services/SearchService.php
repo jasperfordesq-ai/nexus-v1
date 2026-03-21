@@ -11,6 +11,7 @@ use App\Models\Group;
 use App\Models\Listing;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -346,6 +347,7 @@ class SearchService
         try {
             return DB::table('search_logs')
                 ->select('query as term', DB::raw('COUNT(*) as count'))
+                ->where('tenant_id', TenantContext::getId())
                 ->where('created_at', '>=', now()->subDays($days))
                 ->groupBy('query')
                 ->orderByDesc('count')

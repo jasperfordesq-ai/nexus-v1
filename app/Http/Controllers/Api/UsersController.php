@@ -14,6 +14,7 @@ use App\Services\ListingService;
 use App\Services\MailchimpService;
 use App\Core\TenantContext;
 use App\Models\User;
+use App\Services\MemberRankingService;
 
 /**
  * UsersController - User profiles, settings, preferences, sessions.
@@ -918,8 +919,9 @@ class UsersController extends BaseApiController
         }
         unset($user);
 
-        if (!$request->has('sort') && \App\Services\MemberRankingService::isEnabled() && !empty($users)) {
-            $users = \App\Services\MemberRankingService::rankMembers($users, $viewerId, ['search' => $search]);
+        $memberRanking = app(MemberRankingService::class);
+        if (!$request->has('sort') && $memberRanking->isEnabled() && !empty($users)) {
+            $users = $memberRanking->rankMembers($users, $viewerId, ['search' => $search]);
         }
 
         $users = array_map(static function (array $u): array {
