@@ -24,6 +24,17 @@ class LegalDocumentService
     public const TYPE_COMMUNITY_GUIDELINES = 'community_guidelines';
     public const TYPE_ACCEPTABLE_USE = 'acceptable_use';
 
+    // Acceptance method constants (used in acceptance tracking)
+    public const ACCEPTANCE_REGISTRATION = 'registration';
+    public const ACCEPTANCE_LOGIN_PROMPT = 'login_prompt';
+    public const ACCEPTANCE_SETTINGS = 'settings';
+    public const ACCEPTANCE_API = 'api';
+
+    // Acceptance status constants
+    public const STATUS_NOT_ACCEPTED = 'not_accepted';
+    public const STATUS_CURRENT = 'current';
+    public const STATUS_OUTDATED = 'outdated';
+
     /**
      * Get a legal document by type for the current tenant.
      */
@@ -88,7 +99,7 @@ class LegalDocumentService
     public static function getVersions(int $documentId): array
     {
         return DB::table('legal_document_versions')
-            ->where('legal_document_id', $documentId)
+            ->where('document_id', $documentId)
             ->orderByDesc('version_number')
             ->get()
             ->map(fn ($v) => (array) $v)
@@ -297,20 +308,27 @@ class LegalDocumentService
 
         $accepted = 0;
         foreach ($documents as $doc) {
-            $exists = DB::table('legal_document_acceptances')
+            $exists = DB::table('user_legal_acceptances')
                 ->where('user_id', $userId)
-                ->where('document_version_id', $doc->current_version_id)
+                ->where('version_id', $doc->current_version_id)
                 ->exists();
 
             if (! $exists) {
-                DB::table('legal_document_acceptances')->insert([
-                    'user_id'             => $userId,
-                    'legal_document_id'   => $doc->id,
-                    'document_version_id' => $doc->current_version_id,
-                    'acceptance_method'   => $method,
-                    'ip_address'          => request()->ip(),
-                    'accepted_at'         => now(),
-                    'created_at'          => now(),
+                // Get version number for denormalized column
+                $version = DB::table('legal_document_versions')
+                    ->where('id', $doc->current_version_id)
+                    ->value('version_number') ?? 'unknown';
+
+                DB::table('user_legal_acceptances')->insert([
+                    'user_id'           => $userId,
+                    'document_id'       => $doc->id,
+                    'version_id'        => $doc->current_version_id,
+                    'version_number'    => $version,
+                    'acceptance_method' => $method,
+                    'ip_address'        => request()->ip(),
+                    'user_agent'        => request()->userAgent(),
+                    'session_id'        => session()->getId(),
+                    'accepted_at'       => now(),
                 ]);
                 $accepted++;
             }
@@ -357,9 +375,9 @@ class LegalDocumentService
             return true;
         }
 
-        return DB::table('legal_document_acceptances')
+        return DB::table('user_legal_acceptances')
             ->where('user_id', $userId)
-            ->where('document_version_id', $doc->current_version_id)
+            ->where('version_id', $doc->current_version_id)
             ->exists();
     }
 

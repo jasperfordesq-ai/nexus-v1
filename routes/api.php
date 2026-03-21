@@ -1413,15 +1413,11 @@ Route::get('/cookie-consent/inventory', [\App\Http\Controllers\Api\CookieConsent
 Route::get('/cookie-consent/check/{category}', [\App\Http\Controllers\Api\CookieConsentController::class, 'check']);
 Route::put('/cookie-consent/{id}', [\App\Http\Controllers\Api\CookieConsentController::class, 'update']);
 Route::delete('/cookie-consent/{id}', [\App\Http\Controllers\Api\CookieConsentController::class, 'withdraw']);
-Route::get('/v2/legal/versions/compare', [\App\Http\Controllers\Api\LegalController::class, 'apiCompareVersions']);
-Route::get('/v2/legal/version/{versionId}', [\App\Http\Controllers\Api\LegalController::class, 'apiGetVersion']);
-Route::get('/v2/legal/{type}/versions', [\App\Http\Controllers\Api\LegalController::class, 'apiGetVersions']);
-Route::get('/v2/legal/acceptance/status', [\App\Http\Controllers\Api\LegalAcceptanceController::class, 'getStatus']);
-Route::post('/v2/legal/acceptance/accept-all', [\App\Http\Controllers\Api\LegalAcceptanceController::class, 'acceptAll']);
-Route::get('/v2/legal/{type}', [\App\Http\Controllers\Api\LegalController::class, 'apiGetDocument']);
-Route::post('/legal/accept', [\App\Http\Controllers\Api\LegalController::class, 'accept']);
-Route::post('/legal/accept-all', [\App\Http\Controllers\Api\LegalController::class, 'acceptAll']);
-Route::get('/legal/status', [\App\Http\Controllers\Api\LegalController::class, 'status']);
+// Legal document routes are registered OUTSIDE this auth group (see below)
+// because GET /v2/legal/{type} must be public — the React useLegalDocument
+// hook fetches custom legal docs without authentication (skipAuth: true).
+// Keeping them here caused a recurring regression: the API returned 401,
+// the hook silently fell back, and tenants lost their custom policies.
 Route::get('/nexus-score', [\App\Http\Controllers\Api\GamificationController::class, 'apiGetScore']);
 Route::post('/nexus-score/recalculate', [\App\Http\Controllers\Api\GamificationController::class, 'apiRecalculateScores']);
 Route::get('/wallet/transactions', [\App\Http\Controllers\Api\WalletController::class, 'transactions']);
@@ -1457,6 +1453,26 @@ Route::post('/v1/federation/oauth/token', [\App\Http\Controllers\Api\FederationC
 Route::post('/v1/federation/webhooks/test', [\App\Http\Controllers\Api\FederationController::class, 'testWebhook']);
 
 }); // End Route::middleware('auth:sanctum') — Misc/legacy routes
+
+// ============================================
+// PUBLIC LEGAL DOCUMENT ROUTES — No auth required
+// Custom tenant legal docs (Terms, Privacy, etc.) must be accessible
+// without authentication — the React useLegalDocument hook fetches
+// these with skipAuth:true for all visitors including non-logged-in users.
+// ============================================
+Route::get('/v2/legal/versions/compare', [\App\Http\Controllers\Api\LegalController::class, 'apiCompareVersions']);
+Route::get('/v2/legal/version/{versionId}', [\App\Http\Controllers\Api\LegalController::class, 'apiGetVersion']);
+Route::get('/v2/legal/{type}/versions', [\App\Http\Controllers\Api\LegalController::class, 'apiGetVersions']);
+Route::get('/v2/legal/{type}', [\App\Http\Controllers\Api\LegalController::class, 'apiGetDocument']);
+
+// Legal acceptance routes — require auth (user must be identified to record acceptance)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/legal/acceptance/status', [\App\Http\Controllers\Api\LegalAcceptanceController::class, 'getStatus']);
+    Route::post('/v2/legal/acceptance/accept-all', [\App\Http\Controllers\Api\LegalAcceptanceController::class, 'acceptAll']);
+    Route::post('/legal/accept', [\App\Http\Controllers\Api\LegalController::class, 'accept']);
+    Route::post('/legal/accept-all', [\App\Http\Controllers\Api\LegalController::class, 'acceptAll']);
+    Route::get('/legal/status', [\App\Http\Controllers\Api\LegalController::class, 'status']);
+});
 
 // ============================================
 // PUBLIC WEBHOOK ROUTES — No auth required
