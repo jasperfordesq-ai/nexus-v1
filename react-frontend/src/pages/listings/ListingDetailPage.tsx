@@ -28,7 +28,7 @@ import {
   RefreshCw,
   BarChart3,
 } from 'lucide-react';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, ImagePlaceholder } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';
@@ -299,8 +299,8 @@ export function ListingDetailPage() {
         </div>
 
         {/* Listing Image */}
-        {listing.image_url && (
-          <div className="mb-6 overflow-hidden rounded-xl">
+        <div className="mb-6 overflow-hidden rounded-xl">
+          {listing.image_url ? (
             <img
               src={resolveAssetUrl(listing.image_url)}
               alt={listing.title}
@@ -310,8 +310,10 @@ export function ListingDetailPage() {
               height={448}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
-          </div>
-        )}
+          ) : (
+            <ImagePlaceholder size="lg" />
+          )}
+        </div>
 
         {/* Title */}
         <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">{listing.title}</h1>

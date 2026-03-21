@@ -51,7 +51,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, ImagePlaceholder } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -148,6 +148,22 @@ const typeConfig = {
     icon: <Users className="w-3 h-3" aria-hidden="true" />,
     gradient: 'from-fuchsia-500/10 to-purple-500/10',
   },
+};
+
+/* ────────────── Placeholder icon per feed type ────────────── */
+
+import type { LucideIcon } from 'lucide-react';
+
+const feedPlaceholderIcons: Record<string, LucideIcon> = {
+  listing: ShoppingBag,
+  event: Calendar,
+  job: TrendingUp,
+  blog: BookOpen,
+  challenge: Target,
+  volunteer: Heart,
+  goal: Target,
+  review: Star,
+  discussion: Users,
 };
 
 /* ───────────────────────── Comment Item ───────────────────────── */
@@ -533,7 +549,7 @@ const FeedCard = React.memo(function FeedCard({
         )}
 
         {/* Image */}
-        {item.image_url && (
+        {item.image_url ? (
           <div className="mb-4 -mx-5 overflow-hidden">
             {detailPath ? (
               <Link to={tenantPath(detailPath)}>
@@ -557,6 +573,10 @@ const FeedCard = React.memo(function FeedCard({
                 height={448}
               />
             )}
+          </div>
+        ) : item.type !== 'post' && item.type !== 'poll' && (
+          <div className="mb-4 -mx-5 overflow-hidden">
+            <ImagePlaceholder size="md" icon={feedPlaceholderIcons[item.type]} />
           </div>
         )}
 

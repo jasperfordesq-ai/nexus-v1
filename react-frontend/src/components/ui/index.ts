@@ -11,6 +11,7 @@ export { GlassInput, type GlassInputProps } from './GlassInput';
 // UX Components
 export { BackToTop } from './BackToTop';
 export { AlgorithmLabel } from './AlgorithmLabel';
+export { ImagePlaceholder } from './ImagePlaceholder';
 export { DynamicIcon, ICON_MAP, ICON_NAMES } from './DynamicIcon';
 
 // Skeleton Components

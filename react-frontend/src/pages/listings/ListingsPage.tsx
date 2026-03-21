@@ -27,7 +27,7 @@ import {
   AlertTriangle,
   RefreshCw,
 } from 'lucide-react';
-import { GlassCard, AlgorithmLabel, ListingSkeleton } from '@/components/ui';
+import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { EntityMapView } from '@/components/location';
 import { EmptyState } from '@/components/feedback';
@@ -523,13 +523,15 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     <Link to={tenantPath(`/listings/${listing.id}`)}>
       <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
         {/* Listing Image */}
-        {imageUrl && (
+        {imageUrl ? (
           <img
             src={imageUrl}
             alt={listing.title || 'Listing image'}
             className="w-full h-36 object-cover"
             loading="lazy"
           />
+        ) : (
+          <ImagePlaceholder size="sm" />
         )}
 
         <div className="p-5 flex flex-col flex-1">
