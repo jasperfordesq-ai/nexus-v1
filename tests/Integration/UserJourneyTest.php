@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Integration;
+namespace App\Tests\Integration;
 
-use Nexus\Tests\DatabaseTestCase;
+use App\Tests\DatabaseTestCase;
 use App\Core\Database;
 use App\Core\TenantContext;
 use App\Models\User;

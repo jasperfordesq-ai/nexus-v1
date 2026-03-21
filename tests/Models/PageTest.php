@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Models;
+namespace App\Tests\Models;
 
-use Nexus\Tests\DatabaseTestCase;
+use App\Tests\DatabaseTestCase;
 use App\Core\Database;
 use App\Core\TenantContext;
 use App\Models\Page;

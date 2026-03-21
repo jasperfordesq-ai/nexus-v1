@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Core;
+namespace App\Tests\Core;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Core\EmailTemplate;
 
 /**

@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\SearchController as SearchApiController;
 /**
  * Tests for SearchApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\SearchApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\SearchApiControllerTest
  * Original base: PHPUnit\Framework\TestCase -> now LegacyBridgeTestCase
  */
 class SearchApiControllerTest extends LegacyBridgeTestCase

@@ -13,7 +13,7 @@ use Tests\Laravel\LegacyBridgeTestCase;
 /**
  * Tests for AuthController API endpoints (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\AuthControllerTest
+ * Migrated from: App\Tests\Controllers\Api\AuthControllerTest
  * Original base: ApiTestCase -> now LegacyBridgeTestCase
  *
  * Tests authentication-related endpoints including login, logout,

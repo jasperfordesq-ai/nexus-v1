@@ -14,10 +14,10 @@ use App\Http\Controllers\Api\ListingsController as ListingsApiController;
 /**
  * Tests for ListingsApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\ListingsApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\ListingsApiControllerTest
  * Original base: PHPUnit\Framework\TestCase -> now LegacyBridgeTestCase
  *
- * Note: The original used Nexus\Controllers\Api\ListingsApiController.
+ * Note: The original used App\Controllers\Api\ListingsApiController.
  * Updated import to App\Http\Controllers\Api\ListingsApiController for Laravel.
  */
 class ListingsApiControllerTest extends LegacyBridgeTestCase

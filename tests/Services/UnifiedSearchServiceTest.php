@@ -6,12 +6,12 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Services;
+namespace App\Tests\Services;
 
 use App\Services\UnifiedSearchService;
 use App\Core\TenantContext;
 use App\Core\Database;
-use Nexus\Tests\DatabaseTestCase;
+use App\Tests\DatabaseTestCase;
 
 /**
  * UnifiedSearchService Tests

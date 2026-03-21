@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Unit;
+namespace App\Tests\Unit;
 
 use Tests\Laravel\TestCase;
 use App\Http\Controllers\Api\BaseApiController;

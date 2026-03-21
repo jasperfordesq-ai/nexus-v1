@@ -6,13 +6,13 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Services;
+namespace App\Tests\Services;
 
 use App\Core\Database;
 use App\Core\TenantContext;
 use App\Models\JobVacancy;
 use App\Services\JobVacancyService;
-use Nexus\Tests\DatabaseTestCase;
+use App\Tests\DatabaseTestCase;
 
 /**
  * JobVacancyService Test Suite

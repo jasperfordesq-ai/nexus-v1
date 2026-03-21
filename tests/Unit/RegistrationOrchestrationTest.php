@@ -6,13 +6,13 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Unit;
+namespace App\Tests\Unit;
 
-use Nexus\Tests\TestCase;
-use Nexus\Services\Identity\RegistrationOrchestrationService;
+use App\Tests\TestCase;
+use App\Services\Identity\RegistrationOrchestrationService;
 use App\Services\Identity\RegistrationOrchestrationService as AppRegistrationOrchestrationService;
-use Nexus\Services\Identity\RegistrationPolicyService;
-use Nexus\Services\Identity\IdentityVerificationSessionService;
+use App\Services\Identity\RegistrationPolicyService;
+use App\Services\Identity\IdentityVerificationSessionService;
 use ReflectionClass;
 use ReflectionMethod;
 

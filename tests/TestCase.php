@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests;
+namespace App\Tests;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;

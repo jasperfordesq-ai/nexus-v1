@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests;
+namespace App\Tests;
 
 use PDO;
 

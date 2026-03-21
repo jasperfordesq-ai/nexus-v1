@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Models;
+namespace App\Tests\Models;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Models\User;
 use ReflectionMethod;
 

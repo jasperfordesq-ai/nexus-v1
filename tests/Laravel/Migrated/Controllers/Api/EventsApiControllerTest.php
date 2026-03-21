@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\EventsController as EventsApiController;
 /**
  * Tests for EventsApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\EventsApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\EventsApiControllerTest
  * Original base: PHPUnit\Framework\TestCase -> now LegacyBridgeTestCase
  */
 class EventsApiControllerTest extends LegacyBridgeTestCase

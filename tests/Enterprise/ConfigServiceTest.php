@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Enterprise;
+namespace App\Tests\Enterprise;
 
-use Nexus\Services\Enterprise\ConfigService;
-use Nexus\Tests\TestCase;
+use App\Services\Enterprise\ConfigService;
+use App\Tests\TestCase;
 
 /**
  * Configuration Service Tests

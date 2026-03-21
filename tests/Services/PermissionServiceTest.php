@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Services;
+namespace App\Tests\Services;
 
-use Nexus\Tests\TestCase;
-use Nexus\Services\Enterprise\PermissionService;
+use App\Tests\TestCase;
+use App\Services\Enterprise\PermissionService;
 
 /**
  * PermissionService Tests

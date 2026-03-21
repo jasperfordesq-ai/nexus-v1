@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\GroupsController as GroupsApiController;
 /**
  * Tests for GroupsApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\GroupsApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\GroupsApiControllerTest
  * Original base: PHPUnit\Framework\TestCase -> now LegacyBridgeTestCase
  */
 class GroupsApiControllerTest extends LegacyBridgeTestCase

@@ -4,9 +4,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Nexus\Tests\Services;
+namespace App\Tests\Services;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Services\FCMPushService;
 
 class FCMPushServiceTest extends TestCase

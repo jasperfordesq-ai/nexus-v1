@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Unit;
+namespace App\Tests\Unit;
 
-use Nexus\Tests\TestCase;
-use Nexus\Services\TotpService;
+use App\Tests\TestCase;
+use App\Services\TotpService;
 use App\Services\TotpService as AppTotpService;
 
 /**

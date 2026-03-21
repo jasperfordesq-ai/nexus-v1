@@ -6,16 +6,16 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Unit;
+namespace App\Tests\Unit;
 
-use Nexus\Tests\TestCase;
-use Nexus\Services\Identity\IdentityVerificationProviderInterface;
-use Nexus\Services\Identity\VeriffProvider;
-use Nexus\Services\Identity\JumioProvider;
-use Nexus\Services\Identity\OnfidoProvider;
-use Nexus\Services\Identity\IdenfyProvider;
-use Nexus\Services\Identity\StripeIdentityProvider;
-use Nexus\Services\Identity\MockIdentityProvider;
+use App\Tests\TestCase;
+use App\Services\Identity\IdentityVerificationProviderInterface;
+use App\Services\Identity\VeriffProvider;
+use App\Services\Identity\JumioProvider;
+use App\Services\Identity\OnfidoProvider;
+use App\Services\Identity\IdenfyProvider;
+use App\Services\Identity\StripeIdentityProvider;
+use App\Services\Identity\MockIdentityProvider;
 
 /**
  * Identity Provider Integration Tests

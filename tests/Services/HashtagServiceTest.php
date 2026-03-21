@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Services;
+namespace App\Tests\Services;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Services\HashtagService;
 use App\Core\TenantContext;
 

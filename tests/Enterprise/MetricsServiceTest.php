@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Enterprise;
+namespace App\Tests\Enterprise;
 
 use App\Services\Enterprise\MetricsService;
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 
 /**
  * Metrics Service Tests

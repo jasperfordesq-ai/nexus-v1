@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Helpers;
+namespace App\Tests\Helpers;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Helpers\SDG;
 
 /**

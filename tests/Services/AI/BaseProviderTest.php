@@ -4,9 +4,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Nexus\Tests\Services\AI;
+namespace App\Tests\Services\AI;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Services\AI\Providers\BaseProvider;
 use App\Services\AI\Contracts\AIProviderInterface;
 

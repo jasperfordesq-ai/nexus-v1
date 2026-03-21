@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Enterprise;
+namespace App\Tests\Enterprise;
 
 use App\Services\Enterprise\GdprService;
-use Nexus\Tests\DatabaseTestCase;
+use App\Tests\DatabaseTestCase;
 use PDO;
 
 /**

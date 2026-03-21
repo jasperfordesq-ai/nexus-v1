@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Test Cases for Messages API Controller (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\MessagesApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\MessagesApiControllerTest
  * Original base: ApiTestCase -> now LegacyBridgeTestCase
  *
  * Tests the V2 Messages API endpoints:

@@ -4,9 +4,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Nexus\Tests\Models;
+namespace App\Tests\Models;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Models\OrgTransferRequest;
 use App\Models\OrgMember;
 use App\Models\OrgWallet;

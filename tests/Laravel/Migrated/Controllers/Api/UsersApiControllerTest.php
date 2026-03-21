@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\UsersController as UsersApiController;
 /**
  * Tests for UsersApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\UsersApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\UsersApiControllerTest
  * Original base: PHPUnit\Framework\TestCase -> now LegacyBridgeTestCase
  */
 class UsersApiControllerTest extends LegacyBridgeTestCase

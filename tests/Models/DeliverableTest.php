@@ -4,11 +4,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Nexus\Tests\Models;
+namespace App\Tests\Models;
 
 use App\Models\Deliverable;
 use App\Core\TenantContext;
-use Nexus\Tests\DatabaseTestCase;
+use App\Tests\DatabaseTestCase;
 
 class DeliverableTest extends DatabaseTestCase
 {

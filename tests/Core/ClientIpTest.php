@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Core;
+namespace App\Tests\Core;
 
 use App\Core\ClientIp;
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 
 /**
  * Tests for ClientIp — secure client IP resolution behind proxies.

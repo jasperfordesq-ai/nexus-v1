@@ -15,7 +15,7 @@ use App\Core\TenantContext;
 /**
  * Unit tests for WalletApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\WalletApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\WalletApiControllerTest
  * Original base: PHPUnit\Framework\TestCase -> now LegacyBridgeTestCase
  *
  * These tests verify the business logic of wallet operations.

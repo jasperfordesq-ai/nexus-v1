@@ -13,7 +13,7 @@ use Tests\Laravel\LegacyBridgeTestCase;
 /**
  * Tests for FeedSocialApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\FeedSocialApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\FeedSocialApiControllerTest
  * Original base: ApiTestCase -> now LegacyBridgeTestCase
  *
  * Note: The original used legacy get/post/delete helpers with controllerAction

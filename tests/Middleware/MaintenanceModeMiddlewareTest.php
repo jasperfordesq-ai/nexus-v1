@@ -6,9 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Middleware;
+namespace App\Tests\Middleware;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Middleware\MaintenanceModeMiddleware;
 use ReflectionClass;
 

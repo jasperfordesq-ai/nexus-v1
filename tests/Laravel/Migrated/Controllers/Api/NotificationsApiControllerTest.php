@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\NotificationsController as NotificationsApiControll
 /**
  * Tests for NotificationsApiController (Laravel migration)
  *
- * Migrated from: Nexus\Tests\Controllers\Api\NotificationsApiControllerTest
+ * Migrated from: App\Tests\Controllers\Api\NotificationsApiControllerTest
  * Original base: PHPUnit\Framework\TestCase -> now LegacyBridgeTestCase
  */
 class NotificationsApiControllerTest extends LegacyBridgeTestCase

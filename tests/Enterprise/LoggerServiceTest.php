@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Enterprise;
+namespace App\Tests\Enterprise;
 
-use Nexus\Services\Enterprise\LoggerService;
-use Nexus\Tests\TestCase;
+use App\Services\Enterprise\LoggerService;
+use App\Tests\TestCase;
 
 /**
  * Logger Service Tests

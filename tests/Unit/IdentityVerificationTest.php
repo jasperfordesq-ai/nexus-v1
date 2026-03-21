@@ -6,12 +6,12 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Tests\Unit;
+namespace App\Tests\Unit;
 
-use Nexus\Tests\TestCase;
+use App\Tests\TestCase;
 use App\Services\Identity\IdentityProviderRegistry;
-use Nexus\Services\Identity\MockIdentityProvider;
-use Nexus\Services\Identity\IdentityVerificationProviderInterface;
+use App\Services\Identity\MockIdentityProvider;
+use App\Services\Identity\IdentityVerificationProviderInterface;
 use App\Services\Identity\RegistrationPolicyService;
 
 /**
