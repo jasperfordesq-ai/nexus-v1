@@ -305,6 +305,64 @@ sudo bash scripts/safe-deploy.sh status     # Check current deployment status
 
 ---
 
+## 🔴 Global Maintenance Mode (CRITICAL — CANONICAL METHOD)
+
+**This section documents the ONLY reliable method for putting the entire Project NEXUS platform into maintenance mode. Do NOT improvise, guess, or use alternative approaches. This procedure was established on 2026-03-21 and is the canonical method.**
+
+### What "maintenance mode" means
+
+When maintenance mode is ON, **all tenants across the entire platform** return HTTP 503 to every non-localhost request. A static HTML maintenance page is served. No database, Redis, or framework code is involved — the check happens in `httpdocs/index.php` before anything else loads.
+
+### How it works
+
+A `.maintenance` file inside the PHP container (`/var/www/html/.maintenance`) triggers a pre-framework gate in `index.php` (line 16). When the file exists, all external traffic is blocked. When it doesn't exist, the platform is live.
+
+### Commands (run on the production server via SSH)
+
+```bash
+# Enable maintenance mode (all tenants, immediate)
+sudo bash scripts/maintenance.sh on
+
+# Disable maintenance mode (platform goes live, immediate)
+sudo bash scripts/maintenance.sh off
+
+# Check current status
+sudo bash scripts/maintenance.sh status
+```
+
+### Deployment integration
+
+The deploy script (`scripts/safe-deploy.sh`) automatically:
+1. **Enables** maintenance mode at the start of every deployment
+2. **Re-enables** it after container rebuilds (since `docker compose up --force-recreate` wipes container filesystems)
+3. **Disables** it at the end of a successful deployment
+4. **Leaves it ON** if deployment fails — with clear recovery instructions printed to console
+
+### On deployment failure
+
+If a deploy fails, **maintenance mode stays ON**. This is intentional — a failed deploy may leave the platform in an inconsistent state. Recovery options are printed:
+1. Re-deploy: `sudo bash scripts/safe-deploy.sh full`
+2. Rollback: `sudo bash scripts/safe-deploy.sh rollback`
+3. Force live: `sudo bash scripts/maintenance.sh off` (only if you're sure the platform is healthy)
+
+### For AI assistants
+
+When the user says **"maintenance mode on"**, run:
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+  "sudo bash /opt/nexus-php/scripts/maintenance.sh on"
+```
+
+When the user says **"maintenance mode off"**, run:
+```bash
+ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+  "sudo bash /opt/nexus-php/scripts/maintenance.sh off"
+```
+
+**Do NOT** attempt database-driven maintenance mode (updating `tenant_settings`) as a substitute for this method. The database approach exists as a secondary per-tenant layer but the file-based approach is the primary global control.
+
+---
+
 ## Database Migrations
 
 Located in `/migrations/` with timestamp naming. Always use `IF EXISTS`/`IF NOT EXISTS` for idempotency.
@@ -439,7 +497,12 @@ php tests/run-api-tests.php         # API tests
 php scripts/safe_migrate.php        # Run migrations
 php scripts/backup_database.php     # Backup
 
-# Deploy (run on Azure VM via SSH)
+# Maintenance Mode (run on Azure VM via SSH)
+sudo bash scripts/maintenance.sh on         # Enable (all tenants, immediate)
+sudo bash scripts/maintenance.sh off        # Disable (platform goes live)
+sudo bash scripts/maintenance.sh status     # Check current status
+
+# Deploy (run on Azure VM via SSH) — maintenance mode is automatic
 sudo bash scripts/safe-deploy.sh full       # Full deploy (rebuild all)
 sudo bash scripts/safe-deploy.sh quick      # Quick deploy (frontend + PHP restart)
 sudo bash scripts/safe-deploy.sh rollback   # Rollback to last successful

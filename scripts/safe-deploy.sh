@@ -46,6 +46,74 @@ log_warn() { echo -e "${YELLOW}[WARN]${NC} $1" | tee -a "$LOG_FILE"; }
 log_err()  { echo -e "${RED}[FAIL]${NC} $1" | tee -a "$LOG_FILE"; }
 log_step() { echo -e "\n${BOLD}$1${NC}" | tee -a "$LOG_FILE"; }
 
+# --- Maintenance Mode ---
+MAINTENANCE_FILE="/var/www/html/.maintenance"
+PHP_CONTAINER="nexus-php-app"
+
+enable_maintenance_mode() {
+    log_step "=== Enabling Maintenance Mode ==="
+
+    if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+        docker exec "$PHP_CONTAINER" touch "$MAINTENANCE_FILE"
+
+        if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
+            log_ok "Maintenance mode ON — all non-localhost traffic blocked"
+        else
+            log_err "Failed to create .maintenance file"
+            exit 1
+        fi
+
+        # Verify HTTP 503
+        sleep 1
+        local HTTP_CODE
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/api/v2/tenants 2>/dev/null || echo "000")
+        if [ "$HTTP_CODE" = "503" ]; then
+            log_ok "Verified: API returning HTTP 503"
+        else
+            log_warn "API returned HTTP $HTTP_CODE (may not have fully activated yet)"
+        fi
+    else
+        log_warn "$PHP_CONTAINER not running — skipping maintenance mode (will be set after rebuild)"
+        MAINTENANCE_DEFERRED=1
+    fi
+}
+
+disable_maintenance_mode() {
+    log_step "=== Disabling Maintenance Mode ==="
+
+    if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+        docker exec "$PHP_CONTAINER" rm -f "$MAINTENANCE_FILE"
+
+        if docker exec "$PHP_CONTAINER" test -f "$MAINTENANCE_FILE" 2>/dev/null; then
+            log_err ".maintenance file still exists — trying again"
+            docker exec "$PHP_CONTAINER" rm -f "$MAINTENANCE_FILE"
+        fi
+
+        log_ok "Maintenance mode OFF — platform is live"
+
+        # Verify HTTP 200
+        sleep 1
+        local HTTP_CODE
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8090/health.php 2>/dev/null || echo "000")
+        if [ "$HTTP_CODE" = "200" ]; then
+            log_ok "Verified: API returning HTTP 200"
+        else
+            log_warn "API returned HTTP $HTTP_CODE — may need OPCache clear"
+        fi
+    else
+        log_warn "$PHP_CONTAINER not running — cannot disable maintenance mode"
+    fi
+}
+
+# After container rebuild/restart, re-enable maintenance if it was deferred
+# or ensure it persists (container recreate wipes the file)
+re_enable_maintenance_after_rebuild() {
+    if docker ps --filter "name=$PHP_CONTAINER" --format "{{.Names}}" | grep -q "$PHP_CONTAINER"; then
+        docker exec "$PHP_CONTAINER" touch "$MAINTENANCE_FILE" 2>/dev/null || true
+        log_ok "Maintenance mode re-confirmed after container rebuild"
+    fi
+}
+
 # --- Helper functions ---
 cleanup() {
     if [ -f "$LOCK_FILE" ]; then
@@ -580,6 +648,9 @@ deploy_quick() {
     docker restart nexus-php-app
     log_ok "All containers updated"
 
+    # Re-enable maintenance mode (PHP container restart wipes the file)
+    re_enable_maintenance_after_rebuild
+
     # Laravel cache optimization
     run_laravel_cache
 }
@@ -629,6 +700,9 @@ deploy_full() {
     docker compose up -d --force-recreate
 
     log_ok "Full rebuild complete"
+
+    # Re-enable maintenance mode (container recreate wipes the file)
+    re_enable_maintenance_after_rebuild
 
     # Laravel cache optimization
     run_laravel_cache
@@ -790,6 +864,10 @@ if [ "$MODE" != "rollback" ]; then
     validate_environment
 fi
 
+# Enable maintenance mode before any changes
+MAINTENANCE_DEFERRED=0
+enable_maintenance_mode
+
 # Execute deployment based on mode
 case "$MODE" in
     quick)
@@ -850,6 +928,9 @@ VEOF
     # Remove dangling Docker images (prevents disk bloat over time)
     prune_docker_images
 
+    # Disable maintenance mode — deploy succeeded, go live
+    disable_maintenance_mode
+
     echo "" | tee -a "$LOG_FILE"
     echo "============================================" | tee -a "$LOG_FILE"
     echo "  Deployment Successful!"                     | tee -a "$LOG_FILE"
@@ -860,7 +941,12 @@ VEOF
 else
     echo "" | tee -a "$LOG_FILE"
     log_err "Deployment completed but smoke tests failed"
-    log_warn "Consider running: sudo bash scripts/safe-deploy.sh rollback"
+    log_err "MAINTENANCE MODE IS STILL ON — platform is NOT live"
+    log_warn "The platform remains in maintenance mode for safety."
+    log_warn "Fix the issue, then either:"
+    log_warn "  1. Re-deploy:  sudo bash scripts/safe-deploy.sh full"
+    log_warn "  2. Rollback:   sudo bash scripts/safe-deploy.sh rollback"
+    log_warn "  3. Force live:  sudo bash scripts/maintenance.sh off"
     log_info "Log saved to: $LOG_FILE"
     exit 1
 fi

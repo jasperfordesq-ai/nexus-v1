@@ -51,6 +51,8 @@ CLAUDE.md
 !/scripts/backup-production-db.sh
 !/scripts/check-migration-drift.sh
 !/scripts/check-migration-ci.sh
+!/scripts/maintenance.sh
+!/scripts/safe-deploy.sh
 
 # ─── Deploy & Production Config ───────────────────────────────────────────────
 compose.prod.yml
