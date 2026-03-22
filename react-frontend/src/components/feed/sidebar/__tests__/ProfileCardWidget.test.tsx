@@ -81,8 +81,11 @@ describe('ProfileCardWidget', () => {
       user: null,
     } as ReturnType<typeof useAuth>);
 
-    const { container } = render(<ProfileCardWidget />);
-    expect(container.firstChild).toBeNull();
+    render(<ProfileCardWidget />);
+    // Component returns null, but HeroUI provider wrapper still renders.
+    // Verify no meaningful profile content is present.
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('renders the user display name', async () => {

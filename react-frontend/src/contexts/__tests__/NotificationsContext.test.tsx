@@ -12,15 +12,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor, cleanup } from '@testing-library/react';
 import { ReactNode } from 'react';
 
-// Set VITE_PUSHER_KEY before any module is loaded so getPusherKey() returns a
-// non-empty string when the NotificationsContext effect runs in Pusher tests.
-// vi.stubEnv() in beforeEach runs too late — the module is already imported by
-// then and import.meta.env is read at call-time from the live env object.
-vi.hoisted(() => {
-  // @ts-expect-error vitest allows mutating import.meta.env in tests
-  import.meta.env.VITE_PUSHER_KEY = 'test-pusher-key';
-});
-
 vi.mock('framer-motion');
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string) => k }),
@@ -33,31 +24,44 @@ vi.mock('react-i18next', () => ({
 // We capture the channel's bound event handlers so tests can trigger them.
 type EventHandler = (data: unknown) => void;
 const channelEventHandlers: Record<string, EventHandler> = {};
-
-const mockChannelUnbindAll = vi.fn();
-const mockChannelBind = vi.fn((event: string, handler: EventHandler) => {
-  channelEventHandlers[event] = handler;
-});
-const mockChannel = {
-  bind: mockChannelBind,
-  unbind_all: mockChannelUnbindAll,
-};
-
 const connectionHandlers: Record<string, () => void> = {};
-const mockConnectionBind = vi.fn((event: string, handler: () => void) => {
-  connectionHandlers[event] = handler;
-});
-const mockPusherDisconnect = vi.fn();
-const mockPusherSubscribe = vi.fn().mockReturnValue(mockChannel);
 
-const MockPusher = vi.fn().mockImplementation(() => ({
-  subscribe: mockPusherSubscribe,
-  disconnect: mockPusherDisconnect,
-  connection: { bind: mockConnectionBind },
-}));
+// All Pusher mock functions and the MockPusher constructor must live in
+// vi.hoisted() so they are available inside the vi.mock('pusher-js', ...) factory
+// before module-level const declarations are initialized.
+// MockPusher is used as the default export directly (not wrapped in an arrow
+// function) because arrow functions cannot be called with `new`.
+const {
+  MockPusher,
+  mockChannel,
+  mockPusherSubscribe,
+  mockPusherDisconnect,
+  mockChannelBind,
+  mockChannelUnbindAll,
+  mockConnectionBind,
+} = vi.hoisted(() => {
+  // Set VITE_PUSHER_KEY before NotificationsContext is imported so getPusherKey()
+  // returns a non-empty string. vi.stubEnv() in beforeEach runs too late.
+  // @ts-expect-error vitest allows mutating import.meta.env in tests
+  import.meta.env.VITE_PUSHER_KEY = 'test-pusher-key';
+
+  const mockChannelUnbindAll = vi.fn();
+  const mockChannelBind = vi.fn();
+  const mockChannel = { bind: mockChannelBind, unbind_all: mockChannelUnbindAll };
+  const mockConnectionBind = vi.fn();
+  const mockPusherDisconnect = vi.fn();
+  const mockPusherSubscribe = vi.fn().mockReturnValue(mockChannel);
+  const MockPusher = vi.fn().mockImplementation(() => ({
+    subscribe: mockPusherSubscribe,
+    disconnect: mockPusherDisconnect,
+    connection: { bind: mockConnectionBind },
+  }));
+  return { MockPusher, mockChannel, mockPusherSubscribe, mockPusherDisconnect, mockChannelBind, mockChannelUnbindAll, mockConnectionBind };
+});
 
 vi.mock('pusher-js', () => ({
-  default: (...args: unknown[]) => MockPusher(...args),
+  // MockPusher is a vi.fn() (not an arrow function) — safe to call with `new`.
+  default: MockPusher,
 }));
 
 // ─────────────────────────────────────────────────────────────────────────────

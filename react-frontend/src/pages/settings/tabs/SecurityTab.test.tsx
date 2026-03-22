@@ -160,13 +160,16 @@ describe('SecurityTab', () => {
       { id: 'sess-2', device: 'Firefox', browser: 'Firefox 119', ip_address: '10.0.0.1', last_active: '2026-01-02', is_current: false },
     ];
     render(<SecurityTab {...defaultProps} sessions={sessions} />);
-    expect(screen.getByText('Chrome')).toBeDefined();
-    expect(screen.getByText('Firefox')).toBeDefined();
+    // The session renders as "{browser} {t('session_on')} {device}" in a single text node,
+    // so use partial matching to find the browser/device text.
+    expect(screen.getByText(/Chrome 120/)).toBeDefined();
+    expect(screen.getByText(/Firefox 119/)).toBeDefined();
   });
 
   it('renders danger zone with logout and delete actions', () => {
     render(<SecurityTab {...defaultProps} />);
-    expect(screen.getByText('logout_all_devices')).toBeDefined();
+    // Component uses t('log_out') for the logout button, not 'logout_all_devices'
+    expect(screen.getByText('log_out')).toBeDefined();
     expect(screen.getByText('delete_account')).toBeDefined();
   });
 

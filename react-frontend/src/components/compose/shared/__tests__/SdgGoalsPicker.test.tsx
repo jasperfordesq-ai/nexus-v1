@@ -89,18 +89,16 @@ describe('SdgGoalsPicker', () => {
 
   it('toggles multiple goals correctly', () => {
     const onChange = vi.fn();
-    render(<SdgGoalsPicker selected={[]} onChange={onChange} />);
+    const { rerender } = render(<SdgGoalsPicker selected={[]} onChange={onChange} />);
 
     const chip1 = screen.getByText(/No Poverty/).closest('[class*="cursor-pointer"]');
     fireEvent.click(chip1!);
     expect(onChange).toHaveBeenCalledWith([1]);
 
-    // Simulate second click with updated selection
-    const { rerender } = render(<SdgGoalsPicker selected={[1]} onChange={onChange} />);
+    // Re-render with updated selection using the same render tree
+    rerender(<SdgGoalsPicker selected={[1]} onChange={onChange} />);
     const chip2 = screen.getByText(/Zero Hunger/).closest('[class*="cursor-pointer"]');
     fireEvent.click(chip2!);
     expect(onChange).toHaveBeenCalledWith([1, 2]);
-
-    rerender(<SdgGoalsPicker selected={[1, 2]} onChange={onChange} />);
   });
 });

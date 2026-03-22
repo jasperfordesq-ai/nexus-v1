@@ -10,6 +10,7 @@ vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
     delete: vi.fn(),
   },
 }));
@@ -118,45 +119,58 @@ import { ConversationPage } from './ConversationPage';
 const mockApi = api as unknown as {
   get: ReturnType<typeof vi.fn>;
   post: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
   delete: ReturnType<typeof vi.fn>;
 };
 
-const mockConversation = {
+// API response structure: data = messages[], meta.conversation = ConversationMeta
+const mockMessages = [
+  { id: 1, body: 'Hello Bob!', content: 'Hello Bob!', sender_id: 1, is_own: true, created_at: '2026-01-01T10:00:00Z', is_read: true, is_deleted: false, is_edited: false, is_voice: false, attachments: [], reactions: {} },
+  { id: 2, body: 'Hi Alice!', content: 'Hi Alice!', sender_id: 20, is_own: false, created_at: '2026-01-01T10:01:00Z', is_read: true, is_deleted: false, is_edited: false, is_voice: false, attachments: [], reactions: {} },
+];
+
+const mockConversationResponse = {
+  success: true,
+  data: mockMessages,
   meta: {
-    id: 42,
-    other_user: { id: 20, name: 'Bob', avatar_url: null },
+    conversation: {
+      id: 42,
+      other_user: { id: 20, name: 'Bob', avatar_url: null },
+    },
+    cursor: null,
+    has_more: false,
   },
-  messages: [
-    { id: 1, body: 'Hello Bob!', content: 'Hello Bob!', sender_id: 1, is_own: true, created_at: '2026-01-01T10:00:00Z', is_read: true, is_deleted: false, is_edited: false, is_voice: false, attachments: [], reactions: {} },
-    { id: 2, body: 'Hi Alice!', content: 'Hi Alice!', sender_id: 20, is_own: false, created_at: '2026-01-01T10:01:00Z', is_read: true, is_deleted: false, is_edited: false, is_voice: false, attachments: [], reactions: {} },
-  ],
-  pagination: { older_cursor: null, newer_cursor: null, has_older: false, has_newer: false },
 };
 
 describe('ConversationPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // jsdom doesn't provide scrollIntoView — stub it so the component doesn't crash
+    Element.prototype.scrollIntoView = vi.fn();
   });
 
   it('shows loading screen while fetching', () => {
     mockApi.get.mockReturnValue(new Promise(() => {}));
+    mockApi.put.mockResolvedValue({ success: true });
     render(<ConversationPage />);
     expect(screen.getByTestId('loading-screen')).toBeDefined();
   });
 
   it('renders conversation after loading', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: mockConversation });
-    mockApi.post.mockResolvedValue({ success: true });
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
 
     render(<ConversationPage />);
 
-    await waitFor(() => expect(screen.getByText('Hello Bob!')).toBeDefined());
-    expect(screen.getByText('Hi Alice!')).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getByText('Hello Bob!')).toBeDefined();
+      expect(screen.getByText('Hi Alice!')).toBeDefined();
+    });
   });
 
   it('renders message input area', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: mockConversation });
-    mockApi.post.mockResolvedValue({ success: true });
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
 
     render(<ConversationPage />);
 
@@ -164,8 +178,8 @@ describe('ConversationPage', () => {
   });
 
   it('shows other user name in header', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: mockConversation });
-    mockApi.post.mockResolvedValue({ success: true });
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
 
     render(<ConversationPage />);
 
@@ -173,12 +187,16 @@ describe('ConversationPage', () => {
   });
 
   it('renders back navigation button', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: mockConversation });
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
 
     render(<ConversationPage />);
 
-    await waitFor(() => expect(screen.getByTestId('message-input-area')).toBeDefined());
-    // Back button should be present with aria-label
-    expect(screen.getByLabelText(/back/i)).toBeDefined();
+    // Wait for conversation to fully render, then check back button
+    await waitFor(() => {
+      expect(screen.getByTestId('message-input-area')).toBeDefined();
+      // Back button should be present with aria-label (t('aria_back') returns the key)
+      expect(screen.getByLabelText(/back/i)).toBeDefined();
+    });
   });
 });

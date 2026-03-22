@@ -126,13 +126,14 @@ describe('GroupDiscussionTab', () => {
 
   it('renders new discussion button for members', () => {
     render(<GroupDiscussionTab {...defaultProps} />);
-    expect(screen.getByText('detail.new_discussion')).toBeInTheDocument();
+    // Translation: detail.new_discussion -> "New Discussion"
+    expect(screen.getByText('New Discussion')).toBeInTheDocument();
   });
 
   it('calls onShowNewDiscussion when new discussion button clicked', () => {
     const onShowNewDiscussion = vi.fn();
     render(<GroupDiscussionTab {...defaultProps} onShowNewDiscussion={onShowNewDiscussion} />);
-    fireEvent.click(screen.getByText('detail.new_discussion'));
+    fireEvent.click(screen.getByText('New Discussion'));
     expect(onShowNewDiscussion).toHaveBeenCalledTimes(1);
   });
 
@@ -143,13 +144,14 @@ describe('GroupDiscussionTab', () => {
 
   it('shows join prompt for non-members', () => {
     render(<GroupDiscussionTab {...defaultProps} isMember={false} />);
-    expect(screen.getByText('detail.join_to_discuss')).toBeInTheDocument();
+    // Translation: detail.join_to_discuss_title -> "Join to see discussion"
+    expect(screen.getByText('Join to see discussion')).toBeInTheDocument();
   });
 
   it('renders discussion reply count', () => {
     render(<GroupDiscussionTab {...defaultProps} />);
-    // Reply count chip should be present
-    expect(screen.getByText('3')).toBeInTheDocument();
+    // Translation: detail.reply_count with count=3 -> "3 replies"
+    expect(screen.getByText('3 replies')).toBeInTheDocument();
   });
 
   it('calls onExpandDiscussion when discussion row is clicked', () => {

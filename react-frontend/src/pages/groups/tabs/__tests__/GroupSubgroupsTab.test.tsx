@@ -80,7 +80,9 @@ describe('GroupSubgroupsTab', () => {
 
   it('renders member counts for each subgroup', () => {
     render(<GroupSubgroupsTab subGroups={mockSubGroups} />);
-    expect(screen.getByText('detail.members_count')).toBeInTheDocument();
+    // Translation: detail.members_count with count=5 -> "5 members", count=12 -> "12 members"
+    expect(screen.getByText('5 members')).toBeInTheDocument();
+    expect(screen.getByText('12 members')).toBeInTheDocument();
   });
 
   it('renders navigation links for each subgroup', () => {

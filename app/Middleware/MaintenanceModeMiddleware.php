@@ -150,6 +150,13 @@ class MaintenanceModeMiddleware
 
         // For API requests, return JSON error
         if (strpos($requestUri, '/api/') === 0) {
+            // In test environments, throw instead of exit() so PHPUnit survives.
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(
+                    503,
+                    json_encode(['success' => false, 'error' => 'Platform is currently under maintenance. Please check back soon.', 'code' => 'MAINTENANCE_MODE'])
+                );
+            }
             header('Content-Type: application/json');
             http_response_code(503);
             echo json_encode([

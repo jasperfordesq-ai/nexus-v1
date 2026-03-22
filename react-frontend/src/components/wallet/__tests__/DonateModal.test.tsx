@@ -72,9 +72,13 @@ describe('DonateModal', () => {
 
   it('renders the community fund and member radio options', () => {
     render(<DonateModal {...defaultProps} />);
+    // Community fund radio option
     expect(screen.getByRole('radio', { name: /community fund/i }) ||
       screen.getByText(/community fund/i)).toBeTruthy();
-    expect(screen.getByText(/member/i)).toBeTruthy();
+    // "member" text appears in multiple DOM nodes (label + description),
+    // so use getAllByText instead of getByText
+    const memberTexts = screen.getAllByText(/member/i);
+    expect(memberTexts.length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows recipient ID input when "user" radio is selected', async () => {

@@ -35,31 +35,32 @@ describe('ImagePlaceholder', () => {
 
   it('renders with aria-hidden="true" (decorative element)', () => {
     const { container } = render(<ImagePlaceholder />);
-    const div = container.firstChild as HTMLElement;
+    const div = container.querySelector('[aria-hidden="true"]') as HTMLElement;
+    expect(div).toBeInTheDocument();
     expect(div).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('applies sm height class for size="sm"', () => {
     const { container } = render(<ImagePlaceholder size="sm" />);
-    const div = container.firstChild as HTMLElement;
+    const div = container.querySelector('[aria-hidden="true"]') as HTMLElement;
     expect(div.className).toContain('h-36');
   });
 
   it('applies md height class for size="md" (default)', () => {
     const { container } = render(<ImagePlaceholder size="md" />);
-    const div = container.firstChild as HTMLElement;
+    const div = container.querySelector('[aria-hidden="true"]') as HTMLElement;
     expect(div.className).toContain('h-48');
   });
 
   it('applies lg height class for size="lg"', () => {
     const { container } = render(<ImagePlaceholder size="lg" />);
-    const div = container.firstChild as HTMLElement;
+    const div = container.querySelector('[aria-hidden="true"]') as HTMLElement;
     expect(div.className).toContain('h-56');
   });
 
   it('applies custom className to outer container', () => {
     const { container } = render(<ImagePlaceholder className="rounded-xl" />);
-    const div = container.firstChild as HTMLElement;
+    const div = container.querySelector('[aria-hidden="true"]') as HTMLElement;
     expect(div.className).toContain('rounded-xl');
   });
 
@@ -75,7 +76,7 @@ describe('ImagePlaceholder', () => {
 
   it('has correct w-full class', () => {
     const { container } = render(<ImagePlaceholder />);
-    const div = container.firstChild as HTMLElement;
+    const div = container.querySelector('[aria-hidden="true"]') as HTMLElement;
     expect(div.className).toContain('w-full');
   });
 

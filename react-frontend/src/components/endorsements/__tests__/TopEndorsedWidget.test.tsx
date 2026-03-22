@@ -73,9 +73,12 @@ describe('TopEndorsedWidget', () => {
   it('renders nothing when API returns empty array', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
 
-    const { container } = render(<TopEndorsedWidget />);
+    render(<TopEndorsedWidget />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      // Component returns null, but HeroUI provider wrapper still renders.
+      // Verify no meaningful widget content is present.
+      expect(screen.queryByText('Most Endorsed')).not.toBeInTheDocument();
+      expect(screen.queryAllByRole('link')).toHaveLength(0);
     });
   });
 
@@ -152,10 +155,12 @@ describe('TopEndorsedWidget', () => {
   it('handles API error gracefully without crashing', async () => {
     vi.mocked(api.get).mockRejectedValueOnce(new Error('Network error'));
 
-    const { container } = render(<TopEndorsedWidget />);
+    render(<TopEndorsedWidget />);
     await waitFor(() => {
-      // Should render null or be empty after failed load
-      expect(container.firstChild).toBeNull();
+      // Component renders null on error (members stays []), but HeroUI
+      // provider wrapper still renders. Verify no widget content is present.
+      expect(screen.queryByText('Most Endorsed')).not.toBeInTheDocument();
+      expect(screen.queryAllByRole('link')).toHaveLength(0);
     });
   });
 });

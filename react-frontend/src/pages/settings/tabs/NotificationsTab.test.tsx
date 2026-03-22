@@ -139,10 +139,11 @@ describe('NotificationsTab', () => {
 
   it('disables marketing toggle when marketingConsentLoading is true', () => {
     render(<NotificationsTab {...defaultProps} marketingConsentLoading={true} />);
-    // The marketing toggle should be disabled
+    // The marketing toggle should be disabled — HeroUI Switch renders the native disabled
+    // attribute on the underlying <input role="switch"> when isDisabled is true.
     const switches = screen.getAllByRole('switch');
     // Marketing switch is the last one
     const lastSwitch = switches[switches.length - 1];
-    expect(lastSwitch).toHaveAttribute('aria-disabled', 'true');
+    expect(lastSwitch).toBeDisabled();
   });
 });

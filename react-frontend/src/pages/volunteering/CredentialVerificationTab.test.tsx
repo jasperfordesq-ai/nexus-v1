@@ -13,9 +13,11 @@ import { framerMotionMock } from '@/test/mocks';
 
 vi.mock('framer-motion', () => framerMotionMock);
 
+// Stable t function reference to avoid useCallback/useEffect re-trigger loops
+const stableT = (_key: string, fallback: string, _opts?: object) => fallback ?? _key;
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (_key: string, fallback: string, _opts?: object) => fallback ?? _key,
+    t: stableT,
   }),
 }));
 
@@ -137,7 +139,12 @@ describe('CredentialVerificationTab', () => {
     await waitFor(() => {
       expect(screen.getByText('Failed to load credentials.')).toBeInTheDocument();
     });
-    expect(screen.getByRole('button', { name: /Try Again/i })).toBeInTheDocument();
+    // HeroUI Button accessible name — find by text content within waitFor to ensure render completes
+    await waitFor(() => {
+      const buttons = screen.getAllByRole('button');
+      const tryAgainBtn = buttons.find(btn => btn.textContent?.includes('Try Again'));
+      expect(tryAgainBtn).toBeTruthy();
+    });
   });
 
   it('displays credential list items when credentials exist', async () => {
@@ -148,8 +155,8 @@ describe('CredentialVerificationTab', () => {
     render(<CredentialVerificationTab />);
     await waitFor(() => {
       expect(screen.getByText('Police Check')).toBeInTheDocument();
+      expect(screen.getByText('First Aid')).toBeInTheDocument();
     });
-    expect(screen.getByText('First Aid')).toBeInTheDocument();
   });
 
   it('shows rejection reason for rejected credentials', async () => {
@@ -161,7 +168,11 @@ describe('CredentialVerificationTab', () => {
     await waitFor(() => {
       expect(screen.getByText('Safeguarding')).toBeInTheDocument();
     });
-    expect(screen.getByText(/Document is not legible/)).toBeInTheDocument();
+    // Rejection reason text is split across <strong> and text node inside a <p>;
+    // search the full document text content instead.
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Document is not legible');
+    });
   });
 
   it('shows Re-upload button for rejected credentials', async () => {
@@ -176,15 +187,26 @@ describe('CredentialVerificationTab', () => {
   });
 
   it('retries loading when Try Again is clicked', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: false, data: null });
-    vi.mocked(api.get).mockResolvedValue({ success: true, data: [] });
-    render(<CredentialVerificationTab />);
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Try Again/i })).toBeInTheDocument();
+    let callCount = 0;
+    vi.mocked(api.get).mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) {
+        return Promise.resolve({ success: false, data: null });
+      }
+      return Promise.resolve({ success: true, data: [] });
     });
-    fireEvent.click(screen.getByRole('button', { name: /Try Again/i }));
+    render(<CredentialVerificationTab />);
+    // Wait for error state to fully render including the button
+    let tryAgainBtn: HTMLElement | undefined;
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledTimes(2);
+      expect(screen.getByText('Failed to load credentials.')).toBeInTheDocument();
+      const buttons = screen.getAllByRole('button');
+      tryAgainBtn = buttons.find(btn => btn.textContent?.includes('Try Again'));
+      expect(tryAgainBtn).toBeTruthy();
+    });
+    fireEvent.click(tryAgainBtn!);
+    await waitFor(() => {
+      expect(callCount).toBe(2);
     });
   });
 

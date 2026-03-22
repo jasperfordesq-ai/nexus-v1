@@ -119,28 +119,28 @@ describe('CreateGroupPage', () => {
 
   it('renders create group form heading', () => {
     render(<CreateGroupPage />);
-    expect(screen.getByText('form.create_title')).toBeInTheDocument();
+    expect(screen.getByText('Create New Group')).toBeInTheDocument();
   });
 
   it('renders group name input', () => {
     render(<CreateGroupPage />);
-    expect(screen.getByRole('textbox', { name: /form.name_label/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /Group Name/i })).toBeInTheDocument();
   });
 
   it('renders group description textarea', () => {
     render(<CreateGroupPage />);
-    expect(screen.getByRole('textbox', { name: /form.description_label/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /Description/i })).toBeInTheDocument();
   });
 
   it('renders private group toggle switch', () => {
     render(<CreateGroupPage />);
-    // Switch for private/public setting
-    expect(screen.getByText('form.private_label')).toBeInTheDocument();
+    // The switch displays "Public Group" by default (is_private starts false)
+    expect(screen.getByText('Public Group')).toBeInTheDocument();
   });
 
   it('renders submit button', () => {
     render(<CreateGroupPage />);
-    expect(screen.getByText('create')).toBeInTheDocument();
+    expect(screen.getByText('Create Group')).toBeInTheDocument();
   });
 
   it('renders cancel/back button', () => {
@@ -153,16 +153,16 @@ describe('CreateGroupPage', () => {
   it('shows validation error for empty name on submit', async () => {
     render(<CreateGroupPage />);
 
-    const submitButton = screen.getByText('create');
+    const submitButton = screen.getByText('Create Group');
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('form.name_required')).toBeInTheDocument();
+      expect(screen.getByText('Group name is required')).toBeInTheDocument();
     });
   });
 
   it('renders image upload area', () => {
     render(<CreateGroupPage />);
-    expect(screen.getByText('form.image_upload_hint')).toBeInTheDocument();
+    expect(screen.getByText('JPEG, PNG, GIF, or WebP. Max 5MB.')).toBeInTheDocument();
   });
 });

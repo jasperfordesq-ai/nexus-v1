@@ -87,12 +87,15 @@ describe('VoiceMessagePlayer', () => {
     expect(screen.getByLabelText('Play')).toBeDefined();
   });
 
-  it('updates duration display from audio metadata', () => {
+  it('updates duration display from audio metadata', async () => {
+    const { act } = await import('react');
     render(<VoiceMessagePlayer audioUrl="https://cdn.example.com/audio.mp3" />);
 
-    // Simulate loadedmetadata
+    // Simulate loadedmetadata — triggers React state update, so wrap in act()
     mockAudio.duration = 90;
-    mockAudio.onloadedmetadata?.();
+    act(() => {
+      mockAudio.onloadedmetadata?.();
+    });
 
     // 90 seconds = 1:30
     expect(screen.getByText('1:30')).toBeDefined();

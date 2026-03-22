@@ -26,22 +26,23 @@ vi.mock('@/lib/api', () => ({
 const mockHasFeature = vi.fn(() => true);
 const mockHasModule = vi.fn(() => true);
 
+// Stable references to prevent infinite render loops — mocks that return new objects
+// each render cause useCallback/useEffect dep changes → setState → re-render → loop
+const stableToastValue = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
+const stableTenantValue = {
+  tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+  tenantPath: (p: string) => `/test${p}`,
+  hasFeature: (...args: unknown[]) => mockHasFeature(...args),
+  hasModule: (...args: unknown[]) => mockHasModule(...args),
+};
+
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
     user: { id: 1, first_name: 'Test', avatar: null },
     isAuthenticated: true,
   })),
-  useTenant: vi.fn(() => ({
-    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-    tenantPath: (p: string) => `/test${p}`,
-    hasFeature: (...args: unknown[]) => mockHasFeature(...args),
-    hasModule: (...args: unknown[]) => mockHasModule(...args),
-  })),
-  useToast: vi.fn(() => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-  })),
+  useTenant: vi.fn(() => stableTenantValue),
+  useToast: vi.fn(() => stableToastValue),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -64,31 +65,33 @@ vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 
+// Stable t function and i18n — must be module-level constants so useEffect deps don't change
+const stableT = (key: string, opts?: Record<string, string>) => {
+  const map: Record<string, string> = {
+    'compose.tab_post': 'Post',
+    'compose.tab_poll': 'Poll',
+    'compose.tab_listing': 'Listing',
+    'compose.tab_event': 'Event',
+    'compose.tab_goal': 'Goal',
+    'compose.create_title': `Create ${opts?.type ?? ''}`,
+    'compose.cancel': 'Cancel',
+    'compose.post_button': 'Post',
+    'compose.create_poll': 'Create Poll',
+    'compose.create_listing': 'Create Listing',
+    'compose.create_event': 'Create Event',
+    'compose.create_goal': 'Create Goal',
+    'compose.poll_question_placeholder': 'Ask a question...',
+    'whats_on_your_mind': "What's on your mind?",
+    'compose.emoji_search': 'Search emoji',
+    'compose.voice_input': 'Voice input',
+  };
+  return map[key] ?? key;
+};
+const stableI18n = { language: 'en', changeLanguage: vi.fn() };
+const stableTranslation = { t: stableT, i18n: stableI18n };
+
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, opts?: Record<string, string>) => {
-      const map: Record<string, string> = {
-        'compose.tab_post': 'Post',
-        'compose.tab_poll': 'Poll',
-        'compose.tab_listing': 'Listing',
-        'compose.tab_event': 'Event',
-        'compose.tab_goal': 'Goal',
-        'compose.create_title': `Create ${opts?.type ?? ''}`,
-        'compose.cancel': 'Cancel',
-        'compose.post_button': 'Post',
-        'compose.create_poll': 'Create Poll',
-        'compose.create_listing': 'Create Listing',
-        'compose.create_event': 'Create Event',
-        'compose.create_goal': 'Create Goal',
-        'compose.poll_question_placeholder': 'Ask a question...',
-        'whats_on_your_mind': "What's on your mind?",
-        'compose.emoji_search': 'Search emoji',
-        'compose.voice_input': 'Voice input',
-      };
-      return map[key] ?? key;
-    },
-    i18n: { language: 'en', changeLanguage: vi.fn() },
-  }),
+  useTranslation: () => stableTranslation,
   Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   initReactI18next: { type: '3rdParty', init: vi.fn() },
 }));
@@ -123,8 +126,8 @@ describe('ComposeHub', () => {
 
   it('renders without crashing when open', () => {
     render(<ComposeHub {...defaultProps} />);
-    // Should render the "Create Post" title (default tab)
-    expect(screen.getByText(/Create Post/)).toBeInTheDocument();
+    // Default tab is 'listing', so header shows "Create Listing" (also in submit button)
+    expect(screen.getAllByText(/Create Listing/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows all 5 tab labels when all features enabled', () => {
@@ -165,9 +168,9 @@ describe('ComposeHub', () => {
     expect(screen.queryAllByText('Goal').length).toBe(0);
   });
 
-  it('defaults to Post tab header', () => {
+  it('defaults to Listing tab header', () => {
     render(<ComposeHub {...defaultProps} />);
-    expect(screen.getByText(/Create Post/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Create Listing/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('opens to specified defaultTab', () => {
@@ -180,15 +183,15 @@ describe('ComposeHub', () => {
     const user = userEvent.setup();
     render(<ComposeHub {...defaultProps} />);
 
-    expect(screen.getByText(/Create Post/)).toBeInTheDocument();
+    // Default is Listing tab
+    expect(screen.getAllByText(/Create Listing/).length).toBeGreaterThanOrEqual(1);
 
-    // Click the Listing tab
-    const listingTabs = screen.getAllByText('Listing');
-    await user.click(listingTabs[0]);
+    // Click the Post tab
+    const postTabs = screen.getAllByText('Post');
+    await user.click(postTabs[0]);
 
     await waitFor(() => {
-      // "Create Listing" appears in both header and submit button
-      expect(screen.getAllByText(/Create Listing/).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/Create Post/).length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -201,8 +204,8 @@ describe('ComposeHub', () => {
     mockHasFeature.mockReturnValue(false);
     mockHasModule.mockReturnValue(false);
     render(<ComposeHub {...defaultProps} />);
-    // Post tab should still render (no gate)
-    expect(screen.getByText(/Create Post/)).toBeInTheDocument();
+    // Post tab should still render (no gate) — find it in tabs
+    expect(screen.getAllByText('Post').length).toBeGreaterThanOrEqual(1);
     // Gated tabs should be hidden
     expect(screen.queryAllByText('Poll').length).toBe(0);
     expect(screen.queryAllByText('Listing').length).toBe(0);

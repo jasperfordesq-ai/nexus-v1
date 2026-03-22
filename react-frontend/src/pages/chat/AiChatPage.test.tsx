@@ -81,6 +81,9 @@ const mockUseTenant = useTenant as ReturnType<typeof vi.fn>;
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+// jsdom does not implement scrollIntoView
+Element.prototype.scrollIntoView = vi.fn();
+
 describe('AiChatPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();

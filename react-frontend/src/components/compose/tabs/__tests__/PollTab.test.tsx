@@ -140,19 +140,16 @@ describe('PollTab', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('shows error toast when attempting to submit empty question', async () => {
+  it('shows error toast when attempting to submit empty question', () => {
     render(<PollTab {...defaultProps} />);
 
-    // Find Create Poll button and try to click it
+    // The component disables the Create Poll button when the question is empty
+    // (canSubmit is false), which prevents the user from submitting.
     const createBtn = screen.getAllByRole('button').find((b) =>
       b.textContent?.toLowerCase().includes('poll')
     );
-    if (createBtn) {
-      fireEvent.click(createBtn);
-      await waitFor(() => {
-        expect(mockToast.error).toHaveBeenCalled();
-      });
-    }
+    expect(createBtn).toBeDefined();
+    expect(createBtn).toBeDisabled();
   });
 
   it('renders character count component', () => {

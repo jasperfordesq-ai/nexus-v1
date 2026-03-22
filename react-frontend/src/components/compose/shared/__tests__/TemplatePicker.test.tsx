@@ -43,9 +43,11 @@ describe('TemplatePicker', () => {
   });
 
   it('renders nothing for a tab with no templates', () => {
-    // Using 'poll' here which has templates defined, so test with an unknown tab
-    const { container } = render(<TemplatePicker tab={'unknown' as 'post'} onSelect={vi.fn()} />);
-    expect(container.firstChild).toBeNull();
+    // Using an unknown tab that has no templates defined
+    render(<TemplatePicker tab={'unknown' as 'post'} onSelect={vi.fn()} />);
+    // Component returns null, so no button should be rendered
+    // (container.firstChild is the HeroUI provider wrapper, not the component)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('opens dropdown menu when Template button is clicked', async () => {
@@ -56,7 +58,7 @@ describe('TemplatePicker', () => {
     // After opening, dropdown items should appear
     await waitFor(() => {
       // post tab has templates: achievement, help, recommend
-      expect(screen.getAllByRole('option').length).toBeGreaterThan(0);
+      expect(screen.getAllByRole('menuitem').length).toBeGreaterThan(0);
     });
   });
 
@@ -68,11 +70,11 @@ describe('TemplatePicker', () => {
     fireEvent.click(btn);
 
     await waitFor(() => {
-      const items = screen.getAllByRole('option');
+      const items = screen.getAllByRole('menuitem');
       expect(items.length).toBeGreaterThan(0);
     });
 
-    const items = screen.getAllByRole('option');
+    const items = screen.getAllByRole('menuitem');
     fireEvent.click(items[0]);
 
     await waitFor(() => {
@@ -90,10 +92,10 @@ describe('TemplatePicker', () => {
     fireEvent.click(btn);
 
     await waitFor(() => {
-      expect(screen.getAllByRole('option').length).toBeGreaterThan(0);
+      expect(screen.getAllByRole('menuitem').length).toBeGreaterThan(0);
     });
 
-    const items = screen.getAllByRole('option');
+    const items = screen.getAllByRole('menuitem');
     fireEvent.click(items[0]);
 
     await waitFor(() => {

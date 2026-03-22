@@ -113,7 +113,9 @@ describe('GroupEventsTab', () => {
 
   it('shows create event button for members', () => {
     render(<GroupEventsTab groupId={1} events={[]} eventsLoading={false} isMember={true} />);
-    expect(screen.getByText('detail.create_event')).toBeInTheDocument();
+    // Translation: detail.create_event -> "Create Event"
+    // The text appears in both the header button and the empty state action; use getAllByText
+    expect(screen.getAllByText('Create Event').length).toBeGreaterThanOrEqual(1);
   });
 
   it('does not show create event button for non-members', () => {

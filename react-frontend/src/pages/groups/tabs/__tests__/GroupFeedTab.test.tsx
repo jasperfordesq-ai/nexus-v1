@@ -41,8 +41,8 @@ vi.mock('framer-motion', async () => {
 });
 
 vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
+  GlassCard: ({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) => (
+    <div className={className} onClick={onClick}>{children}</div>
   ),
 
   GlassButton: ({ children }: Record<string, unknown>) => children as never,
@@ -139,24 +139,27 @@ describe('GroupFeedTab', () => {
   it('shows compose prompt for members', () => {
     render(<GroupFeedTab {...defaultProps} feedItems={[]} />);
     // The compose prompt (write something area) should be shown for members
-    expect(screen.getByText('detail.whats_happening')).toBeInTheDocument();
+    // Component uses t('detail.feed_whats_on_your_mind', "What's on your mind?") — fallback rendered
+    expect(screen.getByText("What's on your mind?")).toBeInTheDocument();
   });
 
   it('shows join prompt for non-members', () => {
     render(<GroupFeedTab {...defaultProps} isMember={false} feedItems={[]} />);
-    expect(screen.getByText('detail.join_to_post')).toBeInTheDocument();
+    // Component uses t('detail.join_to_see_feed_title', 'Join to see the feed')
+    expect(screen.getByText('Join to see the feed')).toBeInTheDocument();
   });
 
   it('calls onComposeOpen when compose area is clicked', () => {
     const onComposeOpen = vi.fn();
     render(<GroupFeedTab {...defaultProps} feedItems={[]} onComposeOpen={onComposeOpen} />);
-    fireEvent.click(screen.getByText('detail.whats_happening'));
+    fireEvent.click(screen.getByText("What's on your mind?"));
     expect(onComposeOpen).toHaveBeenCalledTimes(1);
   });
 
   it('shows load more button when feedHasMore is true', () => {
     render(<GroupFeedTab {...defaultProps} feedHasMore={true} />);
-    expect(screen.getByText('common:load_more')).toBeInTheDocument();
+    // Component uses t('detail.feed_load_more', 'Load More') — fallback rendered
+    expect(screen.getByText('Load More')).toBeInTheDocument();
   });
 
   it('does not show load more button when no more items', () => {

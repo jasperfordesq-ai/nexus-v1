@@ -74,8 +74,9 @@ import { GroupMembersTab } from '../GroupMembersTab';
 import type { GroupMember } from '../GroupMembersTab';
 
 const mockMembers: GroupMember[] = [
-  { id: 1, name: 'Alice Admin', first_name: 'Alice', last_name: 'Admin', avatar: null, role: 'admin', joined_at: '2026-01-01T10:00:00Z' } as GroupMember,
-  { id: 2, name: 'Bob Member', first_name: 'Bob', last_name: 'Member', avatar: null, role: 'member', joined_at: '2026-01-05T10:00:00Z' } as GroupMember,
+  { id: 1, name: 'Alice Owner', first_name: 'Alice', last_name: 'Owner', avatar: null, role: 'admin', joined_at: '2026-01-01T10:00:00Z' } as GroupMember,
+  { id: 2, name: 'Bob Admin', first_name: 'Bob', last_name: 'Admin', avatar: null, role: 'admin', joined_at: '2026-01-03T10:00:00Z' } as GroupMember,
+  { id: 3, name: 'Charlie Member', first_name: 'Charlie', last_name: 'Member', avatar: null, role: 'member', joined_at: '2026-01-05T10:00:00Z' } as GroupMember,
 ];
 
 const defaultProps = {
@@ -84,7 +85,7 @@ const defaultProps = {
   userIsAdmin: false,
   currentUserId: 99,
   groupOwnerId: 1,
-  groupAdminIds: [1],
+  groupAdminIds: [1, 2],
   updatingMember: null,
   onUpdateMemberRole: vi.fn(),
   onRemoveMember: vi.fn(),
@@ -97,8 +98,9 @@ describe('GroupMembersTab', () => {
 
   it('renders member names', () => {
     render(<GroupMembersTab {...defaultProps} />);
-    expect(screen.getByText('Alice Admin')).toBeInTheDocument();
-    expect(screen.getByText('Bob Member')).toBeInTheDocument();
+    expect(screen.getByText('Alice Owner')).toBeInTheDocument();
+    expect(screen.getByText('Bob Admin')).toBeInTheDocument();
+    expect(screen.getByText('Charlie Member')).toBeInTheDocument();
   });
 
   it('shows loading spinner when membersLoading is true', () => {
@@ -114,8 +116,8 @@ describe('GroupMembersTab', () => {
 
   it('shows admin badge for admin members', () => {
     render(<GroupMembersTab {...defaultProps} />);
-    // Admin chip/badge
-    expect(screen.getByText('detail.admin')).toBeInTheDocument();
+    // Translation: detail.member_admin -> "Admin"
+    expect(screen.getByText('Admin')).toBeInTheDocument();
   });
 
   it('shows management dropdown for admin user', () => {

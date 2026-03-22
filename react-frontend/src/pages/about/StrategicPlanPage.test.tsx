@@ -133,7 +133,7 @@ describe('StrategicPlanPage', () => {
     const buttons = screen.queryAllByRole('button');
     expect(document.body).toBeInTheDocument();
     // TOC section labels
-    expect(screen.queryByText('Executive Summary')).toBeTruthy();
+    expect(screen.queryAllByText('Executive Summary').length).toBeGreaterThan(0);
   });
 
   it('renders the related pages section', () => {

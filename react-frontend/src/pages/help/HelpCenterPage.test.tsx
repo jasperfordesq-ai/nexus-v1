@@ -150,11 +150,13 @@ describe('HelpCenterPage', () => {
     });
 
     const searchInput = screen.getAllByRole('textbox')[0];
-    fireEvent.change(searchInput, { target: { value: 'wallet' } });
+    fireEvent.change(searchInput, { target: { value: 'time credits' } });
 
     await waitFor(() => {
-      // 'Wallet' category FAQ should remain visible
+      // 'Wallet' category FAQ with "How do I earn time credits?" should remain visible
       expect(screen.getByText('How do I earn time credits?')).toBeInTheDocument();
+      // 'Getting Started' FAQs should be filtered out (no match for "time credits")
+      expect(screen.queryByText('How do I sign up?')).not.toBeInTheDocument();
     });
   });
 

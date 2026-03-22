@@ -65,7 +65,9 @@ describe('AdminLayout', () => {
 
   it('renders the sidebar with Admin text', () => {
     renderLayout();
-    expect(screen.getByText('Admin')).toBeInTheDocument();
+    // Layout renders two sidebars (desktop + mobile drawer) — at least one should have the Admin link
+    const adminLinks = screen.getAllByText('Admin');
+    expect(adminLinks.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders the header with Back to site button', () => {
@@ -80,16 +82,19 @@ describe('AdminLayout', () => {
 
   it('shows collapse/expand sidebar button', () => {
     renderLayout();
-    const btn = screen.getByLabelText(/collapse sidebar|expand sidebar/i);
-    expect(btn).toBeInTheDocument();
+    // Layout renders two sidebars (desktop + mobile drawer) — both have collapse buttons
+    const btns = screen.getAllByLabelText(/collapse sidebar|expand sidebar/i);
+    expect(btns.length).toBeGreaterThanOrEqual(1);
   });
 
   it('toggles sidebar on button click', () => {
     renderLayout();
-    const btn = screen.getByLabelText(/collapse sidebar/i);
-    fireEvent.click(btn);
-    // After clicking, label should change to "Expand sidebar"
-    expect(screen.getByLabelText(/expand sidebar/i)).toBeInTheDocument();
+    // Layout renders two sidebars (desktop + mobile drawer) — click the first collapse button
+    const collapseButtons = screen.getAllByLabelText(/collapse sidebar/i);
+    fireEvent.click(collapseButtons[0]);
+    // After clicking, at least one button should change to "Expand sidebar"
+    const expandButtons = screen.getAllByLabelText(/expand sidebar/i);
+    expect(expandButtons.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders tenant name in header', () => {

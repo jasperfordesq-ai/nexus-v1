@@ -41,7 +41,7 @@ describe('CategorySelect', () => {
   it('renders nothing while loading', () => {
     vi.mocked(api.get).mockReturnValueOnce(new Promise(() => {}));
     const { container } = render(<CategorySelect onChange={vi.fn()} />);
-    expect(container.firstChild).toBeNull();
+    expect(container.textContent?.trim()).toBe('');
   });
 
   it('renders nothing when categories are empty after load', async () => {
@@ -49,7 +49,7 @@ describe('CategorySelect', () => {
 
     const { container } = render(<CategorySelect onChange={vi.fn()} />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 
@@ -76,7 +76,9 @@ describe('CategorySelect', () => {
 
     render(<CategorySelect onChange={vi.fn()} label="Transaction Type" />);
     await waitFor(() => {
-      expect(screen.getByText('Transaction Type')).toBeInTheDocument();
+      // HeroUI Select renders the label in multiple places (hidden native + visible)
+      const labels = screen.getAllByText('Transaction Type');
+      expect(labels.length).toBeGreaterThan(0);
     });
   });
 
@@ -85,7 +87,7 @@ describe('CategorySelect', () => {
 
     const { container } = render(<CategorySelect onChange={vi.fn()} />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 
@@ -108,7 +110,7 @@ describe('CategorySelect', () => {
       <CategorySelect onChange={vi.fn()} className="w-full mt-2" />
     );
     await waitFor(() => {
-      expect(container.firstChild).toBeTruthy();
+      expect(container.textContent?.trim()).not.toBe('');
     });
   });
 });

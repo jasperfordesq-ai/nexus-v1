@@ -279,6 +279,9 @@ class TenantContext
                 } else {
                     // STRICT ISOLATION:
                     // If path looks like a tenant slug but isn't one, and isn't a custom page...
+                    if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                        throw new \Symfony\Component\HttpKernel\Exception\HttpException(404, 'The requested tenant or page does not exist.');
+                    }
                     http_response_code(404);
                     // Optional: Render a simple 404 view or text
                     echo "<h1>404 Not Found</h1><p>The requested tenant or page does not exist.</p>";
@@ -648,6 +651,12 @@ class TenantContext
         ];
         self::$basePath = '';
 
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(400, json_encode([
+                'data' => null,
+                'errors' => [['code' => ApiErrorCodes::INVALID_TENANT, 'message' => 'Invalid tenant ID', 'field' => null]]
+            ]));
+        }
         header('Content-Type: application/json');
         http_response_code(400);
         echo json_encode([
@@ -675,6 +684,12 @@ class TenantContext
         ];
         self::$basePath = '';
 
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode([
+                'data' => null,
+                'errors' => [['code' => ApiErrorCodes::TENANT_MISMATCH, 'message' => 'Token tenant does not match requested tenant', 'field' => null]]
+            ]));
+        }
         header('Content-Type: application/json');
         http_response_code(403);
         echo json_encode([
@@ -740,6 +755,9 @@ class TenantContext
      */
     private static function showInactiveTenantError(string $tenantName): void
     {
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(503, 'Community Unavailable: ' . $tenantName);
+        }
         http_response_code(503);
 
         // Set a minimal tenant context so the app doesn't break

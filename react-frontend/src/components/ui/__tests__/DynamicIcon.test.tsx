@@ -29,22 +29,22 @@ describe('DynamicIcon', () => {
 
   it('renders null when name is null', () => {
     const { container } = render(<DynamicIcon name={null} />);
-    expect(container.firstChild).toBeNull();
+    expect(container.querySelector('svg')).toBeNull();
   });
 
   it('renders null when name is undefined', () => {
     const { container } = render(<DynamicIcon name={undefined} />);
-    expect(container.firstChild).toBeNull();
+    expect(container.querySelector('svg')).toBeNull();
   });
 
   it('renders null when name is empty string', () => {
     const { container } = render(<DynamicIcon name="" />);
-    expect(container.firstChild).toBeNull();
+    expect(container.querySelector('svg')).toBeNull();
   });
 
   it('renders null when name is unknown icon', () => {
     const { container } = render(<DynamicIcon name="NonExistentIcon" />);
-    expect(container.firstChild).toBeNull();
+    expect(container.querySelector('svg')).toBeNull();
   });
 
   it('renders an SVG icon for a known icon name', () => {

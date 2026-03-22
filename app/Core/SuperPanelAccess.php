@@ -286,8 +286,6 @@ class SuperPanelAccess
     {
         $access = self::getAccess();
 
-        http_response_code(403);
-
         error_log(sprintf(
             "SuperPanel ACCESS DENIED: user=%s, tenant=%s, reason=%s, ip=%s",
             $_SESSION['user_id'] ?? 'none',
@@ -295,6 +293,15 @@ class SuperPanelAccess
             $access['reason'],
             ClientIp::get()
         ));
+
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode([
+                'error' => 'Access Denied', 'message' => 'You do not have Super Admin Panel access',
+                'reason' => $access['reason'], 'code' => 'SUPER_PANEL_ACCESS_DENIED'
+            ]));
+        }
+
+        http_response_code(403);
 
         if (self::isApiRequest()) {
             header('Content-Type: application/json');

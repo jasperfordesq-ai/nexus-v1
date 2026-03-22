@@ -106,6 +106,9 @@ class CorsHelper
             header('Access-Control-Max-Age: ' . $maxAge);
         }
 
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(204, '');
+        }
         http_response_code(204);
         exit;
     }

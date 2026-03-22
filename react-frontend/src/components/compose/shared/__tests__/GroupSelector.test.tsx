@@ -64,18 +64,20 @@ describe('GroupSelector', () => {
     } as ReturnType<typeof useAuth>);
 
     // No userId → no API call → renders nothing
-    const { container } = render(<GroupSelector value={null} onChange={vi.fn()} />);
+    render(<GroupSelector value={null} onChange={vi.fn()} />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(screen.queryByRole('button')).toBeNull();
+      expect(screen.queryByText(/group/i)).toBeNull();
     });
   });
 
   it('renders nothing when groups are empty after API load', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
 
-    const { container } = render(<GroupSelector value={null} onChange={vi.fn()} />);
+    render(<GroupSelector value={null} onChange={vi.fn()} />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(screen.queryByRole('button')).toBeNull();
+      expect(screen.queryByText(/group/i)).toBeNull();
     });
   });
 
@@ -89,30 +91,33 @@ describe('GroupSelector', () => {
   });
 
   it('renders a Select element after groups are loaded', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: mockGroups });
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: mockGroups });
 
     render(<GroupSelector value={null} onChange={vi.fn()} />);
     await waitFor(() => {
       // The HeroUI Select renders a listbox trigger
-      expect(screen.getByRole('button') || screen.getByRole('combobox')).toBeTruthy();
+      const trigger = screen.queryByRole('button') ?? screen.queryByRole('combobox');
+      expect(trigger).toBeTruthy();
     });
   });
 
   it('handles API error gracefully and renders nothing', async () => {
     vi.mocked(api.get).mockRejectedValueOnce(new Error('Network error'));
 
-    const { container } = render(<GroupSelector value={null} onChange={vi.fn()} />);
+    render(<GroupSelector value={null} onChange={vi.fn()} />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(screen.queryByRole('button')).toBeNull();
+      expect(screen.queryByText(/group/i)).toBeNull();
     });
   });
 
   it('handles API response where data is null', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: false, data: null });
 
-    const { container } = render(<GroupSelector value={null} onChange={vi.fn()} />);
+    render(<GroupSelector value={null} onChange={vi.fn()} />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(screen.queryByRole('button')).toBeNull();
+      expect(screen.queryByText(/group/i)).toBeNull();
     });
   });
 });

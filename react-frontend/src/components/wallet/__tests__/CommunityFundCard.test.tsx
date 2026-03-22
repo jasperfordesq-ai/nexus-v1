@@ -50,7 +50,7 @@ describe('CommunityFundCard', () => {
 
     const { container } = render(<CommunityFundCard />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 
@@ -129,7 +129,7 @@ describe('CommunityFundCard', () => {
     const { container } = render(<CommunityFundCard />);
     await waitFor(() => {
       // After error the fund is null so renders nothing
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 });

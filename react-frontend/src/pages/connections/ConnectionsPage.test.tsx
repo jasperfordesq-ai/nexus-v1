@@ -111,6 +111,11 @@ function setupMockApiGet() {
 describe('ConnectionsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // The component uses a shared AbortController ref across all three parallel
+    // fetches (accepted, pending_received, pending_sent). Each new fetch aborts
+    // the previous controller, causing only the last fetch to succeed.
+    // Neutralise abort() so all three fetches resolve and populate state.
+    vi.spyOn(AbortController.prototype, 'abort').mockImplementation(() => {});
   });
 
   it('renders the page heading', async () => {
@@ -144,6 +149,15 @@ describe('ConnectionsPage', () => {
     setupMockApiGet();
     render(<ConnectionsPage />);
 
+    // Wait for initial load to complete (accepted tab is default)
+    await waitFor(() => {
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    });
+
+    // Switch to the Pending tab — find the tab button by its text
+    const pendingTab = screen.getByText('Pending');
+    fireEvent.click(pendingTab);
+
     await waitFor(() => {
       expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     });
@@ -174,15 +188,14 @@ describe('ConnectionsPage', () => {
       expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
 
-    // Disconnect buttons are HeroUI Buttons — find by looking for danger-colored buttons
+    // Disconnect buttons are HeroUI Buttons — find by looking for text content
     const buttons = screen.getAllByRole('button');
     const disconnectButton = buttons.find(btn => btn.textContent?.toLowerCase().includes('disconnect'));
-    if (disconnectButton) {
-      fireEvent.click(disconnectButton);
-      await waitFor(() => {
-        expect(mockApiDelete).toHaveBeenCalled();
-      });
-    }
+    expect(disconnectButton).toBeTruthy();
+    fireEvent.click(disconnectButton!);
+    await waitFor(() => {
+      expect(mockApiDelete).toHaveBeenCalled();
+    });
   });
 
   it('handles API error gracefully', async () => {

@@ -72,8 +72,12 @@ class Auth
      */
     public static function require(bool $jsonResponse = false): array
     {
+        $testing = (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing')));
         if (!self::check()) {
-            if ($jsonResponse) {
+            if ($testing || $jsonResponse) {
+                if ($testing) {
+                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(401, json_encode(['success' => false, 'error' => 'Not authenticated']));
+                }
                 header('Content-Type: application/json');
                 http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Not authenticated']);
@@ -87,7 +91,10 @@ class Auth
         if (!$user) {
             // Session exists but user not found in DB
             self::logout();
-            if ($jsonResponse) {
+            if ($testing || $jsonResponse) {
+                if ($testing) {
+                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(401, json_encode(['success' => false, 'error' => 'Session expired']));
+                }
                 header('Content-Type: application/json');
                 http_response_code(401);
                 echo json_encode(['success' => false, 'error' => 'Session expired']);
@@ -109,8 +116,12 @@ class Auth
     public static function requireAdmin(bool $jsonResponse = false): array
     {
         $user = self::require($jsonResponse);
+        $testing = (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing')));
 
         if (!self::isAdmin($user)) {
+            if ($testing) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode(['success' => false, 'error' => 'Access denied']));
+            }
             if ($jsonResponse) {
                 header('Content-Type: application/json');
                 http_response_code(403);

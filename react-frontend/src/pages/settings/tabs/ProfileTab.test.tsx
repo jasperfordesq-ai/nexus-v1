@@ -126,8 +126,9 @@ describe('ProfileTab', () => {
 
   it('renders language and appearance section', () => {
     render(<ProfileTab {...defaultProps} />);
-    expect(screen.getByText('language')).toBeDefined();
-    expect(screen.getByText('appearance')).toBeDefined();
+    // The heading renders "{t('language')} & {t('appearance')}" in an <h2>.
+    // Use a heading role query to avoid ambiguity with other elements that contain "language".
+    expect(screen.getByRole('heading', { name: /language/ })).toBeDefined();
   });
 
   it('renders theme mode buttons', () => {
@@ -156,6 +157,7 @@ describe('ProfileTab', () => {
   it('shows uploading state on camera button when isUploading', () => {
     render(<ProfileTab {...defaultProps} isUploading={true} />);
     const cameraBtn = screen.getByLabelText('Change profile photo');
-    expect(cameraBtn).toHaveAttribute('aria-disabled', 'true');
+    // HeroUI Button renders isDisabled as data-disabled, not aria-disabled
+    expect(cameraBtn).toHaveAttribute('data-disabled', 'true');
   });
 });

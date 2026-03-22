@@ -112,7 +112,8 @@ const mockComments = [
 
 const mockCommentsResponse = {
   success: true,
-  data: { items: mockComments, cursor: null, has_more: false },
+  data: mockComments,
+  meta: { cursor: null, has_more: false },
 };
 
 function setupMocks() {
@@ -169,15 +170,18 @@ describe('IdeaDetailPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Reusable Shopping Bags')).toBeInTheDocument();
     });
-    expect(screen.getByText('comments.add_placeholder')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('comments.add_placeholder')).toBeInTheDocument();
   });
 
   it('shows creator name', async () => {
     setupMocks();
     render(<IdeaDetailPage />);
     await waitFor(() => {
-      expect(screen.getByText('Alice Member')).toBeInTheDocument();
+      expect(screen.getByText('Reusable Shopping Bags')).toBeInTheDocument();
     });
+    // Creator name appears in the "submitted by" translation key and Avatar aria-label
+    expect(screen.getByText('idea_detail.submitted_by')).toBeInTheDocument();
+    expect(screen.getByLabelText('Alice Member')).toBeInTheDocument();
   });
 
   it('shows admin controls for admin users', async () => {
@@ -192,8 +196,8 @@ describe('IdeaDetailPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Reusable Shopping Bags')).toBeInTheDocument();
     });
-    // Admin dropdown with status controls
-    expect(screen.getByRole('button', { name: /idea_detail\.admin_actions/i })).toBeInTheDocument();
+    // Admin dropdown with status controls — the trigger button has aria-label="Idea actions"
+    expect(screen.getByRole('button', { name: /Idea actions/i })).toBeInTheDocument();
   });
 
   it('calls the correct API endpoints on mount', async () => {

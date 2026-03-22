@@ -54,7 +54,7 @@ describe('AlgorithmLabel', () => {
 
     const { container } = render(<AlgorithmLabel area="feed" />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 
@@ -93,7 +93,7 @@ describe('AlgorithmLabel', () => {
 
     const { container } = render(<AlgorithmLabel area="feed" />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 
@@ -104,7 +104,7 @@ describe('AlgorithmLabel', () => {
 
     const { container } = render(<AlgorithmLabel area="feed" />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 
@@ -118,7 +118,7 @@ describe('AlgorithmLabel', () => {
 
     const { container } = render(<AlgorithmLabel area="matching" />);
     await waitFor(() => {
-      expect(container.firstChild).toBeNull();
+      expect(container.textContent?.trim()).toBe('');
     });
   });
 });

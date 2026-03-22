@@ -141,7 +141,10 @@ describe('PrivacyTab', () => {
       },
     ];
     render(<PrivacyTab {...defaultProps} insuranceEnabled={true} insuranceCerts={certs} />);
-    expect(screen.getByText('Public Liability')).toBeDefined();
+    // The cert type appears as a <p> element; the Select dropdown also has a "Public Liability" option,
+    // so use getAllByText and assert the paragraph element is present.
+    const publicLiabilityElements = screen.getAllByText('Public Liability');
+    expect(publicLiabilityElements.length).toBeGreaterThan(0);
     expect(screen.getByText(/Aviva/)).toBeDefined();
     expect(screen.getByText('verified')).toBeDefined();
   });

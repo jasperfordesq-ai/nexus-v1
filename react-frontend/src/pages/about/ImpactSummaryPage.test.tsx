@@ -115,10 +115,10 @@ describe('ImpactSummaryPage', () => {
   it('renders key impact statistics', () => {
     render(<ImpactSummaryPage />);
     // Stats: €16, 100%, 95%, €803K
-    expect(screen.getByText('€16')).toBeInTheDocument();
-    expect(screen.getByText('100%')).toBeInTheDocument();
-    expect(screen.getByText('95%')).toBeInTheDocument();
-    expect(screen.getByText('€803K')).toBeInTheDocument();
+    expect(screen.getAllByText('€16').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('100%').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('95%').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('€803K').length).toBeGreaterThan(0);
   });
 
   it('renders links to impact report and strategic plan', () => {

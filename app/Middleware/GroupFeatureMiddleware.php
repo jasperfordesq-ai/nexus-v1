@@ -67,6 +67,9 @@ class GroupFeatureMiddleware
     {
         $check = self::checkGroupsEnabled();
         if (is_array($check)) {
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode($check));
+            }
             if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
                 // AJAX request
                 header('Content-Type: application/json');
@@ -93,6 +96,9 @@ class GroupFeatureMiddleware
         // Then check specific feature
         $check = self::checkFeature($feature, $customMessage);
         if (is_array($check)) {
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode($check));
+            }
             if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
                 // AJAX request
                 header('Content-Type: application/json');

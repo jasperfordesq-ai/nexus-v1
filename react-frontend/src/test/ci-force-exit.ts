@@ -20,13 +20,14 @@
  */
 
 export function setup() {
-  // Hard global timeout — exit after 12 minutes no matter what.
+  // Hard global timeout — exit after 90 minutes no matter what.
+  // 264 test files running sequentially in singleFork mode needs ~40-50 min.
   // Prevents the whole run from hanging forever if workers get stuck.
   const hardKill = setTimeout(() => {
     // eslint-disable-next-line no-console
-    console.log('\n[ci-force-exit] Hard timeout (35 min) — forcing exit');
+    console.log('\n[ci-force-exit] Hard timeout (90 min) — forcing exit');
     process.exit(1);
-  }, 35 * 60 * 1000);
+  }, 90 * 60 * 1000);
   hardKill.unref();
 }
 

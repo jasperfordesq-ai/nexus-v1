@@ -100,6 +100,9 @@ class RedirectMiddleware
                 ]);
 
                 // Perform 301 permanent redirect
+                if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                    throw new \Symfony\Component\HttpKernel\Exception\HttpException(301, '', ['Location' => $destinationUrl]);
+                }
                 header('HTTP/1.1 301 Moved Permanently');
                 header('Location: ' . $destinationUrl);
                 exit;
@@ -149,6 +152,9 @@ class RedirectMiddleware
             'samesite' => 'Lax'
         ]);
 
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException($statusCode, '', ['Location' => $url]);
+        }
         http_response_code($statusCode);
         header('Location: ' . $url);
         exit;

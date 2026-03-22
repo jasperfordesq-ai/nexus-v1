@@ -155,7 +155,7 @@ describe('RegistrationPolicySettings', () => {
     renderWithProviders(<RegistrationPolicySettings />);
 
     await waitFor(() => {
-      expect(screen.getByText('How registration modes work:')).toBeTruthy();
+      expect(screen.getByText('Understanding Registration Modes')).toBeTruthy();
     });
   });
 

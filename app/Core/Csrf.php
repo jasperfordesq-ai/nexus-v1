@@ -92,6 +92,9 @@ class Csrf
             $sessionId = session_id();
             error_log("CSRF FAIL | SessionID: $sessionId | SessionToken: $sessionToken | PostToken: $postToken");
 
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Invalid CSRF Token');
+            }
             http_response_code(403);
             die("<h1>403 Forbidden</h1><p>Invalid CSRF Token. Please refresh the page and try again.</p>");
         }
@@ -118,6 +121,9 @@ class Csrf
             $sessionId = session_id();
             error_log("CSRF API FAIL | SessionID: $sessionId | SessionToken: $sessionToken | HeaderToken: $headerToken | PostToken: $postToken");
 
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode(['error' => 'Invalid CSRF token', 'code' => 'csrf_invalid']));
+            }
             header('Content-Type: application/json');
             http_response_code(403);
             echo json_encode(['error' => 'Invalid CSRF token', 'code' => 'csrf_invalid']);

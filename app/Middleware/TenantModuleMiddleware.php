@@ -125,6 +125,9 @@ class TenantModuleMiddleware
         $check = self::check($module, $customMessage);
 
         if (is_array($check)) {
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, json_encode($check));
+            }
             $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
                 && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
