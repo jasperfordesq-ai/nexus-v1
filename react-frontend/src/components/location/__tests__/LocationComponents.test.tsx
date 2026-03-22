@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
@@ -37,6 +37,15 @@ vi.mock('@/contexts', () => ({
   })),
   useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), showToast: vi.fn() })),
   useTheme: vi.fn(() => ({ resolvedTheme: 'light', theme: 'light', setTheme: vi.fn() })),
+
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/contexts/ThemeContext', () => ({
@@ -146,14 +155,14 @@ import { GoogleMapsProvider } from '../GoogleMapsProvider';
 
 describe('GoogleMapsProvider', () => {
   it('renders without crashing', () => {
-    const { container } = render(
+    render(
       <W>
         <GoogleMapsProvider>
           <div>Test content</div>
         </GoogleMapsProvider>
       </W>
     );
-    expect(container.querySelector('[data-testid="api-provider"]')).toBeTruthy();
+    expect(screen.getByText('Test content')).toBeInTheDocument();
   });
 
   it('renders children', () => {

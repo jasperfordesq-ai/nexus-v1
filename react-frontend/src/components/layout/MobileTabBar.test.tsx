@@ -54,6 +54,16 @@ vi.mock('@/contexts', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
   useTenant: (...args: unknown[]) => mockUseTenant(...args),
   useNotifications: (...args: unknown[]) => mockUseNotifications(...args),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 vi.mock('./QuickCreateMenu', () => ({

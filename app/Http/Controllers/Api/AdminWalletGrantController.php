@@ -42,12 +42,12 @@ class AdminWalletGrantController extends BaseApiController
                   FROM transactions t
                   JOIN users u ON t.receiver_id = u.id
                   LEFT JOIN users admin ON t.sender_id = admin.id
-                  WHERE t.tenant_id = ? AND t.type = 'admin_grant'";
+                  WHERE t.tenant_id = ? AND t.transaction_type = 'admin_grant'";
 
         $countQuery = "SELECT COUNT(*) as total
                        FROM transactions t
                        JOIN users u ON t.receiver_id = u.id
-                       WHERE t.tenant_id = ? AND t.type = 'admin_grant'";
+                       WHERE t.tenant_id = ? AND t.transaction_type = 'admin_grant'";
 
         $params = [$tenantId];
         $countParams = [$tenantId];

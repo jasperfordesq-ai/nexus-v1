@@ -43,6 +43,16 @@ vi.mock('@/contexts', () => ({
     info: vi.fn(),
   })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/contexts/ToastContext', () => ({
@@ -63,6 +73,25 @@ vi.mock('@/lib/helpers', () => ({
 
 vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -101,8 +130,9 @@ describe('LeaderboardPage', () => {
 
   it('shows loading skeleton initially', () => {
     render(<LeaderboardPage />);
-    const skeletons = document.querySelectorAll('.animate-pulse');
-    expect(skeletons.length).toBeGreaterThan(0);
+    // HeroUI Skeleton does not use animate-pulse; check for aria-busy loading containers instead
+    const loadingContainers = document.querySelectorAll('[aria-busy="true"]');
+    expect(loadingContainers.length).toBeGreaterThan(0);
   });
 
   it('shows empty state when no entries are loaded', async () => {

@@ -1,0 +1,22 @@
+{
+  "title": "Skills & Endorsements",
+  "mySkills": "My Skills",
+  "addSkill": "Add skill",
+  "skillPlaceholder": "e.g. Gardening, Cooking…",
+  "noSkills": "No skills added yet.",
+  "endorsedBy": "Endorsed by {{count}} person",
+  "endorsedBy_other": "Endorsed by {{count}} people",
+  "endorse": "Endorse",
+  "endorsed": "Endorsed",
+  "endorseError": "Could not add endorsement.",
+  "addSkillError": "Could not add skill.",
+  "removeSkill": "Remove",
+  "removeSkillConfirm": "Remove this skill?",
+  "skillRemoved": "Skill removed.",
+  "removeSkillError": "Could not remove skill.",
+  "endorsements": "Endorsements",
+  "noEndorsements": "No endorsements yet.",
+  "message": "Message (optional)",
+  "messagePlaceholder": "Say why you're endorsing this skill…",
+  "submit": "Submit endorsement"
+}

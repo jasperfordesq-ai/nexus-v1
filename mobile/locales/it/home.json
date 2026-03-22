@@ -10,7 +10,8 @@
     "title": "Feed della comunità",
     "welcome": "Benvenuto nella tua banca del tempo",
     "empty": "Niente nel feed ancora. Torna presto!",
-    "loading": "Caricamento feed…"
+    "loading": "Caricamento feed…",
+    "emptySubtitle": "Inizia a connetterti con la tua comunità per vedere i post qui."
   },
   "listings": {
     "title": "Annunci",

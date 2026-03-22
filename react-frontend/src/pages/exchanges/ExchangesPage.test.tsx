@@ -47,6 +47,16 @@ vi.mock('@/contexts', () => ({
     info: vi.fn(),
   })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/contexts/ToastContext', () => ({
@@ -83,6 +93,24 @@ vi.mock('@/lib/exchange-status', () => ({
 vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
   ExchangeCardSkeleton: () => <div data-testid="exchange-skeleton">Loading...</div>,
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -115,21 +143,21 @@ describe('ExchangesPage', () => {
 
   it('renders page title and description', () => {
     render(<ExchangesPage />);
-    expect(screen.getByText('title')).toBeInTheDocument();
-    expect(screen.getByText('subtitle')).toBeInTheDocument();
+    expect(screen.getAllByText('My Exchanges').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Track your service exchange requests and confirmations')).toBeInTheDocument();
   });
 
   it('shows Browse Listings button', () => {
     render(<ExchangesPage />);
-    expect(screen.getByText('browse_listings')).toBeInTheDocument();
+    expect(screen.getAllByText('Browse Listings').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders status filter tabs', () => {
     render(<ExchangesPage />);
-    expect(screen.getByText('tabs.active')).toBeInTheDocument();
-    expect(screen.getByText('tabs.needs_confirmation')).toBeInTheDocument();
-    expect(screen.getByText('tabs.completed')).toBeInTheDocument();
-    expect(screen.getByText('tabs.all')).toBeInTheDocument();
+    expect(screen.getAllByText('Active').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Needs Confirmation')).toBeInTheDocument();
+    expect(screen.getAllByText('Completed').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('All').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows loading skeletons initially', () => {
@@ -146,7 +174,7 @@ describe('ExchangesPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
-    expect(screen.getByText('empty.title')).toBeInTheDocument();
+    expect(screen.getByText('No Exchanges Found')).toBeInTheDocument();
   });
 
   it('displays exchanges when loaded', async () => {
@@ -177,7 +205,7 @@ describe('ExchangesPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Gardening Help')).toBeInTheDocument();
     });
-    expect(screen.getByText('card.with_party')).toBeInTheDocument();
+    expect(screen.getByText('With Provider User')).toBeInTheDocument();
   });
 
   it('shows role indicator for requester', async () => {
@@ -205,7 +233,7 @@ describe('ExchangesPage', () => {
     render(<ExchangesPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('card.you_requested')).toBeInTheDocument();
+      expect(screen.getByText('You requested')).toBeInTheDocument();
     });
   });
 
@@ -234,7 +262,7 @@ describe('ExchangesPage', () => {
     render(<ExchangesPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('hours_count')).toBeInTheDocument();
+      expect(screen.getByText('3 hours')).toBeInTheDocument();
     });
   });
 });

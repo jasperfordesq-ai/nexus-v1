@@ -55,21 +55,24 @@ vi.mock('@/lib/webauthn', () => ({
   authenticateWithBiometric: vi.fn(),
 }));
 
-// Mock the api module
-const mockApiGet = vi.fn();
-const mockApiPost = vi.fn();
-const mockTokenManager = {
-  getAccessToken: vi.fn(),
-  setAccessToken: vi.fn(),
-  getRefreshToken: vi.fn(),
-  setRefreshToken: vi.fn(),
-  getTenantId: vi.fn(),
-  setTenantId: vi.fn(),
-  clearTokens: vi.fn(),
-  clearAll: vi.fn(),
-  hasAccessToken: vi.fn(),
-  hasRefreshToken: vi.fn(),
-};
+// Mock the api module — use vi.hoisted so these are available in the hoisted vi.mock factory
+const { mockApiGet, mockApiPost, mockTokenManager } = vi.hoisted(() => {
+  const mockApiGet = vi.fn();
+  const mockApiPost = vi.fn();
+  const mockTokenManager = {
+    getAccessToken: vi.fn(),
+    setAccessToken: vi.fn(),
+    getRefreshToken: vi.fn(),
+    setRefreshToken: vi.fn(),
+    getTenantId: vi.fn(),
+    setTenantId: vi.fn(),
+    clearTokens: vi.fn(),
+    clearAll: vi.fn(),
+    hasAccessToken: vi.fn(),
+    hasRefreshToken: vi.fn(),
+  };
+  return { mockApiGet, mockApiPost, mockTokenManager };
+});
 
 vi.mock('@/lib/api', () => ({
   api: {

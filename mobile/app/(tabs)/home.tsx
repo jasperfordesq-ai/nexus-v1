@@ -112,7 +112,8 @@ export default function HomeScreen() {
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('feed.emptyTitle')}</Text>
+              <Text style={styles.emptyTitle}>{t('feed.emptyTitle')}</Text>
+              <Text style={styles.emptySubText}>{t('feed.emptySubtitle')}</Text>
             </View>
           )
         }
@@ -159,7 +160,8 @@ function makeStyles(theme: Theme) {
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
     errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center' },
+    emptyTitle: { color: theme.text, fontSize: 17, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
+    emptySubText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20 },
     footer: { paddingVertical: 16, alignItems: 'center' },
   });
 }

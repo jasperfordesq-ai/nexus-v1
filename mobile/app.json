@@ -64,7 +64,18 @@
         }
       ],
       "expo-localization",
-      "@sentry/react-native/expo"
+      "@sentry/react-native/expo",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "networkSecurityConfig": "./android-network-security-config.xml"
+          },
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

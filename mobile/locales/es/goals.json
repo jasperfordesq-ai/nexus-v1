@@ -1,0 +1,30 @@
+{
+  "title": "Objetivos",
+  "empty": "Todavía no tienes objetivos.",
+  "addGoal": "Añadir objetivo",
+  "status": {
+    "active": "Activo",
+    "completed": "Completado",
+    "abandoned": "Abandonado"
+  },
+  "progress": "{{current}} / {{target}} h",
+  "noTarget": "{{current}} h registradas",
+  "due": "Vence el {{date}}",
+  "complete": "Marcar como completado",
+  "abandon": "Abandonar",
+  "abandonTitle": "¿Abandonar el objetivo?",
+  "abandonMessage": "Esta acción no se puede deshacer.",
+  "noGoals": "Aún no hay objetivos",
+  "noGoalsHint": "Crea tu primer objetivo para empezar a seguir tu progreso.",
+  "create": {
+    "title": "Nuevo objetivo",
+    "titleLabel": "Título del objetivo",
+    "titlePlaceholder": "p. ej. Ayudar a 5 vecinos",
+    "descriptionLabel": "Descripción (opcional)",
+    "targetHoursLabel": "Horas objetivo (opcional)",
+    "dueDateLabel": "Fecha límite (opcional)",
+    "submit": "Crear objetivo",
+    "error": "No se pudo crear el objetivo."
+  },
+  "updateError": "No se pudo actualizar el objetivo."
+}

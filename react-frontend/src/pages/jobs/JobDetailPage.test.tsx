@@ -58,6 +58,16 @@ vi.mock('@/contexts', () => ({
     info: vi.fn(),
     warning: vi.fn(),
   })),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
@@ -67,6 +77,25 @@ vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => (
     <div data-testid='glass-card' className={className}>{children}</div>
   ),
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -130,6 +159,7 @@ describe('JobDetailPage', () => {
       if (url.includes('/match')) return Promise.resolve({ success: false, data: null, meta: {} });
       if (url.includes('/applications')) return Promise.resolve({ success: true, data: [], meta: {} });
       if (url.includes('/history')) return Promise.resolve({ success: true, data: [], meta: {} });
+      if (url.includes('salary-benchmark')) return Promise.resolve({ success: false, data: null, meta: {} });
       return Promise.resolve({ success: true, data: baseVacancy, meta: {} });
     });
   });
@@ -216,6 +246,7 @@ describe('JobDetailPage', () => {
       if (url.includes('/match')) return Promise.resolve({ success: false, data: null, meta: {} });
       if (url.includes('/applications')) return Promise.resolve({ success: true, data: [], meta: {} });
       if (url.includes('/history')) return Promise.resolve({ success: true, data: [], meta: {} });
+      if (url.includes('salary-benchmark')) return Promise.resolve({ success: false, data: null, meta: {} });
       return Promise.resolve({ success: true, data: makeVacancy({ user_id: 1 }), meta: {} });
     });
     render(<JobDetailPage />);
@@ -279,6 +310,7 @@ describe('JobDetailPage', () => {
       if (url.includes('/match')) return Promise.resolve({ success: false, data: null, meta: {} });
       if (url.includes('/applications')) return Promise.resolve({ success: true, data: [], meta: {} });
       if (url.includes('/history')) return Promise.resolve({ success: true, data: [], meta: {} });
+      if (url.includes('salary-benchmark')) return Promise.resolve({ success: false, data: null, meta: {} });
       return Promise.resolve({ success: true, data: makeVacancy({ user_id: 1, deadline: '2020-01-01' }), meta: {} });
     });
     render(<JobDetailPage />);
@@ -296,6 +328,7 @@ describe('JobDetailPage', () => {
       if (url.includes('/match')) return Promise.resolve({ success: false, data: null, meta: {} });
       if (url.includes('/applications')) return Promise.resolve({ success: true, data: [], meta: {} });
       if (url.includes('/history')) return Promise.resolve({ success: true, data: [], meta: {} });
+      if (url.includes('salary-benchmark')) return Promise.resolve({ success: false, data: null, meta: {} });
       return Promise.resolve({ success: true, data: makeVacancy({ user_id: 1 }), meta: {} });
     });
     render(<JobDetailPage />);

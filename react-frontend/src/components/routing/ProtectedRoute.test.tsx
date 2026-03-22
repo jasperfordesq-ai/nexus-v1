@@ -33,6 +33,17 @@ const mockUseTenant = vi.fn();
 vi.mock('@/contexts', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
   useTenant: (...args: unknown[]) => mockUseTenant(...args),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -40,8 +51,14 @@ vi.mock('@/components/feedback', () => ({
 }));
 
 // Mock heavy dependencies that ProtectedRoute might import transitively
+// api.get must return a Promise because useLegalGate calls .then() on the result
 vi.mock('@/lib/api', () => ({
-  api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
+  api: {
+    get: vi.fn(() => Promise.resolve({ success: true, data: { has_pending: false, documents: [] } })),
+    post: vi.fn(() => Promise.resolve({ success: true, data: {} })),
+    put: vi.fn(() => Promise.resolve({ success: true, data: {} })),
+    delete: vi.fn(() => Promise.resolve({ success: true, data: {} })),
+  },
   tokenManager: { getAccessToken: vi.fn(), getTenantId: vi.fn() },
 }));
 

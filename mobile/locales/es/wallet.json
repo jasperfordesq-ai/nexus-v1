@@ -1,4 +1,10 @@
 {
   "hrs": "hrs",
-  "title": "Wallet"
+  "title": "Wallet",
+  "status": {
+    "pending": "Pendiente",
+    "cancelled": "Cancelado",
+    "disputed": "En disputa",
+    "failed": "Fallido"
+  }
 }

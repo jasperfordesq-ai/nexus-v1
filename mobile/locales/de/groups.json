@@ -1,0 +1,34 @@
+{
+  "title": "Gruppen",
+  "searchPlaceholder": "Gruppen suchen…",
+  "newGroup": "Neue Gruppe",
+  "empty": "Keine Gruppen gefunden.",
+  "featured": "Empfohlen",
+  "members": "{{count}} Mitglied",
+  "members_other": "{{count}} Mitglieder",
+  "posts": "{{count}} Beitrag",
+  "posts_other": "{{count}} Beiträge",
+  "public": "Öffentlich",
+  "private": "Privat",
+  "joined": "Beigetreten",
+  "join": "Beitreten",
+  "leave": "Verlassen",
+  "leaveConfirmTitle": "Gruppe verlassen",
+  "leaveConfirmMessage": "Möchtest du diese Gruppe wirklich verlassen?",
+  "joinError": "Der Gruppe konnte nicht beigetreten werden.",
+  "leaveError": "Die Gruppe konnte nicht verlassen werden.",
+  "detail": {
+    "title": "Gruppe",
+    "about": "Über uns",
+    "members": "Mitglieder",
+    "notFound": "Gruppe nicht gefunden.",
+    "invalidId": "Ungültige Gruppen-ID.",
+    "goBack": "Zurück"
+  },
+  "filter": {
+    "all": "Alle",
+    "public": "Öffentlich",
+    "private": "Privat",
+    "joined": "Meine Gruppen"
+  }
+}

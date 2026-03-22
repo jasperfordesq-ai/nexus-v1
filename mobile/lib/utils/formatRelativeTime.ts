@@ -4,6 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
+ * Formats a date value as a human-readable absolute date string.
+ *
+ * @param date - ISO 8601 string or Date object
+ */
+export function formatDate(date: string | Date): string {
+  return new Date(date).toLocaleDateString('default', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+/**
  * Converts an ISO date string to a human-readable relative time string.
  *
  * NOTE: Returns English-only strings. Callers needing full localization should

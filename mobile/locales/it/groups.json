@@ -1,0 +1,34 @@
+{
+  "title": "Gruppi",
+  "searchPlaceholder": "Cerca gruppi…",
+  "newGroup": "Nuovo gruppo",
+  "empty": "Nessun gruppo trovato.",
+  "featured": "In evidenza",
+  "members": "{{count}} membro",
+  "members_other": "{{count}} membri",
+  "posts": "{{count}} post",
+  "posts_other": "{{count}} post",
+  "public": "Pubblico",
+  "private": "Privato",
+  "joined": "Iscritto",
+  "join": "Iscriviti",
+  "leave": "Abbandona",
+  "leaveConfirmTitle": "Abbandona il gruppo",
+  "leaveConfirmMessage": "Sei sicuro di voler abbandonare questo gruppo?",
+  "joinError": "Impossibile iscriversi al gruppo.",
+  "leaveError": "Impossibile abbandonare il gruppo.",
+  "detail": {
+    "title": "Gruppo",
+    "about": "Informazioni",
+    "members": "Membri",
+    "notFound": "Gruppo non trovato.",
+    "invalidId": "ID gruppo non valido.",
+    "goBack": "Indietro"
+  },
+  "filter": {
+    "all": "Tutti",
+    "public": "Pubblico",
+    "private": "Privato",
+    "joined": "I miei gruppi"
+  }
+}

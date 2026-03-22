@@ -1,0 +1,30 @@
+{
+  "title": "Volontariato",
+  "searchPlaceholder": "Cerca opportunità…",
+  "empty": "Nessuna opportunità trovata.",
+  "remote": "Da remoto",
+  "hoursPerWeek": "{{hours}} ore/settimana",
+  "deadline": "Candidatura entro il {{date}}",
+  "spots": "{{count}} posto disponibile",
+  "spots_other": "{{count}} posti disponibili",
+  "status": {
+    "open": "Aperto",
+    "closed": "Chiuso",
+    "filled": "Completo"
+  },
+  "expressInterest": "Manifesta interesse",
+  "interestSent": "Interesse manifestato!",
+  "interestSentTitle": "Interesse inviato!",
+  "interestSentMessage": "L'organizzazione ti contatterà presto.",
+  "interestError": "Impossibile manifestare l'interesse.",
+  "skills": "Competenze richieste",
+  "commitment": "Impegno richiesto",
+  "detail": {
+    "title": "Opportunità",
+    "about": "Informazioni",
+    "notFound": "Opportunità non trovata.",
+    "invalidId": "ID opportunità non valido.",
+    "goBack": "Indietro",
+    "organisation": "Organizzazione"
+  }
+}

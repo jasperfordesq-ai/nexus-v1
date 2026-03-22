@@ -22,7 +22,11 @@
   },
   "empty": {
     "title": "Gan baill aimsithe",
-    "subtitle": "Bain triail as do chuardach nó scagairí a athrú"
+    "subtitle": "Bain triail as do chuardach nó scagairí a athrú",
+    "noResults": "Gan baill aimsithe do \"{{query}}\""
+  },
+  "memberCard": {
+    "accessibilityLabel": "Féach ar phróifíl {{name}}"
   },
   "loading": "Ag luchtú baill…"
 }

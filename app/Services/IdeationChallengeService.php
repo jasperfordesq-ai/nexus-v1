@@ -41,7 +41,7 @@ class IdeationChallengeService
         $tenantId = TenantContext::getId();
 
         $query = DB::table('ideation_challenges as c')
-            ->leftJoin('users as u', 'c.created_by', '=', 'u.id')
+            ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
             ->where('c.tenant_id', $tenantId)
             ->select('c.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 

@@ -38,6 +38,16 @@ vi.mock('@/contexts', () => ({
     info: vi.fn(),
   })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/contexts/ToastContext', () => ({
@@ -54,6 +64,25 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport', 'custom']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,  };});

@@ -40,8 +40,21 @@ vi.mock('@/components/feedback', () => ({
 vi.mock('@/components/feedback/AppUpdateModal', () => ({
   AppUpdateModal: () => null,
 }));
+vi.mock('@/components/feedback/UpdateAvailableBanner', () => ({
+  UpdateAvailableBanner: () => null,
+}));
+vi.mock('./DevelopmentStatusBanner', () => ({
+  DevelopmentStatusBanner: () => null,
+}));
+vi.mock('@/components/LanguageSwitcher', () => ({
+  LanguageSwitcher: () => null,
+}));
 vi.mock('@/hooks', () => ({
   useApiErrorHandler: vi.fn(),
+  useHeaderScroll: vi.fn(() => ({ isScrolled: false, isUtilityBarVisible: true })),
+}));
+vi.mock('@/hooks/useHeaderScroll', () => ({
+  useHeaderScroll: vi.fn(() => ({ isScrolled: false, isUtilityBarVisible: true })),
 }));
 vi.mock('@/hooks/useAppUpdate', () => ({
   useAppUpdate: vi.fn(() => ({ updateInfo: null, dismiss: vi.fn() })),

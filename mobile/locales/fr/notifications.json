@@ -1,1 +1,5 @@
-{}
+{
+  "allCaughtUpSub": "Vous n'avez aucune nouvelle notification.",
+  "unreadItem": "Non lu : {{label}}",
+  "itemHint": "Appuyez pour afficher"
+}

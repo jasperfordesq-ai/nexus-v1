@@ -63,13 +63,16 @@ vi.mock('@/contexts', () => ({
     hasModule: vi.fn(() => true),
   }),
   useToast: () => mockToast,
-}));
 
-// ── Mock react-i18next ──────────────────────────────────────────────────────
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, opts?: { defaultValue?: string }) => opts?.defaultValue || key,
-  }),
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 // ── Mock react-router-dom ───────────────────────────────────────────────────
@@ -109,7 +112,26 @@ vi.mock('@/components/ui', async () => {
     GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => {
       return React.createElement('div', { 'data-testid': 'glass-card', className }, children);
     },
-  };
+  };,
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 });
 
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));

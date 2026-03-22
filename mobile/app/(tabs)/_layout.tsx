@@ -23,7 +23,7 @@ interface TabConfig {
 
 const TABS: TabConfig[] = [
   { name: 'home',      title: 'Home',      icon: 'home-outline',    iconFocused: 'home' },
-  { name: 'exchanges', title: 'Listings', icon: 'storefront-outline', iconFocused: 'storefront' },
+  { name: 'exchanges', title: 'Listings',  icon: 'storefront-outline', iconFocused: 'storefront' },
   { name: 'events',    title: 'Events',    icon: 'calendar-outline', iconFocused: 'calendar' },
   { name: 'messages',  title: 'Messages',  icon: 'chatbubble-outline', iconFocused: 'chatbubble' },
   { name: 'profile',   title: 'Profile',   icon: 'person-outline',  iconFocused: 'person' },
@@ -81,8 +81,10 @@ export default function TabsLayout() {
           }}
         />
       ))}
-      {/* Hide auxiliary tabs from the tab bar */}
+      {/* Hide auxiliary tabs from the tab bar — navigated to programmatically */}
       <Tabs.Screen name="members" options={{ href: null }} />
+      <Tabs.Screen name="groups" options={{ href: null }} />
+      <Tabs.Screen name="search" options={{ href: null }} />
     </Tabs>
   );
 }

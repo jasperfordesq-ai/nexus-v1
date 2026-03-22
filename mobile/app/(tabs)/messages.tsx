@@ -111,8 +111,9 @@ export default function MessagesScreen() {
           <RefreshControl refreshing={isLoading && conversations.length > 0} onRefresh={refresh} />
         }
         ListEmptyComponent={
-          isLoading ? (
+          isLoading && conversations.length === 0 ? (
             <>
+              <ConversationSkeleton />
               <ConversationSkeleton />
               <ConversationSkeleton />
               <ConversationSkeleton />

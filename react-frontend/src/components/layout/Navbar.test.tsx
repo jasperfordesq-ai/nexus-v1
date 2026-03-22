@@ -55,6 +55,14 @@ vi.mock('@/contexts', () => ({
   useNotifications: (...args: unknown[]) => mockUseNotifications(...args),
   useTheme: (...args: unknown[]) => mockUseTheme(...args),
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 vi.mock('@/components/LanguageSwitcher', () => ({
@@ -70,6 +78,7 @@ const i18nMap: Record<string, string> = {
   'nav.dashboard': 'Dashboard',
   'nav.feed': 'Feed',
   'nav.listings': 'Listings',
+  'nav.timebanking': 'Timebanking',
   'nav.messages': 'Messages',
   'nav.community': 'Community',
   'nav.more': 'More',
@@ -176,9 +185,8 @@ describe('Navbar', () => {
 
     it('does NOT show user avatar when not authenticated', () => {
       render(<Navbar />);
-      // When unauthenticated, there should be no Avatar component rendered
-      // Check for the user dropdown trigger (Avatar) rather than notification badge
-      expect(screen.queryByLabelText('Search (Ctrl+K)')).not.toBeInTheDocument();
+      // When unauthenticated, there should be no Create new button (authenticated-only)
+      expect(screen.queryByLabelText('Create new')).not.toBeInTheDocument();
     });
   });
 
@@ -229,9 +237,10 @@ describe('Navbar', () => {
       expect(screen.getByLabelText('Create new')).toBeInTheDocument();
     });
 
-    it('shows mobile search button', () => {
+    it('shows search button (accessible to authenticated users)', () => {
       render(<Navbar />);
-      expect(screen.getByLabelText('Search')).toBeInTheDocument();
+      // The search button always renders with aria-label "Search (Ctrl+K)"
+      expect(screen.getByLabelText('Search (Ctrl+K)')).toBeInTheDocument();
     });
   });
 
@@ -278,7 +287,7 @@ describe('Navbar', () => {
       expect(screen.getByText('Feed')).toBeInTheDocument();
     });
 
-    it('renders Listings link when module is enabled', () => {
+    it('renders Timebanking dropdown when listings module is enabled', () => {
       setupDefaultMocks({
         auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
         tenant: {
@@ -286,7 +295,11 @@ describe('Navbar', () => {
         },
       });
       render(<Navbar />);
-      expect(screen.getByText('Listings')).toBeInTheDocument();
+      // Listings is rendered inside the Timebanking dropdown trigger on desktop nav
+      // The dropdown items are only in the DOM when opened, but the trigger button renders the label
+      // Check that the Timebanking section is present (it groups Listings + related)
+      // nav.timebanking key falls back to key string since i18nMap doesn't define it
+      expect(screen.getByText('Timebanking')).toBeInTheDocument();
     });
 
     it('renders Messages link when module is enabled', () => {

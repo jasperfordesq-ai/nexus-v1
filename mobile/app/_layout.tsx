@@ -11,12 +11,16 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import '@/lib/i18n'; // initialise i18next before any screen renders
+import { validateEnv } from '@/lib/env';
 import { AuthProvider, useAuthContext } from '@/lib/context/AuthContext';
 import { TenantProvider } from '@/lib/context/TenantContext';
 import { RealtimeProvider } from '@/lib/context/RealtimeContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { navigateToLink } from '@/lib/utils/navigateToLink';
 import * as Sentry from '@sentry/react-native';
+
+// Validate environment variables at startup — logs warnings for missing config
+validateEnv();
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? '',
@@ -136,6 +140,66 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/change-password"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/group-detail"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/blog"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/blog-post"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/gamification"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/goals"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/chat"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/volunteering"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/volunteering-detail"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/jobs"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/job-detail"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/organisations"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/organisation-detail"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/endorsements"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/federation"
+        options={{ presentation: 'modal', headerShown: true, title: '' }}
+      />
+      <Stack.Screen
+        name="(modals)/federation-partner"
         options={{ presentation: 'modal', headerShown: true, title: '' }}
       />
     </Stack>

@@ -600,6 +600,14 @@ class FederationApiMiddleware
      */
     public static function sendError(int $statusCode, string $message, string $code): void
     {
+        // In test environments, throw instead of exit() so PHPUnit survives.
+        // Use $_ENV (set by phpunit.xml) rather than getenv() (which reads process env from Docker).
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
+                $statusCode,
+                json_encode(['error' => true, 'code' => $code, 'message' => $message, 'timestamp' => date('c')])
+            );
+        }
         http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode([
@@ -616,6 +624,12 @@ class FederationApiMiddleware
      */
     public static function sendSuccess(array $data, int $statusCode = 200): void
     {
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
+                200,
+                json_encode(array_merge(['success' => true, 'timestamp' => date('c')], $data))
+            );
+        }
         http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode(array_merge([

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Mobile pre-push hook — Unix line endings required (LF, not CRLF)
+. "$(dirname -- "$0")/_/husky.sh"
+
+cd mobile
+echo "Running tests before push..."
+npm run test:ci

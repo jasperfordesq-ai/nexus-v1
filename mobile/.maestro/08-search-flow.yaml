@@ -1,0 +1,104 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Flow 08 — Global Search
+#
+# Navigates to the Search screen via Profile > Explore > Search, types a
+# query, and verifies that the filter pills appear ("All", "People",
+# "Listings", "Events", "Groups", "Blog"). Uses locale keys from
+# locales/en/search.json.
+#
+# Run:
+#   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
+#     .maestro/08-search-flow.yaml
+
+appId: ie.hour.nexus
+---
+# ── 1. Launch the app without clearing state
+- launchApp
+
+# ── 2. Re-authenticate if session has expired
+- runFlow:
+    when:
+      visible: "Sign in"
+    commands:
+      - runFlow:
+          when:
+            visible: "Select your timebank"
+          commands:
+            - tapOn: "hour-timebank"
+      - tapOn:
+          id: "email-input"
+      - inputText: "${TEST_EMAIL}"
+      - tapOn:
+          id: "password-input"
+      - inputText: "${TEST_PASSWORD}"
+      - tapOn: "Sign in"
+      - wait:
+          for:
+            element:
+              text: "Feed"
+            timeout: 10000
+
+# ── 3. Tap the Profile tab
+- tapOn: "Profile"
+
+# ── 4. Wait for profile screen to load
+- wait:
+    for:
+      element:
+        text: "View wallet"
+      timeout: 5000
+
+# ── 5. Scroll down to the Explore section
+- scrollUntilVisible:
+    element:
+      text: "Search"
+    direction: DOWN
+
+# ── 6. Tap "Search" in the Explore section
+- tapOn: "Search"
+
+# ── 7. Wait for the Search screen to load
+- wait:
+    for:
+      element:
+        text: "Search"
+      timeout: 5000
+
+# ── 8. Assert the search input placeholder is visible (confirms screen rendered)
+- assertVisible: "Search people, listings, events…"
+
+# ── 9. Tap the search input and type a query
+- tapOn:
+    id: "search-input"
+- inputText: "volunteer"
+
+# ── 10. Wait for debounce to fire and results to populate
+- wait:
+    for:
+      milliseconds: 1000
+
+# ── 11. Assert the type-filter pills are visible after results load
+#   Filter pill labels from locales/en/search.json: "All", "People", "Listings",
+#   "Events", "Groups", "Blog"
+- assertVisible: "All"
+- assertVisible: "People"
+- assertVisible: "Listings"
+
+# ── 12. Screenshot the search results with filter pills
+- takeScreenshot: search-results
+
+# ── 13. Tap the "People" filter pill to narrow results
+- tapOn: "People"
+
+# ── 14. Wait for the filtered results
+- wait:
+    for:
+      milliseconds: 500
+
+# ── 15. Screenshot the people-filtered results
+- takeScreenshot: search-people-filter
+
+# ── 16. Navigate back
+- back

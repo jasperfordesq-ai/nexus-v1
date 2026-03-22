@@ -239,8 +239,8 @@ describe('TenantContext', () => {
       expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
 
-    // Default for gamification is false
-    expect(screen.getByTestId('has-gamification')).toHaveTextContent('false');
+    // Default for gamification is true (synced with PHP TenantFeatureConfig::FEATURE_DEFAULTS)
+    expect(screen.getByTestId('has-gamification')).toHaveTextContent('true');
     // Default for events is true
     expect(screen.getByTestId('has-events')).toHaveTextContent('true');
   });

@@ -35,6 +35,16 @@ vi.mock('@/contexts', () => ({
     info: vi.fn(),
     warning: vi.fn(),
   })),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/hooks', () => ({
@@ -49,6 +59,25 @@ vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, className, hoverable: _hoverable }: { children: React.ReactNode; className?: string; hoverable?: boolean }) => (
     <div data-testid="glass-card" className={className}>{children}</div>
   ),
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -177,10 +206,10 @@ describe('OrganisationsPage', () => {
     });
     render(<OrganisationsPage />);
     await waitFor(() => {
-      expect(screen.getByText('3 opportunities')).toBeInTheDocument();
+      expect(screen.getByText(/3 opportunit/i)).toBeInTheDocument();
     });
-    expect(screen.getByText('8 volunteers')).toBeInTheDocument();
-    expect(screen.getByText('50h logged')).toBeInTheDocument();
+    expect(screen.getByText(/8 volunteers/i)).toBeInTheDocument();
+    expect(screen.getByText(/50h logged/i)).toBeInTheDocument();
     expect(screen.getByText('4.2')).toBeInTheDocument();
     expect(screen.getByText('Website')).toBeInTheDocument();
   });

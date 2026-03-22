@@ -1,0 +1,25 @@
+{
+  "title": "Conquistas",
+  "xp": "{{xp}} XP",
+  "level": "Nível {{level}}",
+  "rank": "Posição #{{rank}}",
+  "unranked": "Sem classificação",
+  "streak": "Série de {{days}} dias",
+  "nextLevel": "{{xp}} XP para o próximo nível",
+  "badges": {
+    "title": "Distintivos",
+    "earned": "Obtidos",
+    "locked": "Bloqueados",
+    "empty": "Ainda não tens distintivos."
+  },
+  "leaderboard": {
+    "title": "Classificação",
+    "weekly": "Esta semana",
+    "monthly": "Este mês",
+    "allTime": "Desde sempre",
+    "you": "Tu",
+    "empty": "Ainda não há classificações.",
+    "badgesCount": "{{count}} distintivo",
+    "badgesCount_other": "{{count}} distintivos"
+  }
+}

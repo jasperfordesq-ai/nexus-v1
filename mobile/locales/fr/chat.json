@@ -1,0 +1,9 @@
+{
+  "title": "Assistant IA",
+  "placeholder": "Pose toutes tes questions sur la banque de temps…",
+  "send": "Envoyer",
+  "empty": "Démarre une discussion avec l'assistant IA.",
+  "error": "Impossible d'envoyer le message.",
+  "thinking": "Réflexion en cours…",
+  "disclaimer": "Les réponses de l'IA peuvent ne pas toujours être exactes."
+}

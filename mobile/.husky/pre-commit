@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Mobile pre-commit hook — Unix line endings required (LF, not CRLF)
+. "$(dirname -- "$0")/_/husky.sh"
+
+cd mobile
+echo "Running type check..."
+npm run type-check
+echo "Running lint..."
+npm run lint

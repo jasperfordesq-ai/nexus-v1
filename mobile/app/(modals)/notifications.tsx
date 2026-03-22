@@ -63,6 +63,10 @@ export default function NotificationsScreen() {
   }
 
   function renderItem({ item }: { item: Notification }) {
+    const label = item.title
+      ? `${item.title}. ${item.message}`
+      : item.message;
+
     return (
       <TouchableOpacity
         style={[styles.row, !item.is_read && styles.rowUnread]}
@@ -72,6 +76,9 @@ export default function NotificationsScreen() {
           navigateToLink(item.link);
         }}
         activeOpacity={0.7}
+        accessibilityLabel={item.is_read ? label : t('unreadItem', { label })}
+        accessibilityRole="button"
+        accessibilityHint={t('itemHint')}
       >
         <View style={styles.avatarWrap}>
           <Avatar
@@ -79,7 +86,7 @@ export default function NotificationsScreen() {
             name={item.actor?.name ?? '?'}
             size={42}
           />
-          <View style={[styles.categoryDot, { backgroundColor: categoryColor(item.category, theme.textMuted) }]} />
+          <View style={[styles.categoryDot, { backgroundColor: categoryColor(item.category, theme.textMuted, theme) }]} />
         </View>
 
         <View style={styles.content}>
@@ -110,7 +117,13 @@ export default function NotificationsScreen() {
           )}
         </View>
         {unreadCount > 0 && (
-          <TouchableOpacity onPress={() => void handleMarkAll()} disabled={markingAll}>
+          <TouchableOpacity
+            onPress={() => void handleMarkAll()}
+            disabled={markingAll}
+            accessibilityLabel={t('markAllRead')}
+            accessibilityRole="button"
+            accessibilityState={{ busy: markingAll, disabled: markingAll }}
+          >
             <Text style={[styles.markAll, { color: primary }]}>
               {markingAll ? t('marking') : t('markAllRead')}
             </Text>
@@ -137,8 +150,9 @@ export default function NotificationsScreen() {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('allCaughtUp')}</Text>
+            <View style={styles.centered} accessibilityLabel={t('allCaughtUp')}>
+              <Text style={styles.emptyTitle}>{t('allCaughtUp')}</Text>
+              <Text style={styles.emptySubText}>{t('allCaughtUpSub')}</Text>
             </View>
           )
         }
@@ -148,12 +162,12 @@ export default function NotificationsScreen() {
   );
 }
 
-function categoryColor(category: string, fallback: string): string {
+function categoryColor(category: string, fallback: string, theme: Theme): string {
   switch (category) {
-    case 'message':     return '#3B82F6';
-    case 'transaction': return '#10B981';
-    case 'social':      return '#8B5CF6';
-    case 'system':      return '#F59E0B';
+    case 'message':     return theme.info;
+    case 'transaction': return theme.success;
+    case 'social':      return '#8B5CF6'; // intentional purple — no equivalent token
+    case 'system':      return theme.warning;
     default:            return fallback;
   }
 }
@@ -216,6 +230,7 @@ function makeStyles(theme: Theme) {
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
     errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
     retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
+    emptyTitle: { color: theme.text, fontSize: 17, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
+    emptySubText: { color: theme.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20 },
   });
 }

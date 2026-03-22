@@ -61,11 +61,17 @@ class CronJobRunner
 
         if (empty($validKey)) {
             error_log("SECURITY WARNING: CRON_KEY environment variable is not set. Cron access blocked.");
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(503, 'Service Unavailable: Cron key not configured');
+            }
             http_response_code(503);
             die('Service Unavailable: Cron key not configured');
         }
 
         if (!$key || !hash_equals($validKey, $key)) {
+            if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(403, 'Access Denied: Invalid Cron Key');
+            }
             http_response_code(403);
             die('Access Denied: Invalid Cron Key');
         }

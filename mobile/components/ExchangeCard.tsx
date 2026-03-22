@@ -35,6 +35,8 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
       style={styles.wrapper}
       onPress={openDetail}
       activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel={exchange.title}
     >
       <Card style={styles.card}>
         {/* Header row */}

@@ -34,6 +34,19 @@ import { API_V2 } from '@/lib/constants';
 import Avatar from '@/components/ui/Avatar';
 import { ProfileSkeleton } from '@/components/ui/Skeleton';
 
+const EXPLORE_ITEMS: Array<{ labelKey: string; route: string; icon: React.ComponentProps<typeof Ionicons>['name'] }> = [
+  { labelKey: 'groups',        route: '/(tabs)/groups',            icon: 'people-outline' },
+  { labelKey: 'search',        route: '/(tabs)/search',            icon: 'search-outline' },
+  { labelKey: 'aiChat',        route: '/(modals)/chat',            icon: 'chatbubbles-outline' },
+  { labelKey: 'achievements',  route: '/(modals)/gamification',    icon: 'trophy-outline' },
+  { labelKey: 'myGoals',       route: '/(modals)/goals',           icon: 'flag-outline' },
+  { labelKey: 'volunteering',  route: '/(modals)/volunteering',    icon: 'hand-left-outline' },
+  { labelKey: 'organisations', route: '/(modals)/organisations',   icon: 'business-outline' },
+  { labelKey: 'blog',          route: '/(modals)/blog',            icon: 'newspaper-outline' },
+  { labelKey: 'skills',        route: '/(modals)/endorsements',    icon: 'ribbon-outline' },
+  { labelKey: 'federation',    route: '/(modals)/federation',      icon: 'globe-outline' },
+];
+
 export default function ProfileScreen() {
   const { t } = useTranslation('profile');
   const { user, displayName, logout, refreshUser } = useAuth();
@@ -208,7 +221,30 @@ export default function ProfileScreen() {
           >
             <Text style={styles.actionButtonText}>{t('settings')}</Text>
           </TouchableOpacity>
+        </View>
 
+        {/* Explore section */}
+        <View style={styles.exploreSection}>
+          <Text style={styles.sectionTitle}>{t('explore')}</Text>
+          <View style={styles.actions}>
+            {EXPLORE_ITEMS.map(({ labelKey, route, icon }) => (
+              <TouchableOpacity
+                key={route}
+                style={[styles.exploreButton, { borderColor: theme.border }]}
+                onPress={() => {
+                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push(route as Parameters<typeof router.push>[0]);
+                }}
+                activeOpacity={0.7}
+              >
+                <Ionicons name={icon} size={18} color={primary} />
+                <Text style={[styles.exploreButtonText, { color: theme.text }]}>{t(labelKey)}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.actions}>
           <TouchableOpacity
             style={[styles.actionButton, styles.logoutButton]}
             onPress={confirmLogout}
@@ -267,6 +303,18 @@ function makeStyles(theme: Theme) {
     actionButtonText: { fontSize: 15, fontWeight: '600', color: theme.text },
     logoutButton: { borderColor: theme.error, backgroundColor: theme.errorBg },
     logoutText: { fontSize: 15, fontWeight: '600', color: theme.error },
+    exploreSection: { marginTop: 24, marginBottom: 24 },
+    exploreButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      borderWidth: 1,
+      borderRadius: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: theme.surface,
+    },
+    exploreButtonText: { fontSize: 15, fontWeight: '600' },
     attribution: {
       fontSize: 11,
       color: theme.textMuted,

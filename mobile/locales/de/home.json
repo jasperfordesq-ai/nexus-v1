@@ -10,7 +10,8 @@
     "title": "Community-Feed",
     "welcome": "Willkommen in deiner Zeitbank",
     "empty": "Noch nichts in deinem Feed. Schau später wieder rein!",
-    "loading": "Feed wird geladen…"
+    "loading": "Feed wird geladen…",
+    "emptySubtitle": "Verbinde dich mit deiner Community, um hier Beiträge zu sehen."
   },
   "listings": {
     "title": "Angebote",

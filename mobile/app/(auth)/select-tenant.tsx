@@ -79,6 +79,9 @@ export default function SelectTenantScreen() {
             ]}
             onPress={() => void handleSelect(item)}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={item.name}
+            accessibilityState={{ selected: item.slug === tenantSlug }}
           >
             {item.logo_url ? (
               <Image source={{ uri: item.logo_url }} style={styles.logo} resizeMode="contain" />

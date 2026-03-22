@@ -38,6 +38,16 @@ vi.mock('@/contexts', () => ({
     info: vi.fn(),
     warning: vi.fn(),
   })),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/hooks', () => ({
@@ -57,6 +67,25 @@ vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div data-testid="glass-card" className={className}>{children}</div>
   ),
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -80,7 +109,8 @@ describe('SearchPage', () => {
 
   it('renders the page heading and description', () => {
     render(<SearchPage />);
-    expect(screen.getByText('Search')).toBeInTheDocument();
+    // "Search" appears in both the h1 heading and the document title/input — use heading role
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
     expect(screen.getByText('Find listings, members, events, and groups')).toBeInTheDocument();
   });
 
@@ -106,7 +136,7 @@ describe('SearchPage', () => {
   it('shows no results state when search returns empty', async () => {
     vi.mocked(api.get).mockResolvedValue({
       success: true,
-      data: { listings: [], users: [], events: [], groups: [] },
+      data: [],
     });
 
     render(<SearchPage />);
@@ -127,18 +157,17 @@ describe('SearchPage', () => {
   });
 
   it('shows result tabs with counts after search', async () => {
-    vi.mocked(api.get).mockResolvedValue({
-      success: true,
-      data: {
-        listings: [
-          { id: 1, title: 'Test Listing', description: 'A listing', type: 'offer', hours_estimate: 2 },
-        ],
-        users: [
-          { id: 1, name: 'Alice Smith', avatar: null, tagline: 'Hello', location: 'Dublin' },
-        ],
-        events: [],
-        groups: [],
-      },
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/v2/search?')) {
+        return Promise.resolve({
+          success: true,
+          data: [
+            { type: 'listing', id: 1, title: 'Test Listing', description: 'A listing', listing_type: 'offer', hours_estimate: 2 },
+            { type: 'user', id: 1, name: 'Alice Smith', avatar_url: null, bio: 'Hello', location: 'Dublin' },
+          ],
+        });
+      }
+      return Promise.resolve({ success: true, data: [], meta: {} });
     });
 
     render(<SearchPage />);
@@ -163,18 +192,17 @@ describe('SearchPage', () => {
   });
 
   it('renders search results with listing and user details', async () => {
-    vi.mocked(api.get).mockResolvedValue({
-      success: true,
-      data: {
-        listings: [
-          { id: 1, title: 'Garden Help', description: 'Need help in garden', type: 'request', hours_estimate: 3 },
-        ],
-        users: [
-          { id: 2, name: 'Bob Jones', avatar: null, tagline: 'Gardener', location: 'Cork' },
-        ],
-        events: [],
-        groups: [],
-      },
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/v2/search?')) {
+        return Promise.resolve({
+          success: true,
+          data: [
+            { type: 'listing', id: 1, title: 'Garden Help', description: 'Need help in garden', listing_type: 'request', hours_estimate: 3 },
+            { type: 'user', id: 2, name: 'Bob Jones', avatar_url: null, bio: 'Gardener', location: 'Cork' },
+          ],
+        });
+      }
+      return Promise.resolve({ success: true, data: [], meta: {} });
     });
 
     render(<SearchPage />);

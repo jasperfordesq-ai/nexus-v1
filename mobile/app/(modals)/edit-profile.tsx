@@ -13,7 +13,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  TouchableOpacity,
 } from 'react-native';
 import { router, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -29,6 +28,14 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import OfflineBanner from '@/components/OfflineBanner';
+
+// E.164-ish: optional + then digits, spaces, dashes — at least 7 digits total
+const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
+
+interface FieldErrors {
+  firstName?: string;
+  phone?: string;
+}
 
 export default function EditProfileScreen() {
   const { t } = useTranslation('profile');
@@ -49,13 +56,57 @@ export default function EditProfileScreen() {
   const [location, setLocation] = useState(fullUser?.location ?? '');
   const [phone, setPhone] = useState(fullUser?.phone ?? '');
   const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  // Track whether the form has unsaved changes
+  const isDirty =
+    firstName !== (fullUser?.first_name ?? '') ||
+    lastName !== (fullUser?.last_name ?? '') ||
+    bio !== (fullUser?.bio ?? '') ||
+    location !== (fullUser?.location ?? '') ||
+    phone !== (fullUser?.phone ?? '');
+
+  // Warn the user before navigating away with unsaved changes
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!isDirty || saving) return;
+      e.preventDefault();
+      Alert.alert(
+        t('edit.unsavedTitle'),
+        t('edit.unsavedMessage'),
+        [
+          { text: t('common:buttons.cancel'), style: 'cancel' },
+          {
+            text: t('edit.discard'),
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ],
+      );
+    });
+    return unsubscribe;
+  }, [navigation, isDirty, saving, t]);
+
+  function validate(): FieldErrors {
+    const errors: FieldErrors = {};
+    if (!firstName.trim()) {
+      errors.firstName = t('edit.firstNameRequired');
+    }
+    if (phone.trim() && !PHONE_RE.test(phone.trim())) {
+      errors.phone = t('edit.phoneInvalid');
+    }
+    return errors;
+  }
 
   async function handleSave() {
-    if (!firstName.trim()) {
-      Alert.alert(t('edit.validation'), t('edit.firstNameRequired'));
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setFieldErrors(errors);
       return;
     }
 
+    setFieldErrors({});
     setSaving(true);
     try {
       const payload: UpdateProfilePayload = {
@@ -97,9 +148,14 @@ export default function EditProfileScreen() {
             <Text style={styles.label}>{t('edit.firstName')}</Text>
             <Input
               value={firstName}
-              onChangeText={setFirstName}
+              onChangeText={(v) => {
+                setFirstName(v);
+                if (fieldErrors.firstName) setFieldErrors((e) => ({ ...e, firstName: undefined }));
+              }}
               placeholder={t('edit.firstName')}
               autoCapitalize="words"
+              maxLength={50}
+              error={fieldErrors.firstName}
             />
           </View>
 
@@ -110,6 +166,7 @@ export default function EditProfileScreen() {
               onChangeText={setLastName}
               placeholder={t('edit.lastName')}
               autoCapitalize="words"
+              maxLength={50}
             />
           </View>
 
@@ -122,6 +179,7 @@ export default function EditProfileScreen() {
               multiline
               numberOfLines={4}
               style={styles.bioInput}
+              maxLength={500}
             />
           </View>
 
@@ -139,28 +197,25 @@ export default function EditProfileScreen() {
             <Text style={styles.label}>{t('edit.phoneOptional')}</Text>
             <Input
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(v) => {
+                setPhone(v);
+                if (fieldErrors.phone) setFieldErrors((e) => ({ ...e, phone: undefined }));
+              }}
               placeholder={t('edit.phonePlaceholder')}
               keyboardType="phone-pad"
+              error={fieldErrors.phone}
             />
           </View>
 
           <Button
             onPress={() => void handleSave()}
             disabled={saving}
+            isLoading={saving}
             style={styles.saveBtn}
+            accessibilityLabel={t('edit.saveChanges')}
           >
-            {saving ? t('edit.saving') : t('edit.saveChanges')}
+            {t('edit.saveChanges')}
           </Button>
-
-          <TouchableOpacity
-            style={styles.cancelBtn}
-            onPress={() => router.back()}
-            disabled={saving}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelText}>{t('edit.cancel')}</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -182,7 +237,5 @@ function makeStyles(theme: Theme) {
     },
     bioInput: { height: 100, textAlignVertical: 'top' },
     saveBtn: { marginTop: 8, borderRadius: 10 },
-    cancelBtn: { alignItems: 'center', marginTop: 16, paddingVertical: 10 },
-    cancelText: { fontSize: 15, color: theme.textSecondary },
   });
 }

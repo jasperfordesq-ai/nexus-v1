@@ -752,6 +752,11 @@ class FederationController extends BaseApiController
     {
         try {
             $authenticated = FederationApiMiddleware::authenticate();
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            // Test-mode: sendError() throws instead of calling exit().
+            $data = json_decode($e->getMessage(), true)
+                ?? ['error' => true, 'code' => 'AUTH_FAILED', 'message' => $e->getMessage(), 'timestamp' => date('c')];
+            return response()->json($data, $e->getStatusCode());
         } catch (\Throwable $e) {
             return $this->fedError(500, 'Authentication error', 'AUTH_ERROR');
         }

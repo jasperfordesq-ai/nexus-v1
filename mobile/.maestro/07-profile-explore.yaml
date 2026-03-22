@@ -1,0 +1,112 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Flow 07 — Profile: Explore Section
+#
+# Verifies the complete Profile screen Explore section. Checks the wallet
+# shortcut, then navigates to Achievements and AI Assistant from the Explore
+# row. The Explore items tested here (from profile locale):
+#   Groups | Search | AI Assistant | Achievements | My Goals |
+#   Volunteering | Organisations | Blog
+#
+# Run:
+#   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
+#     .maestro/07-profile-explore.yaml
+
+appId: ie.hour.nexus
+---
+# ── 1. Launch the app without clearing state
+- launchApp
+
+# ── 2. Re-authenticate if session has expired
+- runFlow:
+    when:
+      visible: "Sign in"
+    commands:
+      - runFlow:
+          when:
+            visible: "Select your timebank"
+          commands:
+            - tapOn: "hour-timebank"
+      - tapOn:
+          id: "email-input"
+      - inputText: "${TEST_EMAIL}"
+      - tapOn:
+          id: "password-input"
+      - inputText: "${TEST_PASSWORD}"
+      - tapOn: "Sign in"
+      - wait:
+          for:
+            element:
+              text: "Feed"
+            timeout: 10000
+
+# ── 3. Tap the Profile tab
+- tapOn: "Profile"
+
+# ── 4. Wait for the profile screen to load — "View wallet" is the first action row
+- wait:
+    for:
+      element:
+        text: "View wallet"
+      timeout: 5000
+
+# ── 5. Assert the profile header area is visible
+- assertVisible: "View wallet"
+
+# ── 6. Scroll down to the Explore section header
+- scrollUntilVisible:
+    element:
+      text: "Explore"
+    direction: DOWN
+
+# ── 7. Assert "Achievements" is visible in the Explore section
+- assertVisible: "Achievements"
+
+# ── 8. Tap "Achievements" to open the achievements screen
+- tapOn: "Achievements"
+
+# ── 9. Wait for the achievements screen to load (title from gamification locale)
+- wait:
+    for:
+      element:
+        text: "Achievements"
+      timeout: 5000
+
+# ── 10. Assert the achievements screen loaded without crashing
+- assertVisible: "Achievements"
+
+# ── 11. Navigate back to the profile screen (Android back gesture / back button)
+- back
+
+# ── 12. Wait for the profile screen to be restored
+- wait:
+    for:
+      element:
+        text: "View wallet"
+      timeout: 5000
+
+# ── 13. Scroll back down to Explore section to find AI Assistant
+- scrollUntilVisible:
+    element:
+      text: "AI Assistant"
+    direction: DOWN
+
+# ── 14. Tap "AI Assistant"
+- tapOn: "AI Assistant"
+
+# ── 15. Wait for the AI chat screen to load (title from chat locale)
+- wait:
+    for:
+      element:
+        text: "AI Assistant"
+      timeout: 5000
+
+# ── 16. Assert the chat input placeholder is visible (confirms screen loaded)
+- assertVisible: "Ask anything about timebanking…"
+
+# ── 17. Screenshot the AI chat screen
+- takeScreenshot: ai-chat
+
+# ── 18. Navigate back to profile
+- back

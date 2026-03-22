@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android Network Security Configuration for Project NEXUS
+
+  Certificate pinning: pins the DigiCert Global Root G2 CA (used by Azure/Let's Encrypt)
+  and the ISRG Root X1 (Let's Encrypt root).
+
+  Pins last updated: 2026-03-22 — run scripts/get-cert-pins.sh to refresh after certificate rotation.
+  Keep BACKUP pins from an intermediate CA so a certificate rotation doesn't lock users out.
+-->
+<network-security-config>
+  <domain-config cleartextTrafficPermitted="false">
+    <domain includeSubdomains="false">api.project-nexus.ie</domain>
+    <pin-set expiration="2027-01-01">
+      <!-- Leaf certificate pin — extracted 2026-03-22 via scripts/get-cert-pins.sh -->
+      <pin digest="SHA-256">vMV3B7bfJ4G/LiQCM5Xm3b0WgbnElXWA2A9vtwldgpk=</pin>
+      <!-- Intermediate CA backup pin — extracted 2026-03-22 from live cert chain -->
+      <pin digest="SHA-256">kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4=</pin>
+    </pin-set>
+    <trustkit-config enforcePinning="true" />
+  </domain-config>
+
+  <!-- Allow cleartext for local development (Android emulator uses 10.0.2.2 as host alias) -->
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="false">10.0.2.2</domain>
+    <domain includeSubdomains="false">localhost</domain>
+  </domain-config>
+
+  <!-- Default: use system trust store, no cleartext traffic permitted -->
+  <base-config cleartextTrafficPermitted="false">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+</network-security-config>

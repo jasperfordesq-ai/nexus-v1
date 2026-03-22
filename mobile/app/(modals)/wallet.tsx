@@ -81,7 +81,9 @@ function TransactionRow({
         </Text>
         {item.status !== 'completed' && (
           <View style={[styles.statusBadge, { borderColor: primary }]}>
-            <Text style={[styles.statusText, { color: primary }]}>{item.status}</Text>
+            <Text style={[styles.statusText, { color: primary }]}>
+              {t(`status.${item.status}`, { defaultValue: item.status })}
+            </Text>
           </View>
         )}
       </View>

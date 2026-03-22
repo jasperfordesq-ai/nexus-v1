@@ -162,7 +162,13 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => Linking.openURL('https://app.project-nexus.ie/forgot-password')}
+            onPress={async () => {
+              const url = 'https://app.project-nexus.ie/forgot-password';
+              const supported = await Linking.canOpenURL(url);
+              if (supported) {
+                await Linking.openURL(url);
+              }
+            }}
             style={styles.forgotPasswordBtn}
             activeOpacity={0.7}
           >

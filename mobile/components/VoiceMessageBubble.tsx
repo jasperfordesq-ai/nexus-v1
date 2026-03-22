@@ -147,7 +147,7 @@ export default function VoiceMessageBubble({
       </View>
 
       <Text style={[styles.duration, { color: timeColor }]}>{displayTime}</Text>
-      <Text style={[styles.label, { color: hasError ? '#DC2626' : labelColor }]}>
+      <Text style={[styles.label, { color: hasError ? theme.error : labelColor }]}>
         {hasError ? t('voice.failed') : t('voice.label')}
       </Text>
     </View>

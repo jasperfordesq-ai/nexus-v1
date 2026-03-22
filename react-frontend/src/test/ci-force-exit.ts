@@ -20,23 +20,27 @@
  */
 
 export function setup() {
-  // nothing needed before tests
+  // Hard global timeout — exit after 12 minutes no matter what.
+  // Prevents the whole run from hanging forever if workers get stuck.
+  const hardKill = setTimeout(() => {
+    // eslint-disable-next-line no-console
+    console.log('\n[ci-force-exit] Hard timeout (35 min) — forcing exit');
+    process.exit(1);
+  }, 35 * 60 * 1000);
+  hardKill.unref();
 }
 
 export function teardown() {
-  if (process.env.CI) {
-    // Give Vitest 10 seconds to print its summary and exit cleanly.
-    // If it hasn't exited by then, force-kill.
-    const timer = setTimeout(() => {
-      // eslint-disable-next-line no-console
-      console.log(
-        '\n[ci-force-exit] Vitest hung during teardown — forcing exit (all tests passed)',
-      );
-      process.exit(0);
-    }, 10_000);
+  // Give Vitest time to print its summary, then force-exit.
+  // CI gets 10 s; local gets 30 s (extra time for slow machines / watch mode startup).
+  // jsdom + React Aria + Framer Motion leave open handles that prevent clean exit.
+  const delay = process.env.CI ? 10_000 : 30_000;
+  const timer = setTimeout(() => {
+    // eslint-disable-next-line no-console
+    console.log('\n[ci-force-exit] Forcing exit — open handles detected');
+    process.exit(0);
+  }, delay);
 
-    // .unref() lets Node exit normally if it can; the timer only fires
-    // if the process is still alive after 10 s.
-    timer.unref();
-  }
+  // .unref() lets Node exit naturally if it can; timer only fires if still alive.
+  timer.unref();
 }

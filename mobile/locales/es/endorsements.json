@@ -1,0 +1,22 @@
+{
+  "title": "Habilidades & Recomendaciones",
+  "mySkills": "Mis habilidades",
+  "addSkill": "Añadir habilidad",
+  "skillPlaceholder": "p. ej. Jardinería, Cocina…",
+  "noSkills": "Aún no se han añadido habilidades.",
+  "endorsedBy": "Recomendado por {{count}} persona",
+  "endorsedBy_other": "Recomendado por {{count}} personas",
+  "endorse": "Recomendar",
+  "endorsed": "Recomendado",
+  "endorseError": "No se pudo añadir la recomendación.",
+  "addSkillError": "No se pudo añadir la habilidad.",
+  "removeSkill": "Eliminar",
+  "removeSkillConfirm": "¿Eliminar esta habilidad?",
+  "skillRemoved": "Habilidad eliminada.",
+  "removeSkillError": "No se pudo eliminar la habilidad.",
+  "endorsements": "Recomendaciones",
+  "noEndorsements": "Aún no hay recomendaciones.",
+  "message": "Mensaje (opcional)",
+  "messagePlaceholder": "Diga por qué recomienda esta habilidad…",
+  "submit": "Enviar recomendación"
+}

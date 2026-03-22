@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
+import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import MemberCard from '@/components/MemberCard';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -38,6 +39,7 @@ function extractMembersPage(response: MemberListResponse) {
 
 export default function MembersScreen() {
   const { t } = useTranslation('members');
+  const primary = usePrimaryColor();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [search, setSearch] = useState('');
@@ -77,7 +79,7 @@ export default function MembersScreen() {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <MemberCard member={item} />}
         refreshControl={
-          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} />
+          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} tintColor={primary} colors={[primary]} />
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}
@@ -94,6 +96,7 @@ export default function MembersScreen() {
           ) : (
             <View style={styles.centered}>
               <Text style={styles.emptyText}>{t('empty.title')}</Text>
+              <Text style={[styles.emptyText, { fontSize: 13, marginTop: 4 }]}>{t('empty.subtitle')}</Text>
             </View>
           )
         }

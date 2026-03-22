@@ -27,6 +27,18 @@ vi.mock('@/contexts', () => ({
     isLoading: mockTenantLoading,
     tenant: mockTenant,
   }),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
+  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 describe('useLegalDocument', () => {
@@ -61,7 +73,7 @@ describe('useLegalDocument', () => {
     });
 
     expect(result.current.document).toEqual(mockDoc);
-    expect(mockApiGet).toHaveBeenCalledWith('/v2/legal/terms');
+    expect(mockApiGet).toHaveBeenCalledWith('/v2/legal/terms', { skipAuth: true });
   });
 
   it('returns null document when API returns no data', async () => {

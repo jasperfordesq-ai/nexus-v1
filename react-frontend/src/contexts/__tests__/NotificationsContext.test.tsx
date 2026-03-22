@@ -56,12 +56,16 @@ vi.mock('pusher-js', () => ({
 // API mock
 // ─────────────────────────────────────────────────────────────────────────────
 
-const mockApiGet = vi.fn();
-const mockApiPost = vi.fn();
-const mockTokenManager = {
-  getAccessToken: vi.fn().mockReturnValue('test-token'),
-  getTenantId: vi.fn().mockReturnValue('2'),
-};
+// Use vi.hoisted so these are available in the hoisted vi.mock factory
+const { mockApiGet, mockApiPost, mockTokenManager } = vi.hoisted(() => {
+  const mockApiGet = vi.fn();
+  const mockApiPost = vi.fn();
+  const mockTokenManager = {
+    getAccessToken: vi.fn().mockReturnValue('test-token'),
+    getTenantId: vi.fn().mockReturnValue('2'),
+  };
+  return { mockApiGet, mockApiPost, mockTokenManager };
+});
 
 vi.mock('@/lib/api', () => ({
   api: {

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,9 +11,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import * as Haptics from 'expo-haptics';
 
 import { getExchange } from '@/lib/api/exchanges';
 import { useApi } from '@/lib/hooks/useApi';
@@ -31,6 +34,8 @@ export default function ExchangeDetailModal() {
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { user: currentUser } = useAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({ title: t('detail.title') });
@@ -39,10 +44,34 @@ export default function ExchangeDetailModal() {
   const exchangeId = Number(id);
   const safeExchangeId = isNaN(exchangeId) || exchangeId <= 0 ? 0 : exchangeId;
 
-  const { data, isLoading, error } = useApi(
+  const { data, isLoading, error, refresh } = useApi(
     () => getExchange(safeExchangeId),
     [safeExchangeId],
     { enabled: safeExchangeId > 0 },
+  );
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refresh();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refresh]);
+
+  const handleAction = useCallback(
+    (recipientId: number, recipientName: string) => {
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      router.push({
+        pathname: '/(modals)/thread',
+        params: { recipientId: String(recipientId), name: recipientName },
+      });
+      // Reset after navigation begins so the button is re-enabled if user returns
+      setTimeout(() => setIsSubmitting(false), 600);
+    },
+    [isSubmitting],
   );
 
   if (isNaN(exchangeId) || exchangeId <= 0) {
@@ -73,7 +102,17 @@ export default function ExchangeDetailModal() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => void handleRefresh()}
+            tintColor={primary}
+            colors={[primary]}
+          />
+        }
+      >
         {/* Type badge */}
         <View style={[styles.typeBadge, exchange.type === 'offer' ? styles.offerBadge : styles.requestBadge]}>
           <Text style={styles.typeBadgeText}>
@@ -106,18 +145,22 @@ export default function ExchangeDetailModal() {
         {/* Action -- hidden if you are the poster */}
         {currentUser?.id !== exchange.user.id && (
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: primary }]}
+            style={[styles.actionButton, { backgroundColor: primary, opacity: isSubmitting ? 0.7 : 1 }]}
             activeOpacity={0.8}
-            onPress={() =>
-              router.push({
-                pathname: '/(modals)/thread',
-                params: { recipientId: String(exchange.user.id), name: exchange.user.name },
-              })
+            disabled={isSubmitting}
+            accessibilityLabel={
+              exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')
             }
+            accessibilityRole="button"
+            onPress={() => handleAction(exchange.user.id, exchange.user.name)}
           >
-            <Text style={styles.actionButtonText}>
-              {exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')}
-            </Text>
+            {isSubmitting ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.actionButtonText}>
+                {exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')}
+              </Text>
+            )}
           </TouchableOpacity>
         )}
       </ScrollView>

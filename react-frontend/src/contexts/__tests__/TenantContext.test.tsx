@@ -59,14 +59,17 @@ vi.mock('@/lib/tenant-routing', () => ({
   }),
 }));
 
-// API mock
-const mockApiGet = vi.fn();
-const mockApiClearInflight = vi.fn();
-const mockFetchCsrfToken = vi.fn().mockResolvedValue(undefined);
-const mockTokenManager = {
-  getTenantId: vi.fn().mockReturnValue(null),
-  setTenantId: vi.fn(),
-};
+// Use vi.hoisted so these are available in the hoisted vi.mock factory
+const { mockApiGet, mockApiClearInflight, mockFetchCsrfToken, mockTokenManager } = vi.hoisted(() => {
+  const mockApiGet = vi.fn();
+  const mockApiClearInflight = vi.fn();
+  const mockFetchCsrfToken = vi.fn().mockResolvedValue(undefined);
+  const mockTokenManager = {
+    getTenantId: vi.fn().mockReturnValue(null),
+    setTenantId: vi.fn(),
+  };
+  return { mockApiGet, mockApiClearInflight, mockFetchCsrfToken, mockTokenManager };
+});
 
 vi.mock('@/lib/api', () => ({
   api: {

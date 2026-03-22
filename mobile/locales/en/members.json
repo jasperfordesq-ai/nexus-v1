@@ -27,7 +27,11 @@
   },
   "empty": {
     "title": "No members found",
-    "subtitle": "Try adjusting your search or filters"
+    "subtitle": "Try adjusting your search or filters",
+    "noResults": "No members found for \"{{query}}\""
+  },
+  "memberCard": {
+    "accessibilityLabel": "View {{name}}'s profile"
   },
   "loading": "Loading members…",
   "hrsGiven": "hrs given"

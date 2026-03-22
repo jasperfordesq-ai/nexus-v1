@@ -1,0 +1,30 @@
+{
+  "title": "Ziele",
+  "empty": "Noch keine Ziele vorhanden.",
+  "addGoal": "Ziel hinzufügen",
+  "status": {
+    "active": "Aktiv",
+    "completed": "Abgeschlossen",
+    "abandoned": "Aufgegeben"
+  },
+  "progress": "{{current}} / {{target}} Std.",
+  "noTarget": "{{current}} Std. erfasst",
+  "due": "Fällig am {{date}}",
+  "complete": "Als abgeschlossen markieren",
+  "abandon": "Aufgeben",
+  "abandonTitle": "Ziel aufgeben?",
+  "abandonMessage": "Dies kann nicht rückgängig gemacht werden.",
+  "noGoals": "Noch keine Ziele",
+  "noGoalsHint": "Erstelle dein erstes Ziel, um deinen Fortschritt zu verfolgen.",
+  "create": {
+    "title": "Neues Ziel",
+    "titleLabel": "Zieltitel",
+    "titlePlaceholder": "z. B. 5 Nachbarn helfen",
+    "descriptionLabel": "Beschreibung (optional)",
+    "targetHoursLabel": "Zielstunden (optional)",
+    "dueDateLabel": "Fälligkeitsdatum (optional)",
+    "submit": "Ziel erstellen",
+    "error": "Ziel konnte nicht erstellt werden."
+  },
+  "updateError": "Ziel konnte nicht aktualisiert werden."
+}

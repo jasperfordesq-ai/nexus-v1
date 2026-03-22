@@ -1,0 +1,30 @@
+{
+  "title": "Goals",
+  "empty": "No goals yet.",
+  "addGoal": "Add goal",
+  "status": {
+    "active": "Active",
+    "completed": "Completed",
+    "abandoned": "Abandoned"
+  },
+  "progress": "{{current}} / {{target}} hrs",
+  "noTarget": "{{current}} hrs logged",
+  "due": "Due {{date}}",
+  "complete": "Mark complete",
+  "abandon": "Abandon",
+  "abandonTitle": "Abandon goal?",
+  "abandonMessage": "This cannot be undone.",
+  "noGoals": "No goals yet",
+  "noGoalsHint": "Create your first goal to start tracking your progress.",
+  "create": {
+    "title": "New Goal",
+    "titleLabel": "Goal title",
+    "titlePlaceholder": "e.g. Help 5 neighbours",
+    "descriptionLabel": "Description (optional)",
+    "targetHoursLabel": "Target hours (optional)",
+    "dueDateLabel": "Due date (optional)",
+    "submit": "Create goal",
+    "error": "Could not create goal."
+  },
+  "updateError": "Could not update goal."
+}

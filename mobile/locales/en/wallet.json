@@ -2,5 +2,11 @@
   "title": "Wallet",
   "timeCredits": "Time credits",
   "hrs": "hrs",
-  "noTransactions": "No transactions yet."
+  "noTransactions": "No transactions yet.",
+  "status": {
+    "pending": "Pending",
+    "cancelled": "Cancelled",
+    "disputed": "Disputed",
+    "failed": "Failed"
+  }
 }

@@ -10,7 +10,8 @@
     "title": "Feed da Comunidade",
     "welcome": "Bem-vindo ao seu banco de tempo",
     "empty": "Nada no seu feed ainda. Volte em breve!",
-    "loading": "A carregar feed…"
+    "loading": "A carregar feed…",
+    "emptySubtitle": "Começa a ligar-te à tua comunidade para ver publicações aqui."
   },
   "listings": {
     "title": "Anúncios",

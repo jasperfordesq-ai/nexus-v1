@@ -1,0 +1,57 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { api } from '@/lib/api/client';
+import { API_V2 } from '@/lib/constants';
+
+export interface BlogAuthor {
+  id: number;
+  name: string;
+  avatar: string | null;
+}
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string | null;
+  cover_image: string | null;
+  author: BlogAuthor;
+  category: string | null;
+  tags: string[];
+  published_at: string;
+  reading_time_minutes: number | null;
+}
+
+export interface BlogListResponse {
+  data: BlogPost[];
+  meta: {
+    has_more: boolean;
+    cursor: string | null;
+  };
+}
+
+/**
+ * GET /api/v2/blog
+ * Retrieve a cursor-paginated list of blog posts with optional full-text search.
+ */
+export function getBlogPosts(
+  cursor: string | null,
+  search?: string,
+): Promise<BlogListResponse> {
+  return api.get<BlogListResponse>(`${API_V2}/blog`, {
+    ...(cursor ? { cursor } : {}),
+    ...(search ? { search } : {}),
+  });
+}
+
+/**
+ * GET /api/v2/blog/:id
+ * Retrieve a single blog post by its numeric ID.
+ */
+export function getBlogPost(id: number): Promise<{ data: BlogPost }> {
+  return api.get<{ data: BlogPost }>(`${API_V2}/blog/${id}`);
+}

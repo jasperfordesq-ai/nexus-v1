@@ -50,8 +50,15 @@ export default function FeedItem({ item }: FeedItemProps) {
     }
   }
 
+  const cardLabel = `${item.author_name}. ${item.title}${item.content ? '. ' + item.content.slice(0, 100) : ''}`;
+
   return (
-    <View style={styles.wrapper}>
+    <View
+      style={styles.wrapper}
+      accessible={true}
+      accessibilityLabel={cardLabel}
+      accessibilityRole="article"
+    >
       <Card style={styles.card}>
         {/* Author row */}
         <View style={styles.actor}>

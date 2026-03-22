@@ -1,0 +1,9 @@
+{
+  "title": "Asistente IA",
+  "placeholder": "Pregunta lo que quieras sobre el banco de tiempo…",
+  "send": "Enviar",
+  "empty": "Inicia una conversación con el asistente IA.",
+  "error": "No se pudo enviar el mensaje.",
+  "thinking": "Pensando…",
+  "disclaimer": "Las respuestas de la IA pueden no ser siempre precisas."
+}

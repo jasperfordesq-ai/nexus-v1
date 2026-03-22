@@ -99,7 +99,7 @@ export default function ExchangesScreen() {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <ExchangeCard exchange={item} />}
         refreshControl={
-          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} />
+          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} tintColor={primary} colors={[primary]} />
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}

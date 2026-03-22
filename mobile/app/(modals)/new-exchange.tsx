@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -38,6 +38,11 @@ function getCategories(): Promise<{ data: Category[] }> {
   return api.get<{ data: Category[] }>(`${API_V2}/categories`, { type: 'listing' });
 }
 
+interface FieldErrors {
+  title?: string;
+  timeCredits?: string;
+}
+
 export default function NewExchangeModal() {
   const { t } = useTranslation('exchanges');
   const navigation = useNavigation();
@@ -48,6 +53,7 @@ export default function NewExchangeModal() {
   useEffect(() => {
     navigation.setOptions({ title: t('newExchange') });
   }, [navigation, t]);
+
   const { data: catData } = useApi(() => getCategories());
   const categories = catData?.data ?? [];
 
@@ -56,15 +62,34 @@ export default function NewExchangeModal() {
   const [description, setDescription] = useState('');
   const [timeCredits, setTimeCredits] = useState('1');
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  // Refs for returnKeyType focus chaining
+  const descriptionRef = useRef<TextInput>(null);
+  const creditsRef = useRef<TextInput>(null);
 
   async function handleSubmit() {
-    if (!title.trim()) { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); setError(t('validation.titleRequired')); return; }
-    const credits = parseFloat(timeCredits);
-    if (isNaN(credits) || credits <= 0) { void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); setError(t('validation.invalidCredits')); return; }
+    const errors: FieldErrors = {};
 
-    setIsLoading(true);
+    if (!title.trim()) {
+      errors.title = t('validation.titleRequired');
+    }
+
+    const credits = parseFloat(timeCredits);
+    if (isNaN(credits) || credits <= 0) {
+      errors.timeCredits = t('validation.invalidCredits');
+    }
+
+    if (Object.keys(errors).length > 0) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setFieldErrors(errors);
+      return;
+    }
+
+    setFieldErrors({});
+    setSubmitting(true);
     setError(null);
     try {
       await createExchange({
@@ -80,7 +105,7 @@ export default function NewExchangeModal() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setError(err instanceof ApiResponseError ? err.message : t('createError'));
     } finally {
-      setIsLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -115,22 +140,32 @@ export default function NewExchangeModal() {
 
         {error && (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorText}>{error}</Text>
+            <Text style={styles.errorBannerText}>{error}</Text>
           </View>
         )}
 
         <Text style={styles.label}>{t('titleLabel')}</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, !!fieldErrors.title && styles.inputError]}
           value={title}
-          onChangeText={setTitle}
+          onChangeText={(v) => {
+            setTitle(v);
+            if (fieldErrors.title) setFieldErrors((e) => ({ ...e, title: undefined }));
+          }}
           placeholder={type === 'offer' ? t('offerPlaceholder') : t('requestPlaceholder')}
           placeholderTextColor={theme.textMuted}
           returnKeyType="next"
+          maxLength={100}
+          onSubmitEditing={() => descriptionRef.current?.focus()}
+          blurOnSubmit={false}
         />
+        {fieldErrors.title && (
+          <Text style={styles.fieldError}>{fieldErrors.title}</Text>
+        )}
 
         <Text style={styles.label}>{t('description')}</Text>
         <TextInput
+          ref={descriptionRef}
           style={[styles.input, styles.textarea]}
           value={description}
           onChangeText={setDescription}
@@ -139,18 +174,29 @@ export default function NewExchangeModal() {
           multiline
           numberOfLines={4}
           textAlignVertical="top"
+          maxLength={500}
+          returnKeyType="next"
+          blurOnSubmit={true}
+          onSubmitEditing={() => creditsRef.current?.focus()}
         />
 
         <Text style={styles.label}>{t('timeCredits')}</Text>
         <TextInput
-          style={styles.input}
+          ref={creditsRef}
+          style={[styles.input, !!fieldErrors.timeCredits && styles.inputError]}
           value={timeCredits}
-          onChangeText={setTimeCredits}
+          onChangeText={(v) => {
+            setTimeCredits(v);
+            if (fieldErrors.timeCredits) setFieldErrors((e) => ({ ...e, timeCredits: undefined }));
+          }}
           placeholder="1"
           placeholderTextColor={theme.textMuted}
           keyboardType="decimal-pad"
           returnKeyType="done"
         />
+        {fieldErrors.timeCredits && (
+          <Text style={styles.fieldError}>{fieldErrors.timeCredits}</Text>
+        )}
 
         {/* Category picker */}
         {categories.length > 0 && (
@@ -182,14 +228,14 @@ export default function NewExchangeModal() {
         )}
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: primary }, isLoading && styles.buttonDisabled]}
+          style={[styles.button, { backgroundColor: primary }, submitting && styles.buttonDisabled]}
           onPress={() => void handleSubmit()}
-          disabled={isLoading}
+          disabled={submitting}
           activeOpacity={0.8}
           accessibilityLabel={type === 'offer' ? t('postOffer') : t('postRequest')}
           accessibilityRole="button"
         >
-          {isLoading ? (
+          {submitting ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.buttonText}>
@@ -229,7 +275,9 @@ function makeStyles(theme: Theme) {
       color: theme.text,
       backgroundColor: theme.surface,
     },
+    inputError: { borderColor: theme.error },
     textarea: { height: 100 },
+    fieldError: { fontSize: 12, color: theme.error, marginTop: 4 },
     categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     categoryChip: {
       borderWidth: 1,
@@ -241,7 +289,7 @@ function makeStyles(theme: Theme) {
     },
     categoryChipText: { fontSize: 13, color: theme.textMuted },
     errorBanner: { backgroundColor: theme.errorBg, borderRadius: 8, padding: 12, marginTop: 12 },
-    errorText: { color: theme.error, fontSize: 14 },
+    errorBannerText: { color: theme.error, fontSize: 14 },
     button: { borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 32 },
     buttonDisabled: { opacity: 0.6 },
     buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },

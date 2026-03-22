@@ -22,7 +22,11 @@
   },
   "empty": {
     "title": "No se encontraron miembros",
-    "subtitle": "Intenta ajustar tu búsqueda o filtros"
+    "subtitle": "Intenta ajustar tu búsqueda o filtros",
+    "noResults": "No se encontraron miembros para \"{{query}}\""
+  },
+  "memberCard": {
+    "accessibilityLabel": "Ver el perfil de {{name}}"
   },
   "loading": "Cargando miembros…"
 }

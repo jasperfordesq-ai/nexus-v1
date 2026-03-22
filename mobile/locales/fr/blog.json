@@ -1,0 +1,15 @@
+{
+  "title": "Blog",
+  "searchPlaceholder": "Rechercher des articles…",
+  "empty": "Aucun article pour le moment.",
+  "readingTime": "{{minutes}} min de lecture",
+  "by": "Par {{name}}",
+  "detail": {
+    "title": "Article",
+    "notFound": "Article introuvable.",
+    "invalidId": "Identifiant d'article invalide.",
+    "goBack": "Retour",
+    "readFull": "Lire l'article complet",
+    "share": "Partager la publication"
+  }
+}

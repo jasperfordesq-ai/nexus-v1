@@ -274,6 +274,8 @@ export default function ThreadScreen() {
             onPress={handleSend}
             disabled={isSending || !inputText.trim()}
             activeOpacity={0.8}
+            accessibilityLabel={t('messages:send')}
+            accessibilityRole="button"
           >
             {isSending ? (
               <ActivityIndicator color="#fff" size="small" />

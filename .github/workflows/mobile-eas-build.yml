@@ -1,0 +1,148 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# mobile-eas-build.yml — EAS (Expo Application Services) native build + submit.
+#
+# Triggers:
+#   • Manual dispatch (workflow_dispatch) — choose profile + platform
+#   • Auto on push to main when mobile/** changes — always builds preview/android
+#
+# Secrets required in GitHub repository settings:
+#   EXPO_TOKEN            — EAS authentication token (required)
+#   EXPO_PUBLIC_SENTRY_DSN — Sentry DSN injected into .env.local (optional)
+#   GOOGLE_SERVICES_JSON  — Base64-encoded google-services.json for FCM (optional)
+#   GOOGLE_PLAY_KEY       — Base64-encoded google-play-key.json for Play Store submit
+
+name: Mobile EAS Build
+
+on:
+  # ── Manual trigger with configurable profile + platform ─────────────────────
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "EAS build profile"
+        required: true
+        type: choice
+        default: preview
+        options:
+          - development
+          - preview
+          - production
+      platform:
+        description: "Target platform"
+        required: true
+        type: choice
+        default: android
+        options:
+          - android
+          - ios
+          - all
+
+  # ── Auto-trigger on push to main (mobile changes only) ───────────────────────
+  push:
+    branches:
+      - main
+    paths:
+      - "mobile/**"
+
+# Cancel in-progress builds on the same branch to save EAS build minutes.
+concurrency:
+  group: mobile-eas-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eas-build:
+    name: EAS Build (${{ inputs.profile || 'preview' }} / ${{ inputs.platform || 'android' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    defaults:
+      run:
+        working-directory: mobile
+
+    # EXPO_TOKEN must be available to all EAS CLI calls.
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Node.js setup with npm cache ──────────────────────────────────────
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "mobile/package-lock.json"
+
+      # ── 3. Install dependencies ───────────────────────────────────────────────
+      - name: Install dependencies (npm ci)
+        run: npm ci
+
+      # ── 4. Install EAS CLI globally ───────────────────────────────────────────
+      - name: Install EAS CLI
+        # Install globally so `eas` is on PATH for all subsequent steps.
+        # No working-directory override needed — this is a global npm install.
+        run: npm install -g eas-cli
+        working-directory: ${{ github.workspace }}
+
+      # ── 5. Write .env.local from secrets ─────────────────────────────────────
+      - name: Create .env.local from secrets
+        # .env.local is gitignored; we populate it here so Expo's public env
+        # vars are available at build time without baking them into eas.json.
+        # EXPO_PUBLIC_SENTRY_DSN is optional — the app handles an empty value.
+        run: |
+          cat > .env.local <<EOF
+          EXPO_PUBLIC_API_URL=https://api.project-nexus.ie
+          EXPO_PUBLIC_DEFAULT_TENANT=hour-timebank
+          EXPO_PUBLIC_SENTRY_DSN=${{ secrets.EXPO_PUBLIC_SENTRY_DSN }}
+          EOF
+
+      # ── 6. Decode google-services.json for FCM (Android) ─────────────────────
+      - name: Decode google-services.json
+        # Only needed for Android builds. The secret is base64-encoded to safely
+        # store binary-safe JSON in GitHub Secrets.
+        if: ${{ inputs.platform != 'ios' && secrets.GOOGLE_SERVICES_JSON != '' }}
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > google-services.json
+
+      # ── 7. EAS Build ──────────────────────────────────────────────────────────
+      - name: EAS Build
+        # On manual dispatch: use the chosen inputs.
+        # On auto push to main: default to preview profile + android platform.
+        # --non-interactive is required in CI (no TTY available).
+        run: |
+          eas build \
+            --platform "${{ inputs.platform || 'android' }}" \
+            --profile "${{ inputs.profile || 'preview' }}" \
+            --non-interactive
+
+      # ── 8. Submit to Play Store (production Android builds only) ──────────────
+      - name: Decode Google Play service account key
+        # Only decode the Play Store key when this is a production build targeting
+        # Android (or all platforms, which includes Android).
+        if: >
+          (inputs.profile == 'production') &&
+          (inputs.platform == 'android' || inputs.platform == 'all') &&
+          secrets.GOOGLE_PLAY_KEY != ''
+        run: |
+          echo "${{ secrets.GOOGLE_PLAY_KEY }}" | base64 --decode > google-play-key.json
+
+      - name: Submit to Google Play (internal track)
+        # eas submit uses the serviceAccountKeyPath from eas.json submit.production
+        # which points to ./google-play-key.json decoded in the step above.
+        # --latest picks up the build artifact just created by the EAS Build step.
+        if: >
+          (inputs.profile == 'production') &&
+          (inputs.platform == 'android' || inputs.platform == 'all') &&
+          secrets.GOOGLE_PLAY_KEY != ''
+        run: |
+          eas submit \
+            --platform android \
+            --profile production \
+            --latest \
+            --non-interactive

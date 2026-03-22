@@ -1,0 +1,18 @@
+{
+  "title": "Organizzazioni",
+  "searchPlaceholder": "Cerca organizzazioni…",
+  "empty": "Nessuna organizzazione trovata.",
+  "verified": "Verificata",
+  "members": "{{count}} membro",
+  "members_other": "{{count}} membri",
+  "listings": "{{count}} annuncio",
+  "listings_other": "{{count}} annunci",
+  "website": "Visita il sito web",
+  "detail": {
+    "title": "Organizzazione",
+    "about": "Informazioni",
+    "notFound": "Organizzazione non trovata.",
+    "invalidId": "ID organizzazione non valido.",
+    "goBack": "Indietro"
+  }
+}

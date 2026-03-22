@@ -102,6 +102,14 @@ class TransactionExportService
      */
     public function sendCSVDownload(string $csv, string $filename): void
     {
+        // In test environments, throw instead of calling exit() so PHPUnit survives.
+        if (($_ENV['APP_ENV'] ?? getenv('APP_ENV')) === 'testing' || (function_exists('app') && app()->environment('testing'))) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
+                200,
+                $csv,
+                ['Content-Type' => 'text/csv; charset=utf-8', 'Content-Disposition' => 'attachment; filename="' . $filename . '"']
+            );
+        }
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Content-Length: ' . strlen($csv));

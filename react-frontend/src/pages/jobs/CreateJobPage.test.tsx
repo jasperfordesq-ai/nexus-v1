@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import type { ReactNode } from 'react';
 
 const mockNavigate = vi.fn();
@@ -60,6 +60,16 @@ vi.mock('@/contexts', () => ({
     info: vi.fn(),
     warning: vi.fn(),
   })),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
@@ -69,6 +79,25 @@ vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => (
     <div data-testid='glass-card' className={className}>{children}</div>
   ),
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -154,19 +183,23 @@ describe('CreateJobPage', () => {
 
     it('salary fields are present in the form (J9)', () => {
       render(<CreateJobPage />);
-      expect(screen.getByText('form.salary_min_label')).toBeInTheDocument();
-      expect(screen.getByText('form.salary_max_label')).toBeInTheDocument();
+      expect(screen.getByText(/form\.salary_min_label/)).toBeInTheDocument();
+      expect(screen.getByText(/form\.salary_max_label/)).toBeInTheDocument();
     });
 
     it('submit button calls POST /v2/jobs for create mode', async () => {
       vi.mocked(api.post).mockResolvedValue({ success: true, data: { id: 7 } });
-      const { userEvent } = await import('@/test/test-utils');
       render(<CreateJobPage />);
       const titleInput = screen.getByLabelText(/form.title_label/i);
       const descInput = screen.getByLabelText(/form.description_label/i);
-      await userEvent.type(titleInput, 'New Vacancy');
-      await userEvent.type(descInput, 'Full job description here');
-      await userEvent.click(screen.getByText('form.submit_create'));
+      // Use fireEvent.change to update form state without triggering pointer events
+      // that would interfere with the subsequent fireEvent.click on the HeroUI button
+      fireEvent.change(titleInput, { target: { value: 'New Vacancy' } });
+      fireEvent.change(descInput, { target: { value: 'Full job description here' } });
+      // Find the submit button element (the button that contains the submit text)
+      // and click it directly to trigger HeroUI onPress via the virtual click path
+      const submitBtn = screen.getByText('form.submit_create').closest('button')!;
+      fireEvent.click(submitBtn);
       await waitFor(() => {
         expect(vi.mocked(api.post)).toHaveBeenCalledWith('/v2/jobs', expect.objectContaining({
           title: 'New Vacancy',

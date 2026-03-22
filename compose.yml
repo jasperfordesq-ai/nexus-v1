@@ -24,6 +24,9 @@ services:
     volumes:
       # Mount entire app for development (excludes vendor via .dockerignore)
       - .:/var/www/html:cached
+      # vendor on a named Docker volume (Linux filesystem) — avoids Windows NTFS
+      # slowness when composer extracts packages. Run: docker compose exec app composer install
+      - nexus-vendor:/var/www/html/vendor
       # Persist uploads between rebuilds
       - nexus-uploads:/var/www/html/uploads
       - nexus-httpdocs-uploads:/var/www/html/httpdocs/uploads
@@ -233,6 +236,8 @@ services:
 # Volumes (Named, isolated to this project)
 # =============================================================================
 volumes:
+  nexus-vendor:
+    name: nexus-vendor
   nexus-mysql-data:
     name: nexus-mysql-data
   nexus-redis-data:

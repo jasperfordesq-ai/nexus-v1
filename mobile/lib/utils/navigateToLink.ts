@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { router } from 'expo-router';
+import * as Sentry from '@sentry/react-native';
 
 /**
  * Maps a web-format deep-link (e.g. /exchanges/123) to the appropriate
@@ -29,8 +30,43 @@ export function navigateToLink(link: string | null): void {
       if (id) router.push({ pathname: '/(modals)/thread', params: { id } });
       else router.push('/(tabs)/messages');
       break;
+    case 'blog':
+    case 'blog-post':
+      if (id) router.push({ pathname: '/(modals)/blog-post', params: { id } });
+      break;
+    case 'groups':
+      if (id) router.push({ pathname: '/(modals)/group-detail', params: { id } });
+      break;
+    case 'organisations':
+      if (id) router.push({ pathname: '/(modals)/organisation-detail', params: { id } });
+      break;
+    case 'volunteering':
+      if (id) router.push({ pathname: '/(modals)/volunteering-detail', params: { id } });
+      break;
+    case 'goals':
+      router.push('/(modals)/goals');
+      break;
+    case 'endorsements':
+      router.push('/(modals)/endorsements');
+      break;
+    case 'gamification':
+      router.push('/(modals)/gamification');
+      break;
+    case 'federation':
+      if (id) router.push({ pathname: '/(modals)/federation-partner', params: { id } });
+      else router.push('/(modals)/federation');
+      break;
+    case 'wallet':
+      router.push('/(modals)/wallet');
+      break;
+    case 'notifications':
+      router.push('/(modals)/notifications');
+      break;
+    case 'chat':
+      router.push('/(modals)/chat');
+      break;
     default:
-      console.warn('[DeepLink] Unhandled link:', link);
+      Sentry.captureMessage(`[DeepLink] Unhandled link: ${link}`, 'warning');
       break;
   }
 }

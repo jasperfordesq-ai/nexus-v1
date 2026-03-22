@@ -1,0 +1,34 @@
+{
+  "title": "Grupos",
+  "searchPlaceholder": "Buscar grupos…",
+  "newGroup": "Nuevo grupo",
+  "empty": "No se encontraron grupos.",
+  "featured": "Destacados",
+  "members": "{{count}} miembro",
+  "members_other": "{{count}} miembros",
+  "posts": "{{count}} publicación",
+  "posts_other": "{{count}} publicaciones",
+  "public": "Público",
+  "private": "Privado",
+  "joined": "Unido",
+  "join": "Unirse",
+  "leave": "Salir",
+  "leaveConfirmTitle": "Salir del grupo",
+  "leaveConfirmMessage": "¿Estás seguro de que quieres salir de este grupo?",
+  "joinError": "No se pudo unir al grupo.",
+  "leaveError": "No se pudo salir del grupo.",
+  "detail": {
+    "title": "Grupo",
+    "about": "Acerca de",
+    "members": "Miembros",
+    "notFound": "Grupo no encontrado.",
+    "invalidId": "ID de grupo no válido.",
+    "goBack": "Volver"
+  },
+  "filter": {
+    "all": "Todos",
+    "public": "Público",
+    "private": "Privado",
+    "joined": "Mis grupos"
+  }
+}

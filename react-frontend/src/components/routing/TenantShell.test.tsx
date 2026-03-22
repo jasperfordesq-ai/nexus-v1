@@ -28,8 +28,20 @@ vi.mock('@/contexts', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <div data-testid="auth-provider">{children}</div>,
   NotificationsProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   PusherProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  MenuProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useTenant: (...args: unknown[]) => mockUseTenant(...args),
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 vi.mock('@/lib/tenant-routing', () => ({
@@ -43,10 +55,35 @@ vi.mock('@/lib/tenant-routing', () => ({
 
 vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
+}));
+
+vi.mock('@/components/feedback', () => ({
+  CookieConsentBanner: () => null,
+  LoadingScreen: ({ message }: { message: string }) => <div data-testid="loading-screen">{message}</div>,
+  EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }));
 
 vi.mock('framer-motion', () => {

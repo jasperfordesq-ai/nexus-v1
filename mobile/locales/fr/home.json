@@ -10,7 +10,8 @@
     "title": "Fil de la communauté",
     "welcome": "Bienvenue dans votre banque de temps",
     "empty": "Rien dans votre fil pour l'instant. Revenez bientôt !",
-    "loading": "Chargement du fil…"
+    "loading": "Chargement du fil…",
+    "emptySubtitle": "Commencez à vous connecter avec votre communauté pour voir des publications ici."
   },
   "listings": {
     "title": "Annonces",

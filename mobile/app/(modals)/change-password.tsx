@@ -41,24 +41,30 @@ export default function ChangePasswordScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{
+    currentPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  }>({});
 
   async function handleSubmit() {
+    const errors: typeof fieldErrors = {};
     if (!currentPassword.trim()) {
-      Alert.alert(t('password.validation.currentRequired'));
-      return;
+      errors.currentPassword = t('password.validation.currentRequired');
     }
     if (!newPassword.trim()) {
-      Alert.alert(t('password.validation.newRequired'));
+      errors.newPassword = t('password.validation.newRequired');
+    } else if (newPassword.length < 8) {
+      errors.newPassword = t('password.validation.tooShort');
+    }
+    if (newPassword.trim() && newPassword !== confirmPassword) {
+      errors.confirmPassword = t('password.validation.mismatch');
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
-    if (newPassword !== confirmPassword) {
-      Alert.alert(t('password.validation.mismatch'));
-      return;
-    }
-    if (newPassword.length < 8) {
-      Alert.alert(t('password.validation.tooShort'));
-      return;
-    }
+    setFieldErrors({});
 
     setIsLoading(true);
     try {
@@ -105,8 +111,11 @@ export default function ChangePasswordScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               value={currentPassword}
-              onChangeText={setCurrentPassword}
+              onChangeText={(v) => { setCurrentPassword(v); setFieldErrors((e) => ({ ...e, currentPassword: undefined })); }}
             />
+            {fieldErrors.currentPassword ? (
+              <Text style={styles.fieldError}>{fieldErrors.currentPassword}</Text>
+            ) : null}
             <Input
               label={t('password.newLabel')}
               placeholder={t('password.newPlaceholder')}
@@ -114,8 +123,11 @@ export default function ChangePasswordScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               value={newPassword}
-              onChangeText={setNewPassword}
+              onChangeText={(v) => { setNewPassword(v); setFieldErrors((e) => ({ ...e, newPassword: undefined })); }}
             />
+            {fieldErrors.newPassword ? (
+              <Text style={styles.fieldError}>{fieldErrors.newPassword}</Text>
+            ) : null}
             <Input
               label={t('password.confirmLabel')}
               placeholder={t('password.confirmPlaceholder')}
@@ -123,8 +135,11 @@ export default function ChangePasswordScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               value={confirmPassword}
-              onChangeText={setConfirmPassword}
+              onChangeText={(v) => { setConfirmPassword(v); setFieldErrors((e) => ({ ...e, confirmPassword: undefined })); }}
             />
+            {fieldErrors.confirmPassword ? (
+              <Text style={styles.fieldError}>{fieldErrors.confirmPassword}</Text>
+            ) : null}
           </View>
 
           <Button
@@ -155,5 +170,6 @@ function makeStyles(theme: Theme) {
     },
     form: { marginBottom: 24 },
     saveButton: { marginTop: 8 },
+    fieldError: { color: theme.error, fontSize: 12, marginTop: 4, marginBottom: 4 },
   });
 }

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   FlatList,
   View,
@@ -25,6 +25,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { SkeletonBox } from '@/components/ui/Skeleton';
 
 export default function MembersScreen() {
   const { t } = useTranslation('members');
@@ -39,6 +40,27 @@ export default function MembersScreen() {
   const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
   const [search, setSearch] = useState('');
   const [committedSearch, setCommittedSearch] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleSearchChange(text: string) {
+    setSearch(text);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setCommittedSearch(text.trim());
+    }, 300);
+  }
+
+  function handleClear() {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    setSearch('');
+    setCommittedSearch('');
+  }
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   const fetchFn = useCallback(
     (cursor: string | null) => {
@@ -63,15 +85,6 @@ export default function MembersScreen() {
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
     usePaginatedApi<Member, MemberListResponse>(fetchFn, extractor);
 
-  function handleSearch() {
-    setCommittedSearch(search.trim());
-  }
-
-  function handleClear() {
-    setSearch('');
-    setCommittedSearch('');
-  }
-
   function renderItem({ item }: { item: Member }) {
     return (
       <TouchableOpacity
@@ -83,6 +96,8 @@ export default function MembersScreen() {
           })
         }
         activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={t('memberCard.accessibilityLabel', { name: item.name })}
       >
         <Avatar uri={item.avatar_url} name={item.name} size={46} />
         <View style={styles.rowContent}>
@@ -106,8 +121,7 @@ export default function MembersScreen() {
           placeholder={t('search.placeholder')}
           placeholderTextColor={theme.textMuted}
           value={search}
-          onChangeText={setSearch}
-          onSubmitEditing={handleSearch}
+          onChangeText={handleSearchChange}
           returnKeyType="search"
           clearButtonMode="never"
           autoCorrect={false}
@@ -137,14 +151,19 @@ export default function MembersScreen() {
         }
         ListEmptyComponent={
           isLoading ? (
-            <LoadingSpinner />
+            <MemberListSkeleton />
           ) : error ? (
             <View style={styles.centered}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : (
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('empty.title')}</Text>
+              <Ionicons name="people-outline" size={40} color={theme.textMuted} />
+              <Text style={styles.emptyText}>
+                {committedSearch
+                  ? t('empty.noResults', { query: committedSearch })
+                  : t('empty.title')}
+              </Text>
             </View>
           )
         }
@@ -160,6 +179,45 @@ export default function MembersScreen() {
     </SafeAreaView>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Skeleton
+// ---------------------------------------------------------------------------
+
+function MemberRowSkeleton(): React.JSX.Element {
+  const theme = useTheme();
+  return (
+    <View style={skeletonRowStyle}>
+      <SkeletonBox width={46} height={46} borderRadius={23} />
+      <View style={{ flex: 1, gap: 8 }}>
+        <SkeletonBox width="55%" height={13} />
+        <SkeletonBox width="35%" height={11} />
+      </View>
+    </View>
+  );
+}
+
+const skeletonRowStyle = {
+  flexDirection: 'row' as const,
+  alignItems: 'center' as const,
+  paddingHorizontal: 16,
+  paddingVertical: 12,
+  gap: 12,
+};
+
+function MemberListSkeleton(): React.JSX.Element {
+  return (
+    <>
+      {Array.from({ length: 8 }).map((_, i) => (
+        <MemberRowSkeleton key={i} />
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Styles
+// ---------------------------------------------------------------------------
 
 function makeStyles(theme: Theme) {
   return StyleSheet.create({
@@ -196,7 +254,7 @@ function makeStyles(theme: Theme) {
     separator: { height: 1, backgroundColor: theme.bg, marginLeft: 74 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
     errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
-    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
+    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center', marginTop: 12 },
     footerLoader: { paddingVertical: 16 },
   });
 }

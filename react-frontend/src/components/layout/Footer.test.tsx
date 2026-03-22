@@ -18,6 +18,17 @@ const mockUseFeature = vi.fn();
 vi.mock('@/contexts', () => ({
   useTenant: (...args: unknown[]) => mockUseTenant(...args),
   useFeature: (...args: unknown[]) => mockUseFeature(...args),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useModule: vi.fn(() => true),
+  useAuth: () => ({ user: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), register: vi.fn(), updateUser: vi.fn(), refreshUser: vi.fn(), status: 'idle', error: null }),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 import { Footer, FooterLink } from './Footer';
@@ -87,21 +98,21 @@ describe('Footer', () => {
   });
 
   describe('AGPL attribution', () => {
-    it('renders Built on Project NEXUS by Jasper Ford', () => {
+    it('renders Project NEXUS attribution link', () => {
       render(<Footer />);
-      const link = screen.getByText('Built on Project NEXUS by Jasper Ford');
+      const link = screen.getByText('Project NEXUS');
       expect(link).toBeInTheDocument();
     });
 
     it('attribution links to the GitHub repository', () => {
       render(<Footer />);
-      const link = screen.getByText('Built on Project NEXUS by Jasper Ford').closest('a');
+      const link = screen.getByText('Project NEXUS');
       expect(link).toHaveAttribute('href', 'https://github.com/jasperfordesq-ai/nexus-v1');
     });
 
     it('attribution opens in new tab with security attributes', () => {
       render(<Footer />);
-      const link = screen.getByText('Built on Project NEXUS by Jasper Ford').closest('a');
+      const link = screen.getByText('Project NEXUS');
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });

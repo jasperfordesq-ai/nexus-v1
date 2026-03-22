@@ -31,5 +31,16 @@
     "firstNameRequired": "First name is required.",
     "validation": "Validation"
   },
-  "hrs": "hrs"
+  "hrs": "hrs",
+  "explore": "Explore",
+  "groups": "Groups",
+  "search": "Search",
+  "aiChat": "AI Assistant",
+  "achievements": "Achievements",
+  "myGoals": "My Goals",
+  "volunteering": "Volunteering",
+  "organisations": "Organisations",
+  "blog": "Blog",
+  "skills": "Skills & Endorsements",
+  "federation": "Federation"
 }

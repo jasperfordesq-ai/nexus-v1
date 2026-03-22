@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 
 const mockGet = vi.fn().mockResolvedValue({ success: true, data: [], meta: {} });
@@ -38,6 +38,16 @@ vi.mock('@/contexts', () => ({
     error: vi.fn(),
     info: vi.fn(),
   })),
+
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  usePusher: () => ({ channel: null, isConnected: false }),
+  usePusherOptional: () => null,
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+  readStoredConsent: () => null,
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
 }));
 
 vi.mock('@/hooks', () => ({
@@ -62,6 +72,25 @@ vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, className, ...props }: Record<string, unknown>) => (
     <div className={`glass-card ${className || ''}`} {...props}>{children as React.ReactNode}</div>
   ),
+
+  GlassButton: ({ children }: Record<string, unknown>) => children as never,
+  GlassInput: () => null,
+  BackToTop: () => null,
+  AlgorithmLabel: () => null,
+  ImagePlaceholder: () => null,
+  DynamicIcon: () => null,
+  ICON_MAP: {},
+  ICON_NAMES: [],
+  ListingSkeleton: () => null,
+  MemberCardSkeleton: () => null,
+  StatCardSkeleton: () => null,
+  EventCardSkeleton: () => null,
+  GroupCardSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  ExchangeCardSkeleton: () => null,
+  NotificationSkeleton: () => null,
+  ProfileHeaderSkeleton: () => null,
+  SkeletonList: () => null,
 }));
 
 vi.mock('framer-motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
@@ -87,7 +116,7 @@ describe('FeedPage', () => {
 
   it('shows New Post button for authenticated users', () => {
     render(<FeedPage />);
-    expect(screen.getByText('New Post')).toBeInTheDocument();
+    expect(screen.getAllByText('New Post').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows filter options', () => {
@@ -171,7 +200,6 @@ describe('FeedPage', () => {
   });
 
   it('calls API with filter type when a filter is selected', async () => {
-    const user = userEvent.setup();
     render(<FeedPage />);
 
     // Wait for initial load
@@ -181,9 +209,12 @@ describe('FeedPage', () => {
 
     mockGet.mockClear();
 
-    // Click the "Events" filter
-    const eventsBtn = screen.getByText('Events');
-    await user.click(eventsBtn);
+    // Trigger HeroUI onPress via keyboard: focus button then press Enter key
+    // React Aria's keyboard press path calls onPress when Enter is pressed on focused button
+    const eventsBtn = screen.getByRole('button', { name: 'Events' });
+    eventsBtn.focus();
+    fireEvent.keyDown(eventsBtn, { key: 'Enter', keyCode: 13 });
+    fireEvent.keyUp(eventsBtn, { key: 'Enter', keyCode: 13 });
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(

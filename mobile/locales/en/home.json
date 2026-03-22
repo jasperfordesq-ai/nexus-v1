@@ -13,7 +13,8 @@
     "loading": "Loading feed…",
     "greeting": "Hello, {{name}}",
     "subtitle": "Here's what's happening in your timebank",
-    "emptyTitle": "No activity yet. Say hello to your community!"
+    "emptyTitle": "No activity yet. Say hello to your community!",
+    "emptySubtitle": "Start connecting with your community to see posts here."
   },
   "listings": {
     "title": "Listings",

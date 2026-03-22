@@ -10,7 +10,8 @@
     "title": "Sruth Pobail",
     "welcome": "Fáilte chuig do bhanc ama",
     "empty": "Níl aon rud i do shruth fós. Féach ar ais go luath!",
-    "loading": "Ag luchtú sruth…"
+    "loading": "Ag luchtú sruth…",
+    "emptySubtitle": "Tosaigh ag nascadh le do phobal chun postálacha a fheiceáil anseo."
   },
   "listings": {
     "title": "Liostaí",

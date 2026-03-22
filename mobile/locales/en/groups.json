@@ -1,0 +1,34 @@
+{
+  "title": "Groups",
+  "searchPlaceholder": "Search groups…",
+  "newGroup": "New group",
+  "empty": "No groups found.",
+  "featured": "Featured",
+  "members": "{{count}} member",
+  "members_other": "{{count}} members",
+  "posts": "{{count}} post",
+  "posts_other": "{{count}} posts",
+  "public": "Public",
+  "private": "Private",
+  "joined": "Joined",
+  "join": "Join",
+  "leave": "Leave",
+  "leaveConfirmTitle": "Leave group",
+  "leaveConfirmMessage": "Are you sure you want to leave this group?",
+  "joinError": "Could not join group.",
+  "leaveError": "Could not leave group.",
+  "detail": {
+    "title": "Group",
+    "about": "About",
+    "members": "Members",
+    "notFound": "Group not found.",
+    "invalidId": "Invalid group ID.",
+    "goBack": "Go back"
+  },
+  "filter": {
+    "all": "All",
+    "public": "Public",
+    "private": "Private",
+    "joined": "My Groups"
+  }
+}
