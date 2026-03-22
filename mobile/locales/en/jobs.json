@@ -1,0 +1,118 @@
+{
+  "title": "Jobs",
+  "tabs": {
+    "browse": "Browse",
+    "myApplications": "My Applications"
+  },
+  "search": {
+    "placeholder": "Search jobs..."
+  },
+  "filters": {
+    "type": {
+      "all": "All Types",
+      "paid": "Paid",
+      "volunteer": "Volunteer",
+      "timebank": "Timebank"
+    },
+    "commitment": {
+      "all": "All",
+      "full_time": "Full Time",
+      "part_time": "Part Time",
+      "flexible": "Flexible",
+      "one_off": "One-off"
+    }
+  },
+  "card": {
+    "remote": "Remote",
+    "featured": "Featured",
+    "applications": "{{count}} applications",
+    "deadline": "Closes {{date}}",
+    "salary": "{{min}} – {{max}} / {{type}}"
+  },
+  "detail": {
+    "apply": "Apply Now",
+    "applied": "Applied",
+    "save": "Save",
+    "saved": "Saved",
+    "skills": "Skills Required",
+    "contact": "Contact",
+    "description": "Description",
+    "deadline": "Application Deadline",
+    "matchPercentage": "{{percentage}}% match",
+    "closedBadge": "Closed",
+    "closesToday": "Closes today",
+    "closesIn": "Closes in {{count}} days",
+    "goBack": "Go back",
+    "notFound": "Job not found.",
+    "invalidId": "Invalid job ID.",
+    "saveError": "Could not update saved state.",
+    "timeCredits": "{{count}} time credits",
+    "salaryAnnual": "year",
+    "salaryMonthly": "month",
+    "salaryHourly": "hour"
+  },
+  "apply": {
+    "title": "Apply for {{jobTitle}}",
+    "messagePlaceholder": "Tell the employer why you're a great fit...",
+    "messageLabel": "Cover Message",
+    "submit": "Submit Application",
+    "submitting": "Submitting...",
+    "success": "Application submitted!",
+    "successMessage": "Your application has been sent. Good luck!",
+    "error": "Failed to submit application"
+  },
+  "applications": {
+    "empty": "No applications yet",
+    "emptyHint": "Apply to jobs to see them here",
+    "appliedOn": "Applied {{date}}",
+    "status": {
+      "pending": "Pending",
+      "screening": "Screening",
+      "reviewed": "Reviewed",
+      "interview": "Interview",
+      "offer": "Offer",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn"
+    },
+    "interview_proposed": "Interview requested",
+    "accept_interview": "Accept",
+    "decline_interview": "Decline",
+    "interview_confirmed": "Interview Confirmed",
+    "offer_received": "You received a job offer!",
+    "accept_offer": "Accept Offer",
+    "decline_offer": "Decline",
+    "offer_accepted": "Offer Accepted"
+  },
+  "search": {
+    "advanced": "Advanced Search",
+    "boolean_hint": "e.g. \"developer | engineer\", \"react -junior\"",
+    "salary_min": "Min salary",
+    "salary_max": "Max salary",
+    "company_size_filter": "Company size",
+    "benefits_filter": "Benefits keyword"
+  },
+  "template": {
+    "start_from": "Start from template (optional)",
+    "no_templates": "No templates yet",
+    "save_as": "Save as Template",
+    "template_name": "Template name",
+    "share_with_team": "Share with team (public template)",
+    "saving": "Saving...",
+    "saved": "Template saved!"
+  },
+  "benchmark": {
+    "market_rate": "Market rate for \"{{role}}\": {{currency}}{{min}} – {{currency}}{{max}} / {{type}} (median: {{currency}}{{median}})"
+  },
+  "saved_profile": {
+    "found": "Saved application profile found",
+    "use": "Use Saved Cover Letter",
+    "start_fresh": "Start Fresh"
+  },
+  "empty": "No jobs found",
+  "emptyHint": "Try adjusting your filters or check back later",
+  "loadMore": "Load More",
+  "loading": "Loading jobs...",
+  "error": "Failed to load jobs",
+  "retry": "Retry"
+}

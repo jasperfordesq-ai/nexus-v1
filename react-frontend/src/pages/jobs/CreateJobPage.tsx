@@ -20,14 +20,26 @@ import {
   SelectItem,
   Switch,
   Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@heroui/react';
 import {
   Briefcase,
   ArrowLeft,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  Users,
+  X as XIcon,
+  TrendingUp,
+  FileText,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
-import { useToast, useTenant } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
@@ -52,6 +64,42 @@ interface JobFormData {
   salary_type: string;
   salary_currency: string;
   salary_negotiable: boolean;
+}
+
+const COMPANY_SIZE_OPTIONS = ['1-10', '11-50', '51-200', '201-500', '500+'] as const;
+
+interface SalaryBenchmark {
+  role_keyword: string;
+  salary_min: number;
+  salary_max: number;
+  salary_median: number;
+  salary_type: string;
+  currency: string;
+}
+
+interface JobTemplate {
+  id: number;
+  name: string;
+  type: string;
+  commitment: string;
+  skills_required?: string;
+  is_remote?: boolean;
+  salary_min?: string;
+  salary_max?: string;
+  salary_type?: string;
+  salary_currency?: string;
+  hours_per_week?: string;
+  time_credits?: string;
+  benefits?: string[];
+  tagline?: string;
+  description?: string;
+}
+
+interface TeamMember {
+  id: number;
+  name: string;
+  avatar_url: string | null;
+  role: string;
 }
 
 const INITIAL_FORM: JobFormData = {
@@ -84,6 +132,7 @@ export function CreateJobPage() {
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { isAuthenticated } = useAuth();
 
   const isEditing = Boolean(id);
   usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
@@ -98,6 +147,33 @@ export function CreateJobPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Employer Branding section state
+  const [brandingOpen, setBrandingOpen] = useState(false);
+  const [tagline, setTagline] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [companySize, setCompanySize] = useState('');
+  const [benefits, setBenefits] = useState<string[]>([]);
+  const [benefitInput, setBenefitInput] = useState('');
+
+  // Hiring Team section state
+  const [teamOpen, setTeamOpen] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [teamSearchInput, setTeamSearchInput] = useState('');
+  const [isAddingTeamMember, setIsAddingTeamMember] = useState(false);
+  const [createdJobId, setCreatedJobId] = useState<string | null>(null);
+
+  // Salary Benchmark (Feature 2)
+  const [benchmark, setBenchmark] = useState<SalaryBenchmark | null>(null);
+  const benchmarkDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Job Templates (Feature 3)
+  const [templates, setTemplates] = useState<JobTemplate[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [templateIsPublic, setTemplateIsPublic] = useState(false);
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
   // Parse skills for display
   const skillsArray = form.skills_required
@@ -138,6 +214,11 @@ export function CreateJobPage() {
             salary_currency: str(v.salary_currency),
             salary_negotiable: Boolean(v.salary_negotiable),
           });
+          // Load branding fields
+          if (str(v.tagline)) setTagline(str(v.tagline));
+          if (str(v.video_url)) setVideoUrl(str(v.video_url));
+          if (str(v.company_size)) setCompanySize(str(v.company_size));
+          if (Array.isArray(v.benefits)) setBenefits(v.benefits as string[]);
         } else {
           toastRef.current.error(tRef.current('detail.not_found'));
           navigate(tenantPath('/jobs'));
@@ -153,6 +234,60 @@ export function CreateJobPage() {
 
     loadVacancy();
   }, [id, isEditing, navigate, tenantPath]);
+
+  // Load team members when editing an existing job
+  useEffect(() => {
+    const jobId = isEditing ? id : createdJobId;
+    if (!jobId) return;
+    const controller = new AbortController();
+    api.get<TeamMember[]>(`/v2/jobs/${jobId}/team`)
+      .then((res) => {
+        if (!controller.signal.aborted && res.success && res.data) {
+          setTeamMembers(res.data);
+        }
+      })
+      .catch(() => { /* non-critical */ });
+    return () => { controller.abort(); };
+  }, [id, isEditing, createdJobId]);
+
+  // Feature 3: Load job templates on mount
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const controller = new AbortController();
+    api.get<JobTemplate[]>('/v2/jobs/templates')
+      .then((res) => {
+        if (!controller.signal.aborted && res.success && res.data) {
+          setTemplates(res.data);
+        }
+      })
+      .catch(() => { /* non-critical */ });
+    return () => { controller.abort(); };
+  }, [isAuthenticated]);
+
+  // Feature 2: Salary benchmark — debounce on title change
+  useEffect(() => {
+    if (benchmarkDebounceRef.current) clearTimeout(benchmarkDebounceRef.current);
+    const title = form.title.trim();
+    if (!title) {
+      setBenchmark(null);
+      return;
+    }
+    benchmarkDebounceRef.current = setTimeout(async () => {
+      try {
+        const response = await api.get<SalaryBenchmark>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(title)}`);
+        if (response.success && response.data) {
+          setBenchmark(response.data);
+        } else {
+          setBenchmark(null);
+        }
+      } catch {
+        setBenchmark(null);
+      }
+    }, 600);
+    return () => {
+      if (benchmarkDebounceRef.current) clearTimeout(benchmarkDebounceRef.current);
+    };
+  }, [form.title]);
 
   const updateField = useCallback(<K extends keyof JobFormData>(field: K, value: JobFormData[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -181,6 +316,13 @@ export function CreateJobPage() {
       today.setHours(0, 0, 0, 0);
       if (deadlineDate < today) {
         newErrors.deadline = t('form.validation.deadline_past', 'Deadline must be a future date');
+      }
+    }
+
+    // EU Pay Transparency: salary range required for paid jobs unless negotiable
+    if (form.type === 'paid' && !form.salary_negotiable) {
+      if (!form.salary_min && !form.salary_max) {
+        newErrors.salary_range = t('form.validation.salary_required', "Salary range required. You may check 'Salary negotiable' to omit.");
       }
     }
 
@@ -218,6 +360,12 @@ export function CreateJobPage() {
       if (form.salary_currency.trim()) payload.salary_currency = form.salary_currency.trim();
       payload.salary_negotiable = form.salary_negotiable;
 
+      // Employer Branding fields
+      if (tagline.trim()) payload.tagline = tagline.trim();
+      if (videoUrl.trim()) payload.video_url = videoUrl.trim();
+      if (companySize) payload.company_size = companySize;
+      if (benefits.length > 0) payload.benefits = JSON.stringify(benefits);
+
       let response;
       if (isEditing && id) {
         response = await api.put(`/v2/jobs/${id}`, payload);
@@ -229,6 +377,9 @@ export function CreateJobPage() {
         toastRef.current.success(isEditing ? tRef.current('form.update_success') : tRef.current('form.create_success'));
         const newId = isEditing ? id : (response.data as Record<string, unknown>)?.id;
         if (newId) {
+          if (!isEditing) {
+            setCreatedJobId(String(newId));
+          }
           navigate(tenantPath(`/jobs/${newId}`));
         } else {
           navigate(tenantPath('/jobs'));
@@ -241,6 +392,69 @@ export function CreateJobPage() {
       toastRef.current.error(isEditing ? tRef.current('form.update_error') : tRef.current('form.create_error'));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Feature 3: Apply a template to the form
+  const applyTemplate = useCallback((templateId: string) => {
+    const tpl = templates.find((t) => String(t.id) === templateId);
+    if (!tpl) return;
+    setForm((prev) => ({
+      ...prev,
+      type: tpl.type || prev.type,
+      commitment: tpl.commitment || prev.commitment,
+      skills_required: tpl.skills_required ?? prev.skills_required,
+      is_remote: tpl.is_remote ?? prev.is_remote,
+      salary_min: tpl.salary_min ?? prev.salary_min,
+      salary_max: tpl.salary_max ?? prev.salary_max,
+      salary_type: tpl.salary_type ?? prev.salary_type,
+      salary_currency: tpl.salary_currency ?? prev.salary_currency,
+      hours_per_week: tpl.hours_per_week ?? prev.hours_per_week,
+      time_credits: tpl.time_credits ?? prev.time_credits,
+      description: tpl.description ?? prev.description,
+    }));
+    if (tpl.tagline) setTagline(tpl.tagline);
+    if (tpl.benefits) setBenefits(tpl.benefits);
+    setSelectedTemplate(templateId);
+  }, [templates]);
+
+  // Feature 3: Save current form as a template
+  const handleSaveTemplate = async () => {
+    if (!templateName.trim()) return;
+    setIsSavingTemplate(true);
+    try {
+      const payload = {
+        name: templateName.trim(),
+        is_public: templateIsPublic,
+        type: form.type,
+        commitment: form.commitment,
+        skills_required: form.skills_required,
+        is_remote: form.is_remote,
+        salary_min: form.salary_min,
+        salary_max: form.salary_max,
+        salary_type: form.salary_type,
+        salary_currency: form.salary_currency,
+        hours_per_week: form.hours_per_week,
+        time_credits: form.time_credits,
+        benefits: JSON.stringify(benefits),
+        tagline,
+        description: form.description,
+      };
+      const response = await api.post<JobTemplate>('/v2/jobs/templates', payload);
+      if (response.success && response.data) {
+        setTemplates((prev) => [...prev, response.data!]);
+        toast.success(t('template.saved', 'Template saved!'));
+      } else {
+        toast.error(t('template.save_error', 'Failed to save template'));
+      }
+    } catch (err) {
+      logError('Failed to save template', err);
+      toast.error(t('template.save_error', 'Failed to save template'));
+    } finally {
+      setIsSavingTemplate(false);
+      setSaveTemplateOpen(false);
+      setTemplateName('');
+      setTemplateIsPublic(false);
     }
   };
 
@@ -278,6 +492,26 @@ export function CreateJobPage() {
         </h1>
 
         <div className="space-y-5">
+          {/* Feature 3: Start from template */}
+          {templates.length > 0 && (
+            <Select
+              label={t('template.start_from', 'Start from template (optional)')}
+              selectedKeys={selectedTemplate ? [selectedTemplate] : []}
+              onChange={(e) => {
+                if (e.target.value) applyTemplate(e.target.value);
+              }}
+              startContent={<FileText className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+              classNames={{
+                trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                value: 'text-theme-primary',
+              }}
+            >
+              {templates.map((tpl) => (
+                <SelectItem key={String(tpl.id)}>{tpl.name}</SelectItem>
+              ))}
+            </Select>
+          )}
+
           {/* Title */}
           <Input
             label={t('form.title_label')}
@@ -475,36 +709,77 @@ export function CreateJobPage() {
             }}
           />
 
-          {/* J9: Salary/Compensation */}
+          {/* J9: Salary/Compensation + EU Pay Transparency */}
           {form.type === 'paid' && (
             <div className="space-y-4 pt-2">
               <h3 className="text-sm font-semibold text-theme-primary">{t('form.salary_section')}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  type="number"
-                  label={t('form.salary_min_label')}
-                  value={form.salary_min}
-                  onChange={(e) => updateField('salary_min', e.target.value)}
-                  min="0"
-                  step="100"
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary',
-                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                  }}
-                />
-                <Input
-                  type="number"
-                  label={t('form.salary_max_label')}
-                  value={form.salary_max}
-                  onChange={(e) => updateField('salary_max', e.target.value)}
-                  min="0"
-                  step="100"
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary',
-                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                  }}
-                />
+
+              {/* Negotiable toggle first so it gates the required fields */}
+              <Switch
+                isSelected={form.salary_negotiable}
+                onValueChange={(v) => {
+                  updateField('salary_negotiable', v);
+                  // Clear salary range error when negotiable is checked
+                  if (v && errors.salary_range) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.salary_range;
+                      return next;
+                    });
+                  }
+                }}
+                classNames={{ label: 'text-theme-primary text-sm' }}
+              >
+                <p className="text-sm text-theme-primary">{t('form.salary_negotiable_label')}</p>
+              </Switch>
+
+              {/* Salary range fields — required when NOT negotiable */}
+              <div className="space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    type="number"
+                    label={`${t('form.salary_min_label')}${!form.salary_negotiable ? ' *' : ''}`}
+                    value={form.salary_min}
+                    onChange={(e) => updateField('salary_min', e.target.value)}
+                    min="0"
+                    step="100"
+                    isInvalid={!!errors.salary_range && !form.salary_negotiable}
+                    isDisabled={form.salary_negotiable}
+                    classNames={{
+                      input: 'bg-transparent text-theme-primary',
+                      inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                    }}
+                  />
+                  <Input
+                    type="number"
+                    label={`${t('form.salary_max_label')}${!form.salary_negotiable ? ' *' : ''}`}
+                    value={form.salary_max}
+                    onChange={(e) => updateField('salary_max', e.target.value)}
+                    min="0"
+                    step="100"
+                    isInvalid={!!errors.salary_range && !form.salary_negotiable}
+                    isDisabled={form.salary_negotiable}
+                    classNames={{
+                      input: 'bg-transparent text-theme-primary',
+                      inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                    }}
+                  />
+                </div>
+                {errors.salary_range && (
+                  <p className="text-xs text-danger">{errors.salary_range}</p>
+                )}
+                {/* EU Pay Transparency info chip */}
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  color="primary"
+                  startContent={<Info size={12} aria-hidden="true" />}
+                  className="text-xs"
+                >
+                  {t('form.salary_transparency_hint', 'Required under EU Pay Transparency Directive (June 2026)')}
+                </Chip>
               </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
                   label={t('form.salary_type_label')}
@@ -530,13 +805,239 @@ export function CreateJobPage() {
                   }}
                 />
               </div>
-              <Switch
-                isSelected={form.salary_negotiable}
-                onValueChange={(v) => updateField('salary_negotiable', v)}
-                classNames={{ label: 'text-theme-primary text-sm' }}
+            </div>
+          )}
+
+          {/* Feature 2: Salary Benchmark widget */}
+          {benchmark && (
+            <div className="flex items-start gap-3 bg-primary/5 rounded-lg p-3">
+              <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-xs text-theme-primary">
+                {t('benchmark.market_rate', {
+                  role: benchmark.role_keyword,
+                  currency: benchmark.currency,
+                  min: benchmark.salary_min.toLocaleString(),
+                  max: benchmark.salary_max.toLocaleString(),
+                  type: benchmark.salary_type,
+                  median: benchmark.salary_median.toLocaleString(),
+                  defaultValue: `Market rate for "${benchmark.role_keyword}": ${benchmark.currency}${benchmark.salary_min.toLocaleString()} – ${benchmark.currency}${benchmark.salary_max.toLocaleString()} / ${benchmark.salary_type} (median: ${benchmark.currency}${benchmark.salary_median.toLocaleString()})`,
+                })}
+              </p>
+            </div>
+          )}
+
+          {/* Employer Branding section */}
+          <div className="border border-theme-default rounded-xl overflow-hidden">
+            <button
+              type="button"
+              className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors"
+              onClick={() => setBrandingOpen((o) => !o)}
+              aria-expanded={brandingOpen}
+            >
+              <span className="font-semibold text-theme-primary text-sm">{t('branding.section')}</span>
+              {brandingOpen
+                ? <ChevronUp size={16} className="text-theme-subtle" aria-hidden="true" />
+                : <ChevronDown size={16} className="text-theme-subtle" aria-hidden="true" />
+              }
+            </button>
+            {brandingOpen && (
+              <div className="p-4 space-y-4 border-t border-theme-default">
+                {/* Tagline */}
+                <Input
+                  label={t('branding.tagline_label')}
+                  placeholder={t('branding.tagline_placeholder')}
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value.slice(0, 160))}
+                  maxLength={160}
+                  description={`${tagline.length}/160`}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  }}
+                />
+
+                {/* Culture Video URL */}
+                <Input
+                  type="url"
+                  label={t('branding.video_label')}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary',
+                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                  }}
+                />
+
+                {/* Company Size */}
+                <Select
+                  label={t('branding.size_label')}
+                  selectedKeys={companySize ? [companySize] : []}
+                  onChange={(e) => setCompanySize(e.target.value)}
+                  classNames={{
+                    trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                    value: 'text-theme-primary',
+                  }}
+                >
+                  {COMPANY_SIZE_OPTIONS.map((s) => (
+                    <SelectItem key={s}>{s}</SelectItem>
+                  ))}
+                </Select>
+
+                {/* Benefits tag input */}
+                <div>
+                  <Input
+                    label={t('branding.benefits_label')}
+                    placeholder={t('branding.benefits_placeholder')}
+                    value={benefitInput}
+                    onChange={(e) => setBenefitInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = benefitInput.trim();
+                        if (val && !benefits.includes(val)) {
+                          setBenefits((prev) => [...prev, val]);
+                        }
+                        setBenefitInput('');
+                      }
+                    }}
+                    classNames={{
+                      input: 'bg-transparent text-theme-primary',
+                      inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                    }}
+                  />
+                  {benefits.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {benefits.map((benefit, idx) => (
+                        <Chip
+                          key={idx}
+                          size="sm"
+                          variant="flat"
+                          color="success"
+                          onClose={() => setBenefits((prev) => prev.filter((_, i) => i !== idx))}
+                        >
+                          {benefit}
+                        </Chip>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Hiring Team section (only shown when editing or after creation) */}
+          {(isEditing || createdJobId) && (
+            <div className="border border-theme-default rounded-xl overflow-hidden">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors"
+                onClick={() => setTeamOpen((o) => !o)}
+                aria-expanded={teamOpen}
               >
-                <p className="text-sm text-theme-primary">{t('form.salary_negotiable_label')}</p>
-              </Switch>
+                <span className="font-semibold text-theme-primary text-sm flex items-center gap-2">
+                  <Users size={15} aria-hidden="true" />
+                  {t('team.section')}
+                </span>
+                {teamOpen
+                  ? <ChevronUp size={16} className="text-theme-subtle" aria-hidden="true" />
+                  : <ChevronDown size={16} className="text-theme-subtle" aria-hidden="true" />
+                }
+              </button>
+              {teamOpen && (
+                <div className="p-4 space-y-4 border-t border-theme-default">
+                  {/* Current team members */}
+                  {teamMembers.length > 0 && (
+                    <div className="space-y-2">
+                      {teamMembers.map((member) => (
+                        <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg bg-theme-elevated">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-theme-primary">{member.name}</p>
+                            <p className="text-xs text-theme-subtle">{t(`team.role_${member.role}`, member.role)}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="flat"
+                            color="danger"
+                            isIconOnly
+                            aria-label={t('team.remove')}
+                            onPress={async () => {
+                              const jobId = isEditing ? id : createdJobId;
+                              if (!jobId) return;
+                              try {
+                                const res = await api.delete(`/v2/jobs/${jobId}/team/${member.id}`);
+                                if (res.success) {
+                                  setTeamMembers((prev) => prev.filter((m) => m.id !== member.id));
+                                }
+                              } catch (err) {
+                                logError('Failed to remove team member', err);
+                              }
+                            }}
+                          >
+                            <XIcon size={14} aria-hidden="true" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add reviewer row */}
+                  <div className="flex gap-2">
+                    <Input
+                      label={t('team.add_reviewer')}
+                      placeholder="User ID or name"
+                      value={teamSearchInput}
+                      onChange={(e) => setTeamSearchInput(e.target.value)}
+                      className="flex-1"
+                      classNames={{
+                        input: 'bg-transparent text-theme-primary',
+                        inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                      }}
+                    />
+                    <Button
+                      variant="flat"
+                      className="self-end bg-theme-elevated text-theme-muted"
+                      isLoading={isAddingTeamMember}
+                      isDisabled={!teamSearchInput.trim()}
+                      onPress={async () => {
+                        const jobId = isEditing ? id : createdJobId;
+                        if (!jobId || !teamSearchInput.trim()) return;
+                        setIsAddingTeamMember(true);
+                        try {
+                          const userId = parseInt(teamSearchInput.trim(), 10);
+                          if (isNaN(userId)) return;
+                          const res = await api.post(`/v2/jobs/${jobId}/team`, { user_id: userId, role: 'reviewer' });
+                          if (res.success && res.data) {
+                            setTeamMembers((prev) => [...prev, res.data as TeamMember]);
+                            setTeamSearchInput('');
+                          }
+                        } catch (err) {
+                          logError('Failed to add team member', err);
+                        } finally {
+                          setIsAddingTeamMember(false);
+                        }
+                      }}
+                    >
+                      {t('team.add')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Feature 3: Save as Template button */}
+          {isAuthenticated && (
+            <div className="flex justify-start pt-2">
+              <Button
+                size="sm"
+                variant="flat"
+                className="bg-theme-elevated text-theme-muted"
+                startContent={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
+                onPress={() => setSaveTemplateOpen(true)}
+              >
+                {t('template.save_as', 'Save as Template')}
+              </Button>
             </div>
           )}
 
@@ -578,11 +1079,16 @@ export function CreateJobPage() {
                     if (form.salary_type) payload.salary_type = form.salary_type;
                     if (form.salary_currency.trim()) payload.salary_currency = form.salary_currency.trim();
                     payload.salary_negotiable = form.salary_negotiable;
+                    if (tagline.trim()) payload.tagline = tagline.trim();
+                    if (videoUrl.trim()) payload.video_url = videoUrl.trim();
+                    if (companySize) payload.company_size = companySize;
+                    if (benefits.length > 0) payload.benefits = JSON.stringify(benefits);
                     const response = await api.post('/v2/jobs', payload);
                     if (response.success) {
                       toastRef.current.success(tRef.current('form.draft_saved', 'Draft saved'));
                       const newId = (response.data as Record<string, unknown>)?.id;
                       if (newId) {
+                        setCreatedJobId(String(newId));
                         navigate(tenantPath(`/jobs/${newId}`));
                       } else {
                         navigate(tenantPath('/jobs'));
@@ -616,6 +1122,59 @@ export function CreateJobPage() {
           </div>
         </div>
       </GlassCard>
+
+      {/* Feature 3: Save as Template Modal */}
+      <Modal
+        isOpen={saveTemplateOpen}
+        onClose={() => setSaveTemplateOpen(false)}
+        placement="center"
+        size="sm"
+      >
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">
+            {t('template.save_as', 'Save as Template')}
+          </ModalHeader>
+          <ModalBody className="space-y-4">
+            <Input
+              label={t('template.template_name', 'Template name')}
+              placeholder={t('template.name_placeholder', 'e.g. Senior Developer Role')}
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              isRequired
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
+            />
+            <Switch
+              isSelected={templateIsPublic}
+              onValueChange={setTemplateIsPublic}
+              classNames={{ label: 'text-theme-primary text-sm' }}
+            >
+              {t('template.share_with_team', 'Share with team (public template)')}
+            </Switch>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="text-theme-muted"
+              onPress={() => setSaveTemplateOpen(false)}
+            >
+              {t('form.cancel')}
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              onPress={() => void handleSaveTemplate()}
+              isLoading={isSavingTemplate}
+              isDisabled={!templateName.trim()}
+            >
+              {isSavingTemplate
+                ? t('template.saving', 'Saving...')
+                : t('template.saved', 'Save Template')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

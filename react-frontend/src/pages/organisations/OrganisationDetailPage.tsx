@@ -95,6 +95,15 @@ interface Review {
   created_at: string;
 }
 
+interface MinimalJob {
+  id: number;
+  title: string;
+  type: string;
+  location: string | null;
+  is_remote: boolean;
+  deadline: string | null;
+}
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function OrganisationDetailPage() {
@@ -106,6 +115,7 @@ export function OrganisationDetailPage() {
   const [organisation, setOrganisation] = useState<OrganisationDetail | null>(null);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [orgJobs, setOrgJobs] = useState<MinimalJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -135,11 +145,12 @@ export function OrganisationDetailPage() {
       setIsLoading(true);
       setError(null);
 
-      // Load org details, opportunities, and reviews in parallel
-      const [orgRes, oppsRes, reviewsRes] = await Promise.all([
+      // Load org details, opportunities, reviews, and job openings in parallel
+      const [orgRes, oppsRes, reviewsRes, jobsRes] = await Promise.all([
         api.get<OrganisationDetail>(`/v2/volunteering/organisations/${id}`),
         api.get<{ data: Opportunity[] }>(`/v2/volunteering/opportunities?organization_id=${id}&per_page=50`),
         api.get<{ reviews: Review[] }>(`/v2/volunteering/reviews/organization/${id}`),
+        api.get<{ data: MinimalJob[] } | MinimalJob[]>(`/v2/jobs?organization_id=${id}&status=open&limit=10`),
       ]);
 
       if (controller.signal.aborted) return;
@@ -158,6 +169,14 @@ export function OrganisationDetailPage() {
       if (reviewsRes.success && reviewsRes.data) {
         const reviewsData = reviewsRes.data as { reviews?: Review[] };
         setReviews(reviewsData.reviews ?? []);
+      }
+
+      if (jobsRes.success && jobsRes.data) {
+        const jobsData = jobsRes.data;
+        const jobs = Array.isArray(jobsData)
+          ? jobsData as MinimalJob[]
+          : ('data' in jobsData ? jobsData.data : []);
+        setOrgJobs(jobs);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -411,6 +430,48 @@ export function OrganisationDetailPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Job Openings */}
+      {orgJobs.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            {t('organisation_detail.job_openings', 'Job Openings')}
+            <Chip size="sm" variant="flat" className="text-theme-subtle">{orgJobs.length}</Chip>
+          </h2>
+          <div className="space-y-3">
+            {orgJobs.map((job) => (
+              <Link key={job.id} to={tenantPath(`/jobs/${job.id}`)} className="block">
+                <GlassCard className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-theme-primary">{job.title}</p>
+                      <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-theme-muted">
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          color={job.type === 'paid' ? 'success' : job.type === 'timebank' ? 'warning' : 'primary'}
+                        >
+                          {job.type}
+                        </Chip>
+                        {job.is_remote ? (
+                          <span>Remote</span>
+                        ) : job.location ? (
+                          <span>{job.location}</span>
+                        ) : null}
+                        {job.deadline && (
+                          <span>Closes {new Date(job.deadline).toLocaleDateString()}</span>
+                        )}
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
+                  </div>
+                </GlassCard>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Reviews */}
       {reviews.length > 0 && (

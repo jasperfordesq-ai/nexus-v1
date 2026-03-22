@@ -74,7 +74,11 @@
     "matched": "Matched Skills",
     "missing": "Missing Skills",
     "no_skills_required": "No specific skills required",
-    "no_user_skills": "Add skills to your profile to see your match"
+    "no_user_skills": "Add skills to your profile to see your match",
+    "why_you_match": "Why you match",
+    "you_have": "You have:",
+    "to_develop": "Skills to develop:",
+    "ai_summary_label": "AI Assessment"
   },
   "qualified": {
     "title": "Am I Qualified?",
@@ -94,7 +98,30 @@
     "offer": "Offer",
     "accepted": "Accepted",
     "rejected": "Rejected",
-    "move_to": "Move to {{stage}}"
+    "move_to": "Move to {{stage}}",
+    "no_rules": "No automation rules yet.",
+    "add_rule": "Add rule",
+    "trigger": "If in stage",
+    "days": "Days",
+    "action": "Action",
+    "target": "Move to",
+    "add": "Add Rule",
+    "delete": "Delete"
+  },
+  "employer": {
+    "page_title": "Employer Profile",
+    "open_roles": "open roles",
+    "open_roles_heading": "Open Roles",
+    "no_roles": "No open roles at this time",
+    "error": "Unable to load employer profile",
+    "employer_jobs": "Employer Jobs"
+  },
+  "bulk": {
+    "select_action": "Move to stage...",
+    "apply": "Apply",
+    "clear": "Clear selection",
+    "success": "Applications updated",
+    "error": "Bulk update failed"
   },
   "history": {
     "title": "Status History",
@@ -155,7 +182,13 @@
     "days": "days",
     "views_over_time": "Views Over Time",
     "applications_by_stage": "Applications by Stage",
-    "no_data": "No analytics data yet"
+    "no_data": "No analytics data yet",
+    "weekly_trend": "Weekly Applications",
+    "referral_shares": "Total Shares",
+    "referral_apps": "Referral Applications",
+    "referral_conversion": "Referral Conversion",
+    "scorecard_avg": "Avg Scorecard",
+    "export_csv": "Export CSV"
   },
   "salary": {
     "label": "Compensation",
@@ -172,6 +205,67 @@
     "form_currency_label": "Currency",
     "form_currency_placeholder": "e.g. USD, EUR, GBP",
     "form_negotiable_label": "Salary is negotiable"
+  },
+  "my_applications": {
+    "title": "My Applications",
+    "empty_title": "No applications yet",
+    "empty_description": "Your job applications will appear here",
+    "withdraw_aria": "Withdraw application for {{title}}"
+  },
+  "gdpr": {
+    "export_my_data": "Download my data",
+    "erase_my_data": "Erase my data",
+    "export_success": "Data exported successfully"
+  },
+  "application_withdrawn": "Application withdrawn successfully.",
+  "something_wrong": "Something went wrong. Please try again.",
+  "vacancy_closed": "Vacancy closed",
+  "vacancy_reopened": "Vacancy reopened",
+  "recommended": {
+    "title": "Recommended",
+    "empty_title": "No recommendations yet",
+    "empty_description": "Complete your profile skills to get matched with relevant opportunities"
+  },
+  "geo": {
+    "near_me": "Near me",
+    "radius_label": "Search radius",
+    "radius_5": "5 km",
+    "radius_10": "10 km",
+    "radius_25": "25 km",
+    "radius_50": "50 km",
+    "radius_100": "100 km",
+    "within": "Within {{radius}}km",
+    "clear": "Clear location filter",
+    "not_supported": "Geolocation is not supported by your browser",
+    "permission_denied": "Location access denied. Please allow location access to use this feature."
+  },
+  "kanban": {
+    "pipeline_title": "Kanban Pipeline",
+    "not_authorized": "You are not authorized to view this pipeline.",
+    "download_cv": "Download CV"
+  },
+  "apply": {
+    "button": "Apply Now",
+    "button_label": "Apply for {{title}}",
+    "applied": "Applied",
+    "title": "Apply for this position",
+    "message_label": "Your message (optional)",
+    "message_placeholder": "Tell them why you're a great fit...",
+    "submit": "Submit Application",
+    "cancel": "Cancel",
+    "success": "Application submitted successfully!",
+    "error": "Failed to submit application",
+    "own_vacancy": "This is your vacancy",
+    "closed": "No longer accepting applications",
+    "login_required": "Log in to apply",
+    "cv_label": "CV / Resume",
+    "cv_hint": "(optional — PDF, DOC, DOCX, max 5MB)",
+    "cv_drop_prompt": "Drop CV here or click to browse",
+    "cv_remove": "Remove CV",
+    "cv_dropzone_aria": "Click or drop file to upload CV",
+    "cv_too_large": "CV file must be under 5MB",
+    "cv_invalid_type": "Only PDF, DOC, or DOCX files are supported",
+    "message_employer": "Message Employer"
   },
   "detail": {
     "loading": "Loading vacancy...",
@@ -196,6 +290,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "confirm_delete": "Are you sure you want to delete this vacancy?",
+    "confirm_delete_title": "Delete Vacancy",
     "deleted": "Vacancy deleted successfully",
     "delete_error": "Failed to delete vacancy",
     "views": "{{count}} views",
@@ -213,21 +308,116 @@
     "status_update_error": "Failed to update application status",
     "renew": "Renew",
     "analytics": "Analytics",
-    "check_qualification": "Am I Qualified?"
+    "check_qualification": "Am I Qualified?",
+    "owner_banner_title": "You posted this vacancy",
+    "owner_has_applicants": "{{count}} applicant(s) — scroll down to review",
+    "owner_no_applicants": "No applicants yet — share this listing to get more visibility",
+    "close_vacancy": "Close Vacancy",
+    "reopen_vacancy": "Reopen",
+    "refresh": "Refresh",
+    "message_applicant": "Message",
+    "kanban_board": "Kanban Board"
   },
-  "apply": {
-    "button": "Apply Now",
-    "applied": "Applied",
-    "title": "Apply for this position",
-    "message_label": "Your message (optional)",
-    "message_placeholder": "Tell them why you're a great fit...",
-    "submit": "Submit Application",
-    "cancel": "Cancel",
-    "success": "Application submitted successfully!",
-    "error": "Failed to submit application",
-    "own_vacancy": "This is your vacancy",
-    "closed": "No longer accepting applications",
-    "login_required": "Log in to apply"
+  "interview": {
+    "schedule": "Schedule Interview",
+    "type_video": "Video Call",
+    "type_phone": "Phone Call",
+    "type_in_person": "In Person",
+    "duration": "Duration",
+    "datetime": "Date & Time",
+    "location": "Meeting Link / Location",
+    "send_request": "Send Interview Request",
+    "accepted": "Interview Confirmed",
+    "proposed": "Interview Requested",
+    "declined": "Interview Declined",
+    "accept": "Accept",
+    "decline": "Decline"
+  },
+  "offer": {
+    "title": "You received an offer!",
+    "salary": "Salary",
+    "start_date": "Start Date",
+    "accept": "Accept Offer",
+    "reject": "Decline",
+    "accepted": "Offer Accepted",
+    "rejected": "Offer Declined",
+    "send": "Send Offer",
+    "modal_title": "Send Job Offer"
+  },
+  "org": {
+    "job_openings": "Job Openings"
+  },
+  "cv": {
+    "parse": "Skills will be extracted after submission",
+    "parsing": "Analysing CV...",
+    "detected": "Skills detected from CV",
+    "parsed_toast": "Application submitted! {{count}} skills detected from your CV."
+  },
+  "branding": {
+    "section": "Employer Branding",
+    "tagline_label": "Company Tagline",
+    "tagline_placeholder": "What makes your company great?",
+    "video_label": "Culture Video URL",
+    "size_label": "Company Size",
+    "benefits_label": "Benefits & Perks",
+    "benefits_placeholder": "Type a benefit and press Enter",
+    "about_company": "About the Company"
+  },
+  "referral": {
+    "share": "Share & Earn",
+    "copied": "Referral link copied to clipboard!"
+  },
+  "scorecard": {
+    "title": "Score Applicant",
+    "criteria": "Scoring Criteria",
+    "notes": "Reviewer Notes",
+    "save": "Save Scorecard",
+    "saved": "Scorecard saved",
+    "communication": "Communication",
+    "technical": "Technical Skills",
+    "cultural_fit": "Cultural Fit",
+    "experience": "Experience",
+    "motivation": "Motivation"
+  },
+  "saved_profile": {
+    "found": "Saved application profile found",
+    "use": "Use Saved Profile",
+    "start_fresh": "Start Fresh"
+  },
+  "team": {
+    "section": "Hiring Team",
+    "add_reviewer": "Add Reviewer",
+    "add": "Add",
+    "remove": "Remove",
+    "role_reviewer": "Reviewer",
+    "role_manager": "Manager"
+  },
+  "search": {
+    "label": "Search job vacancies",
+    "advanced": "Advanced Search",
+    "boolean_hint": "e.g. \"developer | engineer\", \"react -junior\"",
+    "bool_and": "AND (all words)",
+    "bool_or": "OR (any word)",
+    "bool_not": "NOT (exclude)",
+    "salary_min": "Min salary",
+    "salary_max": "Max salary",
+    "company_size_filter": "Company size",
+    "benefits_filter": "Benefits keyword",
+    "benefits_placeholder": "e.g. remote, health, pension"
+  },
+  "template": {
+    "start_from": "Start from template (optional)",
+    "no_templates": "No templates yet",
+    "save_as": "Save as Template",
+    "template_name": "Template name",
+    "name_placeholder": "e.g. Senior Developer Role",
+    "share_with_team": "Share with team (public template)",
+    "saving": "Saving...",
+    "saved": "Template saved!",
+    "save_error": "Failed to save template"
+  },
+  "benchmark": {
+    "market_rate": "Market rate for \"{{role}}\": {{currency}}{{min}} – {{currency}}{{max}} / {{type}} (median: {{currency}}{{median}})"
   },
   "form": {
     "create_title": "Post a Job Vacancy",
@@ -263,6 +453,7 @@
     "salary_currency_label": "Currency",
     "salary_currency_placeholder": "e.g. USD, EUR, GBP",
     "salary_negotiable_label": "Salary is negotiable",
+    "salary_transparency_hint": "Required under EU Pay Transparency Directive (June 2026)",
     "submit_create": "Post Vacancy",
     "submit_update": "Save Changes",
     "cancel": "Cancel",
@@ -274,16 +465,9 @@
     "update_error": "Failed to update vacancy",
     "validation": {
       "title_required": "Title is required",
-      "description_required": "Description is required"
+      "description_required": "Description is required",
+      "deadline_past": "Deadline must be a future date",
+      "salary_required": "Salary range required. You may check 'Salary negotiable' to omit."
     }
-  },
-  "my_applications": {
-    "title": "My Applications",
-    "empty_title": "No applications yet",
-    "empty_description": "Your job applications will appear here"
-  },
-  "application_withdrawn": "Application withdrawn successfully.",
-  "something_wrong": "Something went wrong. Please try again.",
-  "vacancy_closed": "Vacancy closed",
-  "vacancy_reopened": "Vacancy reopened"
+  }
 }

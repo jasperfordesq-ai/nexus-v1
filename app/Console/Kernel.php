@@ -8,6 +8,7 @@
 namespace App\Console;
 
 use App\Services\CronJobRunner;
+use App\Services\JobExpiryNotificationService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -35,6 +36,13 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(10)
             ->name('nexus:run-all')
             ->runInBackground();
+
+        $schedule->call(function () {
+            JobExpiryNotificationService::notifyExpiringSoon();
+        })
+            ->dailyAt('08:00')
+            ->name('job-expiry-notifications')
+            ->withoutOverlapping();
     }
 
     /**

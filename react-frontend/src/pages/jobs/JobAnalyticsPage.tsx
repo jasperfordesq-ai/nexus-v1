@@ -25,12 +25,15 @@ import {
   Clock,
   ArrowLeft,
   RefreshCw,
+  Download,
+  Share2,
+  Star,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
-import { api } from '@/lib/api';
+import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 
@@ -44,6 +47,9 @@ interface AnalyticsData {
   time_to_fill_days: number | null;
   views_by_day: Array<{ date: string; count: number }>;
   applications_by_stage: Array<{ stage: string; count: number }>;
+  weekly_trend: { week: string; count: number }[];
+  referral_stats: { total_shares: number; referral_applications: number; referral_conversion_pct: number } | null;
+  scorecard_avg: number | null;
   created_at: string;
   status: string;
 }
@@ -149,6 +155,10 @@ export function JobAnalyticsPage() {
   // Find the max view count for the bar chart
   const maxViews = Math.max(...analytics.views_by_day.map((d) => Number(d.count)), 1);
 
+  const handleExportCsv = () => {
+    window.open(API_BASE + `/v2/jobs/${id}/applications/export-csv`, '_blank');
+  };
+
   return (
     <div className="space-y-6">
       {/* Back nav */}
@@ -160,10 +170,20 @@ export function JobAnalyticsPage() {
         {t('detail.browse_vacancies')}
       </Link>
 
-      <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-        <BarChart3 className="w-7 h-7 text-blue-400" aria-hidden="true" />
-        {t('analytics.title')}
-      </h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
+          <BarChart3 className="w-7 h-7 text-blue-400" aria-hidden="true" />
+          {t('analytics.title')}
+        </h1>
+        <Button
+          variant="flat"
+          className="bg-theme-elevated text-theme-muted self-start sm:self-auto"
+          startContent={<Download className="w-4 h-4" aria-hidden="true" />}
+          onPress={handleExportCsv}
+        >
+          {t('analytics.export_csv', 'Export CSV')}
+        </Button>
+      </div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -188,6 +208,48 @@ export function JobAnalyticsPage() {
           value={`${analytics.conversion_rate}%`}
         />
       </div>
+
+      {/* Referral stats + Scorecard chips */}
+      {(analytics.referral_stats || analytics.scorecard_avg !== null) && (
+        <div className="flex flex-wrap gap-3">
+          {analytics.referral_stats && (
+            <>
+              <GlassCard className="p-4 flex items-center gap-3">
+                <Share2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
+                <div>
+                  <p className="text-xs text-theme-subtle">{t('analytics.referral_shares', 'Total Shares')}</p>
+                  <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.total_shares.toLocaleString()}</p>
+                </div>
+              </GlassCard>
+              <GlassCard className="p-4 flex items-center gap-3">
+                <Users className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
+                <div>
+                  <p className="text-xs text-theme-subtle">{t('analytics.referral_apps', 'Referral Applications')}</p>
+                  <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.referral_applications.toLocaleString()}</p>
+                </div>
+              </GlassCard>
+              <GlassCard className="p-4 flex items-center gap-3">
+                <TrendingUp className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
+                <div>
+                  <p className="text-xs text-theme-subtle">{t('analytics.referral_conversion', 'Referral Conversion')}</p>
+                  <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.referral_conversion_pct}%</p>
+                </div>
+              </GlassCard>
+            </>
+          )}
+          {analytics.scorecard_avg !== null && (
+            <GlassCard className="p-4 flex items-center gap-3">
+              <Star className={`w-4 h-4 ${analytics.scorecard_avg >= 60 ? 'text-success' : 'text-warning'}`} aria-hidden="true" />
+              <div>
+                <p className="text-xs text-theme-subtle">{t('analytics.scorecard_avg', 'Avg Scorecard')}</p>
+                <p className={`text-lg font-bold ${analytics.scorecard_avg >= 60 ? 'text-success' : 'text-warning'}`}>
+                  {analytics.scorecard_avg}%
+                </p>
+              </div>
+            </GlassCard>
+          )}
+        </div>
+      )}
 
       {/* Secondary metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -246,6 +308,41 @@ export function JobAnalyticsPage() {
               );
             })}
           </div>
+        </GlassCard>
+      )}
+
+      {/* Weekly Application Trend */}
+      {analytics.weekly_trend && analytics.weekly_trend.length > 0 && (
+        <GlassCard className="p-6">
+          <h2 className="text-lg font-semibold text-theme-primary mb-4">
+            {t('analytics.weekly_trend', 'Weekly Applications (last 8 weeks)')}
+          </h2>
+          {(() => {
+            const maxWeeklyCount = Math.max(...analytics.weekly_trend.map((w) => Number(w.count)), 1);
+            return (
+              <div className="flex items-end gap-1 h-40">
+                {analytics.weekly_trend.map((week) => {
+                  const height = (Number(week.count) / maxWeeklyCount) * 100;
+                  return (
+                    <div
+                      key={week.week}
+                      className="flex-1 flex flex-col items-center gap-1"
+                    >
+                      <span className="text-[10px] text-theme-subtle">{Number(week.count)}</span>
+                      <div
+                        className="w-full bg-gradient-to-t from-purple-500 to-indigo-400 rounded-t min-h-[2px]"
+                        style={{ height: `${Math.max(height, 2)}%` }}
+                        title={`${week.week}: ${week.count} applications`}
+                      />
+                      <span className="text-[9px] text-theme-subtle rotate-[-45deg] origin-top-left whitespace-nowrap">
+                        {week.week}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </GlassCard>
       )}
 

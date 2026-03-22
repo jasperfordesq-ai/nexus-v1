@@ -7,11 +7,13 @@
 namespace App\Providers;
 
 use App\Events\ConnectionRequested;
+use App\Events\JobVacancyCreated;
 use App\Events\ListingCreated;
 use App\Events\MessageSent;
 use App\Events\TransactionCompleted;
 use App\Events\UserRegistered;
 use App\Listeners\NotifyConnectionRequest;
+use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
 use App\Listeners\SendWelcomeNotification;
 use App\Listeners\UpdateFeedOnListingCreated;
@@ -51,6 +53,10 @@ class EventServiceProvider extends ServiceProvider
 
         MessageSent::class => [
             NotifyMessageReceived::class,
+        ],
+
+        JobVacancyCreated::class => [
+            NotifyJobAlertSubscribers::class,
         ],
     ];
 

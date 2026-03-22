@@ -7,7 +7,24 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\Models\JobApplication;
+use App\Models\JobOffer;
+use App\Services\AiChatService;
+use App\Services\JobGdprService;
+use App\Services\JobInterviewService;
+use App\Services\JobOfferService;
+use App\Services\JobReferralService;
+use App\Services\JobSavedProfileService;
+use App\Services\JobScorecardService;
+use App\Services\JobTeamService;
+use App\Services\JobPipelineRuleService;
 use App\Services\JobVacancyService;
+use App\Services\JobTemplateService;
+use App\Services\SalaryBenchmarkService;
 use App\Core\TenantContext;
 
 /**
@@ -77,6 +94,15 @@ class JobVacanciesController extends BaseApiController
         if ($this->query('featured')) {
             $filters['featured'] = $this->queryBool('featured');
         }
+        if ($this->query('latitude') !== null) {
+            $filters['latitude'] = (float) $this->query('latitude');
+        }
+        if ($this->query('longitude') !== null) {
+            $filters['longitude'] = (float) $this->query('longitude');
+        }
+        if ($this->query('radius_km') !== null) {
+            $filters['radius_km'] = (float) $this->query('radius_km');
+        }
 
         $result = $this->jobService->getAll($filters, $userId);
 
@@ -117,6 +143,11 @@ class JobVacanciesController extends BaseApiController
 
         $data = $this->getAllInput();
         $jobId = $this->jobService->create($userId, $data);
+
+        if (!$jobId) {
+            $errors = $this->jobService->getErrors();
+            return $this->respondWithErrors($errors ?: [['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to create job vacancy']], 422);
+        }
 
         $job = $this->jobService->getById($jobId);
 
@@ -187,20 +218,51 @@ class JobVacanciesController extends BaseApiController
         return $this->noContent();
     }
 
-    /** POST /api/v2/jobs/{id}/apply — apply to a job */
+    /** POST /api/v2/jobs/{id}/apply — apply to a job (supports CV file upload via multipart) */
     public function apply(int $id): JsonResponse
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('jobs_apply', 5, 60);
 
+        $tenantId = TenantContext::getId();
+
+        $cvPath = null;
+        $cvFilename = null;
+        $cvSize = null;
+
+        if (request()->hasFile('cv')) {
+            $file = request()->file('cv');
+            $allowed = ['pdf', 'doc', 'docx'];
+            $ext = strtolower($file->getClientOriginalExtension());
+            if (!in_array($ext, $allowed)) {
+                return $this->respondWithError('VALIDATION_INVALID_VALUE', 'Invalid file type. Allowed: PDF, DOC, DOCX', 'cv', 422);
+            }
+            if ($file->getSize() > 5 * 1024 * 1024) {
+                return $this->respondWithError('VALIDATION_FILE_TOO_LARGE', 'File too large. Maximum 5MB', 'cv', 422);
+            }
+            $cvPath = $file->store("job-applications/{$tenantId}", 'local');
+            $cvFilename = $file->getClientOriginalName();
+            $cvSize = $file->getSize();
+        }
+
         $message = $this->input('message');
 
-        $applicationId = $this->jobService->legacyApply($id, $userId, $message);
+        $applicationId = $this->jobService->apply($id, $userId, [
+            'cover_letter' => $message,
+            'cv_path' => $cvPath,
+            'cv_filename' => $cvFilename,
+            'cv_size' => $cvSize,
+        ]);
 
         if ($applicationId === null) {
             $errors = $this->jobService->getErrors();
             $status = 400;
+
+            if (empty($errors)) {
+                // apply() returns null when already applied (idempotency)
+                return $this->respondWithError('RESOURCE_CONFLICT', 'You have already applied to this vacancy', null, 409);
+            }
 
             foreach ($errors as $error) {
                 if ($error['code'] === 'RESOURCE_NOT_FOUND') {
@@ -219,6 +281,63 @@ class JobVacanciesController extends BaseApiController
         $vacancy = $this->jobService->legacyGetById($id, $userId);
 
         return $this->respondWithData($vacancy, null, 201);
+    }
+
+    /** GET /api/v2/jobs/applications/{id}/cv — download CV for an application */
+    public function downloadCv(int $applicationId): Response|JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_cv_download', 20, 60);
+
+        $tenantId = TenantContext::getId();
+
+        $application = JobApplication::with(['vacancy'])->find($applicationId);
+
+        if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+        }
+
+        // Only allow: the applicant themselves, the job poster, or an admin
+        $isApplicant = (int) $application->user_id === $userId;
+        $isPoster = $application->vacancy && (int) $application->vacancy->user_id === $userId;
+
+        if (!$isApplicant && !$isPoster) {
+            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
+            $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'tenant_admin', 'god']);
+            if (!$isAdmin) {
+                return $this->respondWithError('RESOURCE_FORBIDDEN', 'Access denied', null, 403);
+            }
+        }
+
+        if (empty($application->cv_path)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'No CV attached to this application', null, 404);
+        }
+
+        if (!Storage::disk('local')->exists($application->cv_path)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'CV file not found', null, 404);
+        }
+
+        $filename = $application->cv_filename ?? basename($application->cv_path);
+
+        return response()->download(
+            Storage::disk('local')->path($application->cv_path),
+            $filename,
+            ['Content-Disposition' => 'attachment; filename="' . $filename . '"']
+        );
+    }
+
+    /** GET /api/v2/jobs/recommended — recommended jobs for the authenticated user */
+    public function recommended(): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_recommended', 30, 60);
+
+        $limit = min((int) ($this->query('limit', 10)), 20);
+        $jobs = $this->jobService->getRecommended($userId, $limit);
+
+        return $this->respondWithData(['data' => $jobs]);
     }
 
     // =====================================================================
@@ -657,5 +776,539 @@ class JobVacanciesController extends BaseApiController
         $vacancy = $this->jobService->legacyGetById((int) $id, $userId);
 
         return $this->respondWithData($vacancy);
+    }
+
+    // =====================================================================
+    // INTERVIEWS
+    // =====================================================================
+
+    /** POST /api/v2/jobs/applications/{id}/interview — propose an interview */
+    public function proposeInterview(Request $request, int $applicationId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_interview_propose', 10, 60);
+
+        $data = $this->getAllInput();
+
+        if (empty($data['scheduled_at'])) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'scheduled_at is required', 'scheduled_at', 422);
+        }
+
+        $interview = JobInterviewService::propose($applicationId, $userId, $data);
+
+        if ($interview === false) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to propose interview. Check application ownership and data.', null, 422);
+        }
+
+        return $this->respondWithData($interview, null, 201);
+    }
+
+    /** PUT /api/v2/jobs/interviews/{id}/accept — candidate accepts an interview */
+    public function acceptInterview(Request $request, int $interviewId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_interview_accept', 10, 60);
+
+        $notes = $this->input('notes');
+
+        $success = JobInterviewService::accept($interviewId, $userId, $notes);
+
+        if (!$success) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to accept interview. It may not exist or already been actioned.', null, 422);
+        }
+
+        return $this->respondWithData(['message' => 'Interview accepted successfully']);
+    }
+
+    /** PUT /api/v2/jobs/interviews/{id}/decline — candidate declines an interview */
+    public function declineInterview(Request $request, int $interviewId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_interview_decline', 10, 60);
+
+        $notes = $this->input('notes');
+
+        $success = JobInterviewService::decline($interviewId, $userId, $notes);
+
+        if (!$success) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to decline interview. It may not exist or already been actioned.', null, 422);
+        }
+
+        return $this->respondWithData(['message' => 'Interview declined successfully']);
+    }
+
+    /** DELETE /api/v2/jobs/interviews/{id} — employer cancels an interview */
+    public function cancelInterview(Request $request, int $interviewId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_interview_cancel', 10, 60);
+
+        $success = JobInterviewService::cancel($interviewId, $userId);
+
+        if (!$success) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to cancel interview. It may not exist or already been completed.', null, 422);
+        }
+
+        return $this->noContent();
+    }
+
+    /** GET /api/v2/jobs/{id}/interviews — employer lists interviews for a vacancy */
+    public function getInterviews(Request $request, int $vacancyId): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->getUserId(); // auth required
+        $this->rateLimit('jobs_interviews_list', 30, 60);
+
+        $interviews = JobInterviewService::getForVacancy($vacancyId);
+
+        return $this->respondWithData($interviews);
+    }
+
+    /** GET /api/v2/jobs/my-interviews — candidate lists their own interviews */
+    public function myInterviews(Request $request): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_my_interviews', 30, 60);
+
+        $interviews = JobInterviewService::getForUser($userId);
+
+        return $this->respondWithData($interviews);
+    }
+
+    // =====================================================================
+    // OFFERS
+    // =====================================================================
+
+    /** POST /api/v2/jobs/applications/{id}/offer — employer sends a job offer */
+    public function createOffer(Request $request, int $applicationId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_offer_create', 10, 60);
+
+        $data = $this->getAllInput();
+
+        $offer = JobOfferService::create($applicationId, $userId, $data);
+
+        if ($offer === false) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to create offer. Check application ownership or an offer may already exist.', null, 422);
+        }
+
+        return $this->respondWithData($offer, null, 201);
+    }
+
+    /** PUT /api/v2/jobs/offers/{id}/accept — candidate accepts a job offer */
+    public function acceptOffer(Request $request, int $offerId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_offer_accept', 10, 60);
+
+        $success = JobOfferService::accept($offerId, $userId);
+
+        if (!$success) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to accept offer. It may not exist or already been actioned.', null, 422);
+        }
+
+        return $this->respondWithData(['message' => 'Offer accepted successfully']);
+    }
+
+    /** PUT /api/v2/jobs/offers/{id}/reject — candidate rejects a job offer */
+    public function rejectOffer(Request $request, int $offerId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_offer_reject', 10, 60);
+
+        $success = JobOfferService::reject($offerId, $userId);
+
+        if (!$success) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to reject offer. It may not exist or already been actioned.', null, 422);
+        }
+
+        return $this->respondWithData(['message' => 'Offer rejected successfully']);
+    }
+
+    /** DELETE /api/v2/jobs/offers/{id} — employer withdraws a job offer */
+    public function withdrawOffer(Request $request, int $offerId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_offer_withdraw', 10, 60);
+
+        $success = JobOfferService::withdraw($offerId, $userId);
+
+        if (!$success) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to withdraw offer. It may not exist or already been actioned.', null, 422);
+        }
+
+        return $this->noContent();
+    }
+
+    /** GET /api/v2/jobs/applications/{id}/offer — get the offer for an application */
+    public function getApplicationOffer(Request $request, int $applicationId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_offer_get', 30, 60);
+
+        $offer = JobOfferService::getForApplication($applicationId, $userId);
+
+        if ($offer === null) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Offer not found', null, 404);
+        }
+
+        return $this->respondWithData($offer);
+    }
+
+    /** GET /api/v2/jobs/my-offers — candidate lists their own offers */
+    public function myOffers(Request $request): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_my_offers', 30, 60);
+
+        $offers = JobOfferService::getForUser($userId);
+
+        return $this->respondWithData($offers);
+    }
+
+    // =====================================================================
+    // AI CV PARSING
+    // =====================================================================
+
+    /** GET /api/v2/jobs/applications/{id}/parse-cv — AI-powered CV parsing */
+    public function parseResumeCv(Request $request, int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_parse_cv', 5, 60);
+
+        $tenantId = TenantContext::getId();
+
+        $application = JobApplication::with(['vacancy'])->find($id);
+
+        if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Application not found', null, 404);
+        }
+
+        // Only allow: the applicant themselves or the job poster
+        $isApplicant = (int) $application->user_id === $userId;
+        $isPoster = $application->vacancy && (int) $application->vacancy->user_id === $userId;
+
+        if (!$isApplicant && !$isPoster) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Access denied', null, 403);
+        }
+
+        if (empty($application->cv_path)) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'No CV attached to this application', null, 404);
+        }
+
+        $parsed = AiChatService::parseResume($application->cv_path);
+
+        return $this->respondWithData($parsed);
+    }
+
+    // ── Referral endpoints ─────────────────────────────────────────────────
+
+    /**
+     * POST /v2/jobs/{id}/referral
+     * Get or create a shareable referral token for a vacancy.
+     */
+    public function getOrCreateReferral(int $id): JsonResponse
+    {
+        $userId   = $this->getOptionalUserId();
+        $referral = JobReferralService::getOrCreate($id, $userId);
+
+        if (empty($referral)) {
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to create referral token', null, 422);
+        }
+        return $this->respondWithData(['referral' => $referral], null, 201);
+    }
+
+    /**
+     * GET /v2/jobs/{id}/referral-stats
+     * Employer views referral stats for their vacancy.
+     */
+    public function referralStats(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+
+        $stats = JobReferralService::getStats($id);
+        return $this->respondWithData(['stats' => $stats]);
+    }
+
+    // ── Scorecard endpoints ────────────────────────────────────────────────
+
+    /**
+     * PUT /v2/jobs/applications/{id}/scorecard
+     * Reviewer upserts their scorecard for an application.
+     */
+    public function upsertScorecard(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $data   = $this->getAllInput();
+        $result = JobScorecardService::upsert($id, $userId, $data);
+
+        if ($result === false) {
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to save scorecard', null, 422);
+        }
+        return $this->respondWithData(['scorecard' => $result]);
+    }
+
+    /**
+     * GET /v2/jobs/applications/{id}/scorecards
+     * Get all scorecards for an application (employer/team view).
+     */
+    public function getScorecards(int $id): JsonResponse
+    {
+        $this->getUserId(); // auth required
+
+        $cards = JobScorecardService::getForApplication($id);
+        return $this->respondWithData(['data' => $cards]);
+    }
+
+    // ── Team endpoints ─────────────────────────────────────────────────────
+
+    /**
+     * POST /v2/jobs/{id}/team
+     * Add a team member to a vacancy.
+     */
+    public function addTeamMember(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $data   = $this->getAllInput();
+        $result = JobTeamService::addMember(
+            $id,
+            $userId,
+            (int) ($data['user_id'] ?? 0),
+            $data['role'] ?? 'reviewer'
+        );
+
+        if ($result === false) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to add team member', null, 422);
+        }
+        return $this->respondWithData(['member' => $result], null, 201);
+    }
+
+    /**
+     * DELETE /v2/jobs/{id}/team/{userId}
+     * Remove a team member from a vacancy.
+     */
+    public function removeTeamMember(int $id, int $userId): JsonResponse
+    {
+        $currentUserId = $this->getUserId();
+
+        $ok = JobTeamService::removeMember($id, $currentUserId, $userId);
+        if (!$ok) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', 'Unable to remove team member', null, 422);
+        }
+        return $this->respondWithData(['success' => true]);
+    }
+
+    /**
+     * GET /v2/jobs/{id}/team
+     * List team members for a vacancy.
+     */
+    public function getTeam(int $id): JsonResponse
+    {
+        $this->getUserId(); // auth required
+
+        $members = JobTeamService::getMembers($id);
+        return $this->respondWithData(['data' => $members]);
+    }
+
+    // ── Saved profile endpoints ────────────────────────────────────────────
+
+    /**
+     * GET /v2/jobs/saved-profile
+     * Get the current user's saved application profile.
+     */
+    public function getSavedProfile(): JsonResponse
+    {
+        $userId  = $this->getUserId();
+        $profile = JobSavedProfileService::get($userId);
+        return $this->respondWithData(['profile' => $profile]);
+    }
+
+    /**
+     * PUT /v2/jobs/saved-profile
+     * Save/update the current user's application profile (cover letter + CV metadata).
+     * Note: actual CV file upload happens via the apply endpoint; this stores metadata + text.
+     */
+    public function saveSavedProfile(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $data   = $this->getAllInput();
+        $result = JobSavedProfileService::save($userId, $data);
+
+        if ($result === false) {
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to save profile', null, 422);
+        }
+        return $this->respondWithData(['profile' => $result]);
+    }
+
+    // ── Job Templates ─────────────────────────────────────────────────────
+
+    /**
+     * GET /v2/jobs/templates
+     */
+    public function listTemplates(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        return $this->respondWithData(['data' => JobTemplateService::list($userId)]);
+    }
+
+    /**
+     * POST /v2/jobs/templates
+     */
+    public function createTemplate(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $data   = $this->getAllInput();
+        $result = JobTemplateService::create($userId, $data);
+        return $result !== false
+            ? $this->respondWithData(['template' => $result], null, 201)
+            : $this->respondWithError('SERVER_INTERNAL_ERROR', 'Unable to create template', null, 422);
+    }
+
+    /**
+     * GET /v2/jobs/templates/{id}
+     */
+    public function getTemplate(int $id): JsonResponse
+    {
+        $userId   = $this->getUserId();
+        $template = JobTemplateService::get($id, $userId);
+        return $template
+            ? $this->respondWithData(['template' => $template])
+            : $this->respondWithError('RESOURCE_NOT_FOUND', 'Not found', null, 404);
+    }
+
+    /**
+     * DELETE /v2/jobs/templates/{id}
+     */
+    public function deleteTemplate(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $ok     = JobTemplateService::delete($id, $userId);
+        return $ok
+            ? $this->respondWithData(['success' => true])
+            : $this->respondWithError('RESOURCE_NOT_FOUND', 'Not found', null, 404);
+    }
+
+    // ── Salary Benchmarks ─────────────────────────────────────────────────
+
+    /**
+     * GET /v2/jobs/salary-benchmark?title={title}
+     */
+    public function salaryBenchmark(): JsonResponse
+    {
+        $title = $this->query('title', '');
+        if (!$title) return $this->respondWithData(['benchmark' => null]);
+        $benchmark = SalaryBenchmarkService::findForTitle($title);
+        return $this->respondWithData(['benchmark' => $benchmark]);
+    }
+
+    // ── GDPR ──────────────────────────────────────────────────────────────
+
+    /** GET /v2/jobs/gdpr-export */
+    public function gdprExport(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $data = JobGdprService::exportUserData($userId);
+        return $this->respondWithData(['data' => $data]);
+    }
+
+    /** DELETE /v2/jobs/gdpr-erase-me */
+    public function gdprErase(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $ok = JobGdprService::eraseUserData($userId);
+        return $ok
+            ? $this->respondWithData(['success' => true, 'message' => 'Your job application data has been anonymised.'])
+            : $this->respondWithError('SERVER_INTERNAL_ERROR', 'Erasure failed', null, 500);
+    }
+
+    /** GET /v2/jobs/{id}/applications/export-csv */
+    public function exportApplicationsCsv(int $id): \Illuminate\Http\Response|JsonResponse
+    {
+        $userId = $this->getUserId();
+
+        $csv = $this->jobService->exportApplicationsCsv($id, $userId);
+        if ($csv === null) {
+            $errors = $this->jobService->getErrors();
+            $code   = ($errors[0]['code'] ?? '') === 'RESOURCE_FORBIDDEN' ? 403 : 404;
+            return $this->respondWithErrors($errors, $code);
+        }
+
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"job-{$id}-applications.csv\"",
+        ]);
+    }
+
+    // ── Pipeline Rules ─────────────────────────────────────────────────────
+
+    /** GET /v2/jobs/{id}/pipeline-rules */
+    public function listPipelineRules(int $id): JsonResponse
+    {
+        $this->getUserId();
+        return $this->respondWithData(['data' => JobPipelineRuleService::listForVacancy($id)]);
+    }
+
+    /** POST /v2/jobs/{id}/pipeline-rules */
+    public function createPipelineRule(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $data   = $this->getAllInput();
+        $result = JobPipelineRuleService::create($id, $userId, $data);
+        return $result !== false
+            ? $this->respondWithData(['rule' => $result], null, 201)
+            : $this->respondWithError('VALIDATION_ERROR', 'Unable to create rule', null, 422);
+    }
+
+    /** DELETE /v2/jobs/pipeline-rules/{id} */
+    public function deletePipelineRule(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $ok     = JobPipelineRuleService::delete($id, $userId);
+        return $ok
+            ? $this->respondWithData(['success' => true])
+            : $this->respondWithError('RESOURCE_NOT_FOUND', 'Not found', null, 404);
+    }
+
+    /** POST /v2/jobs/{id}/pipeline-rules/run */
+    public function runPipelineRules(int $id): JsonResponse
+    {
+        $this->getUserId();
+        $count = JobPipelineRuleService::runForVacancy($id);
+        return $this->respondWithData(['actioned' => $count]);
+    }
+
+    // ── Bulk Application Actions ───────────────────────────────────────────
+
+    /** POST /v2/jobs/{id}/applications/bulk-status */
+    public function bulkUpdateApplicationStatus(int $id): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $data   = $this->getAllInput();
+        $ids    = array_map('intval', (array) ($data['application_ids'] ?? []));
+        $status = $data['status'] ?? '';
+
+        if (empty($ids) || !$status) {
+            return $this->respondWithError('VALIDATION_ERROR', 'application_ids and status are required', null, 422);
+        }
+
+        $count  = $this->jobService->bulkUpdateApplicationStatus($id, $userId, $ids, $status);
+        $errors = $this->jobService->getErrors();
+        if (!empty($errors)) {
+            return $this->respondWithErrors($errors, 422);
+        }
+        return $this->respondWithData(['updated' => $count]);
     }
 }

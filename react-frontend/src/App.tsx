@@ -136,6 +136,8 @@ const CreateJobPage = lazyWithRetry(() => import('@/pages/jobs/CreateJobPage'));
 const JobAnalyticsPage = lazyWithRetry(() => import('@/pages/jobs/JobAnalyticsPage'));
 const JobAlertsPage = lazyWithRetry(() => import('@/pages/jobs/JobAlertsPage'));
 const MyApplicationsPage = lazyWithRetry(() => import('@/pages/jobs/MyApplicationsPage'));
+const JobKanbanPage = lazyWithRetry(() => import('@/pages/jobs/JobKanbanPage'));
+const EmployerBrandPage = lazyWithRetry(() => import('@/pages/jobs/EmployerBrandPage'));
 const IdeationPage = lazyWithRetry(() => import('@/pages/ideation/IdeationPage'));
 const ChallengeDetailPage = lazyWithRetry(() => import('@/pages/ideation/ChallengeDetailPage'));
 const IdeaDetailPage = lazyWithRetry(() => import('@/pages/ideation/IdeaDetailPage'));
@@ -638,6 +640,20 @@ function AppRoutes() {
             <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <MyApplicationsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/:id/kanban" element={
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <JobKanbanPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/employers/:userId" element={
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <EmployerBrandPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

@@ -38,6 +38,9 @@ import {
   Divider,
   Progress,
   Tooltip,
+  Select,
+  SelectItem,
+  Input,
 } from '@heroui/react';
 import {
   Briefcase,
@@ -66,9 +69,19 @@ import {
   BarChart3,
   Star,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   History,
   Check,
   X,
+  Upload,
+  FileText as FileTextIcon,
+  MessageCircle,
+  Sparkles,
+  Building2,
+  Share2,
+  TrendingUp,
+  Zap,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -116,6 +129,10 @@ interface JobVacancy {
   is_saved: boolean;
   is_featured: boolean;
   featured_until: string | null;
+  tagline: string | null;
+  video_url: string | null;
+  benefits: string[] | null;
+  company_size: string | null;
   salary_min: number | null;
   salary_max: number | null;
   salary_type: string | null;
@@ -162,6 +179,15 @@ interface QualificationResult {
   missing_skills: string[];
 }
 
+interface QualificationData {
+  percentage: number;
+  level: 'low' | 'moderate' | 'good' | 'excellent';
+  ai_summary: string;
+  matched_skills: string[];
+  missing_skills: string[];
+  dimensions: { label: string; score: number; detail: string }[];
+}
+
 interface HistoryEntry {
   id: number;
   from_status: string | null;
@@ -195,6 +221,69 @@ const STATUS_COLORS: Record<string, 'warning' | 'primary' | 'success' | 'danger'
   withdrawn: 'default',
 };
 
+// ---------------------------------------------------------------------------
+// JSON-LD helper
+// ---------------------------------------------------------------------------
+
+function buildJobPostingSchema(vacancy: JobVacancy, tenantPath: (p: string) => string): string {
+  const base = window.location.origin;
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    'title': vacancy.title,
+    'description': vacancy.description ?? '',
+    'datePosted': vacancy.created_at ?? new Date().toISOString(),
+    'validThrough': vacancy.deadline ?? undefined,
+    'employmentType': vacancy.commitment === 'full_time' ? 'FULL_TIME'
+                    : vacancy.commitment === 'part_time' ? 'PART_TIME'
+                    : vacancy.commitment === 'one_off' ? 'CONTRACTOR'
+                    : 'OTHER',
+    'jobLocationType': vacancy.is_remote ? 'TELECOMMUTE' : undefined,
+    'url': base + tenantPath(`/jobs/${vacancy.id}`),
+  };
+
+  if (vacancy.location && !vacancy.is_remote) {
+    schema['jobLocation'] = {
+      '@type': 'Place',
+      'address': { '@type': 'PostalAddress', 'addressLocality': vacancy.location },
+    };
+  }
+
+  if (vacancy.salary_min || vacancy.salary_max) {
+    schema['baseSalary'] = {
+      '@type': 'MonetaryAmount',
+      'currency': vacancy.salary_currency ?? 'EUR',
+      'value': {
+        '@type': 'QuantitativeValue',
+        'minValue': vacancy.salary_min ?? undefined,
+        'maxValue': vacancy.salary_max ?? undefined,
+        'unitText': vacancy.salary_type?.toUpperCase() ?? 'YEAR',
+      },
+    };
+  }
+
+  if (vacancy.skills_required) {
+    schema['skills'] = vacancy.skills_required;
+  }
+
+  return JSON.stringify(schema);
+}
+
+// ---------------------------------------------------------------------------
+// Pipeline rule interface
+// ---------------------------------------------------------------------------
+
+interface PipelineRule {
+  id: number;
+  name: string;
+  trigger_stage: string;
+  condition_days: number;
+  action: string;
+  action_target: string | null;
+  is_active: boolean;
+  last_run_at: string | null;
+}
+
 export function JobDetailPage() {
   const { t } = useTranslation('jobs');
   const { id } = useParams<{ id: string }>();
@@ -202,7 +291,22 @@ export function JobDetailPage() {
   const { user, isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const applyModal = useDisclosure();
+  const applyModal = useDisclosure({
+    onOpen: async () => {
+      // Feature 5: Fetch saved profile on modal open
+      try {
+        const res = await api.get<{cv_filename?: string; cover_text?: string}>('/v2/jobs/saved-profile');
+        if (res.success && res.data) {
+          setSavedProfile(res.data);
+        } else {
+          setSavedProfile(null);
+        }
+      } catch {
+        setSavedProfile(null);
+      }
+      setUsingSavedProfile(false);
+    },
+  });
   const qualifiedModal = useDisclosure();
   const renewModal = useDisclosure();
   const deleteModal = useDisclosure();
@@ -216,6 +320,13 @@ export function JobDetailPage() {
   const [showApplications, setShowApplications] = useState(true);
   const [isLoadingApps, setIsLoadingApps] = useState(false);
 
+  // CV Upload state
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const cvInputRef = useRef<HTMLInputElement>(null);
+
+  // Feature 5: CV parsing state
+  const [cvParsed, setCvParsed] = useState<{ skills: string[]; summary?: string } | null>(null);
+
   // J1: Saved state
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -227,9 +338,36 @@ export function JobDetailPage() {
   const [qualification, setQualification] = useState<QualificationResult | null>(null);
   const [isLoadingQualification, setIsLoadingQualification] = useState(false);
 
+  // Match explanation card (inline, auto-loaded)
+  const [qualificationData, setQualificationData] = useState<QualificationData | null>(null);
+  const [qualOpen, setQualOpen] = useState(false);
+
   // J7: Renewal
   const [renewDays, setRenewDays] = useState(30);
   const [isRenewing, setIsRenewing] = useState(false);
+
+  // Feature 3: Referral share
+  const [sharing, setSharing] = useState(false);
+
+  // Feature 4: Pipeline rules
+  const [pipelineRules, setPipelineRules] = useState<PipelineRule[]>([]);
+  const [pipelineOpen, setPipelineOpen] = useState(false);
+  const [newRule, setNewRule] = useState({ name: '', trigger_stage: 'applied', condition_days: 7, action: 'move_stage', action_target: 'screening' });
+  const [isAddingRule, setIsAddingRule] = useState(false);
+
+  // Feature 5: Saved profile (one-click apply)
+  const [savedProfile, setSavedProfile] = useState<{cv_filename?: string; cover_text?: string} | null>(null);
+  const [usingSavedProfile, setUsingSavedProfile] = useState(false);
+
+  // Feature 2: Salary benchmark for owners
+  const [benchmark, setBenchmark] = useState<{
+    role_keyword: string;
+    salary_min: number;
+    salary_max: number;
+    salary_median: number;
+    salary_type: string;
+    currency: string;
+  } | null>(null);
 
   usePageTitle(vacancy?.title ?? t('detail.loading'));
 
@@ -289,6 +427,34 @@ export function JobDetailPage() {
     loadMatch();
   }, [id, isAuthenticated, vacancy, isOwner]);
 
+  // Load qualification data for the inline "Why You Match" card
+  useEffect(() => {
+    if (!id || !isAuthenticated || !vacancy || isOwner) return;
+    const loadQualData = async () => {
+      try {
+        const qualRes = await api.get<QualificationData>(`/v2/jobs/${id}/qualified`);
+        if (qualRes.success && qualRes.data) setQualificationData(qualRes.data as QualificationData);
+      } catch {
+        // Non-critical
+      }
+    };
+    loadQualData();
+  }, [id, isAuthenticated, vacancy, isOwner]);
+
+  // Feature 2: Load salary benchmark for owners
+  useEffect(() => {
+    if (!vacancy || !isOwner) return;
+    const controller = new AbortController();
+    api.get<{ role_keyword: string; salary_min: number; salary_max: number; salary_median: number; salary_type: string; currency: string }>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(vacancy.title)}`)
+      .then((res) => {
+        if (!controller.signal.aborted && res.success && res.data) {
+          setBenchmark(res.data);
+        }
+      })
+      .catch(() => { /* non-critical */ });
+    return () => { controller.abort(); };
+  }, [vacancy, isOwner]);
+
   const loadApplications = useCallback(async () => {
     if (!id) return;
     try {
@@ -314,22 +480,88 @@ export function JobDetailPage() {
     if (!id) return;
     setIsSubmitting(true);
     try {
-      const response = await api.post(`/v2/jobs/${id}/apply`, {
-        message: applyMessage || null,
-      });
+      let response;
+      if (cvFile) {
+        // Use FormData for multipart upload
+        const formData = new FormData();
+        formData.append('message', applyMessage || '');
+        formData.append('cv', cvFile);
+        // Fetch directly for multipart — api client uses JSON by default
+        const token = localStorage.getItem('nexus_access_token');
+        const tenantId = localStorage.getItem('nexus_tenant_id');
+        const apiBase = import.meta.env.VITE_API_BASE || '/api';
+        const fetchResponse = await fetch(`${apiBase}/v2/jobs/${id}/apply`, {
+          method: 'POST',
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(tenantId ? { 'X-Tenant-ID': tenantId } : {}),
+          },
+          body: formData,
+        });
+        response = await fetchResponse.json() as { success: boolean; error?: string };
+      } else {
+        response = await api.post(`/v2/jobs/${id}/apply`, {
+          message: applyMessage || null,
+        });
+      }
       if (response.success) {
-        toastRef.current.success(tRef.current('apply.success'));
+        const appId = (response as { data?: { id?: number } }).data?.id;
+        // Feature 5: Auto-parse CV if uploaded and we have an application ID
+        if (cvFile && appId) {
+          try {
+            const parseRes = await api.get<{ skills?: string[]; summary?: string }>(`/v2/jobs/applications/${appId}/parse-cv`);
+            if (parseRes.success && parseRes.data) {
+              const parsed = parseRes.data;
+              setCvParsed({ skills: parsed.skills ?? [], summary: parsed.summary });
+              const count = parsed.skills?.length ?? 0;
+              if (count > 0) {
+                toastRef.current.success(
+                  tRef.current('cv.parsed_toast', 'Application submitted! {{count}} skills detected from your CV.', { count })
+                );
+              } else {
+                toastRef.current.success(tRef.current('apply.success'));
+              }
+            } else {
+              toastRef.current.success(tRef.current('apply.success'));
+            }
+          } catch {
+            toastRef.current.success(tRef.current('apply.success'));
+          }
+        } else {
+          toastRef.current.success(tRef.current('apply.success'));
+        }
         applyModal.onClose();
+        // Feature 5: Silently update saved cover letter (best-effort, no await blocking)
+        if (applyMessage.trim()) {
+          api.put('/v2/jobs/saved-profile', { headline: '', cover_text: applyMessage.trim() }).catch(() => {});
+        }
         setApplyMessage('');
+        setCvFile(null);
+        setSavedProfile(null);
+        setUsingSavedProfile(false);
         loadVacancy();
       } else {
-        toastRef.current.error(response.error || tRef.current('apply.error'));
+        toastRef.current.error((response as { error?: string }).error || tRef.current('apply.error'));
       }
     } catch (err) {
       logError('Failed to apply for job', err);
       toastRef.current.error(tRef.current('apply.error'));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCvDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file && ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
+      if (file.size <= 5 * 1024 * 1024) {
+        setCvFile(file);
+      } else {
+        toastRef.current.error(tRef.current('apply.cv_too_large', 'CV file must be under 5MB'));
+      }
+    } else {
+      toastRef.current.error(tRef.current('apply.cv_invalid_type', 'Only PDF, DOC, or DOCX files are supported'));
     }
   };
 
@@ -430,6 +662,38 @@ export function JobDetailPage() {
     }
   };
 
+  // Feature 3: Referral share
+  const handleShare = async () => {
+    if (!id || !vacancy || sharing) return;
+    setSharing(true);
+    try {
+      const response = await api.post<{ ref_token: string }>(`/v2/jobs/${id}/referral`, {});
+      if (response.success && response.data) {
+        const refUrl =
+          window.location.origin +
+          tenantPath(`/jobs/${vacancy.id}`) +
+          `?ref=${response.data.ref_token}`;
+        await navigator.clipboard.writeText(refUrl);
+        toastRef.current.success(tRef.current('referral.copied', 'Referral link copied to clipboard!'));
+      }
+    } catch (err) {
+      logError('Failed to generate referral link', err);
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  // Feature 4: Load pipeline rules
+  const loadPipelineRules = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await api.get<{ data: PipelineRule[] }>(`/v2/jobs/${id}/pipeline-rules`);
+      if (res.success && res.data) setPipelineRules((res.data as { data: PipelineRule[] }).data ?? []);
+    } catch (err) {
+      logError('Failed to load pipeline rules', err);
+    }
+  }, [id]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -475,21 +739,31 @@ export function JobDetailPage() {
   const isPastDeadline = deadlineDate ? deadlineDate < new Date() : false;
   const TypeIcon = TYPE_ICONS[vacancy.type] ?? Briefcase;
 
-  // J9: Format salary display
+  // J9: Format salary display (EU Pay Transparency — clear range)
   const formatSalary = () => {
+    if (vacancy.salary_negotiable && !vacancy.salary_min && !vacancy.salary_max) return null;
     if (!vacancy.salary_min && !vacancy.salary_max) return null;
     const currency = vacancy.salary_currency || '';
-    const typeLabel = vacancy.salary_type ? t(`salary.${vacancy.salary_type}`) : '';
+    const typeLabel = vacancy.salary_type ? ` / ${t(`salary.${vacancy.salary_type}`)}` : '';
     if (vacancy.salary_min && vacancy.salary_max) {
-      return `${currency} ${vacancy.salary_min.toLocaleString()} - ${vacancy.salary_max.toLocaleString()} ${typeLabel}`;
+      // Use en-dash for range — clear EU Pay Transparency format
+      return `${currency}${vacancy.salary_min.toLocaleString()} \u2013 ${currency}${vacancy.salary_max.toLocaleString()}${typeLabel}`;
     }
-    if (vacancy.salary_min) return `${t('salary.min_only', { min: `${currency} ${vacancy.salary_min.toLocaleString()}` })} ${typeLabel}`;
-    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency} ${vacancy.salary_max.toLocaleString()}` })} ${typeLabel}`;
+    if (vacancy.salary_min) return `${t('salary.min_only', { min: `${currency}${vacancy.salary_min.toLocaleString()}` })}${typeLabel}`;
+    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency}${vacancy.salary_max.toLocaleString()}` })}${typeLabel}`;
     return null;
   };
 
   return (
-    <div className="space-y-6">
+    <main className="space-y-6">
+      {/* JSON-LD structured data */}
+      {vacancy && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: buildJobPostingSchema(vacancy, tenantPath) }}
+        />
+      )}
+
       {/* Back nav */}
       <Link to={tenantPath('/jobs')} className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors">
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
@@ -558,6 +832,20 @@ export function JobDetailPage() {
                   {isSaved ? <BookmarkCheck className="w-4 h-4" aria-hidden="true" /> : <Bookmark className="w-4 h-4" aria-hidden="true" />}
                 </Button>
               </Tooltip>
+            )}
+
+            {/* Feature 3: Referral share button */}
+            {isAuthenticated && !isOwner && (
+              <Button
+                size="sm"
+                variant="flat"
+                className="bg-theme-elevated text-theme-muted"
+                startContent={<Share2 size={14} aria-hidden="true" />}
+                onPress={handleShare}
+                isLoading={sharing}
+              >
+                {t('referral.share', 'Share & Earn')}
+              </Button>
             )}
 
             {isOwner && (
@@ -644,18 +932,21 @@ export function JobDetailPage() {
             </span>
           )}
 
-          {/* J9: Salary display */}
-          {formatSalary() && (
+          {/* J9: Salary display — EU Pay Transparency */}
+          {formatSalary() ? (
             <span className="flex items-center gap-1 font-medium text-theme-primary">
               <DollarSign className="w-4 h-4" aria-hidden="true" />
               {formatSalary()}
               {vacancy.salary_negotiable && (
-                <Chip size="sm" variant="flat" color="default" className="ml-1 text-xs">
-                  {t('salary.negotiable')}
-                </Chip>
+                <span className="text-xs text-theme-subtle font-normal">({t('salary.negotiable')})</span>
               )}
             </span>
-          )}
+          ) : vacancy.salary_negotiable ? (
+            <span className="flex items-center gap-1 text-theme-subtle">
+              <DollarSign className="w-4 h-4" aria-hidden="true" />
+              <span className="text-xs">{t('salary.negotiable')}</span>
+            </span>
+          ) : null}
         </div>
 
         {/* J2: Match percentage badge */}
@@ -692,6 +983,11 @@ export function JobDetailPage() {
               <Link to={tenantPath(`/jobs/${vacancy.id}/analytics`)}>
                 <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}>
                   Analytics
+                </Button>
+              </Link>
+              <Link to={tenantPath(`/jobs/${vacancy.id}/kanban`)}>
+                <Button size="sm" variant="flat" color="primary" startContent={<Users className="w-4 h-4" aria-hidden="true" />}>
+                  {t('detail.kanban_board', 'Kanban Board')}
                 </Button>
               </Link>
               {vacancy.status === 'open' && (
@@ -743,6 +1039,90 @@ export function JobDetailPage() {
             <h2 className="text-lg font-semibold text-theme-primary mb-4">{t('detail.about')}</h2>
             <div className="text-theme-secondary whitespace-pre-wrap">{vacancy.description}</div>
           </GlassCard>
+
+          {/* Match Explanation Card — "Why You Match" */}
+          {qualificationData && !isOwner && (
+            <GlassCard className="p-4 mt-4">
+              <button
+                className="w-full flex items-center justify-between text-left"
+                onClick={() => setQualOpen(v => !v)}
+                aria-expanded={qualOpen}
+              >
+                <span className="font-semibold flex items-center gap-2">
+                  <Sparkles size={16} className={qualificationData.percentage >= 70 ? 'text-success' : 'text-warning'} aria-hidden="true" />
+                  {t('match.why_you_match', 'Why you match')} — {qualificationData.percentage}%
+                </span>
+                {qualOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
+              </button>
+              {qualOpen && (
+                <div className="mt-3 space-y-3">
+                  <p className="text-sm text-theme-secondary italic">{qualificationData.ai_summary}</p>
+                  {qualificationData.dimensions.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {qualificationData.dimensions.map((d, i) => (
+                        <div key={i} className="bg-white/5 rounded-lg p-2">
+                          <div className="text-xs font-medium text-theme-primary">{d.label}</div>
+                          <div className="text-xs text-theme-muted">{d.detail}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {qualificationData.matched_skills.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-success mb-1">{t('match.you_have', 'You have:')}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {qualificationData.matched_skills.map((s, i) => (
+                          <Chip key={i} size="sm" color="success" variant="flat">{s}</Chip>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {qualificationData.missing_skills.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-warning mb-1">{t('match.to_develop', 'Skills to develop:')}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {qualificationData.missing_skills.map((s, i) => (
+                          <Chip key={i} size="sm" color="warning" variant="flat">{s}</Chip>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </GlassCard>
+          )}
+
+          {/* Feature 2: About the Company / Employer Branding */}
+          {(vacancy.tagline || vacancy.video_url || (vacancy.benefits && vacancy.benefits.length > 0)) && (
+            <GlassCard className="p-5 mt-4">
+              <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
+                <Building2 size={16} aria-hidden="true" />
+                {t('branding.about_company', 'About the Company')}
+              </h2>
+              {vacancy.tagline && (
+                <p className="text-sm text-theme-secondary italic mb-3">&ldquo;{vacancy.tagline}&rdquo;</p>
+              )}
+              {vacancy.video_url && (
+                <div className="aspect-video rounded-lg overflow-hidden mb-3">
+                  <iframe
+                    src={vacancy.video_url
+                      .replace('watch?v=', 'embed/')
+                      .replace('youtu.be/', 'youtube.com/embed/')}
+                    className="w-full h-full"
+                    allowFullScreen
+                    title="Company culture video"
+                  />
+                </div>
+              )}
+              {vacancy.benefits && vacancy.benefits.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {vacancy.benefits.map((b: string, i: number) => (
+                    <Chip key={i} size="sm" variant="flat" color="success">{b}</Chip>
+                  ))}
+                </div>
+              )}
+            </GlassCard>
+          )}
 
           {/* Skills */}
           {vacancy.skills.length > 0 && (
@@ -840,6 +1220,8 @@ export function JobDetailPage() {
                         key={app.id}
                         application={app}
                         onUpdateStatus={handleUpdateAppStatus}
+                        tenantPathFn={tenantPath}
+                        navigateFn={navigate}
                       />
                     ))
                   )}
@@ -847,6 +1229,127 @@ export function JobDetailPage() {
               )}
             </GlassCard>
             </div>
+          )}
+
+          {/* Feature 4: Pipeline Automation Rules (owner-only) */}
+          {isOwner && (
+            <GlassCard className="p-4">
+              <button
+                className="w-full flex items-center justify-between"
+                onClick={() => {
+                  setPipelineOpen((v) => !v);
+                  if (!pipelineOpen) loadPipelineRules();
+                }}
+                aria-expanded={pipelineOpen}
+              >
+                <span className="font-semibold flex items-center gap-2">
+                  <Zap size={16} aria-hidden="true" />
+                  {t('pipeline.title', 'Automation Rules')}
+                </span>
+                {pipelineOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
+              </button>
+              {pipelineOpen && (
+                <div className="mt-3 space-y-3">
+                  {pipelineRules.length === 0 && (
+                    <p className="text-sm text-theme-muted">{t('pipeline.no_rules', 'No automation rules yet.')}</p>
+                  )}
+                  {pipelineRules.map((rule) => (
+                    <div key={rule.id} className="flex items-center justify-between text-sm p-2 bg-white/5 rounded-lg">
+                      <div>
+                        <span className="font-medium">{rule.name}</span>
+                        <span className="text-theme-muted ml-2 text-xs">
+                          If in &ldquo;{rule.trigger_stage}&rdquo; for {rule.condition_days}d &rarr; {rule.action}{rule.action_target ? ` \u2192 ${rule.action_target}` : ''}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        color="danger"
+                        variant="flat"
+                        onPress={() =>
+                          api.delete(`/v2/jobs/pipeline-rules/${rule.id}`).then(() => loadPipelineRules()).catch(() => {})
+                        }
+                      >
+                        {t('pipeline.delete', 'Delete')}
+                      </Button>
+                    </div>
+                  ))}
+                  <div className="border-t border-divider pt-3">
+                    <p className="text-xs font-medium text-theme-muted mb-2">{t('pipeline.add_rule', 'Add rule')}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Select
+                        size="sm"
+                        label={t('pipeline.trigger', 'If in stage')}
+                        selectedKeys={[newRule.trigger_stage]}
+                        onSelectionChange={(keys) =>
+                          setNewRule((r) => ({ ...r, trigger_stage: Array.from(keys)[0] as string }))
+                        }
+                      >
+                        {(['applied', 'screening', 'reviewed', 'interview'] as const).map((s) => (
+                          <SelectItem key={s}>{s}</SelectItem>
+                        ))}
+                      </Select>
+                      <Input
+                        size="sm"
+                        type="number"
+                        label={t('pipeline.days', 'Days')}
+                        value={String(newRule.condition_days)}
+                        onChange={(e) =>
+                          setNewRule((r) => ({ ...r, condition_days: parseInt(e.target.value) || 7 }))
+                        }
+                      />
+                      <Select
+                        size="sm"
+                        label={t('pipeline.action', 'Action')}
+                        selectedKeys={[newRule.action]}
+                        onSelectionChange={(keys) =>
+                          setNewRule((r) => ({ ...r, action: Array.from(keys)[0] as string }))
+                        }
+                      >
+                        <SelectItem key="move_stage">Move stage</SelectItem>
+                        <SelectItem key="reject">Auto-reject</SelectItem>
+                        <SelectItem key="notify_reviewer">Notify me</SelectItem>
+                      </Select>
+                      {newRule.action === 'move_stage' && (
+                        <Select
+                          size="sm"
+                          label={t('pipeline.target', 'Move to')}
+                          selectedKeys={[newRule.action_target]}
+                          onSelectionChange={(keys) =>
+                            setNewRule((r) => ({ ...r, action_target: Array.from(keys)[0] as string }))
+                          }
+                        >
+                          {(['screening', 'reviewed', 'interview', 'rejected'] as const).map((s) => (
+                            <SelectItem key={s}>{s}</SelectItem>
+                          ))}
+                        </Select>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      color="primary"
+                      className="mt-2"
+                      isLoading={isAddingRule}
+                      onPress={async () => {
+                        setIsAddingRule(true);
+                        try {
+                          await api.post(`/v2/jobs/${id}/pipeline-rules`, {
+                            ...newRule,
+                            name: `${newRule.trigger_stage} \u2192 ${newRule.action_target || newRule.action} after ${newRule.condition_days}d`,
+                          });
+                          await loadPipelineRules();
+                        } catch (err) {
+                          logError('Failed to add pipeline rule', err);
+                        } finally {
+                          setIsAddingRule(false);
+                        }
+                      }}
+                    >
+                      {t('pipeline.add', 'Add Rule')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </GlassCard>
           )}
         </div>
 
@@ -889,17 +1392,37 @@ export function JobDetailPage() {
               </div>
             )}
 
-            {/* J9: Salary display in sidebar */}
-            {formatSalary() && (
+            {/* J9: Salary display in sidebar — EU Pay Transparency */}
+            {(formatSalary() || vacancy.salary_negotiable) && (
               <div className="flex items-center gap-3">
                 <DollarSign className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
                 <div>
                   <p className="text-xs text-theme-subtle">{t('salary.label')}</p>
-                  <p className="text-sm text-theme-primary font-medium">{formatSalary()}</p>
+                  {formatSalary() ? (
+                    <p className="text-sm text-theme-primary font-medium">{formatSalary()}</p>
+                  ) : null}
                   {vacancy.salary_negotiable && (
                     <p className="text-xs text-success">{t('salary.negotiable')}</p>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Feature 2: Salary benchmark widget — owners only */}
+            {isOwner && benchmark && (
+              <div className="flex items-start gap-2 bg-primary/5 rounded-lg p-2.5">
+                <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+                <p className="text-xs text-theme-primary">
+                  {t('benchmark.market_rate', {
+                    role: benchmark.role_keyword,
+                    currency: benchmark.currency,
+                    min: benchmark.salary_min.toLocaleString(),
+                    max: benchmark.salary_max.toLocaleString(),
+                    type: benchmark.salary_type,
+                    median: benchmark.salary_median.toLocaleString(),
+                    defaultValue: `Market rate for "${benchmark.role_keyword}": ${benchmark.currency}${benchmark.salary_min.toLocaleString()} – ${benchmark.currency}${benchmark.salary_max.toLocaleString()} / ${benchmark.salary_type} (median: ${benchmark.currency}${benchmark.salary_median.toLocaleString()})`,
+                  })}
+                </p>
               </div>
             )}
 
@@ -938,17 +1461,140 @@ export function JobDetailPage() {
             <>
               <ModalHeader>{t('apply.title')}</ModalHeader>
               <ModalBody>
-                <Textarea
-                  label={t('apply.message_label')}
-                  placeholder={t('apply.message_placeholder')}
-                  value={applyMessage}
-                  onValueChange={setApplyMessage}
-                  minRows={4}
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary',
-                    inputWrapper: 'bg-theme-elevated border-theme-default',
-                  }}
-                />
+                <div className="space-y-4">
+                  {/* Feature 5: Saved profile banner */}
+                  {savedProfile && !usingSavedProfile && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
+                      <div className="flex-1 text-theme-primary">
+                        {t('saved_profile.found', 'Saved application profile found')}
+                        {savedProfile.cv_filename && (
+                          <span className="ml-1 text-xs text-theme-subtle">— CV: {savedProfile.cv_filename}</span>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        color="primary"
+                        variant="flat"
+                        onPress={() => {
+                          if (savedProfile.cover_text) setApplyMessage(savedProfile.cover_text);
+                          setUsingSavedProfile(true);
+                        }}
+                      >
+                        {t('saved_profile.use', 'Use Saved Profile')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        className="text-theme-muted"
+                        onPress={() => setSavedProfile(null)}
+                      >
+                        {t('saved_profile.start_fresh', 'Start Fresh')}
+                      </Button>
+                    </div>
+                  )}
+                  {usingSavedProfile && savedProfile?.cv_filename && (
+                    <Chip size="sm" variant="flat" color="primary">
+                      Saved CV: {savedProfile.cv_filename}
+                    </Chip>
+                  )}
+
+                  <Textarea
+                    label={t('apply.message_label')}
+                    placeholder={t('apply.message_placeholder')}
+                    value={applyMessage}
+                    onValueChange={setApplyMessage}
+                    minRows={4}
+                    classNames={{
+                      input: 'bg-transparent text-theme-primary',
+                      inputWrapper: 'bg-theme-elevated border-theme-default',
+                    }}
+                  />
+
+                  {/* CV Upload */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-foreground">
+                      {t('apply.cv_label', 'CV / Resume')}{' '}
+                      <span className="text-default-400 text-xs">
+                        {t('apply.cv_hint', '(optional — PDF, DOC, DOCX, max 5MB)')}
+                      </span>
+                    </label>
+                    <div
+                      className="border-2 border-dashed border-default-200 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+                      onClick={() => cvInputRef.current?.click()}
+                      onDrop={handleCvDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={t('apply.cv_dropzone_aria', 'Click or drop file to upload CV')}
+                      onKeyDown={(e) => e.key === 'Enter' && cvInputRef.current?.click()}
+                    >
+                      {cvFile ? (
+                        <div className="flex items-center justify-center gap-2 text-sm text-foreground">
+                          <FileTextIcon size={16} aria-hidden="true" />
+                          <span>{cvFile.name}</span>
+                          <span className="text-default-400">({(cvFile.size / 1024).toFixed(0)} KB)</span>
+                          <Button
+                            size="sm"
+                            variant="light"
+                            color="danger"
+                            isIconOnly
+                            onClick={(e) => { e.stopPropagation(); setCvFile(null); }}
+                            aria-label={t('apply.cv_remove', 'Remove CV')}
+                          >
+                            <X size={14} aria-hidden="true" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="text-default-400 text-sm">
+                          <Upload size={20} className="mx-auto mb-1" aria-hidden="true" />
+                          {t('apply.cv_drop_prompt', 'Drop CV here or click to browse')}
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      ref={cvInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            toastRef.current.error(tRef.current('apply.cv_too_large', 'CV file must be under 5MB'));
+                          } else {
+                            setCvFile(file);
+                            // Clear any previous parse result when a new CV is selected
+                            setCvParsed(null);
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {/* Feature 5: CV parsed skills display */}
+                  {cvFile && !cvParsed && (
+                    <p className="text-xs text-default-400 flex items-center gap-1 mt-1">
+                      <Sparkles size={12} aria-hidden="true" />
+                      {t('cv.parse', 'Skills will be extracted after submission')}
+                    </p>
+                  )}
+                  {cvParsed && cvParsed.skills && cvParsed.skills.length > 0 && (
+                    <div className="p-2 rounded-lg bg-secondary-50 border border-secondary-200 text-xs mt-1">
+                      <div className="font-medium text-secondary-700 mb-1 flex items-center gap-1">
+                        <Sparkles size={12} aria-hidden="true" />
+                        {t('cv.detected', 'Skills detected from CV')}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {cvParsed.skills.map((skill) => (
+                          <Chip key={skill} size="sm" variant="flat" color="secondary">{skill}</Chip>
+                        ))}
+                      </div>
+                      {cvParsed.summary && (
+                        <p className="text-default-600 mt-1 italic">{cvParsed.summary}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="flat" onPress={onClose}>
@@ -1118,7 +1764,7 @@ export function JobDetailPage() {
           )}
         </ModalContent>
       </Modal>
-    </div>
+    </main>
   );
 
   function renderApplySection() {
@@ -1146,20 +1792,32 @@ export function JobDetailPage() {
             </Chip>
           </div>
         ) : vacancy!.has_applied ? (
-          <div className="text-center space-y-2">
-            <Chip
+          <div className="space-y-3">
+            <div className="text-center">
+              <Chip
+                variant="flat"
+                color={STATUS_COLORS[vacancy!.application_stage ?? vacancy!.application_status ?? 'applied'] ?? 'default'}
+                className="text-sm"
+              >
+                {t('apply.applied')} - {t(`application_status.${vacancy!.application_stage ?? vacancy!.application_status ?? 'applied'}`)}
+              </Chip>
+            </div>
+            {/* Feature 6: Message Employer button for applicants */}
+            <Button
               variant="flat"
-              color={STATUS_COLORS[vacancy!.application_stage ?? vacancy!.application_status ?? 'applied'] ?? 'default'}
-              className="text-sm"
+              startContent={<MessageCircle size={16} aria-hidden="true" />}
+              className="w-full bg-theme-elevated text-theme-muted"
+              onPress={() => navigate(tenantPath(`/messages?user=${vacancy!.creator.id}&context=job&context_id=${vacancy!.id}`))}
             >
-              {t('apply.applied')} - {t(`application_status.${vacancy!.application_stage ?? vacancy!.application_status ?? 'applied'}`)}
-            </Chip>
+              {t('apply.message_employer', 'Message Employer')}
+            </Button>
           </div>
         ) : (
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full"
             size="lg"
             onPress={applyModal.onOpen}
+            aria-label={t('apply.button_label', 'Apply for {{title}}', { title: vacancy?.title ?? 'this job' })}
           >
             {t('apply.button')}
           </Button>
@@ -1197,9 +1855,11 @@ function MatchBadge({ match }: { match: MatchResult }) {
 interface ApplicationCardProps {
   application: Application;
   onUpdateStatus: (applicationId: number, status: string) => void;
+  tenantPathFn: (path: string) => string;
+  navigateFn: (path: string) => void;
 }
 
-function ApplicationCard({ application, onUpdateStatus }: ApplicationCardProps) {
+function ApplicationCard({ application, onUpdateStatus, tenantPathFn, navigateFn }: ApplicationCardProps) {
   const { t } = useTranslation('jobs');
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -1317,6 +1977,19 @@ function ApplicationCard({ application, onUpdateStatus }: ApplicationCardProps) 
           ))}
         </div>
       )}
+
+      {/* Feature 6: Message applicant button (owner view) */}
+      <div className="mt-2 flex items-center gap-3">
+        <Button
+          size="sm"
+          variant="flat"
+          className="bg-theme-elevated text-theme-muted"
+          startContent={<MessageCircle size={13} aria-hidden="true" />}
+          onPress={() => navigateFn(tenantPathFn(`/messages?user=${application.applicant.id}&context=job&context_id=${application.vacancy_id}`))}
+        >
+          {t('detail.message_applicant', 'Message')}
+        </Button>
+      </div>
 
       {/* J4: History toggle */}
       <div className="mt-2">

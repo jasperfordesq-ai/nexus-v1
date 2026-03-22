@@ -368,6 +368,8 @@ Route::get('/v2/polls/{id}/export', [\App\Http\Controllers\Api\PollsController::
 // ============================================
 Route::get('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'index']);
 Route::post('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'store']);
+Route::get('/v2/jobs/recommended', [\App\Http\Controllers\Api\JobVacanciesController::class, 'recommended']);
+Route::get('/v2/jobs/applications/{id}/cv', [\App\Http\Controllers\Api\JobVacanciesController::class, 'downloadCv']);
 Route::get('/v2/jobs/saved', [\App\Http\Controllers\Api\JobVacanciesController::class, 'savedJobs']);
 Route::get('/v2/jobs/my-applications', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myApplications']);
 Route::get('/v2/jobs/my-postings', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myPostings']);
@@ -376,6 +378,26 @@ Route::post('/v2/jobs/alerts', [\App\Http\Controllers\Api\JobVacanciesController
 Route::delete('/v2/jobs/alerts/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteAlert']);
 Route::put('/v2/jobs/alerts/{id}/unsubscribe', [\App\Http\Controllers\Api\JobVacanciesController::class, 'unsubscribeAlert']);
 Route::put('/v2/jobs/alerts/{id}/resubscribe', [\App\Http\Controllers\Api\JobVacanciesController::class, 'resubscribeAlert']);
+// Saved profile — static literal routes BEFORE {id} wildcard
+Route::get('/v2/jobs/saved-profile', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getSavedProfile']);
+Route::put('/v2/jobs/saved-profile', [\App\Http\Controllers\Api\JobVacanciesController::class, 'saveSavedProfile']);
+// Job templates
+Route::get('/v2/jobs/templates', [\App\Http\Controllers\Api\JobVacanciesController::class, 'listTemplates']);
+Route::post('/v2/jobs/templates', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createTemplate']);
+Route::get('/v2/jobs/templates/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getTemplate']);
+Route::delete('/v2/jobs/templates/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteTemplate']);
+// Salary benchmark lookup
+Route::get('/v2/jobs/salary-benchmark', [\App\Http\Controllers\Api\JobVacanciesController::class, 'salaryBenchmark']);
+// GDPR — static literal routes before {id} wildcard
+Route::get('/v2/jobs/gdpr-export', [\App\Http\Controllers\Api\JobVacanciesController::class, 'gdprExport']);
+Route::delete('/v2/jobs/gdpr-erase-me', [\App\Http\Controllers\Api\JobVacanciesController::class, 'gdprErase']);
+// Pipeline rules
+Route::get('/v2/jobs/{id}/pipeline-rules', [\App\Http\Controllers\Api\JobVacanciesController::class, 'listPipelineRules']);
+Route::post('/v2/jobs/{id}/pipeline-rules', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createPipelineRule']);
+Route::delete('/v2/jobs/pipeline-rules/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deletePipelineRule']);
+Route::post('/v2/jobs/{id}/pipeline-rules/run', [\App\Http\Controllers\Api\JobVacanciesController::class, 'runPipelineRules']);
+// Bulk application actions
+Route::post('/v2/jobs/{id}/applications/bulk-status', [\App\Http\Controllers\Api\JobVacanciesController::class, 'bulkUpdateApplicationStatus']);
 Route::get('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'show']);
 Route::put('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'update']);
 Route::delete('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'destroy']);
@@ -385,12 +407,39 @@ Route::delete('/v2/jobs/{id}/save', [\App\Http\Controllers\Api\JobVacanciesContr
 Route::get('/v2/jobs/{id}/match', [\App\Http\Controllers\Api\JobVacanciesController::class, 'matchPercentage']);
 Route::get('/v2/jobs/{id}/qualified', [\App\Http\Controllers\Api\JobVacanciesController::class, 'qualificationAssessment']);
 Route::get('/v2/jobs/{id}/applications', [\App\Http\Controllers\Api\JobVacanciesController::class, 'applications']);
+Route::get('/v2/jobs/{id}/applications/export-csv', [\App\Http\Controllers\Api\JobVacanciesController::class, 'exportApplicationsCsv']);
 Route::get('/v2/jobs/{id}/analytics', [\App\Http\Controllers\Api\JobVacanciesController::class, 'analytics']);
 Route::post('/v2/jobs/{id}/renew', [\App\Http\Controllers\Api\JobVacanciesController::class, 'renewJob']);
 Route::post('/v2/jobs/{id}/feature', [\App\Http\Controllers\Api\JobVacanciesController::class, 'featureJob']);
 Route::delete('/v2/jobs/{id}/feature', [\App\Http\Controllers\Api\JobVacanciesController::class, 'unfeatureJob']);
 Route::put('/v2/jobs/applications/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'updateApplication']);
 Route::get('/v2/jobs/applications/{id}/history', [\App\Http\Controllers\Api\JobVacanciesController::class, 'applicationHistory']);
+// Interviews — static literal routes first to avoid conflict with {id} wildcard
+Route::get('/v2/jobs/my-interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myInterviews']);
+Route::post('/v2/jobs/applications/{id}/interview', [\App\Http\Controllers\Api\JobVacanciesController::class, 'proposeInterview']);
+Route::put('/v2/jobs/interviews/{id}/accept', [\App\Http\Controllers\Api\JobVacanciesController::class, 'acceptInterview']);
+Route::put('/v2/jobs/interviews/{id}/decline', [\App\Http\Controllers\Api\JobVacanciesController::class, 'declineInterview']);
+Route::delete('/v2/jobs/interviews/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'cancelInterview']);
+Route::get('/v2/jobs/{id}/interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getInterviews']);
+// Offers — static literal routes first to avoid conflict with {id} wildcard
+Route::get('/v2/jobs/my-offers', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myOffers']);
+Route::post('/v2/jobs/applications/{id}/offer', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createOffer']);
+Route::put('/v2/jobs/offers/{id}/accept', [\App\Http\Controllers\Api\JobVacanciesController::class, 'acceptOffer']);
+Route::put('/v2/jobs/offers/{id}/reject', [\App\Http\Controllers\Api\JobVacanciesController::class, 'rejectOffer']);
+Route::delete('/v2/jobs/offers/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'withdrawOffer']);
+Route::get('/v2/jobs/applications/{id}/offer', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getApplicationOffer']);
+// AI CV parsing
+Route::get('/v2/jobs/applications/{id}/parse-cv', [\App\Http\Controllers\Api\JobVacanciesController::class, 'parseResumeCv']);
+// Referrals
+Route::post('/v2/jobs/{id}/referral', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getOrCreateReferral']);
+Route::get('/v2/jobs/{id}/referral-stats', [\App\Http\Controllers\Api\JobVacanciesController::class, 'referralStats']);
+// Scorecards
+Route::put('/v2/jobs/applications/{id}/scorecard', [\App\Http\Controllers\Api\JobVacanciesController::class, 'upsertScorecard']);
+Route::get('/v2/jobs/applications/{id}/scorecards', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getScorecards']);
+// Hiring team
+Route::get('/v2/jobs/{id}/team', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getTeam']);
+Route::post('/v2/jobs/{id}/team', [\App\Http\Controllers\Api\JobVacanciesController::class, 'addTeamMember']);
+Route::delete('/v2/jobs/{id}/team/{userId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'removeTeamMember']);
 Route::get('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'index']);
 Route::post('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'store']);
 Route::get('/v2/ideation-ideas/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showIdea']);

@@ -1,0 +1,85 @@
+{
+  "title": "Empregos",
+  "tabs": {
+    "browse": "Explorar",
+    "myApplications": "Minhas candidaturas"
+  },
+  "search": {
+    "placeholder": "Pesquisar empregos..."
+  },
+  "filters": {
+    "type": {
+      "all": "Todos os tipos",
+      "paid": "Remunerado",
+      "volunteer": "Voluntariado",
+      "timebank": "Banco de tempo"
+    },
+    "commitment": {
+      "all": "Todos",
+      "full_time": "Tempo integral",
+      "part_time": "Meio período",
+      "flexible": "Flexível",
+      "one_off": "Pontual"
+    }
+  },
+  "card": {
+    "remote": "Remoto",
+    "featured": "Destaque",
+    "applications": "{{count}} candidaturas",
+    "deadline": "Encerra em {{date}}",
+    "salary": "{{min}} – {{max}} / {{type}}"
+  },
+  "detail": {
+    "apply": "Candidatar-se agora",
+    "applied": "Candidatura enviada",
+    "save": "Salvar",
+    "saved": "Salvo",
+    "skills": "Habilidades necessárias",
+    "contact": "Contato",
+    "description": "Descrição",
+    "deadline": "Prazo de candidatura",
+    "matchPercentage": "{{percentage}}% de compatibilidade",
+    "closedBadge": "Encerrado",
+    "closesToday": "Encerra hoje",
+    "closesIn": "Encerra em {{count}} dias",
+    "goBack": "Voltar",
+    "notFound": "Emprego não encontrado.",
+    "invalidId": "ID de emprego inválido.",
+    "saveError": "Não foi possível atualizar o estado salvo.",
+    "timeCredits": "{{count}} créditos de tempo",
+    "salaryAnnual": "ano",
+    "salaryMonthly": "mês",
+    "salaryHourly": "hora"
+  },
+  "apply": {
+    "title": "Candidatar-se a {{jobTitle}}",
+    "messagePlaceholder": "Diga ao empregador por que você é o candidato ideal...",
+    "messageLabel": "Carta de apresentação",
+    "submit": "Enviar candidatura",
+    "submitting": "Enviando...",
+    "success": "Candidatura enviada!",
+    "successMessage": "Sua candidatura foi enviada. Boa sorte!",
+    "error": "Falha ao enviar a candidatura"
+  },
+  "applications": {
+    "empty": "Nenhuma candidatura ainda",
+    "emptyHint": "Candidate-se a empregos para vê-los aqui",
+    "appliedOn": "Candidatura em {{date}}",
+    "status": {
+      "pending": "Pendente",
+      "screening": "Triagem",
+      "reviewed": "Avaliada",
+      "interview": "Entrevista",
+      "offer": "Oferta",
+      "accepted": "Aceita",
+      "rejected": "Rejeitada",
+      "withdrawn": "Retirada"
+    }
+  },
+  "empty": "Nenhum emprego encontrado",
+  "emptyHint": "Tente ajustar seus filtros ou volte mais tarde",
+  "loadMore": "Carregar mais",
+  "loading": "A carregar empregos...",
+  "error": "Falha ao carregar empregos",
+  "retry": "Tentar novamente"
+}

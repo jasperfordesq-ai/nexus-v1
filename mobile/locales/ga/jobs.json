@@ -1,0 +1,85 @@
+{
+  "title": "Poist",
+  "tabs": {
+    "browse": "Brabhsáil",
+    "myApplications": "Mo iarratais"
+  },
+  "search": {
+    "placeholder": "Cuardaigh poist..."
+  },
+  "filters": {
+    "type": {
+      "all": "Gach cineál",
+      "paid": "Íoctha",
+      "volunteer": "Deonach",
+      "timebank": "Banc ama"
+    },
+    "commitment": {
+      "all": "Gach ceann",
+      "full_time": "Lánaimseartha",
+      "part_time": "Páirtaimseartha",
+      "flexible": "Solúbtha",
+      "one_off": "Uair amháin"
+    }
+  },
+  "card": {
+    "remote": "Cianda",
+    "featured": "Roghnaithe",
+    "applications": "{{count}} iarratas",
+    "deadline": "Dúnann {{date}}",
+    "salary": "{{min}} – {{max}} / {{type}}"
+  },
+  "detail": {
+    "apply": "Déan iarratas anois",
+    "applied": "Iarratas curtha isteach",
+    "save": "Sábháil",
+    "saved": "Sábháilte",
+    "skills": "Scileanna riachtanacha",
+    "contact": "Teagmháil",
+    "description": "Cur síos",
+    "deadline": "Spriocdháta iarratais",
+    "matchPercentage": "{{percentage}}% meaitseáil",
+    "closedBadge": "Dúnta",
+    "closesToday": "Dúnann inniu",
+    "closesIn": "Dúnann i {{count}} lá",
+    "goBack": "Ar ais",
+    "notFound": "Post gan aimsiú.",
+    "invalidId": "Aitheantas poist neamhbhailí.",
+    "saveError": "Níorbh fhéidir an staid shábháilte a nuashonrú.",
+    "timeCredits": "{{count}} creidmheas ama",
+    "salaryAnnual": "bliain",
+    "salaryMonthly": "mí",
+    "salaryHourly": "uair"
+  },
+  "apply": {
+    "title": "Iarratas ar {{jobTitle}}",
+    "messagePlaceholder": "Inis don fhostóir cén fáth go bhfuil tú oiriúnach don phost...",
+    "messageLabel": "Litir chlúdaigh",
+    "submit": "Cuir iarratas isteach",
+    "submitting": "Ag cur isteach...",
+    "success": "Iarratas curtha isteach!",
+    "successMessage": "Seoladh d'iarratas. Ádh mór ort!",
+    "error": "Theip ar sheoladh an iarratais"
+  },
+  "applications": {
+    "empty": "Gan iarratas fós",
+    "emptyHint": "Déan iarratas ar phoist chun iad a fheiceáil anseo",
+    "appliedOn": "Iarratas ar {{date}}",
+    "status": {
+      "pending": "Ar feitheamh",
+      "screening": "Scagadh",
+      "reviewed": "Athbhreithnithe",
+      "interview": "Agallamh",
+      "offer": "Tairiscint",
+      "accepted": "Glactha",
+      "rejected": "Diúltaithe",
+      "withdrawn": "Tarraingthe siar"
+    }
+  },
+  "empty": "Níor aimsíodh aon phoist",
+  "emptyHint": "Bain triail as do scagairí a choigeartú nó fill níos déanaí",
+  "loadMore": "Luchtaigh níos mó",
+  "loading": "Poist á luchtú...",
+  "error": "Theip ar lódáil na bpost",
+  "retry": "Bain triail eile as"
+}

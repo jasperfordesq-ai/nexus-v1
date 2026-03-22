@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * AiChatService — Laravel DI-based service for AI chat operations.
@@ -82,6 +83,94 @@ class AiChatService
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
+    }
+
+    /**
+     * Parse skills and experience from a CV/resume file.
+     *
+     * Reads the file from local storage, sends the text to OpenAI, and returns
+     * structured data extracted by AI.
+     *
+     * @param string $filePath Path relative to the local storage disk.
+     * @return array Parsed data with keys: skills, years_experience, job_titles, education, summary.
+     *               Returns ['error' => '...'] on failure.
+     */
+    public static function parseResume(string $filePath): array
+    {
+        $apiKey = config('services.openai.key');
+        if (empty($apiKey)) {
+            return ['error' => 'AI service is not configured.'];
+        }
+
+        try {
+            if (!Storage::disk('local')->exists($filePath)) {
+                return ['error' => 'Could not parse file'];
+            }
+
+            $fileContent = Storage::disk('local')->get($filePath);
+
+            // For binary/non-text files (PDF, DOC) we attempt to read raw text.
+            // If the content contains a high ratio of non-printable characters it is binary.
+            $nonPrintable = preg_match_all('/[^\x09\x0A\x0D\x20-\x7E]/', $fileContent ?? '');
+            $total = strlen($fileContent ?? '');
+            if ($total > 0 && ($nonPrintable / $total) > 0.3) {
+                return ['error' => 'Could not parse file'];
+            }
+
+            $resumeText = mb_substr(strip_tags($fileContent ?? ''), 0, 8000);
+
+            if (empty(trim($resumeText))) {
+                return ['error' => 'Could not parse file'];
+            }
+
+            $prompt = <<<PROMPT
+You are a CV/resume parser. Extract structured information from the following resume text.
+Return ONLY valid JSON with these fields:
+{
+  "skills": ["skill1", "skill2"],
+  "years_experience": 5,
+  "job_titles": ["Senior Developer", "Junior Developer"],
+  "education": ["BSc Computer Science, UCD"],
+  "summary": "Experienced developer with 5 years..."
+}
+Resume text:
+{$resumeText}
+PROMPT;
+
+            $response = Http::withToken($apiKey)
+                ->timeout(30)
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model'       => 'gpt-4o-mini',
+                    'messages'    => [
+                        ['role' => 'system', 'content' => 'You are a CV/resume parser. Return only valid JSON.'],
+                        ['role' => 'user',   'content' => $prompt],
+                    ],
+                    'max_tokens'  => 1024,
+                ]);
+
+            $content = $response->json('choices.0.message.content', '');
+
+            // Strip any markdown code fences if present
+            $content = preg_replace('/^```(?:json)?\s*/i', '', trim($content));
+            $content = preg_replace('/\s*```$/', '', $content);
+
+            $parsed = json_decode($content, true);
+
+            if (!is_array($parsed)) {
+                return ['error' => 'Could not parse file'];
+            }
+
+            return [
+                'skills'           => $parsed['skills'] ?? [],
+                'years_experience' => isset($parsed['years_experience']) ? (int) $parsed['years_experience'] : 0,
+                'job_titles'       => $parsed['job_titles'] ?? [],
+                'education'        => $parsed['education'] ?? [],
+                'summary'          => $parsed['summary'] ?? '',
+            ];
+        } catch (\Throwable $e) {
+            Log::error('AiChatService::parseResume failed', ['error' => $e->getMessage()]);
+            return ['error' => 'Could not parse file'];
+        }
     }
 
     /**

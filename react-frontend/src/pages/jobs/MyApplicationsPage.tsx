@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Button,
@@ -30,6 +30,9 @@ import {
   Calendar,
   AlertTriangle,
   History,
+  MessageCircle,
+  Video,
+  Download,
 } from 'lucide-react';
 import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -51,6 +54,31 @@ interface ApplicationVacancy {
   location: string | null;
   is_remote: boolean;
   deadline: string | null;
+  creator?: {
+    id: number;
+    name: string;
+  };
+}
+
+interface ApplicationInterview {
+  id: number;
+  application_id: number;
+  scheduled_at: string;
+  interview_type: 'video' | 'phone' | 'in_person';
+  status: 'proposed' | 'accepted' | 'declined';
+  location_notes?: string | null;
+  duration_mins?: number;
+}
+
+interface ApplicationOffer {
+  id: number;
+  application_id: number;
+  salary_offered: string | null;
+  salary_currency: string;
+  salary_type: 'hourly' | 'monthly' | 'annual';
+  start_date: string | null;
+  message: string | null;
+  status: 'pending' | 'accepted' | 'rejected';
 }
 
 interface JobApplication {
@@ -64,6 +92,8 @@ interface JobApplication {
   created_at: string;
   updated_at: string;
   vacancy: ApplicationVacancy;
+  interview?: ApplicationInterview | null;
+  offer?: ApplicationOffer | null;
 }
 
 interface ApplicationsResponse {
@@ -131,9 +161,14 @@ interface ApplicationCardProps {
   application: JobApplication;
   onWithdraw: (app: JobApplication) => void;
   tenantPath: (path: string) => string;
+  onMessageEmployer?: (creatorId: number, vacancyId: number) => void;
+  onAcceptInterview?: (interviewId: number) => void;
+  onDeclineInterview?: (interviewId: number) => void;
+  onAcceptOffer?: (offerId: number) => void;
+  onRejectOffer?: (offerId: number) => void;
 }
 
-function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCardProps) {
+function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmployer, onAcceptInterview, onDeclineInterview, onAcceptOffer, onRejectOffer }: ApplicationCardProps) {
   const { t } = useTranslation('jobs');
   const [messageExpanded, setMessageExpanded] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -273,8 +308,110 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
           </blockquote>
         )}
 
+        {/* Interview section */}
+        {application.interview && (
+          <div className='mt-3 p-3 rounded-lg bg-secondary-50 border border-secondary-200'>
+            <div className='flex items-center gap-2 text-sm font-medium text-secondary-700'>
+              <Video size={14} aria-hidden="true" />
+              {t('interview.proposed', 'Interview')}: {new Date(application.interview.scheduled_at).toLocaleString()}
+            </div>
+            <div className='text-xs text-secondary-600 mt-1'>
+              {application.interview.interview_type === 'video'
+                ? t('interview.type_video', 'Video Call')
+                : application.interview.interview_type === 'phone'
+                ? t('interview.type_phone', 'Phone Call')
+                : t('interview.type_in_person', 'In Person')}
+              {application.interview.location_notes && ` — ${application.interview.location_notes}`}
+            </div>
+            <div className='flex gap-2 mt-2'>
+              {application.interview.status === 'proposed' && (
+                <>
+                  {onAcceptInterview && (
+                    <Button size='sm' color='success' variant='flat'
+                      onPress={() => onAcceptInterview(application.interview!.id)}>
+                      {t('interview.accept', 'Accept')}
+                    </Button>
+                  )}
+                  {onDeclineInterview && (
+                    <Button size='sm' color='danger' variant='flat'
+                      onPress={() => onDeclineInterview(application.interview!.id)}>
+                      {t('interview.decline', 'Decline')}
+                    </Button>
+                  )}
+                </>
+              )}
+              {application.interview.status === 'accepted' && (
+                <Chip size='sm' color='success' variant='flat'>
+                  {t('interview.accepted', 'Interview Confirmed')}
+                </Chip>
+              )}
+              {application.interview.status === 'declined' && (
+                <Chip size='sm' color='danger' variant='flat'>
+                  {t('interview.declined', 'Interview Declined')}
+                </Chip>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Offer section */}
+        {application.offer && application.offer.status === 'pending' && (
+          <div className='mt-3 p-3 rounded-lg bg-success-50 border border-success-200'>
+            <div className='text-sm font-medium text-success-700'>
+              {t('offer.title', 'You received an offer!')}
+            </div>
+            {application.offer.salary_offered && (
+              <div className='text-sm text-success-600 mt-1'>
+                {t('offer.salary', 'Salary')}: {application.offer.salary_currency}{' '}
+                {Number(application.offer.salary_offered).toLocaleString()} /{' '}
+                {t(`salary.${application.offer.salary_type}`, application.offer.salary_type)}
+              </div>
+            )}
+            {application.offer.start_date && (
+              <div className='text-xs text-success-600'>
+                {t('offer.start_date', 'Start Date')}: {new Date(application.offer.start_date).toLocaleDateString()}
+              </div>
+            )}
+            {application.offer.message && (
+              <p className='text-xs text-default-600 mt-2 italic'>
+                &ldquo;{application.offer.message}&rdquo;
+              </p>
+            )}
+            <div className='flex gap-2 mt-3'>
+              {onAcceptOffer && (
+                <Button size='sm' color='success' onPress={() => onAcceptOffer(application.offer!.id)}>
+                  {t('offer.accept', 'Accept Offer')}
+                </Button>
+              )}
+              {onRejectOffer && (
+                <Button size='sm' color='danger' variant='flat' onPress={() => onRejectOffer(application.offer!.id)}>
+                  {t('offer.reject', 'Decline')}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {application.offer && application.offer.status === 'accepted' && (
+          <div className='mt-3'>
+            <Chip size='sm' color='success' variant='flat'>{t('offer.accepted', 'Offer Accepted')}</Chip>
+          </div>
+        )}
+
         {/* Actions */}
-        <div className='flex justify-end gap-2'>
+        <div className='flex justify-end gap-2 flex-wrap'>
+          {/* Feature 6: Message Employer */}
+          {application.vacancy.creator?.id && onMessageEmployer && (
+            <Button
+              size='sm'
+              variant='flat'
+              className='bg-theme-elevated text-theme-muted'
+              startContent={<MessageCircle size={13} aria-hidden="true" />}
+              onPress={() => onMessageEmployer(application.vacancy.creator!.id, application.vacancy_id)}
+            >
+              {t('apply.message_employer', 'Message Employer')}
+            </Button>
+          )}
           <Button
             size='sm'
             variant='flat'
@@ -300,6 +437,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath }: ApplicationCar
               size='sm'
               color='danger'
               variant='flat'
+              aria-label={t('my_applications.withdraw_aria', 'Withdraw application for {{title}}', { title: application.vacancy.title })}
               onPress={() => onWithdraw(application)}>
               {t('my_applications.withdraw', 'Withdraw')}
             </Button>
@@ -381,6 +519,7 @@ export function MyApplicationsPage() {
   usePageTitle(t('my_applications.title'));
   useAuth();
   const { tenantPath } = useTenant();
+  const navigate = useNavigate();
   const toast = useToast();
 
   const [applications, setApplications] = useState<JobApplication[]>([]);
@@ -403,6 +542,9 @@ export function MyApplicationsPage() {
   const [withdrawTarget, setWithdrawTarget] = useState<JobApplication | null>(null);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const { isOpen: isWithdrawOpen, onOpen: openWithdraw, onClose: closeWithdraw } = useDisclosure();
+
+  // GDPR data export
+  const [isExportingGdpr, setIsExportingGdpr] = useState(false);
 
   const tabToStatus = (tab: FilterTab): string => {
     switch (tab) {
@@ -464,6 +606,44 @@ export function MyApplicationsPage() {
     [activeTab],
   );
 
+  // Fetch interviews and offers from API and merge them into applications list
+  const mergeInterviewsAndOffers = useCallback(async (apps: JobApplication[]) => {
+    try {
+      const [interviewsRes, offersRes] = await Promise.all([
+        api.get<{ data: ApplicationInterview[] } | ApplicationInterview[]>('/v2/jobs/my-interviews'),
+        api.get<{ data: ApplicationOffer[] } | ApplicationOffer[]>('/v2/jobs/my-offers'),
+      ]);
+
+      const interviews: ApplicationInterview[] = (() => {
+        if (!interviewsRes.success || !interviewsRes.data) return [];
+        const d = interviewsRes.data;
+        return Array.isArray(d) ? d : ('data' in d ? d.data : []);
+      })();
+
+      const offers: ApplicationOffer[] = (() => {
+        if (!offersRes.success || !offersRes.data) return [];
+        const d = offersRes.data;
+        return Array.isArray(d) ? d : ('data' in d ? d.data : []);
+      })();
+
+      // Build lookup maps by application_id
+      const interviewMap = new Map<number, ApplicationInterview>();
+      for (const iv of interviews) interviewMap.set(iv.application_id, iv);
+
+      const offerMap = new Map<number, ApplicationOffer>();
+      for (const of_ of offers) offerMap.set(of_.application_id, of_);
+
+      setApplications(apps.map((app) => ({
+        ...app,
+        interview: interviewMap.get(app.id) ?? null,
+        offer: offerMap.get(app.id) ?? null,
+      })));
+    } catch (err) {
+      // Non-critical — interviews/offers are supplementary
+      logError('MyApplicationsPage: failed to load interviews/offers', err);
+    }
+  }, []);
+
   useEffect(() => {
     cursorRef.current = null;
     setHasMore(false);
@@ -471,9 +651,95 @@ export function MyApplicationsPage() {
     loadApplications();
   }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // After loadApplications completes, also fetch interviews + offers
+  useEffect(() => {
+    if (!isLoading && applications.length > 0) {
+      mergeInterviewsAndOffers(applications);
+    }
+  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Feature 3: Interview accept/decline handlers
+  const handleAcceptInterview = useCallback(async (interviewId: number) => {
+    try {
+      await api.put(`/v2/jobs/interviews/${interviewId}/accept`, {});
+      toastRef.current.success(tRef.current('interview.accepted', 'Interview Confirmed'));
+      // Refresh
+      cursorRef.current = null;
+      setHasMore(false);
+      setApplications([]);
+      loadApplications();
+    } catch (err) {
+      logError('MyApplicationsPage.handleAcceptInterview', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    }
+  }, [loadApplications]);
+
+  const handleDeclineInterview = useCallback(async (interviewId: number) => {
+    try {
+      await api.put(`/v2/jobs/interviews/${interviewId}/decline`, {});
+      toastRef.current.success(tRef.current('interview.declined', 'Interview Declined'));
+      cursorRef.current = null;
+      setHasMore(false);
+      setApplications([]);
+      loadApplications();
+    } catch (err) {
+      logError('MyApplicationsPage.handleDeclineInterview', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    }
+  }, [loadApplications]);
+
+  // Feature 3: Offer accept/reject handlers
+  const handleAcceptOffer = useCallback(async (offerId: number) => {
+    try {
+      await api.put(`/v2/jobs/offers/${offerId}/accept`, {});
+      toastRef.current.success(tRef.current('offer.accepted', 'Offer Accepted! Congratulations!'));
+      cursorRef.current = null;
+      setHasMore(false);
+      setApplications([]);
+      loadApplications();
+    } catch (err) {
+      logError('MyApplicationsPage.handleAcceptOffer', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    }
+  }, [loadApplications]);
+
+  const handleRejectOffer = useCallback(async (offerId: number) => {
+    try {
+      await api.put(`/v2/jobs/offers/${offerId}/reject`, {});
+      toastRef.current.success(tRef.current('offer.rejected', 'Offer declined'));
+      cursorRef.current = null;
+      setHasMore(false);
+      setApplications([]);
+      loadApplications();
+    } catch (err) {
+      logError('MyApplicationsPage.handleRejectOffer', err);
+      toastRef.current.error(tRef.current('something_wrong'));
+    }
+  }, [loadApplications]);
+
   const handleWithdrawClick = (app: JobApplication) => {
     setWithdrawTarget(app);
     openWithdraw();
+  };
+
+  const handleGdprExport = async () => {
+    setIsExportingGdpr(true);
+    try {
+      const res = await api.get('/v2/jobs/gdpr-export');
+      if (res.success && res.data) {
+        const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'my-job-data.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      logError('GDPR export failed', err);
+    } finally {
+      setIsExportingGdpr(false);
+    }
   };
 
   const confirmWithdraw = useCallback(async () => {
@@ -503,14 +769,26 @@ export function MyApplicationsPage() {
   return (
     <div className='max-w-3xl mx-auto px-4 py-8'>
       {/* Page header */}
-      <div className='mb-6'>
-        <h1 className='text-2xl font-bold text-theme-primary flex items-center gap-2'>
-          <Briefcase size={24} aria-hidden="true" />
-          {t('my_applications.title')}
-        </h1>
-        <p className='text-sm text-theme-muted mt-1'>
-          {t('my_applications.subtitle', 'Track the status of your job and volunteer applications.')}
-        </p>
+      <div className='mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3'>
+        <div>
+          <h1 className='text-2xl font-bold text-theme-primary flex items-center gap-2'>
+            <Briefcase size={24} aria-hidden="true" />
+            {t('my_applications.title')}
+          </h1>
+          <p className='text-sm text-theme-muted mt-1'>
+            {t('my_applications.subtitle', 'Track the status of your job and volunteer applications.')}
+          </p>
+        </div>
+        <Button
+          size='sm'
+          variant='flat'
+          className='bg-theme-elevated text-theme-muted self-start'
+          startContent={<Download size={14} aria-hidden="true" />}
+          isLoading={isExportingGdpr}
+          onPress={handleGdprExport}
+        >
+          {t('gdpr.export_my_data', 'Download my data')}
+        </Button>
       </div>
 
       {/* Filter tabs */}
@@ -577,8 +855,15 @@ export function MyApplicationsPage() {
               <ApplicationCard
                 key={app.id}
                 application={app}
+                onMessageEmployer={(creatorId, vacancyId) =>
+                  navigate(tenantPath(`/messages?user=${creatorId}&context=job&context_id=${vacancyId}`))
+                }
                 onWithdraw={handleWithdrawClick}
                 tenantPath={tenantPath}
+                onAcceptInterview={handleAcceptInterview}
+                onDeclineInterview={handleDeclineInterview}
+                onAcceptOffer={handleAcceptOffer}
+                onRejectOffer={handleRejectOffer}
               />
             ))}
           </motion.div>

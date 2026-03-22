@@ -1,0 +1,85 @@
+{
+  "title": "Lavori",
+  "tabs": {
+    "browse": "Sfoglia",
+    "myApplications": "Le mie candidature"
+  },
+  "search": {
+    "placeholder": "Cerca lavori..."
+  },
+  "filters": {
+    "type": {
+      "all": "Tutti i tipi",
+      "paid": "Retribuito",
+      "volunteer": "Volontariato",
+      "timebank": "Banca del tempo"
+    },
+    "commitment": {
+      "all": "Tutti",
+      "full_time": "Tempo pieno",
+      "part_time": "Part-time",
+      "flexible": "Flessibile",
+      "one_off": "Una tantum"
+    }
+  },
+  "card": {
+    "remote": "Da remoto",
+    "featured": "In evidenza",
+    "applications": "{{count}} candidature",
+    "deadline": "Scade il {{date}}",
+    "salary": "{{min}} – {{max}} / {{type}}"
+  },
+  "detail": {
+    "apply": "Candidati ora",
+    "applied": "Candidatura inviata",
+    "save": "Salva",
+    "saved": "Salvato",
+    "skills": "Competenze richieste",
+    "contact": "Contatto",
+    "description": "Descrizione",
+    "deadline": "Scadenza candidatura",
+    "matchPercentage": "{{percentage}}% di corrispondenza",
+    "closedBadge": "Chiuso",
+    "closesToday": "Scade oggi",
+    "closesIn": "Scade tra {{count}} giorni",
+    "goBack": "Indietro",
+    "notFound": "Lavoro non trovato.",
+    "invalidId": "ID lavoro non valido.",
+    "saveError": "Impossibile aggiornare lo stato salvato.",
+    "timeCredits": "{{count}} crediti tempo",
+    "salaryAnnual": "anno",
+    "salaryMonthly": "mese",
+    "salaryHourly": "ora"
+  },
+  "apply": {
+    "title": "Candidati per {{jobTitle}}",
+    "messagePlaceholder": "Racconta al datore di lavoro perché sei il candidato ideale...",
+    "messageLabel": "Lettera di presentazione",
+    "submit": "Invia candidatura",
+    "submitting": "Invio in corso...",
+    "success": "Candidatura inviata!",
+    "successMessage": "La tua candidatura è stata inviata. Buona fortuna!",
+    "error": "Invio della candidatura non riuscito"
+  },
+  "applications": {
+    "empty": "Nessuna candidatura ancora",
+    "emptyHint": "Candidati a posizioni lavorative per vederle qui",
+    "appliedOn": "Candidatura del {{date}}",
+    "status": {
+      "pending": "In attesa",
+      "screening": "Preselezione",
+      "reviewed": "Esaminata",
+      "interview": "Colloquio",
+      "offer": "Offerta",
+      "accepted": "Accettata",
+      "rejected": "Rifiutata",
+      "withdrawn": "Ritirata"
+    }
+  },
+  "empty": "Nessun lavoro trovato",
+  "emptyHint": "Prova a modificare i filtri o torna più tardi",
+  "loadMore": "Carica altri",
+  "loading": "Caricamento lavori...",
+  "error": "Impossibile caricare i lavori",
+  "retry": "Riprova"
+}

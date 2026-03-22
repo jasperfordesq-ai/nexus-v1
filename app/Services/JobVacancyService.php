@@ -69,12 +69,34 @@ class JobVacancyService
             $query->where('job_vacancies.category', $filters['category']);
         }
         if (!empty($filters['search'])) {
-            $term = '%' . $filters['search'] . '%';
-            $query->where(function (Builder $q) use ($term) {
-                $q->where('job_vacancies.title', 'LIKE', $term)
-                  ->orWhere('job_vacancies.description', 'LIKE', $term)
-                  ->orWhere('job_vacancies.category', 'LIKE', $term);
-            });
+            $parsed = self::parseBooleanQuery($filters['search']);
+
+            // Must terms (AND) — all must match title OR description OR skills_required
+            foreach ($parsed['must'] as $term) {
+                $query->where(function (Builder $inner) use ($term) {
+                    $inner->where('job_vacancies.title', 'LIKE', "%{$term}%")
+                          ->orWhere('job_vacancies.description', 'LIKE', "%{$term}%")
+                          ->orWhere('job_vacancies.skills_required', 'LIKE', "%{$term}%");
+                });
+            }
+
+            // Should terms (OR) — at least one must match
+            if (!empty($parsed['should'])) {
+                $query->where(function (Builder $inner) use ($parsed) {
+                    foreach ($parsed['should'] as $term) {
+                        $inner->orWhere(function (Builder $sub) use ($term) {
+                            $sub->where('job_vacancies.title', 'LIKE', "%{$term}%")
+                                ->orWhere('job_vacancies.description', 'LIKE', "%{$term}%");
+                        });
+                    }
+                });
+            }
+
+            // Not terms — exclude
+            foreach ($parsed['not'] as $term) {
+                $query->where('job_vacancies.title', 'NOT LIKE', "%{$term}%")
+                      ->where('job_vacancies.description', 'NOT LIKE', "%{$term}%");
+            }
         }
         if (!empty($filters['user_id'])) {
             $query->where('job_vacancies.user_id', (int) $filters['user_id']);
@@ -85,6 +107,20 @@ class JobVacancyService
                     $q->whereNull('job_vacancies.featured_until')
                       ->orWhere('job_vacancies.featured_until', '>', now());
                 });
+        }
+
+        // Haversine geolocation radius filter
+        $lat = isset($filters['latitude']) ? (float) $filters['latitude'] : null;
+        $lng = isset($filters['longitude']) ? (float) $filters['longitude'] : null;
+        $radiusKm = isset($filters['radius_km']) ? (float) $filters['radius_km'] : null;
+
+        if ($lat !== null && $lng !== null && $radiusKm !== null && $radiusKm > 0) {
+            $query->whereNotNull('job_vacancies.latitude')
+                ->whereNotNull('job_vacancies.longitude')
+                ->whereRaw(
+                    '(6371 * acos(cos(radians(?)) * cos(radians(job_vacancies.latitude)) * cos(radians(job_vacancies.longitude) - radians(?)) + sin(radians(?)) * sin(radians(job_vacancies.latitude)))) <= ?',
+                    [$lat, $lng, $lat, $radiusKm]
+                );
         }
 
         if ($cursor !== null) {
@@ -157,15 +193,59 @@ class JobVacancyService
      */
     public function create(int $userId, array $data): int
     {
-        $vacancy = $this->vacancy->newQuery()->create([
-            'title' => trim($data['title']),
-            'description' => trim($data['description'] ?? ''),
-            'type' => $data['type'] ?? 'volunteer',
-            'commitment' => $data['commitment'] ?? 'flexible',
-            'location' => $data['location'] ?? null,
-            'status' => 'open',
-            'user_id' => $userId,
-        ]);
+        $this->errors = [];
+
+        // EU Pay Transparency Directive (June 2026) compliance — salary range required unless negotiable
+        $salaryNegotiable = !empty($data['salary_negotiable']) && $data['salary_negotiable'];
+        if (!$salaryNegotiable) {
+            $hasSalaryMin = isset($data['salary_min']) && $data['salary_min'] !== null && $data['salary_min'] !== '';
+            $hasSalaryMax = isset($data['salary_max']) && $data['salary_max'] !== null && $data['salary_max'] !== '';
+            if (!$hasSalaryMin || !$hasSalaryMax) {
+                // Only enforce for paid job types
+                $jobType = $data['type'] ?? 'volunteer';
+                if ($jobType === 'paid') {
+                    $this->errors[] = ['code' => 'VALIDATION_SALARY_REQUIRED', 'message' => 'A salary range (min and max) is required unless the role is marked as salary negotiable. EU Pay Transparency Directive compliance.'];
+                    return 0;
+                }
+            }
+        }
+
+        $vacancy = $this->vacancy->newQuery()->create(array_filter([
+            'title'          => trim($data['title']),
+            'description'    => trim($data['description'] ?? ''),
+            'type'           => $data['type'] ?? 'volunteer',
+            'commitment'     => $data['commitment'] ?? 'flexible',
+            'location'       => $data['location'] ?? null,
+            'status'         => 'open',
+            'user_id'        => $userId,
+            'tagline'        => isset($data['tagline']) ? trim($data['tagline']) : null,
+            'video_url'      => $data['video_url'] ?? null,
+            'culture_photos' => $data['culture_photos'] ?? null,
+            'company_size'   => $data['company_size'] ?? null,
+            'benefits'       => $data['benefits'] ?? null,
+        ], fn($v) => $v !== null));
+
+        // Dispatch webhook for vacancy creation
+        try {
+            \App\Services\WebhookDispatchService::dispatch('job.vacancy.created', [
+                'vacancy_id' => $vacancy->id,
+                'title'      => $vacancy->title,
+                'type'       => $vacancy->type,
+                'tenant_id'  => TenantContext::getId(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('JobVacancyService::create webhook dispatch failed: ' . $e->getMessage());
+        }
+
+        // Fire event to notify job alert subscribers
+        try {
+            $creator = User::find($userId);
+            if ($creator) {
+                event(new \App\Events\JobVacancyCreated($vacancy, $creator, TenantContext::getId()));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('JobVacancyService::create event dispatch failed: ' . $e->getMessage());
+        }
 
         return $vacancy->id;
     }
@@ -193,10 +273,11 @@ class JobVacancyService
         }
 
         $allowedFields = [
-            'title', 'description', 'location', 'is_remote', 'type', 'commitment',
+            'title', 'description', 'location', 'latitude', 'longitude', 'is_remote', 'type', 'commitment',
             'category', 'skills_required', 'hours_per_week', 'time_credits',
             'contact_email', 'contact_phone', 'deadline', 'status', 'organization_id',
             'salary_min', 'salary_max', 'salary_type', 'salary_currency', 'salary_negotiable',
+            'tagline', 'video_url', 'culture_photos', 'company_size', 'benefits',
         ];
 
         $updates = [];
@@ -208,6 +289,24 @@ class JobVacancyService
 
         if (empty($updates)) {
             return true;
+        }
+
+        // EU Pay Transparency Directive (June 2026) compliance — salary range required unless negotiable
+        // Only validate when salary fields are being touched and type is paid
+        $typeAfterUpdate = $updates['type'] ?? $vacancy->type ?? null;
+        if ($typeAfterUpdate === 'paid') {
+            $salaryNegotiable = array_key_exists('salary_negotiable', $updates)
+                ? !empty($updates['salary_negotiable'])
+                : !empty($vacancy->salary_negotiable);
+
+            if (!$salaryNegotiable) {
+                $salaryMin = array_key_exists('salary_min', $updates) ? $updates['salary_min'] : $vacancy->salary_min;
+                $salaryMax = array_key_exists('salary_max', $updates) ? $updates['salary_max'] : $vacancy->salary_max;
+                if (($salaryMin === null || $salaryMin === '') || ($salaryMax === null || $salaryMax === '')) {
+                    $this->errors[] = ['code' => 'VALIDATION_SALARY_REQUIRED', 'message' => 'A salary range (min and max) is required unless the role is marked as salary negotiable. EU Pay Transparency Directive compliance.'];
+                    return false;
+                }
+            }
         }
 
         try {
@@ -257,6 +356,8 @@ class JobVacancyService
     /**
      * Apply to a job vacancy.
      *
+     * Accepts optional cv_path, cv_filename, cv_size for CV file upload support.
+     *
      * @return int|null Application ID or null if already applied.
      */
     public function apply(int $jobId, int $userId, array $data = []): ?int
@@ -273,6 +374,9 @@ class JobVacancyService
             'vacancy_id' => $jobId,
             'user_id' => $userId,
             'message' => $data['cover_letter'] ?? null,
+            'cv_path' => $data['cv_path'] ?? null,
+            'cv_filename' => $data['cv_filename'] ?? null,
+            'cv_size' => isset($data['cv_size']) ? (int) $data['cv_size'] : null,
             'status' => 'pending',
             'stage' => 'applied',
         ]);
@@ -284,6 +388,18 @@ class JobVacancyService
         $this->vacancy->newQuery()
             ->where('id', $jobId)
             ->increment('applications_count');
+
+        // Dispatch webhook for new application
+        try {
+            \App\Services\WebhookDispatchService::dispatch('job.application.created', [
+                'application_id' => $application->id,
+                'vacancy_id'     => $jobId,
+                'user_id'        => $userId,
+                'tenant_id'      => TenantContext::getId(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('JobVacancyService::apply webhook dispatch failed: ' . $e->getMessage());
+        }
 
         return $application->id;
     }
@@ -465,6 +581,20 @@ class JobVacancyService
             ]);
 
             $this->logApplicationHistory($applicationId, $previousStatus, $status, $adminId, $notes);
+
+            // Dispatch webhook for application status change
+            try {
+                \App\Services\WebhookDispatchService::dispatch('job.application.status_changed', [
+                    'application_id' => $applicationId,
+                    'vacancy_id'     => $application->vacancy_id,
+                    'user_id'        => $application->user_id,
+                    'from'           => $previousStatus,
+                    'to'             => $status,
+                    'tenant_id'      => TenantContext::getId(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('JobVacancyService::updateApplicationStatus webhook dispatch failed: ' . $e->getMessage());
+            }
 
             return true;
         } catch (\Throwable $e) {
@@ -846,6 +976,30 @@ class JobVacancyService
             $level = 'moderate';
         }
 
+        // Commitment match
+        $commitmentScore = in_array($vacancy['commitment'] ?? '', ['flexible', 'part_time']) ? 80 : 60;
+        $commitmentNotes = ucfirst(str_replace('_', ' ', $vacancy['commitment'] ?? ''));
+
+        // Remote match
+        $isRemote = !empty($vacancy['is_remote']);
+
+        // Location distance (Haversine)
+        $locationDistanceKm = null;
+        if (!empty($vacancy['latitude']) && !empty($vacancy['longitude'])) {
+            $user = User::where('id', $userId)->first(['latitude', 'longitude']);
+            if ($user && !empty($user->latitude) && !empty($user->longitude)) {
+                $earthRadius = 6371;
+                $latDiff = deg2rad((float) $vacancy['latitude'] - (float) $user->latitude);
+                $lngDiff = deg2rad((float) $vacancy['longitude'] - (float) $user->longitude);
+                $a = sin($latDiff / 2) ** 2
+                    + cos(deg2rad((float) $user->latitude)) * cos(deg2rad((float) $vacancy['latitude'])) * sin($lngDiff / 2) ** 2;
+                $locationDistanceKm = round($earthRadius * 2 * asin(sqrt($a)), 1);
+            }
+        }
+
+        // Salary transparency
+        $salaryDisclosed = !empty($vacancy['salary_min']) || !empty($vacancy['salary_negotiable']);
+
         return [
             'job_id' => $jobId,
             'job_title' => $vacancy['title'],
@@ -858,7 +1012,43 @@ class JobVacancyService
             'matched_skills' => $matchData['matched'],
             'missing_skills' => $matchData['missing'],
             'user_skills' => $matchData['user_skills'],
+            'commitment_notes' => $commitmentNotes,
+            'remote_available' => $isRemote,
+            'location_distance_km' => $locationDistanceKm,
+            'salary_disclosed' => $salaryDisclosed,
+            'dimensions' => [
+                ['label' => 'Skills Match',    'score' => $matchData['percentage'],   'detail' => count($matchData['matched']) . '/' . count($matchData['required_skills']) . ' skills matched'],
+                ['label' => 'Remote Work',     'score' => $isRemote ? 100 : 50,       'detail' => $isRemote ? 'Remote position available' : 'On-site role'],
+                ['label' => 'Commitment',      'score' => $commitmentScore,           'detail' => $commitmentNotes],
+                ['label' => 'Pay Transparency','score' => $salaryDisclosed ? 100 : 50,'detail' => !empty($vacancy['salary_min']) ? 'Salary range disclosed' : 'Salary not specified'],
+            ],
+            'ai_summary' => self::generateMatchSummary($matchData['percentage'], $matchData['matched'], $matchData['missing'], $vacancy),
         ];
+    }
+
+    /**
+     * Generate a concise human-readable match summary.
+     */
+    private static function generateMatchSummary(int $pct, array $matched, array $missing, array $vacancy): string
+    {
+        $lines = [];
+        if ($pct >= 80) {
+            $lines[] = "Strong match ({$pct}%).";
+        } elseif ($pct >= 50) {
+            $lines[] = "Partial match ({$pct}%).";
+        } else {
+            $lines[] = "Developing match ({$pct}%).";
+        }
+        if (!empty($matched)) {
+            $lines[] = 'You have: ' . implode(', ', array_slice($matched, 0, 5)) . '.';
+        }
+        if (!empty($missing)) {
+            $lines[] = 'To develop: ' . implode(', ', array_slice($missing, 0, 3)) . '.';
+        }
+        if ($vacancy['is_remote'] ?? false) {
+            $lines[] = 'Remote-friendly role.';
+        }
+        return implode(' ', $lines);
     }
 
     // =========================================================================
@@ -995,7 +1185,52 @@ class JobVacancyService
             'applications_by_stage' => $applicationsByStatus,
             'created_at' => $vacancy['created_at'],
             'status' => $vacancy['status'],
+            'referral_stats' => self::getReferralStats((int) $jobId, $tenantId),
+            'scorecard_avg'  => self::getScorecardAvg((int) $jobId, $tenantId),
+            'weekly_trend'   => self::getWeeklyApplicationTrend((int) $jobId, $tenantId),
         ];
+    }
+
+    private static function getReferralStats(int $jobId, int $tenantId): array
+    {
+        try {
+            $total   = DB::table('job_referrals')->where('tenant_id', $tenantId)->where('vacancy_id', $jobId)->count();
+            $applied = DB::table('job_referrals')->where('tenant_id', $tenantId)->where('vacancy_id', $jobId)->where('applied', true)->count();
+            return ['total_shares' => $total, 'referral_applications' => $applied, 'referral_conversion_pct' => $total > 0 ? round(($applied / $total) * 100, 1) : 0];
+        } catch (\Throwable $e) {
+            return ['total_shares' => 0, 'referral_applications' => 0, 'referral_conversion_pct' => 0];
+        }
+    }
+
+    private static function getScorecardAvg(int $jobId, int $tenantId): ?float
+    {
+        try {
+            $avg = DB::table('job_scorecards')
+                ->where('tenant_id', $tenantId)
+                ->where('vacancy_id', $jobId)
+                ->avg(DB::raw('(total_score / max_score) * 100'));
+            return $avg !== null ? round((float) $avg, 1) : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private static function getWeeklyApplicationTrend(int $jobId, int $tenantId): array
+    {
+        try {
+            return DB::table('job_vacancy_applications')
+                ->where('vacancy_id', $jobId)
+                ->where('tenant_id', $tenantId)
+                ->where('created_at', '>=', now()->subWeeks(8))
+                ->selectRaw('YEARWEEK(created_at, 1) as week, COUNT(*) as count')
+                ->groupBy('week')
+                ->orderBy('week')
+                ->get()
+                ->map(fn($r) => (array) $r)
+                ->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     // =========================================================================
@@ -1043,6 +1278,96 @@ class JobVacancyService
             Log::error("JobVacancyService::renewJob failed: " . $e->getMessage());
             return false;
         }
+    }
+
+    // =========================================================================
+    // RECOMMENDED JOBS
+    // =========================================================================
+
+    /**
+     * Get recommended job vacancies for a user based on skills matching.
+     *
+     * Recommends open jobs where skills_required overlaps with the user's skills.
+     * Excludes jobs the user has already applied to, and jobs posted by the user.
+     * Orders by match score descending, then by newest first.
+     */
+    public function getRecommended(int $userId, int $limit = 10): array
+    {
+        $tenantId = TenantContext::getId();
+        $limit = max(1, min(20, $limit));
+
+        // 1. Get the user's skills (comma-separated string on users.skills column)
+        $user = User::find($userId, ['id', 'skills']);
+        $userSkills = [];
+        if ($user && !empty($user->skills)) {
+            $userSkills = array_values(array_filter(array_map(fn ($s) => strtolower(trim($s)), explode(',', $user->skills))));
+        }
+
+        // 2. Get open vacancies in this tenant, excluding applied-to and own postings
+        $appliedIds = JobApplication::where('user_id', $userId)
+            ->pluck('vacancy_id')
+            ->toArray();
+
+        $query = $this->vacancy->newQuery()
+            ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
+            ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo')
+            ->where('job_vacancies.status', 'open')
+            ->where('job_vacancies.user_id', '!=', $userId);
+
+        if (!empty($appliedIds)) {
+            $query->whereNotIn('job_vacancies.id', $appliedIds);
+        }
+
+        $vacancies = $query->orderByRaw(
+            '(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END) ASC'
+        )
+            ->orderByDesc('job_vacancies.created_at')
+            ->limit(200) // Fetch a wider set for scoring, then trim to $limit
+            ->get();
+
+        if ($vacancies->isEmpty()) {
+            return [];
+        }
+
+        // 3. Score each vacancy by skill overlap, using same fuzzy matching as calculateMatchPercentage()
+        $scored = $vacancies->map(function ($vacancy) use ($userId, $userSkills) {
+            $data = $this->enrichVacancy($vacancy, $userId);
+
+            $requiredSkills = [];
+            if (!empty($vacancy->skills_required)) {
+                $requiredSkills = array_values(array_filter(array_map(fn ($s) => strtolower(trim($s)), explode(',', $vacancy->skills_required))));
+            }
+
+            $score = 0;
+            if (!empty($requiredSkills) && !empty($userSkills)) {
+                $matched = 0;
+                foreach ($requiredSkills as $required) {
+                    foreach ($userSkills as $userSkill) {
+                        if ($required === $userSkill || str_contains($required, $userSkill) || str_contains($userSkill, $required)) {
+                            $matched++;
+                            break;
+                        }
+                        similar_text($required, $userSkill, $pct);
+                        if ($pct >= 75) {
+                            $matched++;
+                            break;
+                        }
+                    }
+                }
+                $score = (int) round(($matched / count($requiredSkills)) * 100);
+            } elseif (empty($requiredSkills)) {
+                // No required skills — neutral score so it can still appear
+                $score = 50;
+            }
+
+            $data['match_score'] = $score;
+            return $data;
+        });
+
+        // 4. Sort by match_score DESC (jobs with higher skill overlap first)
+        $sorted = $scored->sortByDesc('match_score')->values()->take($limit)->all();
+
+        return $sorted;
     }
 
     // =========================================================================
@@ -1156,6 +1481,142 @@ class JobVacancyService
             ]);
         } catch (\Throwable $e) {
             Log::warning('JobVacancyService: Failed to log application history: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Parse a boolean search query into LIKE clauses.
+     * Supports AND (space / +), OR (|), NOT (-word).
+     * Returns ['must' => [], 'should' => [], 'not' => []]
+     */
+    private static function parseBooleanQuery(string $query): array
+    {
+        $must   = [];
+        $should = [];
+        $not    = [];
+
+        // Split on | for OR groups
+        $orParts = array_map('trim', explode('|', $query));
+
+        foreach ($orParts as $part) {
+            // Split on spaces/+ for AND terms within this OR group
+            $terms = preg_split('/[\s+]+/', trim($part), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($terms as $term) {
+                if (str_starts_with($term, '-') && strlen($term) > 1) {
+                    $not[] = substr($term, 1);
+                } elseif (count($orParts) > 1) {
+                    $should[] = $term;
+                } else {
+                    $must[] = $term;
+                }
+            }
+        }
+
+        return ['must' => $must, 'should' => $should, 'not' => $not];
+    }
+
+    // =========================================================================
+    // CSV EXPORT
+    // =========================================================================
+
+    /**
+     * Export applications for a vacancy as CSV string.
+     */
+    public function exportApplicationsCsv(int $jobId, int $userId): ?string
+    {
+        $this->errors = [];
+        $vacancy = $this->legacyGetById($jobId);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Not found'];
+            return null;
+        }
+        $tenantId = TenantContext::getId();
+        if ((int) $vacancy['user_id'] !== $userId) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
+            return null;
+        }
+
+        $apps = JobApplication::with(['applicant:id,first_name,last_name,email'])
+            ->where('tenant_id', $tenantId)
+            ->where('vacancy_id', $jobId)
+            ->orderBy('created_at')
+            ->get();
+
+        $rows = [['ID', 'Name', 'Email', 'Status', 'Stage', 'Applied At', 'Updated At']];
+        foreach ($apps as $app) {
+            $rows[] = [
+                $app->id,
+                ($app->applicant->first_name ?? '') . ' ' . ($app->applicant->last_name ?? ''),
+                $app->applicant->email ?? '',
+                $app->status,
+                $app->stage ?? $app->status,
+                $app->created_at?->toDateTimeString() ?? '',
+                $app->updated_at?->toDateTimeString() ?? '',
+            ];
+        }
+
+        $out = fopen('php://temp', 'r+');
+        foreach ($rows as $row) {
+            fputcsv($out, $row);
+        }
+        rewind($out);
+        $csv = stream_get_contents($out);
+        fclose($out);
+        return $csv;
+    }
+
+    /**
+     * Bulk update application statuses (employer only).
+     *
+     * @param int   $vacancyId
+     * @param int   $userId       Must be the vacancy owner.
+     * @param int[] $applicationIds
+     * @param string $newStatus   e.g. 'rejected', 'screening', 'reviewed'
+     * @return int  Number of records updated.
+     */
+    public function bulkUpdateApplicationStatus(int $vacancyId, int $userId, array $applicationIds, string $newStatus): int
+    {
+        $this->errors = [];
+        $tenantId     = TenantContext::getId();
+
+        $vacancy = $this->legacyGetById($vacancyId);
+        if (!$vacancy) {
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Not found'];
+            return 0;
+        }
+        if ((int) $vacancy['user_id'] !== $userId) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
+            return 0;
+        }
+
+        $allowed = ['applied','screening','reviewed','interview','offer','accepted','rejected','withdrawn'];
+        if (!in_array($newStatus, $allowed, true)) {
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid status'];
+            return 0;
+        }
+
+        try {
+            $updated = JobApplication::where('tenant_id', $tenantId)
+                ->where('vacancy_id', $vacancyId)
+                ->whereIn('id', $applicationIds)
+                ->update(['status' => $newStatus, 'stage' => $newStatus]);
+
+            // Fire webhook for bulk action
+            try {
+                \App\Services\WebhookDispatchService::dispatch('job.application.bulk_status_changed', [
+                    'vacancy_id'      => $vacancyId,
+                    'application_ids' => $applicationIds,
+                    'new_status'      => $newStatus,
+                    'tenant_id'       => $tenantId,
+                ]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Bulk status webhook failed: ' . $e->getMessage());
+            }
+
+            return $updated;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('bulkUpdateApplicationStatus failed', ['error' => $e->getMessage()]);
+            return 0;
         }
     }
 }

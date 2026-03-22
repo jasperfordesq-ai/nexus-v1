@@ -1,0 +1,104 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Services;
+
+use App\Core\TenantContext;
+use App\Models\JobVacancy;
+use App\Models\JobVacancyTeam;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Log;
+
+class JobTeamService
+{
+    /**
+     * Add a team member to a vacancy.
+     * Only the job poster (owner) can add members.
+     */
+    public static function addMember(int $vacancyId, int $ownerUserId, int $targetUserId, string $role = 'reviewer'): array|false
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $vacancy = JobVacancy::find($vacancyId);
+            if (!$vacancy || (int) $vacancy->tenant_id !== $tenantId) return false;
+            if ((int) $vacancy->user_id !== $ownerUserId) return false;
+
+            // Don't add the owner themselves
+            if ($targetUserId === $ownerUserId) return false;
+
+            $member = JobVacancyTeam::updateOrCreate(
+                ['vacancy_id' => $vacancyId, 'user_id' => $targetUserId],
+                [
+                    'tenant_id'  => $tenantId,
+                    'role'       => in_array($role, ['reviewer', 'manager']) ? $role : 'reviewer',
+                    'added_by'   => $ownerUserId,
+                    'created_at' => now(),
+                ]
+            );
+
+            // Notify the added member
+            try {
+                Notification::createNotification(
+                    $targetUserId,
+                    "You've been added as a {$role} for '{$vacancy->title}'",
+                    "/jobs/{$vacancyId}",
+                    'job_application'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('JobTeamService::addMember notification failed: ' . $e->getMessage());
+            }
+
+            return $member->toArray();
+        } catch (\Throwable $e) {
+            Log::error('JobTeamService::addMember failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Remove a team member from a vacancy.
+     */
+    public static function removeMember(int $vacancyId, int $ownerUserId, int $targetUserId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $vacancy = JobVacancy::find($vacancyId);
+            if (!$vacancy || (int) $vacancy->tenant_id !== $tenantId) return false;
+            if ((int) $vacancy->user_id !== $ownerUserId) return false;
+
+            JobVacancyTeam::where('tenant_id', $tenantId)
+                ->where('vacancy_id', $vacancyId)
+                ->where('user_id', $targetUserId)
+                ->delete();
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('JobTeamService::removeMember failed', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * List all team members for a vacancy.
+     */
+    public static function getMembers(int $vacancyId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            return JobVacancyTeam::with(['user:id,first_name,last_name,avatar_url,email'])
+                ->where('tenant_id', $tenantId)
+                ->where('vacancy_id', $vacancyId)
+                ->get()
+                ->toArray();
+        } catch (\Throwable $e) {
+            Log::error('JobTeamService::getMembers failed', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
+}
