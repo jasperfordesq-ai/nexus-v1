@@ -138,6 +138,9 @@ const JobAlertsPage = lazyWithRetry(() => import('@/pages/jobs/JobAlertsPage'));
 const MyApplicationsPage = lazyWithRetry(() => import('@/pages/jobs/MyApplicationsPage'));
 const JobKanbanPage = lazyWithRetry(() => import('@/pages/jobs/JobKanbanPage'));
 const EmployerBrandPage = lazyWithRetry(() => import('@/pages/jobs/EmployerBrandPage'));
+const TalentSearchPage = lazyWithRetry(() => import('@/pages/jobs/TalentSearchPage'));
+const BiasAuditPage = lazyWithRetry(() => import('@/pages/jobs/BiasAuditPage'));
+const EmployerOnboardingPage = lazyWithRetry(() => import('@/pages/jobs/EmployerOnboardingPage'));
 const IdeationPage = lazyWithRetry(() => import('@/pages/ideation/IdeationPage'));
 const ChallengeDetailPage = lazyWithRetry(() => import('@/pages/ideation/ChallengeDetailPage'));
 const IdeaDetailPage = lazyWithRetry(() => import('@/pages/ideation/IdeaDetailPage'));
@@ -654,6 +657,27 @@ function AppRoutes() {
             <FeatureGate feature="job_vacancies" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Job Vacancies">
                 <EmployerBrandPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/talent-search" element={
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <TalentSearchPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/bias-audit" element={
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <BiasAuditPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/employer-onboarding" element={
+            <FeatureGate feature="job_vacancies" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <EmployerOnboardingPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

@@ -20,7 +20,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Chip, Tabs, Tab, Spinner, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Chip, Tabs, Tab } from '@heroui/react';
 import {
   Briefcase,
   Search,
@@ -41,12 +41,7 @@ import {
   Bell,
   Star,
   Edit,
-  Sparkles,
-  MapPinOff,
-  X,
-  SlidersHorizontal,
-  ChevronDown,
-  ChevronUp,
+  Rocket,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -137,25 +132,6 @@ export function JobsPage() {
   const [myPostings, setMyPostings] = useState<JobVacancy[]>([]);
   const [isLoadingMyPostings, setIsLoadingMyPostings] = useState(false);
 
-  // Feature 4: AI Recommendations
-  const [recommendedJobs, setRecommendedJobs] = useState<JobVacancy[]>([]);
-  const [isLoadingRecommended, setIsLoadingRecommended] = useState(false);
-
-  // Advanced Search panel
-  const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [salaryMin, setSalaryMin] = useState('');
-  const [salaryMax, setSalaryMax] = useState('');
-  const [companySizeFilter, setCompanySizeFilter] = useState('');
-  const [benefitFilter, setBenefitFilter] = useState('');
-  const [booleanMode, setBooleanMode] = useState<'AND' | 'OR' | 'NOT'>('AND');
-
-  // Feature 5: Geolocation radius search
-  const [geoActive, setGeoActive] = useState(false);
-  const [geoLoading, setGeoLoading] = useState(false);
-  const [userLat, setUserLat] = useState<number | null>(null);
-  const [userLng, setUserLng] = useState<number | null>(null);
-  const [radiusKm, setRadiusKm] = useState('25');
-
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounce search query
@@ -192,17 +168,6 @@ export function JobsPage() {
       if (append && cursorRef.current) {
         params.set('cursor', cursorRef.current);
       }
-      // Advanced search params
-      if (salaryMin) params.set('salary_min', salaryMin);
-      if (salaryMax) params.set('salary_max', salaryMax);
-      if (companySizeFilter) params.set('company_size', companySizeFilter);
-      if (benefitFilter) params.set('benefits', benefitFilter);
-      // Feature 5: Geo params
-      if (geoActive && userLat != null && userLng != null) {
-        params.set('latitude', String(userLat));
-        params.set('longitude', String(userLng));
-        params.set('radius_km', radiusKm);
-      }
 
       const response = await api.get<JobVacancy[]>(`/v2/jobs?${params}`);
       if (response.success && response.data) {
@@ -230,7 +195,7 @@ export function JobsPage() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedQuery, selectedType, selectedCommitment, t, toast, geoActive, userLat, userLng, radiusKm, salaryMin, salaryMax, companySizeFilter, benefitFilter]);
+  }, [debouncedQuery, selectedType, selectedCommitment, t, toast]);
 
   // Load vacancies when filters change (fresh load)
   // loadVacancies is intentionally excluded from deps — it depends on cursorRef,
@@ -241,7 +206,7 @@ export function JobsPage() {
       setHasMore(true);
       loadVacancies();
     }
-  }, [debouncedQuery, selectedType, selectedCommitment, activeTab, geoActive, userLat, userLng, radiusKm, salaryMin, salaryMax, companySizeFilter, benefitFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, selectedType, selectedCommitment, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // J1: Load saved jobs
   useEffect(() => {
@@ -263,29 +228,9 @@ export function JobsPage() {
     }
   }, [activeTab, isAuthenticated]);
 
-  // Feature 4: Load AI recommended jobs
+  // Load my postings (also on browse tab to check if user has posted before — for onboarding banner)
   useEffect(() => {
-    if (activeTab === 'recommended' && isAuthenticated) {
-      const loadRecommended = async () => {
-        setIsLoadingRecommended(true);
-        try {
-          const response = await api.get<JobVacancy[]>('/v2/jobs/recommended');
-          if (response.success && response.data) {
-            setRecommendedJobs(response.data);
-          }
-        } catch (err) {
-          logError('Failed to load recommended jobs', err);
-        } finally {
-          setIsLoadingRecommended(false);
-        }
-      };
-      loadRecommended();
-    }
-  }, [activeTab, isAuthenticated]);
-
-  // Load my postings
-  useEffect(() => {
-    if (activeTab === 'my-postings' && isAuthenticated) {
+    if ((activeTab === 'my-postings' || activeTab === 'browse') && isAuthenticated) {
       const loadMyPostings = async () => {
         setIsLoadingMyPostings(true);
         try {
@@ -318,34 +263,6 @@ export function JobsPage() {
     if (isLoadingMore || !hasMore) return;
     loadVacancies(true);
   }, [isLoadingMore, hasMore, loadVacancies]);
-
-  // Feature 5: Geo toggle handler
-  const handleGeoToggle = useCallback(() => {
-    if (geoActive) {
-      setGeoActive(false);
-      setUserLat(null);
-      setUserLng(null);
-      return;
-    }
-    if (!navigator.geolocation) {
-      toast.error(t('geo.not_supported', 'Geolocation is not supported by your browser'));
-      return;
-    }
-    setGeoLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserLat(position.coords.latitude);
-        setUserLng(position.coords.longitude);
-        setGeoActive(true);
-        setGeoLoading(false);
-      },
-      () => {
-        toast.error(t('geo.permission_denied', 'Location access denied. Please allow location access to use this feature.'));
-        setGeoLoading(false);
-      },
-      { timeout: 10000 }
-    );
-  }, [geoActive, t, toast]);
 
   if (!hasFeature('job_vacancies')) {
     return (
@@ -457,28 +374,43 @@ export function JobsPage() {
               </span>
             }
           />
-          {/* Feature 4: Recommended tab */}
-          <Tab
-            key="recommended"
-            title={
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" aria-hidden="true" />
-                {t('recommended.title', 'Recommended')}
-              </span>
-            }
-          />
         </Tabs>
+      )}
+
+      {/* Employer onboarding banner for first-time posters */}
+      {isAuthenticated && activeTab === 'browse' && myPostings.length === 0 && !isLoadingMyPostings && (
+        <GlassCard className="p-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                <Rocket className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="font-semibold text-theme-primary">{t('onboarding.first_time_banner')}</p>
+                <p className="text-sm text-theme-muted">{t('onboarding.first_time_desc')}</p>
+              </div>
+            </div>
+            <Link to={tenantPath('/jobs/employer-onboarding')}>
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                startContent={<Rocket className="w-3.5 h-3.5" aria-hidden="true" />}
+              >
+                {t('onboarding.start_wizard')}
+              </Button>
+            </Link>
+          </div>
+        </GlassCard>
       )}
 
       {/* Browse tab content */}
       {activeTab === 'browse' && (
         <>
           {/* Search */}
-          <div role="search">
-          <GlassCard className="p-4 space-y-3">
+          <GlassCard className="p-4">
             <Input
               placeholder={t('search_placeholder')}
-              aria-label={t('search.label', 'Search job vacancies')}
+              aria-label={t('search_aria')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
@@ -487,116 +419,7 @@ export function JobsPage() {
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
             />
-            {/* Advanced Search toggle */}
-            <button
-              type="button"
-              className="flex items-center gap-1.5 text-xs text-theme-muted hover:text-theme-primary transition-colors"
-              onClick={() => setAdvancedOpen((o) => !o)}
-              aria-expanded={advancedOpen}
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
-              {t('search.advanced', 'Advanced Search')}
-              {advancedOpen
-                ? <ChevronUp className="w-3 h-3" aria-hidden="true" />
-                : <ChevronDown className="w-3 h-3" aria-hidden="true" />}
-            </button>
-
-            {advancedOpen && (
-              <div className="pt-2 space-y-4 border-t border-theme-default">
-                {/* Boolean mode chips */}
-                <div className="space-y-1.5">
-                  <p className="text-xs text-theme-subtle">{t('search.boolean_hint', 'e.g. "developer | engineer", "react -junior"')}</p>
-                  <div className="flex gap-2 flex-wrap" role="group" aria-label="Boolean search mode">
-                    {(['AND', 'OR', 'NOT'] as const).map((mode) => (
-                      <Chip
-                        key={mode}
-                        variant={booleanMode === mode ? 'solid' : 'flat'}
-                        color={booleanMode === mode ? 'primary' : 'default'}
-                        className={
-                          booleanMode === mode
-                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer text-xs'
-                            : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover text-xs'
-                        }
-                        onClick={() => setBooleanMode(mode)}
-                        aria-pressed={booleanMode === mode}
-                      >
-                        {mode === 'AND'
-                          ? t('search.bool_and', 'AND (all words)')
-                          : mode === 'OR'
-                          ? t('search.bool_or', 'OR (any word)')
-                          : t('search.bool_not', 'NOT (exclude)')}
-                      </Chip>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Salary range */}
-                <div className="grid grid-cols-2 gap-3">
-                  <Input
-                    type="number"
-                    label={t('search.salary_min', 'Min salary')}
-                    placeholder="0"
-                    value={salaryMin}
-                    onChange={(e) => setSalaryMin(e.target.value)}
-                    min="0"
-                    step="1000"
-                    size="sm"
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary',
-                      inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                    }}
-                  />
-                  <Input
-                    type="number"
-                    label={t('search.salary_max', 'Max salary')}
-                    placeholder="0"
-                    value={salaryMax}
-                    onChange={(e) => setSalaryMax(e.target.value)}
-                    min="0"
-                    step="1000"
-                    size="sm"
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary',
-                      inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                    }}
-                  />
-                </div>
-
-                {/* Company size filter */}
-                <Select
-                  label={t('search.company_size_filter', 'Company size')}
-                  selectedKeys={companySizeFilter ? [companySizeFilter] : []}
-                  onChange={(e) => setCompanySizeFilter(e.target.value)}
-                  size="sm"
-                  classNames={{
-                    trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                    value: 'text-theme-primary',
-                  }}
-                >
-                  <SelectItem key="">Any size</SelectItem>
-                  <SelectItem key="1-10">1–10</SelectItem>
-                  <SelectItem key="11-50">11–50</SelectItem>
-                  <SelectItem key="51-200">51–200</SelectItem>
-                  <SelectItem key="201-500">201–500</SelectItem>
-                  <SelectItem key="500+">500+</SelectItem>
-                </Select>
-
-                {/* Benefits keyword */}
-                <Input
-                  label={t('search.benefits_filter', 'Benefits keyword')}
-                  placeholder={t('search.benefits_placeholder', 'e.g. remote, health, pension')}
-                  value={benefitFilter}
-                  onChange={(e) => setBenefitFilter(e.target.value)}
-                  size="sm"
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary',
-                    inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                  }}
-                />
-              </div>
-            )}
           </GlassCard>
-          </div>
 
           {/* Type Filter Chips */}
           <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_aria')}>
@@ -621,67 +444,6 @@ export function JobsPage() {
                 </Chip>
               );
             })}
-          </div>
-
-          {/* Feature 5: Geolocation radius filter */}
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              size="sm"
-              variant={geoActive ? 'solid' : 'flat'}
-              color={geoActive ? 'primary' : 'default'}
-              className={geoActive ? '' : 'bg-theme-elevated text-theme-muted'}
-              startContent={
-                geoLoading
-                  ? <Spinner size="sm" />
-                  : geoActive
-                    ? <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
-                    : <MapPinOff className="w-3.5 h-3.5" aria-hidden="true" />
-              }
-              onPress={handleGeoToggle}
-              isDisabled={geoLoading}
-              aria-pressed={geoActive}
-            >
-              {t('geo.near_me', 'Near me')}
-            </Button>
-
-            {geoActive && (
-              <>
-                <Select
-                  size="sm"
-                  selectedKeys={[radiusKm]}
-                  onChange={(e) => setRadiusKm(e.target.value)}
-                  aria-label={t('geo.radius_label', 'Search radius')}
-                  className="w-32"
-                  classNames={{
-                    trigger: 'bg-theme-elevated border-theme-default',
-                    value: 'text-theme-primary text-sm',
-                  }}
-                >
-                  <SelectItem key="5">{t('geo.radius_5', '5 km')}</SelectItem>
-                  <SelectItem key="10">{t('geo.radius_10', '10 km')}</SelectItem>
-                  <SelectItem key="25">{t('geo.radius_25', '25 km')}</SelectItem>
-                  <SelectItem key="50">{t('geo.radius_50', '50 km')}</SelectItem>
-                  <SelectItem key="100">{t('geo.radius_100', '100 km')}</SelectItem>
-                </Select>
-                <Chip
-                  size="sm"
-                  variant="flat"
-                  color="primary"
-                  startContent={<MapPin className="w-3 h-3" aria-hidden="true" />}
-                  endContent={
-                    <button
-                      onClick={() => { setGeoActive(false); setUserLat(null); setUserLng(null); }}
-                      className="ml-1"
-                      aria-label={t('geo.clear', 'Clear location filter')}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  }
-                >
-                  {t('geo.within', 'Within {{radius}}km', { radius: radiusKm })}
-                </Chip>
-              </>
-            )}
           </div>
 
           {/* Commitment Filter Chips */}
@@ -722,11 +484,6 @@ export function JobsPage() {
               </Button>
             </GlassCard>
           )}
-
-          {/* Screen reader live region for results count */}
-          <div aria-live="polite" aria-atomic="true" className="sr-only">
-            {!isLoading && !error && `${vacancies.length} ${t('title', 'vacancies')} ${t('found', 'found')}`}
-          </div>
 
           {/* Vacancies List */}
           {!error && (
@@ -884,36 +641,6 @@ export function JobsPage() {
               {myPostings.map((vacancy) => (
                 <motion.div key={vacancy.id} variants={itemVariants}>
                   <MyPostingCard vacancy={vacancy} />
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </>
-      )}
-
-      {/* Feature 4: Recommended tab content */}
-      {activeTab === 'recommended' && (
-        <>
-          {isLoadingRecommended ? (
-            <div className="flex justify-center py-12">
-              <Spinner size="lg" />
-            </div>
-          ) : recommendedJobs.length === 0 ? (
-            <EmptyState
-              icon={<Sparkles className="w-12 h-12" aria-hidden="true" />}
-              title={t('recommended.empty_title', 'No recommendations yet')}
-              description={t('recommended.empty_description', 'Complete your profile skills to get matched with relevant opportunities')}
-            />
-          ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-4"
-            >
-              {recommendedJobs.map((vacancy) => (
-                <motion.div key={vacancy.id} variants={itemVariants}>
-                  <JobCard vacancy={vacancy} />
                 </motion.div>
               ))}
             </motion.div>

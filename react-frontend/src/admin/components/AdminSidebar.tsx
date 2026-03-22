@@ -218,6 +218,7 @@ function useAdminNav(): NavSection[] {
           { label: 'Goals', href: '/admin/goals', icon: Target },
           { label: 'Ideation Challenges', href: '/admin/ideation', icon: Lightbulb },
           { label: 'Jobs', href: '/admin/jobs', icon: Briefcase },
+          { label: 'Job Moderation', href: '/admin/jobs/moderation', icon: ShieldCheck },
           { label: 'Volunteering', href: '/admin/volunteering', icon: Heart },
         ],
       },

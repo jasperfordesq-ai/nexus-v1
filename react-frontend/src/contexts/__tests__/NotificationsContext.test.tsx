@@ -9,9 +9,17 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor, cleanup } from '@testing-library/react';
 import { ReactNode } from 'react';
-import { HeroUIProvider } from '@heroui/react';
+
+// Set VITE_PUSHER_KEY before any module is loaded so getPusherKey() returns a
+// non-empty string when the NotificationsContext effect runs in Pusher tests.
+// vi.stubEnv() in beforeEach runs too late — the module is already imported by
+// then and import.meta.env is read at call-time from the live env object.
+vi.hoisted(() => {
+  // @ts-expect-error vitest allows mutating import.meta.env in tests
+  import.meta.env.VITE_PUSHER_KEY = 'test-pusher-key';
+});
 
 vi.mock('framer-motion');
 vi.mock('react-i18next', () => ({
@@ -102,17 +110,26 @@ vi.mock('../AuthContext', () => ({
 const mockToastInfo = vi.fn();
 const mockToastSuccess = vi.fn();
 const mockToastError = vi.fn();
+const mockToastWarning = vi.fn();
+const mockToastAddToast = vi.fn();
+const mockToastRemoveToast = vi.fn();
+
+// IMPORTANT: must be a stable constant — NOT a new object on every call.
+// NotificationsContext uses useCallback([toast]) and useEffect([handleNewNotification]).
+// If useToast() returns a new object each render, toast reference changes every render,
+// which recreates handleNewNotification, which re-fires the useEffect → infinite loop → OOM.
+const stableToastValue = {
+  info: mockToastInfo,
+  success: mockToastSuccess,
+  error: mockToastError,
+  warning: mockToastWarning,
+  addToast: mockToastAddToast,
+  removeToast: mockToastRemoveToast,
+  toasts: [] as unknown[],
+};
 
 vi.mock('../ToastContext', () => ({
-  useToast: () => ({
-    info: mockToastInfo,
-    success: mockToastSuccess,
-    error: mockToastError,
-    warning: vi.fn(),
-    addToast: vi.fn(),
-    removeToast: vi.fn(),
-    toasts: [],
-  }),
+  useToast: () => stableToastValue,
 }));
 
 import { NotificationsProvider, useNotifications } from '../NotificationsContext';
@@ -144,15 +161,15 @@ const mockCounts = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function wrapper({ children }: { children: ReactNode }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  // HeroUIProvider omitted — these tests don't render HeroUI components.
+  return <>{children}</>;
 }
 
 function notificationsWrapper({ children }: { children: ReactNode }) {
-  return (
-    <HeroUIProvider>
-      <NotificationsProvider>{children}</NotificationsProvider>
-    </HeroUIProvider>
-  );
+  // HeroUIProvider is intentionally omitted here — NotificationsProvider does not
+  // render any HeroUI components, and including it would inject CSS into JSDOM on
+  // every test, accumulating hundreds of MB per test and causing OOM in the worker.
+  return <NotificationsProvider>{children}</NotificationsProvider>;
 }
 
 describe('NotificationsContext', () => {
@@ -161,6 +178,21 @@ describe('NotificationsContext', () => {
     // Reset channel handlers
     Object.keys(channelEventHandlers).forEach((k) => delete channelEventHandlers[k]);
     Object.keys(connectionHandlers).forEach((k) => delete connectionHandlers[k]);
+
+    // vi.clearAllMocks() wipes mockImplementation() set at module scope — restore them.
+    // mockChannelBind and mockConnectionBind must capture handlers into their maps.
+    mockChannelBind.mockImplementation((event: string, handler: EventHandler) => {
+      channelEventHandlers[event] = handler;
+    });
+    mockConnectionBind.mockImplementation((event: string, handler: () => void) => {
+      connectionHandlers[event] = handler;
+    });
+    mockPusherSubscribe.mockReturnValue(mockChannel);
+    MockPusher.mockImplementation(() => ({
+      subscribe: mockPusherSubscribe,
+      disconnect: mockPusherDisconnect,
+      connection: { bind: mockConnectionBind },
+    }));
 
     // Default: authenticated
     mockUseAuth.mockReturnValue({
@@ -185,6 +217,7 @@ describe('NotificationsContext', () => {
   });
 
   afterEach(() => {
+    cleanup(); // Unmount React trees, triggering useEffect cleanups → clearInterval on polling ref
     vi.restoreAllMocks();
   });
 

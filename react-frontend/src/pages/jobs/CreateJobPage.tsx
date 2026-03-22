@@ -25,6 +25,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Tooltip,
 } from '@heroui/react';
 import {
   Briefcase,
@@ -36,6 +37,9 @@ import {
   X as XIcon,
   TrendingUp,
   FileText,
+  Sparkles,
+  X,
+  EyeOff,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -64,6 +68,7 @@ interface JobFormData {
   salary_type: string;
   salary_currency: string;
   salary_negotiable: boolean;
+  organization_id?: number;
 }
 
 const COMPANY_SIZE_OPTIONS = ['1-10', '11-50', '51-200', '201-500', '500+'] as const;
@@ -174,6 +179,16 @@ export function CreateJobPage() {
   const [templateName, setTemplateName] = useState('');
   const [templateIsPublic, setTemplateIsPublic] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+
+  // AI Generate state (Agent A)
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Duplicate detection state (Agent A)
+  const [duplicates, setDuplicates] = useState<Array<{ id: number; title: string; status: string; similarity: number }>>([]);
+  const [duplicatesDismissed, setDuplicatesDismissed] = useState(false);
+
+  // Blind hiring state (Agent C)
+  const [blindHiring, setBlindHiring] = useState(false);
 
   // Parse skills for display
   const skillsArray = form.skills_required
@@ -330,6 +345,65 @@ export function CreateJobPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // AI description generation (Agent A)
+  const handleAiGenerate = useCallback(async () => {
+    if (!form.title.trim()) {
+      toastRef.current.error(tRef.current('form.validation.title_required'));
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const payload: Record<string, unknown> = {
+        title: form.title.trim(),
+        skills: skillsArray,
+        type: form.type,
+        commitment: form.commitment,
+      };
+
+      const response = await api.post<{ description: string }>('/v2/jobs/generate-description', payload);
+
+      if (response.success && response.data) {
+        const desc = (response.data as Record<string, unknown>).description as string;
+        if (desc) {
+          setForm((prev) => ({ ...prev, description: desc }));
+          toastRef.current.success(tRef.current('ai_generate.success'));
+        }
+      } else {
+        toastRef.current.error(response.error || tRef.current('ai_generate.error'));
+      }
+    } catch (err) {
+      logError('AI description generation failed', err);
+      toastRef.current.error(tRef.current('ai_generate.error'));
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [form.title, form.type, form.commitment, skillsArray]);
+
+  // Duplicate detection on title change (Agent A)
+  useEffect(() => {
+    const title = form.title.trim();
+    if (!title || title.length < 5 || isEditing) {
+      setDuplicates([]);
+      return;
+    }
+    setDuplicatesDismissed(false);
+    const timer = setTimeout(async () => {
+      try {
+        const response = await api.post<{ duplicates: typeof duplicates }>('/v2/jobs/check-duplicate', {
+          title,
+          organization_id: form.organization_id || undefined,
+        });
+        if (response.success && response.data) {
+          setDuplicates((response.data as Record<string, unknown>).duplicates as typeof duplicates || []);
+        }
+      } catch {
+        // Non-critical, silently fail
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [form.title, form.organization_id, isEditing]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = async () => {
     if (!validate()) return;
 
@@ -359,6 +433,7 @@ export function CreateJobPage() {
       if (form.salary_type) payload.salary_type = form.salary_type;
       if (form.salary_currency.trim()) payload.salary_currency = form.salary_currency.trim();
       payload.salary_negotiable = form.salary_negotiable;
+      payload.blind_hiring = blindHiring;
 
       // Employer Branding fields
       if (tagline.trim()) payload.tagline = tagline.trim();
@@ -527,21 +602,62 @@ export function CreateJobPage() {
             }}
           />
 
-          {/* Description */}
-          <Textarea
-            label={t('form.description_label')}
-            placeholder={t('form.description_placeholder')}
-            value={form.description}
-            onValueChange={(v) => updateField('description', v)}
-            isRequired
-            isInvalid={!!errors.description}
-            errorMessage={errors.description}
-            minRows={5}
-            classNames={{
-              input: 'bg-transparent text-theme-primary',
-              inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-            }}
-          />
+          {/* Description with AI Generate Button (Agent A) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-theme-primary">{t('form.description_label')}</span>
+              <Tooltip content={t('ai_generate.tooltip')}>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 text-violet-600 dark:text-violet-400"
+                  startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
+                  onPress={handleAiGenerate}
+                  isLoading={isGenerating}
+                  isDisabled={!form.title.trim()}
+                >
+                  {isGenerating ? t('ai_generate.button_loading') : t('ai_generate.button')}
+                </Button>
+              </Tooltip>
+            </div>
+            <Textarea
+              placeholder={t('form.description_placeholder')}
+              value={form.description}
+              onValueChange={(v) => updateField('description', v)}
+              isRequired
+              isInvalid={!!errors.description}
+              errorMessage={errors.description}
+              minRows={5}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+              }}
+            />
+          </div>
+
+          {/* Duplicate Detection Warning (Agent A) */}
+          {duplicates.length > 0 && !duplicatesDismissed && (
+            <div className="rounded-lg border border-warning/30 bg-warning/10 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1">
+                  {duplicates.map((dup) => (
+                    <p key={dup.id} className="text-sm text-warning-600 dark:text-warning-400">
+                      {t('duplicate.warning', { title: dup.title, status: dup.status })}
+                    </p>
+                  ))}
+                </div>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  onPress={() => setDuplicatesDismissed(true)}
+                  aria-label={t('duplicate.dismiss')}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Type & Commitment */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -825,6 +941,23 @@ export function CreateJobPage() {
               </p>
             </div>
           )}
+
+          {/* Blind Hiring Toggle (Agent C) */}
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-theme-elevated border border-theme-default">
+            <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+              <EyeOff className="w-5 h-5 text-violet-400" aria-hidden="true" />
+            </div>
+            <div className="flex-1">
+              <Switch
+                isSelected={blindHiring}
+                onValueChange={setBlindHiring}
+                classNames={{ label: 'text-theme-primary text-sm' }}
+              >
+                <p className="text-sm font-medium text-theme-primary">{t('blind_hiring.label')}</p>
+              </Switch>
+              <p className="text-xs text-theme-muted mt-1">{t('blind_hiring.description')}</p>
+            </div>
+          </div>
 
           {/* Employer Branding section */}
           <div className="border border-theme-default rounded-xl overflow-hidden">

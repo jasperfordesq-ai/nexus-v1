@@ -13,8 +13,15 @@
 
 import '@testing-library/jest-dom';
 import * as axeMatchers from 'vitest-axe/matchers';
-import { expect, vi, beforeAll, afterAll } from 'vitest';
+import { expect, vi, beforeAll, afterAll, afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
 expect.extend(axeMatchers);
+
+// Ensure DOM is cleaned up after every test so renders from one test never
+// bleed into the next — critical for singleFork mode where jsdom is shared.
+afterEach(() => {
+  cleanup();
+});
 
 // Global mock for @/components/seo — PageMeta calls useTenant() for branding which
 // is never present in test mocks. Make it a no-op for all tests globally.
@@ -67,6 +74,12 @@ afterAll(() => {
   console.error = originalError;
   console.warn = originalWarn;
   console.log = originalLog;
+  // Clean up any lingering DOM nodes between test files in singleFork mode.
+  // React Aria / HeroUI can leave portal elements attached to document.body
+  // that persist across files unless explicitly cleared here.
+  if (typeof document !== 'undefined') {
+    document.body.innerHTML = '';
+  }
   // Force GC after each test file to prevent heap accumulation across files.
   // Workers are long-lived (handle many files); --expose-gc in vitest.config enables this.
   if (typeof (globalThis as Record<string, unknown>).gc === 'function') {

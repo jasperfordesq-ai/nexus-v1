@@ -81,11 +81,18 @@ vi.mock('@heroui/react', async () => {
 });
 
 // ── Mock lucide-react icons ───────────────────────────────────────────────────
-vi.mock('lucide-react', async () => {
-  const R = await import('react');
-  const Icon = ({ 'aria-label': al }: { 'aria-label'?: string }) =>
-    R.createElement('span', { 'aria-hidden': al ? undefined : 'true', 'aria-label': al });
-  return new Proxy({}, { get: () => Icon });
+vi.mock('lucide-react', () => {
+  const Icon = () => null;
+  return {
+    User: Icon, Bell: Icon, Shield: Icon, Save: Icon, Camera: Icon,
+    Mail: Icon, Lock: Icon, Smartphone: Icon, Key: Icon, LogOut: Icon,
+    Trash2: Icon, Settings: Icon, AlertTriangle: Icon, Eye: Icon, EyeOff: Icon,
+    Phone: Icon, Building2: Icon, Search: Icon, MessageSquare: Icon, Trophy: Icon,
+    CreditCard: Icon, Download: Icon, FileText: Icon, RefreshCw: Icon, Monitor: Icon,
+    QrCode: Icon, ShieldCheck: Icon, ShieldOff: Icon, Copy: Icon, CheckCircle: Icon,
+    Info: Icon, FileCheck: Icon, Upload: Icon, PenLine: Icon, Ban: Icon, Scale: Icon,
+    Sparkles: Icon, Calendar: Icon, Users: Icon, Globe: Icon, ChevronRight: Icon,
+  };
 });
 
 vi.mock('@/lib/api', () => ({

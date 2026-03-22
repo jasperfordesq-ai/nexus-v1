@@ -34,8 +34,9 @@ import type { Notification } from '@/types';
 // Configuration
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PUSHER_KEY = import.meta.env.VITE_PUSHER_KEY as string | undefined;
-const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_CLUSTER || 'eu';
+// Read at call-site (not module load) so vi.stubEnv() in tests takes effect.
+const getPusherKey = () => import.meta.env.VITE_PUSHER_KEY as string | undefined;
+const getPusherCluster = () => (import.meta.env.VITE_PUSHER_CLUSTER as string | undefined) || 'eu';
 const POLLING_INTERVAL = 60000; // 60 seconds fallback polling
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -234,7 +235,8 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     refreshCounts();
 
     // Initialize Pusher (skip if key not configured)
-    if (!PUSHER_KEY) {
+    const pusherKey = getPusherKey();
+    if (!pusherKey) {
       if (import.meta.env.DEV) {
         console.warn('[NotificationsContext] VITE_PUSHER_KEY is not set — real-time notifications disabled, using polling.');
       }
@@ -248,8 +250,8 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       };
     }
     try {
-      const pusher = new Pusher(PUSHER_KEY, {
-        cluster: PUSHER_CLUSTER,
+      const pusher = new Pusher(pusherKey, {
+        cluster: getPusherCluster(),
         // Use a custom authorizer instead of authEndpoint so that the request
         // goes through our api client, which handles CORS, content-type, and
         // token refresh — avoiding the 405 error that occurs when Pusher's

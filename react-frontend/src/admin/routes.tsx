@@ -123,6 +123,7 @@ const ResourcesAdmin = lazy(() => import('./modules/resources/ResourcesAdmin'));
 
 // Jobs module
 const JobsAdmin = lazy(() => import('./modules/jobs/JobsAdmin'));
+const JobModerationQueue = lazy(() => import('./modules/jobs/JobModerationQueue'));
 
 // Ideation / Challenges module
 const IdeationAdmin = lazy(() => import('./modules/ideation/IdeationAdmin'));
@@ -444,6 +445,7 @@ export function AdminRoutes() {
 
       {/* ─── JOBS ─── */}
       <Route path="jobs" element={<Lazy><JobsAdmin /></Lazy>} />
+      <Route path="jobs/moderation" element={<Lazy><JobModerationQueue /></Lazy>} />
 
       {/* ─── IDEATION / CHALLENGES ─── */}
       <Route path="ideation" element={<Lazy><IdeationAdmin /></Lazy>} />

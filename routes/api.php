@@ -48,6 +48,12 @@ Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigContro
 
 // ============================================
 
+// PUBLIC ROUTES — Job Feed (RSS/XML and JSON for aggregator syndication)
+// No auth required, tenant-scoped via subdomain/header (Agent D)
+// ============================================
+Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'rssFeed']);
+Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed']);
+
 // ============================================
 // Authenticated routes — Sanctum token authentication required
 // Controllers also enforce auth via $this->requireAuth() as a fallback
@@ -209,6 +215,7 @@ Route::put('/v2/users/me/notifications', [\App\Http\Controllers\Api\UsersControl
 Route::get('/v2/users/me/consent', [\App\Http\Controllers\Api\UsersController::class, 'getConsent']);
 Route::put('/v2/users/me/consent', [\App\Http\Controllers\Api\UsersController::class, 'updateConsent']);
 Route::post('/v2/users/me/gdpr-request', [\App\Http\Controllers\Api\UsersController::class, 'createGdprRequest']);
+Route::put('/v2/users/me/resume-visibility', [\App\Http\Controllers\Api\JobVacanciesController::class, 'updateResumeVisibility']);
 Route::get('/v2/users/me/sessions', [\App\Http\Controllers\Api\UsersController::class, 'sessions']);
 Route::get('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'show']);
 Route::put('/v2/users/me/match-preferences', [\App\Http\Controllers\Api\MatchPreferencesController::class, 'update']);
@@ -373,6 +380,12 @@ Route::get('/v2/jobs/applications/{id}/cv', [\App\Http\Controllers\Api\JobVacanc
 Route::get('/v2/jobs/saved', [\App\Http\Controllers\Api\JobVacanciesController::class, 'savedJobs']);
 Route::get('/v2/jobs/my-applications', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myApplications']);
 Route::get('/v2/jobs/my-postings', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myPostings']);
+// AI description generator + duplicate detection (Agent A)
+Route::post('/v2/jobs/generate-description', [\App\Http\Controllers\Api\JobVacanciesController::class, 'generateDescription']);
+Route::post('/v2/jobs/check-duplicate', [\App\Http\Controllers\Api\JobVacanciesController::class, 'checkDuplicate']);
+// Talent search (Agent C)
+Route::get('/v2/jobs/talent-search', [\App\Http\Controllers\Api\JobVacanciesController::class, 'talentSearch']);
+Route::get('/v2/jobs/talent-search/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'talentProfile']);
 Route::get('/v2/jobs/alerts', [\App\Http\Controllers\Api\JobVacanciesController::class, 'listAlerts']);
 Route::post('/v2/jobs/alerts', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createAlert']);
 Route::delete('/v2/jobs/alerts/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteAlert']);
@@ -440,6 +453,13 @@ Route::get('/v2/jobs/applications/{id}/scorecards', [\App\Http\Controllers\Api\J
 Route::get('/v2/jobs/{id}/team', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getTeam']);
 Route::post('/v2/jobs/{id}/team', [\App\Http\Controllers\Api\JobVacanciesController::class, 'addTeamMember']);
 Route::delete('/v2/jobs/{id}/team/{userId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'removeTeamMember']);
+// Interview self-scheduling slots (Agent E)
+Route::get('/v2/jobs/{id}/interview-slots', [\App\Http\Controllers\Api\JobVacanciesController::class, 'listInterviewSlots']);
+Route::post('/v2/jobs/{id}/interview-slots', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createInterviewSlots']);
+Route::post('/v2/jobs/{id}/interview-slots/bulk', [\App\Http\Controllers\Api\JobVacanciesController::class, 'bulkCreateInterviewSlots']);
+Route::post('/v2/jobs/interview-slots/{slotId}/book', [\App\Http\Controllers\Api\JobVacanciesController::class, 'bookInterviewSlot']);
+Route::delete('/v2/jobs/interview-slots/{slotId}/book', [\App\Http\Controllers\Api\JobVacanciesController::class, 'cancelInterviewSlotBooking']);
+Route::delete('/v2/jobs/interview-slots/{slotId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'deleteInterviewSlot']);
 Route::get('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'index']);
 Route::post('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'store']);
 Route::get('/v2/ideation-ideas/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showIdea']);
@@ -926,12 +946,21 @@ Route::get('/v2/admin/resources', [\App\Http\Controllers\Api\AdminResourcesContr
 Route::get('/v2/admin/resources/{id}', [\App\Http\Controllers\Api\AdminResourcesController::class, 'show']);
 Route::delete('/v2/admin/resources/{id}', [\App\Http\Controllers\Api\AdminResourcesController::class, 'destroy']);
 Route::get('/v2/admin/jobs', [\App\Http\Controllers\Api\AdminJobsController::class, 'index']);
+// Static literal admin job routes BEFORE {id} wildcard (Agent B + D)
+Route::get('/v2/admin/jobs/moderation-queue', [\App\Http\Controllers\Api\AdminJobsController::class, 'moderationQueue']);
+Route::get('/v2/admin/jobs/moderation-stats', [\App\Http\Controllers\Api\AdminJobsController::class, 'moderationStats']);
+Route::get('/v2/admin/jobs/spam-stats', [\App\Http\Controllers\Api\AdminJobsController::class, 'spamStats']);
+Route::get('/v2/admin/jobs/bias-audit', [\App\Http\Controllers\Api\AdminJobsController::class, 'biasAudit']);
+Route::put('/v2/admin/jobs/applications/{id}', [\App\Http\Controllers\Api\AdminJobsController::class, 'updateApplicationStatus']);
+// Wildcard {id} routes
 Route::get('/v2/admin/jobs/{id}', [\App\Http\Controllers\Api\AdminJobsController::class, 'show']);
 Route::delete('/v2/admin/jobs/{id}', [\App\Http\Controllers\Api\AdminJobsController::class, 'destroy']);
 Route::post('/v2/admin/jobs/{id}/feature', [\App\Http\Controllers\Api\AdminJobsController::class, 'feature']);
 Route::post('/v2/admin/jobs/{id}/unfeature', [\App\Http\Controllers\Api\AdminJobsController::class, 'unfeature']);
 Route::get('/v2/admin/jobs/{id}/applications', [\App\Http\Controllers\Api\AdminJobsController::class, 'getApplications']);
-Route::put('/v2/admin/jobs/applications/{id}', [\App\Http\Controllers\Api\AdminJobsController::class, 'updateApplicationStatus']);
+Route::post('/v2/admin/jobs/{id}/approve', [\App\Http\Controllers\Api\AdminJobsController::class, 'approve']);
+Route::post('/v2/admin/jobs/{id}/reject', [\App\Http\Controllers\Api\AdminJobsController::class, 'reject']);
+Route::post('/v2/admin/jobs/{id}/flag', [\App\Http\Controllers\Api\AdminJobsController::class, 'flag']);
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);
 Route::get('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'show']);
 Route::delete('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'destroy']);

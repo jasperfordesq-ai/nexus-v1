@@ -13,6 +13,8 @@ use App\Models\JobApplicationHistory;
 use App\Models\JobVacancy;
 use App\Models\SavedJob;
 use App\Models\User;
+use App\Services\JobModerationService;
+use App\Services\JobSpamDetectionService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -210,20 +212,59 @@ class JobVacancyService
             }
         }
 
+        $tenantId = TenantContext::getId();
+
+        // Run spam detection (Agent B)
+        $spamResult = JobSpamDetectionService::analyzeJob($data, $userId, $tenantId);
+        $spamScore = $spamResult['score'];
+        $spamFlags = $spamResult['flags'];
+        $spamAction = $spamResult['action'];
+
+        // Determine initial status and moderation_status
+        $status = 'open';
+        $moderationStatus = null;
+
+        if ($spamAction === 'block') {
+            $status = 'closed';
+            $moderationStatus = 'rejected';
+        } elseif ($spamAction === 'flag' || JobModerationService::isModerationEnabled($tenantId)) {
+            $status = 'draft';
+            $moderationStatus = 'pending_review';
+        }
+
         $vacancy = $this->vacancy->newQuery()->create(array_filter([
             'title'          => trim($data['title']),
             'description'    => trim($data['description'] ?? ''),
             'type'           => $data['type'] ?? 'volunteer',
             'commitment'     => $data['commitment'] ?? 'flexible',
             'location'       => $data['location'] ?? null,
-            'status'         => 'open',
+            'status'         => $status,
             'user_id'        => $userId,
             'tagline'        => isset($data['tagline']) ? trim($data['tagline']) : null,
             'video_url'      => $data['video_url'] ?? null,
             'culture_photos' => $data['culture_photos'] ?? null,
             'company_size'   => $data['company_size'] ?? null,
             'benefits'       => $data['benefits'] ?? null,
+            'blind_hiring'   => !empty($data['blind_hiring']) ? 1 : 0,
+            'moderation_status' => $moderationStatus,
+            'spam_score'     => $spamScore,
+            'spam_flags'     => !empty($spamFlags) ? $spamFlags : null,
         ], fn($v) => $v !== null));
+
+        // Log spam detection results (Agent B)
+        if ($spamAction === 'block') {
+            Log::warning("Job #{$vacancy->id} auto-blocked by spam detection (score: {$spamScore})", [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'flags' => $spamFlags,
+            ]);
+        } elseif ($spamAction === 'flag') {
+            Log::info("Job #{$vacancy->id} auto-flagged for moderation (score: {$spamScore})", [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'flags' => $spamFlags,
+            ]);
+        }
 
         // Dispatch webhook for vacancy creation
         try {
@@ -278,6 +319,7 @@ class JobVacancyService
             'contact_email', 'contact_phone', 'deadline', 'status', 'organization_id',
             'salary_min', 'salary_max', 'salary_type', 'salary_currency', 'salary_negotiable',
             'tagline', 'video_url', 'culture_photos', 'company_size', 'benefits',
+            'blind_hiring',
         ];
 
         $updates = [];
@@ -517,18 +559,37 @@ class JobVacancyService
             }
         }
 
-        return JobApplication::with(['applicant:id,first_name,last_name,avatar_url,email'])
+        $isBlindHiring = (bool) ($vacancy->blind_hiring ?? false);
+
+        $applications = JobApplication::with(['applicant:id,first_name,last_name,avatar_url,email'])
             ->where('vacancy_id', $jobId)
             ->orderByDesc('created_at')
-            ->get()
-            ->map(function (JobApplication $app) {
+            ->get();
+
+        $candidateNumber = 0;
+
+        return $applications
+            ->map(function (JobApplication $app) use ($isBlindHiring, &$candidateNumber) {
                 $data = $app->toArray();
-                $data['applicant'] = [
-                    'id' => (int) $app->user_id,
-                    'name' => $app->applicant ? trim(($app->applicant->first_name ?? '') . ' ' . ($app->applicant->last_name ?? '')) : null,
-                    'avatar_url' => $app->applicant->avatar_url ?? null,
-                    'email' => $app->applicant->email ?? null,
-                ];
+                $candidateNumber++;
+
+                if ($isBlindHiring) {
+                    // Anonymize: strip names, avatars, emails (Agent C)
+                    $data['applicant'] = [
+                        'id' => (int) $app->user_id,
+                        'name' => 'Candidate #' . $candidateNumber,
+                        'avatar_url' => null,
+                        'email' => null,
+                    ];
+                } else {
+                    $data['applicant'] = [
+                        'id' => (int) $app->user_id,
+                        'name' => $app->applicant ? trim(($app->applicant->first_name ?? '') . ' ' . ($app->applicant->last_name ?? '')) : null,
+                        'avatar_url' => $app->applicant->avatar_url ?? null,
+                        'email' => $app->applicant->email ?? null,
+                    ];
+                }
+
                 return $data;
             })
             ->all();
@@ -1421,6 +1482,7 @@ class JobVacancyService
         $data['is_featured'] = (bool) ($data['is_featured'] ?? false);
         $data['salary_negotiable'] = (bool) ($data['salary_negotiable'] ?? false);
         $data['renewal_count'] = (int) ($data['renewal_count'] ?? 0);
+        $data['blind_hiring'] = (bool) ($data['blind_hiring'] ?? false);
 
         // Auto-expire featured status
         if ($data['is_featured'] && !empty($data['featured_until']) && strtotime($data['featured_until']) < time()) {
@@ -1618,5 +1680,82 @@ class JobVacancyService
             \Illuminate\Support\Facades\Log::error('bulkUpdateApplicationStatus failed', ['error' => $e->getMessage()]);
             return 0;
         }
+    }
+
+    // =====================================================================
+    // DUPLICATE DETECTION (Agent A)
+    // =====================================================================
+
+    /**
+     * Find similar job vacancies based on title word matching.
+     *
+     * Compares individual words from the input title against open/draft
+     * job vacancy titles within the same tenant (and optionally organization).
+     * Returns matches sorted by similarity score (descending).
+     *
+     * @return array<int, array{id: int, title: string, status: string, similarity: float, created_at: string}>
+     */
+    public function findSimilarJobs(string $title, ?int $orgId, int $tenantId): array
+    {
+        // Extract meaningful words (3+ chars, lowercased)
+        $words = array_filter(
+            array_map('strtolower', preg_split('/\s+/', trim($title))),
+            fn (string $w) => strlen($w) >= 3
+        );
+
+        if (empty($words)) {
+            return [];
+        }
+
+        // Build query for open/draft jobs in the same tenant
+        $query = DB::table('job_vacancies')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['open', 'draft'])
+            ->select(['id', 'title', 'status', 'created_at']);
+
+        if ($orgId !== null) {
+            $query->where('organization_id', $orgId);
+        }
+
+        // Filter to rows that match at least one word
+        $query->where(function ($q) use ($words) {
+            foreach ($words as $word) {
+                $q->orWhere('title', 'LIKE', '%' . $word . '%');
+            }
+        });
+
+        $candidates = $query->orderByDesc('created_at')->limit(20)->get();
+
+        $results = [];
+        $totalWords = count($words);
+
+        foreach ($candidates as $row) {
+            $candidateTitle = strtolower($row->title);
+            $matchCount = 0;
+
+            foreach ($words as $word) {
+                if (str_contains($candidateTitle, $word)) {
+                    $matchCount++;
+                }
+            }
+
+            $similarity = round($matchCount / $totalWords, 2);
+
+            // Only include results with >= 40% word overlap
+            if ($similarity >= 0.4) {
+                $results[] = [
+                    'id' => $row->id,
+                    'title' => $row->title,
+                    'status' => $row->status,
+                    'similarity' => $similarity,
+                    'created_at' => $row->created_at,
+                ];
+            }
+        }
+
+        // Sort by similarity descending
+        usort($results, fn ($a, $b) => $b['similarity'] <=> $a['similarity']);
+
+        return array_slice($results, 0, 5);
     }
 }

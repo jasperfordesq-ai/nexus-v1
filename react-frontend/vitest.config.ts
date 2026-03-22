@@ -24,7 +24,7 @@ export default defineConfig({
         // Single fork runs all test files sequentially — no concurrent heap pressure
         // gc() in setup.ts afterAll frees old module instances between files
         // Peak heap ≈ heaviest single test file (not sum of all), stays well under limit
-        execArgv: ['--max-old-space-size=12288', '--expose-gc'],
+        execArgv: ['--max-old-space-size=12288', '--expose-gc', '--trace-gc'],
       },
     },
     fileParallelism: false,

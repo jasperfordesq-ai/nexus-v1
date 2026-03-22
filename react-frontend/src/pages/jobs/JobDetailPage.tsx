@@ -82,6 +82,8 @@ import {
   Share2,
   TrendingUp,
   Zap,
+  EyeOff,
+  CalendarClock,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
@@ -141,6 +143,7 @@ interface JobVacancy {
   expired_at: string | null;
   renewed_at: string | null;
   renewal_count: number;
+  blind_hiring: boolean;
 }
 
 interface Application {
@@ -794,7 +797,20 @@ export function JobDetailPage() {
               <Chip size="sm" variant="flat" color={vacancy.status === 'open' ? 'success' : 'default'}>
                 {t(`status.${vacancy.status}`)}
               </Chip>
+              {vacancy.blind_hiring && (
+                <Chip size="sm" variant="flat" color="secondary" startContent={<EyeOff className="w-3 h-3" />}>
+                  {t('blind_hiring.enabled_badge')}
+                </Chip>
+              )}
             </div>
+
+            {/* Blind Hiring Info Banner (Agent C) */}
+            {vacancy.blind_hiring && isOwner && (
+              <div className="mt-3 flex items-center gap-2 rounded-lg bg-violet-500/10 border border-violet-500/20 p-3">
+                <EyeOff className="w-4 h-4 text-violet-400 flex-shrink-0" aria-hidden="true" />
+                <p className="text-sm text-violet-600 dark:text-violet-400">{t('blind_hiring.info_banner')}</p>
+              </div>
+            )}
 
             {/* Poster info */}
             <div className="flex items-center gap-2 mt-3">
@@ -990,6 +1006,18 @@ export function JobDetailPage() {
                   {t('detail.kanban_board', 'Kanban Board')}
                 </Button>
               </Link>
+              <Button
+                size="sm"
+                variant="flat"
+                color="secondary"
+                startContent={<CalendarClock className="w-4 h-4" aria-hidden="true" />}
+                onPress={() => {
+                  const el = document.getElementById('interview-slots-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                {t('self_scheduling.manage_slots', 'Interview Slots')}
+              </Button>
               {vacancy.status === 'open' && (
                 <Button size="sm" color="warning" variant="flat" onPress={async () => {
                   try {
@@ -1764,6 +1792,41 @@ export function JobDetailPage() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Interview Self-Scheduling Section (Agent E) */}
+      {isOwner && (
+        <div id="interview-slots-section" className="mt-6">
+          <GlassCard className="p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
+                <CalendarClock className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-theme-primary">{t('self_scheduling.title', 'Interview Slots')}</h3>
+                <p className="text-sm text-theme-muted">{t('self_scheduling.employer_no_slots', 'Add interview slots so candidates can self-schedule')}</p>
+              </div>
+            </div>
+            <p className="text-sm text-theme-muted">
+              {t('self_scheduling.manage_slots', 'Manage Interview Slots')} &mdash; {t('self_scheduling.candidate_pick', 'Choose a time slot for your interview')}
+            </p>
+          </GlassCard>
+        </div>
+      )}
+
+      {/* Candidate self-scheduling view (Agent E) */}
+      {!isOwner && vacancy?.has_applied && (
+        <div id="interview-slots-candidate-section" className="mt-6">
+          <GlassCard className="p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
+                <CalendarClock className="w-5 h-5 text-cyan-400" aria-hidden="true" />
+              </div>
+              <h3 className="text-lg font-semibold text-theme-primary">{t('self_scheduling.title', 'Interview Slots')}</h3>
+            </div>
+            <p className="text-sm text-theme-muted">{t('self_scheduling.candidate_pick', 'Choose a time slot for your interview')}</p>
+          </GlassCard>
+        </div>
+      )}
     </main>
   );
 
@@ -2029,6 +2092,7 @@ function ApplicationCard({ application, onUpdateStatus, tenantPathFn, navigateFn
           </div>
         )}
       </div>
+
     </motion.div>
   );
 }

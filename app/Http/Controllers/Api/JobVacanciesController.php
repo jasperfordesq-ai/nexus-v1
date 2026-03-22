@@ -25,6 +25,8 @@ use App\Services\JobPipelineRuleService;
 use App\Services\JobVacancyService;
 use App\Services\JobTemplateService;
 use App\Services\SalaryBenchmarkService;
+use App\Services\CandidateSearchService;
+use App\Services\JobInterviewSchedulingService;
 use App\Core\TenantContext;
 
 /**
@@ -40,6 +42,9 @@ class JobVacanciesController extends BaseApiController
 
     public function __construct(
         private readonly JobVacancyService $jobService,
+        private readonly AiChatService $aiService,
+        private readonly CandidateSearchService $candidateService,
+        private readonly JobInterviewSchedulingService $schedulingService,
     ) {}
 
     /**
@@ -151,7 +156,17 @@ class JobVacanciesController extends BaseApiController
 
         $job = $this->jobService->getById($jobId);
 
-        return $this->respondWithData($job, null, 201);
+        // Include moderation notice if job was flagged or requires review (Agent B)
+        $meta = null;
+        if ($job && isset($job['moderation_status'])) {
+            if ($job['moderation_status'] === 'pending_review') {
+                $meta = ['notice' => 'Your job posting has been submitted for review and will be published once approved.'];
+            } elseif ($job['moderation_status'] === 'rejected') {
+                $meta = ['notice' => 'Your job posting could not be published. Please contact support for more information.'];
+            }
+        }
+
+        return $this->respondWithData($job, $meta, 201);
     }
 
     /** PUT /api/v2/jobs/{id} — update a job vacancy */
@@ -1310,5 +1325,339 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithErrors($errors, 422);
         }
         return $this->respondWithData(['updated' => $count]);
+    }
+
+    // =====================================================================
+    // AI JOB DESCRIPTION GENERATOR (Agent A)
+    // =====================================================================
+
+    /** POST /api/v2/jobs/generate-description — AI-generated job description */
+    public function generateDescription(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->getUserId();
+        $this->rateLimit('jobs_ai_generate', 10, 60);
+
+        $title = $this->input('title');
+        $skills = $this->input('skills', []);
+        $type = $this->input('type', 'paid');
+        $commitment = $this->input('commitment', 'flexible');
+
+        if (empty($title)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Job title is required', 'title', 400);
+        }
+
+        $skillsList = is_array($skills) ? implode(', ', $skills) : (string) $skills;
+
+        $typeLabel = match ($type) {
+            'paid' => 'paid position',
+            'volunteer' => 'volunteer role',
+            'timebank' => 'timebanking opportunity',
+            default => 'position',
+        };
+
+        $commitmentLabel = match ($commitment) {
+            'full_time' => 'full-time',
+            'part_time' => 'part-time',
+            'flexible' => 'flexible hours',
+            'one_off' => 'one-off project',
+            default => 'flexible',
+        };
+
+        $prompt = "Write a professional, engaging job description for a community platform. "
+            . "The role is: \"{$title}\". "
+            . "It is a {$commitmentLabel} {$typeLabel}. "
+            . (!empty($skillsList) ? "Required skills include: {$skillsList}. " : '')
+            . "Write 3-5 paragraphs covering: role overview, key responsibilities, ideal candidate qualities, and what the community offers. "
+            . "Use a warm, community-oriented tone. Do not include a job title heading — just the description body. "
+            . "Do not use markdown formatting.";
+
+        $result = $this->aiService->chat(0, $prompt, [
+            'system_prompt' => 'You are a professional job description writer for a community timebanking platform. Write clear, inclusive, and welcoming job descriptions.',
+            'max_tokens' => 1024,
+            'model' => 'gpt-4o-mini',
+        ]);
+
+        if (!empty($result['error'])) {
+            return $this->respondWithError('AI_SERVICE_ERROR', $result['reply'] ?? 'Failed to generate description', null, 503);
+        }
+
+        return $this->respondWithData(['description' => $result['reply']]);
+    }
+
+    // =====================================================================
+    // DUPLICATE JOB DETECTION (Agent A)
+    // =====================================================================
+
+    /** POST /api/v2/jobs/check-duplicate — find similar open/draft jobs */
+    public function checkDuplicate(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->getUserId();
+        $this->rateLimit('jobs_check_dup', 30, 60);
+
+        $title = $this->input('title');
+        $organizationId = $this->input('organization_id');
+
+        if (empty($title)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'Job title is required', 'title', 400);
+        }
+
+        $tenantId = TenantContext::getId();
+        $duplicates = $this->jobService->findSimilarJobs(
+            (string) $title,
+            $organizationId ? (int) $organizationId : null,
+            $tenantId
+        );
+
+        return $this->respondWithData(['duplicates' => $duplicates]);
+    }
+
+    // =====================================================================
+    // TALENT SEARCH — Candidate Resume Database (Agent C)
+    // =====================================================================
+
+    /** GET /api/v2/jobs/talent-search — search candidates who opted in */
+    public function talentSearch(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->getUserId(); // Requires authentication
+        $this->rateLimit('talent_search', 30, 60);
+
+        $tenantId = TenantContext::getId();
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'offset' => $this->queryInt('offset', 0),
+        ];
+
+        if ($this->query('keywords')) {
+            $filters['keywords'] = $this->query('keywords');
+        }
+        if ($this->query('skills')) {
+            $skills = $this->query('skills');
+            $filters['skills'] = is_string($skills) ? array_filter(array_map('trim', explode(',', $skills))) : [];
+        }
+        if ($this->query('location')) {
+            $filters['location'] = $this->query('location');
+        }
+
+        $result = $this->candidateService->search($filters, $tenantId);
+
+        return $this->respondWithData($result);
+    }
+
+    /** GET /api/v2/jobs/talent-search/{id} — view a candidate profile */
+    public function talentProfile(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->getUserId(); // Requires authentication
+        $this->rateLimit('talent_profile', 60, 60);
+
+        $tenantId = TenantContext::getId();
+
+        $profile = $this->candidateService->getCandidateProfile($id, $tenantId);
+
+        if (!$profile) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', 'Candidate profile not found or not searchable', null, 404);
+        }
+
+        return $this->respondWithData($profile);
+    }
+
+    /** PUT /api/v2/users/me/resume-visibility — toggle resume searchability */
+    public function updateResumeVisibility(): JsonResponse
+    {
+        $userId = $this->getUserId();
+        $this->rateLimit('resume_visibility', 10, 60);
+
+        $tenantId = TenantContext::getId();
+        $searchable = $this->inputBool('searchable');
+
+        $success = $this->candidateService->updateResumeVisibility($userId, $tenantId, $searchable);
+
+        if (!$success) {
+            return $this->respondWithError('SERVER_INTERNAL_ERROR', 'Failed to update resume visibility', null, 500);
+        }
+
+        return $this->respondWithData([
+            'searchable' => $searchable,
+            'message' => $searchable
+                ? 'Your profile is now searchable by employers'
+                : 'Your profile is no longer searchable by employers',
+        ]);
+    }
+
+    // =====================================================================
+    // INTERVIEW SELF-SCHEDULING (Agent E)
+    // =====================================================================
+
+    /** GET /api/v2/jobs/{id}/interview-slots — list slots for a job */
+    public function listInterviewSlots(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('jobs_slots_list', 30, 60);
+
+        $tenantId = TenantContext::getId();
+        $slots = $this->schedulingService->getAvailableSlots($id, $tenantId);
+
+        return $this->respondWithData($slots);
+    }
+
+    /** POST /api/v2/jobs/{id}/interview-slots — employer creates slots */
+    public function createInterviewSlots(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_slots_create', 10, 60);
+
+        $tenantId = TenantContext::getId();
+        $data = $this->getAllInput();
+        $slots = $data['slots'] ?? [];
+
+        if (empty($slots) || !is_array($slots)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'At least one slot is required', 'slots', 400);
+        }
+
+        $created = $this->schedulingService->createSlots($id, $userId, $slots, $tenantId);
+
+        if (empty($created) && !empty($this->schedulingService->getErrors())) {
+            $errors = $this->schedulingService->getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'RESOURCE_NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'RESOURCE_FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($created, null, 201);
+    }
+
+    /** POST /api/v2/jobs/{id}/interview-slots/bulk — employer bulk-creates slots */
+    public function bulkCreateInterviewSlots(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_slots_bulk', 5, 60);
+
+        $tenantId = TenantContext::getId();
+        $data = $this->getAllInput();
+
+        $dateFrom = $data['date_from'] ?? null;
+        $dateTo = $data['date_to'] ?? null;
+        $duration = (int) ($data['duration_minutes'] ?? 30);
+        $dayConfig = $data['day_config'] ?? [];
+
+        if (empty($dateFrom) || empty($dateTo)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'date_from and date_to are required', 'date_from', 400);
+        }
+
+        if (empty($dayConfig)) {
+            return $this->respondWithError('VALIDATION_REQUIRED_FIELD', 'day_config is required', 'day_config', 400);
+        }
+
+        $created = $this->schedulingService->bulkCreateSlots(
+            $id,
+            $userId,
+            $dateFrom,
+            $dateTo,
+            $duration,
+            $dayConfig,
+            $tenantId
+        );
+
+        if (empty($created) && !empty($this->schedulingService->getErrors())) {
+            $errors = $this->schedulingService->getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'RESOURCE_NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'RESOURCE_FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($created, null, 201);
+    }
+
+    /** POST /api/v2/jobs/interview-slots/{slotId}/book — candidate books a slot */
+    public function bookInterviewSlot(int $slotId): JsonResponse
+    {
+        $this->ensureFeature();
+        $userId = $this->getUserId();
+        $this->rateLimit('jobs_slots_book', 10, 60);
+
+        $tenantId = TenantContext::getId();
+        $result = $this->schedulingService->bookSlot($slotId, $userId, $tenantId);
+
+        if ($result === null) {
+            $errors = $this->schedulingService->getErrors();
+            $status = 400;
+            foreach ($errors as $error) {
+                if ($error['code'] === 'RESOURCE_NOT_FOUND') {
+                    $status = 404;
+                    break;
+                }
+                if ($error['code'] === 'RESOURCE_CONFLICT') {
+                    $status = 409;
+                    break;
+                }
+                if ($error['code'] === 'RESOURCE_FORBIDDEN') {
+                    $status = 403;
+                    break;
+                }
+            }
+            return $this->respondWithErrors($errors, $status);
+        }
+
+        return $this->respondWithData($result, null, 201);
+    }
+
+    /** DELETE /api/v2/jobs/interview-slots/{slotId}/book — cancel a booking */
+    public function cancelInterviewSlotBooking(int $slotId): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->getUserId();
+        $this->rateLimit('jobs_slots_cancel', 10, 60);
+
+        $tenantId = TenantContext::getId();
+        $success = $this->schedulingService->cancelSlotBooking($slotId, $tenantId);
+
+        if (!$success) {
+            $errors = $this->schedulingService->getErrors();
+            return $this->respondWithErrors($errors, 400);
+        }
+
+        return $this->respondWithData(['message' => 'Booking cancelled']);
+    }
+
+    /** DELETE /api/v2/jobs/interview-slots/{slotId} — employer deletes a slot */
+    public function deleteInterviewSlot(int $slotId): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->getUserId();
+        $this->rateLimit('jobs_slots_delete', 10, 60);
+
+        $tenantId = TenantContext::getId();
+        $success = $this->schedulingService->deleteSlot($slotId, $tenantId);
+
+        if (!$success) {
+            $errors = $this->schedulingService->getErrors();
+            return $this->respondWithErrors($errors, 404);
+        }
+
+        return $this->noContent();
     }
 }

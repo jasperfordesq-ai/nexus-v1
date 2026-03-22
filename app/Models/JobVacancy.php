@@ -36,14 +36,11 @@ class JobVacancy extends Model
         'contact_phone',
         'deadline',
         'status',
-        'latitude',
-        'longitude',
         'salary_min',
         'salary_max',
         'salary_type',
         'salary_currency',
         'salary_negotiable',
-        'salary_required',
         'is_featured',
         'featured_until',
         'expired_at',
@@ -51,11 +48,12 @@ class JobVacancy extends Model
         'renewal_count',
         'views_count',
         'applications_count',
-        'tagline',
-        'video_url',
-        'culture_photos',
-        'company_size',
-        'benefits',
+        'moderation_status',
+        'moderation_notes',
+        'moderated_by',
+        'moderated_at',
+        'spam_score',
+        'spam_flags',
     ];
 
     protected $casts = [
@@ -75,8 +73,10 @@ class JobVacancy extends Model
         'views_count' => 'integer',
         'applications_count' => 'integer',
         'deadline' => 'datetime',
-        'culture_photos' => 'array',
-        'benefits'       => 'array',
+        'moderated_by' => 'integer',
+        'moderated_at' => 'datetime',
+        'spam_score' => 'integer',
+        'spam_flags' => 'array',
     ];
 
     public function creator(): BelongsTo
@@ -87,10 +87,5 @@ class JobVacancy extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(JobApplication::class, 'vacancy_id');
-    }
-
-    public function team(): HasMany
-    {
-        return $this->hasMany(JobVacancyTeam::class, 'vacancy_id');
     }
 }

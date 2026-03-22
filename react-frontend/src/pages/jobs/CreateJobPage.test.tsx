@@ -191,13 +191,23 @@ describe('CreateJobPage', () => {
       vi.mocked(api.post).mockResolvedValue({ success: true, data: { id: 7 } });
       render(<CreateJobPage />);
       const titleInput = screen.getByLabelText(/form.title_label/i);
-      const descInput = screen.getByLabelText(/form.description_label/i);
+      // Description uses a custom span label, not a <label> element — find by placeholder
+      const descInput = screen.getByPlaceholderText('form.description_placeholder');
+      // The default job type is 'paid' which requires salary range unless negotiable.
+      // Fill salary fields to pass validation (labels include required asterisk '*').
+      const salaryMinInput = screen.getByLabelText(/form.salary_min_label/i);
+      const salaryMaxInput = screen.getByLabelText(/form.salary_max_label/i);
+
       // Use fireEvent.change to update form state without triggering pointer events
       // that would interfere with the subsequent fireEvent.click on the HeroUI button
       fireEvent.change(titleInput, { target: { value: 'New Vacancy' } });
       fireEvent.change(descInput, { target: { value: 'Full job description here' } });
+      fireEvent.change(salaryMinInput, { target: { value: '30000' } });
+      fireEvent.change(salaryMaxInput, { target: { value: '50000' } });
+
       // Find the submit button element (the button that contains the submit text)
       // and click it directly to trigger HeroUI onPress via the virtual click path
+      // fireEvent.click dispatches with detail:0 which triggers the isVirtualClick path
       const submitBtn = screen.getByText('form.submit_create').closest('button')!;
       fireEvent.click(submitBtn);
       await waitFor(() => {
