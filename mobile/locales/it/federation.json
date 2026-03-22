@@ -1,0 +1,23 @@
+{
+  "title": "Federazione",
+  "subtitle": "Comunità connesse",
+  "stats": {
+    "partners": "{{count}} partner",
+    "partners_other": "{{count}} partner",
+    "members": "{{count}} membro federato",
+    "members_other": "{{count}} membri federati",
+    "exchanges": "{{count}} scambio tra comunità",
+    "exchanges_other": "{{count}} scambi tra comunità"
+  },
+  "partners": "Comunità partner",
+  "connectedSince": "Connesso dal {{date}}",
+  "visitWebsite": "Visita il sito web",
+  "empty": "Nessun partner federato ancora.",
+  "detail": {
+    "title": "Comunità partner",
+    "about": "Informazioni",
+    "members": "membri",
+    "notFound": "Partner non trovato.",
+    "goBack": "Torna indietro"
+  }
+}

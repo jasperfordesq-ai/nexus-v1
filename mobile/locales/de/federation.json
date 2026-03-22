@@ -1,0 +1,23 @@
+{
+  "title": "Verbund",
+  "subtitle": "Verbundene Gemeinschaften",
+  "stats": {
+    "partners": "{{count}} Partner",
+    "partners_other": "{{count}} Partner",
+    "members": "{{count}} Verbundmitglied",
+    "members_other": "{{count}} Verbundmitglieder",
+    "exchanges": "{{count}} gemeinschaftsübergreifender Austausch",
+    "exchanges_other": "{{count}} gemeinschaftsübergreifende Austausche"
+  },
+  "partners": "Partner-Gemeinschaften",
+  "connectedSince": "Verbunden seit {{date}}",
+  "visitWebsite": "Website besuchen",
+  "empty": "Noch keine Verbundpartner.",
+  "detail": {
+    "title": "Partner-Gemeinschaft",
+    "about": "Über",
+    "members": "Mitglieder",
+    "notFound": "Partner nicht gefunden.",
+    "goBack": "Zurück"
+  }
+}

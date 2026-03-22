@@ -13,6 +13,8 @@ import {
   TouchableOpacity,
   Alert,
   Linking,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,7 +43,7 @@ export default function EventDetailScreen() {
   const eventId = Number(id);
   const safeEventId = isNaN(eventId) || eventId <= 0 ? 0 : eventId;
 
-  const { data, isLoading } = useApi(() => getEvent(safeEventId), [safeEventId], { enabled: safeEventId > 0 });
+  const { data, isLoading, refresh } = useApi(() => getEvent(safeEventId), [safeEventId], { enabled: safeEventId > 0 });
 
   const event = data?.data ?? null;
 
@@ -121,7 +123,12 @@ export default function EventDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />
+        }
+      >
         {/* Title + category */}
         <Text style={styles.title}>{event.title}</Text>
         {event.category && (
@@ -170,6 +177,7 @@ export default function EventDetailScreen() {
             selected={currentRsvp === 'going'}
             primary={primary}
             theme={theme}
+            loading={updating}
             disabled={updating || (event.is_full && currentRsvp !== 'going')}
             onPress={() => void handleRsvp('going')}
           />
@@ -179,6 +187,7 @@ export default function EventDetailScreen() {
             selected={currentRsvp === 'interested'}
             primary={primary}
             theme={theme}
+            loading={updating}
             disabled={updating}
             onPress={() => void handleRsvp('interested')}
           />
@@ -239,6 +248,7 @@ function RsvpButton({
   selected,
   primary,
   theme,
+  loading,
   disabled,
   onPress,
 }: {
@@ -247,9 +257,11 @@ function RsvpButton({
   selected: boolean;
   primary: string;
   theme: Theme;
+  loading: boolean;
   disabled: boolean;
   onPress: () => void;
 }) {
+  const iconColor = selected ? '#fff' : theme.textSecondary;
   return (
     <TouchableOpacity
       style={[
@@ -262,8 +274,13 @@ function RsvpButton({
       activeOpacity={0.8}
       accessibilityLabel={label}
       accessibilityRole="button"
+      accessibilityState={{ busy: loading, selected }}
     >
-      <Ionicons name={icon} size={16} color={selected ? '#fff' : theme.textSecondary} />
+      {loading ? (
+        <ActivityIndicator size="small" color={iconColor} />
+      ) : (
+        <Ionicons name={icon} size={16} color={iconColor} />
+      )}
       <Text style={[{ fontSize: 14, fontWeight: '600' as const, color: theme.textSecondary }, selected && { color: '#fff' }]}>{label}</Text>
     </TouchableOpacity>
   );

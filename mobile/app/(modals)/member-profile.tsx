@@ -10,10 +10,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  RefreshControl,
 } from 'react-native';
 import { useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import * as Haptics from 'expo-haptics';
 
 import { getMember } from '@/lib/api/members';
 import { useApi } from '@/lib/hooks/useApi';
@@ -50,7 +52,7 @@ export default function MemberProfileScreen() {
   const memberId = Number(id);
   const safeMemberId = isNaN(memberId) || memberId <= 0 ? 0 : memberId;
 
-  const { data, isLoading, error } = useApi(
+  const { data, isLoading, error, refresh } = useApi(
     () => getMember(safeMemberId),
     [safeMemberId],
     { enabled: safeMemberId > 0 },
@@ -96,7 +98,13 @@ export default function MemberProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />
+        }
+      >
 
         {/* Avatar + identity */}
         <View style={styles.heroSection}>
@@ -142,18 +150,20 @@ export default function MemberProfileScreen() {
         </View>
 
         {/* Skills */}
-        {member.skills?.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('profile.skills')}</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('profile.skills')}</Text>
+          {member.skills?.length > 0 ? (
             <View style={styles.skillsWrap}>
-              {member.skills?.map((skill) => (
+              {member.skills.map((skill) => (
                 <View key={skill} style={[styles.skillChip, { borderColor: primary }]}>
                   <Text style={[styles.skillText, { color: primary }]}>{skill}</Text>
                 </View>
               ))}
             </View>
-          </View>
-        )}
+          ) : (
+            <Text style={styles.emptyStateText}>{t('profile.noSkills')}</Text>
+          )}
+        </View>
 
         {/* Member since */}
         <Text style={styles.joinedText}>
@@ -167,12 +177,15 @@ export default function MemberProfileScreen() {
         <TouchableOpacity
           style={[styles.messageButton, { backgroundColor: primary }]}
           activeOpacity={0.85}
-          onPress={() =>
+          accessibilityLabel={t('profile.sendMessage')}
+          accessibilityRole="button"
+          onPress={() => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push({
               pathname: '/(modals)/thread',
               params: { recipientId: String(member.id), name: member.name },
-            })
-          }
+            });
+          }}
         >
           <Text style={styles.messageButtonText}>{t('profile.sendMessage')}</Text>
         </TouchableOpacity>
@@ -242,6 +255,7 @@ function makeStyles(theme: Theme) {
       paddingVertical: 4,
     },
     skillText: { fontSize: 13, fontWeight: '500' },
+    emptyStateText: { fontSize: 13, color: theme.textMuted, fontStyle: 'italic' },
     joinedText: {
       fontSize: 12,
       color: theme.textMuted,
