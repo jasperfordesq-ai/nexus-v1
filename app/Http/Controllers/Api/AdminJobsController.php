@@ -102,7 +102,7 @@ class AdminJobsController extends BaseApiController
         return $this->respondWithData($applications);
     }
 
-    /** PUT /api/v2/admin/jobs/{id}/app-status */
+    /** PUT /api/v2/admin/jobs/applications/{id} */
     public function updateApplicationStatus(int $id): JsonResponse
     {
         $adminId = $this->requireAdmin();

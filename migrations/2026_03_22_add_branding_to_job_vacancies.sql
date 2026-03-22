@@ -1,3 +1,8 @@
+-- Copyright © 2024–2026 Jasper Ford
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+-- Author: Jasper Ford
+-- See NOTICE file for attribution and acknowledgements.
+
 ALTER TABLE `job_vacancies`
   ADD COLUMN `tagline`        VARCHAR(160)  NULL AFTER `description`,
   ADD COLUMN `video_url`      VARCHAR(500)  NULL AFTER `tagline`,
