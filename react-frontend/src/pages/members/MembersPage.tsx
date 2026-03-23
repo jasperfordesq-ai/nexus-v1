@@ -157,7 +157,7 @@ export function MembersPage() {
       if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
         endpoint = '/v2/members/nearby';
         params.set('lat', String(geo.latitude));
-        params.set('lng', String(geo.longitude));
+        params.set('lon', String(geo.longitude));
         params.set('radius_km', String(radiusKm));
       }
 

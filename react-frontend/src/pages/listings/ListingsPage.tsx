@@ -104,7 +104,7 @@ export function ListingsPage() {
       if (nearMeEnabled && geo.latitude !== null && geo.longitude !== null) {
         endpoint = '/v2/listings/nearby';
         params.set('lat', String(geo.latitude));
-        params.set('lng', String(geo.longitude));
+        params.set('lon', String(geo.longitude));
         params.set('radius_km', String(radiusKm));
       }
 
