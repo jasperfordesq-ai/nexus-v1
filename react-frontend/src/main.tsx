@@ -35,6 +35,9 @@ if (import.meta.env.PROD) {
         (window as NexusWindow).__nexus_updateSW = updateSW;
         // Set a flag so the banner can detect updates that fired before React mounted
         (window as NexusWindow).__nexus_updatePending = true;
+        // Persist in sessionStorage so the banner re-appears on navigation if dismissed.
+        // Cleared when the user clicks "Update Now".
+        sessionStorage.setItem('nexus_sw_update_pending', '1');
         // Dispatch a custom event so the React app can show an update banner.
         // The banner lets the user choose when to reload â€” never interrupt them.
         window.dispatchEvent(new CustomEvent('nexus:sw_update_available'));
@@ -50,7 +53,7 @@ if (import.meta.env.PROD) {
       updateSW();
     }, 30 * 60 * 1000);
   }).catch(() => {
-    // PWA registration is optional — app works without it
+    // PWA registration is optional ï¿½ app works without it
   });
 }
 

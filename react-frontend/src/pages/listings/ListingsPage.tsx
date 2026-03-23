@@ -281,7 +281,7 @@ export function ListingsPage() {
             <Select
               aria-label={t('filter_category_label')}
               placeholder={t('filter_category_label')}
-              selectedKeys={[selectedCategory || 'all']}
+              selectedKeys={[categories.length > 0 ? (selectedCategory || 'all') : 'all']}
               onSelectionChange={(keys) => {
                 const val = keys instanceof Set ? ([...keys][0] as string) : 'all';
                 setSelectedCategory(val === 'all' ? '' : (val || ''));

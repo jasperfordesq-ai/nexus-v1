@@ -31,6 +31,7 @@ export default defineConfig(({ command }) => ({
       manifest: false, // We use our own public/manifest.json
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        cleanupOutdatedCaches: true,
         // Don't cache API calls — always network first
         runtimeCaching: [
           {

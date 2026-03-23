@@ -12,22 +12,26 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, X } from 'lucide-react';
 import { Button } from '@heroui/react';
 
+const SW_UPDATE_KEY = 'nexus_sw_update_pending';
+
 export function UpdateAvailableBanner() {
   const { t } = useTranslation('common');
   const [showBanner, setShowBanner] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     // Fix race condition: if onNeedRefresh fired before React mounted,
-    // the custom event was missed. Check the global flag set by main.tsx.
-    if ((window as NexusWindow).__nexus_updatePending) {
-      setShowBanner(true);
+    // the custom event was missed. Check the global flag or sessionStorage.
+    if ((window as NexusWindow).__nexus_updatePending || sessionStorage.getItem(SW_UPDATE_KEY) === '1') {
       (window as NexusWindow).__nexus_updatePending = false;
+      setShowBanner(true);
     }
 
     function handleUpdateAvailable() {
@@ -40,7 +44,17 @@ export function UpdateAvailableBanner() {
     };
   }, []);
 
+  // Re-show on route change if the update was dismissed but not yet applied.
+  // The SW stays in waiting state until the user clicks "Update Now", so we
+  // surface the banner again on every navigation rather than letting it vanish.
+  useEffect(() => {
+    if (sessionStorage.getItem(SW_UPDATE_KEY) === '1') {
+      setShowBanner(true);
+    }
+  }, [location.pathname]);
+
   function handleUpdate() {
+    sessionStorage.removeItem(SW_UPDATE_KEY);
     setUpdating(true);
 
     // Call the updateSW function stored by main.tsx to activate the new SW + reload.
