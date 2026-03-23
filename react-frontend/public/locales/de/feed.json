@@ -357,24 +357,24 @@
     "requests": "Gesuche"
   },
   "stories": {
-    "add": "Add Story",
-    "your_story": "Your Story",
-    "scroll_left": "Scroll stories left",
-    "scroll_right": "Scroll stories right",
-    "create_your_story": "Create your story",
-    "view_story_from": "View story from {{name}}"
+    "add": "Story hinzufügen",
+    "your_story": "Ihre Story",
+    "scroll_left": "Stories nach links scrollen",
+    "scroll_right": "Stories nach rechts scrollen",
+    "create_your_story": "Ihre Story erstellen",
+    "view_story_from": "Story von {{name}} anzeigen"
   },
   "fab": {
-    "create": "Create post"
+    "create": "Beitrag erstellen"
   },
   "carousel": {
-    "aria_label": "Image carousel, {{current}} of {{total}}",
-    "image_of": "Image {{current}} of {{total}}",
-    "view_image": "View image {{current}} of {{total}}",
-    "previous": "Previous image",
-    "next": "Next image",
-    "go_to_image": "Go to image {{number}}",
-    "more_images": "{{count}} more images"
+    "aria_label": "Bildkarussell, {{current}} von {{total}}",
+    "image_of": "Bild {{current}} von {{total}}",
+    "view_image": "Bild {{current}} von {{total}} anzeigen",
+    "previous": "Vorheriges Bild",
+    "next": "Nächstes Bild",
+    "go_to_image": "Zu Bild {{number}} gehen",
+    "more_images": "{{count}} weitere Bilder"
   },
   "lightbox": {
     "aria_label": "Image viewer",
