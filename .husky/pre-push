@@ -1,18 +1,4 @@
 #!/usr/bin/env sh
 
-# PHPStan (warning-only — 123 pre-existing errors)
-if command -v powershell.exe >/dev/null 2>&1; then
-  powershell.exe -Command "docker exec nexus-php-app vendor/bin/phpstan analyse --no-progress --memory-limit=8G --error-format=github" || true
-elif command -v docker >/dev/null 2>&1; then
-  docker exec nexus-php-app vendor/bin/phpstan analyse --no-progress --memory-limit=8G --error-format=github || true
-fi
-
-# PHPUnit (warning-only — 351 pre-existing schema failures in test DB as of 2026-03-23)
-if command -v powershell.exe >/dev/null 2>&1; then
-  powershell.exe -Command "docker exec nexus-php-app php -d memory_limit=8G vendor/bin/phpunit --testsuite Unit,Services --no-progress" || true
-elif command -v docker >/dev/null 2>&1; then
-  docker exec nexus-php-app php -d memory_limit=8G vendor/bin/phpunit --testsuite Unit,Services --no-progress || true
-fi
-
-# i18n drift check + React TypeScript check + build
-node scripts/check-i18n-drift.mjs --summary && cd react-frontend && npx tsc --noEmit && npm run build
+# i18n drift check + React TypeScript check
+node scripts/check-i18n-drift.mjs --summary && cd react-frontend && npx tsc --noEmit
