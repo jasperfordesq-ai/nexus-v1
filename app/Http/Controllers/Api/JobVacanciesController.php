@@ -120,7 +120,7 @@ class JobVacanciesController extends BaseApiController
     }
 
     /** GET /api/v2/jobs/{id} — single job vacancy */
-    public function show(int $id): JsonResponse
+    public function show($id): JsonResponse
     {
         $this->ensureFeature();
         $this->rateLimit('jobs_show', 60, 60);
